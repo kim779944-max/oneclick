@@ -354,17 +354,22 @@ async function openHwpx(buf){
   const LN = el => el.localName || String(el.tagName).replace(/^.*:/, '');
   const kids = el => [...el.children];
   const all = (el, name) => [...el.getElementsByTagName('*')].filter(x => LN(x) === name);
-  const bgMap = {}, chMap = {}, paMap = {};
+  const bgMap = {}, chMap = {}, paMap = {}, nbMap = {};
   if (headerXml){
     const hd = xmlParse(headerXml).documentElement;
     for (const bf of all(hd, 'borderFill')){
       const wb = all(bf, 'winBrush')[0];
       const face = wb ? (wb.getAttribute('faceColor') || '') : '';
       bgMap[bf.getAttribute('id')] = (face && !/^none$/i.test(face) && face.toUpperCase() !== '#FFFFFF') ? face : '';
+      const lb = all(bf, 'leftBorder')[0];                      /* 테두리 없는 칸(작은 표 사이 빈 열·제목 배너) */
+      nbMap[bf.getAttribute('id')] = !!(lb && /^NONE$/i.test(lb.getAttribute('type') || ''));
     }
     for (const cp of all(hd, 'charPr')){
       const h = cp.getAttribute('height');
-      chMap[cp.getAttribute('id')] = {bold: all(cp, 'bold').length > 0, color: cp.getAttribute('textColor') || '', h: h ? +h : 1000};
+      const sh = cp.getAttribute('shadeColor') || '', ul = all(cp, 'underline')[0];
+      chMap[cp.getAttribute('id')] = {bold: all(cp, 'bold').length > 0, color: cp.getAttribute('textColor') || '', h: h ? +h : 1000,
+        shade: (sh && !/^none$/i.test(sh) && sh.toUpperCase() !== '#FFFFFF') ? sh : '',
+        ul: (ul && !/^NONE$/i.test(ul.getAttribute('type') || 'NONE')) ? (ul.getAttribute('color') || '#000000') : ''};
     }
     for (const pp of all(hd, 'paraPr')){
       const al = all(pp, 'align')[0];
@@ -374,6 +379,18 @@ async function openHwpx(buf){
   const doc = xmlParse(xml);
   const outA = [];
   let hasStyle = false, merged = 0, nRowsSeen = 0, nColsSeen = 0;
+  /* 문단 안 글 조각마다 글자색·굵기·형광펜(음영)·밑줄을 살린다 */
+  const runHtml = (p, base) => all(p, 'run').map(run => {
+    const cp = chMap[run.getAttribute('charPrIDRef')] || {};
+    const txt = all(run, 't').map(t => t.textContent).join('');
+    if (!txt) return '';
+    const col = (cp.color || '').toUpperCase();
+    const st = [col && col !== '#000000' && col !== String(base || '').toUpperCase() ? 'color:' + cp.color : '',
+      cp.shade ? 'background:' + cp.shade : '', cp.ul ? 'text-decoration:underline;text-decoration-color:' + cp.ul : '',
+      cp.bold ? 'font-weight:900' : ''].filter(Boolean).join(';');
+    if (cp.shade || cp.ul || (col && col !== '#000000')) hasStyle = true;
+    return st ? '<span style="' + st + '">' + esc(txt) + '</span>' : esc(txt);
+  }).join('');
   const emitTable = tbl => {
     const trs = all(tbl, 'tr');
     nRowsSeen = Math.max(nRowsSeen, trs.length);
@@ -419,10 +436,14 @@ async function openHwpx(buf){
         const run = paras[0] ? all(paras[0], 'run')[0] : null;
         const cp = run ? (chMap[run.getAttribute('charPrIDRef')] || {}) : {};
         const bg = bgMap[tc.getAttribute('borderFillIDRef')] || '';
+        const nb = !!nbMap[tc.getAttribute('borderFillIDRef')];
         if (bg || cp.bold) hasStyle = true;
+        const big = cp.h && cp.h > 1300 ? 'font-size:' + Math.round(cp.h / 1000 * 100) + '%' : '';
         const stl = [bg ? 'background:' + bg : '', cp.color && cp.color.toUpperCase() !== '#000000' ? 'color:' + cp.color : '',
-          pa === 'CENTER' ? 'text-align:center' : (pa === 'RIGHT' ? 'text-align:right' : '')].filter(Boolean).join(';');
-        html += `<td${cs > 1 ? ` colspan="${cs}"` : ''}${rs > 1 ? ` rowspan="${rs}"` : ''}${cp.bold ? ' class="b"' : ''}${stl ? ` style="${stl}"` : ''}>${esc(txt)}</td>`;
+          pa === 'CENTER' ? 'text-align:center' : (pa === 'RIGHT' ? 'text-align:right' : ''), nb ? 'border:none' : '', big].filter(Boolean).join(';');
+        const styled = paras.some(p => all(p, 'run').length > 1);
+        const inner = styled ? paras.map(p => runHtml(p, cp.color)).join('<br>') : esc(txt);
+        html += `<td${cs > 1 ? ` colspan="${cs}"` : ''}${rs > 1 ? ` rowspan="${rs}"` : ''}${cp.bold ? ' class="b"' : ''}${stl ? ` style="${stl}"` : ''}>${inner}</td>`;
       }
       html += '</tr>';
     }
@@ -435,7 +456,13 @@ async function openHwpx(buf){
         const tbls = all(el, 'tbl');
         if (tbls.length){ tbls.forEach(emitTable); continue; }
         const txt = all(el, 't').map(t => t.textContent).join('');
-        if (txt.trim()) outA.push('<p>' + esc(txt) + '</p>');
+        if (txt.trim()){
+          const pa = paMap[el.getAttribute('paraPrIDRef')] || '';
+          const r0 = all(el, 'run')[0], cp0 = r0 ? (chMap[r0.getAttribute('charPrIDRef')] || {}) : {};
+          const ps = [pa === 'CENTER' ? 'text-align:center' : (pa === 'RIGHT' ? 'text-align:right' : ''),
+            cp0.h && cp0.h > 1150 ? 'font-size:' + Math.round(cp0.h / 1000 * 13.5) + 'px' : ''].filter(Boolean).join(';');
+          outA.push('<p' + (ps ? ' style="' + ps + '"' : '') + '>' + runHtml(el, '') + '</p>');
+        }
       } else if (tag === 'tbl'){
         emitTable(el);
       } else {

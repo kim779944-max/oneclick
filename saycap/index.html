@@ -307,6 +307,116 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
   padding:0 11px;border-radius:15px;background:rgba(10,17,40,.82);border:1px solid rgba(255,107,0,.5);color:#FFA24D;
   font-size:11.5px;font-weight:700;z-index:9;max-width:calc(100% - 110px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .loc-chip .ico{width:13px;height:13px;stroke:#FFA24D}
+
+/* =====================================================================
+   v1.5 UX (2026-11-17 대표님 피드백 6건)
+   ① 1탭 사진첩 진입 + 감성 화보 배너  ② 어디서든 '내 폰 사진'  ③ 공유 옆 '수정(연필)'
+   ④ 자막 편집 중 하단 도크 100% 숨김  ⑤ 자막 바로 아래 실시간 이퀄라이저  ⑥ 안내 문구 삭제
+   ===================================================================== */
+/* ① 홈 — 화보 배너 + 큰 '내 사진 불러오기' */
+#home.ux15{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding-top:calc(58px + env(safe-area-inset-top,0px));padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+#home.ux15.ux15-dock{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+#home.ux15 .home-foot{position:static;flex:0 0 auto;margin-top:auto;padding-top:16px}
+#home.ux15 .home-logo{display:none}
+.hero{position:relative;flex:0 0 auto;width:100%;max-width:356px;aspect-ratio:356/236;border-radius:22px;overflow:hidden;margin:0 0 16px;
+  background:#0A1128;box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08)}
+.hero .hero-svg,.hero .hero-img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .hero-img{object-fit:cover;opacity:0;transition:opacity .5s}
+.hero.has-img .hero-img{opacity:1}
+.hero.has-img .hero-svg{display:none}
+/* 뷰파인더(카메라 화면) — 모서리 · 초점 · 상단 계기 · 자막 */
+.hero .vf{position:absolute;left:15%;right:15%;top:12%;bottom:11%;border-radius:10px;pointer-events:none}
+.hero .vf .cn{position:absolute;width:18px;height:18px;border-color:rgba(255,255,255,.92);border-style:solid;border-width:0}
+.hero .vf .cn.tl{left:0;top:0;border-left-width:2px;border-top-width:2px;border-top-left-radius:6px}
+.hero .vf .cn.tr{right:0;top:0;border-right-width:2px;border-top-width:2px;border-top-right-radius:6px}
+.hero .vf .cn.bl{left:0;bottom:0;border-left-width:2px;border-bottom-width:2px;border-bottom-left-radius:6px}
+.hero .vf .cn.br{right:0;bottom:0;border-right-width:2px;border-bottom-width:2px;border-bottom-right-radius:6px}
+.hero .vf .hud{position:absolute;left:10px;right:10px;top:8px;display:flex;justify-content:space-between;align-items:center;
+  font:700 9px/1 var(--sans);letter-spacing:.08em;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.hero .vf .hud .rec{display:inline-flex;align-items:center;gap:4px}
+.hero .vf .hud .rec i{width:6px;height:6px;border-radius:50%;background:#FF6B00;box-shadow:0 0 6px #FF6B00;animation:heroBlink 1.4s infinite}
+@keyframes heroBlink{0%,60%{opacity:1}61%,100%{opacity:.25}}
+.hero .vf .focus{position:absolute;left:50%;top:49%;width:34px;height:46px;transform:translate(-50%,-50%);border:1.5px solid rgba(255,162,77,.95);border-radius:4px;
+  box-shadow:0 0 10px rgba(255,107,0,.35);animation:heroFocus 3.2s ease-in-out infinite}
+@keyframes heroFocus{0%,100%{transform:translate(-50%,-50%) scale(1)}8%{transform:translate(-50%,-50%) scale(1.18)}16%{transform:translate(-50%,-50%) scale(1)}}
+.hero .vf .cap{position:absolute;left:8px;right:8px;bottom:9px;text-align:center;color:#fff;
+  font-family:"Nanum Myeongjo","NanumMyeongjo","Noto Serif KR","Noto Serif CJK KR","Batang","AppleMyungjo",serif;
+  font-style:italic;font-weight:600;font-size:13.5px;line-height:1.45;letter-spacing:.01em;word-break:keep-all;
+  text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 14px rgba(10,17,40,.55)}
+.hero .vf .cap small{display:block;font-family:var(--sans);font-style:normal;font-weight:600;font-size:8.5px;letter-spacing:.18em;color:#FFC08A;margin-top:3px}
+.hero .hero-tag{position:absolute;left:12px;bottom:9px;font:800 9px/1 var(--sans);letter-spacing:.16em;color:rgba(255,255,255,.75)}
+.home-go{flex:0 0 auto;width:100%;max-width:356px;display:flex;align-items:center;gap:14px;text-align:left;padding:15px 18px;margin:0 0 14px;border-radius:20px;
+  background:linear-gradient(135deg,#FF6B00,#FFA24D);color:#0A1224;box-shadow:0 12px 28px rgba(255,107,0,.35);transition:transform .15s}
+.home-go:active{transform:scale(.98)}
+.home-go .gi{flex:0 0 46px;height:46px;border-radius:14px;background:rgba(10,17,40,.16);display:grid;place-items:center}
+.home-go .gi .ico{width:26px;height:26px;stroke:#0A1224;stroke-width:2}
+.home-go b{display:block;font-size:17px;font-weight:900;letter-spacing:-.02em}
+.home-go small{display:block;font-size:11.5px;font-weight:600;opacity:.78;margin-top:3px}
+@media (max-height:740px){
+  .hero{max-width:300px;margin-bottom:10px}
+  #home.ux15{padding-top:calc(50px + env(safe-area-inset-top,0px))}
+  #home.ux15 .home-steps{display:none}
+  .home-go{padding:12px 16px;margin-bottom:10px}
+}
+
+/* ② '내 폰 사진' — 갤러리·뷰어·편집 어디서든 */
+.ux-phone{position:absolute;z-index:9;display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px 0 10px;border-radius:19px;
+  background:rgba(10,17,40,.80);border:1px solid rgba(255,107,0,.55);color:#FFE2C8;font-size:12px;font-weight:800;letter-spacing:-.01em;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.35);white-space:nowrap;transition:opacity .24s ease}
+.ux-phone .ico{width:18px;height:18px;stroke:#FFA24D;stroke-width:1.9}
+.ux-phone:active{transform:scale(.96)}
+#galPhone{left:16px;bottom:calc(30px + env(safe-area-inset-bottom,0px));height:48px;border-radius:24px;padding:0 18px 0 14px;font-size:13px;
+  background:#12203C;border-color:rgba(255,107,0,.7)}
+body.has-badge #galPhone{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+#galFeed{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+#viewPhone{right:16px;top:calc(60px + env(safe-area-inset-top,0px))}
+#editPhone{left:16px;top:calc(46px + env(safe-area-inset-top,0px))}
+#viewer .zoom-badge{top:calc(108px + env(safe-area-inset-top,0px))}
+#viewer .top-chip{max-width:calc(100% - 236px)}
+body.clean #viewPhone,body.clean #editPhone{opacity:0 !important;pointer-events:none !important}
+/* 폰 사진 목록 시트 */
+.ph-sheet{max-height:86vh;padding-left:10px;padding-right:10px}
+.ph-sheet h3{padding:0 6px}
+.ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.ph-cell{position:relative;aspect-ratio:1/1;border-radius:8px;overflow:hidden;background:#121B2E}
+.ph-cell img{width:100%;height:100%;object-fit:cover;display:block;background:#121B2E}
+.ph-cell span{position:absolute;left:4px;bottom:4px;font-size:10px;font-weight:700;color:#fff;background:rgba(10,17,40,.6);padding:2px 5px;border-radius:5px}
+.ph-cell:active{opacity:.75}
+.ph-msg{grid-column:1/-1;padding:26px 10px;text-align:center;color:#9FB0C4;font-size:13px;line-height:1.7}
+.ph-foot{display:flex;gap:8px;margin-top:12px;padding:0 6px}
+
+/* ③ 저장 완료 시트 + 뷰어 '수정(연필)' */
+.saved-row{display:flex;gap:14px;align-items:center;margin:14px 0 14px}
+.saved-row img{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#121B2E;flex:0 0 64px;border:1px solid rgba(255,255,255,.12)}
+.saved-row b{display:block;font-size:16px;color:#fff;margin-bottom:4px}
+.saved-row span{display:block;font-size:12px;color:#9FB0C4;line-height:1.5}
+.saved-acts{display:flex;gap:8px}
+.saved-acts .btn-wide{display:flex;align-items:center;justify-content:center;gap:7px}
+.saved-acts .ico{width:19px;height:19px}
+.saved-acts .ghost .ico{stroke:#FFA24D}
+.saved-acts .primary .ico{stroke:#0A1224;stroke-width:2}
+.view-actions .ux-edit{width:auto !important;padding:0 9px 0 6px;display:flex !important;align-items:center;gap:3px;color:#FFA24D;font-size:13px;font-weight:800}
+.view-actions .ux-edit .ico{stroke:#FFA24D;width:21px;height:21px}
+
+/* ④ 자막 편집(글쓰기·말하기) 중 — 하단 도크·아이콘 100% 숨김 */
+body.cap-editing .edit-dock,body.cap-editing .home-dock,body.cap-editing .home-tip,body.cap-editing .view-bottom,
+body.cap-editing .g-fab,body.cap-editing #galPhone,body.cap-editing .edit-hint,body.cap-editing .slide-bar,
+body.cap-editing .view-count,body.cap-editing ship-page-badge{opacity:0 !important;visibility:hidden !important;pointer-events:none !important}
+body.cap-editing #editCaption,body.cap-editing #viewCaption{padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)) !important;transform:none}
+/* 받아쓰기 중 오른쪽 마이크 — 누르면 멈춤 */
+body.stt-on #btnMic{background:rgba(255,107,0,.92);animation:pulse 1.1s infinite}
+
+/* ⑤ 자막 바로 아래 실시간 이퀄라이저 */
+.cap-eq{display:flex;align-items:center;justify-content:center;gap:3px;height:0;margin:0 auto;max-width:300px;opacity:0;overflow:hidden;
+  transition:opacity .6s ease,height .6s ease,margin .6s ease;pointer-events:none}
+.cap-eq.on{height:30px;margin-top:9px;opacity:1;pointer-events:auto}
+.cap-eq i{flex:0 0 4px;height:100%;border-radius:3px;transform:scaleY(.12);transform-origin:50% 50%;
+  background:linear-gradient(180deg,#FFC08A,#FF6B00 55%,#FFA24D);box-shadow:0 0 8px rgba(255,107,0,.45);will-change:transform}
+#sheetVoice .cap-eq.on{margin:-2px auto 12px}
+
+/* ⑥ 받아쓰기 안내 문구 제거 — 이퀄라이저만으로 상태 표현 */
+#dictChip{display:none !important}
+.stt-live:empty::before{content:"받아쓴 글이 여기에 나타납니다";color:#5d6c84}
 </style>
 </head>
 <body>
@@ -315,6 +425,95 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
 <section id="home" class="screen active">
   <div class="home-top">
     <button class="btn" id="homeHelp" aria-label="사용법"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.8-.9 1.4v.3"/><path d="M12 16.6h.01"/></svg></button>
+  </div>
+  <!-- v1.5 ① 감성 화보 — 여행지 풍경 속 멀리 선 모델 · 앞쪽 카메라 뷰파인더에 비친 모습 + 감성 자막.
+       saycap/model_friends_23_final.png 를 넣으면 자동으로 그 사진을 쓰고, 없으면 아래 SVG 그림이 그대로 보입니다. -->
+  <div class="hero" id="homeHero" aria-label="세이캡 감성 화보">
+    <svg class="hero-svg" viewBox="0 0 356 236" aria-hidden="true">
+      <defs>
+        <linearGradient id="hzSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0A1128"/><stop offset=".34" stop-color="#2B2C5C"/><stop offset=".6" stop-color="#9A4A5E"/>
+          <stop offset=".8" stop-color="#FF8A3D"/><stop offset="1" stop-color="#FFC58A"/>
+        </linearGradient>
+        <radialGradient id="hzSun" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#FFF4DC"/><stop offset=".25" stop-color="#FFD39A" stop-opacity=".95"/>
+          <stop offset=".6" stop-color="#FF8A3D" stop-opacity=".35"/><stop offset="1" stop-color="#FF6B00" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="hzSea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#C46A55"/><stop offset=".25" stop-color="#4A3E66"/><stop offset="1" stop-color="#14213F"/>
+        </linearGradient>
+        <linearGradient id="hzSand" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#6E5468"/><stop offset=".5" stop-color="#3A3352"/><stop offset="1" stop-color="#151C36"/>
+        </linearGradient>
+        <linearGradient id="hzFarM" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7C4F7A"/><stop offset="1" stop-color="#C9706A"/>
+        </linearGradient>
+        <linearGradient id="hzNearM" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3B2F5C"/><stop offset="1" stop-color="#6C4566"/>
+        </linearGradient>
+        <radialGradient id="hzVig" cx=".5" cy=".5" r=".75">
+          <stop offset=".55" stop-color="#0A1128" stop-opacity="0"/><stop offset="1" stop-color="#0A1128" stop-opacity=".75"/>
+        </radialGradient>
+        <filter id="hzBlur" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter>
+        <clipPath id="hzVf"><rect x="53.4" y="28.3" width="249.2" height="181.7" rx="10"/></clipPath>
+        <g id="hzScene">
+          <rect width="356" height="236" fill="url(#hzSky)"/>
+          <g fill="#fff" opacity=".7"><circle cx="40" cy="18" r=".8"/><circle cx="92" cy="9" r=".6"/><circle cx="150" cy="22" r=".7"/><circle cx="262" cy="12" r=".8"/><circle cx="318" cy="30" r=".6"/><circle cx="214" cy="6" r=".5"/></g>
+          <g fill="#FFB38A" opacity=".45"><rect x="20" y="70" width="120" height="2.2" rx="1.1"/><rect x="60" y="77" width="80" height="1.6" rx=".8"/><rect x="230" y="62" width="110" height="2" rx="1"/><rect x="250" y="69" width="70" height="1.4" rx=".7"/></g>
+          <circle cx="206" cy="122" r="46" fill="url(#hzSun)"/>
+          <circle cx="206" cy="122" r="10" fill="#FFF1D6"/>
+          <path d="M0 116 L28 98 L52 108 L84 84 L118 106 L142 96 L170 118 L176 128 L0 128Z" fill="url(#hzFarM)" opacity=".85"/>
+          <path d="M236 128 L262 104 L286 112 L314 90 L340 104 L356 98 L356 128Z" fill="url(#hzFarM)" opacity=".8"/>
+          <path d="M0 128 L0 112 L22 116 L46 106 L74 120 L96 114 L120 128Z" fill="url(#hzNearM)"/>
+          <path d="M280 128 L300 116 L322 120 L344 110 L356 114 L356 128Z" fill="url(#hzNearM)"/>
+          <rect y="127.5" width="356" height="40" fill="url(#hzSea)"/>
+          <g stroke="#FFD7A8" stroke-linecap="round" opacity=".8">
+            <path d="M190 132h32" stroke-width="1.4"/><path d="M184 137h44" stroke-width="1.1" opacity=".8"/>
+            <path d="M194 142h26" stroke-width="1" opacity=".7"/><path d="M180 147h50" stroke-width=".8" opacity=".55"/>
+            <path d="M60 140h26M270 136h30M110 150h22M290 152h26" stroke-width=".7" opacity=".35"/>
+          </g>
+          <path d="M0 160 C60 150 110 158 170 152 C230 146 290 156 356 148 L356 236 L0 236Z" fill="url(#hzSand)"/>
+          <path d="M0 160 C60 150 110 158 170 152 C230 146 290 156 356 148" fill="none" stroke="#FFE3C4" stroke-width="1" opacity=".55"/>
+          <path d="M-4 168 C70 160 120 166 180 161 C240 156 300 163 360 158" fill="none" stroke="#FFE3C4" stroke-width=".6" opacity=".25"/>
+          <g fill="none" stroke="#0A1128" stroke-width=".9" stroke-linecap="round" opacity=".7">
+            <path d="M92 52q3-2.6 6 0q3-2.6 6 0"/><path d="M110 44q2.2-2 4.4 0q2.2-2 4.4 0"/><path d="M262 48q2.6-2.2 5.2 0q2.6-2.2 5.2 0"/>
+          </g>
+          <!-- 공식 모델 (멀리 선 실루엣) — 바람에 날리는 머리칼과 원피스, 챙 모자 -->
+          <g transform="translate(178 153)">
+            <ellipse cx="3" cy=".6" rx="9" ry="1.3" fill="#0A1128" opacity=".35"/>
+            <path d="M-1.1 -0.2 L-0.7 -7 M1.1 -0.2 L0.6 -7" stroke="#0A1128" stroke-width="1.1" stroke-linecap="round"/>
+            <path d="M-1.6 -16.4 L1.6 -16.4 L2.4 -10.2 L6.2 -3.6 C3 -2.4 -1.6 -2.6 -4.4 -3.4 L-2.3 -10.2 Z" fill="#0A1128"/>
+            <path d="M-1.6 -16.2 C-3.4 -14 -4 -12 -3.4 -9.6" stroke="#0A1128" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M1.6 -16 C3.6 -17.6 4.2 -19.6 3.2 -21.4" stroke="#0A1128" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M-1.8 -19.6 C-2.4 -16.6 -1.4 -14.6 .8 -14 C2.8 -14.4 4.6 -14.6 6.4 -13.4 C4.6 -15.6 3 -17.8 2 -19.8 Z" fill="#0A1128"/>
+            <circle cx="0" cy="-19.4" r="2.3" fill="#0A1128"/>
+            <ellipse cx=".4" cy="-21" rx="4.6" ry="1" fill="#0A1128"/>
+            <path d="M-2 -21 C-1.8 -23.4 2.2 -23.6 2.6 -21" fill="#0A1128"/>
+            <path d="M2.4 -10.2 L6.2 -3.6" stroke="#FFB070" stroke-width=".4" opacity=".7"/>
+            <path d="M1.6 -16.4 L2.4 -10.2" stroke="#FFB070" stroke-width=".35" opacity=".6"/>
+            <path d="M-3 2 C-1 6 3 6 6 3" stroke="#0A1128" stroke-width="1.2" opacity=".18" fill="none"/>
+          </g>
+        </g>
+      </defs>
+      <!-- 바깥: 흐린 풍경(심도) -->
+      <g filter="url(#hzBlur)"><use href="#hzScene" xlink:href="#hzScene"/></g>
+      <rect width="356" height="236" fill="#0A1128" opacity=".28"/>
+      <rect width="356" height="236" fill="url(#hzVig)"/>
+      <!-- 안쪽: 뷰파인더에 또렷하게 비친 모델 -->
+      <g clip-path="url(#hzVf)">
+        <g transform="translate(178 116) scale(1.6) translate(-178 -140)"><use href="#hzScene" xlink:href="#hzScene"/></g>
+        <rect x="53.4" y="28.3" width="249.2" height="181.7" fill="none" stroke="#0A1128" stroke-opacity=".25" stroke-width="10"/>
+        <g stroke="#fff" stroke-opacity=".16" stroke-width=".6"><path d="M136.5 28.3v181.7M219.5 28.3v181.7M53.4 88.9h249.2M53.4 149.5h249.2"/></g>
+      </g>
+      <rect x="53.4" y="28.3" width="249.2" height="181.7" rx="10" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width=".8"/>
+    </svg>
+    <img class="hero-img" src="model_friends_23_final.png" alt="" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()">
+    <div class="vf" aria-hidden="true">
+      <i class="cn tl"></i><i class="cn tr"></i><i class="cn bl"></i><i class="cn br"></i>
+      <div class="hud"><span class="rec"><i></i>REC 00:17</span><span>4K · 24 · ▮▮▮▯</span></div>
+      <i class="focus"></i>
+      <div class="cap">바람이 머문 자리,<br>오늘의 나를 새겨 둡니다<small>SAYCAP · 여행 일기</small></div>
+    </div>
   </div>
   <svg class="home-logo" viewBox="0 0 120 120" fill="none" aria-hidden="true">
     <circle cx="60" cy="60" r="41" stroke="#E2E8F0" stroke-width="1.5"/>
@@ -325,6 +524,10 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
   <p class="home-brand"><i>Say</i>Cap</p>
   <p class="home-sub"><b class="home-lead">말하면, 사진에 자막이 새겨집니다</b>말로 남기는 사진일기 · 2016 특허 · 2026 리부트</p>
   <div class="home-steps" aria-hidden="true"><span><i>1</i>찍고</span><span><i>2</i>말하면 자막</span><span><i>3</i>단어로 찾기</span></div>
+  <button class="home-go" id="goPhone" aria-label="내 사진 불러오기">
+    <span class="gi"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4.5 18l5-5 3.5 3.5 2.5-2.5 4 4"/></svg></span>
+    <span><b>내 사진 불러오기</b><small>폰 사진첩에서 골라 바로 자막 쓰기</small></span>
+  </button>
   <div class="home-btns">
     <button class="home-btn primary" id="goCamera">
       <span class="ring"><svg class="ico" viewBox="0 0 48 48"><path d="M6 16h6l4-6h16l4 6h6v24H6z"/><circle cx="24" cy="27" r="9"/></svg></span>
@@ -380,6 +583,7 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
     <button class="save" id="editSave">저장</button>
     <button class="x" id="editClose" aria-label="닫기"><svg class="ico" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:1.6"><path d="M4 4l16 16M20 4L4 20"/></svg></button>
   </div>
+  <button class="ux-phone" id="editPhone" aria-label="내 폰 사진 불러오기"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4.5 18l5-5 3.5 3.5 2.5-2.5 4 4"/></svg>내 폰 사진</button>
   <div class="edit-rail" id="editRail">
     <button class="rbtn" id="btnMic" aria-label="녹음하기"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3M9 21h6"/></svg></button>
     <button class="rbtn" id="btnPencil" aria-label="텍스트 편집하기"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l4.2-1 11-11a2.4 2.4 0 0 0-3.4-3.4l-11 11z"/><path d="M14.5 5.5l4 4"/></svg></button>
@@ -395,9 +599,10 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
       <button id="drawDone" class="done">낙서 끝내기</button>
     </div>
   </div>
-  <button class="dict-chip" id="dictChip" style="display:none">🎙 듣고 있습니다 · 말씀하시면 자막에 새겨집니다 (탭하면 멈춤)</button>
+  <button class="dict-chip" id="dictChip" style="display:none" aria-hidden="true"></button>
   <div class="caption" id="editCaption">
     <div class="memo empty" id="editMemo"><span class="txt">연필로 설명을 더해 보세요</span><button class="cap-more" onclick="openCaptionFull()">…더보기</button></div>
+    <div class="cap-eq" id="editEq" aria-hidden="true"></div>
     <span class="voice" id="editVoice" style="display:none">▶ 목소리 메모</span>
   </div>
   <div class="edit-hint" id="editHint">톡 = 자막 끄기 / 다시 톡 = 자막 켜기</div>
@@ -428,6 +633,7 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
   </div>
   <div class="g-feed" id="galFeed"></div>
   <button class="g-fab" id="galFab" aria-label="촬영"><svg class="ico" viewBox="0 0 32 32" style="stroke:#fff"><path d="M4 10h5l3-4h8l3 4h5v16H4z"/><circle cx="16" cy="18" r="6"/></svg></button>
+  <button class="ux-phone" id="galPhone" aria-label="내 폰 사진 불러오기"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4.5 18l5-5 3.5 3.5 2.5-2.5 4 4"/></svg>내 폰 사진 불러오기</button>
 </section>
 
 <!-- ============ 5. 뷰어 (원본 확대 · 슬라이드쇼) ============ -->
@@ -436,8 +642,11 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
   <div class="doodle-layer" id="viewDoodle"></div>
   <div class="zoom-badge" id="zoomBadge">1.0×</div>
   <div class="view-top" id="viewTop">
+    <button class="ux-phone" id="viewPhone" aria-label="내 폰 사진 불러오기"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4.5 18l5-5 3.5 3.5 2.5-2.5 4 4"/></svg>내 폰 사진</button>
     <div class="top-chip" id="viewChip"><b class="d">2026.11.14</b><i class="sep">·</i><span class="p">장소 미지정</span></div>
     <div class="view-actions">
+      <button class="btn" id="viewShare" aria-label="공유"><svg class="ico" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg></button>
+      <button class="btn ux-edit" id="viewEdit" aria-label="수정"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l4.2-1 11-11a2.4 2.4 0 0 0-3.4-3.4l-11 11z"/><path d="M14.5 5.5l4 4"/></svg><span>수정</span></button>
       <button class="save" id="viewSave">저장</button>
       <button class="btn" id="viewClose" aria-label="닫기"><svg class="ico" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
     </div>
@@ -507,12 +716,13 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
   <div class="sheet">
     <h3>녹음하기 <button data-close>닫기</button></h3>
     <p style="font-size:12.5px;color:#9d95a2;margin:0 0 12px;line-height:1.6">말하면 자막으로 새겨지고, 목소리는 그날의 그대로 남습니다.</p>
-    <div class="stt-live" id="sttLive">마이크를 누르면 말씀이 글자로 나타납니다.</div>
+    <div class="stt-live" id="sttLive"></div>
+    <div class="cap-eq" id="voiceEq" aria-hidden="true"></div>
     <div class="sheet-actions" style="margin-bottom:10px">
       <button class="btn-wide primary" id="sttToggle">● 받아쓰기 시작</button>
       <button class="btn-wide ghost" id="recToggle">🎙 목소리 녹음</button>
     </div>
-    <div class="rec-time" id="recTime" style="display:none">● 00:00 녹음 중…</div>
+    <div class="rec-time" id="recTime" style="display:none">● 00:00</div>
     <div class="sheet-actions">
       <button class="btn-wide ghost" id="sttToMemo">받아쓴 글 자막에 넣기</button>
       <button class="btn-wide primary" data-close>완료</button>
@@ -591,6 +801,32 @@ body.has-badge .edit-hint{top:calc(70px + env(safe-area-inset-top,0px))}
     <button class="menu-row" id="itCaption">자막 포함 저장</button>
     <button class="menu-row" id="itOriginal">원본 그대로 저장</button>
     <button class="menu-row danger" id="itDelete">지우기</button>
+  </div>
+</div>
+
+<!-- v1.5 ② 내 폰 사진 목록 (앱: MediaStore 전체 사진 · 웹: 파일 선택창) -->
+<div class="sheet-wrap" id="sheetPhone">
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet ph-sheet" id="phSheet">
+    <h3>내 폰 사진 <button data-close>닫기</button></h3>
+    <div class="ph-grid" id="phGrid"></div>
+    <div class="ph-foot">
+      <button class="btn-wide ghost" id="phMore">더 보기</button>
+      <button class="btn-wide ghost" id="phSystem">다른 앨범에서 고르기</button>
+    </div>
+  </div>
+</div>
+
+<!-- v1.5 ③ 저장 완료 — 공유 바로 옆 '수정(연필)' -->
+<div class="sheet-wrap" id="sheetSaved">
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet">
+    <div class="saved-row"><img id="savedThumb" alt=""><div><b>저장했습니다</b><span>방금 저장한 사진은 갤러리 맨 위에 있습니다</span></div></div>
+    <div class="saved-acts">
+      <button class="btn-wide ghost" id="savedShare"><svg class="ico" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>공유</button>
+      <button class="btn-wide primary" id="savedEdit"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l4.2-1 11-11a2.4 2.4 0 0 0-3.4-3.4l-11 11z"/><path d="M14.5 5.5l4 4"/></svg>수정</button>
+    </div>
+    <button class="btn-wide ghost" data-close style="display:block;width:100%;margin-top:8px">확인</button>
   </div>
 </div>
 
@@ -1280,7 +1516,7 @@ $('#editSave').onclick = async () => {
     lastSavedId = editing && editing.rec ? editing.rec.id : null;
     show('gallery');
     requestAnimationFrame(()=>{ try{ window.scrollTo({top:0,behavior:'auto'}); const f=document.getElementById('galFeed'); if(f) f.scrollTop=0; }catch(e){} });
-    toast('저장했습니다 · 방금 찍은 사진이 맨 위에 있습니다');
+    showSaved(lastSavedId);      /* v1.5 ③ 저장 완료 — 공유 옆 '수정(연필)' */
   }
 };
 async function saveEdit(keep){
@@ -1359,8 +1595,10 @@ let sttReplay = '';                            // 재시작 직후 엔진이 되
 let recorder = null, recChunks = [], recStartedAt = 0, recTimerId = null;
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+/* v1.5: 세이캡 앱(웹뷰)에는 Web Speech API가 없어 앱의 네이티브 음성인식기를 씁니다 */
+const NATIVE_STT = !SR && !!(window.SayCapApp && typeof window.SayCapApp.startSTT === 'function');
 function openVoiceSheet(){
-  $('#sttLive').innerHTML = '마이크를 누르면 말씀이 글자로 나타납니다.';
+  $('#sttLive').innerHTML = '';
   $('#sttToggle').textContent = sttRunning ? '■ 받아쓰기 멈추기' : '● 받아쓰기 시작';
   const btn = $('#sttToMemo');
   if(btn){
@@ -1388,15 +1626,16 @@ let sttNoSpeech = 0, sttRestartTimer = null;
 function renderSTT(){
   const el = $('#sttLive'); if(!el) return;
   const fin = esc(sttFinal || ''), itr = esc(sttInterim || '');
-  el.innerHTML = fin + (itr ? (fin ? ' ' : '') + `<span class="interim">${itr}</span>` : (fin ? '' : '듣고 있습니다…'));
+  el.innerHTML = fin + (itr ? (fin ? ' ' : '') + `<span class="interim">${itr}</span>` : '');
 }
 function startSTT(){
-  if(!SR){ toast('이 브라우저는 음성인식을 지원하지 않습니다. 크롬·웨일에서 열어 주세요'); return; }
+  if(!SR && !NATIVE_STT){ toast('이 브라우저는 음성인식을 지원하지 않습니다. 크롬·웨일에서 열어 주세요'); return; }
   if(sttRunning) return;
   sttRunning = true;
   sttFinal = ''; sttInterim = ''; sttSessionText = '';
   sttLastCommit = ''; sttLastCommitAt = 0; sttNoSpeech = 0;
   $('#sttToggle').textContent = '■ 받아쓰기 멈추기';
+  if(NATIVE_STT){ try{ SayCapApp.startSTT(); }catch(e){} renderSTT(); return; }   /* 앱(웹뷰): 안드로이드 음성인식기 */
   beginSession();
 }
 function beginSession(){
@@ -1414,6 +1653,7 @@ function beginSession(){
     const t = normSp((r && r[0] && r[0].transcript) || '');
     sttSessionText = t;                           // += 누적 금지 · 매번 덮어쓰기
     sttInterim = (r && r.isFinal) ? '' : t;
+    eqPulse(.85);                                 // v1.5 ⑤ 글자가 들어올 때마다 파형이 출렁
     renderSTT();
   };
   recognition.onerror = e => {
@@ -1430,6 +1670,7 @@ function beginSession(){
     clearTimeout(sttRestartTimer);
     sttRestartTimer = setTimeout(() => { sttRestartTimer = null; if(sttRunning) beginSession(); }, 250);
   };
+  recognition.onsoundstart = recognition.onspeechstart = () => { if(gen === sttGen) eqPulse(.6); };
   try{ recognition.start(); }
   catch(e){ /* InvalidStateError·not-allowed 는 조용히 정지 */ }
 }
@@ -1451,6 +1692,7 @@ function commitSpeech(){
 }
 function stopSTT(){
   sttRunning = false;
+  if(NATIVE_STT){ try{ SayCapApp.stopSTT(); }catch(e){} }
   clearTimeout(sttRestartTimer); sttRestartTimer = null;
   const chip = document.getElementById('dictChip');
   if(chip) chip.style.display = 'none';
@@ -1462,7 +1704,7 @@ function stopSTT(){
 function discardSpeech(){ sttGen++; sttSessionText = ''; sttInterim = ''; clearTimeout(sttRestartTimer); sttRestartTimer = null; }
 $('#sttToMemo').onclick = () => {
   const text = normSp(sttFinal + (sttInterim ? ' ' + sttInterim : ''));
-  if(!text){ toast('먼저 말씀해 주세요'); return; }
+  if(!text){ toast('받아쓴 글이 아직 없습니다'); return; }
   if(sttTarget === 'rec'){ applySpeechToPhoto(text); return; }
   const field = sttTarget === 'place' ? $('#fPlace') : sttTarget === 'who' ? $('#fWho') : sttTarget === 'memo' ? $('#fMemo') : null;
   if(field){ field.value = field.value ? field.value + ' ' + text : text; }
@@ -1533,7 +1775,7 @@ async function startRec(){
     $('#btnMic').classList.add('rec');
     recTimerId = setInterval(()=>{
       const s = Math.floor((Date.now()-recStartedAt)/1000);
-      $('#recTime').textContent = `● ${pad(Math.floor(s/60))}:${pad(s%60)} 녹음 중…`;
+      $('#recTime').textContent = `● ${pad(Math.floor(s/60))}:${pad(s%60)}`;
     }, 250);
   }catch(e){ toast('마이크 권한을 허용해 주세요'); }
 }
@@ -2109,6 +2351,311 @@ async function deletePhoto(id){
   if(currentScreen === 'viewer') show('gallery');
   toast('지웠습니다');
 }
+
+/* =========================================================
+   v1.5 UX (2026-11-17) — 대표님 실사용 피드백 6건
+   ① 1탭 사진첩 진입  ② 어디서든 '내 폰 사진' (앱: MediaStore 목록 브릿지)
+   ③ 저장 완료·뷰어: 공유 옆 '수정(연필)'  ④ 자막 편집 중 하단 도크 100% 숨김
+   ⑤ 자막 바로 아래 실시간 이퀄라이저  ⑥ '녹음 중/말씀하세요' 안내 문구 삭제
+   ========================================================= */
+const SC_APP = window.SayCapApp || null;
+const SC_LIST = !!(SC_APP && typeof SC_APP.listPhotos === 'function');
+function scBridgeUrl(name){
+  const base = location.href.split('#')[0].split('?')[0];
+  return base.replace(/[^/]*$/, name);
+}
+/* 시스템 사진 선택기(앱) 또는 파일 선택창(웹) */
+function scSystemPick(){
+  if(SC_APP && typeof SC_APP.pick === 'function'){
+    if(typeof nativePick === 'function'){ nativePick(); return; }
+    try{ SC_APP.pick(); return; }catch(e){}
+  }
+  const el = $('#filePick'); if(el){ try{ el.value = ''; }catch(e){} el.click(); }
+}
+/* ① ② 1탭 — 앱이면 폰 사진 목록, 웹이면 곧바로 사진 선택창 */
+function openPhonePhotos(){
+  if(SC_LIST){ openDeviceSheet(); return; }
+  scSystemPick();
+}
+
+/* ---------- ② 앱 브릿지: 폰 사진 목록 (최신순 · 페이지 단위) ---------- */
+const DEV_PAGE = 60;
+let devOffset = 0, devDone = false, devBusy = false, devWaitPerm = false;
+function devMsg(html){
+  const g = $('#phGrid'); if(!g) return;
+  const old = g.querySelector('.ph-msg'); if(old) old.remove();
+  if(html){ const d = document.createElement('div'); d.className = 'ph-msg'; d.innerHTML = html; g.appendChild(d); }
+}
+function openDeviceSheet(){
+  devOffset = 0; devDone = false; devBusy = false;
+  const g = $('#phGrid'); if(g) g.innerHTML = '';
+  $('#phMore').style.display = 'none';
+  openSheet('sheetPhone');
+  loadDevicePage();
+}
+function devDate(ms){
+  if(!ms) return '';
+  const d = new Date(+ms);
+  return isNaN(d) ? '' : `${String(d.getFullYear()).slice(2)}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+}
+function loadDevicePage(){
+  if(devBusy || devDone || !SC_LIST) return;
+  devBusy = true;
+  let res = null;
+  try{ res = JSON.parse(SC_APP.listPhotos(devOffset, DEV_PAGE) || 'null'); }catch(e){ res = null; }
+  devBusy = false;
+  if(!res){ closeSheet('sheetPhone'); scSystemPick(); return; }
+  if(res.perm === false){
+    devWaitPerm = true;
+    devMsg('사진 접근을 허용하면 폰 사진이 여기에 바로 보입니다.');
+    return;
+  }
+  devWaitPerm = false;
+  const items = res.items || [];
+  const g = $('#phGrid');
+  if(!items.length && !devOffset){ devMsg('폰에 사진이 없습니다.'); devDone = true; }
+  const frag = document.createDocumentFragment();
+  const thumb = scBridgeUrl('__saycap_thumb');
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.className = 'ph-cell';
+    b.dataset.id = it.id;
+    b.innerHTML = `<img loading="lazy" alt="" onerror="this.style.visibility='hidden'" src="${thumb}?id=${encodeURIComponent(it.id)}&s=320"><span>${esc(devDate(it.date))}</span>`;
+    b.onclick = () => openDevicePhoto(it.id, it.name, it.date);
+    frag.appendChild(b);
+  });
+  g.appendChild(frag);
+  devOffset += items.length;
+  if(items.length < DEV_PAGE || (res.total && devOffset >= res.total)) devDone = true;
+  $('#phMore').style.display = devDone ? 'none' : '';
+}
+/* 앱이 권한 결과를 알려 줌 */
+window.__devPhotosReady = granted => {
+  if(!devWaitPerm) return;
+  devWaitPerm = false;
+  if(granted){ devMsg(''); loadDevicePage(); }
+  else devMsg('사진 접근이 꺼져 있습니다.<br>아래 ‘다른 앨범에서 고르기’로 한 장씩 불러올 수 있습니다.');
+};
+async function openDevicePhoto(id, name, date){
+  closeSheet('sheetPhone');
+  const rid = 'ms_' + id;
+  try{
+    const had = await getPhoto(rid);
+    if(had && had.id === rid){ await startEditExisting(rid); return; }   /* 기록이 없을 때 IDBRequest 를 기록으로 착각하지 않도록 */
+  }catch(e){}
+  let file = null;
+  try{
+    const r = await fetch(scBridgeUrl('__saycap_media') + '?id=' + encodeURIComponent(id) + '&t=' + Date.now(), {cache:'no-store'});
+    if(r.ok){
+      const b = await r.blob();
+      if(b && b.size){
+        const type = b.type || 'image/jpeg';
+        const nm = name || ('SayCap_' + id + '.jpg');
+        try{ file = new File([b], nm, {type, lastModified: +date || Date.now()}); }
+        catch(e){ file = b; file.name = nm; file.lastModified = +date || Date.now(); }
+      }
+    }
+  }catch(e){ file = null; }
+  if(!file){
+    /* 가상 경로를 못 쓰는 환경 — 기존 조각 전달(__npBegin…) 경로로 */
+    if(SC_APP && typeof SC_APP.openPhoto === 'function'){ try{ SC_APP.openPhoto(String(id)); return; }catch(e){} }
+    toast('사진을 열지 못했습니다 — 다른 앨범에서 골라 주세요', 3000);
+    return;
+  }
+  try{
+    await importDeviceFile(file, rid);
+    await loadIndex();
+    await startEditExisting(rid);
+  }catch(e){ console.warn(e); toast('사진을 여는 중 문제가 생겼습니다 — 한 번 더 시도해 주세요', 3000); }
+}
+/* 같은 폰 사진은 같은 기록(ms_<id>)으로 — 일기가 중복되지 않게 */
+async function importDeviceFile(f, rid){
+  if(typeof importPhoto === 'function') return importPhoto(f, rid);
+  const dim = await imageSize(f);
+  const rec = newRec(f, dim.w, dim.h, f.name);
+  rec.id = rid;
+  const ex = await readExif(f);
+  if(ex.taken && !isNaN(ex.taken)){
+    rec.takenAt = ex.taken.getTime();
+    rec.caption.date = `${ex.taken.getFullYear()}.${pad(ex.taken.getMonth()+1)}.${pad(ex.taken.getDate())}`;
+  }else if(f.lastModified){
+    const d = new Date(f.lastModified);
+    rec.takenAt = f.lastModified;
+    if(f.lastModified < Date.now() - 86400000) rec.caption.date = `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+  }
+  if(ex.lat && ex.lng){ rec.exifGeo = {lat:ex.lat, lng:ex.lng}; rec.geo = {lat:ex.lat, lng:ex.lng}; enrichGeo(rec); }
+  await putPhoto(rec);
+  return rec;
+}
+$('#phMore').onclick = () => loadDevicePage();
+$('#phSystem').onclick = () => { closeSheet('sheetPhone'); scSystemPick(); };
+$('#phSheet').addEventListener('scroll', e => {
+  const s = e.currentTarget;
+  if(s.scrollTop + s.clientHeight > s.scrollHeight - 240) loadDevicePage();
+}, {passive:true});
+
+/* 앱이 조각으로 넘겨 주는 사진 받기 — 웹판(원격 주소)에서도 앱 선택기가 동작하도록 (이미 있으면 그대로) */
+if(!window.__npBegin){
+  let npC = null; const npF = {};
+  window.__npBegin = (key, name, type) => { npC = {key, name: name || 'SayCap.jpg', type: type || 'image/jpeg', parts: []}; };
+  window.__npChunk = (idx, b64) => {
+    if(!npC) return;
+    try{ const bin = atob(b64), u = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i); npC.parts[idx] = u; }catch(e){}
+  };
+  window.__npEnd = key => {
+    const c = npC; npC = null; if(!c) return;
+    const blob = new Blob(c.parts.filter(Boolean), {type: c.type});
+    let f; try{ f = new File([blob], c.name, {type: c.type, lastModified: Date.now()}); }catch(e){ f = blob; f.name = c.name; }
+    npF[key || c.key] = f;
+  };
+  window.__npAllDone = count => {
+    const out = [];
+    for(let i=0;i<count;i++){ const f = npF['pick:'+i]; if(f) out.push(f); }
+    Object.keys(npF).forEach(k => { delete npF[k]; });
+    if(out.length) handleFiles(out);
+  };
+  window.__npFail = () => {};
+}
+/* 앱 음성인식 결과 받기 (이미 있으면 그대로) */
+if(!window.__saycapSTT){
+  window.__saycapSTT = (text, isFinal) => {
+    if(!sttRunning) return;
+    const t = normSp(text || ''); if(!t) return;
+    eqPulse(.9);
+    if(isFinal){ sttSessionText = t; commitSpeech(); }
+    else { sttInterim = t; renderSTT(); }
+  };
+  window.__saycapSTTError = code => {
+    sttRunning = false;
+    if(code === 'perm') toast('마이크 권한을 허용해 주세요', 3000);
+    else if(code === 'unavailable') toast('이 휴대폰의 음성인식을 쓸 수 없습니다 — 목소리 녹음을 이용해 주세요', 3800);
+  };
+}
+
+/* ---------- ① ② 버튼 연결 ---------- */
+$('#goPhone').onclick = () => openPhonePhotos();
+$('#galPhone').onclick = () => openPhonePhotos();
+$('#viewPhone').onclick = () => { try{ stopSlideshow(); }catch(e){} openPhonePhotos(); };
+(function(){
+  const ep = document.getElementById('editPhone');
+  if(ep) ep.onclick = async () => { try{ if(sttRunning) stopSTT(); await saveEdit(false); }catch(e){} openPhonePhotos(); };
+  const hm = document.getElementById('home');
+  if(hm){ hm.classList.add('ux15'); if(hm.querySelector('.home-dock')) hm.classList.add('ux15-dock'); }
+})();
+
+/* ---------- ③ 저장 완료 · 뷰어 — 공유 옆 '수정(연필)' ---------- */
+let savedId = null;
+function showSaved(id){
+  savedId = id;
+  if(!id) return;
+  const rec = photos.find(p => p.id === id);
+  const th = $('#savedThumb');
+  if(th){ if(rec){ th.src = urlFor(rec); th.style.visibility = ''; } else th.style.visibility = 'hidden'; }
+  openSheet('sheetSaved');
+}
+async function shareRec(id){
+  if(!id) return;
+  if(typeof sharePhotoCaptioned === 'function') return sharePhotoCaptioned(id);
+  const p = await getPhoto(id); if(!p) return;
+  try{
+    const file = new File([p.blob], p.name, {type:p.type});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], text: (p.caption && p.caption.memo) || 'SayCap'});
+    }else toast('이 브라우저는 공유를 지원하지 않습니다. 저장을 이용해 주세요');
+  }catch(e){ /* 사용자가 취소 */ }
+}
+async function editRecCaption(id){
+  if(!id) return;
+  closeSheet('sheetSaved');
+  try{ stopSlideshow(); }catch(e){}
+  try{ hideViewDock(); }catch(e){}
+  await startEditExisting(id);
+  if(editing && editing.rec && editing.rec.id === id) openCaptionSheet();
+}
+$('#savedShare').onclick = () => { const id = savedId; closeSheet('sheetSaved'); shareRec(id); };
+$('#savedEdit').onclick = () => editRecCaption(savedId);
+$('#viewEdit').onclick = () => { const p = viewerList[viewIndex]; if(p) editRecCaption(p.id); };
+if(!$('#viewShare').onclick) $('#viewShare').onclick = () => { const p = viewerList[viewIndex]; if(p) shareRec(p.id); };
+
+/* ---------- ⑤ 실시간 이퀄라이저 ---------- */
+const EQ_N = 28;
+let eqOn = false, eqRaf = null, eqLevel = 0, eqTarget = 0, eqMic = null, eqOffTimer = null;
+$$('.cap-eq').forEach(el => {
+  for(let i=0;i<EQ_N;i++) el.appendChild(document.createElement('i'));
+  el.addEventListener('click', e => { e.stopPropagation(); if(sttRunning) stopSTT(); });
+});
+function eqPulse(v){ eqTarget = Math.max(eqTarget, Math.min(1, +v || 0)); }
+/* 앱: 안드로이드 음성인식기의 실제 소리 크기(rmsdB) */
+window.__saycapRms = db => { eqPulse(Math.max(0, Math.min(1, ((+db || 0) + 2) / 11))); };
+/* 웹(데스크톱): 실제 마이크 레벨 — 안드로이드 크롬은 음성인식과 마이크가 충돌할 수 있어 쓰지 않습니다 */
+async function eqMicStart(){
+  if(eqMic || SC_APP || /Android/i.test(navigator.userAgent || '')) return;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}});
+    if(!eqOn){ stream.getTracks().forEach(t=>t.stop()); return; }
+    const ctx = new AC();
+    const an = ctx.createAnalyser(); an.fftSize = 512; an.smoothingTimeConstant = .6;
+    ctx.createMediaStreamSource(stream).connect(an);
+    eqMic = {stream, ctx, an, buf: new Uint8Array(an.fftSize)};
+  }catch(e){ eqMic = null; }
+}
+function eqMicStop(){
+  if(!eqMic) return;
+  try{ eqMic.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+  try{ eqMic.ctx.close(); }catch(e){}
+  eqMic = null;
+}
+function eqFrame(t){
+  eqRaf = null;
+  if(eqMic){
+    const b = eqMic.buf; eqMic.an.getByteTimeDomainData(b);
+    let s = 0; for(let i=0;i<b.length;i++){ const v = (b[i]-128)/128; s += v*v; }
+    eqPulse(Math.min(1, Math.sqrt(s/b.length) * 5));
+  }
+  eqLevel += (eqTarget - eqLevel) * (eqTarget > eqLevel ? .35 : .12);
+  eqTarget *= .9;
+  const idle = eqOn ? .16 + .05*Math.sin(t/380) : 0;
+  $$('.cap-eq.on i, .cap-eq.fade i').forEach((bar, k) => {
+    const i = k % EQ_N;
+    const env = Math.pow(Math.sin(Math.PI * (i + .5) / EQ_N), .7);
+    const wob = .55 + .45*Math.sin(t/105 + i*.83) * Math.cos(t/233 - i*.41);
+    const h = .1 + env * (idle * (.6 + .4*Math.sin(t/260 + i*.5)) + eqLevel * wob);
+    bar.style.transform = `scaleY(${Math.max(.08, Math.min(1, h)).toFixed(3)})`;
+  });
+  if(eqOn || eqLevel > .02 || document.querySelector('.cap-eq.fade')) eqRaf = requestAnimationFrame(eqFrame);
+}
+function eqStart(){
+  clearTimeout(eqOffTimer);
+  if(eqOn) return;
+  eqOn = true; eqLevel = 0; eqTarget = .35;
+  $$('.cap-eq').forEach(e => { e.classList.remove('fade'); e.classList.add('on'); });
+  eqMicStart();
+  if(!eqRaf) eqRaf = requestAnimationFrame(eqFrame);
+}
+function eqStop(){
+  if(!eqOn) return;
+  eqOn = false;
+  eqMicStop();
+  /* 인식이 끝나면 스르륵 — 높이·투명도 .6초 */
+  $$('.cap-eq').forEach(e => { e.classList.add('fade'); e.classList.remove('on'); });
+  clearTimeout(eqOffTimer);
+  eqOffTimer = setTimeout(() => { $$('.cap-eq').forEach(e => e.classList.remove('fade')); }, 700);
+}
+
+/* ---------- ④ 자막 편집 상태 감시 — 글쓰기(자막 시트)·말하기(받아쓰기) 중 하단 도크 숨김 ---------- */
+function syncCapEditing(){
+  const talking = !!sttRunning || !!recorder;
+  const typing = $('#sheetCaption').classList.contains('on') || $('#sheetVoice').classList.contains('on');
+  document.body.classList.toggle('cap-editing', talking || typing);
+  document.body.classList.toggle('stt-on', !!sttRunning);
+  if(talking) eqStart(); else eqStop();
+}
+setInterval(syncCapEditing, 150);
+['sheetCaption','sheetVoice'].forEach(id => {
+  try{ new MutationObserver(syncCapEditing).observe($('#'+id), {attributes:true, attributeFilter:['class']}); }catch(e){}
+});
 
 /* =========================================================
    시작
