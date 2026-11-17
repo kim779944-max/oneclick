@@ -680,6 +680,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   today();
   renderHist();
   if (!bootShare()) show('sIntro');
+  window.addEventListener('hashchange', function(){ bootShare(); });
 
   window.__APP = APP;
   window.__ST = ST;
