@@ -1,0 +1,9 @@
+{
+ "attr": "<hp:tbl id=\"1\" zOrder=\"0\" numberingType=\"NONE\" textWrap=\"TOP_AND_BOTTOM\" textFlow=\"BOTH_SIDES\" lock=\"0\" dropcapstyle=\"None\" pageBreak=\"CELL\" repeatHeader=\"1\" rowCnt=\"5\" colCnt=\"3\" cellSpacing=\"0\" borderFillIDRef=\"2\" noAdjust=\"0\">",
+ "sz": "<hp:sz width=\"41952\" widthRelTo=\"ABSOLUTE\" height=\"6410\" heightRelTo=\"ABSOLUTE\" protect=\"0\"/>",
+ "pos": "<hp:pos treatAsChar=\"0\" affectLSpacing=\"0\" flowWithText=\"0\" allowOverlap=\"0\" holdAnchorAndSO=\"0\" vertRelTo=\"PARA\" horzRelTo=\"PARA\" vertAlign=\"TOP\" horzAlign=\"LEFT\" vertOffset=\"0\" horzOffset=\"0\"/>",
+ "outm": "<hp:outMargin left=\"283\" right=\"283\" top=\"283\" bottom=\"283\"/>",
+ "inm": "<hp:inMargin left=\"510\" right=\"510\" top=\"141\" bottom=\"141\"/>",
+ "total_w": 41952,
+ "row_h": 1282
+}

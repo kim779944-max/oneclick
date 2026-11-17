@@ -1,0 +1,9 @@
+{
+  "name": "KTS 만능 뷰어",
+  "short_name": "KTS 뷰어",
+  "start_url": "viewer.html",
+  "display": "standalone",
+  "background_color": "#F7F9FC",
+  "theme_color": "#0B1E3D",
+  "icons": [{"src": "icon.png", "sizes": "512x512", "type": "image/png"}]
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 원클릭 — 상품 상세</title>
+<meta name="theme-color" content="#0A1224">
+<link rel="icon" href="icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="KTS 원클릭 상품 상세">
+<meta property="og:image" content="https://kim779944-max.github.io/K0612766940K-/oneclick/icon.png">
+<style>
+:root{--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--gold:#C6A054}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 50% at 50% -8%,#132A4E 0%,transparent 60%),var(--bg2);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
+  -webkit-font-smoothing:antialiased}
+#app{max-width:560px;margin:0 auto;padding:0 16px 110px}
+.hd{display:flex;align-items:center;gap:9px;padding:14px 2px 10px;position:sticky;top:0;z-index:30;
+  background:linear-gradient(180deg,var(--bg2) 76%,rgba(10,18,36,0))}
+.hd img{width:30px;height:30px;border-radius:8px}
+.hd b{font-size:14px;font-weight:900}
+.hd b span{color:var(--amber2)}
+.hd .sp{flex:1}
+.hd a{font-size:11.5px;font-weight:800;color:#9DAEC5;text-decoration:none;border:1px solid var(--line2);
+  border-radius:999px;padding:6px 10px}
+.shop{display:flex;gap:13px;margin-top:8px;align-items:flex-start}
+.shop .ico{width:64px;height:64px;border-radius:16px;overflow:hidden;border:1px solid rgba(198,160,84,.4);flex:0 0 auto;background:#0B1730}
+.shop .ico img{width:100%;height:100%;object-fit:cover;display:block}
+.shop h1{margin:0;font-size:21px;line-height:1.28;letter-spacing:-.9px;font-weight:900;word-break:keep-all}
+.shop .sub{font-size:11.5px;color:var(--amber2);font-weight:800;margin-top:4px}
+.lead{font-size:13px;line-height:1.72;color:var(--ink2);margin:13px 0 0;word-break:keep-all}
+.lead b{color:#fff}
+.pkg{display:grid;gap:9px;margin-top:14px}
+.pkgrow{border:1px solid var(--line);border-radius:14px;padding:12px 13px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  display:flex;align-items:center;gap:10px}
+.pkgrow.rec{border-color:rgba(255,107,0,.5);background:linear-gradient(180deg,rgba(255,107,0,.1),rgba(255,255,255,.012))}
+.pkgrow .n{flex:1;font-size:12.5px;line-height:1.5}
+.pkgrow .n b{display:block;font-size:13px;color:#fff;font-weight:900}
+.pkgrow .n span{color:var(--gray);font-size:10.5px}
+.pkgrow .p{font-size:14px;font-weight:900;color:#fff;white-space:nowrap}
+.pkgrow .rec-tag{font-size:9.5px;font-weight:900;color:var(--on);background:linear-gradient(90deg,#FF8A2B,#FFA24D);
+  border-radius:999px;padding:2px 7px;margin-left:4px;vertical-align:2px}
+h2.sec{font-size:13.5px;font-weight:900;margin:20px 0 8px;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0B1730}
+.shot img{display:block;width:100%;height:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:2px}
+.tbl th,.tbl td{border:1px solid #22314F;padding:9px 10px;text-align:left;vertical-align:top;line-height:1.55}
+.tbl th{background:#132244;color:#fff;font-weight:900;width:31%;font-size:11.5px}
+.tbl td{color:var(--ink2)}
+.steps{counter-reset:s;display:grid;gap:9px}
+.steps .st{display:flex;gap:10px}
+.steps .st:before{counter-increment:s;content:counter(s);flex:0 0 auto;width:20px;height:20px;border-radius:6px;
+  background:linear-gradient(180deg,var(--amber),#E05F00);color:var(--on);font-size:11px;font-weight:900;
+  display:grid;place-items:center;margin-top:2px}
+.steps .st .c{font-size:12.5px;line-height:1.62;word-break:keep-all;color:#E4ECF7}
+.notes{margin:0;padding:0;list-style:none}
+.notes li{position:relative;padding-left:12px;font-size:11.5px;line-height:1.7;color:#9FAEC4;margin-bottom:6px;word-break:keep-all}
+.notes li:before{content:"·";position:absolute;left:2px;color:var(--amber2)}
+.faq{border:1px solid var(--line);border-radius:13px;padding:12px 13px;margin-bottom:8px;background:#0C1730}
+.faq b{display:block;font-size:12.5px;color:#fff;margin-bottom:4px}
+.faq p{margin:0;font-size:11.5px;line-height:1.65;color:var(--ink2);word-break:keep-all}
+.others{display:grid;gap:8px;margin-top:6px}
+.others a{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:13px;padding:10px;
+  text-decoration:none;color:var(--ink);background:#0C1730}
+.others img{width:36px;height:36px;border-radius:9px}
+.others b{font-size:12.5px;display:block}
+.others span{font-size:10.5px;color:var(--gray)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:linear-gradient(180deg,rgba(10,18,36,.2),var(--bg2) 40%);
+  padding:10px 16px 14px}
+.dockin{max-width:560px;margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.dock a,.dock button{font-family:inherit;font-size:14px;font-weight:900;border-radius:13px;padding:14px;
+  text-align:center;text-decoration:none;cursor:pointer;border:1px solid var(--line2);background:var(--card2);color:var(--ink)}
+.dock a.main{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
+.dock .soon{opacity:.5;pointer-events:none}
+.note-block{border:1px solid #22314F;border-radius:12px;background:rgba(255,255,255,.02);padding:11px 12px;margin-top:12px}
+.note-block p{margin:0;font-size:10.5px;line-height:1.7;color:#93A4BC;word-break:keep-all}
+.missing{padding:40px 0;text-align:center;color:var(--gray);font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hd">
+    <img src="icon.png" alt="">
+    <b>KTS <span>원클릭</span></b>
+    <div class="sp"></div>
+    <a href="index.html">← 전체 도구</a>
+  </div>
+  <div id="doc"></div>
+</div>
+<div class="dock" id="dock" style="display:none">
+  <div class="dockin">
+    <a id="btnAsk" href="sms:01020022899">문의 문자</a>
+    <a class="main" id="btnOpen" href="#">열어보기</a>
+  </div>
+</div>
+
+<script src="products.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const key = new URLSearchParams(location.search).get('k') || 'photo2doc';
+const p = window.PRODUCTS.find(x => x.k === key);
+const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
+
+function faqFor(p){
+  const base = [
+    ['설치가 필요한가요?', '아니요. 브라우저에서 바로 열립니다. 일부 도구는 앱(.apk)으로도 쓸 수 있습니다.'],
+    ['파일이 서버로 올라가나요?', '올라가지 않습니다. 문서는 이 기기 안에서 처리되고, 서버 전송은 없습니다.']
+  ];
+  if (p.k === 'photo2doc') base.push(['사진 글자를 자동으로 읽나요?', 'AI 키를 넣으면 자동으로 읽습니다. 키가 없으면 표를 붙여넣기로 넣어 그대로 쓸 수 있습니다.']);
+  if (p.k === 'loan') base.push(['이 진단으로 대출이 확정되나요?', '아니요. 기관 심사 전에 어디가 걸리는지 먼저 보는 도구입니다.']);
+  if (p.k === 'tax') base.push(['세무 상담을 대신하나요?', '아니요. 세무사에게 물어볼 항목을 미리 정리해 드립니다.']);
+  if (p.k === 'navi') base.push(['상대의 답이 저장되나요?', '아니요. 상대 기기에서 4자리 코드만 나오고, 코드는 문자로 건너옵니다.']);
+  return base;
+}
+
+if (!p){
+  $('#doc').innerHTML = '<div class="missing">상품을 찾지 못했습니다.<br><a href="index.html" style="color:#FFA24D">전체 도구로 돌아가기</a></div>';
+} else {
+  document.title = p.nm + ' — KTS 원클릭';
+  const pkgs = (p.price2 || '').split('·').map(s => s.trim()).filter(Boolean);
+  $('#doc').innerHTML = `
+    <div class="shop">
+      <div class="ico"><img src="${p.icon}" alt=""></div>
+      <div>
+        <h1>${p.nm}</h1>
+        <div class="sub">${p.sub}</div>
+      </div>
+    </div>
+    ${p.badge ? `<div style="margin-top:9px"><span style="font-size:10px;font-weight:900;border-radius:999px;padding:3px 9px;color:#0B2C1B;background:${p.badge==='준비'?'#FCD34D':(p.badge==='무료'?'#4ADE80':'linear-gradient(90deg,#FF8A2B,#FFA24D)')}">${p.badge}</span></div>` : ''}
+    <p class="lead">${p.blurb}</p>
+
+    <h2 class="sec">구성과 가격</h2>
+    <div class="pkg">
+      <div class="pkgrow rec">
+        <div class="n"><b>${p.price}</b><span>${pkgs[0] || '기본 구성'}</span></div>
+        <div class="p">${p.price}</div>
+      </div>
+      ${pkgs.slice(1).map(t => `<div class="pkgrow"><div class="n"><b>${t.split(' ')[0]}</b><span>${t}</span></div><div class="p">${t.split(' ')[0]}</div></div>`).join('')}
+    </div>
+    <div class="note-block"><p>가격은 부가세 포함 표기입니다. 이 사이트에서는 결제하지 않고, 구매·문의는 문자로 안내드립니다.</p></div>
+
+    ${p.shot ? `<h2 class="sec">실제 화면</h2><div class="shot"><img src="${p.shot}" alt="${p.nm} 화면" loading="lazy"></div>` : ''}
+
+    <h2 class="sec">무엇이 되나요</h2>
+    <table class="tbl"><tbody>
+      ${p.bullets.map(([a,b]) => `<tr><th>${a}</th><td>${b}</td></tr>`).join('')}
+    </tbody></table>
+
+    <h2 class="sec">쓰는 순서</h2>
+    <div class="steps">${p.how.map(t => `<div class="st"><div class="c">${t}</div></div>`).join('')}</div>
+
+    <h2 class="sec">알아 두실 것</h2>
+    <ul class="notes">${p.notes.map(n => `<li>${n}</li>`).join('')}</ul>
+
+    <h2 class="sec">자주 묻는 것</h2>
+    ${faqFor(p).map(([q,a]) => `<div class="faq"><b>${q}</b><p>${a}</p></div>`).join('')}
+
+    <h2 class="sec">다른 도구</h2>
+    <div class="others">
+      ${window.PRODUCTS.filter(x => x.k !== p.k && x.status === 'live').slice(0,4).map(x =>
+        `<a href="detail.html?k=${x.k}"><img src="${x.icon}" alt=""><div><b>${x.nm}</b><span>${x.sub}</span></div></a>`).join('')}
+    </div>
+  `;
+  $('#dock').style.display = 'block';
+  const open = $('#btnOpen');
+  if (p.link){ open.href = p.link; open.textContent = '지금 열어보기'; }
+  else { open.href = '#'; open.textContent = '출시 준비 중'; open.classList.add('soon'); }
+  $('#btnAsk').href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] ' + p.nm + ' 문의드립니다');
+}
+</script>
+</body>
+</html>

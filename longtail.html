@@ -1,0 +1,347 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 롱테일 상세 키워드 생성기 (1,700개) · 유튜브 1초 최적화</title>
+<meta name="description" content="지역·업종을 넣으면 롱테일 키워드 1,700개를 엑셀로 바로 받습니다. 유튜브 영상 제목·해시태그·고정댓글까지 1초 자동 최적화.">
+<meta name="theme-color" content="#0A1128">
+<style>
+:root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
+ --amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--green:#2ED47A}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+ background:#070D1E;color:var(--ink);font-size:15px;line-height:1.5;letter-spacing:-.2px;display:flex;justify-content:center;min-height:100vh;word-break:keep-all}
+#app{width:100%;max-width:460px;min-height:100vh;background:radial-gradient(120% 50% at 50% -6%,rgba(255,107,0,.10) 0%,rgba(255,107,0,0) 62%),
+ linear-gradient(180deg,#0E1B3A 0%,#0C1730 46%,#0A1128 100%);padding-bottom:26px;position:relative;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:-.2px}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:40;background:rgba(10,17,40,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:8px;padding:10px 14px}
+.back{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.35);font-size:16px;color:var(--amber2)}
+.brand{font-size:15.5px;font-weight:900;letter-spacing:-.6px;color:#fff}
+.brand small{display:block;font-size:9.5px;font-weight:700;color:#7C8DA6;letter-spacing:.02em}
+main{padding:10px 14px 8px}
+.hero{background:linear-gradient(150deg,rgba(255,107,0,.14) 0%,rgba(18,32,60,.96) 58%);border:1px solid rgba(255,107,0,.42);border-radius:18px;padding:14px;box-shadow:0 10px 26px rgba(0,0,0,.42)}
+.hero .tag{display:inline-block;font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:6px;padding:3px 7px}
+.hero h1{font-size:19px;font-weight:900;letter-spacing:-.8px;line-height:1.3;margin:8px 0 5px;color:#fff}
+.hero h1 b{color:var(--amber2)}
+.hero p{font-size:12.5px;color:var(--ink2)}
+.seg{display:flex;gap:6px;margin:12px 0 10px;background:#0B1729;border:1px solid var(--line);border-radius:14px;padding:4px}
+.seg button{flex:1;font-size:12.5px;font-weight:900;color:#94A3B8;border-radius:11px;padding:10px 6px}
+.seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.card{background:linear-gradient(180deg,#12203C 0%,#0F1B33 100%);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 6px 16px rgba(0,0,0,.28)}
+.card h2{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:900;color:#fff;letter-spacing:-.4px;margin-bottom:9px}
+.card h2 i{width:18px;height:18px;border-radius:6px;background:var(--amber);color:var(--on);font-size:10.5px;font-weight:900;display:grid;place-items:center;font-style:normal}
+label{display:block;font-size:11.5px;font-weight:800;color:var(--gray);margin:9px 0 5px}
+input,select,textarea{width:100%;background:#0B1729;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:14px;padding:11px 12px;outline:0;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:rgba(255,107,0,.6)}
+.row2{display:flex;gap:8px}.row2>div{flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chips button{font-size:11.5px;font-weight:800;color:#CBD5E1;background:#12203C;border:1px solid var(--line2);border-radius:999px;padding:6px 11px}
+.chips button.on{background:rgba(255,107,0,.2);border-color:rgba(255,107,0,.55);color:var(--amber2)}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;border-radius:12px;padding:14px 12px;font-size:14.5px;font-weight:900;margin-top:12px;
+ background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on);box-shadow:0 8px 20px rgba(255,107,0,.28)}
+.btn.ghost{background:#12203C;color:#DCE6F2;border:1px solid var(--line2);box-shadow:none}
+.btn:active{transform:translateY(1px)}
+.plan{position:relative;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;padding:11px 12px;margin-top:8px;background:#0F1B33}
+.plan.rec{border-color:rgba(255,107,0,.55);background:linear-gradient(180deg,rgba(255,107,0,.10),rgba(15,27,51,.9))}
+.plan .nm{font-size:13.5px;font-weight:900;color:#fff}
+.plan .ds{font-size:11px;color:var(--gray);margin-top:2px}
+.plan .pr{margin-left:auto;font-size:14px;font-weight:900;color:var(--amber2);white-space:nowrap}
+.led{position:absolute;right:9px;top:-7px;font-size:9px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:6px;padding:2px 6px;letter-spacing:-.02em}
+.led i{display:inline-block;width:5px;height:5px;border-radius:50%;background:#FF3B30;margin-right:3px;box-shadow:0 0 6px #FF3B30;vertical-align:middle}
+.out{background:#0B1729;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;font-size:13px;line-height:1.7;color:#DCE6F2;white-space:pre-wrap;max-height:340px;overflow:auto}
+.out b{color:var(--amber2)}
+.metaRow{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--gray);margin-top:8px}
+.pill{font-size:11px;font-weight:900;color:#5BE9A6;background:rgba(46,212,122,.14);border:1px solid rgba(46,212,122,.45);border-radius:999px;padding:4px 9px}
+.foot{margin-top:14px;padding:12px;border-top:1px solid var(--line);font-size:10.5px;color:#7C8DA6;line-height:1.7;text-align:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.45);
+ color:#fff;font-size:12.5px;font-weight:700;padding:11px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.hide{display:none!important}
+</style></head><body><div id="app">
+<header><div class="hd">
+  <a class="back" href="index.html" aria-label="뒤로">←</a>
+  <div class="brand">롱테일 키워드 · 유튜브 최적화<small>KTS 원클릭 · 설치 없음 · 결과 바로 엑셀</small></div>
+</div></header>
+<main>
+  <div class="hero">
+    <span class="tag">1,700개 · 엑셀 바로 다운로드</span>
+    <h1>지역·업종만 넣으면<br><b>롱테일 키워드</b>가 쏟아집니다</h1>
+    <p>파워링크 70원대 롱테일, 유튜브 제목·해시태그까지 한 번에.</p>
+  </div>
+
+  <div class="seg">
+    <button data-t="kw" class="on">롱테일 키워드</button>
+    <button data-t="yt">유튜브 1초 최적화</button>
+  </div>
+
+  <!-- ============ 롱테일 ============ -->
+  <div id="paneKw">
+    <div class="card">
+      <h2><i>1</i>지역·업종 넣기</h2>
+      <label>지역 (시·구·동·역)</label>
+      <input id="kwRegion" placeholder="예: 하남 미사, 부산 해운대">
+      <label>업종</label>
+      <input id="kwBiz" placeholder="예: 치킨, 부동산, 헤어샵">
+      <div class="chips" id="bizChips">
+        <button data-b="부동산">부동산</button><button data-b="치킨">치킨</button><button data-b="헤어샵">헤어샵</button>
+        <button data-b="피부관리">피부관리</button><button data-b="포차">포차</button><button data-b="풀빌라">풀빌라</button>
+        <button data-b="정형외과">정형외과</button><button data-b="학원">학원</button>
+      </div>
+      <div class="row2">
+        <div><label>개수</label>
+          <select id="kwCount"><option value="1700">1,700개 · 19,000원</option><option value="5000">5,000개 · 39,000원</option><option value="20000">20,000개 · 89,000원</option></select>
+        </div>
+        <div><label>정렬</label>
+          <select id="kwSort"><option value="mix">골고루</option><option value="short">짧은 순</option><option value="long">긴 순</option></select>
+        </div>
+      </div>
+      <button class="btn" id="kwGen">키워드 뽑기</button>
+      <button class="btn ghost" id="kwXlsx">엑셀(.xlsx) 다운로드</button>
+      <div class="metaRow"><span id="kwStat">아직 생성 전</span><span class="pill" id="kwPill">무료 미리보기</span></div>
+      <div class="out hide" id="kwOut"></div>
+    </div>
+
+    <div class="card">
+      <h2><i>2</i>요금표</h2>
+      <div class="plan rec"><span class="led"><i></i>추천</span><div><div class="nm">1,700개</div><div class="ds">롱테일 1,700 · 엑셀 1시트</div></div><div class="pr">19,000원</div></div>
+      <div class="plan"><div><div class="nm">5,000개 + 세팅</div><div class="ds">키워드 5,000 · 광고 세팅 포함</div></div><div class="pr">69,000원</div></div>
+      <div class="plan"><div><div class="nm">20,000개 + 세팅</div><div class="ds">키워드 20,000 · 광고 세팅 포함</div></div><div class="pr">129,000원</div></div>
+      <div class="ds" style="font-size:10.5px;color:#7C8DA6;margin-top:8px;line-height:1.6">세팅 없는 키워드만: 5,000개 39,000원 · 20,000개 89,000원</div>
+    </div>
+  </div>
+
+  <!-- ============ 유튜브 ============ -->
+  <div id="paneYt" class="hide">
+    <div class="card">
+      <h2><i>1</i>영상 주제 넣기</h2>
+      <label>주제 (한 줄)</label>
+      <input id="ytTopic" placeholder="예: 미사 치킨 맛집, 하남 풀빌라 오픈">
+      <div class="chips" id="ytChips">
+        <button data-y="미사 치킨 맛집">미사 치킨 맛집</button><button data-y="하남 풀빌라">하남 풀빌라</button>
+        <button data-y="표 사진 엑셀 변환">표 사진 엑셀</button><button data-y="교환 매물">교환 매물</button>
+      </div>
+      <button class="btn" id="ytGen">1초 최적화</button>
+      <div class="metaRow"><span id="ytStat">앞 2초 훅 · 제목 · 해시태그 · 고정댓글</span><span class="pill">복사 가능</span></div>
+      <div class="out hide" id="ytOut"></div>
+      <button class="btn ghost hide" id="ytCopy">전체 복사</button>
+    </div>
+    <div class="card">
+      <h2><i>2</i>왜 안 검색될까</h2>
+      <div style="font-size:12.5px;color:var(--ink2);line-height:1.8">
+        유튜브는 <b style="color:#FFA24D">첫 2초</b>에 시청자가 남는지로 다음 노출을 정합니다.<br>
+        제목이 짧으면 검색어와 안 맞고, 너무 길면 잘립니다. <b style="color:#FFA24D">롱테일 제목 4~6단어</b>가 정답입니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><b>KTS 원클릭 · 010-2002-2899</b><br>모든 생성은 이 기기 안에서 이뤄지고, 만든 엑셀도 기기에서 바로 저장됩니다.</div>
+</main>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+let tT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),2200); }
+
+/* ---------- 탭 ---------- */
+$$('.seg button').forEach(b => b.onclick = () => {
+  $$('.seg button').forEach(x => x.classList.toggle('on', x === b));
+  $('#paneKw').classList.toggle('hide', b.dataset.t !== 'kw');
+  $('#paneYt').classList.toggle('hide', b.dataset.t !== 'yt');
+});
+$$('#bizChips button').forEach(b => b.onclick = () => { $('#kwBiz').value = b.dataset.b; $$('#bizChips button').forEach(x=>x.classList.toggle('on', x===b)); });
+$$('#ytChips button').forEach(b => b.onclick = () => { $('#ytTopic').value = b.dataset.y; });
+
+/* ---------- 롱테일 생성 ---------- */
+const PREFIX = ['', '가까운 ', '동네 ', '역 앞 ', '24시간 ', '주말 ', '심야 ', '조용한 ', '가성비 ', '프리미엄 ', '당일 ', '예약 ', '포장 ', '배달 ', '단체 ', '커플 ', '가족 ', '혼자 ', '첫 방문 ', '재방문 '];
+const SUFFIX = ['추천', '순위', '가격', '비용', '후기', '예약', '상담', '위치', '주차', '영업시간', '메뉴', '할인', '이벤트', '전화번호', '지도', '리뷰', '오픈', '시간', '당일예약', '비교', '견적', '문의', '솔직후기', '비교견적', '바로가기'];
+const BIZWORD = { '부동산':['아파트','오피스텔','상가','토지','전세','월세','매매','급매','권리분석','교환'], '치킨':['후라이드','양념치킨','간장치킨','치즈볼','반반','순살','뿌링클','세트메뉴'],
+  '헤어샵':['커트','펌','염색','남자커트','여자커트','레이어드','볼륨매직','두피관리'], '피부관리':['여드름','모공','리프팅','아쿠아필','필링','톤업','수분'],
+  '포차':['안주','생맥주','소주','해물찜','닭발','골뱅이','야식'], '풀빌라':['수영장','독채','바베큐','온수풀','복층','프라이빗','가족','단체'],
+  '정형외과':['도수치료','허리','어깨','무릎','관절','충격파','재활'], '학원':['수학','영어','국어','코딩','미술','태권도','성인'] };
+function expandRegion(r){
+  const base = r.replace(/\s*,\s*/g, ',').split(',').map(s=>s.trim()).filter(Boolean);
+  const out = [];
+  base.forEach(b => {
+    out.push(b);
+    ['역','동','읍','면','로'].forEach(t => { if(!b.includes(t)) out.push(b + ' ' + t); });
+  });
+  return out.slice(0, 24);
+}
+function buildKeywords(){
+  const region = $('#kwRegion').value.trim(), biz = $('#kwBiz').value.trim();
+  if(!region || !biz){ toast('지역과 업종을 넣어 주세요'); return []; }
+  const regions = expandRegion(region);
+  const words = BIZWORD[biz] || [biz];
+  const list = [];
+  const seen = new Set();
+  const push = k => { const s = k.replace(/\s+/g,' ').trim(); if(s && !seen.has(s)){ seen.add(s); list.push(s); } };
+  for (const w of words) for (const r of regions) for (const p of PREFIX) for (const s of SUFFIX) push(p + r + ' ' + w + ' ' + s);
+  for (const r of regions) for (const w of words) push(r + ' ' + w);
+  for (const w of words) for (const p of PREFIX) for (const s of SUFFIX) push(p + w + ' ' + s);
+  for (const r of regions) for (const s of SUFFIX) push(r + ' ' + biz + ' ' + s);
+  return list;
+}
+let KW = [];
+$('#kwGen').onclick = () => {
+  KW = buildKeywords();
+  if(!KW.length) return;
+  const n = +$('#kwCount').value;
+  const sort = $('#kwSort').value;
+  if(sort === 'short') KW.sort((a,b)=>a.length-b.length);
+  else if(sort === 'long') KW.sort((a,b)=>b.length-a.length);
+  KW = KW.slice(0, n);
+  const out = $('#kwOut');
+  out.classList.remove('hide');
+  out.innerHTML = '<b>' + KW.length.toLocaleString('ko-KR') + '개 생성</b> · ' + $('#kwRegion').value + ' / ' + $('#kwBiz').value + '\n\n'
+    + KW.slice(0, 40).map((k,i)=> (i+1) + '. ' + k).join('\n') + (KW.length > 40 ? '\n… 외 ' + (KW.length-40).toLocaleString('ko-KR') + '개 (엑셀로 받으실 수 있습니다)' : '');
+  $('#kwStat').textContent = KW.length.toLocaleString('ko-KR') + '개 준비 완료';
+  $('#kwPill').textContent = '엑셀 준비됨';
+  toast(KW.length.toLocaleString('ko-KR') + '개 키워드를 만들었습니다');
+};
+
+/* ---------- 유튜브 최적화 ---------- */
+$('#ytGen').onclick = () => {
+  const t = $('#ytTopic').value.trim();
+  if(!t){ toast('영상 주제를 넣어 주세요'); return; }
+  const core = t.split(/\s+/).filter(Boolean);
+  const hooks = [
+    '이거 모르면 3분 날립니다 — ' + t,
+    t + ', 직접 가봤습니다 (결론부터)',
+    '아직도 이렇게 하세요? ' + t + ' 이렇게 됩니다'
+  ];
+  const titles = [
+    t + ' 진짜 후기 | 가격·위치 총정리',
+    t + ' 3분 정리 (처음 가시는 분 필수)',
+    '2026 ' + t + ' 이걸로 끝 | 비교·주의사항',
+    t + ' 어떻게 고르나요? 실패 안 하는 5가지',
+    t + ' 솔직 리뷰 — 광고 아님'
+  ];
+  const tags = [...new Set([t.replace(/\s/g,''), ...core, 'kts원클릭', '정보', '리뷰', '추천', t + '추천', t + '후기', t + '가격', 'howto', 'shorts'])]
+    .slice(0, 15).map(x => '#' + x.replace(/[^\w가-힣]/g,''));
+  const pinned = '영상 보시고 궁금한 점 댓글로 남겨주세요. ' + t + ' 관련 자료(비교표)는 고정댓글 링크에서 무료로 받으실 수 있습니다.';
+  const out = $('#ytOut');
+  out.classList.remove('hide');
+  out.innerHTML = '<b>① 앞 2초 훅</b>\n' + hooks.map((h,i)=>(i+1)+'. '+h).join('\n')
+    + '\n\n<b>② 롱테일 제목</b>\n' + titles.map((h,i)=>(i+1)+'. '+h).join('\n')
+    + '\n\n<b>③ 해시태그</b>\n' + tags.join(' ')
+    + '\n\n<b>④ 고정댓글</b>\n' + pinned;
+  $('#ytStat').textContent = '훅 3 · 제목 5 · 해시태그 ' + tags.length;
+  $('#ytCopy').classList.remove('hide');
+  toast('1초 최적화 완료');
+};
+$('#ytCopy').onclick = () => {
+  const txt = $('#ytOut').innerText;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('전체 복사했습니다'), ()=>toast('복사 권한이 없습니다'));
+  } else toast('복사 권한이 없습니다');
+};
+
+/* ---------- ZIP / XLSX ---------- */
+const CRC_TABLE = (() => { const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+  return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+async function deflateRaw(u8){
+  if (typeof CompressionStream === 'undefined') return null;
+  try{ const cs = new CompressionStream('deflate-raw');
+    return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(cs)).arrayBuffer());
+  }catch(e){ return null; }
+}
+async function makeZip(entries){
+  const enc = new TextEncoder(), chunks = [], central = []; let offset = 0;
+  for (const e of entries){
+    const nameBytes = enc.encode(e.name);
+    const data = typeof e.data === 'string' ? enc.encode(e.data) : e.data;
+    const crc = crc32(data);
+    let payload = data, method = 0;
+    if (!e.store){ const d = await deflateRaw(data); if (d && d.length < data.length){ payload = d; method = 8; } }
+    const lh = new Uint8Array(30 + nameBytes.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0, true);
+    dv.setUint16(8, method, true); dv.setUint16(10, 0, true); dv.setUint16(12, 0x2100, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, payload.length, true); dv.setUint32(22, data.length, true);
+    dv.setUint16(26, nameBytes.length, true); lh.set(nameBytes, 30);
+    chunks.push(lh, payload);
+    const ch = new Uint8Array(46 + nameBytes.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(10, method, true); cv.setUint16(14, 0x2100, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, payload.length, true); cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true); cv.setUint32(42, offset, true); ch.set(nameBytes, 46);
+    central.push(ch); offset += lh.length + payload.length;
+  }
+  const cs = central.reduce((a, b) => a + b.length, 0);
+  const eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, entries.length, true); ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cs, true); ev.setUint32(16, offset, true);
+  return new Blob([...chunks, ...central, eocd], {type:'application/zip'});
+}
+const xesc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function colName(c){ let s='', n=c+1; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; }
+async function buildXlsx(rows, sheetName){
+  const rowsXml = rows.map((cells, r) => '<row r="' + (r+1) + '">' + cells.map((v, c) => {
+    const ref = colName(c) + (r+1);
+    const s = (r === 0 ? ' s="1"' : '');
+    if (typeof v === 'number') return '<c r="' + ref + '"' + s + '><v>' + v + '</v></c>';
+    return '<c r="' + ref + '"' + s + ' t="inlineStr"><is><t xml:space="preserve">' + xesc(v) + '</t></is></c>';
+  }).join('') + '</row>').join('');
+  const sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="46" customWidth="1"/><col min="3" max="3" width="10" customWidth="1"/><col min="4" max="4" width="30" customWidth="1"/></cols>'
+    + '<sheetData>' + rowsXml + '</sheetData></worksheet>';
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<fonts count="2"><font><sz val="11"/><name val="맑은 고딕"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="맑은 고딕"/></font></fonts>'
+    + '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FFFF6B00"/><bgColor indexed="64"/></patternFill></fill></fills>'
+    + '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + '<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheets><sheet name="' + xesc(sheetName) + '" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbrels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+    + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    + '<Default Extension="xml" ContentType="application/xml"/>'
+    + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+    + '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+    + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
+  return makeZip([
+    {name:'[Content_Types].xml', data:ct},
+    {name:'_rels/.rels', data:rels},
+    {name:'xl/workbook.xml', data:wb},
+    {name:'xl/_rels/workbook.xml.rels', data:wbrels},
+    {name:'xl/styles.xml', data:styles},
+    {name:'xl/worksheets/sheet1.xml', data:sheet}
+  ]);
+}
+$('#kwXlsx').onclick = async () => {
+  if(!KW.length){
+    KW = buildKeywords();
+    if(!KW.length) return;
+    KW = KW.slice(0, +$('#kwCount').value);
+  }
+  toast('엑셀을 만드는 중…');
+  const rows = [['번호','키워드','글자수','지역/업종']];
+  KW.forEach((k, i) => rows.push([i+1, k, k.length, $('#kwRegion').value + ' / ' + $('#kwBiz').value]));
+  const blob = await buildXlsx(rows, '롱테일 키워드');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'KTS_롱테일키워드_' + $('#kwRegion').value.replace(/\s/g,'') + '_' + KW.length + '개.xlsx';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  $('#kwPill').textContent = '엑셀 저장됨';
+  toast(KW.length.toLocaleString('ko-KR') + '개를 엑셀로 저장했습니다');
+};
+/* ship.page 배지 대응 */
+(function(){ function s(){ const b=document.querySelector('ship-page-badge'); document.body.classList.toggle('has-badge', !!(b && b.getBoundingClientRect().height>0)); } s(); setInterval(s,1200); })();
+</script></body></html>
