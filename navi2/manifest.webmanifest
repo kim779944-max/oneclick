@@ -1,5 +1,5 @@
 {
-  "name": "독심술 — 그림 8장으로 보는 8가지 결",
+  "name": "독심술 — 4문항으로 보는 32가지 결",
   "short_name": "독심술",
   "start_url": "./index.html",
   "display": "standalone",
@@ -7,7 +7,16 @@
   "theme_color": "#0A1224",
   "lang": "ko",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "description": "4문항 · 8결 × 4갈래 = 32유형. 그림 한 장과 세 마디로 정리합니다."
 }
