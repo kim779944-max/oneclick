@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>오늘의 특가 — 할인만 모은 가격비교 & 1초 발주서</title>
+<meta name="theme-color" content="#0A1224">
+<meta name="description" content="정가 빼고 오늘 할인·특가만 모았습니다. 편의점 1+1·2+1, 제과점·카페 쿠폰, 마트 전단, 사장님용 업소 식자재까지 마트별로 비교하고 체크하면 장보기·카톡 발주서가 1초에 만들어집니다.">
+<link rel="icon" href="../icon.png">
+<link rel="apple-touch-icon" href="../icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="오늘의 특가 — 할인만 모은 가격비교">
+<meta property="og:description" content="정가 제외 · 오늘 특가만. 체크하면 발주서가 1초에 나옵니다.">
+<style>
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--or:#FF6B00;--or2:#FFA24D;--on:#0A1224;--ok:#4ADE80}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 50% at 50% -6%,#132A4E 0%,transparent 62%),var(--bg2);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding:0 14px 168px}
+header{position:sticky;top:0;z-index:40;background:var(--bg2);padding-top:11px;box-shadow:0 8px 16px rgba(6,11,24,.55);border-bottom:1px solid rgba(38,55,95,.55)}
+.hd{display:flex;align-items:center;gap:8px;padding:0 2px 9px}
+.hd .back{font-size:11.5px;font-weight:800;color:#C7D3E3;text-decoration:none;border:1px solid var(--line2);
+  border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.03)}
+.hd .brand{font-size:14px;font-weight:900;letter-spacing:-.4px;margin-left:2px}
+.hd .brand span{color:var(--or2)}
+.hd .sp{flex:1}
+.hd .asof{font-size:10px;font-weight:800;color:#0B2C1B;background:var(--ok);border-radius:999px;padding:5px 8px;white-space:nowrap}
+.hero{padding:6px 0 0}
+.kicker{display:inline-block;font-size:10.5px;font-weight:900;color:var(--on);
+  background:linear-gradient(90deg,var(--or),var(--or2));border-radius:999px;padding:5px 10px}
+h1{font-size:23px;line-height:1.32;letter-spacing:-1px;margin:11px 0 0;font-weight:900;word-break:keep-all}
+h1 em{font-style:normal;color:var(--or)}
+.lead{font-size:12px;line-height:1.7;color:var(--ink2);margin:9px 0 0;word-break:keep-all}
+.lead b{color:#fff}
+.tabs{display:flex;gap:6px;overflow:auto;margin-top:14px;padding-bottom:4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;font-family:inherit;color:var(--gray);background:#0E1B33;border:1px solid var(--line);
+  border-radius:13px;padding:9px 11px;cursor:pointer;text-align:left}
+.tabs button b{display:block;font-size:12.5px;font-weight:900;letter-spacing:-.3px}
+.tabs button i{display:block;font-style:normal;font-size:9.5px;font-weight:700;margin-top:2px;opacity:.85}
+.tabs button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or)}
+.filters{display:flex;gap:6px;overflow:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex:0 0 auto;font-family:inherit;font-size:11px;font-weight:800;color:#9DAEC5;background:rgba(255,255,255,.04);
+  border:1px solid var(--line);border-radius:999px;padding:6px 10px;cursor:pointer}
+.filters button.on{color:var(--or2);border-color:rgba(255,107,0,.65);background:rgba(255,107,0,.12)}
+.count{font-size:11px;color:var(--gray);margin:11px 0 2px}
+.count b{color:#fff}
+.list{display:grid;gap:9px;margin-top:6px}
+.g{border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));overflow:hidden}
+.gh{display:flex;align-items:flex-start;gap:8px;padding:11px 12px 8px}
+.gh .t{flex:1;min-width:0}
+.gh .nm{font-size:13.5px;font-weight:900;letter-spacing:-.35px;color:#fff;word-break:keep-all}
+.gh .sp2{font-size:10.5px;color:var(--gray);margin-top:2px}
+.gh .tg{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#20180A;background:linear-gradient(90deg,#FF8A2B,#FFA24D);
+  border-radius:999px;padding:3px 7px;white-space:nowrap}
+.gh .tg.hot{color:#0B2C1B;background:var(--ok)}
+.rows{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:9px;background:#0D1930;padding:9px 12px;cursor:pointer}
+.row.on{background:rgba(255,107,0,.1)}
+.row .ck{width:19px;height:19px;border-radius:6px;border:1.5px solid var(--line2);flex:0 0 auto;position:relative;background:#0A1526}
+.row.on .ck{background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or)}
+.row.on .ck::after{content:"";position:absolute;left:5px;top:2px;width:6px;height:10px;border:2px solid var(--on);
+  border-top:0;border-left:0;transform:rotate(42deg)}
+.row .st{flex:0 0 auto;width:74px;font-size:11px;font-weight:800;color:#D5E0EE;line-height:1.3;word-break:keep-all}
+.row .mid{flex:1;min-width:0}
+.row .pr{font-size:12.5px;font-weight:900;color:#fff;white-space:nowrap}
+.row .pr small{font-size:9.5px;font-weight:700;color:var(--gray);margin-left:4px;text-decoration:line-through}
+.row .pr .best{font-size:9px;font-weight:900;color:#0B2C1B;background:var(--ok);border-radius:999px;padding:2px 5px;margin-left:5px;vertical-align:1px}
+.row .cd{font-size:10px;color:var(--ink2);margin-top:2px;line-height:1.35;word-break:keep-all}
+.row .cd b{color:var(--or2);font-weight:800}
+.row .qty{display:flex;align-items:center;gap:0;flex:0 0 auto;border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:#0A1526}
+.row .qty button{font-family:inherit;width:25px;height:27px;border:0;background:transparent;color:#D5E0EE;font-size:14px;font-weight:900;cursor:pointer;line-height:1}
+.row .qty span{min-width:17px;text-align:center;font-size:11.5px;font-weight:900;color:#fff}
+.row.off{opacity:.55}
+.row.off .qty{visibility:hidden}
+.store{font-size:8.5px;color:#6F809B;margin-top:2px}
+.empty{border:1px dashed var(--line2);border-radius:14px;padding:26px 14px;text-align:center;color:var(--gray);font-size:12px;line-height:1.7}
+.catnote{border:1px solid #22314F;border-radius:12px;background:rgba(255,255,255,.025);padding:10px 12px;margin-top:10px;
+  font-size:10.5px;line-height:1.65;color:#9DAEC5;word-break:keep-all}
+.catnote b{color:#E4EBF4}
+.banners{margin-top:16px;display:grid;gap:8px}
+.bn{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:11px 12px;
+  text-decoration:none;color:var(--ink);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+.bn.dark{border-color:rgba(255,107,0,.45);background:linear-gradient(180deg,rgba(255,107,0,.11),rgba(255,255,255,.015))}
+.bn .ico{width:34px;height:34px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;font-size:10px;font-weight:900;
+  color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--or));letter-spacing:-.3px}
+.bn .ico.g{background:#4ADE80;color:#0B2C1B}
+.bn .ico.w{background:#E7EDF6;color:#0A1224}
+.bn .tx{flex:1;min-width:0}
+.bn .tx b{display:block;font-size:12.5px;font-weight:900;letter-spacing:-.3px}
+.bn .tx span{display:block;font-size:10.5px;color:var(--gray);margin-top:2px;line-height:1.4}
+.bn .ar{font-size:15px;color:var(--or2)}
+.foot{margin-top:18px;border-top:1px solid #1B2946;padding-top:14px;font-size:10px;line-height:1.75;color:#7D8CA6;word-break:keep-all}
+.foot b{color:#C7D3E3}
+.foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
+
+/* 하단 발주 바 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(10,17,40,.72),rgba(10,17,40,.98) 38%);backdrop-filter:blur(9px);
+  border-top:1px solid rgba(255,107,0,.3)}
+.bar .in{max-width:480px;margin:0 auto;display:flex;align-items:center;gap:9px}
+.bar .sum{flex:1;min-width:0}
+.bar .sum b{display:block;font-size:12.5px;font-weight:900;color:#fff}
+.bar .sum span{display:block;font-size:10.5px;color:var(--gray);margin-top:1px}
+.bar .sum span em{font-style:normal;color:var(--or2);font-weight:800}
+.bar button{font-family:inherit;font-size:12.5px;font-weight:900;border-radius:12px;padding:12px 14px;cursor:pointer;border:1px solid var(--line2);
+  background:var(--card2);color:var(--ink);white-space:nowrap}
+.bar button.go{background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or);color:var(--on)}
+.bar button:disabled{opacity:.45}
+
+/* 발주서 모달 */
+.sheet{position:fixed;inset:0;z-index:90;display:none}
+.sheet.on{display:block}
+.sheet .bg{position:absolute;inset:0;background:rgba(4,8,18,.72)}
+.sheet .pane{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--bg);
+  border-top:1px solid rgba(255,107,0,.45);border-radius:20px 20px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom))}
+.sheet .pane .hd2{display:flex;align-items:center;gap:8px}
+.sheet .pane h3{margin:0;font-size:15px;font-weight:900;letter-spacing:-.4px}
+.sheet .pane h3 span{color:var(--or2)}
+.sheet .x{margin-left:auto;font-family:inherit;width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);
+  background:var(--card2);color:var(--ink);font-size:14px;cursor:pointer}
+.sheet .sub{font-size:10.5px;color:var(--gray);margin:5px 0 10px;line-height:1.6}
+#sheetText{margin:0;background:#0B1730;color:#E7EDF6;border:1px solid var(--line2);border-radius:12px;
+  padding:11px;font-size:11.5px;line-height:1.62;white-space:pre-wrap;word-break:break-word;max-height:56vh;overflow:auto;
+  font-family:"SF Mono",ui-monospace,Menlo,Consolas,"Noto Sans KR",monospace}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.acts button,.acts a{font-family:inherit;font-size:12px;font-weight:900;border-radius:11px;padding:12px 8px;cursor:pointer;
+  text-align:center;text-decoration:none;border:1px solid var(--line2);background:var(--card2);color:var(--ink)}
+.acts .main{background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or);color:var(--on)}
+.acts .wide{grid-column:1 / -1}
+.sheet .tip{font-size:10px;line-height:1.65;color:#7D8CA6;margin-top:9px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:rgba(10,17,40,.97);
+  border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;
+  opacity:0;transition:.25s;z-index:120;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="hd">
+      <a class="back" href="../">← KTS 원클릭</a>
+      <div class="brand">오늘의 <span>특가</span></div>
+      <div class="sp"></div>
+      <div class="asof" id="asof">기준 11/17</div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <span class="kicker">정가 뺐습니다 · 할인·특가만</span>
+    <h1>오늘 <em>특가만</em> 모아서,<br>체크하면 <em>발주서 1초</em>.</h1>
+    <p class="lead">편의점 1+1·2+1, 제과점·카페 쿠폰, 마트 전단, <b>사장님용 업소 식자재</b>까지 마트별로 값 비교.</p>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters">
+    <button class="on" data-f="all">전체</button>
+    <button data-f="bogo">1+1 · 2+1</button>
+    <button data-f="half">40% 이상</button>
+    <button data-f="today">오늘 끝</button>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+  <div class="catnote" id="catnote"></div>
+
+  <div class="banners">
+    <a class="bn dark" href="https://bungaealba.kr/" target="_blank" rel="noopener">
+      <div class="ico">도매</div>
+      <div class="tx"><b>식당 공산품 제로베이스 도매관</b><span>포장재·소모품을 마진 없이. 사장님만 보는 도매가</span></div>
+      <div class="ar">→</div>
+    </a>
+    <a class="bn" href="https://bungaealba.kr/" target="_blank" rel="noopener">
+      <div class="ico g">알바</div>
+      <div class="tx"><b>번개알바</b><span>당일 알바·구인 무료 · 가게 단독 홈페이지 무상</span></div>
+      <div class="ar">→</div>
+    </a>
+    <a class="bn" href="https://autooneclick.com/?from=sale-bottom" target="_blank" rel="noopener">
+      <div class="ico w">KTS</div>
+      <div class="tx"><b>KTS 원클릭 쇼룸</b><span>표 사진 → 한글·엑셀, 만능 뷰어, 독심술 32유형</span></div>
+      <div class="ar">→</div>
+    </a>
+  </div>
+
+  <div class="foot">
+    <b>오늘의 특가</b> · 기준 <span id="footAsOf">2026년 11월 17일 (화) 23:50</span><br>
+    값은 마트 전단과 각 사 공개 행사 페이지에서 확인한 대표값입니다. 매장·지점마다 값·재고·행사 조건이 다르고,
+    조기 품절·조기 종료될 수 있습니다. <b>결제 전 매장에서 확인하세요.</b><br>
+    이 사이트는 결제를 받지 않습니다. 카드·계좌 입력 화면이 없습니다.<br>
+    <a href="../">KTS 원클릭</a> · <a href="../navi2/">독심술 32유형</a> · <a href="https://bungaealba.kr/" target="_blank" rel="noopener">번개알바</a>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <div class="sum">
+      <b id="barCnt">담은 품목 0개</b>
+      <span id="barSum">체크하면 <em>예상 합계</em>가 나옵니다</span>
+    </div>
+    <button class="go" id="btnSheet" type="button" disabled>발주서 1초</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="bg" data-close="1"></div>
+  <div class="pane">
+    <div class="hd2">
+      <h3>장보기 · 카톡 <span>발주서</span></h3>
+      <button class="x" id="sheetClose" type="button" aria-label="닫기">✕</button>
+    </div>
+    <p class="sub">복사해서 카톡·문자에 붙여 넣으면 끝입니다. 매장에서 값 확인 후 결제하세요.</p>
+    <pre id="sheetText"></pre>
+    <div class="acts">
+      <button class="main" id="btnCopy" type="button">전체 복사</button>
+      <button id="btnShare" type="button">카톡·메신저로</button>
+      <a class="wide" id="btnSms" href="#">문자로 보내기</a>
+    </div>
+    <p class="tip">값은 2026-11-17 기준 특가이고, 1+1·2+1 품목은 묶음 수량으로 계산했습니다. 결제 전 매장에서 확인하세요.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  var D = window.SALE;
+  var $ = function(s){ return document.querySelector(s); };
+  var state = { cat:'food', filter:'all', sel:{} };  // sel: { 'gid|oi': qty }
+
+  $('#asof').textContent = '기준 ' + D.asOf.slice(5).replace('-', '/');
+  $('#footAsOf').textContent = D.asOfKo + ' ' + D.asOfTime;
+
+  function won(n){ return (n == null) ? '값 확인' : n.toLocaleString('ko-KR') + '원'; }
+  function key(g, i){ return g.id + '|' + i; }
+  function priceOf(o){ return (o && typeof o.p === 'number') ? o.p : null; }
+  function pct(o){
+    if (o && typeof o.p === 'number' && typeof o.o === 'number' && o.o > o.p) return Math.round((1 - o.p / o.o) * 100);
+    var m = /(\d{1,2})%/.exec(o.c || '');
+    return m ? Number(m[1]) : 0;
+  }
+  function isEndToday(u){ return /11\/1[78]|오늘|11\/17/.test(u || ''); }
+  function isBogo(g, o){ return /1\+1|2\+1/.test((o && o.c) || '') || /^1\+1$|^2\+1$/.test(g.tag || ''); }
+
+  /* ── 탭 ── */
+  var tabs = $('#tabs');
+  D.cats.forEach(function(c){
+    var b = document.createElement('button');
+    b.type = 'button'; b.dataset.k = c.k;
+    b.innerHTML = '<b>' + c.nm + '</b><i>' + c.tag + '</i>';
+    if (c.k === state.cat) b.className = 'on';
+    b.addEventListener('click', function(){
+      state.cat = c.k;
+      [].forEach.call(tabs.children, function(x){ x.classList.toggle('on', x === b); });
+      render(); window.scrollTo({ top: 178, behavior:'smooth' });
+    });
+    tabs.appendChild(b);
+  });
+
+  [].forEach.call($('#filters').children, function(b){
+    b.addEventListener('click', function(){
+      state.filter = b.dataset.f;
+      [].forEach.call($('#filters').children, function(x){ x.classList.toggle('on', x === b); });
+      render();
+    });
+  });
+
+  var NOTE = {
+    food:'사장님이 쓰는 대용량·소모품만 모았습니다. 코스트코 값은 온라인몰 할인가(배송비 포함)이고, 홈플러스·롯데마트 값은 이번 주 전단가입니다. 수량·포장 단위를 꼭 확인하세요.',
+    cvs:'1+1은 2개를 집어 1개 값, 2+1은 3개를 집어 2개 값입니다. 계산대에서 자동 적용되고, 일부 점포는 행사 상품이 없을 수 있습니다.',
+    cafe:'대부분 결제수단·앱·쿠폰 조건이 붙습니다. 값이 적힌 것은 할인 적용가, "값 확인"은 조건만 있는 행사입니다.',
+    mart:'같은 품목이 여러 마트에 있으면 한 줄씩 놓고 비교했습니다. 용량이 다르면 제목에 적었으니 개당 값으로 보세요.'
+  };
+
+  function render(){
+    var list = $('#list'); list.innerHTML = '';
+    var groups = D.groups.filter(function(g){ return g.cat === state.cat; });
+    if (state.filter !== 'all'){
+      groups = groups.filter(function(g){
+        return g.offers.some(function(o){
+          if (state.filter === 'bogo') return isBogo(g, o);
+          if (state.filter === 'half') return pct(o) >= 40;
+          if (state.filter === 'today') return isEndToday(o.u);
+          return true;
+        });
+      });
+    }
+    var nItem = groups.length, nOffer = 0;
+    groups.forEach(function(g){ nOffer += g.offers.length; });
+
+    if (!groups.length){
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = '이 조건에 맞는 특가가 오늘은 없습니다. 다른 탭이나 [전체]로 보세요.';
+      list.appendChild(e);
+    }
+
+    groups.forEach(function(g){
+      var card = document.createElement('div'); card.className = 'g';
+
+      var prices = g.offers.map(priceOf).filter(function(v){ return v != null; });
+      var min = prices.length ? Math.min.apply(null, prices) : null;
+      var multi = prices.length > 1;
+
+      var head = document.createElement('div'); head.className = 'gh';
+      var t = document.createElement('div'); t.className = 't';
+      var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = g.item; t.appendChild(nm);
+      var sp = document.createElement('div'); sp.className = 'sp2';
+      sp.textContent = g.spec + (multi ? ' · ' + g.offers.length + '곳 비교' : '');
+      t.appendChild(sp); head.appendChild(t);
+      var tg = document.createElement('div'); tg.className = 'tg' + (multi ? ' hot' : '');
+      tg.textContent = g.tag || (multi ? '최저 비교' : '특가');
+      head.appendChild(tg);
+      card.appendChild(head);
+
+      var rows = document.createElement('div'); rows.className = 'rows';
+      g.offers.forEach(function(o, i){
+        var k = key(g, i);
+        var qty = state.sel[k] || 0;
+        var row = document.createElement('div');
+        row.className = 'row' + (qty ? ' on' : '') + (priceOf(o) == null ? ' off' : '');
+        row.setAttribute('role', 'checkbox');
+        row.setAttribute('aria-checked', qty ? 'true' : 'false');
+
+        var ck = document.createElement('div'); ck.className = 'ck'; row.appendChild(ck);
+
+        var st = document.createElement('div'); st.className = 'st'; st.textContent = o.st; row.appendChild(st);
+
+        var mid = document.createElement('div'); mid.className = 'mid';
+        var pr = document.createElement('div'); pr.className = 'pr';
+        if (priceOf(o) == null){
+          pr.textContent = '값 확인';
+          var sm = document.createElement('small'); sm.style.textDecoration = 'none';
+          sm.textContent = '조건만'; pr.appendChild(sm);
+        } else {
+          pr.textContent = won(o.p);
+          if (o.o) { var s2 = document.createElement('small'); s2.textContent = won(o.o); pr.appendChild(s2); }
+          if (multi && o.p === min) { var bd = document.createElement('span'); bd.className = 'best'; bd.textContent = '최저'; pr.appendChild(bd); }
+        }
+        mid.appendChild(pr);
+        var cd = document.createElement('div'); cd.className = 'cd';
+        cd.innerHTML = '<b>' + (o.c || '특가') + '</b>' + (o.u ? ' · ' + o.u : '') +
+                       (o.pack ? ' · ' + o.pack : '') + (o.each ? ' · 개당 ' + won(o.each) : '');
+        mid.appendChild(cd);
+        var src = document.createElement('div'); src.className = 'store'; src.textContent = '확인 ' + (o.src || '');
+        mid.appendChild(src);
+        row.appendChild(mid);
+
+        var q = document.createElement('div'); q.className = 'qty';
+        var mi = document.createElement('button'); mi.type = 'button'; mi.textContent = '−'; mi.setAttribute('aria-label', '수량 줄이기');
+        var nu = document.createElement('span'); nu.textContent = String(qty || 1);
+        var pl = document.createElement('button'); pl.type = 'button'; pl.textContent = '+'; pl.setAttribute('aria-label', '수량 늘리기');
+        mi.addEventListener('click', function(ev){
+          ev.stopPropagation();
+          var cur = state.sel[k] || 0;
+          if (!cur) return;
+          if (cur <= 1) delete state.sel[k]; else state.sel[k] = cur - 1;
+          render(); syncBar();
+        });
+        pl.addEventListener('click', function(ev){
+          ev.stopPropagation();
+          var cur = state.sel[k] || 0;
+          if (cur >= 99) return;
+          state.sel[k] = cur + 1;
+          render(); syncBar();
+        });
+        q.appendChild(mi); q.appendChild(nu); q.appendChild(pl);
+        row.appendChild(q);
+
+        row.addEventListener('click', function(){
+          if (priceOf(o) == null){ toast('조건만 있는 행사입니다 — 앱·매장에서 값 확인'); return; }
+          if (state.sel[k]) delete state.sel[k]; else state.sel[k] = 1;
+          render(); syncBar();
+        });
+        rows.appendChild(row);
+      });
+      card.appendChild(rows);
+      list.appendChild(card);
+    });
+
+    $('#count').innerHTML = '<b>' + nItem + '</b>개 품목 · <b>' + nOffer + '</b>개 특가 · ' + D.asOfKo.replace('2026년 ', '');
+    $('#catnote').innerHTML = '<b>' + (D.cats.filter(function(c){ return c.k === state.cat; })[0] || {}).nm + '</b> — ' + NOTE[state.cat];
+    syncBar();
+  }
+
+  function selected(){
+    var out = [];
+    D.groups.forEach(function(g){
+      g.offers.forEach(function(o, i){
+        var q = state.sel[key(g, i)];
+        if (q) out.push({ g:g, o:o, i:i, qty:q });
+      });
+    });
+    return out;
+  }
+
+  function syncBar(){
+    var sel = selected();
+    var cnt = sel.reduce(function(a, x){ return a + x.qty; }, 0);
+    var sum = sel.reduce(function(a, x){ return a + (priceOf(x.o) || 0) * x.qty; }, 0);
+    var save = sel.reduce(function(a, x){
+      var p = priceOf(x.o), org = x.o.o;
+      return a + ((typeof org === 'number' && org > p) ? (org - p) * x.qty : 0);
+    }, 0);
+    $('#barCnt').textContent = '담은 품목 ' + cnt + '개';
+    $('#barSum').innerHTML = cnt
+      ? '예상 합계 <em>' + won(sum) + '</em>' + (save ? ' · 정가 대비 ' + won(save) + ' 아낌' : '')
+      : '체크하면 <em>예상 합계</em>가 나옵니다';
+    $('#btnSheet').disabled = !cnt;
+  }
+
+  function sheetText(){
+    var sel = selected();
+    var byStore = {}, order = [];
+    sel.forEach(function(x){
+      var s = x.o.st;
+      if (!byStore[s]) { byStore[s] = []; order.push(s); }
+      byStore[s].push(x);
+    });
+    var d = new Date();
+    var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    var lines = [];
+    lines.push('[장보기 발주서] ' + D.asOfKo + ' ' + hh + ':' + mm);
+    lines.push('오늘의 특가 기준 · 매장 확인 후 결제');
+    lines.push('────────────────────');
+    var total = 0, save = 0, count = 0;
+    order.forEach(function(s){
+      lines.push('■ ' + s);
+      byStore[s].forEach(function(x){
+        var o = x.o, p = priceOf(o) || 0;
+        var amount = p * x.qty;
+        total += amount; count += x.qty;
+        if (typeof o.o === 'number' && o.o > p) save += (o.o - p) * x.qty;
+        lines.push(' · ' + x.g.item + ' × ' + x.qty + ' — ' + won(amount));
+        lines.push('   (' + (o.c || '특가') + (o.u ? ', ' + o.u : '') + (o.pack ? ', ' + o.pack : '') + ')');
+      });
+      var sub = byStore[s].reduce(function(a, x){ return a + (priceOf(x.o) || 0) * x.qty; }, 0);
+      lines.push('   소계 ' + won(sub));
+      lines.push('');
+    });
+    lines.push('────────────────────');
+    lines.push('총 ' + count + '개 · 예상 ' + won(total) + (save ? ' (정가 대비 ' + won(save) + ' 아낌)' : ''));
+    lines.push('※ 1+1·2+1은 묶음 수량으로 계산했습니다.');
+    lines.push('※ 값·재고는 매장마다 다릅니다. 결제 전 확인하세요.');
+    lines.push('— 오늘의 특가 (KTS) https://autooneclick.com/sale/');
+    return lines.join('\n');
+  }
+
+  var LAST_SHEET = '';
+  function openSheet(){
+    if (!selected().length) return;
+    LAST_SHEET = sheetText();
+    $('#sheetText').textContent = LAST_SHEET;
+    $('#btnSms').href = 'sms:?&body=' + encodeURIComponent(LAST_SHEET);
+    $('#sheet').classList.add('on');
+    $('#sheetText').scrollTop = 0;
+  }
+  $('#btnSheet').addEventListener('click', openSheet);
+  $('#sheetClose').addEventListener('click', function(){ $('#sheet').classList.remove('on'); });
+  $('#sheet').querySelector('.bg').addEventListener('click', function(){ $('#sheet').classList.remove('on'); });
+
+  var tt = null;
+  function toast(msg){
+    var el = $('#toast'); el.textContent = msg; el.classList.add('on');
+    clearTimeout(tt); tt = setTimeout(function(){ el.classList.remove('on'); }, 2300);
+  }
+  function copyText(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(function(){ toast('발주서를 복사했습니다 — 카톡에 붙여 넣으세요'); },
+        function(){ fallbackCopy(text); });
+    }
+    fallbackCopy(text);
+  }
+  function fallbackCopy(text){
+    var t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.top = '-1000px';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); toast('발주서를 복사했습니다'); }
+    catch (e) { toast('복사가 안 되면 길게 눌러 직접 복사해 주세요'); }
+    t.remove();
+  }
+  $('#btnCopy').addEventListener('click', function(){ copyText(LAST_SHEET || $('#sheetText').textContent); });
+  $('#btnShare').addEventListener('click', function(){
+    var text = LAST_SHEET || $('#sheetText').textContent;
+    if (navigator.share){
+      navigator.share({ title:'장보기 발주서', text:text }).catch(function(){ copyText(text); });
+      return;
+    }
+    copyText(text);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

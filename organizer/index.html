@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 폰 앱 정리기</title>
+<style>
+:root{--bg:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+ --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--or:#FF6B00;--or2:#FFA24D;--on-or:#0A1224}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+ font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;letter-spacing:-.3px}
+body{padding-bottom:26px}
+.hd{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 80%,rgba(10,18,36,0));padding:14px 16px 8px;display:flex;align-items:center;gap:10px}
+.logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(145deg,#FF8A2B,var(--or));color:var(--on-or);display:grid;place-items:center;font-weight:900;font-size:15px}
+.hd b{font-size:15.5px;font-weight:900;letter-spacing:-.6px}
+.hd span{display:block;font-size:10.5px;color:var(--gray);margin-top:1px}
+.hd .sp{flex:1}
+.cnt{font-size:10.5px;font-weight:800;color:var(--or2);border:1px solid var(--line2);background:rgba(255,107,0,.08);border-radius:999px;padding:5px 9px}
+.wrap{padding:0 16px}
+.sbox{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0 12px;margin:2px 0 14px}
+.sbox svg{opacity:.6}
+#q{flex:1;background:none;border:0;outline:0;color:#fff;font-size:14px;padding:13px 0;font-family:inherit}
+#q::placeholder{color:#66799A}
+.clr{width:28px;height:28px;border-radius:50%;background:#1B2A48;border:0;color:var(--ink2);font-size:13px}
+
+.sect{display:flex;align-items:center;gap:8px;margin:0 2px 9px}
+.sect h2{font-size:12px;font-weight:900;color:var(--or2);letter-spacing:.2px;margin:0}
+.sect .ln{flex:1;height:1px;background:#1C2B49}
+.sect .tip{font-size:10.5px;color:#6F819B}
+
+.pinrow{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:16px}
+.slot{aspect-ratio:1/1;border-radius:14px;background:var(--card);border:1px dashed #2C3F66;display:grid;place-items:center;position:relative;overflow:hidden}
+.slot.full{border-style:solid;border-color:var(--line2)}
+.slot img{width:66%;height:66%;object-fit:contain;border-radius:9px}
+.slot .plus{font-size:19px;color:#4A5F87}
+.slot .x{position:absolute;top:1px;right:2px;font-size:11px;color:#7E90AB;background:rgba(10,18,36,.7);border-radius:50%;width:15px;height:15px;line-height:15px;text-align:center}
+.slot .lb{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px 10px 11px}
+.cat h3{margin:0 0 8px;font-size:11.5px;font-weight:900;display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:99px}
+.cat .n{margin-left:auto;font-size:9.5px;color:var(--gray);font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 4px}
+.ap{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;font-family:inherit}
+.ap img,.ap .ph{width:40px;height:40px;border-radius:11px;object-fit:contain;background:#16264A;display:grid;place-items:center;font-size:15px;font-weight:900;color:#9FB2CC}
+.ap span{font-size:9px;color:var(--ink2);max-width:56px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap:active img{transform:scale(.92)}
+.more{grid-column:1/-1;background:none;border:1px dashed #2C3F66;border-radius:10px;color:#8FA0B8;font-size:10.5px;padding:7px;font-family:inherit;margin-top:2px}
+
+.web{margin-top:16px}
+.wform{display:flex;gap:6px;margin-bottom:9px}
+.wform input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px;color:#fff;font-size:12.5px;font-family:inherit;outline:0;min-width:0}
+.wform input::placeholder{color:#66799A}
+.wform button{background:linear-gradient(180deg,#FF8A2B,var(--or));color:var(--on-or);border:0;border-radius:11px;padding:0 14px;font-size:12.5px;font-weight:900;font-family:inherit}
+.wlist{display:grid;gap:7px}
+.wcard{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 12px}
+.wico{width:34px;height:34px;border-radius:10px;background:rgba(255,107,0,.14);border:1px solid rgba(255,107,0,.4);color:var(--or2);display:grid;place-items:center;font-size:13px;font-weight:900;flex:0 0 auto}
+.wcard .t{flex:1;min-width:0}
+.wcard .t b{display:block;font-size:12.5px;font-weight:900;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wcard .t span{display:block;font-size:10px;color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.wcard .del{background:none;border:0;color:#7E90AB;font-size:15px;padding:4px}
+.empty{font-size:11.5px;color:#66799A;text-align:center;padding:12px 0}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);background:#1B2A48;border:1px solid var(--line2);color:#fff;font-size:12px;font-weight:800;padding:10px 14px;border-radius:11px;opacity:0;transition:.2s;z-index:80;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div class="logo">⊞</div>
+  <div><b>폰 앱 정리기</b><span>4칸 자동 분류 · 1초 검색</span></div>
+  <div class="sp"></div>
+  <div class="cnt" id="cnt">불러오는 중</div>
+</div>
+
+<div class="wrap">
+  <div class="sbox">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8FA0B8" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="앱 이름 한 글자만 쳐도 바로 나옵니다" autocomplete="off">
+    <button class="clr" id="clr">✕</button>
+  </div>
+
+  <div class="sect"><h2>자주 쓰는 6개</h2><div class="ln"></div><div class="tip" id="pinTip">길게 눌러 고정</div></div>
+  <div class="pinrow" id="pins"></div>
+
+  <div class="sect"><h2>자동 분류 4칸</h2><div class="ln"></div><div class="tip" id="allTip"></div></div>
+  <div class="cats" id="cats"></div>
+
+  <div class="web">
+    <div class="sect"><h2>웹앱 바로가기</h2><div class="ln"></div></div>
+    <div class="wform">
+      <input id="wname" placeholder="이름 (예: 원클릭)">
+      <input id="wurl" placeholder="주소 autooneclick.com">
+      <button id="wadd">추가</button>
+    </div>
+    <div class="wlist" id="wlist"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = [
+  {k:'talk', name:'소통', color:'#38BDF8',
+   kw:['kakao','talk','line','instagram','facebook','twitter','telegram','whatsapp','band','discord','dm','snap','wechat','naver','tiktok']},
+  {k:'money', name:'금융·결제', color:'#22C55E',
+   kw:['bank','kb','shinhan','woori','hana','nh','ibk','toss','pay','card','securities','증권','은행','카드','캐피탈','보험','fin','kbpay','samsungcard','hyundai']},
+  {k:'shop', name:'쇼핑·생활', color:'#FF6B00',
+   kw:['coupang','gmarket','11st','auction','baemin','yogiyo','emart','lotte','ssg','kurly','olive','musinsa','zigzag','tmoney','taxi','delivery','market','mart','shop','배달','마트','컬리','쿠팡']},
+  {k:'work', name:'도구·업무', color:'#A78BFA',
+   kw:[]}
+];
+const catOf = (pkg,label)=>{
+  const s=(pkg+' '+label).toLowerCase();
+  for(const c of CATS){ if(c.kw.some(k=>s.includes(k))) return c.k; }
+  return 'work';
+};
+const $=s=>document.querySelector(s);
+let APPS=[], q='';
+const LS_PIN='kts_pin_v1', LS_WEB='kts_web_v1';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let PIN=load(LS_PIN,[]), WEB=load(LS_WEB,[]);
+let expanded={};
+
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(window._t);window._t=setTimeout(()=>e.classList.remove('on'),1500)}
+
+function iconHtml(a,size){
+  if(a.i) return `<img src="${a.i}" alt="">`;
+  return `<div class="ph">${(a.n||'?').slice(0,1)}</div>`;
+}
+function renderPins(){
+  const el=$('#pins'); el.innerHTML='';
+  for(let i=0;i<6;i++){
+    const p=PIN[i]; const d=document.createElement('div');
+    d.className='slot'+(p?' full':'');
+    if(p){
+      const a=APPS.find(x=>x.p===p)||{n:'?',p:p};
+      d.innerHTML=iconHtml(a)+`<div class="lb">${a.n||''}</div><div class="x">✕</div>`;
+      d.onclick=(e)=>{ if(e.target.className==='x'){ PIN.splice(i,1); save(LS_PIN,PIN); renderPins(); return;} launch(a.p); };
+    } else {
+      d.innerHTML='<div class="plus">+</div>';
+      d.onclick=()=>{ toast('아래 앱을 길게 누르면 여기에 고정됩니다'); };
+    }
+    el.appendChild(d);
+  }
+}
+function launch(p){
+  if(window.Native && Native.launch){ Native.launch(p); }
+  else toast('이 기기에서는 바로 열 수 없습니다');
+}
+function pin(p){
+  const idx=PIN.indexOf(p);
+  if(idx>=0){ PIN.splice(idx,1); toast('고정을 해제했습니다'); }
+  else if(PIN.length>=6){ toast('6개까지 고정할 수 있습니다'); return; }
+  else { PIN.push(p); toast('자주 쓰는 앱에 고정했습니다'); }
+  save(LS_PIN,PIN); renderPins(); render();
+}
+function appBtn(a){
+  const b=document.createElement('button');
+  b.className='ap';
+  b.innerHTML=iconHtml(a)+`<span>${a.n}</span>`;
+  b.onclick=()=>launch(a.p);
+  let t=null;
+  b.addEventListener('touchstart',()=>{ t=setTimeout(()=>pin(a.p),600); },{passive:true});
+  b.addEventListener('touchend',()=>{ clearTimeout(t); });
+  b.addEventListener('touchmove',()=>{ clearTimeout(t); });
+  b.addEventListener('contextmenu',e=>{e.preventDefault();pin(a.p);});
+  return b;
+}
+function render(){
+  const kw=q.trim().toLowerCase();
+  const pool=APPS.filter(a=>!kw || a.n.toLowerCase().includes(kw) || a.p.toLowerCase().includes(kw));
+  $('#cnt').textContent=`앱 ${APPS.length}개`;
+  $('#allTip').textContent=kw?`'${q}' 검색 ${pool.length}개`:'길게 눌러 고정';
+  const host=$('#cats'); host.innerHTML='';
+  if(!pool.length){
+    host.innerHTML=`<div class="cat" style="grid-column:1/-1"><div class="empty">'${q}' 로 시작하는 앱이 없습니다.</div></div>`;
+    return;
+  }
+  CATS.forEach(c=>{
+    const list=pool.filter(a=>catOf(a.p,a.n)===c.k);
+    if(!list.length) return;
+    const lim=expanded[c.k]?999:9;
+    const card=document.createElement('div'); card.className='cat';
+    card.innerHTML=`<h3><span class="dot" style="background:${c.color}"></span>${c.name}<span class="n">${list.length}</span></h3><div class="grid"></div>`;
+    const g=card.querySelector('.grid');
+    list.slice(0,lim).forEach(a=>g.appendChild(appBtn(a)));
+    if(list.length>lim){
+      const m=document.createElement('button'); m.className='more'; m.textContent=`+ ${list.length-lim}개 더 보기`;
+      m.onclick=()=>{ expanded[c.k]=true; render(); };
+      g.appendChild(m);
+    }
+    host.appendChild(card);
+  });
+}
+function renderWeb(){
+  const el=$('#wlist');
+  if(!WEB.length){ el.innerHTML='<div class="empty">자주 여는 사이트를 추가해 두세요.</div>'; return; }
+  el.innerHTML='';
+  WEB.forEach((w,i)=>{
+    const d=document.createElement('div'); d.className='wcard';
+    d.innerHTML=`<div class="wico">↗</div><div class="t"><b>${w.n}</b><span>${w.u}</span></div><button class="del">✕</button>`;
+    d.querySelector('.t').onclick=()=>{ if(window.Native&&Native.open) Native.open(w.u); else window.open(w.u,'_blank'); };
+    d.querySelector('.del').onclick=()=>{ WEB.splice(i,1); save(LS_WEB,WEB); renderWeb(); };
+    el.appendChild(d);
+  });
+}
+$('#q').oninput=e=>{q=e.target.value;render()};
+$('#clr').onclick=()=>{q='';$('#q').value='';render()};
+$('#wadd').onclick=()=>{
+  const n=$('#wname').value.trim(), u=$('#wurl').value.trim();
+  if(!n||!u){ toast('이름과 주소를 넣어 주세요'); return; }
+  const url=/^https?:\/\//.test(u)?u:'https://'+u.replace(/^\/+/,'');
+  WEB.push({n,u:url}); save(LS_WEB,WEB); renderWeb();
+  $('#wname').value='';$('#wurl').value=''; toast('바로가기를 추가했습니다');
+};
+function boot(raw){
+  try{ APPS=JSON.parse(raw||'[]'); }catch(e){ APPS=[]; }
+  if(!APPS.length){
+    APPS=[{p:'com.kakao.talk',n:'카카오톡',i:''},{p:'com.coupang.mobile',n:'쿠팡',i:''},
+          {p:'viva.republica.toss',n:'토스',i:''},{p:'com.instagram.android',n:'인스타그램',i:''}];
+    toast('앱 목록을 불러오는 중입니다');
+  }
+  renderPins(); render(); renderWeb();
+}
+if(window.Native && Native.apps){ boot(Native.apps()); } else { boot(null); }
+</script>
+</body>
+</html>

@@ -79,12 +79,18 @@ h1 em{font-style:normal;color:var(--amber)}
 .foot b{color:#C7D3E3}
 .foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
 .notice{border:1px solid #22314F;border-radius:12px;background:rgba(255,255,255,.02);padding:11px 12px;margin-top:14px}
-.notice b{display:block;font-size:10.5px;color:#8FA0B8;letter-spacing:.08em;margin-bottom:6px}
-.notice p{margin:0;font-size:10.5px;line-height:1.7;color:#93A4BC}
+.notice b{display:block;font-size:10.5px;color:#8FA0B8;letter-spacing:.08em;margin-bottom:6px}.notice p{margin:0;font-size:10.5px;line-height:1.7;color:#93A4BC}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(10,17,40,.97);
   border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;
   opacity:0;transition:.25s;z-index:90;pointer-events:none}
 .toast.on{opacity:1}
+.freebar{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px 12px;text-decoration:none;
+  border:1px solid rgba(255,107,0,.5);border-radius:15px;background:linear-gradient(100deg,rgba(255,107,0,.16),rgba(255,255,255,.02) 65%)}
+.freebar .fb{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:4px 8px}
+.freebar .ft{flex:1;min-width:0}
+.freebar .ft b{display:block;font-size:12.5px;font-weight:900;letter-spacing:-.35px;color:#fff}
+.freebar .ft span{display:block;font-size:10.5px;color:#AFBDD0;margin-top:2px;line-height:1.45}
+.freebar .fa{flex:0 0 auto;font-size:16px;font-weight:900;color:var(--amber2)}
 </style>
 </head>
 <body>
@@ -97,6 +103,13 @@ h1 em{font-style:normal;color:var(--amber)}
       <a class="tel" href="tel:01020022899">010-2002-2899</a>
     </div>
   </header>
+
+  <a class="freebar" href="sale/">
+    <span class="fb">무료</span>
+    <span class="ft"><b>오늘의 특가 — 할인만 모은 가격비교</b>
+      <span>편의점 1+1 · 마트 전단 · 사장님 업소 식자재 → 체크하면 발주서 1초</span></span>
+    <span class="fa">→</span>
+  </a>
 
   <div class="hero">
     <span class="kicker">설치 없이 · 로그인 없이</span>

@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>독심술 — 4문항으로 보는 32가지 결</title>
 <meta name="theme-color" content="#0A1224">
-<meta name="description" content="문항 4개로 그 사람의 결(結)을 읽고, 그림 한 장과 세 마디로 정리합니다. 강점 → 그 힘의 이면 → 한 줄 처방 → 미래 예보와 예비책. 오락·참고용이며 심리검사·진단이 아닙니다.">
+<meta name="description" content="문항 4개로 그 사람의 결(結)을 읽고, 그림 한 장과 세 마디로 정리합니다. 유형마다 생활 속 예시 → 속마음 → 강점 → 한 줄 처방. 오락·참고용이며 심리검사·진단이 아닙니다.">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:title" content="독심술 — 4문항으로 보는 32가지 결">
-<meta property="og:description" content="4문항 → 8결 × 4갈래 = 32유형. 그림 한 장, 세 마디. 답은 기기 밖으로 나가지 않습니다.">
+<meta property="og:description" content="4문항 → 8결 × 4갈래 = 32유형. 유형마다 생활 속 예시 한 장면과 세 마디. 답은 기기 밖으로 나가지 않습니다.">
 <meta property="og:image" content="https://autooneclick.com/navi2/img/cover.webp">
 <meta property="og:url" content="https://autooneclick.com/navi2/">
 <style>
@@ -106,6 +106,11 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 .tag.o{color:var(--or2);border-color:rgba(255,107,0,.5);background:rgba(255,107,0,.1)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px;margin-bottom:11px}
 .card.amber{border-color:rgba(255,107,0,.42);background:linear-gradient(180deg,rgba(255,107,0,.08),rgba(15,27,51,.92))}
+.card.ex{border-color:rgba(125,211,252,.34);background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(15,27,51,.92))}
+.card.ex .ctit{color:#7DD3FC}
+.card.ex .ctit:before{background:#38BDF8;box-shadow:0 0 8px #38BDF8}
+.card.ex .exx{font-size:15px;line-height:1.72;letter-spacing:-.25px;font-weight:700;color:#E6F1FB;margin:0;word-break:keep-all}
+.card.ex .exx b{color:#93C5FD}
 .ctit{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:var(--or2);margin-bottom:9px}
 .ctit:before{content:"";width:5px;height:5px;border-radius:99px;background:var(--or);box-shadow:0 0 8px var(--or)}
 .big{font-size:20px;line-height:1.6;letter-spacing:-.6px;font-weight:900;color:#fff;word-break:keep-all}
@@ -166,7 +171,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
   <header class="hd">
     <div class="logo">術</div>
-    <div class="brand">독심술 <small>v4.0 · 32유형 · 4문항</small></div>
+    <div class="brand">독심술 <small>v4.1 · 32유형 · 4문항</small></div>
     <div class="sp"></div>
     <span class="pill" id="hdDate">—</span>
   </header>
@@ -175,7 +180,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   <section class="scr on" id="sIntro">
     <span class="kicker">4문항 · 1분 · 32유형 · 무료</span>
     <h1>그 사람의 <em>결</em>을,<br>그림 한 장으로 봅니다.</h1>
-    <p class="sub">읽고 머리 아픈 긴 설명은 뺐습니다. <b>결 32유형 · 그림 한 장 · 세 마디</b>만 남겼습니다.</p>
+    <p class="sub">어려운 말은 뺐습니다. <b>결 32유형</b>마다 <b>생활 속 예시</b> 한 장면과 세 마디만 남겼습니다.</p>
     <img class="hero" src="img/cover.webp" alt="독심술" width="960" height="600" loading="eager">
     <div class="gal" id="gal"></div>
     <div class="dock">
@@ -294,11 +299,11 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
 <div class="toast" id="toast"></div>
 
-<script src="js/lint.js?v=4"></script>
-<script src="js/data.cards.js?v=4"></script>
-<script src="js/data.modes.js?v=4"></script>
-<script src="js/data.subs.js?v=4"></script>
-<script src="js/engine.js?v=4"></script>
+<script src="js/lint.js?v=5"></script>
+<script src="js/data.cards.js?v=5"></script>
+<script src="js/data.modes.js?v=5"></script>
+<script src="js/data.subs.js?v=5"></script>
+<script src="js/engine.js?v=5"></script>
 <script>
 (function(){
   var $ = function(s){ return document.querySelector(s); };
@@ -531,8 +536,20 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
     var main = el('div', 'card amber');
     main.appendChild(el('div', 'big', v.line));
-    main.appendChild(el('p', 'small', '겉과 다른 속마음 — ' + v.inner));
     body.appendChild(main);
+
+    /* ①-1 생활 속 예시 — 어려운 말 대신 장면으로 (v4.1) */
+    if (v.ex){
+      var ex = el('div', 'card ex');
+      ex.appendChild(el('div', 'ctit', '이럴 때 이렇습니다 — 생활 속 예시'));
+      ex.appendChild(el('p', 'exx', v.ex));
+      body.appendChild(ex);
+    }
+
+    var inn = el('div', 'card');
+    inn.appendChild(el('div', 'ctit', '겉과 다른 속마음'));
+    inn.appendChild(el('p', 'small', v.inner));
+    body.appendChild(inn);
 
     if (res.mode === 'self'){
       /* ② 강점 → 그 힘의 이면 → 처방 */

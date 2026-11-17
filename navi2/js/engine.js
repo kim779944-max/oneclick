@@ -145,6 +145,7 @@
     }
 
     var view = {};
+    view.ex = sub.ex || '';   /* 생활 속 예시 — v4.1 신규(쉬운 말 개편) */
     if (mode === 'self'){
       view.line = put(sub.line[band] || sub.line.mid, 'summary', 'line');
       view.inner = put(sub.inner, 'inner', 'inner');
@@ -164,7 +165,7 @@
     }
 
     return {
-      mode: mode, modeNm: M[mode].nm, ctx: ctx, code: code,
+      mode: mode, modeNm: M[mode].nm, ctx: ctx, code: code, ex: sub.ex || '',
       card: primary + '-' + flavor, base: primary,
       cardName: sub.nm, cardNo: sub.no, cardSub: sub.sub, img: card.img,
       flavor: flavor, flavorNm: FLAVOR_NM[flavor],
