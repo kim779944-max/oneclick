@@ -8,7 +8,7 @@
 <link rel="icon" href="icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="KTS 원클릭 상품 상세">
-<meta property="og:image" content="https://kim779944-max.github.io/K0612766940K-/oneclick/icon.png">
+<meta property="og:image" content="https://autooneclick.com/icon.png">
 <style>
 :root{--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
   --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--gold:#C6A054}
@@ -79,6 +79,36 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
 .note-block{border:1px solid #22314F;border-radius:12px;background:rgba(255,255,255,.02);padding:11px 12px;margin-top:12px}
 .note-block p{margin:0;font-size:10.5px;line-height:1.7;color:#93A4BC;word-break:keep-all}
 .missing{padding:40px 0;text-align:center;color:var(--gray);font-size:13px}
+/* ---------- (추가) 쿠팡형 표준: ① 9:16 시연 ② Before/After ③ 도크 3버튼 + 본사 홈 락인 ---------- */
+.demo{position:relative;width:min(100%,calc(62vh * 9 / 16));aspect-ratio:9/16;margin:6px auto 0;border-radius:18px;overflow:hidden;
+  border:1px solid rgba(255,107,0,.4);background:#070D1E;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+.demo video,.demo .zimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.demo .zimg{object-position:50% 0;transform-origin:50% 18%;animation:kzoom 9s ease-in-out infinite}
+@keyframes kzoom{0%,8%{transform:scale(1)}38%,62%{transform:scale(2.2)}92%,100%{transform:scale(1)}}
+.demo .tag{position:absolute;left:10px;top:10px;font-size:10px;font-weight:900;color:var(--on);border-radius:999px;padding:3px 9px;
+  background:linear-gradient(90deg,#FF8A2B,#FFA24D)}
+.demo .snd{position:absolute;right:10px;bottom:10px;font-family:inherit;font-size:11px;font-weight:900;color:#fff;border-radius:999px;padding:6px 10px;
+  background:rgba(10,17,40,.75);border:1px solid rgba(255,255,255,.25);cursor:pointer}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ba .c{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#0C1730;display:flex;flex-direction:column}
+.ba .c.af{border-color:rgba(46,212,122,.5)}
+.ba .lb{font-size:10.5px;font-weight:900;padding:6px 9px;color:#fff;background:#3A2030}
+.ba .c.af .lb{background:#123A2A;color:#7CF0B0}
+.ba .bf{flex:1;min-height:150px;padding:12px 10px;display:flex;flex-direction:column;justify-content:center;gap:8px;
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 8px,transparent 8px 16px)}
+.ba .bf .x{font-size:26px;line-height:1;color:#F87171;font-weight:900}
+.ba .bf p{margin:0;font-size:11.5px;line-height:1.6;color:#C9D4E4;word-break:keep-all}
+.ba .af img{display:block;width:100%;height:170px;object-fit:cover;object-position:50% 0;flex:0 0 auto}
+.ba .af p{margin:0;padding:7px 9px;font-size:11px;line-height:1.5;color:#C9F5DC;word-break:keep-all}
+.lock{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 13px;border-radius:14px;text-decoration:none;color:inherit;
+  background:linear-gradient(135deg,rgba(255,107,0,.14),rgba(198,160,84,.08));border:1px solid rgba(255,107,0,.5)}
+.lock .t{flex:1;min-width:0}
+.lock .t b{display:block;font-size:13px;color:#fff;font-weight:900;letter-spacing:-.3px}
+.lock .t span{display:block;font-size:11px;color:var(--ink2);line-height:1.5;margin-top:2px}
+.lock em{font-style:normal;font-size:12px;font-weight:900;color:var(--amber2);white-space:nowrap}
+.dockin.three{grid-template-columns:1.25fr 1fr 1fr}
+.dockin.three a{padding:14px 6px;font-size:13.5px}
+.dockin.three a.cu{color:var(--amber2);border-color:rgba(255,107,0,.45)}
 </style>
 </head>
 <body>
@@ -92,9 +122,10 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
   <div id="doc"></div>
 </div>
 <div class="dock" id="dock" style="display:none">
-  <div class="dockin">
-    <a id="btnAsk" href="sms:01020022899">문의 문자</a>
-    <a class="main" id="btnOpen" href="#">열어보기</a>
+  <div class="dockin three">
+    <a class="main" id="btnOpen" href="#">무료 체험</a>
+    <a id="btnBuy" href="sms:01020022899">구매</a>
+    <a class="cu" id="btnAsk" href="sms:01020022899">커스텀 의뢰</a>
   </div>
 </div>
 
@@ -113,7 +144,7 @@ function faqFor(p){
   if (p.k === 'photo2doc') base.push(['사진 글자를 자동으로 읽나요?', 'AI 키를 넣으면 자동으로 읽습니다. 키가 없으면 표를 붙여넣기로 넣어 그대로 쓸 수 있습니다.']);
   if (p.k === 'loan') base.push(['이 진단으로 대출이 확정되나요?', '아니요. 기관 심사 전에 어디가 걸리는지 먼저 보는 도구입니다.']);
   if (p.k === 'tax') base.push(['세무 상담을 대신하나요?', '아니요. 세무사에게 물어볼 항목을 미리 정리해 드립니다.']);
-  if (p.k === 'navi') base.push(['상대의 답이 저장되나요?', '아니요. 상대 기기에서 4자리 코드만 나오고, 코드는 문자로 건너옵니다.']);
+  if (p.k === 'navi') base.push(['결과가 서버에 저장되나요?', '아니요. 답과 결과는 이 기기 안에서만 계산됩니다. 공유는 요약 링크로만 나갑니다.']);
   return base;
 }
 
@@ -122,7 +153,38 @@ if (!p){
 } else {
   document.title = p.nm + ' — KTS 원클릭';
   const pkgs = (p.price2 || '').split('·').map(s => s.trim()).filter(Boolean);
+  /* ① 9:16 시연 영상(있으면) → 없으면 실제 화면 2배 줌인 움짤 */
+  const VIDEO = {photo2doc:'v/photo2doc', viewer:'v/viewer', saycap:'v/saycap', hwp:'v/hwp', append:'v/append'};
+  const demo = VIDEO[p.k]
+    ? `<div class="demo"><video id="demoV" src="${VIDEO[p.k]}.mp4" poster="${VIDEO[p.k]}.jpg" autoplay muted loop playsinline preload="metadata"></video>
+         <span class="tag">시연 영상</span><button type="button" class="snd" id="demoSnd">🔇 소리 켜기</button></div>`
+    : (p.shot ? `<div class="demo"><img class="zimg" src="${p.shot}" alt="${p.nm} 실제 화면 줌인"><span class="tag">실제 화면 · 줌인</span></div>` : '');
+  /* ② Before / After — 왼쪽: 지금 겪는 불편, 오른쪽: 실제 화면 캡처 */
+  const BEFORE = {
+    photo2doc:'카톡으로 받은 표 사진을 보며 한 칸씩 다시 타이핑',
+    viewer:'폰에서 .hwp 첨부가 안 열리고 앱 설치부터 요구',
+    loan:'어느 기관에 넣을지 몰라 여기저기 전화 문의',
+    tax:'창업 순서·통장·과세 유형을 몰라 처음부터 상담',
+    navi:'상담 자리에서 무슨 말을 꺼낼지 몰라 망설임',
+    saycap:'사진만 쌓이고 그날의 이야기는 잊힘',
+    organizer:'앱 서랍이 뒤죽박죽, 쓸 앱을 매번 찾음',
+    keyword:'검색 키워드를 하나씩 손으로 조합'
+  };
+  const ba = p.shot ? `
+    <h2 class="sec">Before / After</h2>
+    <div class="ba">
+      <div class="c"><div class="lb">BEFORE · 지금</div>
+        <div class="bf"><div class="x">✕</div><p>${BEFORE[p.k] || p.line}</p></div></div>
+      <div class="c af"><div class="lb">AFTER · ${p.nm.split(' ')[0]}</div>
+        <img src="${p.shot}" alt="${p.nm} 실제 화면 캡처" loading="lazy"><p>${p.line}</p></div>
+    </div>` : '';
+  const lock = `
+    <a class="lock" href="https://autooneclick.com/?from=detail-${p.k}" rel="noopener">
+      <span class="t"><b>무료로 써 보고 → 본사 홈에서 무료 업그레이드</b><span>autooneclick.com 에서 더 많은 도구를 무료로 이어 쓰세요</span></span>
+      <em>본사 홈 →</em>
+    </a>`;
   $('#doc').innerHTML = `
+    ${demo}
     <div class="shop">
       <div class="ico"><img src="${p.icon}" alt=""></div>
       <div>
@@ -132,6 +194,8 @@ if (!p){
     </div>
     ${p.badge ? `<div style="margin-top:9px"><span style="font-size:10px;font-weight:900;border-radius:999px;padding:3px 9px;color:#0B2C1B;background:${p.badge==='준비'?'#FCD34D':(p.badge==='무료'?'#4ADE80':'linear-gradient(90deg,#FF8A2B,#FFA24D)')}">${p.badge}</span></div>` : ''}
     <p class="lead">${p.blurb}</p>
+    ${ba}
+    ${lock}
 
     <h2 class="sec">구성과 가격</h2>
     <div class="pkg">
@@ -167,9 +231,15 @@ if (!p){
   `;
   $('#dock').style.display = 'block';
   const open = $('#btnOpen');
-  if (p.link){ open.href = p.link; open.textContent = '지금 열어보기'; }
+  if (p.link){ open.href = p.link; open.textContent = '무료 체험'; }
   else { open.href = '#'; open.textContent = '출시 준비 중'; open.classList.add('soon'); }
-  $('#btnAsk').href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] ' + p.nm + ' 문의드립니다');
+  $('#btnBuy').href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] ' + p.nm + ' 구매 문의드립니다 (' + p.price + ')');
+  $('#btnAsk').href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] ' + p.nm + ' 커스텀 의뢰드립니다 (원하는 기능: )');
+  const dv = document.getElementById('demoV'), ds = document.getElementById('demoSnd');
+  if (dv && ds){
+    ds.onclick = () => { dv.muted = !dv.muted; ds.textContent = dv.muted ? '🔇 소리 켜기' : '🔊 소리 끄기'; dv.play().catch(()=>{}); };
+    dv.addEventListener('error', () => { const d = dv.closest('.demo'); if (d) d.remove(); });
+  }
 }
 </script>
 </body>

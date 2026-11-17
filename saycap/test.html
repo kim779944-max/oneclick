@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SayCap v3 자동검수</title>
+<style>body{font-family:-apple-system,"Noto Sans KR",sans-serif;background:#0f172a;color:#e2e8f0;padding:16px;font-size:13px}
+iframe{width:390px;height:800px;border:1px solid #334155;border-radius:10px;background:#000;vertical-align:top}
+#log{white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px;line-height:1.7}
+.ok{color:#4ade80}.ng{color:#f87171}</style></head><body>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<iframe id="fr" src="index.html"></iframe>
+<div id="log" style="flex:1">검수 시작…</div>
+</div>
+<script>
+const L = (m, ok) => { const d=document.createElement('div'); d.className = ok===undefined?'':(ok?'ok':'ng'); d.textContent=(ok===false?'✗ ':'✓ ')+m; document.getElementById('log').appendChild(d); };
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const fr = document.getElementById('fr');
+const W = () => fr.contentWindow, D = () => fr.contentDocument;
+const RESULT = {checks:[], pass:0, fail:0};
+function check(name, cond, extra){ RESULT.checks.push({name, ok:!!cond, extra:extra||null}); cond?RESULT.pass++:RESULT.fail++; L(name+(extra?` — ${extra}`:''), !!cond); }
+
+fr.onload = async () => {
+  await sleep(600);
+  const w = W(), d = D();
+  check('앱 로드', !!d.querySelector('#home'), d.title);
+
+  // 1) 카메라 진입 (헤드리스에는 카메라 없음 → 폴백이 떠야 정상)
+  d.querySelector('#goCamera').click();
+  await sleep(1200);
+  const camActive = d.querySelector('#camera').classList.contains('active');
+  check('촬영하기 → 카메라 화면 전환', camActive);
+  await sleep(5200);
+  const fb = d.querySelector('#camFallback');
+  const fbShown = fb && getComputedStyle(fb).display !== 'none';
+  const videoOn = d.querySelector('#camVideo').style.display !== 'none' && w.camStream;
+  check('카메라 실패 시 폴백 또는 실시간 스트림', fbShown || videoOn, fbShown ? '폴백 표시(권한/장치 없음)' : '스트림 연결');
+  const fbText = fb ? fb.querySelector('p').textContent.slice(0,40) : '';
+  check('폴백 안내문구 표시', fbShown ? fbText.length>8 : true, fbText);
+
+  // 2) 폴백의 "사진 불러오기" 버튼이 실제 input을 여는지
+  let pickerOpened = false;
+  const inp = d.querySelector('#filePick');
+  inp.addEventListener('click', ()=>{ pickerOpened = true; });
+  if (fbShown) { d.querySelector('#fbPick').click(); }
+  await sleep(300);
+  check('폴백 "사진 불러오기" → 파일선택 연결', fbShown ? pickerOpened : true);
+  const fbGal = d.querySelector('#fbGallery');
+  if (fbShown) { fbGal.click(); await sleep(300); }
+  check('폴백 "갤러리로 이동" 동작', d.querySelector('#gallery').classList.contains('active'));
+
+  // 3) 샘플 4장 로드
+  await w.loadSamples();
+  await sleep(900);
+  await w.renderGallery();
+  const items = d.querySelectorAll('.g-item').length;
+  check('샘플 4장 로드', items === 4, items + '장');
+
+  // 4) 날짜 앨범 자동 그룹
+  const albums = d.querySelectorAll('.album-h').length;
+  check('스마트 날짜 앨범 헤더', albums >= 1, albums + '개 그룹');
+
+  // 5) 다중 키워드 AND 검색
+  const srch = d.querySelector('#galSearch');
+  const type = v => { srch.value = v; srch.dispatchEvent(new Event('input')); };
+  type('큰방'); await sleep(180); const n1 = d.querySelectorAll('.g-item').length;
+  type('채광'); await sleep(180); const n2 = d.querySelectorAll('.g-item').length;
+  type('큰방 햇살'); await sleep(180); const n3 = d.querySelectorAll('.g-item').length;
+  type('큰방 채광'); await sleep(180); const n4 = d.querySelectorAll('.g-item').length;
+  type('큰방 없는단어'); await sleep(180); const n5 = d.querySelectorAll('.g-item').length;
+  type(''); await sleep(180);
+  const and1 = n3, and0 = n5;
+  check('단어 검색 “큰방”', n1 === 1, n1 + '장');
+  check('단어 검색 “채광”', n2 === 1, n2 + '장');
+  check('AND 검색 “큰방 햇살” (둘 다 있는 사진)', and1 === 1, and1 + '장');
+  check('AND 검색 “큰방 채광” (한 사진에 둘 다 없음 → 0)', n4 === 0, n4 + '장');
+  check('AND 검색 “큰방 없는단어” → 0', and0 === 0, and0 + '장');
+
+  // 6) 원터치 자막 토글 (스르륵)
+  const firstImg = d.querySelector('.g-item .ph');
+  firstImg.click(); await sleep(500);
+  const viewerActive = d.querySelector('#viewer').classList.contains('active');
+  check('사진 탭 → 뷰어 열림', viewerActive);
+  const capEl = d.querySelector('#viewCaption');
+  const before = capEl.classList.contains('off');
+  d.querySelector('#viewImg').click(); await sleep(350);
+  const after1 = capEl.classList.contains('off');
+  d.querySelector('#viewImg').click(); await sleep(350);
+  const after2 = capEl.classList.contains('off');
+  check('톡 → 자막 숨김 / 다시 톡 → 복귀', before===false && after1===true && after2===false, `${before} → ${after1} → ${after2}`);
+
+  // 7) GPS 함수 존재 + 거부 시에도 저장 흐름 유지
+  check('GPS 위치기록 함수 탑재', typeof w.grabGeo === 'function');
+  check('위치 표기 헬퍼', typeof w.geoLine === 'function', w.geoLine({lat:37.55,lng:127.02}));
+
+  // 8) 콘솔 에러 수집 결과
+  check('JS 예외 0건', (w.__errs||[]).length === 0, (w.__errs||[]).join(' | ').slice(0,120));
+
+  document.title = RESULT.fail === 0 ? 'PASS' : 'FAIL';
+  L(`\n결과: PASS ${RESULT.pass} / FAIL ${RESULT.fail}`, RESULT.fail===0);
+  window.__result = RESULT;
+};
+</script>
+</body></html>

@@ -810,14 +810,315 @@ document.addEventListener('click', e => {
     if (up) up.addEventListener('click', function(ev){ ev.preventDefault(); openHome(); });
   }
 
-  /* ④ 더편집(서명·도장·글자 수정) — 아직 도구가 없으면 빈 화면 대신 '준비 중 · 알림 받기' */
-  var ed = document.getElementById('kipEdit');
-  if (ed) ed.addEventListener('click', function(){
-    if (typeof showToast === 'function') showToast('더편집은 준비 중입니다 · 문자로 알려 드릴게요');
-    setTimeout(function(){
-      location.href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] 더편집(글자·표·서명 수정) 준비되면 알려주세요');
-    }, 600);
+  /* ④ 더편집 — 아래 '더편집' 스크립트가 버튼을 연결합니다 */
+})();
+</script>
+
+<!-- ===== (추가) 더편집 v1 — 글자 수정 · 글자/서명/도장 얹기 · 되돌리기 · 저장(PNG) =====
+     탭 1: [글자·표 고치기] → 편집 모드(글자는 눌러서 바로 고침)
+     탭 2: [서명]/[도장]/[글자] 얹기 (끌어서 이동, 모서리로 크기, ✕ 삭제)
+     탭 3: [저장] → 편집본 PNG 내려받기 (실패 시 HTML 사본)
+     파일은 서버로 가지 않습니다(기기 안에서만 처리). -->
+<style>
+body.editing .banner{display:none}
+body.editing #kipFoot{display:none}
+body.editing .doc{margin-bottom:150px}
+body.editing #out{position:relative;outline:2px dashed rgba(255,107,0,.45);outline-offset:-2px}
+body.editing #out [contenteditable="true"]:focus,body.editing #out:focus{outline:2px dashed rgba(255,107,0,.8)}
+.edtop{display:none;position:sticky;top:46px;z-index:19;margin:8px 14px 0;padding:8px 10px;border-radius:12px;
+ background:rgba(15,27,51,.97);border:1px solid rgba(255,107,0,.45);align-items:center;gap:7px;font-size:11.5px;color:#AFBDD0}
+body.editing .edtop{display:flex}
+.edtop b{color:var(--amber2);font-weight:900;white-space:nowrap}
+.edtop .sp{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.edtop a{font-size:11px;font-weight:900;color:#E6EDF7;border:1px solid var(--line2);border-radius:8px;padding:6px 8px;white-space:nowrap;text-decoration:none;background:#12203C}
+.edtop a.up{border-color:rgba(255,107,0,.55);color:var(--amber2)}
+.edbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:55;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+ background:linear-gradient(180deg,#0E1B3A,#0A1224);border-top:1px solid rgba(255,107,0,.4)}
+body.editing .edbar{display:block}
+.edbar .in{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.edbar button{font-family:inherit;border:1px solid var(--line2);background:#12203C;color:#E6EDF7;border-radius:11px;
+ padding:7px 2px 6px;font-size:10.5px;font-weight:900;line-height:1.25;cursor:pointer;min-height:48px}
+.edbar button i{display:block;font-style:normal;font-size:16px;line-height:1.15}
+.edbar button.save{background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber);color:var(--on-amber)}
+.edbar button:disabled{opacity:.4}
+.edbar .links{max-width:460px;margin:6px auto 0;display:flex;gap:6px}
+.edbar .links a{flex:1;text-align:center;font-size:11px;font-weight:900;padding:7px 4px;border-radius:9px;text-decoration:none;
+ color:var(--amber2);border:1px solid rgba(255,107,0,.45);background:rgba(255,107,0,.07)}
+.edbar .links a.cu{color:#D9E3F0;border-color:var(--line2);background:#12203C}
+#out .edlayer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5}
+#out .edobj{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:move}
+#out .edobj img{display:block;width:100%;height:auto;pointer-events:none}
+#out .edobj.txt{min-width:40px;padding:2px 5px;background:#fff;color:#111;font-size:14px;font-weight:700;line-height:1.35;
+ border-radius:3px;white-space:pre-wrap;cursor:text;user-select:text;-webkit-user-select:text}
+#out .edobj .h,#out .edobj .x,#out .edobj .mv{display:none;position:absolute;width:24px;height:24px;border-radius:50%;
+ background:var(--amber);color:#0A1224;font-size:13px;font-weight:900;line-height:24px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+body.editing #out .edobj{outline:1.5px dashed rgba(255,107,0,.9)}
+body.editing #out .edobj .h{display:block;right:-12px;bottom:-12px;cursor:nwse-resize}
+body.editing #out .edobj .x{display:block;right:-12px;top:-12px;background:#fff}
+body.editing #out .edobj.txt .mv{display:block;left:-12px;top:-12px;cursor:move}
+.edsheet{display:none;position:fixed;inset:0;z-index:70;background:rgba(3,7,18,.72);align-items:flex-end;justify-content:center}
+.edsheet.on{display:flex}
+.edsheet .pane{width:100%;max-width:460px;background:#0F1B33;border-top:1px solid rgba(255,107,0,.45);border-radius:18px 18px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom))}
+.edsheet h3{margin:0 0 8px;font-size:14px;color:#fff;font-weight:900}
+.edsheet canvas{display:block;width:100%;height:200px;background:#fff;border-radius:12px;touch-action:none}
+.edsheet .row{display:flex;gap:7px;margin-top:10px}
+.edsheet .row button{flex:1;font-family:inherit;padding:13px 8px;border-radius:11px;border:1px solid var(--line2);background:#12203C;color:#E6EDF7;font-size:13px;font-weight:900}
+.edsheet .row button.ok{background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber);color:var(--on-amber)}
+body.edcap #out{outline:0!important}
+body.edcap #out .edobj{outline:0!important}
+body.edcap #out .edobj .h,body.edcap #out .edobj .x,body.edcap #out .edobj .mv{display:none!important}
+body.edcap .xlwrap{overflow:visible!important}
+</style>
+
+<div class="edtop" id="edTop">
+  <b>더편집</b><span class="sp">글자는 눌러서 바로 고치세요</span>
+  <a class="up" href="https://autooneclick.com/?from=viewer-edit" rel="noopener" id="edUpTop">본사 홈 무료 업그레이드</a>
+</div>
+
+<div class="edbar" id="edBar">
+  <div class="in">
+    <button type="button" id="edTxt"><i>T</i>글자</button>
+    <button type="button" id="edSign"><i>✍</i>서명</button>
+    <button type="button" id="edSeal"><i>㊞</i>도장</button>
+    <button type="button" id="edUndo" disabled><i>↶</i>되돌리기</button>
+    <button type="button" id="edSave" class="save"><i>⤓</i>저장</button>
+    <button type="button" id="edDone"><i>✓</i>완료</button>
+  </div>
+  <div class="links">
+    <a href="https://autooneclick.com/?from=viewer-edit" rel="noopener" id="edUp">본사 홈 무료 업그레이드 →</a>
+    <a class="cu" id="edCustom" href="sms:01020022899">커스텀 의뢰</a>
+  </div>
+</div>
+
+<div class="edsheet" id="edSignSheet">
+  <div class="pane">
+    <h3>손가락으로 서명하세요</h3>
+    <canvas id="edPad"></canvas>
+    <div class="row">
+      <button type="button" id="edPadClear">지우기</button>
+      <button type="button" id="edPadPhoto">도장·서명 사진</button>
+      <button type="button" class="ok" id="edPadOk">얹기</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="edImgIn" accept="image/*" hidden>
+
+<script>
+(function(){
+  var out = document.getElementById('out'), docEl = document.getElementById('doc');
+  var body = document.body, editing = false, undo = [], typingT = null;
+  var H2C = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  docEl.parentNode.insertBefore(document.getElementById('edTop'), docEl);
+  function toast(m){ if (typeof showToast === 'function') showToast(m); }
+  function $(id){ return document.getElementById(id); }
+  function docOpen(){ return docEl && docEl.style.display !== 'none' && out.children.length > 0; }
+  function inApp(){ try{ if (window.KTSApp) return true; }catch(e){} return /KTS[\s\S]*더뷰/.test(navigator.userAgent); }
+
+  /* 커스텀 의뢰 문자 */
+  $('edCustom').href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] 더편집 커스텀 의뢰드립니다 (원하는 양식/기능: )');
+  ['edUp','edUpTop'].forEach(function(id){
+    $(id).addEventListener('click', function(ev){
+      try{ if (inApp() && window.KTSApp && typeof KTSApp.openHome === 'function'){ ev.preventDefault(); KTSApp.openHome(); } }catch(e){}
+    });
   });
+
+  function layer(){
+    var l = out.querySelector(':scope > .edlayer');
+    if (!l){ l = document.createElement('div'); l.className = 'edlayer'; l.contentEditable = 'false'; out.appendChild(l); }
+    return l;
+  }
+  /* PDF 페이지(캔버스)는 편집 중 사라지지 않도록 그림으로 고정 */
+  function freezeCanvas(){
+    out.querySelectorAll('canvas').forEach(function(cv){
+      try{
+        var im = document.createElement('img');
+        im.src = cv.toDataURL('image/png'); im.className = cv.className; im.style.cssText = cv.style.cssText;
+        im.style.width = '100%'; cv.parentNode.replaceChild(im, cv);
+      }catch(e){}
+    });
+    out.querySelectorAll('.btnz').forEach(function(b){ b.style.display = 'none'; });
+  }
+  /* 되돌리기 */
+  function snap(){
+    undo.push(out.innerHTML); if (undo.length > 40) undo.shift();
+    $('edUndo').disabled = undo.length === 0;
+  }
+  function doUndo(){
+    if (!undo.length) return;
+    out.innerHTML = undo.pop(); setEditable(true);
+    $('edUndo').disabled = undo.length === 0; toast('한 단계 되돌렸습니다');
+  }
+  function setEditable(on){
+    out.contentEditable = on ? 'true' : 'false';
+    out.querySelectorAll('.edlayer').forEach(function(l){ l.contentEditable = 'false'; });
+    out.querySelectorAll('.edobj.txt .t').forEach(function(t){ t.contentEditable = on ? 'true' : 'false'; });
+  }
+  out.addEventListener('beforeinput', function(){
+    if (!editing) return;
+    if (!typingT) snap();
+    clearTimeout(typingT); typingT = setTimeout(function(){ typingT = null; }, 1200);
+  });
+
+  /* 얹기(서명·도장·글자) — 화면 가운데 근처에 놓고 끌어서 옮김 */
+  function place(el, w){
+    var l = layer(), r = out.getBoundingClientRect();
+    var vy = Math.max(0, Math.min(r.height - 60, (window.innerHeight * 0.42) - r.top));
+    el.style.left = Math.max(4, (r.width - w) / 2) + 'px';
+    el.style.top = vy + 'px';
+    el.style.width = w + 'px';
+    var x = document.createElement('span'); x.className = 'x'; x.textContent = '✕'; x.dataset.act = 'del';
+    var h = document.createElement('span'); h.className = 'h'; h.textContent = '⤡'; h.dataset.act = 'size';
+    el.appendChild(x); el.appendChild(h);
+    snap(); l.appendChild(el);
+  }
+  function addImg(src, w, cls){
+    var d = document.createElement('div'); d.className = 'edobj ' + (cls || '');
+    var im = document.createElement('img'); im.src = src; im.alt = '';
+    d.appendChild(im); place(d, w);
+  }
+  function addText(){
+    var d = document.createElement('div'); d.className = 'edobj txt';
+    var t = document.createElement('div'); t.className = 't'; t.contentEditable = 'true'; t.textContent = '여기에 글자';
+    var mv = document.createElement('span'); mv.className = 'mv'; mv.textContent = '✥'; mv.dataset.act = 'move';
+    d.appendChild(t); d.appendChild(mv); place(d, 140);
+    setTimeout(function(){ try{ t.focus(); var rg = document.createRange(); rg.selectNodeContents(t); var s = getSelection(); s.removeAllRanges(); s.addRange(rg); }catch(e){} }, 30);
+  }
+  /* 기본 도장 — 입력 없이 붉은 원형 '인' 도장 */
+  function sealURL(){
+    var c = document.createElement('canvas'); c.width = c.height = 240; var g = c.getContext('2d');
+    g.strokeStyle = g.fillStyle = 'rgba(214,32,32,.9)';
+    g.lineWidth = 14; g.beginPath(); g.arc(120,120,100,0,Math.PI*2); g.stroke();
+    g.lineWidth = 4; g.beginPath(); g.arc(120,120,82,0,Math.PI*2); g.stroke();
+    g.font = '900 104px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('인', 120, 128);
+    return c.toDataURL('image/png');
+  }
+
+  /* 끌기·크기·삭제 (위임) */
+  var drag = null;
+  out.addEventListener('pointerdown', function(ev){
+    if (!editing) return;
+    var obj = ev.target.closest && ev.target.closest('.edobj'); if (!obj) return;
+    var act = ev.target.dataset && ev.target.dataset.act;
+    if (act === 'del'){ ev.preventDefault(); snap(); obj.remove(); return; }
+    if (obj.classList.contains('txt') && !act) return; /* 글자 상자 안은 글쓰기 */
+    ev.preventDefault();
+    snap();
+    drag = {obj: obj, mode: act === 'size' ? 'size' : 'move', x: ev.clientX, y: ev.clientY,
+      l: obj.offsetLeft, t: obj.offsetTop, w: obj.offsetWidth};
+    try{ obj.setPointerCapture(ev.pointerId); }catch(e){}
+  });
+  window.addEventListener('pointermove', function(ev){
+    if (!drag) return;
+    var dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
+    if (drag.mode === 'move'){ drag.obj.style.left = (drag.l + dx) + 'px'; drag.obj.style.top = (drag.t + dy) + 'px'; }
+    else drag.obj.style.width = Math.max(36, drag.w + dx) + 'px';
+  });
+  window.addEventListener('pointerup', function(){ drag = null; });
+
+  /* 서명 패드 */
+  var pad = $('edPad'), pg = null, inked = false, drawing = false;
+  function padInit(){
+    var r = pad.getBoundingClientRect(), dpr = Math.max(1, window.devicePixelRatio || 1);
+    pad.width = r.width * dpr; pad.height = r.height * dpr;
+    pg = pad.getContext('2d'); pg.scale(dpr, dpr);
+    pg.lineWidth = 3.2; pg.lineCap = pg.lineJoin = 'round'; pg.strokeStyle = '#111';
+    inked = false;
+  }
+  function pt(ev){ var r = pad.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+  pad.addEventListener('pointerdown', function(ev){ drawing = true; var p = pt(ev); pg.beginPath(); pg.moveTo(p[0], p[1]); try{ pad.setPointerCapture(ev.pointerId); }catch(e){} });
+  pad.addEventListener('pointermove', function(ev){ if (!drawing) return; var p = pt(ev); pg.lineTo(p[0], p[1]); pg.stroke(); inked = true; });
+  pad.addEventListener('pointerup', function(){ drawing = false; });
+  function trimSign(){
+    var w = pad.width, h = pad.height, d = pg.getImageData(0,0,w,h).data, x0=w, y0=h, x1=0, y1=0;
+    for (var y = 0; y < h; y += 2) for (var x = 0; x < w; x += 2){ if (d[(y*w+x)*4+3] > 20){ if (x<x0)x0=x; if (x>x1)x1=x; if (y<y0)y0=y; if (y>y1)y1=y; } }
+    if (x1 <= x0) return pad.toDataURL('image/png');
+    var m = 8, c = document.createElement('canvas'); c.width = x1-x0+m*2; c.height = y1-y0+m*2;
+    c.getContext('2d').drawImage(pad, x0-m, y0-m, c.width, c.height, 0, 0, c.width, c.height);
+    return c.toDataURL('image/png');
+  }
+  $('edPadClear').onclick = padInit;
+  $('edPadOk').onclick = function(){
+    if (!inked){ toast('먼저 서명을 그려 주세요'); return; }
+    var u = trimSign(); $('edSignSheet').classList.remove('on'); addImg(u, 150, 'sign'); toast('서명을 얹었습니다 · 끌어서 옮기세요');
+  };
+  $('edPadPhoto').onclick = function(){ $('edImgIn').click(); };
+  $('edSignSheet').addEventListener('click', function(ev){ if (ev.target === this) this.classList.remove('on'); });
+  $('edImgIn').addEventListener('change', function(){
+    var f = this.files && this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){ $('edSignSheet').classList.remove('on'); addImg(rd.result, 110, 'photo'); toast('사진을 얹었습니다 · 끌어서 옮기세요'); };
+    rd.readAsDataURL(f); this.value = '';
+  });
+
+  /* 저장 — PNG(html2canvas), 실패 시 HTML 사본 */
+  function baseName(){ var n = ($('fname').textContent || '문서').replace(/\.[^.]+$/, ''); return n + '_더편집'; }
+  function dl(blob, name){
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  }
+  function loadH2C(){
+    return new Promise(function(ok, no){
+      if (window.html2canvas) return ok();
+      var s = document.createElement('script'); s.src = H2C; s.onload = ok; s.onerror = no; document.head.appendChild(s);
+    });
+  }
+  function saveHtml(){
+    var css = Array.prototype.map.call(document.querySelectorAll('style'), function(s){ return s.textContent; }).join('\n');
+    var html = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
+      + baseName() + '</title><style>' + css + '</style></head><body style="background:#fff;display:block"><div class="doc ' + (docEl.classList.contains('paper') ? 'paper' : '')
+      + '" style="margin:0"><div class="body" id="out" style="position:relative">' + out.innerHTML + '</div></div></body></html>';
+    dl(new Blob([html], {type: 'text/html'}), baseName() + '.html');
+  }
+  $('edSave').onclick = function(){
+    var b = this; b.disabled = true; toast('저장 파일을 만드는 중…');
+    if (document.activeElement) document.activeElement.blur();
+    loadH2C().then(function(){
+      body.classList.add('edcap');
+      return html2canvas(out, {backgroundColor: docEl.classList.contains('paper') ? '#ffffff' : '#0F1B33', scale: (out.scrollHeight > 6000 ? 1 : 2), useCORS: true,
+        width: out.scrollWidth, height: out.scrollHeight, windowWidth: Math.max(out.scrollWidth, document.documentElement.clientWidth)});
+    }).then(function(cv){
+      body.classList.remove('edcap');
+      cv.toBlob(function(bl){ if (!bl){ saveHtml(); } else { dl(bl, baseName() + '.png'); } toast('저장했습니다 · 다운로드 폴더를 확인하세요'); b.disabled = false; }, 'image/png');
+    }).catch(function(){
+      body.classList.remove('edcap'); saveHtml(); toast('그림 저장 대신 문서(HTML) 사본으로 저장했습니다'); b.disabled = false;
+    });
+  };
+
+  /* 켜기·끄기 */
+  function enter(){
+    if (!docOpen()){
+      toast('먼저 고칠 파일을 열어 주세요');
+      setTimeout(function(){ $('f').click(); }, 350);
+      return;
+    }
+    editing = true; undo = []; $('edUndo').disabled = true;
+    freezeCanvas(); layer(); setEditable(true);
+    body.classList.add('editing');
+    toast('더편집 · 글자를 누르면 바로 고쳐집니다');
+  }
+  function exit(silent){
+    if (!editing) return;
+    editing = false; setEditable(false); body.classList.remove('editing');
+    $('edSignSheet').classList.remove('on');
+    if (!silent) toast('편집을 마쳤습니다 · [저장]은 다시 더편집에서');
+  }
+  $('kipEdit').addEventListener('click', enter);
+  $('edDone').onclick = function(){ exit(false); };
+  $('edUndo').onclick = doUndo;
+  $('edTxt').onclick = addText;
+  $('edSeal').onclick = function(){ addImg(sealURL(), 72, 'seal'); toast('도장을 얹었습니다 · 끌어서 옮기세요'); };
+  $('edSign').onclick = function(){ $('edSignSheet').classList.add('on'); setTimeout(padInit, 30); };
+
+  /* 다른 파일을 열거나 닫으면 편집 모드 해제 */
+  $('backb').addEventListener('click', function(){ exit(true); });
+  $('f').addEventListener('change', function(){ exit(true); });
+  if (typeof window.resetView === 'function'){
+    var rv = window.resetView; window.resetView = function(){ exit(true); return rv.apply(this, arguments); };
+  }
+  if (typeof window.showFile === 'function'){
+    var sf = window.showFile; window.showFile = function(){ exit(true); return sf.apply(this, arguments); };
+  }
 })();
 </script>
 </body></html>

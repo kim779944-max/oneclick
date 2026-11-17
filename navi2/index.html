@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>독심술 — 4문항으로 보는 32가지 결</title>
+<meta name="theme-color" content="#0A1224">
+<meta name="description" content="문항 4개로 그 사람의 결(結)을 읽고, 그림 한 장과 세 마디로 정리합니다. 강점 → 그 힘의 이면 → 한 줄 처방 → 미래 예보와 예비책. 오락·참고용이며 심리검사·진단이 아닙니다.">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="독심술 — 4문항으로 보는 32가지 결">
+<meta property="og:description" content="4문항 → 8결 × 4갈래 = 32유형. 그림 한 장, 세 마디. 답은 기기 밖으로 나가지 않습니다.">
+<meta property="og:image" content="https://autooneclick.com/navi2/img/cover.webp">
+<meta property="og:url" content="https://autooneclick.com/navi2/">
+<style>
+:root{--bg:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#C2CFDF;--gray:#93A4BC;--or:#FF6B00;--or2:#FFA24D;--on:#0A1224;
+  --gold:#C6A054;--ok:#34D399;--warn:#FBBF24;--bad:#FB7185}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 58% at 50% -10%,#132A4E 0%,transparent 62%),var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding:0 16px 34px;min-height:100vh;display:flex;flex-direction:column}
+.hd{display:flex;align-items:center;gap:9px;padding:13px 2px 9px;position:sticky;top:0;z-index:30;
+  background:linear-gradient(180deg,var(--bg) 74%,rgba(10,18,36,0))}
+.logo{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:0 0 auto;
+  background:linear-gradient(150deg,#16234A,#0C1730);border:1px solid rgba(198,160,84,.55);
+  font-weight:900;font-size:15px;color:var(--or2)}
+.brand{font-size:16px;font-weight:900;letter-spacing:-.4px;line-height:1.12}
+.brand small{display:block;font-size:10.5px;font-weight:700;color:var(--gray);margin-top:2px}
+.hd .sp{flex:1}
+.pill{font-size:10.5px;font-weight:800;color:var(--or2);border:1px solid var(--line2);
+  background:rgba(255,107,0,.08);border-radius:999px;padding:5px 9px;white-space:nowrap;font-family:inherit}
+.scr{display:none;flex:1;flex-direction:column}
+.scr.on{display:flex;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.kicker{display:inline-block;font-size:11.5px;font-weight:900;color:var(--on);
+  background:linear-gradient(90deg,var(--or),var(--or2));border-radius:999px;padding:6px 12px;align-self:flex-start}
+h1{font-size:26px;line-height:1.32;letter-spacing:-1.2px;margin:12px 0 0;font-weight:900;word-break:keep-all}
+h1 em{font-style:normal;color:var(--or2)}
+h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weight:900;word-break:keep-all}
+.sub{font-size:14px;line-height:1.75;color:var(--ink2);margin:10px 0 0;letter-spacing:-.3px;word-break:keep-all}
+.sub b{color:#fff}
+.hero{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;border-radius:18px;margin-top:14px;
+  border:1px solid var(--line);display:block}
+.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.gal figure{margin:0;border-radius:11px;overflow:hidden;border:1px solid var(--line);position:relative;aspect-ratio:1/1}
+.gal img{width:100%;height:100%;object-fit:cover;display:block;opacity:.92}
+.gal figcaption{position:absolute;left:0;right:0;bottom:0;font-size:8.5px;font-weight:800;text-align:center;
+  padding:2px 0;color:#EAF0F8;background:linear-gradient(180deg,rgba(10,18,36,0),rgba(10,18,36,.92));letter-spacing:-.2px}
+.btn{display:block;width:100%;border:0;border-radius:15px;padding:16px;font-size:16px;font-weight:900;
+  letter-spacing:-.5px;cursor:pointer;font-family:inherit;text-align:center}
+.btn.main{background:linear-gradient(180deg,#FF8A2B,var(--or));color:var(--on);box-shadow:0 10px 26px rgba(255,107,0,.24)}
+.btn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line2)}
+.btn.sm{padding:12px;font-size:14px;border-radius:12px}
+.btn[disabled]{opacity:.42;pointer-events:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.dock{margin-top:auto;padding:16px 0 4px;display:grid;gap:9px}
+.foot-note{font-size:10.5px;color:#71839E;line-height:1.65;text-align:center;margin-top:12px;letter-spacing:-.15px;word-break:keep-all}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.mode{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:15px 14px;cursor:pointer;
+  font-family:inherit;text-align:left;position:relative;color:var(--ink)}
+.mode:active,.mode.on{border-color:var(--or);background:rgba(255,107,0,.08)}
+.mode .mi i{display:block;width:6px;height:6px;border-radius:99px;background:var(--or);box-shadow:0 0 8px var(--or)}
+.mode b{display:block;font-size:15.5px;font-weight:900;color:#fff;margin-top:7px}
+.mode span{display:block;font-size:11px;color:var(--gray);margin-top:3px;line-height:1.45;word-break:keep-all}
+.big2{display:grid;gap:10px;margin-top:14px}
+.big2 .btn{text-align:left;padding:17px 16px}
+.big2 .btn small{display:block;font-size:11.5px;font-weight:700;color:#2B1A05;opacity:.72;margin-top:4px}
+.big2 .btn.ghost small{color:var(--gray);opacity:1}
+#relWrap{display:none;margin-top:8px}
+#relWrap.on{display:block}
+.prog{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
+.bar{flex:1;height:5px;border-radius:99px;background:#1A2A4A;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--or),var(--or2));transition:width .3s}
+.pnum{font-size:11.5px;font-weight:800;color:var(--gray);white-space:nowrap;font-variant-numeric:tabular-nums}
+.qtag{font-size:11.5px;font-weight:900;color:var(--or2);letter-spacing:.35px}
+.qtxt{font-size:21px;line-height:1.42;letter-spacing:-.8px;margin:8px 0 0;font-weight:900;word-break:keep-all}
+.qhint{font-size:12px;color:var(--gray);margin:7px 0 0;letter-spacing:-.2px;line-height:1.55;word-break:keep-all}
+.grid{display:grid;gap:10px;margin-top:15px}
+.opt{font-family:inherit;text-align:left;border:1px solid var(--line2);border-radius:14px;background:var(--card);
+  padding:15px 14px 15px 42px;cursor:pointer;position:relative;color:var(--ink);transition:border-color .15s,background .15s}
+.opt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.35px;color:#fff;line-height:1.5;word-break:keep-all}
+.opt .no{position:absolute;left:12px;top:15px;width:21px;height:21px;border-radius:6px;background:rgba(10,18,36,.8);
+  border:1px solid var(--line2);color:var(--ink2);font-size:11px;font-weight:900;display:grid;place-items:center}
+.opt.sel{border-color:var(--or);background:rgba(255,107,0,.1);box-shadow:0 0 0 2px rgba(255,107,0,.22)}
+.opt.sel .no{background:var(--or);color:var(--on);border-color:var(--or)}
+.opt.sel2{border-style:dashed;border-color:var(--or2);background:rgba(255,162,77,.06)}
+.opt.sel2 .no{background:rgba(255,162,77,.22);color:var(--or2);border-color:var(--or2)}
+.opt .rk{position:absolute;right:11px;top:13px;font-size:9.5px;font-weight:900;color:var(--or2);
+  border:1px solid rgba(255,162,77,.5);border-radius:999px;padding:2px 7px;letter-spacing:.04em}
+.switch{display:flex;align-items:center;gap:9px;margin-top:14px;border:1px solid var(--line);border-radius:12px;
+  background:rgba(255,255,255,.03);padding:11px 12px;cursor:pointer}
+.switch .sw{flex:0 0 auto;width:38px;height:22px;border-radius:99px;background:#1B2B4B;border:1px solid var(--line2);position:relative}
+.switch .sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#8FA0B8;transition:.18s}
+.switch.on .sw{background:rgba(255,107,0,.28);border-color:var(--or)}
+.switch.on .sw i{left:18px;background:var(--or2)}
+.switch .sl{font-size:11.5px;line-height:1.5;color:var(--ink2);word-break:keep-all}
+.switch .sl b{display:block;color:#fff;font-size:12.5px;margin-bottom:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px}
+.tag{font-size:11px;font-weight:800;color:#CBD6E6;background:rgba(255,255,255,.06);
+  border:1px solid var(--line2);border-radius:999px;padding:4px 9px}
+.tag.o{color:var(--or2);border-color:rgba(255,107,0,.5);background:rgba(255,107,0,.1)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px;margin-bottom:11px}
+.card.amber{border-color:rgba(255,107,0,.42);background:linear-gradient(180deg,rgba(255,107,0,.08),rgba(15,27,51,.92))}
+.ctit{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:var(--or2);margin-bottom:9px}
+.ctit:before{content:"";width:5px;height:5px;border-radius:99px;background:var(--or);box-shadow:0 0 8px var(--or)}
+.big{font-size:20px;line-height:1.6;letter-spacing:-.6px;font-weight:900;color:#fff;word-break:keep-all}
+.big em{font-style:normal;color:var(--or2)}
+.mid{font-size:17.5px;line-height:1.68;letter-spacing:-.5px;font-weight:800;color:#F0F5FB;word-break:keep-all}
+.mid b{color:var(--or2)}
+.small{font-size:14px;line-height:1.7;color:var(--ink2);letter-spacing:-.2px;margin:9px 0 0;word-break:keep-all}
+.rows{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:19px 1fr;gap:9px}
+.row .ic{width:19px;height:19px;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:900;margin-top:2px}
+.row .lab{font-size:11px;font-weight:900;letter-spacing:.02em;margin-bottom:3px}
+.row .tx{font-size:17px;line-height:1.62;letter-spacing:-.45px;font-weight:800;color:#F2F6FB;word-break:keep-all}
+.row.s .ic{background:rgba(52,211,153,.14);border:1px solid rgba(52,211,153,.4);color:var(--ok)}
+.row.s .lab{color:var(--ok)}
+.row.w .ic{background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);color:var(--warn)}
+.row.w .lab{color:var(--warn)}
+.row.p .ic{background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.4);color:#7DD3FC}
+.row.p .lab{color:#7DD3FC}
+.quote{font-size:19px;line-height:1.55;font-weight:900;letter-spacing:-.6px;color:#FFF4E8;
+  background:rgba(255,107,0,.09);border:1px solid rgba(255,107,0,.4);border-radius:14px;padding:14px 15px;word-break:keep-all}
+.quote:before{content:"“";color:var(--or2)}
+.quote:after{content:"”";color:var(--or2)}
+.hitimg{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:20px;border:1px solid var(--line2);display:block;
+  box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.deck{display:flex;align-items:center;gap:8px;margin:12px 0 2px}
+.deck b{font-size:20px;font-weight:900;letter-spacing:-.7px}
+.deck span{font-size:11.5px;color:var(--gray);font-weight:800;border:1px solid var(--line2);border-radius:999px;padding:3px 8px}
+.note{font-size:11px;color:#7C8DA6;line-height:1.66;margin-top:10px;word-break:keep-all}
+.fld{margin-top:12px}
+.fld label{display:block;font-size:11.5px;font-weight:800;color:var(--gray);margin-bottom:6px}
+.fld input{width:100%;padding:13px;border-radius:11px;border:1px solid var(--line2);background:#0B1730;color:#fff;
+  font-size:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:2px;text-align:center}
+.fld input:focus{outline:0;border-color:var(--or)}
+.hist{margin-top:14px}
+.hist b{display:block;font-size:10.5px;color:var(--gray);letter-spacing:.04em;margin-bottom:7px}
+.hit{width:100%;text-align:left;font-family:inherit;border:1px solid var(--line);border-radius:12px;
+  background:var(--card);color:var(--ink2);padding:10px 12px;margin-bottom:6px;font-size:11.5px;cursor:pointer;line-height:1.5}
+.hit b{color:var(--or2);font-weight:900;margin-right:6px}
+.sheet{position:fixed;inset:0;z-index:80;display:none}
+.sheet.on{display:block}
+.sheet .bg{position:absolute;inset:0;background:rgba(4,8,16,.72)}
+.sheet .pane{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#101C36,#0A1224);
+  border-top:1px solid var(--line2);border-radius:20px 20px 0 0;padding:18px 16px 22px;max-height:88vh;overflow:auto}
+.sheet h4{margin:0 0 4px;font-size:17px;font-weight:900;letter-spacing:-.5px}
+.sheet .sp-sub{font-size:12px;color:var(--gray);line-height:1.6;margin:0 0 12px;word-break:keep-all}
+.sheet .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);
+  background:#12203C;color:#C7D3E3;font-size:13px;cursor:pointer;font-family:inherit}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:rgba(10,17,40,.97);
+  border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12.5px;font-weight:700;padding:10px 14px;border-radius:999px;
+  opacity:0;transition:.25s;z-index:90;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="hd">
+    <div class="logo">術</div>
+    <div class="brand">독심술 <small>v4.0 · 32유형 · 4문항</small></div>
+    <div class="sp"></div>
+    <span class="pill" id="hdDate">—</span>
+  </header>
+
+  <!-- ① 표지 -->
+  <section class="scr on" id="sIntro">
+    <span class="kicker">4문항 · 1분 · 32유형 · 무료</span>
+    <h1>그 사람의 <em>결</em>을,<br>그림 한 장으로 봅니다.</h1>
+    <p class="sub">읽고 머리 아픈 긴 설명은 뺐습니다. <b>결 32유형 · 그림 한 장 · 세 마디</b>만 남겼습니다.</p>
+    <img class="hero" src="img/cover.webp" alt="독심술" width="960" height="600" loading="eager">
+    <div class="gal" id="gal"></div>
+    <div class="dock">
+      <button class="btn main" id="btnGo" type="button">시작하기 — 나를 볼 때</button>
+      <button class="btn ghost sm" id="btnToMode" type="button">남을 볼 때 (거래처·애인·선배·후배)</button>
+    </div>
+    <div class="hist hidden" id="histBox"></div>
+    <p class="foot-note">오락·참고용이며, 심리검사·진단이 아닙니다. 답은 기기 밖으로 전송·저장되지 않습니다.</p>
+  </section>
+
+  <!-- ② 모드 선택 -->
+  <section class="scr" id="sMode">
+    <span class="kicker">누구를 볼까요</span>
+    <h2>나를 볼 때와, 남을 볼 때는 <em style="font-style:normal;color:var(--or2)">묻는 방식</em>이 다릅니다.</h2>
+    <div class="big2">
+      <button class="btn main" id="btnSelf" type="button">나를 볼 때<small>내가 아침에 손이 가는 곳부터</small></button>
+      <button class="btn ghost" id="btnOther" type="button">남을 볼 때<small>거래처 · 애인 · 선배 · 후배</small></button>
+    </div>
+    <div id="relWrap"><div class="modes" id="relGrid"></div></div>
+    <div class="dock"><button class="btn ghost sm" id="btnModeBack" type="button">← 처음으로</button></div>
+    <p class="foot-note">대상이 다르면 질문이 달라집니다. 네 문항이 사람마다 갈라집니다.</p>
+  </section>
+
+  <!-- ③ 시작 -->
+  <section class="scr" id="sStart">
+    <span class="kicker" id="startKicker">나를 볼 때</span>
+    <h2 id="startTitle">네 문항이면 충분합니다.</h2>
+    <p class="sub" id="startDesc">답하는 동안 다음 질문이 달라집니다.</p>
+    <div class="fld" id="birthWrap">
+      <label for="birth">생년월일 8자리 (선택 · 나이대 문장에만 씀)</label>
+      <input id="birth" inputmode="numeric" autocomplete="bday" placeholder="19690815" maxlength="8">
+    </div>
+    <p class="note" id="birthNote">넣지 않으셔도 됩니다. 넣으시면 나이대에 맞는 문장으로 바꿔 씁니다.</p>
+    <div class="dock">
+      <button class="btn main" id="btnStart" type="button">4문항 시작</button>
+      <button class="btn ghost sm" id="btnStartBack" type="button">← 이전</button>
+    </div>
+    <p class="foot-note">오락·참고용이며, 심리검사·진단이 아닙니다.</p>
+  </section>
+
+  <!-- ④ 질문 -->
+  <section class="scr" id="sQuiz">
+    <div class="prog"><div class="pnum" id="pnum">1 / 4</div><div class="bar"><i id="pbar" style="width:25%"></i></div></div>
+    <div class="qtag" id="qtag">L1</div>
+    <div class="qtxt" id="qtxt">—</div>
+    <p class="qhint" id="qhint"></p>
+    <div class="grid" id="ogrid"></div>
+    <div class="switch" id="swTwo" role="switch" aria-checked="false" tabindex="0">
+      <div class="sw"><i></i></div>
+      <div class="sl"><b>어느 정도만 맞아요</b>두 번째 카드까지 고를 수 있습니다</div>
+    </div>
+    <div class="dock">
+      <button class="btn main" id="btnNext" type="button" disabled>다음</button>
+      <button class="btn ghost sm" id="btnPrev" type="button">← 이전</button>
+    </div>
+  </section>
+
+  <!-- ⑤ 결과 -->
+  <section class="scr" id="sResult">
+    <div class="chips" id="resChips"></div>
+    <div id="resBody"></div>
+    <div class="dock">
+      <button class="btn main" id="btnShare" type="button">내 결과 카톡·링크로 보내기</button>
+      <a class="btn ghost" id="btnShowroom" href="https://autooneclick.com/?from=navi2-result"
+         target="_blank" rel="noopener" style="text-decoration:none">KTS 원클릭 쇼룸 구경하기 →</a>
+      <div class="row2">
+        <button class="btn ghost sm" id="btnAgain" type="button">다시 하기</button>
+        <button class="btn ghost sm" id="btnHome" type="button">처음으로</button>
+      </div>
+    </div>
+    <p class="note" id="resNote">공유 링크에는 결 이름·한 줄·속마음 한 줄까지만 담깁니다.</p>
+    <p class="foot-note">오락·참고용이며, 심리검사·진단이 아닙니다.</p>
+  </section>
+
+  <!-- ⑥ 공유받은 결과 -->
+  <section class="scr" id="sShared">
+    <span class="kicker">친구가 보낸 결과</span>
+    <h2>이 사람의 결은<br><em id="shName">—</em> 입니다.</h2>
+    <div class="card amber" style="margin-top:14px">
+      <div class="ctit">한 줄 요약</div>
+      <div class="big" id="shSummary">—</div>
+    </div>
+    <div class="card">
+      <div class="ctit">속마음 한 줄</div>
+      <p class="small" id="shInner">—</p>
+    </div>
+    <div class="dock">
+      <button class="btn main" id="btnShMine" type="button">나도 해 보기 — 4문항 1분</button>
+      <a class="btn ghost sm" id="btnShShop" href="https://autooneclick.com/?from=navi2-shared"
+         target="_blank" rel="noopener" style="text-decoration:none">KTS 원클릭 쇼룸 구경하기 →</a>
+    </div>
+    <p class="note">친구의 결과는 요약만 보입니다. 내 결과는 32유형 중 하나로 나옵니다.</p>
+  </section>
+
+</div>
+
+<div class="sheet" id="shShare">
+  <div class="bg" data-close="1"></div>
+  <div class="pane">
+    <button class="x" id="shClose" type="button" aria-label="닫기">✕</button>
+    <h4>이 결과 보내기</h4>
+    <p class="sp-sub">카톡·문자·메신저로 바로 보냅니다. 링크에는 요약까지만 담깁니다.</p>
+    <div class="fld"><label for="shLink">공유 링크</label><input id="shLink" readonly></div>
+    <div class="row2" style="margin-top:12px">
+      <button class="btn main sm" id="shSend" type="button">카톡·메신저로 보내기</button>
+      <button class="btn ghost sm" id="shCopyText" type="button">글자로 복사</button>
+    </div>
+    <div class="row2" style="margin-top:9px">
+      <button class="btn ghost sm" id="shCopy" type="button">링크만 복사</button>
+      <a class="btn ghost sm" href="https://autooneclick.com/?from=navi2-share" target="_blank" rel="noopener"
+         style="text-decoration:none;display:grid;place-items:center">쇼룸 보기 →</a>
+    </div>
+    <p class="note">메일·문자 발송은 하지 않습니다. 복사한 링크를 직접 붙여 넣어 주세요.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/lint.js?v=4"></script>
+<script src="js/data.cards.js?v=4"></script>
+<script src="js/data.modes.js?v=4"></script>
+<script src="js/data.subs.js?v=4"></script>
+<script src="js/engine.js?v=4"></script>
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var APP = window.APP, M = window.MODES, CARDS = window.CARDS, ORDER = window.CARD_ORDER;
+
+  var ST = { mode:null, birth:'', lv:1, picks:[], sel:{p:null,s:null}, two:false, res:null, q:null };
+
+  function show(id){
+    [].forEach.call(document.querySelectorAll('.scr'), function(s){ s.classList.toggle('on', s.id === id); });
+    window.scrollTo(0, 0);
+  }
+  var tt = null;
+  function toast(msg){
+    var el = $('#toast'); el.textContent = msg; el.classList.add('on');
+    clearTimeout(tt); tt = setTimeout(function(){ el.classList.remove('on'); }, 2200);
+  }
+  function el(tag, cls, text){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function today(){
+    var ctx = APP.context(new Date(), '');
+    $('#hdDate').textContent = ctx.dateKo;
+    return ctx;
+  }
+
+  /* ── 표지 8결 그림 ── */
+  (function(){
+    var g = $('#gal');
+    ORDER.forEach(function(k){
+      var c = CARDS[k];
+      var f = document.createElement('figure');
+      var im = document.createElement('img');
+      im.src = c.img; im.alt = c.name; im.loading = 'lazy';
+      var cap = document.createElement('figcaption');
+      cap.textContent = ({SPEED:'장군',PUTOFF:'느긋',EYE:'살핌',FACE:'체면',CALC:'셈',LOYAL:'의리',PERFECT:'벼림',FREE:'자유'})[k] || c.name;
+      f.appendChild(im); f.appendChild(cap); g.appendChild(f);
+    });
+  })();
+
+  /* ── 모드 ── */
+  function buildRel(){
+    var g = $('#relGrid'); g.innerHTML = '';
+    ['deal','love','senior','junior'].forEach(function(k){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mode'; b.dataset.mode = k;
+      var mi = el('div', 'mi'); mi.appendChild(el('i'));
+      b.appendChild(mi); b.appendChild(el('b', null, M[k].nm)); b.appendChild(el('span', null, M[k].q));
+      b.addEventListener('click', function(){ ST.mode = k; toStart(); });
+      g.appendChild(b);
+    });
+  }
+  buildRel();
+
+  function toStart(){
+    var mm = M[ST.mode];
+    $('#startKicker').textContent = mm.nm;
+    $('#startTitle').textContent = ST.mode === 'self' ? '네 문항이면 충분합니다.' : mm.nm + ' — 네 문항이면 충분합니다.';
+    $('#startDesc').textContent = ST.mode === 'self'
+      ? '아침에 손이 가는 곳부터 묻습니다. 앞 답에 따라 다음 질문이 달라집니다.'
+      : '눈으로 확인되는 행동만 묻습니다. 앞 답에 따라 다음 질문이 달라집니다.';
+    /* 생년월일은 '나를 볼 때'에만 받는다 — 남의 나이로 오해되지 않게 */
+    $('#birthWrap').classList.toggle('hidden', ST.mode !== 'self');
+    $('#birthNote').classList.toggle('hidden', ST.mode !== 'self');
+    show('sStart');
+  }
+
+  $('#btnGo').addEventListener('click', function(){ ST.mode = 'self'; toStart(); });
+  $('#btnToMode').addEventListener('click', function(){ show('sMode'); });
+  $('#btnSelf').addEventListener('click', function(){ ST.mode = 'self'; toStart(); });
+  $('#btnOther').addEventListener('click', function(){ $('#relWrap').classList.toggle('on'); });
+  $('#btnModeBack').addEventListener('click', function(){ show('sIntro'); });
+  $('#btnStartBack').addEventListener('click', function(){ show('sMode'); });
+  $('#btnShMine').addEventListener('click', function(){ location.hash = ''; show('sIntro'); });
+
+  /* ── 생년월일 ── */
+  $('#birth').addEventListener('input', function(e){
+    var v = (e.target.value || '').replace(/[^0-9]/g, '').slice(0, 8);
+    e.target.value = v; ST.birth = v;
+    var note = $('#birthNote');
+    if (v.length === 8){
+      var c = APP.context(new Date(), v);
+      note.textContent = c.age == null ? '날짜를 다시 확인해 주세요. (예: 19690815)'
+        : c.bandLabel + ' 문장으로 바꿔 씁니다. 생일은 화면에 숫자로 찍지 않습니다.';
+    } else {
+      note.textContent = '넣지 않으셔도 됩니다. 넣으시면 나이대에 맞는 문장으로 바꿔 씁니다.';
+    }
+  });
+
+  /* ── 질문 ── */
+  $('#btnStart').addEventListener('click', function(){
+    ST.lv = 1; ST.picks = []; ST.res = null;
+    renderQ(); show('sQuiz');
+  });
+
+  function variantFor(lv){
+    if (lv === 1) return '*';
+    var prev = ST.picks[lv - 2];
+    return prev && prev.primary ? prev.primary.opt.n : '*';
+  }
+
+  function renderQ(){
+    var lv = ST.lv, v = variantFor(lv);
+    var q = APP.questionAt(ST.mode, lv, v) || APP.questionAt(ST.mode, lv, '*');
+    ST.q = q;
+    $('#pnum').textContent = lv + ' / 4';
+    $('#pbar').style.width = (lv * 25) + '%';
+    $('#qtag').textContent = 'L' + lv + ' · ' + M[ST.mode].nm;
+    $('#qtxt').textContent = q.q;
+    $('#qhint').textContent = q.hint || '';
+    var g = $('#ogrid'); g.innerHTML = '';
+    q.opts.forEach(function(o, i){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'opt'; b.dataset.idx = String(i + 1);
+      b.appendChild(el('span', 'no', String(i + 1)));
+      b.appendChild(el('b', null, o.label));
+      b.addEventListener('click', function(){ tapOpt(o, i + 1); });
+      g.appendChild(b);
+    });
+    ST.sel = { p:null, s:null };
+    paint();
+  }
+
+  function tapOpt(o, idx){
+    var S = ST.sel;
+    if (S.p && S.p.idx === idx){ S.p = null; S.s = null; }
+    else if (S.s && S.s.idx === idx){ S.s = null; }
+    else if (!S.p){ S.p = { o:o, idx:idx }; }
+    else if (!S.s){ if (ST.two) S.s = { o:o, idx:idx }; else S.p = { o:o, idx:idx }; }
+    else { toast('제일 맞는 것 하나만. 두 번째까지는 받아들여요'); return; }
+    paint();
+  }
+
+  function paint(){
+    var S = ST.sel;
+    [].forEach.call(document.querySelectorAll('#ogrid .opt'), function(node){
+      var idx = Number(node.dataset.idx);
+      node.classList.toggle('sel', !!(S.p && S.p.idx === idx));
+      node.classList.toggle('sel2', !!(S.s && S.s.idx === idx));
+      var rk = node.querySelector('.rk');
+      if (S.p && S.p.idx === idx){ if (!rk){ rk = el('span', 'rk'); node.appendChild(rk); } rk.textContent = '1순위'; }
+      else if (S.s && S.s.idx === idx){ if (!rk){ rk = el('span', 'rk'); node.appendChild(rk); } rk.textContent = '2순위'; }
+      else if (rk) rk.remove();
+    });
+    $('#btnNext').disabled = !S.p;
+    $('#btnNext').textContent = ST.lv === 4 ? '결과 보기' : '다음';
+  }
+
+  var sw = $('#swTwo');
+  function toggleTwo(){
+    ST.two = !ST.two;
+    sw.classList.toggle('on', ST.two);
+    sw.setAttribute('aria-checked', ST.two ? 'true' : 'false');
+    if (!ST.two && ST.sel.s){ ST.sel.s = null; paint(); }
+  }
+  sw.addEventListener('click', toggleTwo);
+  sw.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleTwo(); } });
+
+  $('#btnNext').addEventListener('click', function(){
+    if (!ST.sel.p) return;
+    ST.picks[ST.lv - 1] = {
+      primary: { opt: ST.sel.p.o, idx: ST.sel.p.idx },
+      secondary: ST.sel.s ? { opt: ST.sel.s.o, idx: ST.sel.s.idx } : null
+    };
+    ST.picks = ST.picks.slice(0, ST.lv);
+    if (ST.lv === 4){ finish(); return; }
+    ST.lv += 1; renderQ();
+  });
+  $('#btnPrev').addEventListener('click', function(){
+    if (ST.lv === 1){ show('sStart'); return; }
+    ST.picks = ST.picks.slice(0, ST.lv - 2);
+    ST.lv -= 1; renderQ();
+  });
+
+  function buildPicks(){
+    var out = [];
+    ST.picks.forEach(function(r, i){
+      if (!r) return;
+      out.push({ lv:i + 1, idx:r.primary.idx, opt:r.primary.opt, rank:1 });
+      if (r.secondary) out.push({ lv:i + 1, idx:r.secondary.idx, opt:r.secondary.opt, rank:2 });
+    });
+    return out;
+  }
+
+  function finish(){
+    var res = APP.compose(ST.mode, buildPicks(), ST.birth, new Date());
+    ST.res = res;
+    renderResult(res);
+    APP.saveHistory({
+      at: new Date().toISOString(), mode: res.mode, modeNm: res.modeNm, code: res.code,
+      card: res.cardName, line: res.view.line, inner: res.view.inner, birth: ST.birth || ''
+    });
+    renderHist();
+    show('sResult');
+  }
+
+  function blockRow(kind, icon, label, text){
+    var r = el('div', 'row ' + kind);
+    r.appendChild(el('div', 'ic', icon));
+    var body = el('div');
+    body.appendChild(el('div', 'lab', label));
+    body.appendChild(el('div', 'tx', text));
+    r.appendChild(body);
+    return r;
+  }
+
+  function renderResult(res){
+    var v = res.view, c = res.ctx;
+
+    var chips = $('#resChips'); chips.innerHTML = '';
+    chips.appendChild(el('span', 'tag o', '결 ' + res.cardNo + ' · ' + res.cardName));
+    chips.appendChild(el('span', 'tag', res.flavorNm + ' 갈래'));
+    chips.appendChild(el('span', 'tag', c.dateKo + ' ' + c.timeNoun));
+    if (res.mode === 'self') chips.appendChild(el('span', 'tag', c.age == null ? '나이 미입력' : '만 ' + c.age + '세'));
+    if (res.tie && res.secondary) chips.appendChild(el('span', 'tag', '동률 · ' + window.CARDS[res.secondary].name));
+
+    var body = $('#resBody'); body.innerHTML = '';
+
+    /* ① 그림 + 한 줄 */
+    var img = el('img', 'hitimg');
+    img.src = res.img; img.alt = res.cardName; img.width = 800; img.height = 600;
+    body.appendChild(img);
+
+    var deck = el('div', 'deck');
+    deck.appendChild(el('b', null, '결 ' + res.cardNo + ' ' + res.cardName));
+    deck.appendChild(el('span', null, res.cardSub));
+    body.appendChild(deck);
+
+    var main = el('div', 'card amber');
+    main.appendChild(el('div', 'big', v.line));
+    main.appendChild(el('p', 'small', '겉과 다른 속마음 — ' + v.inner));
+    body.appendChild(main);
+
+    if (res.mode === 'self'){
+      /* ② 강점 → 그 힘의 이면 → 처방 */
+      var b2 = el('div', 'card');
+      b2.appendChild(el('div', 'ctit', '② 이 사람의 힘'));
+      var rows = el('div', 'rows');
+      rows.appendChild(blockRow('s', '강', '강점', v.strength));
+      rows.appendChild(blockRow('w', '면', '그 힘의 이면', v.softness));
+      rows.appendChild(blockRow('p', '처', '한 줄 처방', v.rx));
+      b2.appendChild(rows);
+      body.appendChild(b2);
+
+      /* ③ 미래 예보 & 예비책 */
+      var b3 = el('div', 'card');
+      b3.appendChild(el('div', 'ctit', '③ 미래 예보 & 예비책'));
+      var r3 = el('div', 'rows');
+      r3.appendChild(blockRow('s', '☀', '좋은 일', v.good));
+      r3.appendChild(blockRow('w', '!', '조심할 일', v.risk));
+      r3.appendChild(blockRow('p', '✓', '예비책', v.hedge));
+      b3.appendChild(r3);
+      body.appendChild(b3);
+
+      $('#resNote').textContent = '공유 링크에는 한 줄 요약과 속마음 한 줄까지만 담깁니다.';
+    } else {
+      /* 상대 공략: 강점 살리기 · 비켜 갈 것 · 실제 한마디 */
+      var b2 = el('div', 'card');
+      b2.appendChild(el('div', 'ctit', '② 이렇게 대하세요'));
+      var rows = el('div', 'rows');
+      rows.appendChild(blockRow('s', '강', '강점 살리기', v.keep));
+      rows.appendChild(blockRow('w', '피', '건드리지 말 것', v.avoid));
+      b2.appendChild(rows);
+      body.appendChild(b2);
+
+      var b3 = el('div', 'card');
+      b3.appendChild(el('div', 'ctit', '③ 실제로 꺼낼 한마디'));
+      b3.appendChild(el('div', 'quote', v.script));
+      body.appendChild(b3);
+
+      $('#resNote').textContent = '상대의 강점을 살리고, 단점은 건드리지 않고 피해서 대화하세요.';
+    }
+  }
+
+  /* ── 공유 ── */
+  var SHOP = 'https://autooneclick.com/?from=navi2-share';
+  function shareText(){
+    if (!ST.res) return '';
+    var r = ST.res;
+    return '독심술 · ' + r.modeNm + '\n'
+      + '결 ' + r.cardNo + ' · ' + r.cardName + ' (' + r.flavorNm + ' 갈래)\n'
+      + '① ' + r.view.line + '\n'
+      + (r.mode === 'self'
+          ? '② ' + r.view.strength + '\n③ ' + r.view.hedge
+          : '② ' + r.view.keep + '\n③ ' + r.view.script)
+      + '\n' + shareUrl() + '\n— 나도 해보기: 4문항 1분 (' + SHOP + ')';
+  }
+  function shareUrl(){
+    return location.origin + location.pathname + APP.shareLink(ST.mode, ST.res);
+  }
+  $('#btnShare').addEventListener('click', function(){
+    if (!ST.res) return;
+    $('#shLink').value = shareUrl();
+    $('#shShare').classList.add('on');
+    if (navigator.share){
+      /* 손떼에서 한 번에 카톡·문자로 보내기 시도 — 취소해도 창은 열어 둔다 */
+      navigator.share({ title: '독심술 · ' + ST.res.cardName, text: ST.res.view.line, url: shareUrl() }).catch(function(){});
+    }
+  });
+  function closeShare(){ $('#shShare').classList.remove('on'); }
+  $('#shClose').addEventListener('click', closeShare);
+  $('#shShare').querySelector('.bg').addEventListener('click', closeShare);
+
+  function copy(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(function(){ toast('복사했습니다'); }, function(){ fallback(text); });
+    }
+    fallback(text);
+  }
+  function fallback(text){
+    var t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.top = '-1000px';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); toast('복사했습니다'); } catch (e){ toast('복사가 안 되면 길게 눌러 복사해 주세요'); }
+    t.remove();
+  }
+  $('#shCopy').addEventListener('click', function(){ copy($('#shLink').value); });
+  $('#shSend').addEventListener('click', function(){
+    if (!ST.res) return;
+    var data = { title: '독심술 · ' + ST.res.cardName, text: shareText() };
+    if (navigator.share){
+      navigator.share(data).catch(function(){});
+      return;
+    }
+    copy(shareText());
+  });
+  $('#shCopyText').addEventListener('click', function(){ if (ST.res) copy(shareText()); });
+
+  $('#btnAgain').addEventListener('click', function(){ ST.lv = 1; ST.picks = []; renderQ(); show('sQuiz'); });
+  $('#btnHome').addEventListener('click', function(){ show('sIntro'); });
+
+  /* ── 최근 결과 (기기에만) ── */
+  function renderHist(){
+    var box = $('#histBox'), list = APP.loadHistory();
+    box.innerHTML = '';
+    if (!list.length){ box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.appendChild(el('b', null, '최근 본 결과 ' + list.length + '건 (이 기기에만 저장)'));
+    list.slice(0, 5).forEach(function(h){
+      var b = el('button', 'hit'); b.type = 'button';
+      b.appendChild(el('b', null, h.card || '—'));
+      b.appendChild(document.createTextNode((h.modeNm || '') + ' · ' + String(h.at || '').slice(0, 10)));
+      b.addEventListener('click', function(){ openSaved(h); });
+      box.appendChild(b);
+    });
+  }
+  function openSaved(h){
+    var pane = $('#shShare').querySelector('.pane');
+    var old = pane.querySelector('.savedbox');
+    if (old) old.remove();
+    var box = el('div', 'savedbox');
+    box.appendChild(el('h4', null, (h.card || '') + ' · ' + (h.modeNm || '')));
+    box.appendChild(el('p', 'sp-sub', String(h.at || '').slice(0, 16).replace('T', ' ')));
+    var card = el('div', 'card amber');
+    card.appendChild(el('div', 'ctit', '한 줄 요약'));
+    card.appendChild(el('div', 'big', h.line || ''));
+    box.appendChild(card);
+    var c2 = el('div', 'card');
+    c2.appendChild(el('div', 'ctit', '속마음 한 줄'));
+    c2.appendChild(el('p', 'small', h.inner || ''));
+    box.appendChild(c2);
+    pane.appendChild(box);
+    $('#shShare').classList.add('on');
+  }
+
+  /* ── 공유받은 결과 ── */
+  function bootShare(){
+    var o = APP.readShare(location.hash);
+    if (!o) return false;
+    $('#shName').textContent = o.n || '이 사람';
+    $('#shSummary').textContent = o.s || '—';
+    $('#shInner').textContent = o.j || '—';
+    show('sShared');
+    return true;
+  }
+
+  today();
+  renderHist();
+  if (!bootShare()) show('sIntro');
+
+  window.__APP = APP;
+  window.__ST = ST;
+})();
+</script>
+</body>
+</html>

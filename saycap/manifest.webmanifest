@@ -1,0 +1,16 @@
+{
+  "name": "SayCap 세이캡 2026",
+  "short_name": "SayCap",
+  "description": "말로 남기는 사진일기 — 원본은 그대로, 설명은 자막으로.",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
