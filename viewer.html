@@ -117,7 +117,7 @@ table.xl td.b{font-weight:900}
 .kipupg em{font-style:normal;font-size:12px;font-weight:900;color:var(--amber2);white-space:nowrap}
 </style></head><body>
 <div id="app">
-<header><span class="brand">KTS <i>더뷰</i></span><span class="sp"></span><a href="index.html">← 원클릭</a></header>
+<header><span class="brand">KTS <i>더뷰</i></span><span class="sp"></span><a href="https://autooneclick.com/" id="homeA">← 원클릭</a></header>
 
 <div class="drop" id="drop">
   <div class="mini">
@@ -174,7 +174,7 @@ table.xl td.b{font-weight:900}
 
 <div class="banner" id="banner">
   <div class="t"><b>5장 4,900원</b><br>변환·날인이 필요할 때만</div>
-  <a href="index.html#order">신청</a>
+  <a href="https://autooneclick.com/?from=viewer-banner" rel="noopener">신청</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="window.pdfjsLib=undefined"></script>
@@ -517,7 +517,7 @@ async function openDocx(buf){
 }
 
 /* ---------- 표 래핑 + 확대/축소 + 전체 폭 맞춤 (줄바꿈 없이 글자만 축소) ---------- */
-let fitOn = false, userZoom = 1;
+let fitOn = true, userZoom = 1, lastK = 1;   /* 기본: 전체 폭 맞춤 */
 function maxCols(tables){
   let cols = 0;
   tables.forEach(t => {
@@ -542,7 +542,8 @@ function applyTableZoom(){
     sc.style.width = nat + 'px';
     /* 스케일 후 실제 차지 높이를 잡아 빈 공간·겹침을 없앤다 */
     const h = tbl.offsetHeight * k;
-    w.style.height = (fitOn ? Math.max(h, 0) : Math.max(tbl.offsetHeight, 0)) + 'px';
+    w.style.height = Math.max(h, 0) + 'px';
+    lastK = k;
     w.style.overflowX = fitOn ? 'hidden' : 'auto';
     const pct = w.parentNode.querySelector('.zoombox .pct');
     if (pct) pct.textContent = Math.round(k * 100) + '%';
@@ -572,7 +573,8 @@ function wrapTables(){
       + '<span class="sp2"></span>'
       + '<div class="zoombox"><button type="button" id="zOut">축소</button><span class="pct">100%</span>'
       + '<button type="button" id="zIn">확대</button>'
-      + '<button class="fitbtn" id="fitBtn">전체 폭 맞춤</button></div>';
+      + '<button class="fitbtn on" id="fitBtn">전체 폭 맞춤</button></div>';
+    fitOn = true;   /* 새 파일은 항상 전체 폭 맞춤으로 시작 */
     const host = out.querySelector('.hw') || out;
     host.insertBefore(bar, host.firstChild);
     const swipe = document.createElement('div');
@@ -580,15 +582,17 @@ function wrapTables(){
     swipe.textContent = '← 옆으로 밀면 오른쪽 열까지 보입니다 · 칸이 좁으면 글자가 자동으로 줄어듭니다';
     host.insertBefore(swipe, host.children[1] || null);
     document.getElementById('zOut').onclick = () => {
-      userZoom = Math.max(0.5, +(userZoom - 0.1).toFixed(2)); fitOn = false;
+      if (fitOn) userZoom = lastK;
+      userZoom = Math.max(0.3, +(userZoom - 0.1).toFixed(2)); fitOn = false;
       document.getElementById('fitBtn').classList.remove('on'); applyTableZoom();
     };
     document.getElementById('zIn').onclick = () => {
-      userZoom = Math.min(2, +(userZoom + 0.1).toFixed(2));
-      applyTableZoom();
+      if (fitOn) userZoom = lastK;
+      userZoom = Math.min(2, +(userZoom + 0.1).toFixed(2)); fitOn = false;
+      document.getElementById('fitBtn').classList.remove('on'); applyTableZoom();
     };
     document.getElementById('fitBtn').onclick = () => {
-      fitOn = !fitOn;
+      fitOn = !fitOn; if (!fitOn) userZoom = 1;
       document.getElementById('fitBtn').classList.toggle('on', fitOn);
       applyTableZoom();
       showToast(fitOn ? '전체 폭 맞춤 · 글자만 줄여 한 화면에' : '원래 크기 · 옆으로 밀어 보기');
@@ -823,7 +827,7 @@ document.addEventListener('click', e => {
     location.href = 'https://autooneclick.com/?from=viewer';
   }
   if (inApp()){
-    var a = document.querySelector('header a[href="index.html"]');
+    var a = document.getElementById('homeA');
     if (a){
       a.textContent = '← 돌아가기';
       a.addEventListener('click', function(ev){

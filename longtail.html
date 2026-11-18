@@ -57,6 +57,33 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,107,0,.6)}
  color:#fff;font-size:12.5px;font-weight:700;padding:11px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .hide{display:none!important}
+/* 2단 가격표 */
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tier{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:14px;padding:13px 11px 12px;background:#0F1B33;display:flex;flex-direction:column;gap:2px}
+.tier.on{border-color:var(--amber);background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(15,27,51,.95))}
+.tier .tk{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--amber2)}
+.tier b{font-size:15px;font-weight:900;color:#fff}
+.tier .tp{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.8px;margin-top:2px}
+.tier .tp small{font-size:12px;color:var(--gray);margin-left:1px}
+.tier .tl{font-size:11px;color:var(--ink2);line-height:1.6;margin-top:5px}
+/* 접수 폼 · 자동응답 */
+textarea{resize:vertical;min-height:52px}
+.agree{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--ink2);font-weight:700;margin-top:10px;line-height:1.5}
+.agree input{width:16px;height:16px;flex:0 0 auto;margin-top:1px;accent-color:var(--amber);padding:0}
+input.bad{border-color:#FF6B6B}
+.ar{margin-top:12px;border:1px solid rgba(255,107,0,.5);border-radius:13px;background:#0B1729;padding:12px}
+.arh{display:flex;align-items:center;gap:8px}
+.arh b{font-size:13.5px;font-weight:900;color:#fff;flex:1}
+.arh .sec{font-size:11px;font-weight:900;color:var(--amber2);font-variant-numeric:tabular-nums}
+.spin{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:var(--amber2);animation:sp .8s linear infinite;flex:0 0 auto}
+.spin.done{animation:none;border-color:var(--green);background:var(--green)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.arbar{height:4px;border-radius:999px;background:#1A2A4A;margin-top:9px;overflow:hidden}
+.arbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--amber2));transition:width .3s}
+.arbody{margin-top:10px;font-size:12.5px;line-height:1.75;color:#DCE6F2;white-space:pre-wrap}
+.arbody b{color:var(--amber2)}
+.arbody .kv{display:grid;grid-template-columns:72px 1fr;gap:2px 8px;font-size:12px;margin:6px 0 8px;white-space:normal}
+.arbody .kv span:nth-child(odd){color:var(--gray);font-weight:800}
 </style></head><body><div id="app">
 <header><div class="hd">
   <a class="back" href="index.html" aria-label="뒤로">←</a>
@@ -89,7 +116,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,107,0,.6)}
       </div>
       <div class="row2">
         <div><label>개수</label>
-          <select id="kwCount"><option value="1700">1,700개 · 19,000원</option><option value="5000">5,000개 · 39,000원</option><option value="20000">20,000개 · 89,000원</option></select>
+          <select id="kwCount"><option value="1700">기본 1,700개</option><option value="20000">대량 20,000개</option></select>
         </div>
         <div><label>정렬</label>
           <select id="kwSort"><option value="mix">골고루</option><option value="short">짧은 순</option><option value="long">긴 순</option></select>
@@ -102,11 +129,49 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,107,0,.6)}
     </div>
 
     <div class="card">
-      <h2><i>2</i>요금표</h2>
-      <div class="plan rec"><span class="led"><i></i>추천</span><div><div class="nm">1,700개</div><div class="ds">롱테일 1,700 · 엑셀 1시트</div></div><div class="pr">19,000원</div></div>
-      <div class="plan"><div><div class="nm">5,000개 + 세팅</div><div class="ds">키워드 5,000 · 광고 세팅 포함</div></div><div class="pr">69,000원</div></div>
-      <div class="plan"><div><div class="nm">20,000개 + 세팅</div><div class="ds">키워드 20,000 · 광고 세팅 포함</div></div><div class="pr">129,000원</div></div>
-      <div class="ds" style="font-size:10.5px;color:#7C8DA6;margin-top:8px;line-height:1.6">세팅 없는 키워드만: 5,000개 39,000원 · 20,000개 89,000원</div>
+      <h2><i>2</i>요금표 · 딱 2가지</h2>
+      <div class="tiers">
+        <button type="button" class="tier on" data-v="1700" data-p="basic">
+          <span class="led"><i></i>추천</span>
+          <span class="tk">BASIC</span><b>기본</b>
+          <span class="tp">17,000<small>원</small></span>
+          <span class="tl">롱테일 1,700개<br>엑셀 1시트<br>유튜브 제목·해시태그</span>
+        </button>
+        <button type="button" class="tier" data-v="20000" data-p="bulk">
+          <span class="tk">BULK</span><b>대량</b>
+          <span class="tp">150,000<small>원</small></span>
+          <span class="tl">롱테일 20,000개<br>지역·업종 무제한 조합<br>광고 세팅 대행 포함</span>
+        </button>
+      </div>
+      <div class="ds" style="font-size:10.5px;color:#7C8DA6;margin-top:8px;line-height:1.6">결제는 이 사이트에서 받지 않습니다. 아래 접수 폼을 보내면 60초 안에 자동응답 확인서가 나옵니다.</div>
+    </div>
+
+    <div class="card" id="orderCard">
+      <h2><i>3</i>접수 · 60초 자동응답</h2>
+      <form id="ordForm" autocomplete="on" novalidate>
+        <div class="row2">
+          <div><label>상호·이름</label><input id="oName" name="name" placeholder="예: 미사치킨"></div>
+          <div><label>연락처</label><input id="oTel" name="tel" type="tel" inputmode="tel" placeholder="010-0000-0000"></div>
+        </div>
+        <div class="row2">
+          <div><label>지역</label><input id="oRegion" placeholder="예: 하남 미사"></div>
+          <div><label>업종</label><input id="oBiz" placeholder="예: 치킨"></div>
+        </div>
+        <label>요금</label>
+        <div class="chips" id="oPlan">
+          <button type="button" data-p="basic" class="on">기본 17,000원</button>
+          <button type="button" data-p="bulk">대량 150,000원</button>
+        </div>
+        <label>요청사항 (선택)</label>
+        <textarea id="oMemo" rows="2" placeholder="예: 배달 키워드 위주로, 다음 주 오픈"></textarea>
+        <label class="agree"><input type="checkbox" id="oAgree"> 접수 확인 연락을 위해 연락처를 쓰는 데 동의합니다</label>
+        <button class="btn" type="submit" id="oGo">접수하고 60초 자동응답 받기</button>
+      </form>
+      <div class="ar hide" id="ar">
+        <div class="arh"><span class="spin" id="arSpin"></span><b id="arTitle">자동응답 작성 중…</b><span class="sec" id="arSec">0초</span></div>
+        <div class="arbar"><i id="arBar"></i></div>
+        <div class="arbody hide" id="arBody"></div>
+      </div>
     </div>
   </div>
 
@@ -342,6 +407,82 @@ $('#kwXlsx').onclick = async () => {
   $('#kwPill').textContent = '엑셀 저장됨';
   toast(KW.length.toLocaleString('ko-KR') + '개를 엑셀로 저장했습니다');
 };
+/* ---------- 2단 가격표 ↔ 개수 선택 ↔ 접수 폼 연동 ---------- */
+let oPlan = 'basic';
+const PLAN = { basic:{nm:'기본', price:'17,000원', n:1700, what:'롱테일 1,700개 · 엑셀 1시트 · 유튜브 제목·해시태그'},
+               bulk:{nm:'대량', price:'150,000원', n:20000, what:'롱테일 20,000개 · 지역·업종 무제한 조합 · 광고 세팅 대행'} };
+function setPlan(p, from){
+  oPlan = p;
+  $$('.tier').forEach(t => t.classList.toggle('on', t.dataset.p === p));
+  $$('#oPlan button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  $('#kwCount').value = String(PLAN[p].n);
+  if(from === 'tier'){ $('#orderCard').scrollIntoView({behavior:'smooth', block:'start'}); toast(PLAN[p].nm + ' ' + PLAN[p].price + ' 선택 · 아래에서 접수하세요'); }
+}
+$$('.tier').forEach(t => t.onclick = () => setPlan(t.dataset.p, 'tier'));
+$$('#oPlan button').forEach(b => b.onclick = () => setPlan(b.dataset.p));
+$('#kwCount').addEventListener('change', () => setPlan($('#kwCount').value === '20000' ? 'bulk' : 'basic'));
+/* 위에서 넣은 지역·업종을 폼에 미리 채움 */
+['Region','Biz'].forEach(k => $('#kw'+k).addEventListener('input', () => { const o=$('#o'+k); if(!o.dataset.touched) o.value = $('#kw'+k).value; }));
+['oRegion','oBiz'].forEach(id => $('#'+id).addEventListener('input', () => $('#'+id).dataset.touched = '1'));
+
+/* ---------- 60초 자동응답 웹폼 (서버 없이 즉시 확인서 · 문자로 확정) ---------- */
+function telOk(v){ return /^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(v.replace(/\s/g,'')); }
+$('#oTel').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g,'').slice(0,11);
+  e.target.value = d.length < 4 ? d : d.length < 8 ? d.slice(0,3)+'-'+d.slice(3) : d.slice(0,3)+'-'+d.slice(3, d.length-4)+'-'+d.slice(-4);
+});
+$('#ordForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = { name:$('#oName').value.trim(), tel:$('#oTel').value.trim(), region:$('#oRegion').value.trim(), biz:$('#oBiz').value.trim(), memo:$('#oMemo').value.trim() };
+  let bad = null;
+  [['oName',!f.name],['oTel',!telOk(f.tel)],['oRegion',!f.region],['oBiz',!f.biz]].forEach(([id,b]) => { $('#'+id).classList.toggle('bad', b); if(b && !bad) bad = id; });
+  if(bad){ $('#'+bad).focus(); toast(bad==='oTel' ? '연락처를 확인해 주세요' : '빈 칸을 채워 주세요'); return; }
+  if(!$('#oAgree').checked){ toast('연락처 사용 동의에 체크해 주세요'); return; }
+  autoReply(f);
+});
+function autoReply(f){
+  const P = PLAN[oPlan], t0 = Date.now();
+  const d = new Date(), pad = n => String(n).padStart(2,'0');
+  const no = 'LT-' + String(d.getFullYear()).slice(2) + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + String(Math.floor(1000 + Math.random()*9000));
+  const ar = $('#ar'), body = $('#arBody');
+  ar.classList.remove('hide'); body.classList.add('hide');
+  $('#arSpin').classList.remove('done'); $('#arTitle').textContent = '자동응답 작성 중…'; $('#arBar').style.width = '0';
+  $('#oGo').disabled = true;
+  ar.scrollIntoView({behavior:'smooth', block:'nearest'});
+  /* 샘플 키워드 10개 — 접수한 지역·업종으로 바로 생성 */
+  const keepR = $('#kwRegion').value, keepB = $('#kwBiz').value;
+  $('#kwRegion').value = f.region; $('#kwBiz').value = f.biz;
+  const sample = buildKeywords().filter((_,i) => i % 37 === 0).slice(0, 10);
+  $('#kwRegion').value = keepR || f.region; $('#kwBiz').value = keepB || f.biz;
+  const steps = ['접수 내용 확인', '요금·구성 맞추는 중', '샘플 키워드 뽑는 중', '확인서 작성 완료'];
+  let k = 0;
+  const tm = setInterval(() => {
+    const s = Math.floor((Date.now() - t0) / 1000);
+    $('#arSec').textContent = s + '초 / 60초';
+    if(k < steps.length){ $('#arTitle').textContent = steps[k] + (k < steps.length-1 ? '…' : ''); $('#arBar').style.width = ((k+1)/steps.length*100) + '%'; k++; }
+    if(k >= steps.length){ clearInterval(tm); done(s); }
+  }, 650);
+  function done(s){
+    $('#arSpin').classList.add('done');
+    $('#arTitle').textContent = '자동응답 도착 · ' + Math.max(1, s) + '초';
+    $('#arSec').textContent = '60초 이내 ✓';
+    const sms = '[롱테일 접수 ' + no + ']\n' + f.name + ' / ' + f.tel + '\n' + f.region + ' · ' + f.biz + '\n요금: ' + P.nm + ' ' + P.price + (f.memo ? '\n요청: ' + f.memo : '');
+    body.innerHTML =
+      '<b>' + esc(f.name) + '</b>님, 접수됐습니다.\n'
+      + '<div class="kv"><span>접수번호</span><span>' + no + '</span><span>요금</span><span><b>' + P.nm + ' ' + P.price + '</b></span>'
+      + '<span>구성</span><span>' + P.what + '</span><span>대상</span><span>' + esc(f.region) + ' · ' + esc(f.biz) + '</span>'
+      + '<span>연락처</span><span>' + esc(f.tel) + '</span></div>'
+      + '<b>미리 뽑은 샘플 10개</b>\n' + sample.map((x,i) => (i+1) + '. ' + esc(x)).join('\n')
+      + '\n\n<b>다음 순서</b>\n① 아래 [문자로 접수 확정]을 누르면 접수 내용이 담당자에게 문자로 갑니다\n② 결제 안내(별도 채널)를 받고 확인되면\n③ ' + (oPlan === 'bulk' ? '20,000개 엑셀 + 광고 세팅을 진행합니다' : '1,700개 엑셀을 바로 보내 드립니다')
+      + '<a class="btn" href="sms:01020022899?body=' + encodeURIComponent(sms) + '">문자로 접수 확정</a>'
+      + '<button class="btn ghost" type="button" id="arCopy">접수 내용 복사</button>';
+    body.classList.remove('hide');
+    $('#oGo').disabled = false;
+    $('#arCopy').onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(sms) : Promise.reject()).then(() => toast('복사했습니다'), () => toast('복사가 막혀 있습니다 · 길게 눌러 복사하세요')); };
+    try{ const L = JSON.parse(localStorage.getItem('kts_lt_orders') || '[]'); L.unshift({no, at:Date.now(), plan:oPlan, ...f}); localStorage.setItem('kts_lt_orders', JSON.stringify(L.slice(0,20))); }catch(e){}
+  }
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 /* ship.page 배지 대응 */
 (function(){ function s(){ const b=document.querySelector('ship-page-badge'); document.body.classList.toggle('has-badge', !!(b && b.getBoundingClientRect().height>0)); } s(); setInterval(s,1200); })();
 </script></body></html>

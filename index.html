@@ -91,14 +91,40 @@ h1 em{font-style:normal;color:var(--amber)}
 .freebar .ft b{display:block;font-size:12.5px;font-weight:900;letter-spacing:-.35px;color:#fff}
 .freebar .ft span{display:block;font-size:10.5px;color:#AFBDD0;margin-top:2px;line-height:1.45}
 .freebar .fa{flex:0 0 auto;font-size:16px;font-weight:900;color:var(--amber2)}
+.hd a.home{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
+/* 하단 전 도구 타일 허브 */
+.hub{margin-top:24px;border:1px solid rgba(255,107,0,.4);border-radius:18px;padding:14px 12px 12px;
+  background:linear-gradient(180deg,rgba(255,107,0,.08),rgba(10,17,40,.6) 40%)}
+.hub h2{margin:0;font-size:15px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:7px}
+.hub h2 i{font-style:normal;font-size:10px;font-weight:900;color:var(--on);background:var(--amber);border-radius:6px;padding:2px 6px}
+.hub p{margin:4px 0 11px;font-size:11px;color:var(--gray)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:92px;padding:11px 4px 9px;
+  border:1px solid var(--line);border-radius:14px;background:#0F1B33;text-decoration:none;color:var(--ink);text-align:center;position:relative}
+.tile:active{transform:translateY(1px)}
+.tile .ti{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;font-weight:900;
+  background:rgba(255,107,0,.13);border:1px solid rgba(255,107,0,.4);color:var(--amber2);overflow:hidden}
+.tile .ti img{width:100%;height:100%;object-fit:cover;display:block}
+.tile b{font-size:11.5px;font-weight:900;letter-spacing:-.4px;line-height:1.25;word-break:keep-all}
+.tile small{font-size:9.5px;color:var(--gray);line-height:1.3;word-break:keep-all}
+.tile .nw{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.tile.off{opacity:.5}
+/* 상단 원클릭 복귀 */
+.totop{position:fixed;right:max(14px,calc(50% - 266px));bottom:20px;z-index:40;display:flex;align-items:center;gap:5px;
+  font-family:inherit;font-size:12px;font-weight:900;color:var(--on);background:linear-gradient(135deg,var(--amber),var(--amber2));
+  border:0;border-radius:999px;padding:10px 14px;box-shadow:0 8px 20px rgba(255,107,0,.35);cursor:pointer;
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}
+.totop.on{opacity:1;transform:none;pointer-events:auto}
 </style>
 </head>
 <body>
 <div id="app">
-  <header>
+  <header id="top">
     <div class="hd">
-      <img src="icon.png" alt="">
-      <div class="brand">KTS <span>원클릭</span><small>만든 도구를 한자리에</small></div>
+      <a class="home" href="./" id="homeLink" aria-label="원클릭 처음으로">
+        <img src="icon.png" alt="">
+        <div class="brand">KTS <span>원클릭</span><small>만든 도구를 한자리에</small></div>
+      </a>
       <div class="sp"></div>
       <a class="tel" href="tel:01020022899">010-2002-2899</a>
     </div>
@@ -140,6 +166,12 @@ h1 em{font-style:normal;color:var(--amber)}
   <div class="count" id="count"></div>
   <div class="plist" id="plist"></div>
 
+  <section class="hub" id="hub">
+    <h2><i>ALL</i>전 도구 한눈에</h2>
+    <p>누르면 바로 열립니다 · 설치·로그인 없음</p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
   <div class="notice">
     <b>이 사이트에서 결제하지 않습니다</b>
     <p>원클릭은 도구를 소개하고 <b>맛보기·미리보기</b>를 여는 곳입니다. 유료 도구의 결제는 별도 판매 채널(크몽 등)에서
@@ -154,6 +186,7 @@ h1 em{font-style:normal;color:var(--amber)}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<button class="totop" id="toTop" type="button" aria-label="원클릭 맨 위로">↑ 원클릭</button>
 
 <script src="products.js"></script>
 <script>
@@ -189,6 +222,40 @@ $$('#tabs button').forEach(b => b.onclick = () => {
   render();
 });
 render();
+
+/* 하단 전 도구 타일 허브 — products.js(열린 도구) + 직통 도구 */
+(function(){
+  const EXTRA = [
+    {nm:'더스캔', sub:'찍으면 바로 스캔', link:'thescan/', ico:'▣', nw:1},
+    {nm:'더싸인', sub:'사인·도장·간인', link:'sign/', ico:'✍', nw:1},
+    {nm:'더지우개', sub:'글씨·얼룩 지우기', link:'theeraser/', ico:'⌫'},
+    {nm:'더상세', sub:'상세페이지 1장', link:'thedetail/', ico:'▤'}
+  ];
+  const short = s => String(s||'').split(/ — | \(/)[0];
+  const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => e.link === p.link))
+    .map(p => ({nm:short(p.nm), sub:p.sub.split(' · ')[0].split('→')[0].trim(), link:p.link, img:p.icon, nw:p.badge==='NEW'}));
+  const soon = window.PRODUCTS.filter(p => p.status === 'soon').map(p => ({nm:short(p.nm), sub:'준비 중', img:p.icon, off:1}));
+  const all = [...EXTRA, ...live, ...soon];
+  $('#tiles').innerHTML = all.map(t => {
+    const ic = t.img ? `<img src="${t.img}" alt="" loading="lazy">` : t.ico;
+    const inner = `${t.nw ? '<span class="nw"></span>' : ''}<span class="ti">${ic}</span><b>${t.nm}</b><small>${t.sub}</small>`;
+    return t.off ? `<div class="tile off soonbtn">${inner}</div>` : `<a class="tile" href="${t.link}">${inner}</a>`;
+  }).join('');
+})();
+
+/* 상단 원클릭 복귀 — 로고·떠 있는 버튼 모두 맨 위(처음 화면)로 */
+(function(){
+  const btn = $('#toTop');
+  const goTop = ev => {
+    if (ev) ev.preventDefault();
+    if (cur !== 'all'){ const b = $('#tabs button[data-c="all"]'); if (b) b.click(); }
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+  btn.onclick = goTop;
+  $('#homeLink').addEventListener('click', goTop);
+  const onScroll = () => btn.classList.toggle('on', window.scrollY > 420);
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+})();
 /* 준비 중 카드 안내 */
 document.querySelectorAll('.soonbtn').forEach(b => b.onclick = () => {
   const t = $('#toast'); t.textContent = '출시 준비 중입니다 — 문의 주시면 열리면 먼저 알려드립니다';

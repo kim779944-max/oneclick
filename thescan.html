@@ -108,9 +108,48 @@ header a{font-size:12px;font-weight:800;color:#9DAEC5;text-decoration:none}
  font-size:12px;font-weight:800;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;z-index:90;max-width:88%;text-align:center;pointer-events:none}
 .toast.on{opacity:1}
 body.sheet-on .toast{top:14px;bottom:auto}
+/* ---------- 컬러모드 · 남은 횟수 · 30초 가이드 ---------- */
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#0B1729;border:1px solid var(--line);border-radius:12px;padding:4px}
+.modes button{font-family:inherit;font-size:12px;font-weight:900;color:#94A3B8;background:none;border:0;border-radius:9px;padding:9px 4px;cursor:pointer}
+.modes button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
+.quota{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;color:#C7D3E3}
+.quota .qbar{flex:1;height:6px;border-radius:999px;background:#1A2A4A;overflow:hidden}
+.quota .qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));transition:width .3s}
+.quota b{color:var(--amber2)}
+.quota.out b{color:#FF7A7A}
+.guide{margin:12px 14px 0;border:1px solid rgba(255,107,0,.45);border-radius:14px;background:linear-gradient(180deg,rgba(255,107,0,.1),rgba(15,27,51,.92));padding:12px 13px}
+.guide .gh{display:flex;align-items:center;gap:8px}
+.guide .gh b{font-size:13.5px;font-weight:900;color:#fff}
+.guide .gh .t30{font-size:10px;font-weight:900;color:var(--on-amber);background:var(--amber2);border-radius:6px;padding:2px 6px}
+.guide .gh .sp{flex:1}
+.guide .gh button{font-family:inherit;font-size:11px;font-weight:800;color:#9DAEC5;background:none;border:0;cursor:pointer;padding:4px}
+.guide ol{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.guide li{display:flex;gap:8px;font-size:11.5px;color:var(--ink2);line-height:1.5}
+.guide li i{flex:0 0 auto;font-style:normal;font-size:10px;font-weight:900;color:var(--amber2);background:rgba(255,107,0,.14);border:1px solid rgba(255,107,0,.4);border-radius:6px;padding:0 5px;height:18px;line-height:17px}
+.guide li b{color:#fff}
+.guide .gbar{height:4px;border-radius:999px;background:#1A2A4A;margin-top:10px;overflow:hidden}
+.guide .gbar i{display:block;height:100%;width:0;background:var(--amber)}
+.guide.run .gbar i{width:100%;transition:width 30s linear}
+.guide.hide{display:none}
+.shut{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);width:62px;height:62px;border-radius:50%;border:4px solid #fff;background:rgba(255,107,0,.9);box-shadow:0 0 0 4px rgba(255,107,0,.35);display:none;cursor:pointer;z-index:3}
+.capbox.live .shut{display:block}
+.capbox .camx{position:absolute;right:8px;top:8px;z-index:3;font-family:inherit;font-size:11px;font-weight:900;color:#fff;background:rgba(10,17,40,.75);border:1px solid var(--line2);border-radius:999px;padding:5px 10px;display:none;cursor:pointer}
+.capbox.live .camx{display:block}
+.capnow{z-index:2}
 </style></head><body>
 <div id="app">
-<header><span class="brand">KTS <i>더스캔</i></span><span class="sp"></span><a href="theeraser.html">더지우개 →</a></header>
+<header><a href="https://autooneclick.com/" style="color:var(--amber2)">← 원클릭</a><span class="brand">KTS <i>더스캔</i></span><span class="sp"></span><a href="../theeraser/">더지우개 →</a></header>
+
+<!-- 30초 가이드 -->
+<section class="guide" id="guide">
+  <div class="gh"><span class="t30">30초</span><b>이렇게만 하면 끝</b><span class="sp"></span><button type="button" id="gClose">닫기 ✕</button></div>
+  <ol>
+    <li><i>0~5초</i><span><b>찍기</b>를 누르면 확인창 없이 카메라가 바로 켜집니다</span></li>
+    <li><i>5~20초</i><span>종이를 화면에 채우면 <b>초록 테두리</b> → 알아서 찍힙니다 (가운데 버튼으로 직접 찍어도 됨)</span></li>
+    <li><i>20~30초</i><span><b>컬러 · 흑백 · 원본</b> 중 고르고, 아래 <b>연결하기</b>로 PDF 한 권</span></li>
+  </ol>
+  <div class="gbar"><i></i></div>
+</section>
 
 <!-- 1. 찍기 -->
 <section class="cap">
@@ -123,13 +162,21 @@ body.sheet-on .toast{top:14px;bottom:auto}
       <p>모서리 맞추기·초점 기다리기 <b>0초</b><br>찍는 즉시 펴고·그림자 지우고·갤러리에 저장</p>
     </div>
     <div class="capnow" id="capnow"><span class="led" style="display:inline-block;background:#2ED47A;margin-right:5px"></span>종이가 잡히면 알아서 찍힙니다</div>
+    <button class="shut" id="btnShut" type="button" aria-label="지금 찍기"></button>
+    <button class="camx" id="btnCamX" type="button">카메라 끄기 ✕</button>
   </div>
   <div class="capacts">
-    <button class="btn big" id="btnShoot"><span class="led"></span>찍기 (0초 자동 보정)</button>
+    <div class="modes" id="modes">
+      <button type="button" data-m="color">컬러</button>
+      <button type="button" data-m="bw">흑백 문서</button>
+      <button type="button" data-m="orig">원본</button>
+    </div>
+    <button class="btn big" id="btnShoot"><span class="led"></span>찍기 · 카메라 바로 켜짐</button>
     <div class="row2">
       <button class="btn ghost mini" id="btnFile"><span class="led"></span>사진첩에서</button>
-      <button class="btn ghost mini" id="btnLive"><span class="led"></span>실시간 카메라</button>
+      <button class="btn ghost mini" id="btnLive"><span class="led"></span>기본 카메라 앱</button>
     </div>
+    <div class="quota" id="quota"><span>이번 달 무료</span><span class="qbar"><i id="qBar"></i></span><span id="qTxt"><b>10</b>/10회 남음</span></div>
     <div class="foot-hint">찍은 사진은 이 기기 안에서만 처리됩니다 (서버 전송 없음)</div>
   </div>
   <input type="file" id="fShoot" accept="image/*" capture="environment" hidden>
@@ -393,7 +440,8 @@ function illumNormalize(g, W, H, passes){
   }
   return cur;
 }
-function scanFilter(c){
+function scanFilter(c, mode){
+  if(mode==='orig') return c;                      // 원본: 펴기만, 색·밝기 그대로
   const W=c.width, H=c.height;
   const ctx=c.getContext('2d',{willReadFrequently:true});
   const img=ctx.getImageData(0,0,W,H), d=img.data;
@@ -422,10 +470,21 @@ function scanFilter(c){
     sh[y*W+x]=s<0?0:s>255?255:s;
   }
   const od=ctx.createImageData(W,H), o=od.data;
-  for(let i=0,p=0;i<n;i++,p+=4){
-    // 아주 옅은 회색 대신 거의 흰색으로 (스캔본 느낌)
-    let v=sh[i]; v = v>238?255:v;
-    o[p]=o[p+1]=o[p+2]=v; o[p+3]=255;
+  if(mode==='color'){
+    // 컬러: 흑백과 같은 그림자 제거·대비를 밝기 비율로 RGB에 그대로 실어 색(도장·형광펜·사진)을 살린다
+    for(let i=0,p=0;i<n;i++,p+=4){
+      const v=sh[i];
+      if(v>238){ o[p]=o[p+1]=o[p+2]=255; o[p+3]=255; continue; }
+      const f=Math.min(4, v/Math.max(g[i],6));
+      const r=d[p]*f, gg=d[p+1]*f, b=d[p+2]*f;
+      o[p]=r>255?255:r; o[p+1]=gg>255?255:gg; o[p+2]=b>255?255:b; o[p+3]=255;
+    }
+  }else{
+    for(let i=0,p=0;i<n;i++,p+=4){
+      // 아주 옅은 회색 대신 거의 흰색으로 (스캔본 느낌)
+      let v=sh[i]; v = v>238?255:v;
+      o[p]=o[p+1]=o[p+2]=v; o[p+3]=255;
+    }
   }
   ctx.putImageData(od,0,0);
   return c;
@@ -446,9 +505,9 @@ async function processFile(file, idx, total){
   }else{
     warped = raw;                                   // 종이를 못 찾으면 원본 프레임 그대로 보정
   }
-  setProg(null,null,'그림자 지우고 글씨 살리는 중…');
+  setProg(null,null, scanMode==='orig' ? '원본 색 그대로 정리 중…' : scanMode==='color' ? '그림자 지우고 색 살리는 중…' : '그림자 지우고 글씨 살리는 중…');
   await tick();
-  const clean = scanFilter(warped);
+  const clean = scanFilter(warped, scanMode);
   const url = clean.toDataURL('image/jpeg',0.9);
   const item={id:++seq, url, raw:rawUrl, w:clean.width, h:clean.height, quad:!!quad,
               name:'scan_'+String(seq).padStart(2,'0'), at:new Date()};
@@ -739,46 +798,126 @@ $('#btnAll').addEventListener('click', async ()=>{
   toast(gallery.length+'장 저장을 시작했습니다');
 });
 
+/* ---------- 10-1. 컬러모드 (컬러 · 흑백 문서 · 원본) ---------- */
+let scanMode = (function(){ try{ return localStorage.getItem('kts_scan_mode')||'color'; }catch(e){ return 'color'; } })();
+function paintModes(){ document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('on', b.dataset.m===scanMode)); }
+document.querySelectorAll('#modes button').forEach(b=>b.addEventListener('click',()=>{
+  scanMode=b.dataset.m; paintModes();
+  try{ localStorage.setItem('kts_scan_mode',scanMode); }catch(e){}
+  toast(scanMode==='color'?'컬러 — 도장·형광펜 색을 살립니다':scanMode==='bw'?'흑백 문서 — 글씨만 또렷하게':'원본 — 펴기만 하고 색은 그대로');
+}));
+paintModes();
+
+/* ---------- 10-2. 월 10회 무료 한도 (이 기기 localStorage, 매월 1일 초기화) ---------- */
+const QUOTA_MAX = 10, QKEY = 'kts_scan_quota';
+function monthKey(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function quotaGet(){
+  try{ const q=JSON.parse(localStorage.getItem(QKEY)||'{}'); return q.m===monthKey() ? (q.n|0) : 0; }catch(e){ return 0; }
+}
+function quotaUse(){ const n=quotaGet()+1; try{ localStorage.setItem(QKEY, JSON.stringify({m:monthKey(), n})); }catch(e){} paintQuota(); return n; }
+function quotaLeft(){ return Math.max(0, QUOTA_MAX-quotaGet()); }
+function paintQuota(){
+  const left=quotaLeft();
+  $('#qTxt').innerHTML='<b>'+left+'</b>/'+QUOTA_MAX+'회 남음';
+  $('#qBar').style.width=(left/QUOTA_MAX*100)+'%';
+  $('#quota').classList.toggle('out', left===0);
+}
+function quotaSheet(){
+  const d=new Date(); const nx=new Date(d.getFullYear(), d.getMonth()+1, 1);
+  stopLive();
+  openSheet(`
+    <div class="sh"><b>이번 달 무료 10회를 다 쓰셨어요</b><span class="sp"></span><button class="x" id="sx">✕</button></div>
+    <p class="shsub">무료 스캔은 <b style="color:#FFA24D">${nx.getMonth()+1}월 1일</b>에 다시 10회로 채워집니다.<br>
+    이미 찍은 장은 그대로 <b style="color:#FFA24D">연결하기 · 분리하기 · 저장</b>할 수 있습니다.</p>
+    <div class="sheetacts">
+      <a class="btn pri" style="text-decoration:none" href="https://autooneclick.com/?from=thescan-quota">원클릭에서 무제한 안내 보기</a>
+      <a class="btn ghost" style="text-decoration:none" href="sms:01020022899?body=${encodeURIComponent('[더스캔] 월 10회 넘게 쓰고 싶습니다')}">문자로 문의</a>
+    </div>`, sh=>{ sh.querySelector('#sx').onclick=closeSheet; });
+}
+paintQuota();
+
+/* ---------- 10-3. 30초 가이드 (처음 한 번 자동, 30초 후 접힘) ---------- */
+(function(){
+  const g=$('#guide');
+  let seen=false; try{ seen=localStorage.getItem('kts_scan_guide')==='1'; }catch(e){}
+  const close=()=>{ g.classList.add('hide'); try{ localStorage.setItem('kts_scan_guide','1'); }catch(e){} };
+  $('#gClose').onclick=close;
+  if(seen){ g.classList.add('hide'); return; }
+  requestAnimationFrame(()=>requestAnimationFrame(()=>g.classList.add('run')));
+  setTimeout(close, 30000);
+})();
+
 /* ---------- 11. 입력 연결 ---------- */
-$('#btnShoot').addEventListener('click',()=>$('#fShoot').click());
-$('#btnFile').addEventListener('click',()=>$('#fFile').click());
+$('#btnShoot').addEventListener('click',()=>{
+  if(stream){ shootNow(); return; }
+  startLive(true);                                   // 확인창 없이 바로 카메라
+});
+$('#btnLive').addEventListener('click',()=>{ if(!quotaLeft()){ quotaSheet(); return; } stopLive(); $('#fShoot').click(); });
+$('#btnFile').addEventListener('click',()=>{ if(!quotaLeft()){ quotaSheet(); return; } $('#fFile').click(); });
 $('#fShoot').addEventListener('change',(e)=>handleFiles(e.target.files));
 $('#fFile').addEventListener('change',(e)=>handleFiles(e.target.files));
+let busy=false;
 async function handleFiles(fl){
-  const files=Array.from(fl||[]).filter(f=>f.type.startsWith('image/'));
+  let files=Array.from(fl||[]).filter(f=>f.type.startsWith('image/'));
   if(!files.length) return;
+  const left=quotaLeft();
+  if(!left){ quotaSheet(); $('#fShoot').value=''; $('#fFile').value=''; return; }
+  let cut=0;
+  if(files.length>left){ cut=files.length-left; files=files.slice(0,left); }
+  busy=true;
   try{
-    for(let i=0;i<files.length;i++) await processFile(files[i], i, files.length);
+    for(let i=0;i<files.length;i++){ await processFile(files[i], i, files.length); quotaUse(); }
     progDone();
-    toast(files.length>1? (files.length+'장을 스캔해 저장했습니다') : '스캔 완료 · 내 스캔에 저장됨');
+    const rest=quotaLeft();
+    toast(cut ? (files.length+'장 저장 · 무료 한도로 '+cut+'장은 건너뜀')
+              : (files.length>1? (files.length+'장 스캔 저장') : '스캔 완료')+' · 이번 달 '+rest+'회 남음');
+    if(!rest) setTimeout(quotaSheet, 900);
   }catch(e){ console.error(e); toast('처리 실패: '+e.message); $('#prog').classList.remove('on'); }
+  busy=false;
   $('#fShoot').value=''; $('#fFile').value='';
 }
 
-/* ---------- 12. 실시간 카메라 + 핸즈프리 자동 촬영 (지원 기기에서) ---------- */
-let stream=null, liveTimer=null, steady=0;
-$('#btnLive').addEventListener('click', async ()=>{
-  if(stream){ stopLive(); return; }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저는 실시간 카메라를 지원하지 않습니다. 찍기 버튼을 써 주세요'); return; }
+/* ---------- 12. 바로 직행 카메라 (getUserMedia) + 핸즈프리 자동 촬영 ---------- */
+let stream=null, liveTimer=null, steady=0, armed=true, lost=0;
+async function startLive(fromTap){
+  if(stream) return true;
+  if(!quotaLeft()){ if(fromTap) quotaSheet(); return false; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    if(fromTap) $('#fShoot').click();                // 미지원 브라우저 → 기본 카메라 앱으로 바로
+    return false;
+  }
   try{
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:2560}}, audio:false});
     const v=$('#vid'); v.srcObject=stream; await v.play();
     $('#capbox').classList.add('live');
-    $('#btnLive').innerHTML='<span class="led"></span>실시간 끄기';
+    $('#btnShoot').innerHTML='<span class="led"></span>지금 찍기';
+    $('#capbox').scrollIntoView({block:'nearest', behavior:'smooth'});
+    steady=0; armed=true; lost=0;
     startAutoCapture();
+    return true;
   }catch(e){
-    toast('카메라를 열 수 없습니다 → 찍기 버튼을 써 주세요');
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+    stream=null;
+    if(fromTap) $('#fShoot').click();                // 권한 거절·카메라 없음 → 기본 카메라 앱으로 바로
+    return false;
   }
-});
+}
 function stopLive(){
   if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
-  $('#capbox').classList.remove('live'); $('#btnLive').innerHTML='<span class="led"></span>실시간 카메라';
+  $('#capbox').classList.remove('live'); $('#btnShoot').innerHTML='<span class="led"></span>찍기 · 카메라 바로 켜짐';
+}
+$('#btnShut').addEventListener('click', ()=>shootNow());
+$('#btnCamX').addEventListener('click', ()=>stopLive());
+function shootNow(){
+  if(busy) return;
+  if(!quotaLeft()){ quotaSheet(); return; }
+  captureFromVideo();
 }
 function startAutoCapture(){
   const v=$('#vid'), ov=$('#ov');
   liveTimer=setInterval(()=>{
-    if(!v.videoWidth) return;
+    if(!v.videoWidth || busy) return;
     // 미리보기 프레임을 작은 캔버스로 → 종이가 잡혔는지 검사
     const w=200, h=Math.round(v.videoHeight*w/v.videoWidth);
     const c=document.createElement('canvas'); c.width=w; c.height=h;
@@ -786,30 +925,40 @@ function startAutoCapture(){
     const q=detectQuad(c);
     ov.width=w; ov.height=h;
     const x=ov.getContext('2d'); x.clearRect(0,0,w,h);
-    if(q){ steady++; } else { steady=0; }
+    if(q){ steady++; lost=0; } else { steady=0; if(++lost>=3) armed=true; }   // 종이를 치웠다 다시 대야 다음 장 자동 촬영
     if(q){
       x.strokeStyle='rgba(46,212,122,.95)'; x.lineWidth=2.5;
       x.beginPath(); q.forEach((p,i)=> i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y)); x.closePath(); x.stroke();
-      if(steady===2){ captureFromVideo(); }       // 2프레임 연속 안정 → 자동 촬영 (0초 체감)
+      if(armed && steady===2 && quotaLeft()){ armed=false; captureFromVideo(); }   // 2프레임 연속 안정 → 자동 촬영
     }else{
       x.strokeStyle='rgba(255,162,77,.85)'; x.setLineDash([6,6]); x.lineWidth=1.5;
       x.strokeRect(w*0.1,h*0.1,w*0.8,h*0.8); x.setLineDash([]);
     }
-    $('#capnow').firstChild.textContent='';
     $('#capnow').innerHTML = q
-      ? '<span class="led" style="display:inline-block;background:#2ED47E;margin-right:5px"></span>종이 인식됨 — 그대로 두세요'
+      ? (armed ? '<span class="led" style="display:inline-block;background:#2ED47E;margin-right:5px"></span>종이 인식됨 — 그대로 두세요'
+               : '<span class="led" style="display:inline-block;background:#2ED47E;margin-right:5px"></span>찍었어요 · 다음 장으로 바꿔 주세요')
       : '<span class="led" style="display:inline-block;background:#FFA24D;margin-right:5px"></span>종이를 화면에 채워 주세요';
   }, 260);
 }
 async function captureFromVideo(){
   steady=0;
   const v=$('#vid');
+  if(!v.videoWidth) return;
   const c=document.createElement('canvas'); c.width=v.videoWidth; c.height=v.videoHeight;
   c.getContext('2d').drawImage(v,0,0);
   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.95));
   const f=new File([blob],'live_'+Date.now()+'.jpg',{type:'image/jpeg'});
   await handleFiles([f]);
 }
+/* 이미 카메라를 허용한 기기면 페이지를 열자마자 카메라 직행 */
+(async function(){
+  try{
+    if(!navigator.permissions || !navigator.mediaDevices) return;
+    const st=await navigator.permissions.query({name:'camera'});
+    if(st.state==='granted' && quotaLeft()) startLive(false);
+  }catch(e){}
+})();
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) stopLive(); });
 
 /* ---------- 13. 시작 ---------- */
 render();

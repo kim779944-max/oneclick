@@ -1,0 +1,558 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 더싸인 — 폰으로 사인·도장·간인까지 (한 장 무료)</title>
+<meta name="description" content="직접 사인·사인도장·도장 사진 자동 투명 PNG 중 골라 문서에 찍습니다. 한 장 무료, 여러 장·간인(사이간자) 월 4,900원.">
+<meta name="theme-color" content="#0A1128">
+<link rel="icon" href="../icon.png">
+<style>
+:root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
+ --amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--green:#2ED47A;--seal:#D3262E}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:#070D1E;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+ line-height:1.55;word-break:keep-all;letter-spacing:-.2px;display:flex;justify-content:center}
+#app{width:100%;max-width:460px;min-height:100vh;padding-bottom:30px;overflow-x:hidden;
+ background:radial-gradient(120% 40% at 50% -8%,rgba(255,107,0,.10),rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A,#0B1428 46%,#0A1128)}
+button{font-family:inherit}
+header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+ border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:9px}
+header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px;white-space:nowrap}
+.brand{font-weight:900;font-size:15px;color:#fff;letter-spacing:-.4px}.brand i{font-style:normal;color:var(--amber2)}
+header .sp{flex:1}
+header .st{font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:999px;padding:3px 8px;white-space:nowrap}
+main{padding:12px 14px 0}
+.hero h1{margin:2px 0 4px;font-size:20px;font-weight:900;letter-spacing:-.8px;line-height:1.3}
+.hero h1 b{color:var(--amber2)}
+.hero p{margin:0;font-size:12px;color:var(--ink2)}
+.card{background:linear-gradient(180deg,#12203C,#0F1B33);border:1px solid var(--line);border-radius:16px;padding:13px;margin-top:12px}
+.card h2{display:flex;align-items:center;gap:7px;margin:0 0 10px;font-size:14px;font-weight:900;letter-spacing:-.4px}
+.card h2 i{width:19px;height:19px;border-radius:6px;background:var(--amber);color:var(--on);font-size:10.5px;font-weight:900;display:grid;place-items:center;font-style:normal}
+.card h2 small{margin-left:auto;font-size:10.5px;color:var(--gray);font-weight:700}
+/* 요금 2택 */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plan{position:relative;text-align:left;border:1.5px solid var(--line);background:#0E1A33;border-radius:13px;padding:11px 10px;cursor:pointer;color:var(--ink)}
+.plan.on{border-color:var(--amber);background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(14,26,51,.95))}
+.plan .pk{font-size:10px;font-weight:900;letter-spacing:.06em;color:var(--amber2)}
+.plan b{display:block;font-size:14px;font-weight:900;margin-top:3px;letter-spacing:-.4px}
+.plan .pr{display:block;font-size:16px;font-weight:900;color:#fff;margin-top:4px}
+.plan .pr small{font-size:11px;color:var(--gray);font-weight:700}
+.plan span.ds{display:block;font-size:10.5px;color:var(--ink2);margin-top:4px;line-height:1.45}
+.plan .ck{position:absolute;right:8px;top:8px;width:18px;height:18px;border-radius:50%;border:2px solid #55708F}
+.plan.on .ck{border-color:var(--amber);background:var(--amber);box-shadow:inset 0 0 0 3px #0E1A33}
+.unlock{display:none;margin-top:9px;border:1px dashed rgba(255,107,0,.45);border-radius:11px;padding:9px 10px;font-size:11px;color:var(--ink2)}
+.unlock.on{display:block}
+.unlock .r{display:flex;gap:6px;margin-top:6px}
+.unlock input{flex:1;min-width:0;background:#0B1729;border:1px solid var(--line);border-radius:9px;color:var(--ink);font-size:13px;padding:9px 10px;font-family:inherit;text-transform:uppercase}
+.unlock button,.unlock a{flex:0 0 auto;border:0;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:900;cursor:pointer;text-decoration:none}
+.unlock button{background:var(--amber);color:var(--on)}
+.unlock a{background:#12203C;color:#DCE6F2;border:1px solid var(--line2)}
+.unlock .okmsg{color:var(--green);font-weight:900}
+/* 사인 3택 */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#0B1729;border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{border:0;background:none;color:#94A3B8;font-size:12px;font-weight:900;border-radius:9px;padding:9px 2px;cursor:pointer;line-height:1.3}
+.seg button small{display:block;font-size:9.5px;font-weight:700;opacity:.85}
+.seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.pane{display:none;margin-top:10px}.pane.on{display:block}
+.pad{position:relative;width:100%;aspect-ratio:5/2;border-radius:12px;overflow:hidden;border:1px solid var(--line2);
+ background-color:#fff;background-image:linear-gradient(#fff,#fff),repeating-linear-gradient(45deg,#eee 0 8px,#fff 8px 16px)}
+.pad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.pad .base{position:absolute;left:8%;right:8%;bottom:26%;border-bottom:1.5px dashed #C5CEDA;pointer-events:none}
+.pad .ph{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:12px;color:#9AA7B8;pointer-events:none}
+.row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid #2E4370;cursor:pointer;padding:0}
+.dot.on{border-color:#fff;box-shadow:0 0 0 2px var(--amber)}
+.mini{border:1px solid var(--line2);background:#12203C;color:#DCE6F2;border-radius:9px;padding:7px 10px;font-size:11.5px;font-weight:900;cursor:pointer}
+.mini.on{border-color:var(--amber);color:var(--amber2);background:rgba(255,107,0,.12)}
+.row .sp{flex:1}
+label.lb{display:block;font-size:11.5px;font-weight:800;color:var(--gray);margin:0 0 5px}
+input.tx{width:100%;background:#0B1729;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;padding:11px 12px;outline:0;font-family:inherit}
+input.tx:focus{border-color:rgba(255,107,0,.6)}
+.drop{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;border:1.5px dashed rgba(255,107,0,.5);border-radius:12px;padding:16px 10px;
+ background:rgba(255,107,0,.05);cursor:pointer;text-align:center;font-size:12px;color:var(--ink2)}
+.drop b{color:#fff;font-size:13px}
+.prev{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;border-radius:12px;padding:10px;min-height:96px;
+ background-color:#fff;background-image:linear-gradient(45deg,#E6EAF0 25%,transparent 25%),linear-gradient(-45deg,#E6EAF0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#E6EAF0 75%),linear-gradient(-45deg,transparent 75%,#E6EAF0 75%);
+ background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0}
+.prev img{max-height:110px;max-width:70%;display:block}
+.prev .em{font-size:11.5px;color:#6B7A90;font-weight:700}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;border:0;border-radius:12px;padding:13px 12px;font-size:14.5px;font-weight:900;cursor:pointer;
+ background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on);box-shadow:0 8px 20px rgba(255,107,0,.25);margin-top:10px;text-decoration:none}
+.btn.ghost{background:#12203C;color:#DCE6F2;border:1px solid var(--line2);box-shadow:none}
+.btn:disabled{opacity:.45;filter:grayscale(.4);cursor:default}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.two .btn{margin-top:8px;font-size:13px;padding:12px 8px}
+/* 문서 */
+.pages{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;margin-top:8px;scrollbar-width:thin}
+.pages button{flex:0 0 auto;position:relative;width:52px;height:68px;border:1.5px solid var(--line2);border-radius:7px;overflow:hidden;padding:0;background:#fff;cursor:pointer}
+.pages button img{width:100%;height:100%;object-fit:cover;display:block}
+.pages button.on{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.35)}
+.pages button i{position:absolute;left:2px;top:2px;font-style:normal;font-size:9.5px;font-weight:900;color:#fff;background:rgba(10,17,40,.85);border-radius:4px;padding:0 4px}
+.pages button em{position:absolute;right:2px;bottom:2px;font-style:normal;font-size:9px;font-weight:900;color:#fff;background:var(--seal);border-radius:4px;padding:0 3px}
+.stage{position:relative;margin-top:6px;border-radius:10px;overflow:hidden;background:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+.stage img.pg{display:block;width:100%;height:auto;pointer-events:none}
+.stage .sig{position:absolute;transform:translate(-50%,-50%);outline:1.5px dashed var(--amber);outline-offset:2px;cursor:move;touch-action:none}
+.stage .sig img{display:block;width:100%;pointer-events:none}
+.stage .seam{position:absolute;pointer-events:none;opacity:.95}
+.stage .hint{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:rgba(10,17,40,.85);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:5px 11px;pointer-events:none;white-space:nowrap}
+.rng{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:var(--ink2);font-weight:800}
+.rng input{flex:1;accent-color:var(--amber)}
+.tog{display:flex;align-items:center;gap:9px;margin-top:9px;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:#0E1A33;cursor:pointer}
+.tog .sw{flex:0 0 auto;width:38px;height:22px;border-radius:999px;background:#2A3A5C;position:relative;transition:.2s}
+.tog .sw::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on .sw{background:var(--amber)}.tog.on .sw::after{left:19px}
+.tog .tt{font-size:12.5px;font-weight:900}.tog .tt small{display:block;font-size:10.5px;color:var(--gray);font-weight:600}
+.tog .lk{margin-left:auto;font-size:10px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:6px;padding:2px 6px;white-space:nowrap}
+.note{margin:9px 2px 0;font-size:10.5px;color:#7C8DA6;line-height:1.65}
+.foot{margin:16px 14px 0;padding-top:12px;border-top:1px solid var(--line);font-size:10.5px;color:#7C8DA6;line-height:1.7;text-align:center}
+.foot a{color:#9DAEC5}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;
+ font-size:12px;font-weight:800;padding:10px 15px;border-radius:999px;opacity:0;transition:.25s;z-index:90;max-width:90%;text-align:center;pointer-events:none}
+.toast.on{opacity:1}
+.hide{display:none!important}
+</style></head><body>
+<div id="app">
+<header><a class="back" href="https://autooneclick.com/">← 원클릭</a><span class="brand">KTS <i>더싸인</i></span><span class="sp"></span><span class="st" id="planTag">한 장 무료</span></header>
+<main>
+  <div class="hero">
+    <h1>출력 없이 폰으로<br><b>사인 · 도장 · 간인</b>까지</h1>
+    <p>사인은 투명 PNG로 만들어 문서 위에 바로 찍습니다. 이 기기 안에서만 처리(서버 전송 없음).</p>
+  </div>
+
+  <!-- 1. 요금 선택 -->
+  <section class="card">
+    <h2><i>1</i>어떻게 쓰실 건가요</h2>
+    <div class="plans">
+      <button class="plan on" type="button" data-p="free"><span class="ck"></span><span class="pk">FREE</span><b>한 장 문서</b>
+        <span class="pr">무료</span><span class="ds">1쪽 계약서·영수증·확인서에 사인 1곳</span></button>
+      <button class="plan" type="button" data-p="pro"><span class="ck"></span><span class="pk">PRO</span><b>여러 장 + 간인</b>
+        <span class="pr">4,900원<small> /월</small></span><span class="ds">여러 쪽 · 쪽마다 사인 · 사이간자(간인) 자동</span></button>
+    </div>
+    <div class="unlock" id="unlock">
+      <span id="ulMsg">이용권 코드를 넣으면 워터마크 없이 저장됩니다. 코드가 없으면 <b style="color:#FFA24D">미리보기(워터마크)</b>로 먼저 써 보세요.</span>
+      <div class="r" id="ulRow">
+        <input id="ulCode" placeholder="이용권 코드 (예: KS2611-XXXX)" autocomplete="off">
+        <button type="button" id="ulGo">확인</button>
+        <a id="ulBuy" href="sms:01020022899">월 4,900원 신청</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 사인 만들기 3택 -->
+  <section class="card">
+    <h2><i>2</i>사인 만들기<small>3가지 중 하나</small></h2>
+    <div class="seg" id="mk">
+      <button type="button" class="on" data-m="draw">직접 사인<small>손가락으로</small></button>
+      <button type="button" data-m="seal">사인도장<small>이름 → 도장</small></button>
+      <button type="button" data-m="photo">도장 사진<small>자동 투명</small></button>
+    </div>
+
+    <div class="pane on" id="pDraw">
+      <div class="pad" id="pad"><div class="base"></div><div class="ph" id="padPh">여기에 손가락으로 사인하세요</div><canvas id="cv"></canvas></div>
+      <div class="row">
+        <button class="dot on" type="button" data-c="#111111" style="background:#111111" aria-label="검정"></button>
+        <button class="dot" type="button" data-c="#1D3FB8" style="background:#1D3FB8" aria-label="파랑"></button>
+        <button class="dot" type="button" data-c="#D3262E" style="background:#D3262E" aria-label="빨강"></button>
+        <button class="mini" type="button" data-w="2.4">가늘게</button>
+        <button class="mini on" type="button" data-w="3.6">보통</button>
+        <button class="mini" type="button" data-w="5.4">굵게</button>
+        <span class="sp"></span>
+        <button class="mini" type="button" id="padClr">지우기</button>
+      </div>
+    </div>
+
+    <div class="pane" id="pSeal">
+      <label class="lb">도장에 새길 이름 (2~4자)</label>
+      <input class="tx" id="sealName" maxlength="4" placeholder="예: 김철수">
+      <div class="row">
+        <button class="mini on" type="button" data-s="circle">원형</button>
+        <button class="mini" type="button" data-s="square">사각</button>
+        <button class="mini" type="button" data-s="oval">타원</button>
+        <span class="sp"></span>
+        <button class="mini on" type="button" data-f="myeongjo">명조</button>
+        <button class="mini" type="button" data-f="gothic">고딕</button>
+      </div>
+    </div>
+
+    <div class="pane" id="pPhoto">
+      <div class="drop" id="stDrop"><b>도장 사진 고르기 · 찍기</b>흰 종이에 찍은 도장을 찍어 올리면 배경을 자동으로 지웁니다</div>
+      <input type="file" id="stFile" accept="image/*" hidden>
+      <div class="rng"><span>배경 지우기 강도</span><input type="range" id="stTh" min="20" max="120" value="58"><span id="stThV">58</span></div>
+      <div class="row">
+        <button class="mini on" type="button" data-k="red">인주 빨강으로</button>
+        <button class="mini" type="button" data-k="keep">원래 색 그대로</button>
+      </div>
+    </div>
+
+    <div class="prev" id="prev"><span class="em">사인을 만들면 여기에 투명 PNG로 보입니다</span></div>
+    <button class="btn ghost" type="button" id="pngDl" disabled>투명 PNG 저장</button>
+  </section>
+
+  <!-- 3. 문서에 찍기 -->
+  <section class="card">
+    <h2><i>3</i>문서에 찍기<small id="docInfo">사진·PDF</small></h2>
+    <div class="drop" id="docDrop"><b>문서 올리기</b><span id="docDropSub">사진(JPG·PNG) 또는 PDF · 무료는 1쪽</span></div>
+    <input type="file" id="docFile" accept="image/*,application/pdf,.pdf" multiple hidden>
+    <div class="hide" id="docArea">
+      <div class="pages" id="pages"></div>
+      <div class="stage" id="stage"><img class="pg" id="pgImg" alt=""><div class="hint" id="stHint">찍을 자리를 누르세요 · 끌어서 옮기기</div></div>
+      <div class="rng"><span>크기</span><input type="range" id="sz" min="8" max="60" value="24"><span id="szV">24%</span></div>
+      <div class="row"><button class="mini" type="button" id="sigDel">이 쪽 사인 빼기</button><button class="mini" type="button" id="sigAll">모든 쪽 같은 자리</button></div>
+      <div class="tog" id="ganin"><span class="sw"></span><span class="tt">간인 (사이간자) 자동<small>쪽과 쪽 사이 경계에 도장을 반씩 걸쳐 찍습니다</small></span><span class="lk" id="ganinLk">PRO</span></div>
+      <div class="two">
+        <button class="btn" type="button" id="outImg">날인본 이미지 저장</button>
+        <button class="btn ghost" type="button" id="outPdf">PDF 한 권 저장</button>
+      </div>
+    </div>
+    <div class="note">· 전자서명법상 효력은 서명 방식·당사자 합의에 따라 달라집니다. 중요한 계약은 상대방과 방식을 먼저 맞추세요.<br>
+    · 결제는 이 사이트에서 받지 않습니다. 월 4,900원 이용권은 문자로 신청하면 코드를 보내 드립니다.</div>
+  </section>
+</main>
+<div class="foot"><a href="https://autooneclick.com/">KTS 원클릭</a> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>모든 처리는 이 기기 브라우저 안에서 합니다.</div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* =====================================================================
+   KTS 더싸인 v1.0 — 사인 3택(직접·사인도장·도장사진) → 투명 PNG → 문서 날인 / 간인
+   외부 서버 전송 없음. PDF 읽기만 pdf.js(cdnjs)를 필요할 때 불러옵니다.
+   ===================================================================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2100); }
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }};
+
+/* ---------- 1. 요금 (무료 한 장 / 월 4,900원 여러 장·간인) ---------- */
+let plan=LS.get('kts_sign_plan','free');
+function ym(){ const d=new Date(); return String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0'); }
+function fnv(s){ let h=0x811c9dc5; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return h; }
+/* 월 이용권 코드: KS + 연월(YYMM) + '-' + 4자리. 그 달에만 유효 (간이 확인 — 실제 결제는 별도 채널) */
+function codeOk(c){ const m=String(c||'').trim().toUpperCase().match(/^KS(\d{4})-([0-9A-F]{4})$/); if(!m||m[1]!==ym()) return false;
+  return (fnv('kts-sign-'+m[1]).toString(16).toUpperCase().padStart(8,'0').slice(0,4))===m[2]; }
+const isPro=()=>plan==='pro', unlocked=()=>codeOk(LS.get('kts_sign_code',''));
+function paintPlan(){
+  $$('.plan').forEach(b=>b.classList.toggle('on', b.dataset.p===plan));
+  $('#unlock').classList.toggle('on', isPro());
+  $('#planTag').textContent = isPro() ? (unlocked()?'PRO 이용 중':'PRO 미리보기') : '한 장 무료';
+  if(isPro() && unlocked()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 이번 달 이용권 확인됨</span> — 여러 장·간인을 워터마크 없이 저장합니다.'; $('#ulRow').classList.add('hide'); }
+  else{ $('#ulRow').classList.remove('hide'); }
+  $('#docDropSub').textContent = isPro() ? '사진 여러 장 또는 PDF 여러 쪽' : '사진(JPG·PNG) 또는 PDF · 무료는 1쪽';
+  $('#docFile').multiple = isPro();
+  $('#ganinLk').classList.toggle('hide', isPro());
+  if(!isPro() && ganin){ ganin=false; }
+  $('#ganin').classList.toggle('on', ganin);
+  if(!isPro() && docs.length>1){ docs=docs.slice(0,1); cur=0; renderDoc(); toast('무료는 1쪽만 — 첫 쪽만 남겼습니다'); }
+  renderStage();
+}
+$$('.plan').forEach(b=>b.onclick=()=>{ plan=b.dataset.p; LS.set('kts_sign_plan',plan); paintPlan();
+  if(isPro() && !unlocked()) toast('미리보기로 바로 써 보세요 · 저장본에 워터마크가 들어갑니다'); });
+$('#ulBuy').href='sms:01020022899?body='+encodeURIComponent('[더싸인] 월 4,900원 이용권(여러 장·간인) 신청합니다');
+$('#ulGo').onclick=()=>{ const c=$('#ulCode').value.trim().toUpperCase();
+  if(codeOk(c)){ LS.set('kts_sign_code',c); toast('이용권 확인 — 워터마크 없이 저장됩니다'); paintPlan(); }
+  else toast('코드가 맞지 않거나 지난달 코드입니다'); };
+
+/* ---------- 2. 사인 만들기 ---------- */
+let mode='draw', sig=null;                 // sig: 투명 캔버스(잘라낸 사인/도장)
+$$('#mk button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m;
+  $$('#mk button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#pDraw').classList.toggle('on',mode==='draw'); $('#pSeal').classList.toggle('on',mode==='seal'); $('#pPhoto').classList.toggle('on',mode==='photo');
+  if(mode==='draw') { requestAnimationFrame(sizePad); buildFromDraw(); }
+  if(mode==='seal') buildSeal();
+  if(mode==='photo') buildFromPhoto();
+});
+
+/* 투명 캔버스에서 그려진 부분만 잘라내기 */
+function cropAlpha(c, pad){
+  const x=c.getContext('2d',{willReadFrequently:true}); const {width:W,height:H}=c; const d=x.getImageData(0,0,W,H).data;
+  let x0=W,y0=H,x1=-1,y1=-1;
+  for(let y=0;y<H;y++) for(let i=0;i<W;i++){ if(d[(y*W+i)*4+3]>16){ if(i<x0)x0=i; if(i>x1)x1=i; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  if(x1<0) return null;
+  pad=pad||6; x0=Math.max(0,x0-pad); y0=Math.max(0,y0-pad); x1=Math.min(W-1,x1+pad); y1=Math.min(H-1,y1+pad);
+  const o=document.createElement('canvas'); o.width=x1-x0+1; o.height=y1-y0+1;
+  o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height); return o;
+}
+function setSig(c){
+  sig=c;
+  const pv=$('#prev');
+  if(!c){ pv.innerHTML='<span class="em">사인을 만들면 여기에 투명 PNG로 보입니다</span>'; $('#pngDl').disabled=true; renderStage(); return; }
+  pv.innerHTML='<img alt="사인 미리보기" src="'+c.toDataURL('image/png')+'">';
+  $('#pngDl').disabled=false;
+  renderStage(); paintThumbs();
+}
+
+/* (a) 직접 사인 — 손가락 필기 (속도에 따라 굵기 변화) */
+const cv=$('#cv'); const cx=cv.getContext('2d');
+let pen='#111111', penW=3.6, drawing=false, last=null, strokes=0;
+function sizePad(){
+  const r=cv.getBoundingClientRect(); if(!r.width) return;
+  const dpr=Math.max(2,window.devicePixelRatio||1);
+  const keep = strokes ? cv.toDataURL() : null;
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.lineCap='round'; cx.lineJoin='round';
+  if(keep){ const im=new Image(); im.onload=()=>{ cx.save(); cx.setTransform(1,0,0,1,0,0); cx.drawImage(im,0,0,cv.width,cv.height); cx.restore(); }; im.src=keep; }
+}
+function pt(e){ const r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top, t:performance.now()}; }
+cv.addEventListener('pointerdown',e=>{ e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing=true; last=pt(e); last.w=penW; $('#padPh').classList.add('hide');
+  cx.fillStyle=pen; cx.beginPath(); cx.arc(last.x,last.y,penW/2,0,Math.PI*2); cx.fill(); });
+cv.addEventListener('pointermove',e=>{ if(!drawing) return; e.preventDefault();
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for(const ev of evs){
+    const p=pt(ev); const dist=Math.hypot(p.x-last.x,p.y-last.y); if(dist<0.6) continue;
+    const v=dist/Math.max(1,p.t-last.t);
+    const w=Math.max(penW*0.45, Math.min(penW*1.25, penW*(1.25-v*0.55)));
+    p.w=last.w*0.6+w*0.4;
+    cx.strokeStyle=pen; cx.lineWidth=p.w; cx.beginPath();
+    const mx=(last.x+p.x)/2, my=(last.y+p.y)/2;
+    cx.moveTo(last.mx??last.x, last.my??last.y); cx.quadraticCurveTo(last.x,last.y,mx,my); cx.stroke();
+    p.mx=mx; p.my=my; last=p;
+  }
+});
+const endStroke=()=>{ if(!drawing) return; drawing=false; strokes++; buildFromDraw(); };
+cv.addEventListener('pointerup',endStroke); cv.addEventListener('pointercancel',endStroke); cv.addEventListener('pointerleave',endStroke);
+function buildFromDraw(){ if(mode!=='draw') return; setSig(strokes?cropAlpha(cv,10):null); }
+$('#padClr').onclick=()=>{ cx.save(); cx.setTransform(1,0,0,1,0,0); cx.clearRect(0,0,cv.width,cv.height); cx.restore(); strokes=0; $('#padPh').classList.remove('hide'); buildFromDraw(); };
+$$('#pDraw .dot').forEach(b=>b.onclick=()=>{ pen=b.dataset.c; $$('#pDraw .dot').forEach(x=>x.classList.toggle('on',x===b)); });
+$$('#pDraw [data-w]').forEach(b=>b.onclick=()=>{ penW=+b.dataset.w; $$('#pDraw [data-w]').forEach(x=>x.classList.toggle('on',x===b)); });
+window.addEventListener('resize',()=>{ if(mode==='draw') sizePad(); });
+
+/* (b) 사인도장 — 이름으로 인감 스타일 도장 생성 */
+let sealShape='circle', sealFont='myeongjo';
+function buildSeal(){
+  if(mode!=='seal') return;
+  const name=($('#sealName').value||'').replace(/\s/g,'').slice(0,4);
+  if(!name){ setSig(null); return; }
+  const S=360, c=document.createElement('canvas'); c.width=S; c.height=sealShape==='oval'?Math.round(S*1.3):S;
+  const x=c.getContext('2d'); const W=c.width, H=c.height, red='#D3262E';
+  x.strokeStyle=red; x.fillStyle=red; x.lineWidth=S*0.045;
+  const m=S*0.05;
+  x.beginPath();
+  if(sealShape==='circle') x.arc(W/2,H/2,W/2-m,0,Math.PI*2);
+  else if(sealShape==='oval') x.ellipse(W/2,H/2,W/2-m,H/2-m,0,0,Math.PI*2);
+  else { const r=S*0.06; x.roundRect ? x.roundRect(m,m,W-2*m,H-2*m,r) : x.rect(m,m,W-2*m,H-2*m); }
+  x.stroke();
+  const fam = sealFont==='myeongjo' ? '"Nanum Myeongjo","Batang","AppleMyungjo","Noto Serif KR",serif' : '"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+  x.textAlign='center'; x.textBaseline='middle';
+  const ch=[...name];
+  const inner = sealShape==='square' ? (W-2*m)*0.86 : (W-2*m)*0.70;
+  const put=(t,cxp,cyp,size,sx,sy)=>{ x.save(); x.translate(cxp,cyp); x.scale(sx||1,sy||1); x.font='900 '+size+'px '+fam; x.fillText(t,0,size*0.04); x.restore(); };
+  if(ch.length===1){ put(ch[0],W/2,H/2,inner*0.92); }
+  else if(ch.length===2){ const sz=inner/2; put(ch[0],W/2,H/2-sz*0.5,sz*0.98,1.25,1); put(ch[1],W/2,H/2+sz*0.5,sz*0.98,1.25,1); }
+  else if(ch.length===3){ const sz=inner/3; [0,1,2].forEach(i=>put(ch[i],W/2,H/2+(i-1)*sz*1.02,sz*1.02,1.7,1)); }
+  else { const sz=inner/2; /* 오른쪽 세로줄부터 위→아래 (인감 읽는 순서) */
+    put(ch[0],W/2+sz*0.5,H/2-sz*0.5,sz*0.96); put(ch[1],W/2+sz*0.5,H/2+sz*0.5,sz*0.96);
+    put(ch[2],W/2-sz*0.5,H/2-sz*0.5,sz*0.96); put(ch[3],W/2-sz*0.5,H/2+sz*0.5,sz*0.96); }
+  // 인주 질감 — 잔 점을 살짝 비워 진짜 찍은 느낌
+  const id=x.getImageData(0,0,W,H), d=id.data; let seed=fnv(name+sealShape);
+  const rnd=()=>{ seed=(Math.imul(seed,1103515245)+12345)>>>0; return seed/4294967296; };
+  for(let i=3;i<d.length;i+=4){ if(d[i] && rnd()<0.035) d[i]=Math.round(d[i]*0.35); else if(d[i]) d[i]=Math.round(d[i]*(0.86+rnd()*0.14)); }
+  x.putImageData(id,0,0);
+  setSig(cropAlpha(c,4));
+}
+$('#sealName').addEventListener('input',buildSeal);
+$$('#pSeal [data-s]').forEach(b=>b.onclick=()=>{ sealShape=b.dataset.s; $$('#pSeal [data-s]').forEach(x=>x.classList.toggle('on',x===b)); buildSeal(); });
+$$('#pSeal [data-f]').forEach(b=>b.onclick=()=>{ sealFont=b.dataset.f; $$('#pSeal [data-f]').forEach(x=>x.classList.toggle('on',x===b)); buildSeal(); });
+
+/* (c) 도장 사진 → 배경 자동 제거 → 투명 PNG */
+let stImg=null, stKeep='red';
+$('#stDrop').onclick=()=>$('#stFile').click();
+$('#stFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const u=URL.createObjectURL(f); const im=new Image();
+  im.onload=()=>{ stImg=im; buildFromPhoto(); URL.revokeObjectURL(u); }; im.onerror=()=>toast('사진을 열 수 없습니다'); im.src=u; e.target.value=''; };
+$('#stTh').oninput=()=>{ $('#stThV').textContent=$('#stTh').value; buildFromPhoto(); };
+$$('#pPhoto [data-k]').forEach(b=>b.onclick=()=>{ stKeep=b.dataset.k; $$('#pPhoto [data-k]').forEach(x=>x.classList.toggle('on',x===b)); buildFromPhoto(); });
+function buildFromPhoto(){
+  if(mode!=='photo') return;
+  if(!stImg){ setSig(null); return; }
+  const r=Math.min(1,900/Math.max(stImg.naturalWidth,stImg.naturalHeight));
+  const W=Math.max(1,Math.round(stImg.naturalWidth*r)), H=Math.max(1,Math.round(stImg.naturalHeight*r));
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(stImg,0,0,W,H);
+  const id=x.getImageData(0,0,W,H), d=id.data;
+  // 배경색 = 가장자리 픽셀의 중앙값 (종이색)
+  const rs=[],gs=[],bs=[]; const take=i=>{ rs.push(d[i]); gs.push(d[i+1]); bs.push(d[i+2]); };
+  for(let i=0;i<W;i+=2){ take(i*4); take(((H-1)*W+i)*4); } for(let j=0;j<H;j+=2){ take(j*W*4); take((j*W+W-1)*4); }
+  const med=a=>{ a.sort((p,q)=>p-q); return a[a.length>>1]; };
+  const br=med(rs), bgc=med(gs), bb=med(bs);
+  const t0=+$('#stTh').value, t1=t0+70;
+  for(let i=0;i<d.length;i+=4){
+    const R=d[i],G=d[i+1],B=d[i+2];
+    const dist=Math.sqrt((R-br)**2+(G-bgc)**2+(B-bb)**2);
+    const redness=R-Math.max(G,B);
+    let a=(dist-t0)/(t1-t0);
+    if(stKeep==='red'){ a=Math.max(a, (redness-25)/60); if(redness<8 && dist<t1*1.4) a*=0.25; }
+    a=a<0?0:a>1?1:a;
+    if(stKeep==='red'){ d[i]=211; d[i+1]=38; d[i+2]=46; }
+    else { const k=0.85; d[i]=R*k; d[i+1]=G*k; d[i+2]=B*k; }
+    d[i+3]=Math.round(a*255);
+  }
+  x.putImageData(id,0,0);
+  const out=cropAlpha(c,6);
+  if(!out){ toast('도장을 찾지 못했습니다 · 강도를 낮춰 보세요'); setSig(null); return; }
+  setSig(out);
+}
+
+/* 투명 PNG 저장 */
+function hardDownload(blob, name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1500); }
+function saveBlob(blob,name){
+  const br=window.KTSApp||{};
+  if(br.saveFile){ const fr=new FileReader(); fr.onload=()=>{ try{ br.saveFile(fr.result,name,blob.type); toast('저장했습니다: '+name); }catch(e){ hardDownload(blob,name); } }; fr.readAsDataURL(blob); return; }
+  hardDownload(blob,name); toast('저장했습니다: '+name);
+}
+$('#pngDl').onclick=()=>{ if(!sig) return; sig.toBlob(b=>saveBlob(b,'KTS더싸인_'+({draw:'사인',seal:'사인도장',photo:'도장'}[mode])+'.png'),'image/png'); };
+
+/* ---------- 3. 문서에 찍기 ---------- */
+let docs=[], cur=0, ganin=false;            // docs: {c:canvas, thumb, place:{x,y,w}|null}  (x,y,w = 쪽 너비 대비 비율)
+$('#docDrop').onclick=()=>$('#docFile').click();
+$('#docFile').onchange=async e=>{
+  const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
+  toast('문서 여는 중…');
+  const out=[];
+  try{
+    for(const f of files){
+      if(/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)) out.push(...await pdfToCanvases(f));
+      else if(f.type.startsWith('image/')) out.push(await imgToCanvas(f));
+      if(!isPro() && out.length>=1) break;
+    }
+  }catch(err){ toast('열지 못했습니다: '+err.message); return; }
+  if(!out.length){ toast('사진 또는 PDF를 골라 주세요'); return; }
+  let cut=false; if(!isPro() && out.length>1){ out.length=1; cut=true; }
+  if(!isPro() && (files.length>1)) cut=true;
+  docs=out.map(c=>({c, thumb:thumbOf(c), place:null})); cur=0;
+  $('#docArea').classList.remove('hide');
+  renderDoc();
+  toast(cut ? '무료는 1쪽만 — 여러 장·간인은 월 4,900원' : docs.length+'쪽 열림 · 찍을 자리를 누르세요');
+};
+function imgToCanvas(f){ return new Promise((res,rej)=>{ const u=URL.createObjectURL(f), im=new Image();
+  im.onload=()=>{ const r=Math.min(1,2000/Math.max(im.naturalWidth,im.naturalHeight)); const c=document.createElement('canvas');
+    c.width=Math.round(im.naturalWidth*r); c.height=Math.round(im.naturalHeight*r); const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c); };
+  im.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error('이미지')); }; im.src=u; }); }
+function loadPdfJs(){ return new Promise((res,rej)=>{ if(window.pdfjsLib) return res(window.pdfjsLib);
+  const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  s.onload=()=>{ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(pdfjsLib); };
+  s.onerror=()=>rej(new Error('PDF 엔진을 불러오지 못했습니다(인터넷 확인)')); document.head.appendChild(s); }); }
+async function pdfToCanvases(f){
+  const lib=await loadPdfJs(); const pdf=await lib.getDocument({data:await f.arrayBuffer()}).promise; const list=[];
+  const n = isPro() ? Math.min(pdf.numPages,40) : 1;
+  for(let i=1;i<=n;i++){ const pg=await pdf.getPage(i); const v0=pg.getViewport({scale:1}); const sc=Math.min(2.4,1600/v0.width);
+    const vp=pg.getViewport({scale:sc}); const c=document.createElement('canvas'); c.width=Math.round(vp.width); c.height=Math.round(vp.height);
+    const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); await pg.render({canvasContext:x, viewport:vp}).promise; list.push(c); }
+  if(!isPro() && pdf.numPages>1) toast('무료는 1쪽만 — 첫 쪽만 열었습니다');
+  return list;
+}
+function thumbOf(c){ const t=document.createElement('canvas'); const r=120/c.width; t.width=120; t.height=Math.round(c.height*r); t.getContext('2d').drawImage(c,0,0,t.width,t.height); return t.toDataURL('image/jpeg',0.7); }
+function paintThumbs(){
+  $('#pages').innerHTML=docs.map((p,i)=>'<button type="button" class="'+(i===cur?'on':'')+'" data-i="'+i+'"><img src="'+p.thumb+'" alt=""><i>'+(i+1)+'</i>'+(p.place&&sig?'<em>사인</em>':'')+'</button>').join('');
+  $$('#pages button').forEach(b=>b.onclick=()=>{ cur=+b.dataset.i; renderDoc(); });
+  $('#pages').classList.toggle('hide', docs.length<2);
+  $('#docInfo').textContent = docs.length ? docs.length+'쪽' : '사진·PDF';
+}
+function renderDoc(){ if(!docs.length) return; $('#pgImg').src=docs[cur].c.toDataURL('image/jpeg',0.85); paintThumbs(); renderStage(); }
+function renderStage(){
+  const st=$('#stage'); if(!st || !docs.length) return;
+  st.querySelectorAll('.sig,.seam').forEach(n=>n.remove());
+  const p=docs[cur]; $('#stHint').classList.toggle('hide', !!(p.place&&sig));
+  if(p.place && sig){
+    const el=document.createElement('div'); el.className='sig';
+    el.style.left=(p.place.x*100)+'%'; el.style.top=(p.place.y*100)+'%'; el.style.width=(p.place.w*100)+'%';
+    el.innerHTML='<img alt="" src="'+sig.toDataURL('image/png')+'">'; st.appendChild(el); dragSig(el);
+    $('#sz').value=Math.round(p.place.w*100); $('#szV').textContent=$('#sz').value+'%';
+  }
+  if(ganin && sig && docs.length>1){
+    const ar=docs[cur].c.height/docs[cur].c.width;
+    seamsFor(cur).forEach(s=>{ const im=document.createElement('img'); im.className='seam'; im.src=s.url;
+      im.style.left=(s.x*100)+'%'; im.style.top=(s.y/ar*100)+'%'; im.style.width=(s.w*100)+'%'; st.appendChild(im); });
+  }
+}
+$('#stage').addEventListener('pointerdown',e=>{
+  if(e.target.closest('.sig')) return;
+  if(!sig){ toast('먼저 ② 사인을 만들어 주세요'); return; }
+  const r=$('#stage').getBoundingClientRect();
+  const w = docs[cur].place ? docs[cur].place.w : (+$('#sz').value/100);
+  docs[cur].place={x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height, w};
+  renderStage(); paintThumbs();
+});
+function dragSig(el){
+  let sx,sy,ox,oy,on=false;
+  el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); el.setPointerCapture(e.pointerId); on=true; sx=e.clientX; sy=e.clientY; ox=docs[cur].place.x; oy=docs[cur].place.y; });
+  el.addEventListener('pointermove',e=>{ if(!on) return; const r=$('#stage').getBoundingClientRect();
+    const p=docs[cur].place; p.x=Math.min(1,Math.max(0,ox+(e.clientX-sx)/r.width)); p.y=Math.min(1,Math.max(0,oy+(e.clientY-sy)/r.height));
+    el.style.left=(p.x*100)+'%'; el.style.top=(p.y*100)+'%'; });
+  const end=()=>{ on=false; }; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+}
+$('#sz').oninput=()=>{ $('#szV').textContent=$('#sz').value+'%'; const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } };
+$('#sigDel').onclick=()=>{ if(docs[cur]){ docs[cur].place=null; renderStage(); paintThumbs(); } };
+$('#sigAll').onclick=()=>{ const p=docs[cur]&&docs[cur].place; if(!p){ toast('먼저 이 쪽에 찍을 자리를 누르세요'); return; }
+  docs.forEach(d=>d.place={...p}); paintThumbs(); toast(docs.length+'쪽 모두 같은 자리에 찍었습니다'); };
+$('#ganin').onclick=()=>{
+  if(!isPro()){ toast('간인(사이간자)은 월 4,900원 PRO — 위 ①에서 고르면 미리보기로 써 볼 수 있습니다'); return; }
+  if(docs.length<2){ toast('간인은 2쪽 이상일 때 찍힙니다'); }
+  ganin=!ganin; $('#ganin').classList.toggle('on',ganin); renderStage();
+};
+
+/* 간인: 쪽 i 아래 경계에 도장 위쪽 절반, 쪽 i+1 위 경계에 아래쪽 절반 — 오른쪽 여백에 */
+function ganinSeal(){ return sig; }
+function seamsFor(i){
+  const s=ganinSeal(); if(!s) return [];
+  const out=[], w=0.13, ar=s.height/s.width, pc=docs[i].c, pageAr=pc.height/pc.width;
+  const hh=w*ar;                                   // 도장 높이(쪽 너비 비율)
+  const half=(top)=>{ const c=document.createElement('canvas'); c.width=s.width; c.height=Math.ceil(s.height/2);
+    c.getContext('2d').drawImage(s,0,top?0:-Math.floor(s.height/2)); return c; };
+  if(i<docs.length-1){ const c=half(true); out.push({c, url:c.toDataURL('image/png'), x:0.84, y:pageAr-hh/2, w}); }
+  if(i>0){ const c=half(false); out.push({c, url:c.toDataURL('image/png'), x:0.84, y:0, w}); }
+  return out;
+}
+
+/* 날인본 만들기 */
+function composePage(i){
+  const p=docs[i], src=p.c, c=document.createElement('canvas'); c.width=src.width; c.height=src.height;
+  const x=c.getContext('2d'); x.drawImage(src,0,0);
+  if(p.place && sig){ const w=p.place.w*c.width, h=w*sig.height/sig.width; x.drawImage(sig, p.place.x*c.width-w/2, p.place.y*c.height-h/2, w, h); }
+  if(ganin && sig && docs.length>1) seamsFor(i).forEach(s=>{ const w=s.w*c.width, h=w*s.c.height/s.c.width; x.drawImage(s.c, s.x*c.width, s.y*c.width, w, h); });
+  if(isPro() && !unlocked() && (docs.length>1 || ganin)){       // PRO 미리보기 워터마크
+    x.save(); x.translate(c.width/2,c.height/2); x.rotate(-Math.PI/6); x.textAlign='center'; x.textBaseline='middle';
+    x.font='900 '+Math.round(c.width*0.07)+'px "Malgun Gothic",sans-serif'; x.fillStyle='rgba(255,107,0,.28)';
+    x.fillText('KTS 더싸인 미리보기',0,0); x.font='800 '+Math.round(c.width*0.035)+'px "Malgun Gothic",sans-serif';
+    x.fillText('월 4,900원 이용권으로 워터마크 없이',0,c.width*0.08); x.restore();
+  }
+  return c;
+}
+function checkReady(){
+  if(!docs.length){ toast('문서를 먼저 올려 주세요'); return false; }
+  if(!sig){ toast('먼저 ② 사인을 만들어 주세요'); return false; }
+  if(!docs.some(d=>d.place) && !ganin){ toast('문서에서 찍을 자리를 눌러 주세요'); return false; }
+  return true;
+}
+$('#outImg').onclick=async ()=>{
+  if(!checkReady()) return;
+  for(let i=0;i<docs.length;i++){
+    const c=composePage(i); const b=await new Promise(r=>c.toBlob(r,'image/jpeg',0.92));
+    saveBlob(b,'KTS더싸인_날인본'+(docs.length>1?'_'+(i+1)+'쪽':'')+'.jpg');
+    await new Promise(r=>setTimeout(r,350));
+  }
+};
+$('#outPdf').onclick=async ()=>{
+  if(!checkReady()) return;
+  const pages=[];
+  for(let i=0;i<docs.length;i++){ const c=composePage(i); const u=c.toDataURL('image/jpeg',0.9);
+    const bin=atob(u.split(',')[1]); const bytes=new Uint8Array(bin.length); for(let k=0;k<bin.length;k++) bytes[k]=bin.charCodeAt(k);
+    pages.push({w:c.width,h:c.height,bytes}); }
+  saveBlob(new Blob([buildPDF(pages)],{type:'application/pdf'}),'KTS더싸인_날인본.pdf');
+};
+/* 최소 PDF (JPEG 페이지, A4 안에 맞춤) */
+function buildPDF(pages){
+  const enc=new TextEncoder(); const chunks=[]; let off=0; const offs=[];
+  const push=u=>{ chunks.push(u); off+=u.length; }, ps=s=>push(enc.encode(s)), mark=n=>{ offs[n-1]=off; };
+  ps('%PDF-1.4\n'); mark(1); ps('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  const kids=pages.map((_,i)=>(3+i*3)+' 0 R'); mark(2); ps('2 0 obj\n<< /Type /Pages /Kids [ '+kids.join(' ')+' ] /Count '+pages.length+' >>\nendobj\n');
+  pages.forEach((p,i)=>{ const pn=3+i*3, cn=pn+1, im=pn+2, W=595, H=842, s=Math.min(W/p.w,H/p.h), dw=Math.round(p.w*s), dh=Math.round(p.h*s);
+    mark(pn); ps(pn+' 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /XObject << /Im0 '+im+' 0 R >> >> /Contents '+cn+' 0 R >>\nendobj\n');
+    const ct='q '+dw+' 0 0 '+dh+' '+Math.round((W-dw)/2)+' '+Math.round((H-dh)/2)+' cm /Im0 Do Q\n';
+    mark(cn); ps(cn+' 0 obj\n<< /Length '+enc.encode(ct).length+' >>\nstream\n'+ct+'endstream\nendobj\n');
+    mark(im); ps(im+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+p.w+' /Height '+p.h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+p.bytes.length+' >>\nstream\n');
+    push(p.bytes); ps('\nendstream\nendobj\n'); });
+  const xs=off; let xr='xref\n0 '+(offs.length+1)+'\n0000000000 65535 f \n'; offs.forEach(o=>xr+=String(o).padStart(10,'0')+' 00000 n \n');
+  ps(xr); ps('trailer\n<< /Size '+(offs.length+1)+' /Root 1 0 R >>\nstartxref\n'+xs+'\n%%EOF\n');
+  const out=new Uint8Array(off); let o=0; chunks.forEach(c=>{ out.set(c,o); o+=c.length; }); return out;
+}
+
+/* ---------- 시작 ---------- */
+sizePad(); paintPlan();
+if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
+</script>
+</body></html>
