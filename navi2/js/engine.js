@@ -71,13 +71,16 @@
     };
   }
 
-  /* ── 채점: 네 문항을 같은 무게로 합산(1순위 3 · 2순위 1) ── */
+  /* ── 채점: 네~여섯 문항을 같은 무게로 합산.
+     v5.0 : 1~4순위 비중(4·3·2·1) — 순위를 매길수록 그 결의 세기가 정밀해진다. ── */
+  var RW = [4, 3, 2, 1];
   function score(picks){
-    var s = {}, first = {}, order = [];
+    var s = {}, first = {}, order = [], total = 0;
     picks.forEach(function(p){
       var t = p.opt.t;
       if (!(t in s)){ s[t] = 0; first[t] = 0; order.push(t); }
-      s[t] += (p.rank === 1 ? 3 : 1);
+      s[t] += (RW[(p.rank || 1) - 1] || 1);
+      total += (RW[(p.rank || 1) - 1] || 1);
       if (p.rank === 1) first[t] += 1;
     });
     var arr = order.map(function(t, i){ return { t:t, v:s[t], f:first[t], i:i }; });
@@ -88,7 +91,9 @@
       secondary: arr[1] ? arr[1].t : null,
       gap: top - second,
       rank: arr,
-      scores: s
+      scores: s,
+      total: total || 1,
+      share: top / (total || 1)
     };
   }
 
@@ -124,6 +129,23 @@
     var sub = (S[primary] && S[primary][flavor]) || null;
     if (!sub){ /* 자료가 없을 때만 기본 문장으로 */ flavor = 'JEONG'; sub = S[primary][flavor]; }
     var band = ctx.band === 'unknown' ? 'mid' : ctx.band;
+
+    /* v5.0 — 64유형(8결 × 4갈래 × 강/약) + 강·약 6단계 스펙트럼
+       ① 강/약 : 이 결이 1순위로 나온 문항이 절반 이상이면 '강'(주된 결), 아니면 '약'(잔향)
+       ② 1~6단계 : 전체 비중에서 이 결이 차지하는 몫(share)으로 세기를 나눈다 */
+    var ORDER8 = ['SPEED','PUTOFF','EYE','FACE','CALC','LOYAL','PERFECT','FREE'];
+    var FLAV = ['JEONG','HAP','BAN','HWAK'];
+    var qCount = 0, lead = 0;
+    picks.forEach(function(p){
+      if (p.rank !== 1) return;
+      qCount++;
+      if (p.opt.t === primary) lead++;
+    });
+    var pol = (qCount > 0 && lead * 2 >= qCount) ? '강' : '약';
+    var lvl = Math.max(1, Math.min(6, 1 + Math.floor((sc.share - 0.18) / 0.05)));
+    var idx32 = ORDER8.indexOf(primary) * 4 + FLAV.indexOf(flavor);
+    if (idx32 < 0) idx32 = 0;
+    var tno = idx32 * 2 + (pol === '강' ? 0 : 1) + 1;      /* 1 ~ 64 */
     var labels = picks.map(function(p){ return p.opt.label; });
     var code = picks.filter(function(p){ return p.rank === 1; }).map(function(p){ return p.idx; }).join('');
     var seed = hash(primary + '|' + flavor + '|' + band + '|' + ctx.date + '|' + ctx.bucket + '|' + code);
@@ -169,6 +191,7 @@
       card: primary + '-' + flavor, base: primary,
       cardName: sub.nm, cardNo: sub.no, cardSub: sub.sub, img: card.img,
       flavor: flavor, flavorNm: FLAVOR_NM[flavor],
+      tno: tno, pol: pol, lvl: lvl, share: sc.share, typeTotal: 64,
       primary: primary, secondary: sc.gap === 0 ? secondary : null,
       tie: sc.gap === 0, band: band,
       next: (sc.rank[1] ? { nm: (S[sc.rank[1].t] && S[sc.rank[1].t][flavorOf(sc, picks)] ? S[sc.rank[1].t][flavorOf(sc, picks)].nm : C[sc.rank[1].t].name) } : null),
@@ -218,9 +241,8 @@
   }
 
   function typeCount(){
-    var n = 0;
-    for (var k in S) n += Object.keys(S[k]).length;
-    return n;
+    /* 8결 × 4갈래 × 강/약 = 64유형 */
+    return 64;
   }
 
   var APP = {

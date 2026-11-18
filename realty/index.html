@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>부동산 매물 1초 정리기 | KTS</title>
+<style>
+  :root{
+    --navy:#0A1128; --card:#121C33; --card2:#18233D; --line:#25314F;
+    --orange:#FF6B00; --orange-soft:#FFB066; --text:#EDF0F5; --muted:#8FA0B8;
+    --green:#35C48A; --red:#E8554D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0}
+  body{
+    background:var(--navy); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    font-size:14px; line-height:1.5; letter-spacing:-.2px;
+    padding-bottom:40px;
+  }
+  .wrap{max-width:480px; margin:0 auto; padding:0 16px}
+  header{padding:22px 0 10px}
+  .brand{display:flex; align-items:center; gap:8px; font-weight:800; font-size:12px; letter-spacing:2px; color:var(--orange)}
+  .dot{width:6px; height:6px; border-radius:50%; background:var(--orange); box-shadow:0 0 0 3px rgba(255,107,0,.16)}
+  h1{margin:10px 0 8px; font-size:23px; line-height:1.3; font-weight:800}
+  h1 em{font-style:normal; color:var(--orange)}
+  .sub{margin:0; color:var(--muted); font-size:13px}
+  .panel{margin:14px 0 12px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px}
+  .tabs{display:flex; gap:6px; background:#0D1630; border-radius:10px; padding:4px; margin-bottom:10px}
+  .tab{flex:1; border:0; background:transparent; color:var(--muted); font-size:13px; font-weight:700; padding:8px 4px; border-radius:8px; cursor:pointer}
+  .tab.active{background:var(--orange); color:#1A0E00}
+  .tabbody[hidden]{display:none}
+  textarea{
+    width:100%; min-height:132px; resize:vertical; background:#0D1630; color:var(--text);
+    border:1px solid var(--line); border-radius:10px; padding:11px; font-size:13px; line-height:1.55;
+    font-family:inherit;
+  }
+  textarea::placeholder{color:#5C6B85}
+  .row{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+  button{font-family:inherit; cursor:pointer}
+  .primary{flex:1; min-height:46px; border:0; border-radius:10px; background:var(--orange); color:#1A0E00; font-weight:800; font-size:15px}
+  .primary:active{transform:translateY(1px)}
+  .ghost{min-height:46px; padding:0 14px; border:1px solid var(--line); background:var(--card2); color:var(--text); border-radius:10px; font-size:13px; font-weight:700}
+  .ghost:active{background:#22304F}
+  .drop{
+    border:1.5px dashed #33415F; border-radius:12px; padding:26px 14px; text-align:center; color:var(--muted);
+    font-size:13px; background:#0D1630;
+  }
+  .drop.on{border-color:var(--orange); color:var(--orange-soft)}
+  .drop b{display:block; color:var(--text); font-size:14px; margin-bottom:6px}
+  .fileline{margin-top:8px; font-size:12px; color:var(--muted); word-break:break-all}
+  .hint{margin:8px 0 0; font-size:12px; color:var(--muted)}
+  .hint b{color:var(--orange-soft)}
+  .ai{margin:0 0 12px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0 12px}
+  .ai summary{padding:12px 0; font-size:13px; font-weight:700; color:var(--text); cursor:pointer; list-style:none}
+  .ai summary::-webkit-details-marker{display:none}
+  .ai summary:after{content:"＋"; float:right; color:var(--muted)}
+  .ai[open] summary:after{content:"－"}
+  .ai .inner{padding:0 0 12px}
+  .ai input{width:100%; background:#0D1630; border:1px solid var(--line); color:var(--text); border-radius:9px; padding:10px; font-size:13px; font-family:inherit}
+  .ai p{margin:8px 0 0; font-size:12px; color:var(--muted)}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 10px}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px 10px}
+  .stat .n{font-size:19px; font-weight:800; color:var(--orange)}
+  .stat .l{font-size:11px; color:var(--muted); margin-top:2px}
+  .chips{display:flex; gap:6px; overflow-x:auto; padding:2px 0 10px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto; border:1px solid var(--line); background:var(--card); color:var(--muted); font-size:12px; font-weight:700; padding:7px 12px; border-radius:20px}
+  .chip.on{background:var(--orange); border-color:var(--orange); color:#1A0E00}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:13px; margin-bottom:9px}
+  .card .top{display:flex; align-items:center; gap:8px}
+  .badge{font-size:11px; font-weight:800; color:#1A0E00; background:var(--orange); padding:3px 8px; border-radius:6px; white-space:nowrap}
+  .badge.mid{background:var(--orange-soft)}
+  .badge.none{background:#33415F; color:var(--text)}
+  .title{font-size:14px; font-weight:800; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .src{font-size:10px; color:var(--muted); white-space:nowrap}
+  .money{display:flex; align-items:baseline; gap:8px; margin-top:8px; flex-wrap:wrap}
+  .price{font-size:17px; font-weight:800; color:var(--orange)}
+  .area{font-size:12px; color:var(--muted)}
+  .phone{margin-left:auto; font-size:12px; color:var(--muted); text-decoration:none}
+  .sum{margin:7px 0 0; font-size:12.5px; color:#C3CDDF}
+  details.raw{margin-top:8px}
+  details.raw summary{font-size:11px; color:var(--muted); cursor:pointer; list-style:none}
+  details.raw summary::-webkit-details-marker{display:none}
+  details.raw summary:before{content:"▸ "}
+  details.raw[open] summary:before{content:"▾ "}
+  details.raw p{margin:6px 0 0; font-size:12px; color:#9FAEC5; background:#0D1630; border-radius:8px; padding:9px; white-space:pre-wrap; word-break:break-all}
+  .exports{margin-top:14px}
+  .exports .ghost{flex:1}
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:26px 10px; border:1px dashed var(--line); border-radius:12px}
+  .msg{margin:10px 0 0; font-size:12.5px; color:var(--green); min-height:18px}
+  .msg.err{color:var(--red)}
+  footer{margin-top:18px; font-size:11px; color:#5C6B85; line-height:1.6}
+  .kbd{background:#0D1630; border:1px solid var(--line); border-radius:5px; padding:1px 5px; font-size:11px; color:var(--muted)}
+  @media (min-width:520px){
+    .wrap{max-width:720px; padding:0 20px}
+    h1{font-size:27px}
+  }
+.apkbar{display:flex;align-items:center;gap:9px;margin:10px 0 2px;padding:9px 11px;border-radius:12px;
+  border:1px solid rgba(255,107,0,.45);background:linear-gradient(100deg,rgba(255,107,0,.14),rgba(255,255,255,.02) 70%);
+  text-decoration:none;color:#F2F4F8}
+.apkbar b{display:block;font-size:11.5px;font-weight:800}
+.apkbar i{display:block;font-style:normal;font-size:10px;color:#9FB0C8;margin-top:2px}
+.apkbar .go{margin-left:auto;font-size:11px;font-weight:900;color:#0A1128;background:#FFA24D;border-radius:8px;padding:6px 9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="apkbar" href="KTS_매물수집기_v1.2_debug.apk" download>
+    <span style="font-size:16px">⬇</span>
+    <span><b>앱(APK)으로 쓰면 문자·카톡 공유를 바로 받습니다</b>
+      <i>v1.2 · 폰 주소록 이름·수신 날짜까지</i></span>
+    <span class="go">받기</span>
+  </a>
+  <header>
+    <div class="brand"><span class="dot"></span>KTS 매물 정리</div>
+    <h1>부동산 매물 <em>1초</em> 정리기</h1>
+    <p class="sub">문자·카톡·수집기 JSON을 통째로 넣으면 거래유형 · 물건 · 지역 · 가격 · 면적 · 연락처로 자동 정리합니다. 서버 전송 없이 이 기기 안에서만 처리됩니다.</p>
+  </header>
+
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="paste" role="tab">붙여넣기</button>
+      <button class="tab" data-tab="file" role="tab">파일</button>
+      <button class="tab" data-tab="sheet" role="tab">시트 연결</button>
+    </div>
+
+    <div class="tabbody" id="tab-paste">
+      <textarea id="raw" placeholder="문자 내용이나 카톡 대화를 그대로 붙여넣으세요.
+
+예)
+급매) 가평 북면 신하리 토지 8,500평 3억5천 교환 가능. 수익률 좋습니다. 010-1234-5678
+[무인비서] 문의: 당진 초락도리 주유소 매매 25억, 대지 1,200평"></textarea>
+      <div class="row">
+        <button class="primary" id="btnParse">1초 정리</button>
+        <button class="ghost" id="btnSample">예시</button>
+        <button class="ghost" id="btnClear">지우기</button>
+      </div>
+    </div>
+
+    <div class="tabbody" id="tab-file" hidden>
+      <div class="drop" id="drop">
+        <b>카톡 대화 내보내기(.txt)·수집기 JSON을 놓으세요</b>
+        눌러서 파일을 고를 수도 있습니다 (여러 개 선택 가능)
+      </div>
+      <input type="file" id="file" accept=".txt,.json,.csv,text/plain,application/json" multiple hidden>
+      <div class="fileline" id="fileline"></div>
+      <div class="row"><button class="primary" id="btnParseFile">올린 파일 정리</button></div>
+      <p class="hint">카톡: 대화방 → <b>⋮ → 대화 내용 내보내기</b>로 만든 .txt를 그대로 올리면 됩니다.</p>
+    </div>
+
+    <div class="tabbody" id="tab-sheet" hidden>
+      <textarea id="sheetUrl" placeholder="구글시트 공개 CSV 주소 또는 무인비서 웹앱 ?mode=csv 주소" style="min-height:70px"></textarea>
+      <div class="row">
+        <button class="primary" id="btnSheet">불러와서 합치기</button>
+      </div>
+      <p class="hint">수집기 앱 → 설정 → 구글시트 웹앱 URL을 배포했다면 <b>?mode=listings&key=…</b> 주소로 바로 받아옵니다. 브라우저가 막으면 시트에서 CSV로 내려받아 <b>파일</b> 탭에 올려 주세요.</p>
+    </div>
+
+    <p class="msg" id="msg"></p>
+  </section>
+
+  <details class="ai">
+    <summary>AI 보정 (선택 · 무료 키)</summary>
+    <div class="inner">
+      <input id="gemKey" type="password" placeholder="Gemini API 키 (비워 두면 기본 정리기만 동작)" autocomplete="off">
+      <div class="row"><button class="ghost" id="btnAi" style="flex:1">규칙으로 놓친 항목만 AI로 한 번 더</button></div>
+      <p>키는 이 브라우저에만 남습니다. 키 없이도 아래 정리는 100% 동작합니다.<br>
+      <b>AI 보정을 누를 때만</b> 해당 매물 원문이 Google(Gemini)로 전송되며, 연락처(전화번호)는 보내기 전에 자동으로 가립니다. 이름·계약 정보가 섞인 원문은 보내지 마세요.</p>
+    </div>
+  </details>
+
+  <section id="result" hidden>
+    <div class="stats">
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">정리된 매물</div></div>
+      <div class="stat"><div class="n" id="sDeal">0</div><div class="l">교환·급매</div></div>
+      <div class="stat"><div class="n" id="sDup">0</div><div class="l">중복 제거</div></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="cards"></div>
+    <div class="row exports">
+      <button class="ghost" data-exp="csv">엑셀(CSV)</button>
+      <button class="ghost" data-exp="md">마크다운 복사</button>
+      <button class="ghost" data-exp="json">JSON 복사</button>
+    </div>
+  </section>
+
+  <footer>
+    수집기 앱과 같은 규칙으로 정리합니다. 같은 원문은 한 번만 남기고, 스팸·인증번호·택배 문자는 처음부터 걸러냅니다.<br>
+    입력한 내용은 어디에도 저장·전송되지 않습니다(브라우저를 닫으면 사라집니다).
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ── 규칙 (수집기 앱과 동일) ──────────────────────────────────
+  var DEAL = ["교환","급매","매매","임대","잔가","차액","월세","전세"];
+  // 추출 게이트: 이 중 하나가 반드시 있어야 매물로 인정한다(숫자+단위만으로는 매물이 아니다)
+  var DEAL_GATE = ["교환","급매","매매","임대","잔가","차액","월세","전세","권리금","분양","경매","공매"];
+  var KINDS = ["풀빌라","펜션","상가주택","상가건물","오피스텔","아파트","다가구","원룸","빌라",
+    "토지","임야","대지","농지","상가","공장","창고","건물","주택","모텔","리조트","사무실","숙박","상권","근린",
+    "주유소","콘도","고시원","다세대","연립","전원주택","수익형","꼬마빌딩","빌딩"];
+  var HARD_NO = ["인증번호","인증코드","verification code","택배","운송장","배송완료","배송출발","배송 예정",
+    "주문번호","주문취소","반품","카드결제","카드 승인","카드승인","결제금액","결제되었","결제 완료","승인번호",
+    "카드대금","청구금액","요금안내","요금청구","출금","입금","이체","잔액",
+    "대출승인","대출한도","신용대출","대출금리","대환대출","대출 실행","대출 안내","대출 문의",
+    "보험료","보험청구","보험 만기","보험 안내","주식","펀드","비트코인",
+    "관리비 부과","관리비 청구","관리비 납부","관리비가 부과","이번 달 관리비",
+    "당첨","쿠폰","할인코드","이벤트","광고성 정보","무료수신거부","수신거부",
+    "비밀번호","포인트 소멸","적립금 소멸"];
+  var WORDS = ["매매","교환","급매","임대","월세","전세","토지","상가","건물","공장","빌라","풀빌라","펜션",
+    "억원","지목","용도","수익률","매물","아파트","다가구","원룸","임야","대지","상권","권리금","보증금","오피스텔","재개발"];
+
+  var RE_PYEONG = /\d+\s*평/;
+  var RE_AMOUNT_UNIT = /\d[\d,\.]*\s*(억|천만|만원|만|원|평|㎡|m2|m²|제곱미터)/;
+  var RE_PRICE1 = /([0-9][0-9,\.]*)\s*억(?:\s*([0-9][0-9,\.]*)\s*(천|만))?/;
+  var RE_PRICE2 = /([0-9][0-9,\.]{0,8})\s*만\s*원?/;
+  var RE_AREA = /([0-9][0-9,\.]*)\s*(평|㎡|m²|m2|제곱미터)/;
+  var RE_MOBILE = /(01[016789])[-.\s]?(\d{3,4})[-.\s]?(\d{4})/;
+  var RE_TEL = /(0[2-6][0-9]?)[-.\s]?(\d{3,4})[-.\s]?(\d{4})/;
+  var RE_DO = /(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)/;
+  var RE_SIGUN = /([가-힣]{2,5}?(?:시|군|구))/;
+  var RE_EUP = /([가-힣]{1,5}?(?:읍|면|동))/;
+  var RE_RI = /(?:^|\s)([가-힣]{2,3}리)(?![조])/;
+
+  function clean(raw){
+    var t = String(raw || "").replace(/\r/g," ").replace(/\n/g," ");
+    t = t.replace(/\[Web발신\]/g," ").replace(/\(광고\)/g," ");
+    t = t.replace(/무료\s*수신거부[^.]*$/," ");
+    return t.replace(/\s+/g," ").trim();
+  }
+  function isRealty(raw){
+    if(!raw) return false;
+    var t = clean(raw);
+    if(t.length < 6) return false;
+    var low = t.toLowerCase();
+    for(var i=0;i<HARD_NO.length;i++){ if(low.indexOf(HARD_NO[i].toLowerCase()) > -1) return false; }
+    if(!hasDealWord(t)) return false;                 // ① 거래어 필수
+    return RE_AMOUNT_UNIT.test(t) || hasKindNoun(t);  // ② 숫자+단위 또는 ③ 물건 명사
+  }
+  function hasDealWord(t){
+    for(var i=0;i<DEAL_GATE.length;i++){ if(t.indexOf(DEAL_GATE[i]) > -1) return true; }
+    return false;
+  }
+  function hasKindNoun(t){
+    for(var i=0;i<KINDS.length;i++){ if(t.indexOf(KINDS[i]) > -1) return true; }
+    return false;
+  }
+  function hasRealtyWord(s){
+    for(var i=0;i<WORDS.length;i++){ if(s.indexOf(WORDS[i])>-1) return true; }
+    for(var j=0;j<KINDS.length;j++){ if(s.indexOf(KINDS[j])>-1) return true; }
+    return false;
+  }
+  function dealType(t){ for(var i=0;i<DEAL.length;i++){ if(t.indexOf(DEAL[i])>-1) return DEAL[i]; } return ""; }
+  function kindOf(t){
+    for(var i=0;i<KINDS.length;i++){ if(t.indexOf(KINDS[i])>-1) return KINDS[i]; }
+    if(t.indexOf("다세대")>-1 || t.indexOf("연립")>-1 || t.indexOf("전원주택")>-1) return "주택";
+    return "";
+  }
+  function isNoiseRegion(v){
+    var noise = ["매매시","교환시","임대시","전세시","월세시","급매시","부동산","문의","가능","완료","진행"];
+    for(var i=0;i<noise.length;i++){ if(v === noise[i] || v.indexOf(noise[i]) === 0) return true; }
+    return false;
+  }
+  function regionOf(t){
+    var out = [], m;
+    m = RE_DO.exec(t); if(m) out.push(m[1]);
+    var reS = new RegExp(RE_SIGUN.source, "g");
+    while((m = reS.exec(t))){
+      if(isNoiseRegion(m[1])) continue;
+      out.push(m[1]); break;
+    }
+    var reE = new RegExp(RE_EUP.source, "g");
+    while((m = reE.exec(t))){
+      if(isNoiseRegion(m[1])) continue;
+      // '가평 북면'처럼 시·군 표기 없이 앞말만 있는 경우도 지역으로 본다
+      var before = t.slice(0, m.index).trim().split(/\s+/).pop() || "";
+      before = before.replace(/[^가-힣]/g, "");
+      if(before.length >= 2 && before.length <= 4 && !isNoiseRegion(before) && !hasRealtyWord(before) && out.indexOf(before) < 0) out.push(before);
+      if(out.indexOf(m[1]) < 0) out.push(m[1]);
+      break;
+    }
+    m = RE_RI.exec(t);
+    if(m && out.indexOf(m[1]) < 0){
+      var rs = m.index + m[0].indexOf(m[1]);
+      var prev = t.slice(0, rs).trim().split(/\s+/).pop() || "";
+      prev = prev.replace(/[^가-힣]/g, "");
+      if(prev.length >= 2 && prev.length <= 4 && !isNoiseRegion(prev) && !hasRealtyWord(prev) && out.indexOf(prev) < 0) out.push(prev);
+      out.push(m[1]);
+    }
+    // '하남 풀빌라'처럼 표기가 하나도 없으면 물건종류 바로 앞말을 지역으로 본다
+    if(!out.length){
+      for(var ki=0; ki<KINDS.length; ki++){
+        var idx = t.indexOf(KINDS[ki]);
+        if(idx <= 0) continue;
+        var pv = t.slice(0, idx).trim().split(/\s+/).pop() || "";
+        pv = pv.replace(/[^가-힣]/g, "");
+        if(pv.length >= 2 && pv.length <= 4 && !isNoiseRegion(pv) && !hasRealtyWord(pv)){ out.push(pv); break; }
+      }
+    }
+    out = out.filter(function(v,i,a){ return a.indexOf(v) === i; }).slice(0,3);
+    var res = out.join(" ");
+    return res.length > 24 ? res.slice(0,24) : res;
+  }
+  function priceOf(t){
+    var m = RE_PRICE1.exec(t);
+    if(m){ return m[1] + "억" + (m[2] ? " " + m[2] + (m[3] === "천" ? "천만" : "만") : ""); }
+    m = RE_PRICE2.exec(t);
+    if(m) return m[1] + "만";
+    return "";
+  }
+  function areaOf(t){
+    var m = RE_AREA.exec(t);
+    if(!m) return "";
+    var u = m[2];
+    if(u === "m2" || u === "m²" || u === "제곱미터") u = "㎡";
+    return m[1] + u;
+  }
+  function phoneOf(t){
+    var m = RE_MOBILE.exec(t);
+    if(m) return m[1] + "-" + m[2] + "-" + m[3];
+    m = RE_TEL.exec(t);
+    if(m) return m[1] + "-" + m[2] + "-" + m[3];
+    return "";
+  }
+  function summaryOf(t){
+    var s = t;
+    var p = phoneOf(t);
+    if(p){ s = s.replace(RE_MOBILE," ").replace(RE_TEL," "); }
+    s = s.replace(/\s+/g," ").replace(/^[,·\-\s]+/,"").trim();
+    return s.length > 70 ? s.slice(0,70) + "…" : s;
+  }
+  function keyOf(text){
+    var n = String(text||"").replace(/\s+/g,"").replace(/[^가-힣0-9]/g,"");
+    var h1 = 0x811c9dc5, h2 = 0x1000193;
+    for(var i=0;i<n.length;i++){
+      var c = n.charCodeAt(i);
+      h1 = (h1 ^ c) * 16777619 >>> 0;
+      h2 = (h2 + c * (i+7)) >>> 0;
+    }
+    return ("0000000" + h1.toString(16)).slice(-8) + ("0000000" + h2.toString(16)).slice(-8);
+  }
+  function stripChatPrefix(line){
+    var v = line;
+    v = v.replace(/^\d{4}년\s*\d{1,2}월\s*\d{1,2}일\s*(오전|오후)\s*\d{1,2}:\d{2}(:\d{2})?,\s*/,"");
+    v = v.replace(/^\[[^\]]{1,20}\]\s*/,"");
+    v = v.replace(/^\[?(오전|오후)\s*\d{1,2}:\d{2}\]?\s*/,"");
+    var m = /^([^:：]{1,20})\s*[:：]\s*/.exec(v);
+    if(m && !hasRealtyWord(m[1])) v = v.slice(m[0].length);
+    return v.trim();
+  }
+  function parseOne(text, src, from, when){
+    var t = clean(text);
+    var l = {
+      key: keyOf(String(text||"")), src: src || "문자", from: from || "", time: when || "",
+      type: dealType(t), kind: kindOf(t), region: regionOf(t), price: priceOf(t),
+      area: areaOf(t), phone: phoneOf(t), summary: summaryOf(t), text: String(text||"").trim()
+    };
+    if(!l.type && !l.kind && !l.price && !l.area) l.type = "";
+    return l;
+  }
+
+  // ── 상태 ────────────────────────────────────────────────────
+  var items = [], shown = [], dupCount = 0, filter = "전체";
+  var $ = function(id){ return document.getElementById(id); };
+  function say(text, err){ var m = $("msg"); m.textContent = text || ""; m.className = "msg" + (err ? " err" : ""); }
+
+  // 같은 매물 지문 — 거래유형·물건·지역·가격·면적이 같으면 같은 매물로 본다
+  function fpOf(x){
+    var kind = x.kind || "";
+    var region = String(x.region || "").replace(/\s/g, "");
+    var price = String(x.price || "").replace(/\s/g, "");
+    var area = String(x.area || "").replace(/\s/g, "");
+    var n = 0;
+    if(kind) n++; if(region) n++; if(price) n++; if(area) n++;
+    // 가격·면적 같은 수치가 없으면 원문 키로만 중복 판단(다른 물건을 합치는 것을 막는다)
+    if(n < 2 || (!price && !area)) return x.key;
+    return "F" + keyOf((x.type || "") + "|" + kind + "|" + region + "|" + price + "|" + area);
+  }
+  function tsOf(x){
+    if(x.ts) return +x.ts;
+    var m = String(x.time || "").replace(/[^0-9]/g, "");
+    return m ? +m : 0;
+  }
+
+  function addAll(list){
+    var byKey = {}, byFp = {};
+    items.forEach(function(x){ byKey[x.key] = x; byFp[fpOf(x)] = x; });
+    var added = 0;
+    list.forEach(function(x){
+      if(!x || !x.text) return;
+      x.fp = fpOf(x);
+      if(byKey[x.key]){ dupCount++; return; }
+      var old = byFp[x.fp];
+      if(old){
+        // 같은 매물이면 가장 최신 1건만 남긴다
+        if(tsOf(x) > tsOf(old)){
+          var i = items.indexOf(old);
+          if(i >= 0){ items[i] = x; delete byKey[old.key]; byKey[x.key] = x; byFp[x.fp] = x; added++; }
+        }
+        dupCount++;
+        return;
+      }
+      byKey[x.key] = x; byFp[x.fp] = x; items.push(x); added++;
+    });
+    return added;
+  }
+
+  // ── 입력 해석 ───────────────────────────────────────────────
+  function looksJson(s){
+    var t = String(s).trim();
+    return t.charAt(0) === "{" || t.charAt(0) === "[";
+  }
+  function fromJson(s){
+    var data = JSON.parse(s);
+    var arr = Array.isArray(data) ? data : (data.items || data.rows || data.listings || []);
+    var out = [];
+    arr.forEach(function(o){
+      if(typeof o === "string"){ if(isRealty(o)) out.push(parseOne(o)); return; }
+      if(!o || typeof o !== "object") return;
+      var text = o.text || o.body || o.content || o.summary || o["내용"] || o["원문"] || "";
+      if(!text) return;
+      var l = parseOne(text, o.src || o.source || "수집기", o.from || o.sender || o["발신"] || "", o.time || o["시각"] || "");
+      ["type","kind","region","price","area","phone","summary"].forEach(function(f){
+        if(o[f] && String(o[f]).length) l[f] = o[f];
+      });
+      if(o.key) l.key = o.key;
+      out.push(l);
+    });
+    return out;
+  }
+  function fromText(blob){
+    var out = [];
+    String(blob).split(/\r?\n/).forEach(function(line){
+      var v = stripChatPrefix(line.trim());
+      if(!v || !isRealty(v)) return;
+      out.push(parseOne(v));
+    });
+    if(!out.length){
+      // 줄바꿈 없이 길게 붙인 경우: 문장 단위로 한 번 더 시도
+      String(blob).split(/(?<=[.!?])\s+/).forEach(function(seg){
+        var v = seg.trim();
+        if(v.length > 8 && isRealty(v)) out.push(parseOne(v));
+      });
+    }
+    return out;
+  }
+  function csvRows(text){
+    var rows = [], row = [], cur = "", q = false;
+    for(var i=0;i<text.length;i++){
+      var c = text[i];
+      if(q){
+        if(c === '"'){ if(text[i+1] === '"'){ cur += '"'; i++; } else q = false; }
+        else cur += c;
+      } else {
+        if(c === '"') q = true;
+        else if(c === ","){ row.push(cur); cur = ""; }
+        else if(c === "\n"){ row.push(cur); rows.push(row); row = []; cur = ""; }
+        else if(c !== "\r") cur += c;
+      }
+    }
+    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function fromCsv(text){
+    var rows = csvRows(text);
+    if(!rows.length) return [];
+    var head = rows[0].map(function(h){ return String(h).replace(/^"|"$/g,"").trim(); });
+    var idxText = head.findIndex(function(h){ return /내용|원문|text|body|문의|메모/.test(h); });
+    if(idxText < 0) idxText = head.length > 1 ? 1 : 0;
+    var idxFrom = head.findIndex(function(h){ return /발신|연락처|전화|from|sender|번호/.test(h); });
+    var idxTime = head.findIndex(function(h){ return /시각|시간|날짜|time|date|접수/.test(h); });
+    var out = [];
+    for(var r=1;r<rows.length;r++){
+      var cells = rows[r];
+      var body = cells[idxText] || "";
+      if(!body) continue;
+      var rest = cells.filter(function(_,i){ return i !== idxText; }).join(" ");
+      var l = parseOne(body, "시트", idxFrom >= 0 ? cells[idxFrom] : "", idxTime >= 0 ? cells[idxTime] : "");
+      // 본문이 짧아 비는 항목은 같은 줄의 다른 칸에서 보충
+      ["price","area","region","phone"].forEach(function(f){ if(!l[f]){ var p = parseOne(body + " " + rest); if(p[f]) l[f] = p[f]; } });
+      out.push(l);
+    }
+    return out;
+  }
+
+  function consume(text, label){
+    var list = [], mode = "";
+    if(looksJson(text)){
+      try { list = fromJson(text); mode = "JSON"; }
+      catch(e){ list = fromText(text); mode = "텍스트"; }
+    } else if(/,.*,/.test(text.split(/\r?\n/)[0] || "") && /(시각|내용|연락처|text|body|접수)/i.test(text.split(/\r?\n/)[0] || "")){
+      list = fromCsv(text); mode = "CSV";
+    } else {
+      list = fromText(text);
+      mode = "텍스트";
+    }
+    if(!list.length){
+      say(label + "에서 부동산 매물을 찾지 못했습니다. 매매·교환·급매·토지·상가 등 단어가 들어간 줄만 담습니다.", true);
+      return 0;
+    }
+    var added = addAll(list);
+    render();
+    say(label + " " + list.length + "건 인식 · 새로 " + added + "건 정리 (" + mode + ")");
+    return added;
+  }
+
+  // ── 화면 ────────────────────────────────────────────────────
+  function render(){
+    $("result").hidden = items.length === 0;
+    $("sTotal").textContent = items.length;
+    $("sDeal").textContent = items.filter(function(x){ return x.type === "교환" || x.type === "급매"; }).length;
+    $("sDup").textContent = dupCount;
+
+    var types = ["전체"];
+    items.forEach(function(x){ if(x.type && types.indexOf(x.type) < 0) types.push(x.type); });
+    var chips = $("chips");
+    chips.innerHTML = "";
+    types.forEach(function(t){
+      var b = document.createElement("button");
+      b.className = "chip" + (t === filter ? " on" : "");
+      b.textContent = t + (t === "전체" ? " " + items.length : " " + items.filter(function(x){ return x.type === t; }).length);
+      b.onclick = function(){ filter = t; render(); };
+      chips.appendChild(b);
+    });
+
+    shown = filter === "전체" ? items.slice() : items.filter(function(x){ return x.type === filter; });
+    var box = $("cards");
+    box.innerHTML = "";
+    if(!shown.length){
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "이 유형의 매물은 없습니다.";
+      box.appendChild(e);
+      return;
+    }
+    shown.forEach(function(x, i){ box.appendChild(card(x, i + 1)); });
+  }
+
+  function el(tag, cls, text){
+    var d = document.createElement(tag);
+    if(cls) d.className = cls;
+    if(text !== undefined && text !== null) d.textContent = text;
+    return d;
+  }
+
+  function card(x, no){
+    var c = el("div","card");
+    var top = el("div","top");
+    var badge = el("span","badge" + (x.type === "교환" ? "" : (x.type ? " mid" : " none")), x.type || "매물");
+    top.appendChild(badge);
+    var title = el("span","title", [x.kind, x.region].filter(Boolean).join(" · ") || "물건 정보");
+    top.appendChild(title);
+    top.appendChild(el("span","src", (x.src || "") + (x.time ? " " + x.time : "")));
+    c.appendChild(top);
+
+    var money = el("div","money");
+    if(x.price) money.appendChild(el("span","price", x.price));
+    if(x.area) money.appendChild(el("span","area", x.area));
+    if(x.phone){
+      var a = el("a","phone", x.phone);
+      a.href = "tel:" + x.phone.replace(/[^0-9+]/g,"");
+      money.appendChild(a);
+    }
+    if(money.childNodes.length) c.appendChild(money);
+    if(x.summary) c.appendChild(el("p","sum", x.summary));
+
+    var d = el("details","raw");
+    d.appendChild(el("summary", null, "원문 보기"));
+    d.appendChild(el("p", null, x.text));
+    c.appendChild(d);
+    return c;
+  }
+
+  // ── 내보내기 ────────────────────────────────────────────────
+  var HEAD = ["번호","거래유형","물건종류","지역","가격","면적","연락처","출처","시각","요약"];
+  function rows(){
+    return items.map(function(x, i){
+      return [i+1, x.type, x.kind, x.region, x.price, x.area, x.phone, x.src, x.time, x.summary];
+    });
+  }
+  function toCsv(){
+    var lines = [HEAD.join(",")];
+    rows().forEach(function(r){
+      lines.push(r.map(function(v){ return '"' + String(v==null?"":v).replace(/"/g,'""') + '"'; }).join(","));
+    });
+    return "\ufeff" + lines.join("\r\n");
+  }
+  function toMarkdown(){
+    var out = ["# 부동산 매물 정리 (" + new Date().toISOString().slice(0,10) + " · " + items.length + "건)", ""];
+    items.forEach(function(x, i){
+      out.push("### " + (i+1) + ". [" + (x.type || "매물") + "] " + [x.kind, x.region].filter(Boolean).join(" "));
+      out.push("- 가격: " + (x.price || "-") + " / 면적: " + (x.area || "-") + " / 연락: " + (x.phone || "-"));
+      out.push("- 출처: " + (x.src || "-") + (x.time ? " · " + x.time : ""));
+      out.push("- 요약: " + (x.summary || "-"));
+      out.push("");
+    });
+    return out.join("\n");
+  }
+  function toJson(){
+    return JSON.stringify({
+      app: "KTS_매물정리기", version: "1.0",
+      exported: new Date().toISOString().slice(0,16).replace("T"," "),
+      count: items.length,
+      items: items.map(function(x){
+        return { key:x.key, src:x.src, from:x.from, time:x.time, type:x.type, kind:x.kind,
+                 region:x.region, price:x.price, area:x.area, phone:x.phone, summary:x.summary, text:x.text };
+      })
+    }, null, 1);
+  }
+  function download(name, text, mime){
+    var blob = new Blob([text], {type: mime || "text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 400);
+  }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(function(){ say("복사했습니다. 교환 매물 DB·메모 어디든 붙여넣으세요."); })
+        .catch(function(){ fallbackCopy(text); });
+    }
+    fallbackCopy(text);
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); say("복사했습니다."); }
+    catch(e){ say("복사가 막혔습니다. 아래로 내려받아 주세요.", true); }
+    document.body.removeChild(ta);
+  }
+
+  // ── AI 보정(선택) ───────────────────────────────────────────
+  function mask(t){
+    return String(t || "").replace(/(01[016789])[-.\s]?\d{3,4}[-.\s]?\d{4}/g, "$1-****-****")
+                             .replace(/(0[2-6][0-9]?)[-.\s]?\d{3,4}[-.\s]?\d{4}/g, "$1-***-****");
+  }
+
+  function aiFill(){
+    var key = $("gemKey").value.trim();
+    if(!key){ say("AI 보정은 Gemini 키를 넣었을 때만 동작합니다. 키 없이도 정리는 그대로 됩니다.", true); return; }
+    var need = items.filter(function(x){ return !x.price || !x.region || !x.kind; }).slice(0, 20);
+    if(!need.length){ say("규칙만으로 모든 항목이 채워졌습니다. AI 보정이 필요 없습니다."); return; }
+    say("AI가 빈 항목을 확인하는 중…");
+    var payload = {
+      contents: [{ role: "user", parts: [{ text:
+        "다음은 한국 부동산 매물 문자다. 각 항목의 빈 칸(type, kind, region, price, area)만 채워 JSON 배열로만 답해라. " +
+        "없는 값은 빈 문자열로 두고 원문에 없는 내용을 지어내지 마라. 값 형식: type=교환/급매/매매/임대/월세/전세, price='3억 5,000만'.\n" +
+        JSON.stringify(need.map(function(x, i){ return { i:i, text: mask(x.text), type:x.type, kind:x.kind, region:x.region, price:x.price, area:x.area }; }))
+      }]}],
+      generationConfig: { temperature: 0, maxOutputTokens: 1024 }
+    };
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=" + encodeURIComponent(key), {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); }).then(function(j){
+      var txt = "";
+      try { txt = j.candidates[0].content.parts[0].text; } catch(e){ throw new Error("응답을 읽지 못했습니다"); }
+      var m = /\[[\s\S]*\]/.exec(txt);
+      if(!m) throw new Error("JSON 답이 없습니다");
+      var arr = JSON.parse(m[0]);
+      var fixed = 0;
+      arr.forEach(function(o){
+        var target = need[o.i]; if(!target) return;
+        ["type","kind","region","price","area"].forEach(function(f){
+          if(!target[f] && o[f]){ target[f] = String(o[f]); fixed++; }
+        });
+        target.summary = target.summary || summaryOf(target.text);
+      });
+      render();
+      say(fixed ? "AI가 " + fixed + "개 항목을 보완했습니다." : "보완할 항목이 없었습니다.");
+    }).catch(function(e){
+      say("AI 보정 실패: " + (e && e.message ? e.message : e) + " — 키와 네트워크를 확인해 주세요.", true);
+    });
+  }
+
+  // ── 이벤트 ──────────────────────────────────────────────────
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick = function(){
+      document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      ["paste","file","sheet"].forEach(function(k){ $("tab-" + k).hidden = (k !== t.dataset.tab); });
+    };
+  });
+
+  $("btnParse").onclick = function(){
+    var v = $("raw").value;
+    if(!v.trim()){ say("정리할 문자나 카톡 내용을 먼저 붙여넣어 주세요.", true); return; }
+    consume(v, "붙여넣은 내용");
+  };
+  $("btnClear").onclick = function(){
+    $("raw").value = ""; items = []; shown = []; dupCount = 0; filter = "전체";
+    $("result").hidden = true; say("");
+  };
+  $("btnSample").onclick = function(){
+    $("raw").value = SAMPLE;
+    say("예시를 넣었습니다. [1초 정리]를 눌러 보세요.");
+  };
+
+  var picked = [];
+  $("drop").onclick = function(){ $("file").click(); };
+  $("file").onchange = function(e){ takeFiles(e.target.files); };
+  ["dragenter","dragover"].forEach(function(ev){
+    $("drop").addEventListener(ev, function(e){ e.preventDefault(); $("drop").classList.add("on"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    $("drop").addEventListener(ev, function(e){ e.preventDefault(); $("drop").classList.remove("on"); });
+  });
+  $("drop").addEventListener("drop", function(e){
+    if(e.dataTransfer && e.dataTransfer.files) takeFiles(e.dataTransfer.files);
+  });
+  function takeFiles(list){
+    picked = [];
+    var names = [];
+    for(var i=0;i<list.length;i++){ picked.push(list[i]); names.push(list[i].name); }
+    $("fileline").textContent = names.length ? "고른 파일: " + names.join(", ") : "";
+  }
+  $("btnParseFile").onclick = function(){
+    if(!picked.length){ say("먼저 파일을 고르거나 끌어다 놓아 주세요.", true); return; }
+    var left = picked.length, total = 0;
+    picked.forEach(function(f){
+      var r = new FileReader();
+      r.onload = function(){
+        total += 1;
+        consume(String(r.result), f.name);
+        left--;
+        if(left === 0) say(total + "개 파일을 정리했습니다.");
+      };
+      r.onerror = function(){ left--; say(f.name + " 을(를) 읽지 못했습니다.", true); };
+      r.readAsText(f, "utf-8");
+    });
+  };
+
+  $("btnSheet").onclick = function(){
+    var u = $("sheetUrl").value.trim();
+    if(!u){ say("시트 주소를 넣어 주세요.", true); return; }
+    say("시트를 불러오는 중…");
+    fetch(u).then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    }).then(function(t){
+      consume(t, "시트");
+    }).catch(function(e){
+      say("시트를 못 불러왔습니다(" + (e.message || e) + "). 시트에서 CSV로 내려받아 파일 탭에 올리면 됩니다.", true);
+    });
+  };
+
+  document.querySelectorAll("[data-exp]").forEach(function(b){
+    b.onclick = function(){
+      if(!items.length){ say("정리된 매물이 없습니다.", true); return; }
+      var k = b.dataset.exp;
+      if(k === "csv"){ download("KTS_매물정리_" + stamp() + ".csv", toCsv(), "text/csv;charset=utf-8"); say("CSV로 내려받았습니다. 엑셀에서 바로 열립니다."); }
+      if(k === "md") copy(toMarkdown());
+      if(k === "json") copy(toJson());
+    };
+  });
+
+  $("btnAi").onclick = aiFill;
+
+  function stamp(){
+    var d = new Date(), p = function(n){ return (n<10?"0":"") + n; };
+    return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + "_" + p(d.getHours()) + p(d.getMinutes());
+  }
+
+  // 수집기 앱(안드로이드)에서 넘겨주는 통로
+  window.KTS_receive = function(jsonText){
+    try {
+      var added = consume(String(jsonText), "수집기 앱");
+      if(added >= 0) say("수집기에서 받은 매물을 정리했습니다 · 새로 " + added + "건");
+    } catch(e){ say("수집기 데이터를 읽지 못했습니다.", true); }
+  };
+
+  var SAMPLE =
+"급매) 가평 북면 신하리 토지 8,500평 3억5천 교환 가능. 수익률 좋습니다. 010-1234-5678\n" +
+"[Web발신] [KB카드] 승인번호 12345 12,000원 결제되었습니다.\n" +
+"당진 석문면 초락도리 주유소 매매 25억, 대지 1,200평, 010-9876-5432\n" +
+"2026년 11월 18일 오후 2:13, 김사장 : [교환] 하남 풀빌라 3억2천 / 월세 매출 1,500만 상가 건물\n" +
+"인증번호 [482913] 를 입력해 주세요.\n" +
+"택배가 배송완료 되었습니다. 운송장 1234-5678\n" +
+"제주 선흘리 펜션 임대 1,500만 / 보증금 3,000만, 문의 010-2222-3333\n" +
+"포천 양문리 공장 매매 10억, 500평, 02-345-6789";
+})();
+</script>
+</body>
+</html>

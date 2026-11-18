@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>독심술 — 4문항으로 보는 32가지 결</title>
+<title>독심술 — 4문항 순위로 보는 64가지 결</title>
 <meta name="theme-color" content="#0A1224">
 <meta name="description" content="문항 4개로 그 사람의 결(結)을 읽고, 그림 한 장과 세 마디로 정리합니다. 유형마다 생활 속 예시 → 속마음 → 강점 → 한 줄 처방. 오락·참고용이며 심리검사·진단이 아닙니다.">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:title" content="독심술 — 4문항으로 보는 32가지 결">
-<meta property="og:description" content="4문항 → 8결 × 4갈래 = 32유형. 유형마다 생활 속 예시 한 장면과 세 마디. 답은 기기 밖으로 나가지 않습니다.">
+<meta property="og:title" content="독심술 — 4문항 순위로 보는 64가지 결">
+<meta property="og:description" content="4문항을 가까운 순서(1~4순위)로 고르면 8결 × 4갈래 × 강/약 = 64유형, 강·약 6단계까지. 유형마다 그림과 생활 속 예시. 답은 기기 밖으로 나가지 않습니다.">
 <meta property="og:image" content="https://autooneclick.com/navi2/img/cover.webp">
 <meta property="og:url" content="https://autooneclick.com/navi2/">
 <style>
@@ -82,17 +82,26 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 .qtxt{font-size:21px;line-height:1.42;letter-spacing:-.8px;margin:8px 0 0;font-weight:900;word-break:keep-all}
 .qhint{font-size:12px;color:var(--gray);margin:7px 0 0;letter-spacing:-.2px;line-height:1.55;word-break:keep-all}
 .grid{display:grid;gap:10px;margin-top:15px}
+/* v5.0 : 4지선다 = 2×2 상황 그림 카드(1호기 복원) + 1~4순위 */
+#ogrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .opt{font-family:inherit;text-align:left;border:1px solid var(--line2);border-radius:14px;background:var(--card);
-  padding:15px 14px 15px 42px;cursor:pointer;position:relative;color:var(--ink);transition:border-color .15s,background .15s}
-.opt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.35px;color:#fff;line-height:1.5;word-break:keep-all}
-.opt .no{position:absolute;left:12px;top:15px;width:21px;height:21px;border-radius:6px;background:rgba(10,18,36,.8);
-  border:1px solid var(--line2);color:var(--ink2);font-size:11px;font-weight:900;display:grid;place-items:center}
-.opt.sel{border-color:var(--or);background:rgba(255,107,0,.1);box-shadow:0 0 0 2px rgba(255,107,0,.22)}
+  padding:0;overflow:hidden;cursor:pointer;position:relative;color:var(--ink);transition:border-color .15s,background .15s;
+  display:flex;flex-direction:column;align-items:stretch}
+.opt .art{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#16264A}
+.opt .tx{display:block;padding:8px 10px 10px}
+.opt b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.3px;color:#fff;line-height:1.45;word-break:keep-all}
+.opt .no{position:absolute;left:7px;top:7px;width:19px;height:19px;border-radius:6px;background:rgba(10,18,36,.85);
+  border:1px solid rgba(255,255,255,.22);color:#E7EDF6;font-size:10.5px;font-weight:900;display:grid;place-items:center}
+.opt.sel{border-color:var(--or);background:rgba(255,107,0,.1);box-shadow:0 0 0 2px rgba(255,107,0,.24)}
 .opt.sel .no{background:var(--or);color:var(--on);border-color:var(--or)}
 .opt.sel2{border-style:dashed;border-color:var(--or2);background:rgba(255,162,77,.06)}
-.opt.sel2 .no{background:rgba(255,162,77,.22);color:var(--or2);border-color:var(--or2)}
-.opt .rk{position:absolute;right:11px;top:13px;font-size:9.5px;font-weight:900;color:var(--or2);
-  border:1px solid rgba(255,162,77,.5);border-radius:999px;padding:2px 7px;letter-spacing:.04em}
+.opt.sel2 .no{background:rgba(255,162,77,.9);color:var(--on);border-color:var(--or2)}
+.opt.sel3,.opt.sel4{border-style:dotted;border-color:#4C6491;background:rgba(120,150,200,.06)}
+.opt.sel3 .no,.opt.sel4 .no{background:rgba(120,150,200,.25);color:#E7EDF6;border-color:#4C6491}
+.opt .rk{position:absolute;right:7px;top:7px;font-size:9.5px;font-weight:900;color:#0A1224;background:rgba(255,162,77,.95);
+  border-radius:999px;padding:2px 7px;letter-spacing:.02em}
+.opt.sel2 .rk{background:rgba(255,162,77,.75)}
+.opt.sel3 .rk,.opt.sel4 .rk{background:rgba(160,180,215,.85)}
 .switch{display:flex;align-items:center;gap:9px;margin-top:14px;border:1px solid var(--line);border-radius:12px;
   background:rgba(255,255,255,.03);padding:11px 12px;cursor:pointer}
 .switch .sw{flex:0 0 auto;width:38px;height:22px;border-radius:99px;background:#1B2B4B;border:1px solid var(--line2);position:relative}
@@ -165,6 +174,22 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 .toast.on{opacity:1}
 .hidden{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* v5.0 — 강·약 6단계 스펙트럼 */
+.spec{margin-top:12px;border:1px solid var(--line2);border-radius:16px;background:rgba(18,32,60,.75);padding:13px 14px}
+.spec .hd2{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:900;color:var(--or2);letter-spacing:.2px}
+.spec .hd2 b{margin-left:auto;color:#fff;font-size:12.5px}
+.spec .pol{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:900;
+  background:rgba(255,107,0,.16);color:#FFA24D;border:1px solid rgba(255,107,0,.45)}
+.spec .pol.weak{background:rgba(120,150,200,.14);color:#B9C8DE;border-color:#3D5580}
+.spec .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:10px}
+.spec .steps i{height:8px;border-radius:99px;background:#1D2C4C;display:block}
+.spec .steps i.on{background:linear-gradient(90deg,var(--or),var(--or2))}
+.spec .steps i.now{box-shadow:0 0 0 2px rgba(255,162,77,.35)}
+.spec .lbl{display:flex;justify-content:space-between;font-size:9.5px;color:#7E90AC;margin-top:5px;font-variant-numeric:tabular-nums}
+.spec .why{font-size:11.5px;color:#AFBDD0;line-height:1.6;margin-top:9px}
+.expl{font-size:11.5px;color:#93A4BC;line-height:1.65;margin:9px 2px 0;word-break:keep-all}
+.expl b{color:#E7EDF6}
 </style>
 </head>
 <body>
@@ -172,7 +197,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
   <header class="hd">
     <div class="logo">術</div>
-    <div class="brand">독심술 <small>v4.1 · 32유형 · 4문항</small></div>
+    <div class="brand">독심술 <small>v5.0 · 64유형 · 4문항 순위</small></div>
     <div class="sp"></div>
     <span class="pill" id="hdDate">—</span>
   </header>
@@ -181,11 +206,13 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
   <!-- ① 표지 -->
   <section class="scr on" id="sIntro">
-    <span class="kicker">4문항 · 1분 · 32유형 · 무료</span>
+    <span class="kicker">4문항 순위 · 1분 · 64유형 · 무료</span>
     <h1>그 사람의 <em>결</em>을,<br>그림 한 장으로 봅니다.</h1>
-    <p class="sub">어려운 말은 뺐습니다. <b>결 32유형</b>마다 <b>생활 속 예시</b> 한 장면과 세 마디만 남겼습니다.</p>
+    <p class="sub">어려운 말은 뺐습니다. 그림 4장을 <b>가까운 순서대로 톡톡</b> 고르면 <b>결 64유형</b>과 <b>강·약 6단계</b>까지 나옵니다. 유형마다 <b>생활 속 예시</b> 한 장면이 붙습니다.</p>
     <img class="hero" src="img/cover.webp" alt="독심술" width="960" height="600" loading="eager">
     <div class="gal" id="gal"></div>
+    <p class="expl">위 그림 여덟 장이 <b>여덟 결</b>입니다. 문제마다 상황 그림 4장이 나오고,
+      <b>가까운 순서대로 1~4순위</b>로 톡톡 누르면 됩니다.</p>
     <div class="dock">
       <button class="btn main" id="btnGo" type="button">시작하기 — 나를 볼 때</button>
       <button class="btn ghost sm" id="btnToMode" type="button">남을 볼 때 (거래처·애인·선배·후배)</button>
@@ -231,9 +258,9 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     <div class="qtxt" id="qtxt">—</div>
     <p class="qhint" id="qhint"></p>
     <div class="grid" id="ogrid"></div>
-    <div class="switch" id="swTwo" role="switch" aria-checked="false" tabindex="0">
+    <div class="switch on" id="swTwo" role="switch" aria-checked="true" tabindex="0">
       <div class="sw"><i></i></div>
-      <div class="sl"><b>어느 정도만 맞아요</b>두 번째 카드까지 고를 수 있습니다</div>
+      <div class="sl"><b>가까운 순서로 1~4순위</b>톡톡 누른 순서대로 비중이 정해집니다 (끄면 1장만)</div>
     </div>
     <div class="dock">
       <button class="btn main" id="btnNext" type="button" disabled>다음</button>
@@ -275,7 +302,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
       <a class="btn ghost sm" id="btnShShop" href="https://autooneclick.com/?from=navi2-shared"
          target="_blank" rel="noopener" style="text-decoration:none">KTS 원클릭 둘러보기 →</a>
     </div>
-    <p class="note">친구의 결과는 요약만 보입니다. 내 결과는 32유형 중 하나로 나옵니다.</p>
+    <p class="note">친구의 결과는 요약만 보입니다. 내 결과는 64유형 중 하나로 나옵니다.</p>
   </section>
 
 </div>
@@ -312,7 +339,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   var $ = function(s){ return document.querySelector(s); };
   var APP = window.APP, M = window.MODES, CARDS = window.CARDS, ORDER = window.CARD_ORDER;
 
-  var ST = { mode:null, birth:'', lv:1, picks:[], sel:{p:null,s:null}, two:false, res:null, q:null };
+  var ST = { mode:null, birth:'', lv:1, total:4, picks:[], sel:{ranks:[],p:null,s:null}, two:true, res:null, q:null };
 
   function show(id){
     [].forEach.call(document.querySelectorAll('.scr'), function(s){ s.classList.toggle('on', s.id === id); });
@@ -410,12 +437,51 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     return prev && prev.primary ? prev.primary.opt.n : '*';
   }
 
+  /* v5.0 — 보기마다 상황 그림(1호기 photos 재사용). 낱말로 먼저 찾고, 없으면 결(結)로 고른다. */
+  var OPT_IMG = {
+    ticket:'ticket', route:'route', together:'together', home:'home', price:'price', mood:'mood',
+    favmenu:'favmenu', nearby:'nearby', self:'self', who:'who', fix:'fix', cut:'cut',
+    win:'win', famjoy:'famjoy', praised:'praised', free:'free'
+  };
+  var OPT_SRC = {
+    ticket:'img/opts/nav_photo_01_ticket_train.jpg', route:'img/opts/nav_photo_02_route_map.jpg',
+    together:'img/opts/nav_photo_03_calendar_two.jpg', home:'img/opts/nav_photo_04_home_organize.jpg',
+    price:'img/opts/nav_photo_05_price.jpg', mood:'img/opts/nav_photo_06_mood.jpg',
+    favmenu:'img/opts/nav_photo_07_favmenu.jpg', nearby:'img/opts/nav_photo_08_nearby.jpg',
+    self:'img/opts/nav_photo_09_self.jpg', who:'img/opts/nav_photo_10_who.jpg',
+    fix:'img/opts/nav_photo_11_fix.jpg', cut:'img/opts/nav_photo_12_cut.jpg',
+    win:'img/opts/nav_photo_13_win.jpg', famjoy:'img/opts/nav_photo_14_famjoy.jpg',
+    praised:'img/opts/nav_photo_15_praised.jpg', free:'img/opts/nav_photo_16_free.jpg'
+  };
+  var TYPE_IMG = { SPEED:'ticket', PERFECT:'route', LOYAL:'together', PUTOFF:'home',
+                   EYE:'self', FACE:'praised', CALC:'price', FREE:'free' };
+  var IMG_RULES = [
+    [/카톡|문자|답장|연락|전화|메시지/, 'self'],
+    [/할 일|메모|적어|목록|체크|순서|계획|일정|짜|표|지도|동선|미리|준비|그림부터|끝까지/, 'route'],
+    [/돈|가격|비용|계산|숫자|이득|남는|차액|얼마|지출|이익|손해|장부|비교/, 'price'],
+    [/사람|같이|누구|모임|가족|팀|친구|상대|만나|말할|설득|부탁/, 'together'],
+    [/인정|보여|자존|체면|눈치|어떻게 보|평판|칭찬|대우/, 'praised'],
+    [/쉬|집|누워|자|휴식|여유|미루|나중|접|내려|버티|가만/, 'home'],
+    [/바로|즉시|당장|먼저|빨리|지금|움직|나서|해치|결론|바로바로/, 'ticket'],
+    [/분위기|감성|노을|맛|카페|술|여행|사진/, 'mood'],
+    [/고치|수습|해결|정리|다시|되짚|점검|확인|실수|엉킨/, 'fix'],
+    [/끊|그만|손절|안 믿|포기|잘라|관계/, 'cut'],
+    [/이기|성과|실력|성공|뿌듯|큰 판|해냈/, 'win'],
+    [/걱정|신경|불안|혼자|마음|속마음|생각/, 'self'],
+    [/내가|직접|혼자서|스스로/, 'self']
+  ];
+  function optImage(o){
+    var lb = String(o && o.label || '');
+    for (var i = 0; i < IMG_RULES.length; i++){ if (IMG_RULES[i][0].test(lb)) return OPT_SRC[IMG_RULES[i][1]]; }
+    return OPT_SRC[TYPE_IMG[o && o.t] || 'self'];
+  }
+
   function renderQ(){
     var lv = ST.lv, v = variantFor(lv);
     var q = APP.questionAt(ST.mode, lv, v) || APP.questionAt(ST.mode, lv, '*');
     ST.q = q;
-    $('#pnum').textContent = lv + ' / 4';
-    $('#pbar').style.width = (lv * 25) + '%';
+    $('#pnum').textContent = lv + ' / ' + ST.total;
+    $('#pbar').style.width = Math.round(lv / ST.total * 100) + '%';
     $('#qtag').textContent = 'L' + lv + ' · ' + M[ST.mode].nm;
     $('#qtxt').textContent = q.q;
     $('#qhint').textContent = q.hint || '';
@@ -423,38 +489,63 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     q.opts.forEach(function(o, i){
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'opt'; b.dataset.idx = String(i + 1);
+      var im = document.createElement('img');
+      im.className = 'art'; im.src = optImage(o); im.alt = ''; im.loading = 'eager'; im.decoding = 'async';
+      b.appendChild(im);
       b.appendChild(el('span', 'no', String(i + 1)));
-      b.appendChild(el('b', null, o.label));
+      var tx = el('span', 'tx');
+      tx.appendChild(el('b', null, o.label));
+      b.appendChild(tx);
       b.addEventListener('click', function(){ tapOpt(o, i + 1); });
       g.appendChild(b);
     });
-    ST.sel = { p:null, s:null };
+    ST.sel = { ranks: [], p:null, s:null };
     paint();
   }
 
+  /* 순위(비중) 선택 — 톡톡 누른 순서대로 1·2·3·4순위. 다시 누르면 취소. */
+  var RANK_W = [4, 3, 2, 1];
   function tapOpt(o, idx){
-    var S = ST.sel;
-    if (S.p && S.p.idx === idx){ S.p = null; S.s = null; }
-    else if (S.s && S.s.idx === idx){ S.s = null; }
-    else if (!S.p){ S.p = { o:o, idx:idx }; }
-    else if (!S.s){ if (ST.two) S.s = { o:o, idx:idx }; else S.p = { o:o, idx:idx }; }
-    else { toast('제일 맞는 것 하나만. 두 번째까지는 받아들여요'); return; }
+    var R = ST.sel.ranks;
+    var at = -1;
+    for (var i = 0; i < R.length; i++) if (R[i].idx === idx){ at = i; break; }
+    if (at >= 0){ R.splice(at, 1); }
+    else {
+      var max = ST.two ? 4 : 1;
+      if (R.length >= max){
+        if (!ST.two){ R.length = 0; R.push({ o:o, idx:idx }); paint(); return; }
+        toast('한 문항에 4장까지 — 다시 누르면 순위가 바뀝니다'); return;
+      }
+      R.push({ o:o, idx:idx });
+    }
+    ST.sel.p = R[0] || null;
+    ST.sel.s = R[1] || null;
     paint();
   }
 
   function paint(){
-    var S = ST.sel;
+    var R = ST.sel.ranks || [];
     [].forEach.call(document.querySelectorAll('#ogrid .opt'), function(node){
       var idx = Number(node.dataset.idx);
-      node.classList.toggle('sel', !!(S.p && S.p.idx === idx));
-      node.classList.toggle('sel2', !!(S.s && S.s.idx === idx));
+      var order = -1;
+      for (var i = 0; i < R.length; i++) if (R[i].idx === idx) order = i;
+      node.classList.toggle('sel',  order === 0);
+      node.classList.toggle('sel2', order === 1);
+      node.classList.toggle('sel3', order === 2);
+      node.classList.toggle('sel4', order === 3);
       var rk = node.querySelector('.rk');
-      if (S.p && S.p.idx === idx){ if (!rk){ rk = el('span', 'rk'); node.appendChild(rk); } rk.textContent = '1순위'; }
-      else if (S.s && S.s.idx === idx){ if (!rk){ rk = el('span', 'rk'); node.appendChild(rk); } rk.textContent = '2순위'; }
-      else if (rk) rk.remove();
+      if (order >= 0){
+        if (!rk){ rk = el('span', 'rk'); node.appendChild(rk); }
+        rk.textContent = (order + 1) + '순위';
+      } else if (rk) rk.remove();
     });
-    $('#btnNext').disabled = !S.p;
-    $('#btnNext').textContent = ST.lv === 4 ? '결과 보기' : '다음';
+    $('#btnNext').disabled = R.length === 0;
+    $('#btnNext').textContent = ST.lv === ST.total ? '결과 보기' : '다음';
+    var hint = $('#qhint');
+    if (hint && R.length){
+      var pct = R.map(function(r, i){ var w = RANK_W[i] / RANK_W.slice(0, R.length).reduce(function(a,b){return a+b;},0) * 100; return (i+1) + '순위 ' + Math.round(w) + '%'; });
+      hint.textContent = (ST.q && ST.q.hint ? ST.q.hint + '  ' : '') + '· 비중 ' + pct.join(' · ');
+    } else if (hint && ST.q) hint.textContent = ST.q.hint || '';
   }
 
   var sw = $('#swTwo');
@@ -462,19 +553,25 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     ST.two = !ST.two;
     sw.classList.toggle('on', ST.two);
     sw.setAttribute('aria-checked', ST.two ? 'true' : 'false');
-    if (!ST.two && ST.sel.s){ ST.sel.s = null; paint(); }
+    if (!ST.two && ST.sel.ranks && ST.sel.ranks.length > 1){
+      ST.sel.ranks = ST.sel.ranks.slice(0, 1);
+      ST.sel.p = ST.sel.ranks[0] || null; ST.sel.s = null;
+      paint();
+    }
   }
   sw.addEventListener('click', toggleTwo);
   sw.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleTwo(); } });
 
   $('#btnNext').addEventListener('click', function(){
-    if (!ST.sel.p) return;
+    var R = ST.sel.ranks || [];
+    if (!R.length) return;
     ST.picks[ST.lv - 1] = {
-      primary: { opt: ST.sel.p.o, idx: ST.sel.p.idx },
-      secondary: ST.sel.s ? { opt: ST.sel.s.o, idx: ST.sel.s.idx } : null
+      ranks: R.map(function(r){ return { opt:r.o, idx:r.idx }; }),
+      primary: R[0] ? { opt: R[0].o, idx: R[0].idx } : null,
+      secondary: R[1] ? { opt: R[1].o, idx: R[1].idx } : null
     };
     ST.picks = ST.picks.slice(0, ST.lv);
-    if (ST.lv === 4){ finish(); return; }
+    if (ST.lv === ST.total){ finish(); return; }
     ST.lv += 1; renderQ();
   });
   $('#btnPrev').addEventListener('click', function(){
@@ -487,8 +584,10 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var out = [];
     ST.picks.forEach(function(r, i){
       if (!r) return;
-      out.push({ lv:i + 1, idx:r.primary.idx, opt:r.primary.opt, rank:1 });
-      if (r.secondary) out.push({ lv:i + 1, idx:r.secondary.idx, opt:r.secondary.opt, rank:2 });
+      var list = r.ranks || (r.primary ? [r.primary, r.secondary].filter(Boolean) : []);
+      list.forEach(function(x, k){
+        out.push({ lv:i + 1, idx:x.idx, opt:x.opt || x.o, rank:k + 1 });
+      });
     });
     return out;
   }
@@ -520,6 +619,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
     var chips = $('#resChips'); chips.innerHTML = '';
     chips.appendChild(el('span', 'tag o', '결 ' + res.cardNo + ' · ' + res.cardName));
+    chips.appendChild(el('span', 'tag', '제' + res.tno + '유형/' + (res.typeTotal || 64)));
     chips.appendChild(el('span', 'tag', res.flavorNm + ' 갈래'));
     chips.appendChild(el('span', 'tag', c.dateKo + ' ' + c.timeNoun));
     if (res.mode === 'self') chips.appendChild(el('span', 'tag', c.age == null ? '나이 미입력' : '만 ' + c.age + '세'));
@@ -536,6 +636,31 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     deck.appendChild(el('b', null, '결 ' + res.cardNo + ' ' + res.cardName));
     deck.appendChild(el('span', null, res.cardSub));
     body.appendChild(deck);
+
+    /* v5.0 — 64유형 · 강/약 · 1~6단계 */
+    var spec = el('div', 'spec');
+    var hd = el('div', 'hd2');
+    hd.appendChild(el('span', null, '제 ' + res.tno + ' / ' + (res.typeTotal || 64) + ' 유형'));
+    var pol = el('span', 'pol' + (res.pol === '약' ? ' weak' : ''), res.pol === '강' ? '강한 결' : '약한 결');
+    hd.appendChild(pol);
+    hd.appendChild(el('b', null, (res.pol || '강') + ' ' + res.lvl + '단계'));
+    spec.appendChild(hd);
+    var steps = el('div', 'steps');
+    for (var si = 1; si <= 6; si++){
+      var dot = el('i');
+      if (si <= res.lvl) dot.className = 'on';
+      if (si === res.lvl) dot.className = (si <= res.lvl ? 'on ' : '') + 'now';
+      steps.appendChild(dot);
+    }
+    spec.appendChild(steps);
+    var lb = el('div', 'lbl');
+    lb.appendChild(el('span', null, '1 약함'));
+    lb.appendChild(el('span', null, '6 강함'));
+    spec.appendChild(lb);
+    spec.appendChild(el('div', 'why', res.pol === '강'
+      ? '이 결이 답의 중심입니다. 비중 ' + Math.round((res.share || 0) * 100) + '% — ' + res.pol + ' ' + res.lvl + '단계.'
+      : '이 결은 옆에서 함께 보이는 결입니다. 비중 ' + Math.round((res.share || 0) * 100) + '% — ' + res.pol + ' ' + res.lvl + '단계.'));
+    body.appendChild(spec);
 
     var main = el('div', 'card amber');
     main.appendChild(el('div', 'big', v.line));

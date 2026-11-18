@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1128">
+<title>더통역 · 외국인 대면·영화 자막</title>
+<style>
+  :root{
+    --navy:#0A1128; --card:#121C33; --card2:#1A2440; --orange:#FF6B00; --orange2:#FFB066;
+    --text:#EDF0F5; --muted:#8FA0B8; --line:#25314F; --green:#35C48A; --red:#E8554D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0; height:100%; background:var(--navy)}
+  body{
+    color:var(--text); font-size:15px; overflow:hidden;
+    font-family:"Apple SD Gothic Neo","Noto Sans KR","Noto Sans CJK KR","Malgun Gothic","Liberation Sans",Roboto,Arial,system-ui,sans-serif;
+  }
+  .app{display:flex; flex-direction:column; height:100dvh; max-width:560px; margin:0 auto;
+       padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  header{display:flex; align-items:center; gap:8px; padding:12px 16px 6px}
+  .brand{display:flex; align-items:center; gap:8px; font-size:17px; font-weight:800; letter-spacing:-.3px}
+  .brand .dot{width:9px; height:9px; border-radius:50%; background:var(--orange); box-shadow:0 0 10px rgba(255,107,0,.75)}
+  .brand em{font-style:normal; font-size:10px; font-weight:800; color:var(--orange);
+            background:rgba(255,107,0,.14); padding:2px 6px; border-radius:6px; letter-spacing:.3px}
+  .spacer{flex:1}
+  .icon{height:44px; min-width:56px; padding:0 12px; border-radius:10px; border:1px solid var(--line);
+        background:var(--card); color:var(--text); font-size:12px; font-weight:700; font-family:inherit}
+  .tabs{display:flex; gap:6px; padding:2px 16px 10px}
+  .tab{flex:1; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--card);
+       color:var(--muted); font-size:14px; font-weight:800; font-family:inherit; letter-spacing:-.2px}
+  .tab.on{background:var(--orange); border-color:var(--orange); color:#1A0E00}
+  main{flex:1; min-height:0; display:flex; flex-direction:column; padding:0 16px}
+  .pane{display:none; flex:1; min-height:0; flex-direction:column; gap:9px}
+  .pane.on{display:flex}
+
+  /* ── 모드 1: 대면 대화 ── */
+  .msg{flex:1; min-height:0; background:var(--card); border:1px solid var(--line); border-radius:16px;
+       padding:13px 14px 12px; display:flex; flex-direction:column; justify-content:center; overflow:hidden}
+  .msg:first-child{border-top:3px solid var(--green)}
+  .msg.me{border-top:3px solid var(--orange)}
+  .msg.dim{opacity:1}
+  .msg .who::after{content:""}
+  .msg.active .who::after{content:" · 듣는 중"; color:var(--orange2); font-weight:800; font-size:10px; letter-spacing:0}
+  .who{display:flex; align-items:center; gap:6px; font-size:11px; font-weight:800; color:var(--muted);
+       letter-spacing:.2px; text-transform:none}
+  .who .k{width:7px; height:7px; border-radius:50%; background:var(--green)}
+  .msg.me .who .k{background:var(--orange)}
+  .big{margin-top:7px; font-weight:800; letter-spacing:-.6px; line-height:1.34; overflow-y:auto; word-break:keep-all; font-family:inherit}
+  #koBig{font-size:28px; color:#fff}
+  #enBig{font-size:22px; color:#fff}
+  .big.pending{opacity:.45}
+  .orig{display:none; margin-top:7px; font-size:12px; line-height:1.45; color:var(--muted); max-height:56px; overflow-y:auto}
+  body.show-orig .orig{display:block}
+  .ctrl{display:flex; flex-direction:column; gap:7px; padding:8px 0 10px}
+  .row{display:flex; gap:7px}
+  .pri{height:52px; width:100%; border:0; border-radius:14px; background:var(--orange); color:#1A0E00;
+       font-size:17px; font-weight:900; font-family:inherit; letter-spacing:-.3px}
+  .pri.on{background:var(--red); color:#fff}
+  .pri.alt{background:var(--card2); color:var(--text); border:1px solid var(--orange)}
+  .gh{height:44px; flex:1; border-radius:12px; border:1px solid var(--line); background:var(--card2);
+      color:var(--text); font-size:12.5px; font-weight:800; font-family:inherit}
+  .gh.on{border-color:var(--orange); color:var(--orange2); background:#231505}
+  .status{min-height:16px; font-size:11px; color:var(--muted); display:flex; align-items:center; gap:6px;
+          flex-wrap:wrap; line-height:1.4}
+  .status b{color:var(--green); font-weight:800}
+  .status i{font-style:normal; color:var(--orange2); font-weight:700}
+
+  /* ── 모드 2: 영화·영상 자막 ── */
+  .stage{position:relative; flex:1; min-height:0; background:#05080E; border:1px solid var(--line);
+         border-radius:16px; padding:16px 16px 18px; display:flex; flex-direction:column;
+         justify-content:flex-end; overflow:hidden}
+  .stage .tag{position:absolute; top:11px; left:13px; font-size:10px; color:var(--muted);
+              background:rgba(10,17,40,.85); border:1px solid var(--line); padding:3px 8px; border-radius:8px}
+  .stage .cnt{position:absolute; top:11px; right:13px; font-size:10px; color:var(--muted)}
+  .hist{display:flex; flex-direction:column; justify-content:flex-end; gap:4px; max-height:76px; overflow:hidden}
+  .hist div{font-size:13px; line-height:1.45; color:#5E6C85}
+  #subNow{font-size:26px; font-weight:800; line-height:1.34; color:#fff; letter-spacing:-.5px;
+          margin-top:8px; min-height:74px; display:flex; align-items:flex-end; word-break:keep-all}
+  #subNow.pending{opacity:.5}
+  .sizedown #subNow{font-size:22px} .sizeup #subNow{font-size:31px}
+  .sizedown .hist div{font-size:12px} .sizeup .hist div{font-size:14px}
+  .stage .hint{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+               justify-content:center; gap:8px; color:#4E5B73; font-size:12.5px; text-align:center; padding:24px}
+  .stage .hint b{color:#8FA0B8; font-size:14px}
+  .notice{font-size:11px; line-height:1.55; color:#7A8AA3; border-left:2px solid var(--orange);
+          padding-left:9px}
+  .notice b{color:var(--orange2); font-weight:700}
+  footer{padding:6px 16px 12px; font-size:10.5px; color:#4E5B73; text-align:center}
+
+  /* ── 설정 시트 ── */
+  .sheet{position:fixed; inset:0; display:none; z-index:30}
+  .sheet.on{display:block}
+  .sheet .mask{position:absolute; inset:0; background:rgba(3,7,16,.72)}
+  .sheet .panel{position:absolute; left:0; right:0; bottom:0; max-height:88%; overflow-y:auto;
+                background:#0D1526; border-top:1px solid var(--line); border-radius:18px 18px 0 0;
+                padding:16px 16px calc(18px + env(safe-area-inset-bottom))}
+  .sheet h3{margin:0 0 12px; font-size:15px; display:flex; align-items:center; gap:8px}
+  .sheet h3 .spacer{flex:1}
+  .sheet .x{width:40px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--card);
+            color:var(--text); font-size:14px; font-family:inherit}
+  .field{margin-bottom:12px}
+  .field label{display:block; font-size:11px; color:var(--muted); font-weight:700; margin-bottom:5px}
+  .field input,.field select{width:100%; height:44px; border-radius:11px; border:1px solid var(--line);
+        background:var(--card); color:var(--text); font-size:13px; font-family:inherit; padding:0 12px}
+  .field small{display:block; margin-top:5px; font-size:10.5px; color:#6B7B95; line-height:1.5}
+  .seg{display:flex; gap:6px}
+  .seg button{flex:1; height:42px; border-radius:11px; border:1px solid var(--line); background:var(--card);
+              color:var(--muted); font-size:12px; font-weight:700; font-family:inherit}
+  .seg button.on{border-color:var(--orange); color:var(--orange2); background:#231505}
+  .save{width:100%; height:50px; border:0; border-radius:13px; background:var(--orange); color:#1A0E00;
+        font-size:16px; font-weight:900; font-family:inherit; margin-top:6px}
+  .fine{font-size:10.5px; color:#5C6B85; line-height:1.6; margin-top:10px}
+
+/* ---------- v1.1 언어 바 · AI 음성 출력 ---------- */
+.langbar{display:flex;align-items:flex-end;gap:7px;margin:0 0 10px;padding:9px 10px;border-radius:14px;
+  background:linear-gradient(180deg,#101E36,#0D1930);border:1px solid #26375F}
+.langbar .lb{flex:1;min-width:0;display:block}
+.langbar .lb span{display:block;font-size:9.5px;font-weight:900;color:#8FA0B8;letter-spacing:.2px;margin:0 0 3px 2px}
+.langbar select{width:100%;-webkit-appearance:none;appearance:none;background:#16284A;border:1px solid #2E4370;color:#F3F6FA;
+  border-radius:10px;padding:9px 26px 9px 11px;font-size:13px;font-weight:800;font-family:inherit;
+  background-image:linear-gradient(45deg,transparent 50%,#8FA0B8 50%),linear-gradient(135deg,#8FA0B8 50%,transparent 50%);
+  background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.langbar .swap{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:1px solid #FF6B00;background:rgba(255,107,0,.14);
+  color:#FFA24D;font-size:16px;font-weight:900;line-height:1;padding:0}
+.ttsbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 10px}
+.ttsbar .sp{flex:1 1 46%;min-width:0;border:1px solid #2E4370;background:#12203C;color:#F3F6FA;border-radius:11px;
+  padding:10px 8px;font-size:11.5px;font-weight:900;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttsbar .sp:active{background:#16284A}
+.ttsbar .sp.gh2{flex:0 1 auto;font-size:11px;color:#AFBDD0}
+.ttsbar .sw{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#AFBDD0;
+  background:#12203C;border:1px solid #2E4370;border-radius:999px;padding:7px 10px}
+.ttsbar .sw input{accent-color:#FF6B00;width:14px;height:14px;margin:0}
+.segnote{font-size:11.5px;line-height:1.7;color:#AFBDD0;background:#0D1930;border:1px solid #26375F;border-radius:11px;padding:10px 11px}
+.segnote b{color:#FFA24D}
+.apkbar{display:flex;align-items:center;gap:9px;margin:8px 12px 0;padding:9px 11px;border-radius:12px;
+  border:1px solid rgba(255,107,0,.45);background:linear-gradient(100deg,rgba(255,107,0,.14),rgba(255,255,255,.02) 70%);
+  text-decoration:none;color:#F3F6FA}
+.apkbar b{display:block;font-size:11.5px;font-weight:900}
+.apkbar i{display:block;font-style:normal;font-size:10px;color:#9FB0C8;margin-top:2px}
+.apkbar .go{margin-left:auto;font-size:11px;font-weight:900;color:#0A1224;background:#FFA24D;border-radius:8px;padding:6px 9px}
+</style>
+</head>
+<body>
+<a class="apkbar" href="KTS_더통역_v1.1_debug.apk" download>
+  <span style="font-size:16px">⬇</span>
+  <span><b>앱(APK)으로 쓰면 기기 음성인식·AI 음성 출력이 가장 정확합니다</b>
+    <i>v1.1 · 홈 화면에 두고 두 손으로 대면·통화에서 바로</i></span>
+  <span class="go">받기</span>
+</a>
+
+<div class="app">
+  <header>
+    <div class="brand"><span class="dot"></span>더통역 <em>v1.1</em></div>
+    <div class="spacer"></div>
+    <button class="icon" id="btnSettings">설정</button>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab on" id="tabTalk" data-mode="talk">외국인 대면</button>
+    <button class="tab" id="tabMovie" data-mode="movie">영화·영상 자막</button>
+  </div>
+
+  <main>
+    <!-- 모드 1 -->
+    <section class="pane on" id="talk">
+      <!-- v1.1 : 내 언어 ↔ 상대 언어를 첫 화면 상단에서 바로 고른다 -->
+      <div class="langbar">
+        <label class="lb"><span>내 언어</span><select id="selMe" aria-label="내 언어"></select></label>
+        <button class="swap" id="btnSwap" aria-label="언어 맞바꾸기">⇄</button>
+        <label class="lb"><span>상대 언어</span><select id="selThem" aria-label="상대 언어"></select></label>
+      </div>
+      <div class="msg" id="guestCard">
+        <div class="who"><span class="k"></span>상대가 한 말 → <b id="whoGuest">한국어</b></div>
+        <div class="big" id="koBig">상대 말이 여기에 큰 내 언어로 뜹니다</div>
+        <div class="orig" id="enOrig"></div>
+      </div>
+      <div class="msg me" id="meCard">
+        <div class="who"><span class="k"></span>내가 한 말 → <b id="whoMe">English</b></div>
+        <div class="big" id="enBig">Show this to the guest</div>
+        <div class="orig" id="koOrig"></div>
+      </div>
+      <!-- v1.1 : 번역된 상대 언어를 AI 음성(TTS)으로 대신 읽어 주는 출력 -->
+      <div class="ttsbar">
+        <button class="sp" id="btnSpeakMe">🗣 내 말을 상대 언어로 읽어 주기</button>
+        <button class="sp gh2" id="btnSpeakThem">🔊 상대 말을 내 언어로</button>
+        <label class="sw"><input type="checkbox" id="ttsAuto" checked><span>자동 읽기</span></label>
+      </div>
+      <div class="ctrl">
+        <button class="pri" id="btnMic">듣기 시작</button>
+        <div class="row">
+          <button class="gh on" id="btnAuto">자동 감지 켜짐</button>
+          <button class="gh" id="btnOrig">원문 보기</button>
+          <button class="gh" id="btnClear">지우기</button>
+        </div>
+        <div class="status"><span id="talkStatus">마이크를 켜면 손님 말과 내 말을 번갈아 듣습니다.</span></div>
+      </div>
+    </section>
+
+    <!-- 모드 2 -->
+    <section class="pane" id="movie">
+      <div class="stage" id="stage">
+        <div class="tag" id="engineTag">무료 자막</div>
+        <div class="cnt" id="lineCount">0줄</div>
+        <div class="hist" id="hist"></div>
+        <div id="subNow">자막이 여기에 흐릅니다</div>
+        <div class="hint" id="hint"><b>영화·영상 소리를 들려주세요</b>아래 [자막 시작]을 누르면<br>1~2초 간격으로 한국어 자막이 흐릅니다.</div>
+      </div>
+      <div class="ctrl">
+        <button class="pri" id="btnSub">자막 시작</button>
+        <div class="row">
+          <button class="gh" id="btnSize">글자 크게</button>
+          <button class="gh" id="btnOrig2">원문 보기</button>
+          <button class="gh" id="btnPhone">폰 소리 캡처</button>
+        </div>
+        <div class="status"><span id="movieStatus">대기 중</span></div>
+      </div>
+      <div class="notice"><b>유료 OTT(넷플릭스·디즈니+ 등)는 DRM 보호로 폰 소리 캡처가 막힙니다.</b>
+        그때는 폰 스피커 소리를 마이크로 듣는 방식으로 자동 전환됩니다. 이어폰을 끼면 마이크가 소리를 못 들어 자막이 끊길 수 있습니다.</div>
+    </section>
+  </main>
+
+  <footer>무료 음성인식 + 무료 번역 · 유료 API 없이 동작합니다</footer>
+</div>
+
+<!-- 설정 -->
+<div class="sheet" id="sheet">
+  <div class="mask" id="sheetMask"></div>
+  <div class="panel">
+    <h3>설정 <span class="spacer"></span><button class="x" id="sheetClose">닫기</button></h3>
+
+    <div class="field">
+      <label>언어</label>
+      <div class="segnote">첫 화면 맨 위 <b>[내 언어] ⇄ [상대 언어]</b>에서 바로 바꿉니다.<br>
+        한국어 · 영어 · 일본어 · 중국어 · 베트남어 · 태국어 · 스페인어</div>
+    </div>
+
+    <div class="field">
+      <label>번역 방식</label>
+      <div class="seg" id="segEngine">
+        <button data-engine="auto" class="on">자동(무료)</button>
+        <button data-engine="offline">사전만</button>
+        <button data-engine="gemini">내 키</button>
+      </div>
+      <small>자동은 무료 번역 서버를 먼저 쓰고, 인터넷이 없으면 내장 사전으로 번역합니다. 0원입니다.</small>
+    </div>
+
+    <div class="field">
+      <label>Gemini API 키 (선택 · 문장을 자연스럽게 의역)</label>
+      <input id="geminiKey" type="password" placeholder="키를 넣으면 내 키로 더 정확하게 번역합니다" autocomplete="off">
+      <small>키는 이 기기 브라우저에만 저장되며 어디로도 보내지 않습니다. 비워 두면 무료 방식으로만 동작합니다.</small>
+    </div>
+
+    <div class="field">
+      <label>영상 자막 글자 크기</label>
+      <div class="seg" id="segSize">
+        <button data-size="small">작게</button>
+        <button data-size="normal" class="on">보통</button>
+        <button data-size="large">크게</button>
+      </div>
+    </div>
+
+    <button class="save" id="sheetSave">저장하고 닫기</button>
+    <div class="fine">· 마이크 권한은 이 화면에서만 쓰고, 녹음한 소리는 저장·전송하지 않습니다.<br>
+      · 번역할 <b>문장 글자</b>는 무료 번역 서버로 전송됩니다. 민감한 내용은 [사전만]으로 쓰세요(전송 없음).<br>
+      · 영화 모드는 인식이 끊겨도 자동으로 다시 켜지는 무중단 방식입니다. 상대가 짧게 말할수록 정확도가 올라갑니다.</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ────────────────────────────────────────────────────────────
+   더통역 v1.0 — 유료 API 0원
+   · 음성인식: 브라우저 Web Speech(무료) / APK 안에서는 기기 음성인식(무료)
+   · 번역    : 무료 번역 서버(키 없음) → 내장 사전·문형 → (선택) 사용자가 넣은 Gemini 키
+   · 영상모드: 끝나면 자동 재시작하는 무중단 루프 + 1~2초 자막
+   ──────────────────────────────────────────────────────────── */
+
+const $ = (s) => document.querySelector(s);
+const NATIVE = window.KTSNative || null;      // APK 안에서만 존재
+const HTTP = window.KTShttp || null;
+
+const state = {
+  mode: 'talk',
+  my: 'ko-KR',                // v1.1 내 언어
+  lang: 'en-US',             // v1.1 상대 언어(기존 이름 유지)
+  engine: 'auto',
+  geminiKey: '',
+  size: 'normal',
+  auto: true,
+  ttsAuto: true,             // v1.1 번역되면 AI 음성으로 읽어 주기
+  listening: false,
+  channel: 'guest',           // guest(상대 말→내 언어) | me(내 말→상대 언어)
+  showOrig: false,
+  wantMovie: false,
+  lines: 0,
+  lastIn: '', lastOut: ''     // 카드에 있는 마지막 번역문(AI 음성 출력용)
+};
+
+/* v1.1 지원 언어 7종 — 음성인식·번역·음성출력이 모두 이 코드를 따른다 */
+const LANGS = [
+  { c:'ko-KR', nm:'한국어', en:'Korean' },
+  { c:'en-US', nm:'영어',   en:'English' },
+  { c:'ja-JP', nm:'일본어', en:'Japanese' },
+  { c:'zh-CN', nm:'중국어', en:'Chinese' },
+  { c:'vi-VN', nm:'베트남어', en:'Vietnamese' },
+  { c:'th-TH', nm:'태국어', en:'Thai' },
+  { c:'es-ES', nm:'스페인어', en:'Spanish' }
+];
+const langNm = c => (LANGS.find(l => l.c === c) || { nm: c }).nm;
+/* '한국어로 / 일본어로 / 스페인어로' — 받침에 맞춰 조사를 고른다 */
+function ro(nm) {
+  const ch = String(nm || '').trim().slice(-1);
+  const code = ch.charCodeAt(0);
+  if (code < 0xAC00 || code > 0xD7A3) return nm + '(으)로';
+  return nm + (((code - 0xAC00) % 28) ? '으로' : '로');
+}
+const langEn = c => (LANGS.find(l => l.c === c) || { en: 'English' }).en;
+
+/* ── 내장 사전(0원) ─────────────────────────────────────────── */
+const EN_KO = {
+  'hello':'안녕하세요', 'hi':'안녕하세요', 'good morning':'좋은 아침입니다', 'good evening':'안녕하세요',
+  'thank you':'고맙습니다', 'thanks':'고맙습니다', 'sorry':'죄송합니다', 'excuse me':'실례합니다',
+  'nice to meet you':'만나서 반갑습니다', 'goodbye':'안녕히 가세요', 'bye':'안녕히 가세요',
+  'see you tomorrow':'내일 봐요', 'welcome':'어서 오세요', "you're welcome":'천만에요',
+  'how much is it':'얼마예요?', 'how much':'얼마예요?', 'how much per night':'하룻밤에 얼마예요?',
+  'do you have a room':'방 있나요?', 'is there a room':'방 있나요?', 'i want to check in':'체크인하고 싶어요',
+  'check in':'체크인', 'check out':'체크아웃', 'check-in time':'체크인 시간', 'check-out time':'체크아웃 시간',
+  'what time is check-in':'체크인은 몇 시예요?', 'what time is check out':'체크아웃은 몇 시예요?',
+  'where is the bathroom':'화장실 어디에 있어요?', 'where is the toilet':'화장실 어디에 있어요?',
+  'wifi password':'와이파이 비밀번호', 'what is the wifi password':'와이파이 비밀번호가 뭐예요?',
+  'is breakfast included':'조식 포함인가요?', 'breakfast':'조식', 'breakfast time':'조식 시간',
+  'can i park here':'여기 주차해도 되나요?', 'where can i park':'어디에 주차하면 되나요?',
+  'parking':'주차', 'where is the station':'역이 어디에 있어요?', 'how do i get to the station':'역에 어떻게 가요?',
+  'how far is it':'얼마나 멀어요?', 'is it far':'멀어요?', 'it is far':'멀어요', 'it is near':'가까워요',
+  'i need a taxi':'택시가 필요해요', 'please call a taxi':'택시 좀 불러 주세요', 'taxi':'택시',
+  'the air conditioner does not work':'에어컨이 안 돼요', 'the heater does not work':'난방이 안 돼요',
+  'no hot water':'온수가 안 나와요', 'the hot water is not working':'온수가 안 나와요',
+  'can i get more towels':'수건 더 주실 수 있나요?', 'towels':'수건', 'more towels':'수건 더',
+  'the room is cold':'방이 추워요', 'the room is hot':'방이 더워요', 'the room is noisy':'방이 시끄러워요',
+  'the room is clean':'방이 깨끗해요', 'the view is beautiful':'경치가 아름다워요',
+  'barbecue':'바비큐', 'the barbecue area':'바비큐장', 'swimming pool':'수영장', 'the pool':'수영장',
+  'what time is the pool open':'수영장은 몇 시에 열어요?', 'what time does the pool close':'수영장은 몇 시에 닫아요?',
+  'can we stay one more night':'하루 더 묵어도 될까요?', 'one more night':'하루 더',
+  'i want to cancel':'취소하고 싶어요', 'cancellation':'취소', 'i would like a refund':'환불받고 싶어요',
+  'do you accept card':'카드 되나요?', 'card':'카드', 'cash':'현금', 'cash only':'현금만',
+  'i will pay by card':'카드로 결제할게요', 'i will pay in cash':'현금으로 낼게요',
+  'we are four people':'네 명이에요', 'two adults one child':'어른 둘에 아이 하나요',
+  'do you have a baby crib':'아기 침대 있나요?', 'baby crib':'아기 침대',
+  'is there a convenience store nearby':'근처에 편의점 있나요?', 'convenience store':'편의점',
+  'where is the supermarket':'슈퍼 어디에 있어요?', 'supermarket':'슈퍼',
+  'restaurant':'식당', 'where is a good restaurant':'맛집이 어디에 있어요?',
+  'what is the weather like':'날씨가 어때요?', 'it is raining':'비가 와요', 'it is snowing':'눈이 와요',
+  'i am hungry':'배고파요', 'i am thirsty':'목말라요', 'menu':'메뉴', 'do you have a menu':'메뉴 있나요?',
+  'i will have this':'이걸로 주세요', 'this one please':'이걸로 주세요', 'no spicy please':'안 맵게 해 주세요',
+  'not spicy':'안 맵게', 'it is delicious':'맛있어요', 'the bill please':'계산서 주세요',
+  'separate checks':'각자 계산해 주세요', 'water please':'물 주세요', 'water':'물', 'beer':'맥주',
+  'coffee':'커피', 'tea':'차', 'rice':'밥', 'kimchi':'김치', 'chicken':'닭고기', 'beef':'소고기',
+  'pork':'돼지고기', 'fish':'생선', 'vegetarian':'채식', 'i am vegetarian':'저는 채식해요',
+  'allergy':'알레르기', 'i have an allergy':'알레르기가 있어요',
+  'i am lost':'길을 잃었어요', 'can you help me':'도와주실 수 있나요?', 'help':'도와주세요',
+  'speak slowly please':'천천히 말해 주세요', 'i do not understand':'이해하지 못했어요',
+  'do you speak english':'영어 하세요?', 'i do not speak english':'저는 영어를 못해요',
+  'one moment please':'잠시만 기다려 주세요', 'just a minute':'잠시만요', 'wait please':'기다려 주세요',
+  'this way please':'이쪽으로 오세요', 'follow me':'따라오세요', 'come in':'들어오세요', 'sit down':'앉으세요',
+  'be careful':'조심하세요', 'the road is slippery':'길이 미끄러워요', 'slowly':'천천히',
+  'i like it':'좋아요', 'it is okay':'괜찮아요', 'no problem':'문제없어요', 'of course':'물론이죠',
+  'i am sorry':'죄송합니다', 'wait a moment':'잠시만요', 'one night':'하룻밤', 'two nights':'이틀밤',
+  'tonight':'오늘 밤', 'tomorrow':'내일', 'today':'오늘', 'now':'지금', 'later':'나중에',
+  'left':'왼쪽', 'right':'오른쪽', 'straight':'직진', 'here':'여기', 'there':'저기',
+  'how many people':'몇 명이세요?', 'how many':'몇 개요?', 'this':'이것', 'that':'저것',
+  'expensive':'비싸요', 'cheap':'싸요', 'big':'커요', 'small':'작아요', 'hot':'뜨거워요', 'cold':'차가워요',
+  'open':'열었어요', 'closed':'닫았어요', 'free':'무료', 'reservation':'예약', 'i have a reservation':'예약했어요',
+  'my name is':'제 이름은', 'passport':'여권', 'phone':'전화', 'charger':'충전기',
+  'battery':'배터리', 'doctor':'의사', 'hospital':'병원', 'pharmacy':'약국', 'police':'경찰', 'emergency':'긴급'
+};
+
+const KO_EN = {
+  '안녕하세요':'Hello', '고맙습니다':'Thank you', '감사합니다':'Thank you', '죄송합니다':'I am sorry',
+  '실례합니다':'Excuse me', '어서 오세요':'Welcome', '안녕히 가세요':'Goodbye', '내일 봐요':'See you tomorrow',
+  '잠시만 기다려 주세요':'One moment, please', '잠시만요':'Just a moment', '기다려 주세요':'Please wait',
+  '체크인은 3시부터입니다':'Check-in starts at 3 PM', '체크아웃은 11시입니다':'Check-out is at 11 AM',
+  '조식은 포함입니다':'Breakfast is included', '조식은 8시부터입니다':'Breakfast starts at 8',
+  '주차는 앞마당에 하시면 됩니다':'You can park in the front yard', '수건 더 드릴게요':'I will bring more towels',
+  '바비큐장은 저쪽입니다':'The barbecue area is over there', '수영장은 10시까지입니다':'The pool is open until 10',
+  '카드 됩니다':'We accept cards', '현금만 됩니다':'Cash only, please', '계산은 카운터에서 하시면 됩니다':'Please pay at the counter',
+  '택시 불러 드릴게요':'I will call a taxi for you', '근처에 편의점이 있습니다':'There is a convenience store nearby',
+  '날씨가 좋습니다':'The weather is nice', '맛있게 드세요':'Enjoy your meal', '천천히 말씀해 주세요':'Please speak slowly',
+  '다시 말씀해 주시겠어요':'Could you say that again?', '여기 앉으세요':'Please sit here', '따라오세요':'Follow me',
+  '조심하세요':'Be careful', '길이 미끄러워요':'The road is slippery', '내일 뵙겠습니다':'See you tomorrow',
+  '좋은 하루 보내세요':'Have a nice day', '방이 준비되었습니다':'Your room is ready', '예약 확인했습니다':'I have your reservation',
+  '여권 주세요':'May I see your passport?', '와이파이 비밀번호는 여기 있습니다':'Here is the Wi-Fi password',
+  '화장실은 저쪽입니다':'The bathroom is over there', '물 주세요':'Water, please', '잠깐만요':'Just a second',
+  '괜찮아요':'It is okay', '문제없어요':'No problem', '물론이죠':'Of course', '얼마예요':'How much is it?',
+  '여기요':'Excuse me', '감사해요':'Thanks', '미안해요':'Sorry', '네':'Yes', '아니요':'No',
+  '몇 명이세요':'How many people?', '한 명':'One person', '두 명':'Two people', '세 명':'Three people',
+  '네 명':'Four people', '오늘':'Today', '내일':'Tomorrow', '지금':'Now', '나중에':'Later',
+  '왼쪽':'Left', '오른쪽':'Right', '직진':'Straight', '여기':'Here', '저기':'There',
+  '비가 와요':'It is raining', '추워요':'It is cold', '더워요':'It is hot', '맛있어요':'It is delicious',
+  '비싸요':'It is expensive', '싸요':'It is cheap', '커요':'It is big', '작아요':'It is small',
+  '카드':'Card', '현금':'Cash', '영수증':'Receipt', '주차':'Parking', '수건':'Towels', '물':'Water',
+  '밥':'Rice', '김치':'Kimchi', '맥주':'Beer', '커피':'Coffee', '차':'Tea', '닭고기':'Chicken',
+  '소고기':'Beef', '돼지고기':'Pork', '생선':'Fish', '메뉴':'Menu', '화장실':'Bathroom', '택시':'Taxi',
+  '병원':'Hospital', '약국':'Pharmacy', '경찰':'Police', '도와주세요':'Please help me',
+  '천천히':'Slowly', '다시':'Again', '하룻밤':'One night', '이틀밤':'Two nights', '예약':'Reservation'
+};
+
+const WORD_EN_KO = {
+  room:'방', bed:'침대', water:'물', towel:'수건', key:'열쇠', door:'문', window:'창문', light:'불',
+  air:'에어컨', heater:'난방', wifi:'와이파이', password:'비밀번호', bathroom:'화장실', toilet:'화장실',
+  shower:'샤워', pool:'수영장', beach:'해변', mountain:'산', sea:'바다', view:'경치', garden:'정원',
+  breakfast:'조식', lunch:'점심', dinner:'저녁', coffee:'커피', beer:'맥주', wine:'와인', meat:'고기',
+  chicken:'닭고기', beef:'소고기', pork:'돼지고기', fish:'생선', rice:'밥', bread:'빵', fruit:'과일',
+  spicy:'매운', sweet:'단', salty:'짠', menu:'메뉴', order:'주문', bill:'계산서', card:'카드', cash:'현금',
+  taxi:'택시', bus:'버스', train:'기차', station:'역', airport:'공항', hospital:'병원', pharmacy:'약국',
+  police:'경찰', help:'도움', today:'오늘', tomorrow:'내일', night:'밤', morning:'아침', evening:'저녁',
+  time:'시간', hour:'시간', minute:'분', people:'명', person:'사람', child:'아이', adult:'어른',
+  reservation:'예약', passport:'여권', phone:'전화', charger:'충전기', bag:'가방', car:'차',
+  hot:'뜨거운', cold:'차가운', big:'큰', small:'작은', expensive:'비싼', cheap:'싼', clean:'깨끗한',
+  noisy:'시끄러운', quiet:'조용한', open:'열린', closed:'닫힌', near:'가까운', far:'먼', good:'좋은',
+  bad:'나쁜', delicious:'맛있는', beautiful:'아름다운', sorry:'죄송한', thanks:'고마운'
+};
+
+const WORD_KO_EN = {
+  방:'room', 침대:'bed', 물:'water', 수건:'towel', 열쇠:'key', 문:'door', 창문:'window', 불:'light',
+  에어컨:'air conditioner', 난방:'heater', 와이파이:'wifi', 비밀번호:'password', 화장실:'bathroom',
+  샤워:'shower', 수영장:'pool', 바다:'sea', 산:'mountain', 경치:'view', 정원:'garden', 조식:'breakfast',
+  점심:'lunch', 저녁:'dinner', 커피:'coffee', 맥주:'beer', 와인:'wine', 고기:'meat', 닭고기:'chicken',
+  소고기:'beef', 돼지고기:'pork', 생선:'fish', 밥:'rice', 빵:'bread', 과일:'fruit', 매운:'spicy',
+  메뉴:'menu', 주문:'order', 계산서:'bill', 카드:'card', 현금:'cash', 택시:'taxi', 버스:'bus',
+  기차:'train', 역:'station', 공항:'airport', 병원:'hospital', 약국:'pharmacy', 경찰:'police',
+  도움:'help', 오늘:'today', 내일:'tomorrow', 밤:'night', 아침:'morning', 시간:'time', 분:'minute',
+  사람:'person', 아이:'child', 어른:'adult', 예약:'reservation', 여권:'passport', 전화:'phone',
+  충전기:'charger', 가방:'bag', 차:'car', 뜨거운:'hot', 차가운:'cold', 큰:'big', 작은:'small',
+  비싼:'expensive', 싼:'cheap', 깨끗한:'clean', 시끄러운:'noisy', 조용한:'quiet', 가까운:'near',
+  먼:'far', 좋은:'good', 맛있는:'delicious', 아름다운:'beautiful', 네:'yes', 아니요:'no',
+  하나:'one', 둘:'two', 셋:'three', 넷:'four', 다섯:'five'
+};
+
+const NUM_WORDS = {one:'1',two:'2',three:'3',four:'4',five:'5',six:'6',seven:'7',eight:'8',nine:'9',
+  ten:'10',eleven:'11',twelve:'12',fifteen:'15',twenty:'20',thirty:'30',forty:'40',fifty:'50',hundred:'100'};
+const STOP = ['the','a','an','is','are','was','were','please','to','of','for','my','i','you','it','am','do',
+  'does','did','can','could','would','will','we','have','has','had','with','on','in','at','and','this','that'];
+
+/** 받침에 맞춰 은/는 */
+function koTopic(w) {
+  const s = String(w || '').trim();
+  if (!s) return '';
+  const c = s.charCodeAt(s.length - 1);
+  if (c >= 0xAC00 && c <= 0xD7A3) return s + (((c - 0xAC00) % 28) ? '은' : '는');
+  return s + '는';
+}
+
+/** 영어 낱말 → 한국어(모르는 낱말 수를 함께 돌려준다) */
+function mapTokens(str, map, drop) {
+  const toks = String(str || '').split(/\s+/).filter(Boolean);
+  const out = [];
+  let unknown = 0;
+  for (const t of toks) {
+    if (/[가-힣]/.test(t)) { out.push(t); continue; }          // 이미 번역된 말
+    const clean = t.toLowerCase().replace(/[^a-z']/g, '');
+    if (!clean) { out.push(t); continue; }
+    if (drop && drop.indexOf(clean) >= 0) continue;
+    if (map[clean]) out.push(map[clean]);
+    else if (NUM_WORDS[clean]) out.push(NUM_WORDS[clean]);
+    else { unknown++; out.push(t); }
+  }
+  return { text: out.join(' ').replace(/\s+/g, ' ').trim(), unknown: unknown };
+}
+
+function enPhrase(str) {
+  const n = norm(str);
+  if (EN_KO[n]) return EN_KO[n];
+  const m = mapTokens(n, WORD_EN_KO, STOP);
+  return m.unknown === 0 && m.text ? m.text : '';
+}
+
+function numKo(s) {
+  const v = String(s || '').trim().toLowerCase();
+  if (NUM_WORDS[v]) return NUM_WORDS[v];
+  const d = v.replace(/[^0-9]/g, '');
+  return d || '';
+}
+
+const EN_PATTERNS = [
+  [/^where (?:is|are) (?:the )?(.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 어디에 있어요?'],
+  [/^how much (?:is|are|for) (?:the )?(.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 얼마예요?'],
+  [/^how much(?: is it)?$/, () => '얼마예요?'],
+  [/^(?:i want|i would like|i'd like) (?:to )?(.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 주세요.'],
+  [/^can i (.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 해도 될까요?'],
+  [/^do you have (.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 있나요?'],
+  [/^is (?:the )?(.+) included$/, m => (enPhrase(m[1]) || m[1]) + ' 포함인가요?'],
+  [/^(?:the )?(.+) (?:is|are) included$/, m => (enPhrase(m[1]) || m[1]) + ' 포함입니다.'],
+  [/^what time (?:is|does) (?:the )?(.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 몇 시예요?'],
+  [/^(?:the )?(.+) (?:is |are )?open until (.+)$/, m => koTopic(enPhrase(m[1]) || m[1]) + ' ' + numKo(m[2]) + '시까지 열어요.'],
+  [/^(?:the )?(.+) (?:does not work|doesn't work)$/, m => (enPhrase(m[1]) || m[1]) + '가 안 돼요.'],
+  [/^(?:the )?(.+) is broken$/, m => (enPhrase(m[1]) || m[1]) + '가 고장 났어요.'],
+  [/^(?:the )?(.+) is (?:too )?(cold|hot|noisy|dirty)$/, m => (enPhrase(m[1]) || m[1]) + '가 ' +
+    ({cold:'추워요', hot:'더워요', noisy:'시끄러워요', dirty:'더러워요'}[m[2]] || '그래요')],
+  [/^i need (.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 필요해요.'],
+  [/^(?:please )?(?:give me|bring me) (.+)$/, m => (enPhrase(m[1]) || m[1]) + ' 주세요.'],
+  [/^how do i get to (.+)$/, m => (enPhrase(m[1]) || m[1]) + '에 어떻게 가요?'],
+  [/^how (?:far|long) (?:is it|does it take)$/, () => '얼마나 걸려요?'],
+  [/^i have a reservation$/, () => '예약했어요.'],
+  [/^my name is (.+)$/, m => '제 이름은 ' + m[1] + '입니다.']
+];
+
+const KO_PATTERNS = [
+  [/(.+?)\s*어디(?:에|예요|에요|야|죠)?\??$/, m => 'Where is ' + koWords(m[1]) + '?'],
+  [/(.+?)\s*얼마(?:예요|에요|야|죠)?\??$/, m => 'How much is ' + koWords(m[1]) + '?'],
+  [/(.+?)\s*주세요$/, m => koWords(m[1]) + ', please.'],
+  [/(.+?)\s*(?:되나요|됩니다|돼요|가능한가요)\??$/, m => 'Is ' + koWords(m[1]) + ' possible?'],
+  [/(.+?)\s*(?:있나요|있어요)\??$/, m => 'Do you have ' + koWords(m[1]) + '?'],
+  [/(.+?)\s*몇 시(?:예요|에요|죠)?\??$/, m => 'What time is ' + koWords(m[1]) + '?'],
+  [/(.+?)\s*(?:어떻게 가요|어떻게 가나요)\??$/, m => 'How do I get to ' + koWords(m[1]) + '?']
+];
+
+function norm(s) {
+  return String(s || '').toLowerCase()
+    .replace(/[\u2018\u2019\u201C\u201D]/g, '')
+    .replace(/[.,!?;:"'`~()[\]{}]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function koWords(s) {
+  let v = String(s || '').trim();
+  const exact = KO_EN[v];
+  if (exact) return exact;
+  const parts = v.split(/\s+/).map(w => WORD_KO_EN[w] || w.replace(/(은|는|이|가|을|를|에|에서|으로|로|도|만|의)$/, ''));
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/** 내장 사전·문형 번역 — 인터넷 없이 0원. 확신이 없으면 빈 값(무료 서버가 맡는다) */
+function offlineTranslate(text, dir) {
+  const raw = String(text || '').trim();
+  if (!raw) return '';
+  const n = norm(raw);
+
+  if (dir === 'en2ko') {
+    if (EN_KO[n]) return EN_KO[n];
+    for (const [re, fn] of EN_PATTERNS) {
+      const m = n.match(re);
+      if (m) {
+        const out = fn(m);
+        if (out && !/[a-z]{3,}/i.test(out)) return out;
+      }
+    }
+    // 여러 단어 문구를 긴 것부터 치환
+    const keys = Object.keys(EN_KO).filter(k => k.indexOf(' ') > 0).sort((a, b) => b.length - a.length);
+    let out = ' ' + n + ' ';
+    let hit = 0;
+    for (const k of keys) {
+      if (out.indexOf(k) >= 0) {
+        out = out.split(k).join(' ' + EN_KO[k] + ' ');
+        hit++;
+      }
+    }
+    if (hit) {
+      const mapped = mapTokens(out, WORD_EN_KO, STOP);
+      if (mapped.unknown === 0 && !/[a-z]{2,}/i.test(mapped.text)) return mapped.text;
+    }
+    const w = mapTokens(n, WORD_EN_KO, STOP);
+    if (w.unknown === 0 && w.text) return w.text;
+    return '';
+  }
+
+  // ko2en
+  if (KO_EN[raw]) return KO_EN[raw];
+  const ks = Object.keys(KO_EN).sort((a, b) => b.length - a.length);
+  for (const k of ks) {
+    if (raw.indexOf(k) >= 0 && k.length >= 2) {
+      const rest = raw.split(k).join(' ').trim();
+      const joined = (KO_EN[k] + (rest ? ' ' + koWords(rest) : '')).trim();
+      if (!/[가-힣]/.test(joined)) return joined;
+    }
+  }
+  for (const [re, fn] of KO_PATTERNS) {
+    const m = raw.match(re);
+    if (m && m[1] && m[1].length >= 1) {
+      const out = fn(m);
+      if (out && !/[가-힣]/.test(out)) return out;
+    }
+  }
+  const words = raw.split(/\s+/).filter(Boolean);
+  if (words.length && words.every(w => WORD_KO_EN[w] || KO_EN[w])) {
+    return words.map(w => WORD_KO_EN[w] || KO_EN[w]).join(' ');
+  }
+  return '';
+}
+
+/* ── 무료 번역 서버 / 내 Gemini 키 ───────────────────────────── */
+function httpGet(url) {
+  return new Promise((resolve, reject) => {
+    if (HTTP && typeof HTTP.get === 'function') {
+      const id = 'r' + Math.random().toString(36).slice(2);
+      window.__ktsHttpWait = window.__ktsHttpWait || {};
+      window.__ktsHttpWait[id] = { resolve, reject };
+      try { HTTP.get(url, id); } catch (e) { reject(e); }
+      setTimeout(() => {
+        if (window.__ktsHttpWait[id]) { delete window.__ktsHttpWait[id]; reject(new Error('timeout')); }
+      }, 5000);
+      return;
+    }
+    const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const timer = setTimeout(() => { if (ctl) ctl.abort(); }, 5000);
+    fetch(url, ctl ? { signal: ctl.signal } : {}).then(r => r.text()).then(t => {
+      clearTimeout(timer); resolve(t);
+    }).catch(e => { clearTimeout(timer); reject(e); });
+  });
+}
+
+window.__ktsHttp = function (id, status, body) {
+  const w = (window.__ktsHttpWait || {})[id];
+  if (!w) return;
+  delete window.__ktsHttpWait[id];
+  if (status >= 200 && status < 300) w.resolve(body);
+  else w.reject(new Error('http ' + status));
+};
+
+const CACHE = {};
+
+async function serverTranslate(text, dir) {
+  const pf = pairFor(dir);
+  const key = pf.from + '|' + pf.to + '|' + text;
+  if (CACHE[key]) return CACHE[key];
+  const lp = shortCode(pf.from) + '|' + shortCode(pf.to);
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lp;
+  const raw = await httpGet(url);
+  const j = JSON.parse(raw);
+  let out = j && j.responseData && j.responseData.translatedText ? String(j.responseData.translatedText) : '';
+  out = out.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+  if (!out || /^MYMEMORY WARNING/i.test(out)) throw new Error('empty');
+  CACHE[key] = out;
+  return out;
+}
+
+async function geminiTranslate(text, dir) {
+  const key = (state.geminiKey || '').trim();
+  if (!key) throw new Error('no key');
+  const to = langEn(pairFor(dir).to);
+  const prompt = 'Translate the speech below into natural spoken ' + to +
+    ' for a Korean pension front desk. Give ONLY the translation, no quotes, no explanation.\n\n' + text;
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' +
+    encodeURIComponent(key);
+  const body = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2 } });
+  let raw;
+  if (HTTP && typeof HTTP.post === 'function') {
+    const id = 'p' + Math.random().toString(36).slice(2);
+    raw = await new Promise((resolve, reject) => {
+      window.__ktsHttpWait = window.__ktsHttpWait || {};
+      window.__ktsHttpWait[id] = { resolve, reject };
+      try { HTTP.post(url, body, id); } catch (e) { reject(e); }
+      setTimeout(() => { if (window.__ktsHttpWait[id]) { delete window.__ktsHttpWait[id]; reject(new Error('timeout')); } }, 8000);
+    });
+  } else {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+    raw = await r.text();
+  }
+  const j = JSON.parse(raw);
+  const out = j && j.candidates && j.candidates[0] && j.candidates[0].content &&
+    j.candidates[0].content.parts && j.candidates[0].content.parts[0] &&
+    j.candidates[0].content.parts[0].text;
+  if (!out) throw new Error('empty');
+  return String(out).trim();
+}
+
+/* v1.1 — 번역 방향은 '내 언어 ↔ 상대 언어' 선택에서 계산한다.
+   dir 'en2ko' = 상대가 한 말 → 내 언어 / 'ko2en' = 내가 한 말 → 상대 언어 (이름만 유지) */
+function pairFor(dir) {
+  return dir === 'en2ko'
+    ? { from: state.lang, to: state.my }
+    : { from: state.my, to: state.lang };
+}
+function shortCode(c) {
+  if (!c) return 'en';
+  if (c === 'zh-CN' || c === 'zh-TW') return c;
+  return String(c).slice(0, 2);
+}
+
+/** 번역 체인: 선택한 방식 → 실패하면 사전으로 */
+async function translate(text, dir) {
+  const mode = state.engine;
+  const pf = pairFor(dir);
+  const koEn = (shortCode(pf.from) === 'ko' && shortCode(pf.to) === 'en') ||
+               (shortCode(pf.from) === 'en' && shortCode(pf.to) === 'ko');
+  if (mode === 'offline') {
+    const o = koEn ? offlineTranslate(text, dir) : '';
+    return { text: o, engine: o ? '내장 사전' : '' };
+  }
+  if (mode === 'gemini' && state.geminiKey) {
+    try {
+      return { text: await geminiTranslate(text, dir), engine: '내 Gemini 키' };
+    } catch (e) {
+      // 키·한도 문제 → 무료 방식으로
+    }
+  }
+  try {
+    return { text: await serverTranslate(text, dir), engine: '무료 서버' };
+  } catch (e) {
+    const o = koEn ? offlineTranslate(text, dir) : '';
+    return { text: o, engine: o ? '내장 사전' : '' };
+  }
+}
+
+/* ── 화면 ───────────────────────────────────────────────────── */
+function setStatus(el, txt) { el.innerHTML = txt; }
+
+function setMode(mode) {
+  state.mode = mode;
+  $('#tabTalk').classList.toggle('on', mode === 'talk');
+  $('#tabMovie').classList.toggle('on', mode === 'movie');
+  $('#talk').classList.toggle('on', mode === 'talk');
+  $('#movie').classList.toggle('on', mode === 'movie');
+  if (mode === 'movie') {
+    state.autoTalk = state.auto;      // 대면 모드의 자동 감지 상태를 기억
+    state.auto = false;
+    reflectAuto();
+    stopListening();
+  } else {
+    stopMovie();
+    if (state.autoTalk !== undefined) state.auto = state.autoTalk;
+    reflectAuto();
+  }
+}
+
+function reflectAuto() {
+  const b = $('#btnAuto');
+  if (!b) return;
+  b.classList.toggle('on', state.auto);
+  b.textContent = state.auto ? '자동 감지 켜짐' : '자동 감지 꺼짐';
+}
+
+function setChannel(ch) {
+  state.channel = ch;
+  $('#guestCard').classList.toggle('active', ch === 'guest');
+  $('#meCard').classList.toggle('active', ch === 'me');
+  const st = $('#talkStatus');
+  if (ch === 'guest') setStatus(st, '<b>지금</b> ' + langNm(state.lang) + ' 말을 듣고 ' + langNm(state.my) + '(으)로 바꿉니다.');
+  else setStatus(st, '<b>지금</b> 내 말(' + langNm(state.my) + ')을 듣고 ' + langNm(state.lang) + '(으)로 바꿉니다.');
+}
+
+function applySize() {
+  document.body.classList.remove('sizedown', 'sizeup');
+  if (state.size === 'small') document.body.classList.add('sizedown');
+  if (state.size === 'large') document.body.classList.add('sizeup');
+}
+
+/* ── 음성인식 ───────────────────────────────────────────────── */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let rec = null, wanted = false, restartT = null, watchdogT = null, lastVoice = 0;
+
+function speechAvailable() {
+  return !!(NATIVE && typeof NATIVE.startListening === 'function') || !!SR;
+}
+
+function startListening() {
+  if (!speechAvailable()) {
+    setStatus($('#talkStatus'), '<i>이 브라우저는 음성인식을 지원하지 않습니다.</i> Chrome 또는 APK로 열어 주세요.');
+    return;
+  }
+  wanted = true;
+  lastVoice = Date.now();
+  if (NATIVE && typeof NATIVE.startListening === 'function') {
+    try { NATIVE.startListening(currentLang()); } catch (e) { /* 아래 웹 방식으로 */ }
+  } else {
+    startWebRec();
+  }
+  state.listening = true;
+  $('#btnMic').classList.add('on');
+  $('#btnMic').textContent = '듣는 중 · 멈추기';
+  setStatus($('#talkStatus'), '<b>듣는 중</b> · ' + (state.channel === 'guest' ? (langNm(state.lang) + ' → ' + langNm(state.my)) : (langNm(state.my) + ' → ' + langNm(state.lang))) + ' 로 바꿉니다.');
+  armWatchdog();
+}
+
+function stopListening() {
+  wanted = false;
+  state.listening = false;
+  if (NATIVE && typeof NATIVE.stopListening === 'function') {
+    try { NATIVE.stopListening(); } catch (e) { /* 무시 */ }
+  }
+  if (rec) {
+    try { rec.stop(); } catch (e) { /* 무시 */ }
+    rec = null;
+  }
+  clearTimeout(restartT);
+  clearInterval(watchdogT);
+  $('#btnMic').classList.remove('on');
+  $('#btnMic').textContent = '듣기 시작';
+}
+
+function startWebRec() {
+  if (!SR) return;
+  try {
+    if (rec) { try { rec.stop(); } catch (e) {} }
+    rec = new SR();
+    rec.lang = currentLang();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    rec.onstart = () => { lastVoice = Date.now(); };
+    rec.onresult = (ev) => {
+      lastVoice = Date.now();
+      let interim = '', final = '';
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const r = ev.results[i];
+        const t = r[0] && r[0].transcript ? r[0].transcript.trim() : '';
+        if (!t) continue;
+        if (r.isFinal) final += (final ? ' ' : '') + t;
+        else interim += (interim ? ' ' : '') + t;
+      }
+      if (interim) onPartial(interim);
+      if (final) onFinal(final);
+    };
+    rec.onerror = (e) => {
+      const err = e && e.error ? e.error : 'error';
+      if (err === 'not-allowed' || err === 'service-not-allowed') {
+        setStatus($('#talkStatus'), '<i>마이크 권한이 꺼져 있습니다.</i> 주소창 왼쪽 자물쇠에서 허용해 주세요.');
+        stopListening();
+        return;
+      }
+      if (err === 'no-speech' || err === 'aborted' || err === 'network') {
+        // 무중단: 계속 다시 켠다
+      }
+    };
+    rec.onend = () => {
+      if (wanted) {
+        restartT = setTimeout(() => {
+          try { if (wanted) startWebRec(); } catch (e) { /* 무시 */ }
+        }, 280);
+      }
+    };
+    rec.start();
+  } catch (e) {
+    // 이미 시작된 경우 등 — 잠시 뒤 재시도
+    if (wanted) restartT = setTimeout(startWebRec, 500);
+  }
+}
+
+/** 음성이 12초 끊기면 다시 켠다(무중단) */
+function armWatchdog() {
+  clearInterval(watchdogT);
+  watchdogT = setInterval(() => {
+    if (!wanted) return;
+    if (Date.now() - lastVoice < 12000) return;
+    lastVoice = Date.now();
+    if (NATIVE && typeof NATIVE.startListening === 'function') {
+      try { NATIVE.stopListening(); NATIVE.startListening(state.lang); } catch (e) {}
+    } else if (rec) {
+      try { rec.stop(); } catch (e) {}
+    }
+  }, 4000);
+}
+
+/** APK 안 음성인식 콜백 */
+window.__ktsSpeech = function (type, text) {
+  lastVoice = Date.now();
+  if (type === 'final') {
+    if (state.mode === 'movie') onFinal(text);
+    else onFinal(text);
+  } else if (type === 'partial') {
+    onPartial(text);
+  } else if (type === 'error') {
+    if (text === 'permission') {
+      setStatus($('#talkStatus'), '<i>마이크 권한을 허용해 주세요.</i>');
+      stopListening();
+    }
+  }
+};
+
+/* ── 결과 처리 ──────────────────────────────────────────────── */
+let reqSeq = 0;
+
+function onPartial(text) {
+  if (!text) return;
+  if (state.mode === 'movie') {
+    $('#subNow').textContent = text;
+    $('#subNow').classList.add('pending');
+    return;
+  }
+  if (state.channel === 'guest') {
+    $('#enOrig').textContent = text;
+    $('#koBig').textContent = text;
+    $('#koBig').classList.add('pending');
+  } else {
+    $('#koOrig').textContent = text;
+    $('#enBig').textContent = text;
+    $('#enBig').classList.add('pending');
+  }
+}
+
+async function onFinal(text) {
+  const t = String(text || '').trim();
+  if (!t) return;
+  if (state.mode === 'movie') {
+    await handleSubtitle(t);
+    return;
+  }
+  const seq = ++reqSeq;
+  if (state.channel === 'guest') {
+    $('#enOrig').textContent = t;
+    $('#koBig').classList.remove('pending');
+    $('#koBig').textContent = '번역 중…';
+    const r = await translate(t, 'en2ko');
+    if (seq !== reqSeq) return;
+    state.lastIn = r.text || '';
+    $('#koBig').textContent = r.text || '(번역을 못 했습니다) — 원문 보기로 확인하세요';
+    $('#koBig').classList.toggle('pending', !r.text);
+    tagEngine(r.engine);
+    if (state.ttsAuto && r.text) speakText(r.text, state.my);   /* 상대 말 → 내 언어 음성 */
+  } else {
+    $('#koOrig').textContent = t;
+    $('#enBig').classList.remove('pending');
+    $('#enBig').textContent = '번역 중…';
+    const r = await translate(t, 'ko2en');
+    if (seq !== reqSeq) return;
+    state.lastOut = r.text || '';
+    $('#enBig').textContent = r.text || '(번역을 못 했습니다)';
+    $('#enBig').classList.toggle('pending', !r.text);
+    tagEngine(r.engine);
+    if (state.ttsAuto && r.text) speakText(r.text, state.lang);  /* 내 말 → 상대 언어 음성 */
+  }
+  if (state.auto) {
+    setChannel(state.channel === 'guest' ? 'me' : 'guest');
+    if (wanted) restartWithLang();
+  }
+}
+
+function restartWithLang() {
+  if (!wanted) return;
+  if (NATIVE && typeof NATIVE.startListening === 'function') {
+    try {
+      NATIVE.stopListening();
+      setTimeout(() => { try { if (wanted) NATIVE.startListening(currentLang()); } catch (e) {} }, 220);
+    } catch (e) {}
+  } else if (rec) {
+    try { rec.stop(); } catch (e) {}
+  }
+}
+
+function currentLang() {
+  return state.channel === 'guest' ? state.lang : state.my;   /* v1.1 내 언어 기준 */
+}
+
+function tagEngine(engine) {
+  const tag = $('#engineTag');
+  if (tag) tag.textContent = engine ? '번역 · ' + engine : '번역 · 사전에 없음';
+  const st = $('#talkStatus');
+  if (engine && st) st.setAttribute('data-engine', engine);
+}
+
+async function handleSubtitle(text) {
+  state.lines++;
+  $('#lineCount').textContent = state.lines + '줄';
+  $('#hint').style.display = 'none';
+  $('#subNow').classList.remove('pending');
+  $('#subNow').textContent = text;
+  const r = await translate(text, 'en2ko');
+  const prev = $('#subNow').textContent;
+  if (prev !== text) return;                 // 그 사이 새 자막이 왔으면 덮지 않는다
+  const ko = r.text || text;
+  $('#subNow').textContent = ko;
+  const hist = $('#hist');
+  const d = document.createElement('div');
+  d.textContent = ko;
+  hist.appendChild(d);
+  while (hist.children.length > 3) hist.removeChild(hist.firstChild);
+  if (state.showOrig) {
+    const o = document.createElement('div');
+    o.style.color = '#42506A';
+    o.textContent = text;
+    hist.appendChild(o);
+    while (hist.children.length > 4) hist.removeChild(hist.firstChild);
+  }
+  $('#engineTag').textContent = '번역 · ' + (r.engine || '원문');
+}
+
+/* ── 영화 모드 ──────────────────────────────────────────────── */
+function startMovie() {
+  state.wantMovie = true;
+  state.mode = 'movie';
+  state.channel = 'guest';
+  state.auto = false;
+  $('#btnSub').classList.add('on');
+  $('#btnSub').textContent = '자막 멈추기';
+  $('#movieStatus').innerHTML = '<b>마이크로 듣는 중</b> · 자동 재시작으로 끊기지 않습니다.';
+  $('#hint').style.display = 'none';
+  if (!wanted) startListening();
+  else restartWithLang();
+}
+
+function stopMovie() {
+  state.wantMovie = false;
+  $('#btnSub').classList.remove('on');
+  $('#btnSub').textContent = '자막 시작';
+  $('#movieStatus').textContent = '대기 중';
+  stopListening();
+}
+
+/* ── 폰 소리 캡처(APK 전용) ─────────────────────────────────── */
+function phoneAudio() {
+  if (NATIVE && typeof NATIVE.startPhoneAudio === 'function') {
+    try {
+      NATIVE.startPhoneAudio();
+      $('#movieStatus').innerHTML = '<b>폰 소리 캡처 요청</b> · 화면 녹화 허용 창에서 [지금 시작]을 눌러 주세요.';
+    } catch (e) {
+      $('#movieStatus').textContent = '폰 소리 캡처를 시작하지 못했습니다.';
+    }
+  } else {
+    $('#movieStatus').innerHTML = '<i>폰 소리 캡처는 APK에서만 됩니다.</i> 지금은 스피커 소리를 마이크로 듣습니다.';
+  }
+}
+
+window.__ktsAudioLevel = function (pct) {
+  $('#movieStatus').innerHTML = '<b>폰 소리 캡처 중</b> · 음량 ' + pct + '% · 자막은 마이크로 받습니다.';
+};
+
+window.__ktsAudioError = function (msg) {
+  $('#movieStatus').innerHTML = '<i>' + (msg || '폰 소리 캡처가 막혔습니다') + '</i> — 마이크 방식으로 계속합니다.';
+};
+
+/* ── 버튼 ───────────────────────────────────────────────────── */
+$('#tabTalk').onclick = () => setMode('talk');
+$('#tabMovie').onclick = () => setMode('movie');
+
+$('#btnMic').onclick = () => {
+  if (wanted) stopListening();
+  else startListening();
+};
+
+$('#btnAuto').onclick = () => {
+  state.auto = !state.auto;
+  state.autoTalk = state.auto;
+  reflectAuto();
+  if (state.auto && state.channel !== 'guest') setChannel('guest');
+};
+
+$('#btnOrig').onclick = () => {
+  state.showOrig = !state.showOrig;
+  document.body.classList.toggle('show-orig', state.showOrig);
+  $('#btnOrig').classList.toggle('on', state.showOrig);
+  $('#btnOrig2').classList.toggle('on', state.showOrig);
+  save();
+};
+
+$('#btnOrig2').onclick = () => {
+  state.showOrig = !state.showOrig;
+  document.body.classList.toggle('show-orig', state.showOrig);
+  $('#btnOrig').classList.toggle('on', state.showOrig);
+  $('#btnOrig2').classList.toggle('on', state.showOrig);
+  save();
+};
+
+$('#btnClear').onclick = () => {
+  state.lastIn = ''; state.lastOut = '';
+  $('#koBig').textContent = '상대 말이 여기에 큰 ' + langNm(state.my) + '(으)로 뜹니다';
+  $('#enBig').textContent = 'Show this to the guest';
+  $('#enOrig').textContent = '';
+  $('#koOrig').textContent = '';
+  reqSeq++;
+  setChannel('guest');
+};
+
+$('#guestCard').onclick = () => { setChannel('guest'); if (wanted) restartWithLang(); };
+$('#meCard').onclick = () => { setChannel('me'); if (wanted) restartWithLang(); };
+
+$('#btnSub').onclick = () => {
+  if (state.wantMovie) stopMovie();
+  else startMovie();
+};
+
+$('#btnSize').onclick = () => {
+  state.size = state.size === 'normal' ? 'large' : (state.size === 'large' ? 'small' : 'normal');
+  applySize();
+  $('#btnSize').textContent = state.size === 'large' ? '글자 보통' : (state.size === 'small' ? '글자 크게' : '글자 크게');
+  save();
+};
+
+$('#btnPhone').onclick = phoneAudio;
+
+/* ── 설정 ───────────────────────────────────────────────────── */
+function openSheet() { $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheet').classList.remove('on'); }
+$('#btnSettings').onclick = openSheet;
+$('#sheetMask').onclick = closeSheet;
+$('#sheetClose').onclick = closeSheet;
+
+document.querySelectorAll('#segLang button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#segLang button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    state.lang = b.getAttribute('data-lang');
+  };
+});
+document.querySelectorAll('#segEngine button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#segEngine button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    state.engine = b.getAttribute('data-engine');
+  };
+});
+document.querySelectorAll('#segSize button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#segSize button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    state.size = b.getAttribute('data-size');
+    applySize();
+  };
+});
+
+$('#sheetSave').onclick = () => {
+  state.geminiKey = ($('#geminiKey').value || '').trim();
+  save();
+  closeSheet();
+  const st = $('#talkStatus');
+  setStatus(st, '번역 방식 <i>' + (state.engine === 'auto' ? '자동(무료)' : state.engine === 'offline' ? '내장 사전' : '내 Gemini 키') + '</i> · ' + (speechAvailable() ? '음성인식 준비됨' : '음성인식 미지원'));
+};
+
+/* ── 저장/복원 ──────────────────────────────────────────────── */
+function save() {
+  try {
+    localStorage.setItem('thetongyeok.v1', JSON.stringify({
+      lang: state.lang, my: state.my, engine: state.engine, size: state.size, ttsAuto: state.ttsAuto,
+      geminiKey: state.geminiKey, showOrig: state.showOrig
+    }));
+  } catch (e) { /* 저장 못 해도 동작 */ }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem('thetongyeok.v1');
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o.lang) state.lang = o.lang;
+    if (o.my) state.my = o.my;
+    if (typeof o.ttsAuto === 'boolean') state.ttsAuto = o.ttsAuto;
+    if (o.engine) state.engine = o.engine;
+    if (o.size) state.size = o.size;
+    if (o.geminiKey) state.geminiKey = o.geminiKey;
+    if (o.showOrig) state.showOrig = true;
+    document.querySelectorAll('#segLang button').forEach(b => b.classList.toggle('on', b.getAttribute('data-lang') === state.lang));
+    document.querySelectorAll('#segEngine button').forEach(b => b.classList.toggle('on', b.getAttribute('data-engine') === state.engine));
+    document.querySelectorAll('#segSize button').forEach(b => b.classList.toggle('on', b.getAttribute('data-size') === state.size));
+    $('#geminiKey').value = state.geminiKey || '';
+    applySize();
+    document.body.classList.toggle('show-orig', state.showOrig);
+    $('#btnOrig').classList.toggle('on', state.showOrig);
+    $('#btnOrig2').classList.toggle('on', state.showOrig);
+  } catch (e) { /* 무시 */ }
+}
+
+
+/* ── v1.1 언어 선택 · AI 음성(TTS) 출력 ─────────────────────── */
+function fillLangSelects() {
+  ['#selMe', '#selThem'].forEach(sel => {
+    const el = $(sel); if (!el) return;
+    el.innerHTML = LANGS.map(l => '<option value="' + l.c + '">' + l.nm + '</option>').join('');
+  });
+}
+function applyLangUI() {
+  const m = $('#selMe'), t = $('#selThem');
+  if (m) m.value = state.my;
+  if (t) t.value = state.lang;
+  const wg = $('#whoGuest'), wm = $('#whoMe');
+  if (wg) wg.textContent = langNm(state.my);
+  if (wm) wm.textContent = langNm(state.lang);
+  const bs = $('#btnSpeakMe'), bt = $('#btnSpeakThem');
+  if (bs) bs.textContent = '🗣 내 말을 ' + ro(langNm(state.lang)) + ' 읽어 주기';
+  if (bt) bt.textContent = '🔊 상대 말을 ' + ro(langNm(state.my));
+  const cb = $('#ttsAuto'); if (cb) cb.checked = state.ttsAuto;
+  setChannel(state.channel);
+}
+
+/** 기기 TTS(APK) 우선, 없으면 브라우저 음성 — 둘 다 0원 */
+function speakText(text, lang) {
+  if (!text) return false;
+  if (NATIVE && typeof NATIVE.speak === 'function') {
+    try { NATIVE.speak(text, lang || state.lang); return true; } catch (e) { /* 웹으로 */ }
+  }
+  const SS = window.speechSynthesis;
+  if (!SS || typeof SpeechSynthesisUtterance === 'undefined') return false;
+  try {
+    SS.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || state.lang;
+    u.rate = 1.0;
+    const v = (SS.getVoices() || []).find(x => x.lang && x.lang.toLowerCase().indexOf(String(u.lang).slice(0, 2).toLowerCase()) === 0);
+    if (v) u.voice = v;
+    SS.speak(u);
+    return true;
+  } catch (e) { return false; }
+}
+const PLACEHOLDER = /Show this to the guest|여기에 큰|번역 중|Translating/;
+function speakLast(which) {
+  let text, lang;
+  if (which === 'out') {                 /* 내 말 → 상대 언어 (손님에게 들려주기·2대 폰 통화) */
+    text = state.lastOut || $('#enBig').textContent || '';
+    lang = state.lang;
+  } else {                               /* 상대 말 → 내 언어 */
+    text = state.lastIn || $('#koBig').textContent || '';
+    lang = state.my;
+  }
+  if (PLACEHOLDER.test(text)) text = '';
+  if (!text) { setStatus($('#talkStatus'), '<i>읽어 줄 번역문이 아직 없습니다.</i> 먼저 말해 주세요.'); return; }
+  const ok = speakText(text, lang);
+  setStatus($('#talkStatus'), ok
+    ? ('<b>AI 음성 출력</b> · ' + ro(langNm(lang)) + ' 읽는 중입니다.')
+    : '<i>이 기기에서는 음성 출력을 쓸 수 없습니다.</i> (APK에서 동작)');
+}
+$('#selMe').onchange = e => { state.my = e.target.value; applyLangUI(); save(); if (wanted) restartWithLang(); };
+$('#selThem').onchange = e => { state.lang = e.target.value; applyLangUI(); save(); if (wanted) restartWithLang(); };
+$('#btnSwap').onclick = () => {
+  const a = state.my; state.my = state.lang; state.lang = a;
+  applyLangUI(); save();
+  setStatus($('#talkStatus'), '<b>맞바꿈</b> · 내 언어 ' + langNm(state.my) + ' · 상대 언어 ' + langNm(state.lang));
+  if (wanted) restartWithLang();
+};
+$('#ttsAuto').onchange = e => { state.ttsAuto = !!e.target.checked; save(); };
+$('#btnSpeakMe').onclick = () => speakLast('out');
+$('#btnSpeakThem').onclick = () => speakLast('in');
+
+/* ── 시작 ───────────────────────────────────────────────────── */
+fillLangSelects();
+load();
+state.my = state.my || 'ko-KR';
+state.lang = state.lang || 'en-US';
+state.my = state.my || 'ko-KR';
+applyLangUI();
+applySize();
+if (NATIVE && typeof NATIVE.isListening === 'function') { /* APK 준비 완료 */ }
+$('#engineTag').textContent = '무료 자막';
+
+/* 테스트·미리보기용 (사용자 화면에는 영향 없음) */
+window.__demo = async function (text, lang) {
+  if (lang === 'ko') {
+    state.channel = 'me';
+    document.querySelectorAll('#segLang button').forEach(b => b.classList.toggle('on', b.getAttribute('data-lang') === state.lang));
+  } else {
+    state.channel = 'guest';
+  }
+  await onFinal(text);
+};
+window.__demomovie = async function (text) {
+  state.mode = 'movie';
+  $('#hint').style.display = 'none';
+  await handleSubtitle(text);
+};
+window.__setEngine = function (e) { state.engine = e; };
+window.__state = state;
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 폰 앱 정리기</title>
+<title>폰정리 — 4~12 폴더 · 홈 화면</title>
 <style>
 :root{--bg:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--or:#FF6B00;--or2:#FFA24D;--on-or:#0A1224}
@@ -65,6 +65,14 @@ body{padding-bottom:26px}
 .empty{font-size:11.5px;color:#66799A;text-align:center;padding:12px 0}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);background:#1B2A48;border:1px solid var(--line2);color:#fff;font-size:12px;font-weight:800;padding:10px 14px;border-radius:11px;opacity:0;transition:.2s;z-index:80;pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.dl{display:flex;align-items:center;gap:10px;margin:12px 0 8px;padding:13px 14px;border-radius:15px;
+ background:linear-gradient(135deg,#FF8A2B,#FF6B00);color:#0A1224;text-decoration:none;box-shadow:0 10px 24px rgba(255,107,0,.22)}
+.dl .di{width:34px;height:34px;border-radius:11px;background:rgba(10,18,36,.14);display:grid;place-items:center;font-size:17px;font-weight:900;flex:0 0 auto}
+.dl .dt{flex:1;min-width:0}
+.dl .dt b{display:block;font-size:14px;font-weight:900;letter-spacing:-.4px}
+.dl .dt i{display:block;font-style:normal;font-size:10.5px;font-weight:800;opacity:.75;margin-top:2px}
+.dl .da{font-size:12px;font-weight:900;background:#0A1224;color:#FFA24D;border-radius:9px;padding:7px 11px;flex:0 0 auto}
+.dnote{font-size:10.5px;line-height:1.6;color:#7286A2;margin:0 2px 12px}
 </style>
 </head>
 <body>
@@ -72,12 +80,18 @@ body{padding-bottom:26px}
 
 <div class="hd">
   <div class="logo">⊞</div>
-  <div><b>폰 앱 정리기</b><span>4칸 자동 분류 · 1초 검색</span></div>
+  <div><b>폰정리</b><span>4~12 폴더 · 2차 소분류 · 1초 검색</span></div>
   <div class="sp"></div>
   <div class="cnt" id="cnt">불러오는 중</div>
 </div>
 
 <div class="wrap">
+  <a class="dl" href="KTS_폰정리_v3.0.apk" download>
+    <span class="di">⬇</span>
+    <span class="dt"><b>폰정리 앱(APK) 바로 받기</b><i>v3.0 · 4~12 맞춤 폴더 · 홈 화면 모드</i></span>
+    <span class="da">받기</span>
+  </a>
+  <div class="dnote">웹은 미리보기입니다. 설치형 앱에서 폰의 앱·아이콘을 실제로 읽고, 폴더를 눌러 바로 실행합니다.</div>
   <div class="sbox">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8FA0B8" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="앱 이름 한 글자만 쳐도 바로 나옵니다" autocomplete="off">
