@@ -55,6 +55,9 @@ input,textarea{font-family:inherit}
 .home-foot{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));text-align:center;font-size:11px;color:#6a656c;line-height:1.7}
 .home-foot b{color:#FFA24D;font-weight:700}
 .home-top{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));right:18px;display:flex;gap:16px;align-items:center}
+.oc-back{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:16px;z-index:7;display:inline-flex;align-items:center;gap:4px;
+  font-size:11.5px;font-weight:800;color:#FFA24D;text-decoration:none;background:rgba(255,107,0,.12);
+  border:1px solid rgba(255,107,0,.42);border-radius:999px;padding:6px 11px;line-height:1}
 .home-search{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;right:16px;display:flex;align-items:center;gap:8px;
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:0 12px;height:42px;backdrop-filter:blur(6px)}
 .home-search input{flex:1;background:none;border:0;outline:0;color:#fff;font-size:14px}
@@ -423,6 +426,7 @@ body.stt-on #btnMic{background:rgba(255,107,0,.92);animation:pulse 1.1s infinite
 
 <!-- ============ 1. 홈 (SC 로고 · 촬영하기 / 갤러리보기) ============ -->
 <section id="home" class="screen active">
+  <a class="oc-back" href="https://autooneclick.com/" aria-label="원클릭으로 돌아가기">← 원클릭</a>
   <div class="home-top">
     <button class="btn" id="homeHelp" aria-label="사용법"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.8-.9 1.4v.3"/><path d="M12 16.6h.01"/></svg></button>
   </div>

@@ -42,7 +42,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .qcard{border:1px solid var(--line);border-radius:15px;padding:12px 13px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
   text-decoration:none;color:var(--ink);display:block}
 .qcard.new{border-color:rgba(255,107,0,.45);background:linear-gradient(180deg,rgba(255,107,0,.1),rgba(255,255,255,.015))}
-.qcard .qk{font_size:10px;font-size:9.5px;font-weight:900;letter-spacing:.13em;color:var(--amber2)}
+.qcard .qk{font-size:9.5px;font-weight:900;letter-spacing:.13em;color:var(--amber2)}
 .qcard b{display:block;font-size:13.5px;font-weight:900;margin-top:5px;letter-spacing:-.35px}
 .qcard span{display:block;font-size:10.5px;color:var(--gray);margin-top:3px;line-height:1.45}
 .tabs{display:flex;gap:6px;overflow:auto;margin-top:18px;padding-bottom:3px;scrollbar-width:none}
@@ -229,13 +229,18 @@ render();
     {nm:'더스캔', sub:'찍으면 바로 스캔', link:'thescan/', ico:'▣', nw:1},
     {nm:'더싸인', sub:'사인·도장·간인', link:'sign/', ico:'✍', nw:1},
     {nm:'더지우개', sub:'글씨·얼룩 지우기', link:'theeraser/', ico:'⌫'},
-    {nm:'더상세', sub:'상세페이지 1장', link:'thedetail/', ico:'▤'}
+    {nm:'더상세', sub:'상세페이지 1장', link:'thedetail/', ico:'▤'},
+    {nm:'더파일', sub:'표 사진 → 한글·엑셀', link:'converter.html', img:'shots/ic_photo2doc.png', nw:1}
   ];
   const short = s => String(s||'').split(/ — | \(/)[0];
   const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => e.link === p.link))
     .map(p => ({nm:short(p.nm), sub:p.sub.split(' · ')[0].split('→')[0].trim(), link:p.link, img:p.icon, nw:p.badge==='NEW'}));
   const soon = window.PRODUCTS.filter(p => p.status === 'soon').map(p => ({nm:short(p.nm), sub:'준비 중', img:p.icon, off:1}));
   const all = [...EXTRA, ...live, ...soon];
+  /* 대표님 확정 순서 — 더뷰 · 더스캔 · 더지우개 · 더상세 · 더파일 · 더싸인 · 롱테일 · 독심술 · 세이캡 · 오늘의 특가 먼저, 나머지는 뒤로 */
+  const PRIORITY = ['viewer.html','thescan/','theeraser/','thedetail/','converter.html','sign/','longtail.html','navi2/','saycap/','sale/'];
+  const ord = t => { const i = PRIORITY.indexOf(t.link); return i < 0 ? 99 : i; };
+  all.sort((a, b) => ord(a) - ord(b));
   $('#tiles').innerHTML = all.map(t => {
     const ic = t.img ? `<img src="${t.img}" alt="" loading="lazy">` : t.ico;
     const inner = `${t.nw ? '<span class="nw"></span>' : ''}<span class="ti">${ic}</span><b>${t.nm}</b><small>${t.sub}</small>`;
