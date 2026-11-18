@@ -336,7 +336,7 @@ function calc(){
 
   /* 소상공인시장진흥공단 — 소상공인 정책자금 */
   {
-    const ok = !noStart && sales < 1200000000 && passed.tax && !passed.debt;
+    const ok = !noStart && sales < 1200000000 && passed.tax && passed.debt;
     let amt = ok ? Math.min(70000000, Math.max(10000000, sales * 0.25)) : 0;
     if (!passed.tax) amt = 0;
     push('소상공인시장진흥공단 (소진공)', ok ? 'go' : 'no',
@@ -344,7 +344,8 @@ function calc(){
       ok ? '소상공인 정책자금(일반경영안정·성장기반)은 <b>세금 체납이 없고 기대출이 적을 때</b> 가장 먼저 열립니다.'
          : (!passed.tax ? '국세·지방세 체납이 있으면 접수 단계에서 막힙니다. 완납 또는 분납 약정이 먼저입니다.'
                         : (noStart ? '사업자등록 전에는 신청 자체가 안 됩니다. 등록 후 업력이 쌓여야 합니다.'
-                                   : '기존 대출·보증 잔액이 많으면 한도가 거의 남지 않습니다.')),
+                                   : (!passed.debt ? '기존 대출·보증 잔액이 많으면 한도가 거의 남지 않습니다. 상환 후 다시 신청하세요.'
+                                                   : '매출 규모가 소상공인 기준을 넘으면 이 자금 대신 중진공·보증 쪽으로 가야 합니다.'))),
       '업력·매출·업종별 한도가 다르고, 접수 기간이 정해져 있습니다.');
   }
   /* 중소벤처기업진흥공단 — 시설·운전자금 */
@@ -359,9 +360,9 @@ function calc(){
   }
   /* 신용보증기금 — 보증서 대출 */
   {
-    const ok = !noStart && passed.tax && !passed.credit;
+    const ok = !noStart && passed.tax && passed.credit;
     const amt = ok ? Math.min(200000000, Math.max(20000000, sales * 0.35)) : 0;
-    push('신용보증기금 (신보)', ok ? (passed.debt ? 'cond' : 'go') : 'no', amt,
+    push('신용보증기금 (신보)', ok ? (passed.debt ? 'go' : 'cond') : 'no', amt,
       ok ? (passed.debt ? '기존 보증 잔액이 있어 <b>남은 한도</b>만 계산됩니다. 먼저 잔액을 확인하세요.'
                         : '매출과 부채비율이 기준 안에 있으면 <b>보증서 → 은행 대출</b>로 이어집니다.')
          : (!passed.credit ? '대표자 신용점수가 700점 미만이면 보증 심사가 어렵습니다.'
@@ -379,7 +380,7 @@ function calc(){
   }
   /* 은행 */
   {
-    const ok = !passed.credit || sales >= 300000000;
+    const ok = passed.credit || sales >= 300000000;
     const amt = ok ? Math.min(100000000, Math.max(5000000, sales * 0.15 + (passed.credit ? 10000000 : 0))) : 0;
     push('시중은행 (신용·담보대출)', ok ? (passed.credit ? 'go' : 'cond') : 'no', amt,
       ok ? (passed.credit ? '4대보험·매출 이력이 있으면 은행 자체 신용대출도 함께 비교하세요. 금리는 보증대출보다 높습니다.'

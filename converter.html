@@ -161,8 +161,9 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 .wtools button{flex:1;font-size:11.5px;font-weight:900;color:#DCE6F2;background:#12203C;border:1px solid var(--line2);border-radius:9px;padding:8px 2px;cursor:pointer;white-space:nowrap}
 .wtools button:active{transform:scale(.98)}
 .wtools .zt{flex:0 0 auto;font-size:10.5px;font-weight:900;color:var(--amber2);min-width:34px;text-align:right}
-.pvblank{border:0;background:transparent}
+.pvblank{border:0;background:transparent;position:relative}
 #work .pvblank{outline:1px dashed #E3E9F2;outline-offset:-1px}
+#work .pvblank:empty:after{content:"직인·도장·그림 자리";position:absolute;right:4px;bottom:2px;font-size:8px;color:#C6CFDB;letter-spacing:-.2px}
 .resume{display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,107,0,.45);
   background:linear-gradient(100deg,rgba(255,107,0,.14),rgba(255,255,255,.02) 70%)}
 .resume .t{flex:1;min-width:0}
