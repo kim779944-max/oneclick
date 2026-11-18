@@ -1,0 +1,1860 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 더양식 — 내 종이 양식, 한 번 등록하면 값만 채워 바로 출력</title>
+<meta name="description" content="거래명세서·견적서·근로계약서·동의서·신청서 같은 종이 양식을 사진 한 장으로 등록하고, 다음부터는 값만 채워 한글(.hwpx)·엑셀(.xlsx)·PDF로 바로 뽑습니다. 모든 처리는 이 기기 안에서만.">
+<meta name="theme-color" content="#0A1128">
+<link rel="icon" href="icon.png">
+<style>
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+ --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;--amber:#FF6B00;--amber2:#FFA24D;--on-amber:#0A1224;--red:#FF5A5A;--green:#2ED47A}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+ background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:flex;justify-content:center;min-height:100vh;word-break:keep-all}
+#app{width:100%;max-width:460px;min-height:100vh;position:relative;overflow-x:hidden;
+ background:radial-gradient(120% 50% at 50% -6%,rgba(255,107,0,.10) 0%,rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A 0%,#0C1730 46%,#0A1128 100%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:-.2px}
+input,select,textarea{font:inherit;color:var(--ink);background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 11px;width:100%;font-size:14px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--amber2)}
+a{color:var(--amber2)}
+header.top{position:sticky;top:0;z-index:40;background:rgba(10,17,40,.95);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:8px;padding:10px 14px}
+.brand{display:flex;align-items:center;gap:7px;font-size:16px;font-weight:900;color:#fff;letter-spacing:-.6px}
+.brand .mark{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224;font-size:12px;font-weight:900}
+.brand small{font-size:9.5px;font-weight:700;color:#7C8DA6}
+.sp{flex:1}
+.keyb{font-size:11px;font-weight:800;color:var(--amber2);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:6px 10px}
+.steps{display:flex;gap:4px;padding:0 14px 10px}
+.steps button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#7C8DA6}
+.steps button i{display:block;width:100%;height:4px;border-radius:4px;background:#22335A}
+.steps button.done i{background:rgba(255,107,0,.5)}
+.steps button.on{color:#fff}.steps button.on i{background:var(--amber)}
+main{padding:12px 14px 120px}
+.scr{display:none}.scr.on{display:block}
+.hero{background:linear-gradient(150deg,rgba(255,107,0,.14) 0%,rgba(18,32,60,.96) 58%);border:1px solid rgba(255,107,0,.42);border-radius:18px;padding:14px}
+.hero .tag{display:inline-block;font-size:10.5px;font-weight:900;color:var(--on-amber);background:var(--amber2);border-radius:6px;padding:3px 7px}
+.hero h1{font-size:19px;font-weight:900;letter-spacing:-.8px;line-height:1.3;margin:8px 0 5px;color:#fff}
+.hero h1 b{color:var(--amber2)}
+.hero p{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.card{background:linear-gradient(180deg,#12203C 0%,#0F1B33 100%);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+.card h2{font-size:14px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px}
+.card h2 .n{width:18px;height:18px;border-radius:6px;background:var(--amber);color:var(--on-amber);font-size:10.5px;font-weight:900;display:grid;place-items:center}
+.sub{font-size:11.5px;color:var(--gray);margin-top:4px;line-height:1.5}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:6px;vertical-align:middle}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;border-radius:12px;padding:13px 12px;font-size:14.5px;font-weight:900}
+.btn.pri{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));box-shadow:0 8px 22px rgba(255,107,0,.3)}
+.btn.sec{color:#E6EDF7;background:#12203C;border:1px solid var(--line2)}
+.btn.sm{padding:9px 10px;font-size:12.5px;border-radius:10px}
+.btn[disabled]{opacity:.45}
+.row{display:flex;gap:7px;margin-top:8px}.row>*{flex:1}
+.flist{margin-top:8px;display:flex;flex-direction:column;gap:7px}
+.fi{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#0B1729}
+.fi .nm{font-size:13.5px;font-weight:900;color:#fff}
+.fi .ds{font-size:10.5px;color:var(--gray);margin-top:2px}
+.fi .bd{font-size:9.5px;font-weight:900;border-radius:6px;padding:2px 6px;margin-left:5px;color:var(--on-amber);background:var(--amber2)}
+.fi .bd.my{background:#2ED47A}
+.fi .acts{margin-left:auto;display:flex;gap:4px}
+.fi .acts button{font-size:11.5px;font-weight:800;color:#DCE6F2;border:1px solid var(--line2);border-radius:8px;padding:7px 8px;background:#12203C}
+.fi .acts button.go{color:var(--on-amber);background:var(--amber2);border-color:var(--amber2)}
+.stage{position:relative;width:100%;margin-top:8px;border-radius:10px;overflow:hidden;background:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+.stage img,.stage canvas{display:block;width:100%;height:auto;pointer-events:none}
+.fld{position:absolute;border:2px solid var(--amber);background:rgba(255,107,0,.16);border-radius:3px;touch-action:none}
+.fld span{position:absolute;left:3px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:900;color:#B84A00;white-space:nowrap;max-width:calc(100% - 6px);overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.fld.sel{border-color:#1E6BFF;background:rgba(30,107,255,.18)}
+.fld.sel span{left:-2px;top:-17px;transform:none;font-size:10px;color:#fff;background:#1E6BFF;border-radius:4px 4px 0 0;padding:1px 5px;max-width:200px}
+.fld .hd2{position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#1E6BFF;border:2px solid #fff;display:none}
+.fld.sel .hd2{display:block}
+.tools{display:flex;gap:6px;margin-top:8px}
+.tools button{flex:1;font-size:13px;font-weight:900;border-radius:10px;padding:10px 4px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
+.tools button.pl{font-size:18px;color:var(--amber2)}
+.seg{display:flex;gap:4px;background:#0B1729;border:1px solid var(--line);border-radius:10px;padding:3px;margin-top:6px}
+.seg button{flex:1;font-size:12px;font-weight:900;color:#94A3B8;border-radius:8px;padding:8px 4px}
+.seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
+label.lb{display:block;font-size:11.5px;font-weight:800;color:var(--ink2);margin:9px 0 4px}
+label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px}
+.sig{width:100%;height:110px;background:#fff;border-radius:10px;touch-action:none;display:block}
+.pv{width:100%;border-radius:8px;background:#fff;display:block;margin-top:8px}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;z-index:50;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+ background:linear-gradient(180deg,rgba(10,17,40,0) 0%,rgba(10,17,40,.96) 26%);display:flex;gap:8px}
+.bar .back{flex:0 0 86px}
+.bar .btn{padding:15px 12px;font-size:15.5px}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.25s;background:#1E2C4D;border:1px solid var(--amber);color:#fff;font-size:13px;font-weight:800;border-radius:12px;padding:10px 14px;z-index:90;max-width:360px;text-align:center;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.ba{display:flex;gap:6px;margin-top:6px}.ba button{flex:1}
+.kv{font-size:11px;color:var(--gray);line-height:1.55;margin-top:6px}
+.qa{margin-top:16px}
+.qa .draft{white-space:pre-wrap;font-size:12px;line-height:1.55;background:#0B1729;border:1px dashed var(--amber2);border-radius:10px;padding:10px;margin-top:8px;color:#DCE6F2;display:none}
+.foot{font-size:10.5px;color:#6E7F99;text-align:center;margin-top:14px;line-height:1.6}
+.modal{position:fixed;inset:0;background:rgba(3,7,18,.72);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.modal .sheet{width:100%;max-width:460px;background:#0F1B33;border-top:2px solid var(--amber);border-radius:18px 18px 0 0;padding:16px 14px 22px}
+#busy{position:fixed;inset:0;background:rgba(3,7,18,.7);z-index:85;display:none;align-items:center;justify-content:center}
+#busy.on{display:flex}
+#busy div{background:#12203C;border:1px solid var(--amber);border-radius:14px;padding:16px 18px;font-weight:900;font-size:13.5px}
+#printArea{display:none}
+@media print{
+ body{background:#fff;display:block}
+ #app,.bar,#toast,.modal,#busy{display:none!important}
+ #printArea{display:block}
+ #printArea img{width:100%;display:block;page-break-after:always}
+ @page{size:A4;margin:0}
+}
+</style>
+</head><body>
+<div id="app">
+<header class="top">
+ <div class="hd">
+  <div class="brand"><span class="mark">양</span>더양식 <small>KTS 원클릭</small></div>
+  <span class="sp"></span>
+  <button class="keyb" id="keyBtn">AI 열쇠 · 없음</button>
+ </div>
+ <nav class="steps" id="steps">
+  <button data-s="1"><i></i>등록</button><button data-s="2"><i></i>빈칸 지정</button><button data-s="3"><i></i>값 입력</button><button data-s="4"><i></i>미리보기</button><button data-s="5"><i></i>내보내기</button>
+ </nav>
+</header>
+<main>
+<!-- ① 등록 -->
+<section class="scr" id="s1">
+ <div class="hero">
+  <span class="tag">한 번 등록 · 계속 재사용</span>
+  <h1>종이 양식 사진 한 장,<br><b>다음부터는 값만 채우면 끝</b></h1>
+  <p>거래명세서·견적서·계약서처럼 매번 처음부터 만들던 양식을 내 전용 양식으로 등록해 두세요. 사진과 값은 이 기기 안에만 저장됩니다.</p>
+ </div>
+ <div class="card">
+  <h2><span class="n">1</span>새 양식 사진 등록</h2>
+  <p class="sub">종이를 어두운 바닥에 놓고 찍으면 기울기와 테두리를 자동으로 바로잡아 배경으로 깝니다.</p>
+  <div class="row"><button class="btn pri" id="pickBtn">양식 사진 찍기 · 고르기</button></div>
+  <input type="file" id="photoIn" accept="image/*" hidden>
+  <div id="regBox" style="display:none">
+   <div class="stage" id="regStage"><canvas id="regCv"></canvas></div>
+   <div class="seg" id="regSeg"><button data-v="fix" class="on">보정 후</button><button data-v="raw">보정 전</button></div>
+   <p class="kv" id="regInfo"></p>
+  </div>
+ </div>
+ <div class="card">
+  <h2><span class="n">2</span>내 양식 목록</h2>
+  <p class="sub">기본 양식 5종은 열쇠 없이 바로 씁니다. 복제하면 내 전용 양식으로 고쳐 쓸 수 있습니다.</p>
+  <div class="flist" id="formList"></div>
+ </div>
+</section>
+
+<!-- ② 빈칸 지정 -->
+<section class="scr" id="s2">
+ <div class="card">
+  <h2><span class="n">2</span>채울 자리 찍기</h2>
+  <p class="sub" id="s2tip">미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.</p>
+  <div class="tools">
+   <button class="pl" id="addF" title="칸 추가">+</button><button class="pl" id="delF" title="칸 삭제">−</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
+  </div>
+  <div class="stage" id="edStage"></div>
+  <div id="fEdit" style="display:none">
+   <label class="lb">이름표<em>예: 성명 · 금액 · 날짜</em></label>
+   <input id="fLabel" maxlength="30">
+   <label class="lb">성격</label>
+   <div class="seg" id="fType"><button data-v="text">글자</button><button data-v="number">숫자</button><button data-v="date">날짜</button><button data-v="sign">서명</button></div>
+  </div>
+  <p class="kv" id="fCount"></p>
+ </div>
+ <div class="card">
+  <h2><span class="n">+</span>AI로 빈칸 자동 찾기 <small style="font-size:10.5px;color:var(--gray);font-weight:700">(내 제미나이 무료 열쇠 필요)</small></h2>
+  <p class="sub">열쇠가 있으면 사진 속 빈칸과 이름표를 자동으로 찍고, 한글·엑셀용 문서 틀까지 읽어 둡니다. 열쇠가 없어도 손으로 찍어 그대로 쓸 수 있습니다.</p>
+  <div class="row"><button class="btn sec sm" id="aiFind">AI 자동 인식</button></div>
+ </div>
+ <div class="card">
+  <label class="lb" style="margin-top:0">양식 이름</label>
+  <input id="formName" maxlength="40" placeholder="예: 우리 가게 거래명세서">
+ </div>
+</section>
+
+<!-- ③ 값 입력 -->
+<section class="scr" id="s3">
+ <div class="card">
+  <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
+  <p class="sub">입력한 값은 이 기기에 자동 저장됩니다. 칸을 누른 뒤 음성으로도 넣을 수 있습니다.</p>
+  <div class="row"><button class="btn sec sm" id="voiceBtn">음성 메모로 넣기</button><button class="btn sec sm" id="handBtn">손글씨 사진 읽기</button></div>
+  <input type="file" id="handIn" accept="image/*" hidden>
+  <div id="valList"></div>
+  <div class="row"><button class="btn sec sm" id="clearVals">값 모두 지우기</button><button class="btn sec sm" id="sampleVals">예시 값 넣기</button></div>
+ </div>
+</section>
+
+<!-- ④ 미리보기 -->
+<section class="scr" id="s4">
+ <div class="card">
+  <h2><span class="n">4</span>미리보기</h2>
+  <p class="sub">종이 위에 값이 얹힌 모습 그대로 인쇄·PDF로 나갑니다.</p>
+  <canvas class="pv" id="pvCv"></canvas>
+ </div>
+</section>
+
+<!-- ⑤ 내보내기 -->
+<section class="scr" id="s5">
+ <div class="card">
+  <h2><span class="n">5</span>내보내기</h2>
+  <p class="sub">파일은 이 기기 안에서 만들어집니다. 서버로 올라가지 않습니다.</p>
+  <label class="lb">파일 이름</label>
+  <input id="outName">
+  <div class="flist">
+   <button class="btn pri" id="exHwpx">한글 파일(.hwpx) 저장</button>
+   <button class="btn pri" id="exXlsx">엑셀 파일(.xlsx) 저장</button>
+   <button class="btn sec" id="exPrint">인쇄 · PDF 저장</button>
+  </div>
+  <p class="kv" id="exInfo">저장한 파일은 더뷰(<a href="viewer.html">viewer.html</a>)로 바로 열어 확인할 수 있습니다.</p>
+ </div>
+</section>
+
+<!-- 60초 문의 -->
+<section class="card qa" id="qa">
+ <h2><span class="n">?</span>60초 문의</h2>
+ <p class="sub">원하는 양식을 알려 주시면 기본 양식으로 넣어 드립니다. 남긴 내용은 이 기기에 보관되고, 담당자가 확인한 뒤 연락드립니다.</p>
+ <label class="lb">이름</label><input id="qName" maxlength="20">
+ <label class="lb">연락처</label><input id="qTel" maxlength="30" inputmode="tel" placeholder="010-0000-0000">
+ <label class="lb">문의 내용</label><textarea id="qMsg" rows="3" maxlength="500" placeholder="예: 우리 업종 납품확인서 양식도 넣어 주세요"></textarea>
+ <div class="row"><button class="btn sec sm" id="qMake">답장 초안 만들기</button><button class="btn sec sm" id="qSave">승인 대기에 담기</button></div>
+ <div class="draft" id="qDraft"></div>
+ <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
+</section>
+<p class="foot">더양식 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
+</main>
+<div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
+</div>
+
+<div class="modal" id="keyModal"><div class="sheet">
+ <h2 style="font-size:15px;font-weight:900">내 제미나이 무료 열쇠</h2>
+ <p class="kv">손글씨 판독·빈칸 자동 인식에만 씁니다. 열쇠는 이 기기 브라우저에만 저장되고, 구글 제미나이 외 어디로도 보내지 않습니다. 열쇠가 없어도 기본 양식과 손으로 찍은 양식은 끝까지 쓸 수 있습니다.</p>
+ <label class="lb">열쇠(AIza…)</label><input id="keyIn" autocomplete="off" spellcheck="false">
+ <div class="row"><button class="btn sec sm" id="keyDel">지우기</button><button class="btn pri sm" id="keySave">이 기기에 저장</button></div>
+ <div class="row"><button class="btn sec sm" id="keyClose">닫기</button></div>
+</div></div>
+<div id="busy"><div id="busyT">처리 중…</div></div>
+<div id="toast"></div>
+<div id="printArea"></div>
+<script src="freekey.js" onerror="window.KTS_FREE=null"></script>
+<script src="ai.js" onerror="window.KTS_AI={key:''}"></script>
+<script>
+/* ===== 아래 엔진은 oneclick/converter.html 에서 그대로 가져온 복사본입니다(수정 금지·동기화 대상) ===== */
+const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
+/* ================= 사진 → 구조(JSON) ================= */
+/* 문서 전체 1:1 복제 — 표 하나가 아니라 사진 속 종이 한 장의 모든 요소를 위→아래 순서로 읽는다 */
+const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
+사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
+아래 형식의 JSON만 출력하세요. 다른 말은 절대 쓰지 마세요.
+
+{"blocks":[블록, 블록, ...]}
+
+블록은 두 종류입니다.
+1) 표 블록
+{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+ "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
+2) 글 블록(제목 배너·문단·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
+{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,
+ "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
+
+규칙:
+- x, w는 종이(문서 본문) 전체 너비를 100으로 본 가로 위치·너비입니다. 가운데 놓인 것은 좌우 여백이 같게.
+- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0.
+- 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
+- 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
+- 문단 안에서 색이 바뀌는 부분(빨간 글씨 등)은 runs를 나눠 color를 적으세요. 검정 글씨는 color 빈칸.
+- 노란 형광펜이 칠해진 글은 형광펜에 그 색(#FFFF00 등)을, 밑줄 친 글은 밑줄에 밑줄 색을 적으세요.
+- 본문 글자 크기는 10을 기준으로 상대 크기를 적으세요(작은 글 9, 큰 제목 22 등).
+- '- 아 래 -' 같은 가운데 한 줄, 하단 날짜, 회사명·직인 문구도 각각 글 블록으로 넣으세요. 로고 그림은 그 안의 글자만 적으세요.
+- 문단은 원본의 줄바꿈이 아니라 문단 단위로 한 블록에 이어 적으세요(띄어쓰기는 원본대로).
+- 표: nRows/nCols는 병합을 포함한 전체 격자. colWidths 길이 = nCols. cells는 병합 안 된 칸마다 하나씩(빈 칸 포함). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
+- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸). 칸 전체가 색 글씨면 color에 적으세요.
+- 한 칸 안에서 일부 글자만 색이 다르면(예: "…, 화물 1호기"의 '화물 1호기'만 빨강) 그 칸 배열 끝(12번째)에 runs를 붙이세요: [["인승 1~4호기, 비상 1호기, ",0,"","",""],["화물 1호기",0,"#C00000","",""]]. runs 글자를 이으면 5번째 "글자"와 같아야 합니다.
+- 숫자만 든 칸은 align "C". 긴 목록·설명 칸은 align "L". num은 금액·수량처럼 계산하는 숫자면 1(날짜·전화번호는 0).
+- 글자는 사진에 보이는 그대로. 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로. 없는 글자 절대 지어내지 마세요.
+- 사진 밖 배경(벽지·액자·게시판)은 무시하세요.
+- 압축된 JSON(줄바꿈/공백 없이)으로 출력하세요.`;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function fileToImage(file, maxSide){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(im.width, im.height));
+      const w = Math.max(1, Math.round(im.width * s)), h = Math.max(1, Math.round(im.height * s));
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(im, 0, 0, w, h);
+      const data = cv.toDataURL('image/jpeg', 0.92).split(',')[1];
+      URL.revokeObjectURL(url); res({data, w, h, preview: im.src});
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('사진을 열지 못했습니다')); };
+    im.src = url;
+  });
+}
+
+async function visionStruct(file, onStep){
+  const cfg = window.KTS_AI || {};
+  let key = cfg.key || '';
+  try{ key = localStorage.getItem('kts_ai_key') || key; }catch(e){}
+  if (!key || /^__/.test(key)) throw new Error('NO_KEY');
+  const img = await fileToImage(file, cfg.maxSide || 1800);
+  onStep && onStep('사진을 정리했습니다 · AI에게 보내는 중…', 26);
+  const models = cfg.models || ['gemini-3.5-flash'];
+  let lastErr = null, quotaHit = false;
+  for (const model of models){
+    for (let attempt = 0; attempt < 2; attempt++){
+    try{
+      const body = {contents:[{parts:[{text:PROMPT},{inline_data:{mime_type:'image/jpeg', data:img.data}}]}],
+        generationConfig:{responseMimeType:'application/json', temperature:0, maxOutputTokens:65535}};
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
+      const r = await fetch(cfg.endpoint + model + ':generateContent?key=' + encodeURIComponent(key),
+        {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
+      clearTimeout(to);
+      if (r.status === 429){ quotaHit = true; lastErr = new Error('QUOTA'); await sleep(1500); break; }
+      if (r.status === 503 || r.status === 500){ lastErr = new Error('AI_BUSY'); await sleep(800); break; }
+      if (!r.ok){ lastErr = new Error('AI ' + r.status); break; }
+      const j = await r.json();
+      const txt = (((j.candidates || [])[0] || {}).content || {}).parts?.[0]?.text || '';
+      const raw = parseJsonLoose(txt);
+      const st0 = raw ? docFromRaw(raw, img.preview) : null;
+      if (!st0) { lastErr = new Error('AI가 표를 찾지 못했습니다'); continue; }
+      onStep && onStep('문서 전체 구조를 정리하는 중…', 78);
+      return st0;
+    }catch(e){ lastErr = e; }
+    }
+  }
+  if (quotaHit) throw new Error('QUOTA');
+  throw lastErr || new Error('AI 변환에 실패했습니다');
+}
+function parseJsonLoose(txt){
+  let t = String(txt || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  try{ return JSON.parse(t); }catch(e){}
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a >= 0 && b > a){ try{ return JSON.parse(t.slice(a, b + 1)); }catch(e){} }
+  return null;
+}
+/* 병합·겹침·빈칸을 정리해 반드시 '딱 맞는 격자'로 만든다 */
+function normalize(raw, preview){
+  const toObj = c => Array.isArray(c)
+    ? {r:+c[0]||0, c:+c[1]||0, rs:Math.max(1, +c[2]||1), cs:Math.max(1, +c[3]||1),
+       text:String(c[4] == null ? '' : c[4]), bold:!!+c[5],
+       align:(c[6] === 'L' || c[6] === 'left') ? 'L' : ((c[6] === 'R' || c[6] === 'right') ? 'R' : 'C'),
+       bg:normHex(c[7]), color:normHex(c[8]), num:!!+c[9], nb:!!+c[10], runs:normRuns(c[11])}
+    : {r:+c.r||0, c:+c.c||0, rs:Math.max(1, +(c.rowSpan||1)), cs:Math.max(1, +(c.colSpan||1)),
+       text:String(c.text == null ? '' : c.text), bold:!!c.bold,
+       align:(c.align === 'left' || c.align === 'L') ? 'L' : ((c.align === 'right' || c.align === 'R') ? 'R' : 'C'),
+       bg:normHex(c.bg), color:normHex(c.color), num:!!c.num, nb:!!c.nb, runs:normRuns(c.runs)};
+  let cells = (raw.cells || []).map(toObj).filter(c => c.r >= 0 && c.c >= 0);
+  let nRows = Math.max(1, +raw.nRows || 1), nCols = Math.max(1, +raw.nCols || 1);
+  cells.forEach(c => { nRows = Math.max(nRows, c.r + c.rs); nCols = Math.max(nCols, c.c + c.cs); });
+  // 열 너비
+  let cw = (raw.colWidths || []).map(x => Math.max(0, Math.round(+x || 0)));
+  if (cw.length !== nCols){
+    const tmp = []; for (let i = 0; i < nCols; i++) tmp.push(cw[i] || Math.round(100 / nCols));
+    cw = tmp;
+  }
+  let sum = cw.reduce((a, b) => a + b, 0) || 1;
+  cw = cw.map(w => Math.max(2, Math.round(w / sum * 1000) / 10));
+  // 격자 채우기(겹치면 잘라내고, 빈칸은 빈 셀)
+  cells.sort((a, b) => a.r - b.r || a.c - b.c);
+  const occ = Array.from({length: nRows}, () => new Array(nCols).fill(false));
+  const out = [];
+  for (const c of cells){
+    if (c.r >= nRows || c.c >= nCols) continue;
+    let cs = 1, rs = 1;
+    while (c.c + cs < nCols && !occ[c.r][c.c + cs] && cs < c.cs) cs++;
+    while (c.r + rs < nRows && !occ[c.r + rs][c.c] && rs < c.rs) rs++;
+    let free = true;
+    for (let r = c.r; r < c.r + rs && free; r++) for (let k = c.c; k < c.c + cs; k++) if (occ[r][k]) { free = false; break; }
+    if (!free) continue;
+    for (let r = c.r; r < c.r + rs; r++) for (let k = c.c; k < c.c + cs; k++) occ[r][k] = true;
+    const o = {r:c.r, c:c.c, rs, cs, text:c.text, bold:c.bold, align:c.align, bg:c.bg, color:c.color, num:c.num};
+    if (c.nb) o.nb = true;
+    if (c.runs && c.runs.length > 1){ o.runs = c.runs; o.text = c.runs.map(x => x.text).join(''); }
+    out.push(o);
+  }
+  for (let r = 0; r < nRows; r++) for (let c = 0; c < nCols; c++){
+    if (!occ[r][c]) out.push({r, c, rs:1, cs:1, text:'', bold:false, align:'C', bg:'', color:'', num:false});
+  }
+  out.sort((a, b) => a.r - b.r || a.c - b.c);
+  // 열이 너무 좁아 '5/13' 같은 값이 두 줄로 쪼개지는 것 방지: 가장 긴 토큰 기준으로 최소 폭 확보
+  const minW = new Array(nCols).fill(0);
+  out.forEach(c => {
+    if (c.cs !== 1) return;
+    const toks = String(c.text || '').split(/\s+/).filter(Boolean);
+    const len = toks.length ? Math.max(...toks.map(t => t.length)) : 0;
+    minW[c.c] = Math.max(minW[c.c], Math.min(14, Math.max(3.5, len * 1.55)));
+  });
+  if (!raw.lockWidths) cw = cw.map((w, i) => Math.max(w, minW[i]));   /* 사진에서 읽은 원본 너비는 잠근다 */
+  const tot2 = cw.reduce((a, b) => a + b, 0) || 1;
+  cw = cw.map(w => Math.round(w / tot2 * 1000) / 10);
+  const st = {title:String(raw.title || '').trim(), nRows, nCols, colWidths:cw, cells:out, preview};
+  /* 실제 글자 폭(9pt)으로 다시 한 번 맞춤 — 미리보기·한글·엑셀이 같은 너비를 쓰게 */
+  if (raw.lockWidths) st.lockWidths = true;   /* 사진에서 읽은 원본 열 너비를 그대로 고정 */
+  else { try{ st.colWidths = fitColWidths(st, 41952); }catch(e){} }
+  return st;
+}
+function normHex(v){ const s = String(v || '').trim(); return /^#[0-9a-f]{6}$/i.test(s) ? s.toUpperCase() : ''; }
+
+/* ================= 문서 전체(배너·문단·작은 표·메인 표·서명) ================= */
+/* 글 조각(run): {text, b, color, hl(형광펜), ul(밑줄 색)} — 같은 모양이 이어지면 하나로 합친다 */
+function normRuns(a){
+  if (!Array.isArray(a)) return null;
+  const ulOf = v => normHex(v) || ((v === 1 || v === '1' || v === true) ? '#000000' : '');
+  const out = [];
+  a.forEach(x => {
+    if (Array.isArray(x)) out.push({text:String(x[0] == null ? '' : x[0]), b:!!+x[1], color:normHex(x[2]), hl:normHex(x[3]), ul:ulOf(x[4])});
+    else if (x && typeof x === 'object') out.push({text:String(x.text == null ? '' : x.text), b:!!(x.b || x.bold), color:normHex(x.color), hl:normHex(x.hl || x.highlight), ul:ulOf(x.ul || x.underline)});
+    else if (typeof x === 'string') out.push({text:x, b:false, color:'', hl:'', ul:''});
+  });
+  const m = [];
+  out.filter(r => r.text !== '').forEach(r => {
+    const p = m[m.length - 1];
+    if (p && p.b === r.b && p.color === r.color && p.hl === r.hl && p.ul === r.ul) p.text += r.text; else m.push(r);
+  });
+  return m;
+}
+function clampPct(v, d){ const n = +v; return isFinite(n) ? Math.max(0, Math.min(100, n)) : d; }
+function placeXW(b){
+  let x = clampPct(b.x, 0), w = clampPct(b.w, 100);
+  if (w < 5) w = 100;
+  if (x + w > 100) x = Math.max(0, 100 - w);
+  return {x: Math.round(x * 10) / 10, w: Math.round(w * 10) / 10};
+}
+/* AI 결과 → 구조. st 자체는 '메인 표'(편집 화면이 그대로 쓰는 표)이고, st.doc 에 종이 전체 순서가 담긴다 */
+function docFromRaw(raw, preview){
+  if (!raw || typeof raw !== 'object') return null;
+  if (!Array.isArray(raw.blocks)){                       /* 예전 형식(표 하나) */
+    if (!raw.cells || !raw.cells.length) return null;
+    return normalize(raw, preview);
+  }
+  const blocks = raw.blocks.filter(b => b && typeof b === 'object');
+  const isTbl = b => (b.t || b.type) === 'table' && Array.isArray(b.cells) && b.cells.length;
+  const tables = blocks.filter(isTbl);
+  const main = tables.find(b => +b.main === 1) || tables.slice().sort((a, b) => b.cells.length - a.cells.length)[0] || null;
+  const doc = []; let st = null, textN = 0;
+  for (const b of blocks){
+    const t = b.t || b.type;
+    if (t === 'table'){
+      if (!isTbl(b)) continue;
+      const p = placeXW(b);
+      if (b === main){ st = normalize(b, preview); doc.push({t:'table', main:true, x:p.x, w:p.w}); }
+      else doc.push({t:'table', x:p.x, w:p.w, tbl:normalize(Object.assign({}, b, {lockWidths:true}), '')});
+    } else if (t === 'text'){
+      let runs = normRuns(b.runs);
+      if ((!runs || !runs.length) && b.text) runs = [{text:String(b.text), b:!!+b.bold, color:normHex(b.color), hl:'', ul:''}];
+      runs = runs || [];
+      let size = +b.size; if (!isFinite(size) || size <= 0) size = 10; size = Math.max(7, Math.min(32, size));
+      const al = String(b.align || 'L').toUpperCase().charAt(0);
+      const p = placeXW(b);
+      if (runs.length) textN++;
+      doc.push({t:'text', runs, align:al === 'C' ? 'C' : (al === 'R' ? 'R' : 'L'), size, bg:normHex(b.bg), x:p.x, w:p.w});
+    }
+  }
+  if (!st){
+    if (!textN) return null;
+    /* 표가 없는 문서 — 글만 복제한다(메인 표 자리는 비워 둔다) */
+    st = normalize({nRows:1, nCols:1, colWidths:[100], cells:[[0, 0, 1, 1, '', 0, 'C', '', '', 0]]}, preview);
+    st._noMain = true;
+  }
+  st.title = '';
+  st.doc = doc;
+  return st;
+}
+function docCounts(st){
+  const d = (st && st.doc) || [];
+  return {tables: d.filter(b => b.t === 'table').length, texts: d.filter(b => b.t === 'text' && b.runs.length).length,
+    colors: [...new Set(docColors(st))]};
+}
+/* 문서에 쓰인 색(배경·글자·형광펜·밑줄)을 모두 모은다 — 검증·안내용 */
+function docColors(st){
+  const out = [];
+  const addCell = c => { if (c.bg) out.push(c.bg); if (c.color) out.push(c.color); (c.runs || []).forEach(r => { if (r.color) out.push(r.color); if (r.hl) out.push(r.hl); }); };
+  (st.cells || []).forEach(addCell);
+  ((st && st.doc) || []).forEach(b => {
+    if (b.t === 'text'){ if (b.bg) out.push(b.bg); b.runs.forEach(r => { if (r.color) out.push(r.color); if (r.hl) out.push(r.hl); if (r.ul) out.push(r.ul); }); }
+    else if (b.tbl) b.tbl.cells.forEach(addCell);
+  });
+  return out;
+}
+/* ================= 글꼴 (원본과 같게, 없으면 유사 폰트) ================= */
+const FONT_ALIAS = {'HY신명조':'바탕', 'HY중고딕':'돋움', '한컴바탕':'바탕', '새바탕':'바탕',
+  '한컴돋움':'돋움', '새돋움':'돋움', '맑은고딕':'맑은 고딕', 'Malgun Gothic':'맑은 고딕'};
+let CUR_FONT = '';
+function hwFont(xml, face){
+  if (!face) return xml;
+  xml = xml.replace(/<hh:fontface lang="([A-Z]+)" fontCnt="1">(<hh:font id="0"[^>]*\/>)<\/hh:fontface>/g,
+    (m, lang, f0) => `<hh:fontface lang="${lang}" fontCnt="2">${f0}<hh:font id="1" face="${face}" type="TTF" isEmbedded="0"/></hh:fontface>`);
+  xml = xml.replace(/<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"\/>/,
+    '<hh:fontRef hangul="1" latin="1" hanja="1" japanese="1" other="1" symbol="0" user="0"/>');
+  return xml;
+}
+
+/* ================= ZIP (store/deflate-raw) ================= */
+const CRC_TABLE = (() => { const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+  return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+async function deflateRaw(u8){
+  if (typeof CompressionStream === 'undefined') return null;
+  try{ const cs = new CompressionStream('deflate-raw');
+    return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(cs)).arrayBuffer());
+  }catch(e){ return null; }
+}
+async function makeZip(entries){
+  const enc = new TextEncoder(), chunks = [], central = []; let offset = 0;
+  for (const e of entries){
+    const nameBytes = enc.encode(e.name);
+    const data = typeof e.data === 'string' ? enc.encode(e.data) : e.data;
+    const crc = crc32(data);
+    let payload = data, method = 0;
+    if (!e.store){ const d = await deflateRaw(data); if (d && d.length < data.length){ payload = d; method = 8; } }
+    const lh = new Uint8Array(30 + nameBytes.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0, true);
+    dv.setUint16(8, method, true); dv.setUint16(10, 0, true); dv.setUint16(12, 0x2100, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, payload.length, true); dv.setUint32(22, data.length, true);
+    dv.setUint16(26, nameBytes.length, true); lh.set(nameBytes, 30);
+    chunks.push(lh, payload);
+    const ch = new Uint8Array(46 + nameBytes.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(10, method, true); cv.setUint16(14, 0x2100, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, payload.length, true); cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true); cv.setUint32(42, offset, true); ch.set(nameBytes, 46);
+    central.push(ch); offset += lh.length + payload.length;
+  }
+  const cs = central.reduce((a, b) => a + b.length, 0);
+  const eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, entries.length, true); ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cs, true); ev.setUint32(16, offset, true);
+  return new Blob([...chunks, ...central, eocd], {type:'application/zip'});
+}
+const xmlEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const colName = c => { let s = '', n = c + 1; while (n > 0){ const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+
+/* ================= XLSX (병합·색·테두리·정렬·숫자) ================= */
+function buildXlsx(st){
+  if (st.doc) return buildXlsxDoc(st);   /* 종이 전체(배너·문단·작은 표·서명)를 한 시트에 */
+  const fonts = [{b:false, color:''}], fills = ['', ''], borders = [false, true], xfs = [], numFmts = [];
+  const fidx = (b, color) => { const k = (b ? 1 : 0) + '|' + color; let i = fonts.findIndex(f => (f.b ? 1 : 0) + '|' + f.color === k); if (i < 0){ fonts.push({b, color}); i = fonts.length - 1; } return i; };
+  const gidx = bg => { if (!bg) return 0; let i = fills.indexOf(bg.toUpperCase()); if (i < 0){ fills.push(bg.toUpperCase()); i = fills.length - 1; } return i; };
+  const xf = (font, fill, border, align, numFmt) => {
+    const k = [font, fill, border, align, numFmt].join(';');
+    let i = xfs.findIndex(x => x.k === k);
+    if (i < 0){ xfs.push({k, font, fill, border, align, numFmt}); i = xfs.length - 1; }
+    return i;
+  };
+  xf(0, 0, 0, '', 0); // 0 = 기본
+  const totalW = 104; // A4 세로에 맞는 대략적 폭(문자 단위)
+  let colsXml = '<cols>' + st.colWidths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${Math.max(6, Math.round(w / 100 * totalW * 10) / 10)}" customWidth="1"/>`).join('') + '</cols>';
+  const rowsXml = [];
+  for (let r = 0; r < st.nRows; r++){
+    const rowCells = st.cells.filter(c => c.r === r).sort((a, b) => a.c - b.c);
+    let sx = `<row r="${r + 1}">`;
+    for (const c of rowCells){
+      const ref = colName(c.c) + (r + 1);
+      const txt = String(c.text || '');
+      let t = null, v = null, nf = 0;
+      if (c.num && XLET.test(txt.replace(/\s/g, ''))){
+        const cur = /^[₩$]/.test(txt.trim());
+        const raw = txt.replace(/[₩$,\s]/g, '');
+        if (raw !== '' && !isNaN(+raw)){ t = 'n'; v = raw; nf = cur ? 164 : 3; }
+      }
+      const s = xf(fidx(!!c.bold, c.color), gidx(c.bg), 1, c.align, nf);
+      if (t === 'n') sx += `<c r="${ref}" s="${s}"><v>${v}</v></c>`;
+      else if (txt !== '') sx += `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`;
+      else sx += `<c r="${ref}" s="${s}"/>`;
+    }
+    sx += '</row>'; rowsXml.push(sx);
+  }
+  let mergeXml = '';
+  const mg = st.cells.filter(c => c.rs > 1 || c.cs > 1)
+    .map(c => colName(c.c) + (c.r + 1) + ':' + colName(c.c + c.cs - 1) + (c.r + c.rs));
+  if (mg.length) mergeXml = `<mergeCells count="${mg.length}">` + mg.map(m => `<mergeCell ref="${m}"/>`).join('') + '</mergeCells>';
+  const lastRef = colName(st.nCols - 1) + st.nRows;
+  const sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + `<dimension ref="A1:${lastRef}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="17"/>`
+    + colsXml + '<sheetData>' + rowsXml.join('') + '</sheetData>' + mergeXml
+    + '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/></worksheet>';
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    + '<Default Extension="xml" ContentType="application/xml"/>'
+    + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+    + '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+    + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+    + '</Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheets><sheet name="표" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbrels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+    + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const fontsXml = fonts.map(f => `<font>${f.b ? '<b/>' : ''}${f.color ? `<color rgb="FF${f.color.replace('#', '')}"/>` : ''}<sz val="11"/><name val="맑은 고딕"/><family val="2"/></font>`).join('');
+  const fillsXml = fills.map((bg, i) => i === 0 ? '<fill><patternFill patternType="none"/></fill>' : (i === 1 ? '<fill><patternFill patternType="gray125"/></fill>' : `<fill><patternFill patternType="solid"><fgColor rgb="FF${bg.replace('#', '')}"/><bgColor indexed="64"/></patternFill></fill>`)).join('');
+  const bordersXml = borders.map(b => b
+    ? '<border><left style="thin"><color rgb="FF333333"/></left><right style="thin"><color rgb="FF333333"/></right><top style="thin"><color rgb="FF333333"/></top><bottom style="thin"><color rgb="FF333333"/></bottom><diagonal/></border>'
+    : '<border><left/><right/><top/><bottom/><diagonal/></border>').join('');
+  const xfsXml = xfs.map(x => {
+    const al = x.align ? `<alignment horizontal="${x.align === 'L' ? 'left' : (x.align === 'R' ? 'right' : 'center')}" vertical="center" wrapText="1"/>` : '<alignment vertical="center" wrapText="1"/>';
+    return `<xf numFmtId="${x.numFmt}" fontId="${x.font}" fillId="${x.fill}" borderId="${x.border}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1">${al}</xf>`;
+  }).join('');
+  const customFmts = '<numFmt numFmtId="164" formatCode="&quot;₩&quot;#,##0"/>';
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + `<numFmts count="1">${customFmts}</numFmts>`
+    + `<fonts count="${fonts.length}">${fontsXml}</fonts>`
+    + `<fills count="${fills.length}">${fillsXml}</fills>`
+    + `<borders count="${borders.length}">${bordersXml}</borders>`
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + `<cellXfs count="${xfs.length}">${xfsXml}</cellXfs>`
+    + '</styleSheet>';
+  return [
+    {name:'[Content_Types].xml', data:ct},
+    {name:'_rels/.rels', data:rels},
+    {name:'xl/workbook.xml', data:wb},
+    {name:'xl/_rels/workbook.xml.rels', data:wbrels},
+    {name:'xl/styles.xml', data:styles},
+    {name:'xl/worksheets/sheet1.xml', data:sheet}
+  ];
+}
+
+/* ================= XLSX — 문서 전체(시트 위아래에 제목 배너·본문·강조색·작은 표·서명까지) ================= */
+/* 모든 표의 열 경계를 하나의 격자로 합쳐, 작은 표·메인 표·문단이 한 시트에서 원본 위치 그대로 놓이게 한다 */
+function buildXlsxDoc(st){
+  const PW = 41952;
+  const tbls = [];
+  st.doc.forEach(b => {
+    if (b.t !== 'table') return;
+    if (b.main){ if (!st._noMain) tbls.push({tst:st, x:b.x || 0, w:b.w || 100, main:true}); }
+    else tbls.push({tst:b.tbl, x:b.x || 0, w:b.w || 100});
+  });
+  const edges = t => { const out = [t.x]; let acc = t.x; t.tst.colWidths.forEach(cw => { acc += cw * t.w / 100; out.push(acc); }); return out; };
+  /* 1) 열 경계 합치기(메인 표 먼저 — 1.2% 안쪽으로 붙은 경계는 하나로) */
+  const bounds = [0, 100];
+  const addB = v => { v = Math.max(0, Math.min(100, v)); if (!bounds.some(b => Math.abs(b - v) < 1.2)) bounds.push(v); };
+  tbls.filter(t => t.main).concat(tbls.filter(t => !t.main)).forEach(t => edges(t).forEach(addB));
+  bounds.sort((a, b) => a - b);
+  const NC = bounds.length - 1;
+  const snap = v => { let bi = 0, bd = 1e9; bounds.forEach((b, i) => { const d = Math.abs(b - v); if (d < bd){ bd = d; bi = i; } }); return bi; };
+  tbls.forEach(t => {
+    const ix = edges(t).map(snap);
+    for (let k = 1; k < ix.length; k++) if (ix[k] <= ix[k - 1]) ix[k] = Math.min(NC, ix[k - 1] + 1);
+    t.ix = ix;
+  });
+  /* 2) 스타일 표 */
+  const fonts = [{b:false, color:'', sz:11, u:false}], fills = ['', ''], xfs = [];
+  const fidx = (b, color, sz, u) => {
+    const k = [b ? 1 : 0, color || '', sz || 11, u ? 1 : 0].join('|');
+    let i = fonts.findIndex(f => [f.b ? 1 : 0, f.color || '', f.sz, f.u ? 1 : 0].join('|') === k);
+    if (i < 0){ fonts.push({b:!!b, color:color || '', sz:sz || 11, u:!!u}); i = fonts.length - 1; }
+    return i;
+  };
+  const gidx = bg => { if (!bg) return 0; const u = bg.toUpperCase(); let i = fills.indexOf(u); if (i < 0){ fills.push(u); i = fills.length - 1; } return i; };
+  const xf = (font, fill, border, align, numFmt) => {
+    const k = [font, fill, border, align, numFmt].join(';');
+    let i = xfs.findIndex(x => x.k === k);
+    if (i < 0){ xfs.push({k, font, fill, border, align, numFmt}); i = xfs.length - 1; }
+    return i;
+  };
+  xf(0, 0, 0, '', 0);
+  const rich = (runs, base) => runs.map(r => {
+    const b = base.b || r.b, color = r.color || base.color, sz = base.sz;
+    return '<r><rPr>' + (b ? '<b/>' : '') + (r.ul ? '<u/>' : '') + `<sz val="${sz}"/>`
+      + (color ? `<color rgb="FF${color.replace('#', '')}"/>` : '') + '<rFont val="맑은 고딕"/><family val="2"/></rPr>'
+      + `<t xml:space="preserve">${xmlEsc(r.text)}</t></r>`;
+  }).join('');
+  /* 3) 행 만들기 */
+  const grid = [];      /* grid[row] = {cells:{col:xml}, ht} */
+  const merges = [];
+  let R = 0;
+  const putRow = () => { grid[R] = grid[R] || {cells:{}, ht:0}; return grid[R]; };
+  const charsPerLine = sz => Math.max(8, Math.floor(104 / (sz / 11) / 1.9));   /* 한글 한 글자 ≈ 엑셀 1.9칸 */
+  st.doc.forEach(b => {
+    if (b.t === 'text'){
+      const row = putRow();
+      const sz = Math.max(8, Math.round(b.size * 1.1));
+      const txt = b.runs.map(r => r.text).join('');
+      if (!txt){ row.ht = 9; R++; return; }
+      const hlChars = b.runs.filter(r => r.hl).reduce((a, r) => a + r.text.length, 0);
+      const hl = b.runs.find(r => r.hl);
+      const fillBg = b.bg || (hl && hlChars >= txt.length * 0.6 ? hl.hl : '');
+      const uniform = b.runs.length === 1 && !b.runs[0].ul;
+      const f0 = uniform ? fidx(b.runs[0].b, b.runs[0].color, sz, false) : fidx(false, '', sz, false);
+      const s = xf(f0, gidx(fillBg), 0, b.align, 0);
+      const c0 = snap(b.x || 0), c1 = Math.max(c0, snap((b.x || 0) + (b.w || 100)) - 1);
+      const ref = colName(c0) + (R + 1);
+      row.cells[c0] = uniform
+        ? `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`
+        : `<c r="${ref}" s="${s}" t="inlineStr"><is>${rich(b.runs, {b:false, color:'', sz})}</is></c>`;
+      for (let k = c0 + 1; k <= c1; k++) row.cells[k] = `<c r="${colName(k) + (R + 1)}" s="${s}"/>`;
+      if (c1 > c0) merges.push(ref + ':' + colName(c1) + (R + 1));
+      const span = Math.max(0.1, ((b.w || 100)) / 100);
+      const lines = Math.max(1, Math.ceil(txt.length / (charsPerLine(sz) * span)));
+      row.ht = Math.round(lines * sz * 1.45 + (b.bg ? 14 : 5));
+      R++;
+      return;
+    }
+    if (b.t !== 'table') return;
+    const t = tbls.find(x => (b.main ? x.main : x.tst === b.tbl));
+    if (!t) return;
+    const tst = t.tst;
+    const tw = PW * t.w / 100;
+    const widthsH = tst.colWidths.map(w => tw * w / 100);
+    for (let r = 0; r < tst.nRows; r++){
+      const row = (grid[R + r] = grid[R + r] || {cells:{}, ht:0});
+      const n = rowLines(tst, r, widthsH, tw);
+      row.ht = Math.max(row.ht, n <= 1 ? 20 : n * 15 + 6);
+    }
+    tst.cells.forEach(c => {
+      const c0 = t.ix[c.c], c1 = Math.max(c0, t.ix[c.c + c.cs] - 1);
+      const r0 = R + c.r, r1 = R + c.r + c.rs - 1;
+      const txt = String(c.text || '');
+      let tN = null, v = null, nf = 0;
+      if (c.num && XLET.test(txt.replace(/\s/g, ''))){
+        const cur = /^[₩$]/.test(txt.trim()), raw = txt.replace(/[₩$,\s]/g, '');
+        if (raw !== '' && !isNaN(+raw)){ tN = 'n'; v = raw; nf = cur ? 164 : 3; }
+      }
+      const s = xf(fidx(!!c.bold, c.color, 11, false), gidx(c.bg), c.nb ? 0 : 1, c.align, nf);
+      const ref = colName(c0) + (r0 + 1);
+      let xml;
+      if (tN === 'n') xml = `<c r="${ref}" s="${s}"><v>${v}</v></c>`;
+      else if (c.runs && c.runs.length) xml = `<c r="${ref}" s="${s}" t="inlineStr"><is>${rich(c.runs, {b:!!c.bold, color:c.color || '', sz:11})}</is></c>`;
+      else if (txt !== '') xml = `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`;
+      else xml = `<c r="${ref}" s="${s}"/>`;
+      for (let y = r0; y <= r1; y++){
+        const row = (grid[y] = grid[y] || {cells:{}, ht:0});
+        for (let k = c0; k <= c1; k++) row.cells[k] = (y === r0 && k === c0) ? xml : `<c r="${colName(k) + (y + 1)}" s="${s}"/>`;   /* 병합 영역 전체에 테두리·배경 */
+      }
+      if (c1 > c0 || r1 > r0) merges.push(ref + ':' + colName(c1) + (r1 + 1));
+    });
+    R += tst.nRows;
+  });
+  const rowsXml = [];
+  for (let r = 0; r < Math.max(1, R); r++){
+    const row = grid[r] || {cells:{}, ht:0};
+    const cols = Object.keys(row.cells).map(Number).sort((a, b) => a - b);
+    rowsXml.push(`<row r="${r + 1}"${row.ht ? ` ht="${row.ht}" customHeight="1"` : ''}>` + cols.map(k => row.cells[k]).join('') + '</row>');
+  }
+  const totalW = 104;
+  const colsXml = '<cols>' + bounds.slice(1).map((b, i) => {
+    const w = Math.max(1.2, Math.round((b - bounds[i]) / 100 * totalW * 10) / 10);
+    return `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`;
+  }).join('') + '</cols>';
+  const mergeXml = merges.length ? `<mergeCells count="${merges.length}">` + merges.map(m => `<mergeCell ref="${m}"/>`).join('') + '</mergeCells>' : '';
+  const lastRef = colName(NC - 1) + Math.max(1, R);
+  const sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+    + `<dimension ref="A1:${lastRef}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="17"/>`
+    + colsXml + '<sheetData>' + rowsXml.join('') + '</sheetData>' + mergeXml
+    + '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>'
+    + '<pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="0"/></worksheet>';
+  const fontsXml = fonts.map(f => `<font>${f.b ? '<b/>' : ''}${f.u ? '<u/>' : ''}<sz val="${f.sz}"/>${f.color ? `<color rgb="FF${f.color.replace('#', '')}"/>` : ''}<name val="맑은 고딕"/><family val="2"/></font>`).join('');
+  const fillsXml = fills.map((bg, i) => i === 0 ? '<fill><patternFill patternType="none"/></fill>' : (i === 1 ? '<fill><patternFill patternType="gray125"/></fill>' : `<fill><patternFill patternType="solid"><fgColor rgb="FF${bg.replace('#', '')}"/><bgColor indexed="64"/></patternFill></fill>`)).join('');
+  const bordersXml = '<border><left/><right/><top/><bottom/><diagonal/></border>'
+    + '<border><left style="thin"><color rgb="FF333333"/></left><right style="thin"><color rgb="FF333333"/></right><top style="thin"><color rgb="FF333333"/></top><bottom style="thin"><color rgb="FF333333"/></bottom><diagonal/></border>';
+  const xfsXml = xfs.map(x => {
+    const al = x.align ? `<alignment horizontal="${x.align === 'L' ? 'left' : (x.align === 'R' ? 'right' : 'center')}" vertical="center" wrapText="1"/>` : '<alignment vertical="center" wrapText="1"/>';
+    return `<xf numFmtId="${x.numFmt}" fontId="${x.font}" fillId="${x.fill}" borderId="${x.border}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1">${al}</xf>`;
+  }).join('');
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;₩&quot;#,##0"/></numFmts>'
+    + `<fonts count="${fonts.length}">${fontsXml}</fonts>`
+    + `<fills count="${fills.length}">${fillsXml}</fills>`
+    + '<borders count="2">' + bordersXml + '</borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + `<cellXfs count="${xfs.length}">${xfsXml}</cellXfs>`
+    + '</styleSheet>';
+  const base = buildXlsx({nRows:1, nCols:1, colWidths:[100], cells:[]});   /* 통 껍데기(관계·통합문서)는 기존 것을 그대로 쓴다 */
+  return base.map(e => e.name === 'xl/worksheets/sheet1.xml' ? {name:e.name, data:sheet} : (e.name === 'xl/styles.xml' ? {name:e.name, data:styles} : e));
+}
+
+/* ================= HWPX (병합·열너비·배경·정렬·굵게) ================= */
+let TPL = null;
+async function loadTpl(){
+  if (TPL) return TPL;
+  const files = ['version.xml','settings.xml','META-INF__manifest.xml','META-INF__container.xml','META-INF__container.rdf','Contents__content.hpf','Contents__header.xml','sec_prefix.xml','tbl_parts.json'];
+  const text = {};
+  await Promise.all(files.map(async f => {
+    const r = await fetch('tpl/' + f);
+    if (!r.ok) throw new Error('tpl/' + f + ' 없음');
+    text[f] = f.endsWith('.json') ? await r.json() : await r.text();
+  }));
+  TPL = {text, prefix:text['sec_prefix.xml'], parts:text['tbl_parts.json']};
+  return TPL;
+}
+/* 글자 모양 열쇠 — 굵기|색|크기[|형광펜|밑줄] (형광펜·밑줄이 없으면 예전 열쇠와 같다) */
+const chKey = (b, color, h, hl, ul) => (b ? 1 : 0) + '|' + (color || '') + '|' + (h || 900) + ((hl || ul) ? '|' + (hl || '') + '|' + (ul || '') : '');
+function hwHeader(base, need){
+  // need: {bgs:[], nbBgs:[], chars:[{b,color,h,hl,ul}], aligns:[]}
+  let borderFills = '', chars = '', paras = '';
+  let bfCnt = 2, chCnt = 3, paCnt = 10;
+  const bfId = {}, chId = {}, paId = {};
+  const bfXml = (id, bg, line) => {
+    const side = s => `<hh:${s}Border type="${line ? 'SOLID' : 'NONE'}" width="${line ? '0.12 mm' : '0.1 mm'}" color="#000000"/>`;
+    return `<hh:borderFill id="${id}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">`
+      + '<hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>'
+      + side('left') + side('right') + side('top') + side('bottom')
+      + '<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>'
+      + (bg ? `<hc:fillBrush><hc:winBrush faceColor="${bg}" hatchColor="#999999" alpha="0"/></hc:fillBrush>` : '')
+      + '</hh:borderFill>';
+  };
+  need.bgs.forEach(bg => {
+    if (!bg){ bfId[''] = 2; return; }
+    if (bfId[bg]) return;
+    bfCnt++; bfId[bg] = 99 + bfCnt; borderFills += bfXml(bfId[bg], bg, true);
+  });
+  (need.nbBgs || []).forEach(bg => {          /* 테두리 없는 칸(좌우 작은 표 사이 빈 열·제목 배너) */
+    const k = 'nb|' + (bg || '');
+    if (bfId[k]) return;
+    if (!bg){ bfId[k] = 1; return; }
+    bfCnt++; bfId[k] = 99 + bfCnt; borderFills += bfXml(bfId[k], bg, false);
+  });
+  need.chars.forEach(c => {
+    const key = chKey(c.b, c.color, c.h, c.hl, c.ul);
+    if (chId[key]) return;
+    chCnt++; const id = 99 + chCnt; chId[key] = id;
+    chars += `<hh:charPr id="${id}" height="${c.h || 900}" textColor="${c.color || '#000000'}" shadeColor="${c.hl || 'none'}" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">`
+      + '<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + (c.b ? '<hh:bold/>' : '')
+      + `<hh:underline type="${c.ul ? 'BOTTOM' : 'NONE'}" shape="SOLID" color="${c.ul || '#000000'}"/><hh:strikeout shape="NONE" color="#000000"/>`
+      + '<hh:outline type="NONE"/><hh:shadow type="NONE" color="#000000" offsetX="0" offsetY="0"/></hh:charPr>';
+  });
+  const paBase = /<hh:paraPr id="0".*?<\/hh:paraPr>/s.exec(base)[0];
+  need.aligns.forEach(al => {
+    if (paId[al]) return;
+    paCnt++; const id = 99 + paCnt; paId[al] = id;
+    /* 'L'/'C'/'R' = 표 칸(줄간격 125%) · 'TL'/'TC'/'TR' = 본문 문단(줄간격 160%, 문단 아래 여백) */
+    const a = al.charAt(al.length - 1), text = al.length > 1;
+    const horiz = a === 'L' ? 'JUSTIFY' : (a === 'R' ? 'RIGHT' : 'CENTER');
+    let body = paBase.replace(/<hh:paraPr id="0"/, `<hh:paraPr id="${id}"`)
+      .replace(/<hh:align horizontal="[A-Z]+"/, `<hh:align horizontal="${horiz}"`);
+    if (text) body = body.replace(/<hc:next value="0" unit="HWPUNIT"\/>/g, '<hc:next value="500" unit="HWPUNIT"/>');
+    else body = body.replace(/value="160" unit="HWPUNIT"/g, 'value="125" unit="HWPUNIT"');
+    paras += body;
+  });
+  let xml = base;
+  xml = xml.replace('<hh:borderFills itemCnt="2">', `<hh:borderFills itemCnt="${bfCnt}">`);
+  xml = xml.replace('</hh:borderFills>', borderFills + '</hh:borderFills>');
+  xml = xml.replace(/<hh:charProperties itemCnt="3">/, `<hh:charProperties itemCnt="${chCnt}">`);
+  xml = xml.replace('</hh:charProperties>', chars + '</hh:charProperties>');
+  xml = xml.replace(/<hh:paraProperties itemCnt="10">/, `<hh:paraProperties itemCnt="${paCnt}">`);
+  xml = xml.replace('</hh:paraProperties>', paras + '</hh:paraProperties>');
+  return {xml, bfId, chId, paId};
+}
+/* ================= 열 너무·행 높이: 원본 1:1 보장 ================= */
+const HWPU_PER_PT = 100;           /* 1pt = 100 HWPUNIT */
+const CELL_MARGIN = 360;           /* 좌우 여백 합 170+170 + 여유 */
+function charUnits(ch){
+  const c = ch.charCodeAt(0);
+  if(c === 32) return 260;                       /* 공백 */
+  if(c < 128) return 470;                        /* 영문·숫자·기호 */
+  if(c >= 0x3130 && c <= 0x318F) return 480;      /* 한글 호환 자모 */
+  return 900;                                    /* 한글·한자·확장 */
+}
+function textUnits(s){
+  let n = 0;
+  const t = String(s == null ? '' : s);
+  for(const ch of t) n += charUnits(ch);
+  return n;
+}
+/* 원본 열 너비를 잠그고 글자를 줄여 넣는다 — 넘치면 임의 줄바꿈 대신 크기를 줄인다 */
+function shrinkH(text, w){
+  const avail = Math.max(600, w - CELL_MARGIN);
+  let h = 900;
+  while (h > 700 && textUnits(text) * (h / 900) > avail) h -= 50;
+  return h;
+}
+/* 열 너비(%): 원본 비율 유지하면서 ‘글자가 꾼기는 최소 폭’을 보장하고, 남는 폭에서 나눔 */
+function fitColWidths(st, totalW){
+  const n = st.nCols;
+  let pct = (st.colWidths || []).slice(0, n).map(x => Math.max(1, +x || 0));
+  while (pct.length < n) pct.push(100 / n);
+  const sum0 = pct.reduce((a, b) => a + b, 0) || 100;
+  pct = pct.map(x => x / sum0 * 100);
+  /* 열별 ‘절대 넓히면 안 꾼기는’ 최소 HWPUNIT */
+  const need = new Array(n).fill(0);
+  st.cells.forEach(c => {
+    if (c.cs > 1) return;                            /* 병합 칸은 기준에서 제외 */
+    const lines = String(c.text == null ? '' : c.text).split('\n');
+    let mx = 0;
+    lines.forEach(l => { const u = textUnits(l); if (u > mx) mx = u; });
+    if (mx > need[c.c]) need[c.c] = mx;
+  });
+  const minPct = need.map(u => Math.min(60, (u + CELL_MARGIN) / totalW * 100));
+  /* 공백이 있으면 먼저 분배, 모자라면 넓은 열에서 가져온다 */
+  for (let pass = 0; pass < 4; pass++){
+    let deficit = 0;
+    for (let i = 0; i < n; i++) if (pct[i] < minPct[i]) deficit += minPct[i] - pct[i];
+    if (deficit < 0.01) break;
+    let pool = 0;
+    for (let i = 0; i < n; i++) pool += Math.max(0, pct[i] - minPct[i]);
+    for (let i = 0; i < n; i++){
+      if (pct[i] < minPct[i]){ pct[i] = minPct[i]; continue; }
+      const flex = Math.max(0, pct[i] - minPct[i]);
+      if (pool > 0) pct[i] -= flex / pool * Math.min(deficit, pool);
+    }
+    const s = pct.reduce((a, b) => a + b, 0) || 100;
+    pct = pct.map(x => x / s * 100);
+  }
+  return pct.map(x => Math.max(1, Math.round(x * 10) / 10));
+}
+/* 행 높이 — 그 행에서 몇 줄까지 꾼이는지 계산해 1줄은 1:1로 유지 */
+function rowLines(st, r, widths, totalW){
+  let maxLines = 1;
+  st.cells.forEach(c => {
+    if (c.r > r || c.r + c.rs <= r) return;
+    let w = 0;
+    for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+    const avail = Math.max(600, w - CELL_MARGIN);
+    const lines = String(c.text == null ? '' : c.text).split('\n');
+    let need = 1;
+    lines.forEach(l => { need += Math.ceil(textUnits(l) / avail); });
+    need = Math.max(1, need - 1);
+    if (need > maxLines) maxLines = need;
+  });
+  return maxLines;
+}
+
+async function buildHwpx(st){
+  if (st.doc) return buildHwpxDoc(st);   /* AI가 종이 전체를 읽은 경우 — 배너·문단·작은 표까지 함께 */
+  const t = await loadTpl();
+  const totalW = t.parts.total_w;
+  /* 열 너비를 원본 비율로 시작해, 글자가 꺾이지 않는 최소 폭을 보장한다 (월일 열 3줄 꺾임 방지)
+     사진에서 읽은 원본 너비는 그대로 잠그고(st.lockWidths) 글자 크기를 줄여 맞춘다 */
+  if (!st.lockWidths) st.colWidths = fitColWidths(st, totalW);
+  const widths = st.colWidths.map(w => Math.max(600, Math.round(totalW * w / 100)));
+  // 폭 합 보정
+  let wsum = widths.reduce((a, b) => a + b, 0);
+  widths[widths.length - 1] += totalW - wsum;
+  const bgs = [...new Set(st.cells.map(c => c.bg || ''))];
+  const charKeys = [];
+  st.cells.forEach(c => {
+    let cw2 = 0; for (let k = 0; k < c.cs; k++) cw2 += widths[c.c + k] || 0;
+    c._h = st.lockWidths ? shrinkH(c.text, cw2) : 900;
+    const k = (c.bold ? 1 : 0) + '|' + (c.color || '') + '|' + c._h;
+    if (!charKeys.includes(k)) charKeys.push(k);
+  });
+  const chars = charKeys.map(k => { const p = k.split('|'); return {b:p[0] === '1', color:p[1], h:(+p[2] || 900)}; });
+  chars.push({b:true, color:'#111111', h:1100});
+  const aligns = [...new Set(st.cells.map(c => c.align || 'C'))];
+  const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
+  const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {bgs, chars, aligns});
+  const chGet = (b, color, h) => H.chId[(b ? 1 : 0) + '|' + (color || '') + '|' + (h || 900)] || 0;
+  const titleChar = H.chId['1|#111111|1100'];
+  const rowH = (r) => { const n = rowLines(st, r, widths, totalW); return n <= 1 ? 1150 : (n * 1100 + 300); };
+  st._rowLines = [];
+  for (let r = 0; r < st.nRows; r++) st._rowLines.push(rowLines(st, r, widths, totalW));
+  let totalH = 0; for (let r = 0; r < st.nRows; r++) totalH += rowH(r);
+  let body = '', pid = 200;
+  if (st.title){
+    body += `<hp:p id="${pid}" paraPrIDRef="${H.paId['C']}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${titleChar ? titleChar : 1}"><hp:t>${xmlEsc(st.title)}</hp:t></hp:run></hp:p>`;
+    pid++;
+  }
+  body += `<hp:p id="${pid}" paraPrIDRef="${H.paId['L'] || 0}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0">`;
+  body += `<hp:tbl id="1" zOrder="0" numberingType="NONE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${st.nRows}" colCnt="${st.nCols}" cellSpacing="0" borderFillIDRef="2" noAdjust="0">`;
+  body += `<hp:sz width="${totalW}" widthRelTo="ABSOLUTE" height="${totalH}" heightRelTo="ABSOLUTE" protect="0"/>`;
+  body += t.parts.pos + t.parts.outm + t.parts.inm;
+  const byRow = {}; st.cells.forEach(c => (byRow[c.r] = byRow[c.r] || []).push(c));
+  // 위쪽 행에서 내려온 병합이 덮고 있는 칸 표시(빈 칸 보충 시 겹침 방지)
+  const covered = Array.from({length: st.nRows}, () => new Array(st.nCols).fill(false));
+  st.cells.forEach(c => { for (let y = c.r; y < c.r + c.rs; y++) for (let x = c.c; x < c.c + c.cs; x++) if (covered[y]) covered[y][x] = true; });
+  let seq = 5000;
+  const blank = {bold:false, color:'', bg:'', align:'C'};
+  for (let r = 0; r < st.nRows; r++){
+    const list = (byRow[r] || []).sort((a, b) => a.c - b.c);
+    let acc = 0;
+    body += '<hp:tr>';
+    for (const c of list){
+      let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+      for (let k = acc; k < c.c; k++){ // 앞쪽 빈 칸(다른 행 병합이 덮은 칸은 건너뜀)
+        if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+      }
+      body += hwCell(c, r, c.c, c.cs, c.rs, c.text, w, rowH(r) * c.rs, H, seq++);
+      acc = c.c + c.cs;
+    }
+    for (let k = acc; k < st.nCols; k++){
+      if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+    }
+    body += '</hp:tr>';
+  }
+  body += '</hp:tbl></hp:run></hp:p>';
+  const section = t.prefix + body + '</hs:sec>';
+  return [
+    {name:'mimetype', data:'application/hwp+zip', store:true},
+    {name:'version.xml', data:t.text['version.xml']},
+    {name:'settings.xml', data:t.text['settings.xml']},
+    {name:'META-INF/manifest.xml', data:t.text['META-INF__manifest.xml']},
+    {name:'META-INF/container.xml', data:t.text['META-INF__container.xml']},
+    {name:'META-INF/container.rdf', data:t.text['META-INF__container.rdf']},
+    {name:'Contents/content.hpf', data:t.text['Contents__content.hpf']},
+    {name:'Contents/header.xml', data:H.xml},
+    {name:'Contents/section0.xml', data:section}
+  ];
+}
+function hwCell(cell, r, c, cs, rs, value, w, h, H, seq){
+  const bf = cell.nb ? (H.bfId['nb|' + (cell.bg || '')] || 1) : (H.bfId[cell.bg || ''] || 2);
+  const pa = H.paId[cell.align || 'C'] || 0;
+  let paras = '';
+  if (cell.runs && cell.runs.length){
+    paras = hwRunParas(cell.runs, {b:!!cell.bold, color:cell.color || '', h:cell._h || 900}, pa, H, seq * 10);
+  } else {
+    const ch = H.chId[chKey(cell.bold, cell.color, cell._h || 900)] || 0;
+    const lines = String(value == null ? '' : value).split('\n');
+    lines.forEach((line, k) => {
+      paras += `<hp:p id="${seq * 10 + k}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">`
+        + `<hp:run charPrIDRef="${ch}">` + (line === '' ? '<hp:t/>' : `<hp:t>${xmlEsc(line)}</hp:t>`) + '</hp:run></hp:p>';
+    });
+  }
+  const mg = cell._pad ? '<hp:cellMargin left="510" right="510" top="280" bottom="280"/>' : '<hp:cellMargin left="170" right="170" top="60" bottom="60"/>';
+  return `<hp:tc name="" header="0" hasMargin="${cell._pad ? 1 : 0}" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}">`
+    + `<hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${paras}</hp:subList>`
+    + `<hp:cellAddr colAddr="${c}" rowAddr="${r}"/><hp:cellSpan colSpan="${cs}" rowSpan="${rs}"/>`
+    + `<hp:cellSz width="${w}" height="${h}"/>${mg}</hp:tc>`;
+}
+
+/* 글 조각(run) → 한글 문단들. 조각마다 글자색·굵기·형광펜(음영)·밑줄을 따로 준다 */
+function runLines(runs){
+  const lines = [[]];
+  runs.forEach(r => String(r.text).split('\n').forEach((seg, i) => {
+    if (i > 0) lines.push([]);
+    if (seg !== '') lines[lines.length - 1].push(Object.assign({}, r, {text:seg}));
+  }));
+  return lines;
+}
+const runCharKey = (r, base) => chKey(base.b || r.b, r.color || base.color, base.h, r.hl, r.ul);
+function hwRunParas(runs, base, pa, H, idBase){
+  return runLines(runs).map((ln, k) =>
+    `<hp:p id="${idBase + k}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">`
+    + (ln.length
+      ? ln.map(r => `<hp:run charPrIDRef="${H.chId[runCharKey(r, base)] || 0}"><hp:t>${xmlEsc(r.text)}</hp:t></hp:run>`).join('')
+      : `<hp:run charPrIDRef="${H.chId[chKey(base.b, base.color, base.h)] || 0}"><hp:t/></hp:run>`)
+    + '</hp:p>').join('');
+}
+
+/* ================= HWPX — 문서 전체(작은 표·제목 배너·문단·색 글자·형광펜·메인 표·서명) ================= */
+/* 제목 배너(색 띠 안 흰 글씨)는 테두리 없는 1×1 표에 배경색을 깔아 똑같이 보이게 한다 */
+function bannerTable(b){
+  return {nRows:1, nCols:1, colWidths:[100], lockWidths:true, _banner:true,
+    cells:[{r:0, c:0, rs:1, cs:1, text:b.runs.map(x => x.text).join(''), bold:false, align:b.align, bg:b.bg, color:'',
+      nb:true, runs:b.runs, _h:Math.round(b.size * 100), _fixH:true, _pad:true}]};
+}
+async function buildHwpxDoc(st){
+  const t = await loadTpl();
+  const PW = t.parts.total_w;
+  /* 1) 종이 위→아래 순서로 놓을 것들 */
+  const items = [];
+  st.doc.forEach(b => {
+    if (b.t === 'table'){
+      if (b.main){ if (!st._noMain) items.push({kind:'tbl', tst:st, x:b.x, w:b.w, main:true}); }
+      else items.push({kind:'tbl', tst:b.tbl, x:b.x, w:b.w});
+    } else if (b.t === 'text'){
+      if (b.bg && b.runs.length) items.push({kind:'tbl', tst:bannerTable(b), x:b.x, w:b.w});
+      else items.push({kind:'txt', b});
+    }
+  });
+  /* 2) 표마다 열 너비·글자 크기·행 높이 계산 */
+  const need = {bgs:[''], nbBgs:[''], chars:[], aligns:['TL', 'TC', 'TR']};
+  const addChar = (b, color, h, hl, ul) => need.chars.push({b:!!b, color:color || '', h:h || 900, hl:hl || '', ul:ul || ''});
+  items.forEach(it => {
+    if (it.kind === 'txt'){
+      const h = Math.round(it.b.size * 100);
+      addChar(false, '', h);
+      it.b.runs.forEach(r => addChar(r.b, r.color, h, r.hl, r.ul));
+      return;
+    }
+    const tst = it.tst;
+    const tw = Math.max(3000, Math.round(PW * (it.w || 100) / 100));
+    if (it.main && !tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);
+    const widths = tst.colWidths.map(w => Math.max(600, Math.round(tw * w / 100)));
+    widths[widths.length - 1] += tw - widths.reduce((a, b) => a + b, 0);
+    it.tw = tw; it.widths = widths;
+    it.off = Math.max(0, Math.min(PW - tw, Math.round(PW * (it.x || 0) / 100)));
+    tst.cells.forEach(c => {
+      let cw2 = 0; for (let k = 0; k < c.cs; k++) cw2 += widths[c.c + k] || 0;
+      if (!c._fixH) c._h = tst.lockWidths ? shrinkH(c.text, cw2) : 900;
+      if (c.nb) need.nbBgs.push(c.bg || ''); else need.bgs.push(c.bg || '');
+      need.aligns.push(c.align || 'C');
+      const base = {b:!!c.bold, color:c.color || '', h:c._h};
+      addChar(base.b, base.color, base.h);
+      (c.runs || []).forEach(r => addChar(base.b || r.b, r.color || base.color, base.h, r.hl, r.ul));
+    });
+    it.rowH = [];
+    for (let r = 0; r < tst.nRows; r++){
+      const n = rowLines(tst, r, widths, tw);
+      let hMax = 900;
+      tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hMax = Math.max(hMax, c._h || 900); });
+      let h = n <= 1 ? 1150 : (n * 1100 + 300);
+      if (hMax > 900) h = Math.max(h, n * Math.round(hMax * 1.35) + (tst._banner ? 900 : 400));
+      it.rowH.push(h);
+    }
+  });
+  const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
+  const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {
+    bgs:[...new Set(need.bgs)], nbBgs:[...new Set(need.nbBgs)], chars:need.chars, aligns:[...new Set(need.aligns)]});
+  /* 3) 본문 */
+  let body = '', pid = 200, seq = 5000, tblId = 1;
+  for (const it of items){
+    if (it.kind === 'txt'){
+      const b = it.b, h = Math.round(b.size * 100);
+      const pa = H.paId['T' + b.align] || 0;
+      body += b.runs.length ? hwRunParas(b.runs, {b:false, color:'', h}, pa, H, pid * 10)
+        : `<hp:p id="${pid * 10}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${H.chId[chKey(false, '', h)] || 0}"><hp:t/></hp:run></hp:p>`;
+      pid++;
+      continue;
+    }
+    const tst = it.tst, widths = it.widths, rowH = r => it.rowH[r];
+    let totalH = 0; for (let r = 0; r < tst.nRows; r++) totalH += rowH(r);
+    body += `<hp:p id="${pid * 10}" paraPrIDRef="${H.paId['L'] || H.paId['TL'] || 0}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0">`;
+    pid++;
+    body += `<hp:tbl id="${tblId++}" zOrder="0" numberingType="NONE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${tst.nRows}" colCnt="${tst.nCols}" cellSpacing="0" borderFillIDRef="${tst._banner ? 1 : 2}" noAdjust="0">`;
+    body += `<hp:sz width="${it.tw}" widthRelTo="ABSOLUTE" height="${totalH}" heightRelTo="ABSOLUTE" protect="0"/>`;
+    body += t.parts.pos.replace('horzOffset="0"', `horzOffset="${it.off}"`) + t.parts.outm + t.parts.inm;
+    const byRow = {}; tst.cells.forEach(c => (byRow[c.r] = byRow[c.r] || []).push(c));
+    const covered = Array.from({length: tst.nRows}, () => new Array(tst.nCols).fill(false));
+    tst.cells.forEach(c => { for (let y = c.r; y < c.r + c.rs; y++) for (let x = c.c; x < c.c + c.cs; x++) if (covered[y]) covered[y][x] = true; });
+    const blank = {bold:false, color:'', bg:'', align:'C'};
+    for (let r = 0; r < tst.nRows; r++){
+      const list = (byRow[r] || []).sort((a, b) => a.c - b.c);
+      let acc = 0;
+      body += '<hp:tr>';
+      for (const c of list){
+        let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+        let h = 0; for (let k = 0; k < c.rs; k++) h += rowH(r + k) || rowH(r);
+        for (let k = acc; k < c.c; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+        body += hwCell(c, r, c.c, c.cs, c.rs, c.text, w, h, H, seq++);
+        acc = c.c + c.cs;
+      }
+      for (let k = acc; k < tst.nCols; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+      body += '</hp:tr>';
+    }
+    body += '</hp:tbl></hp:run></hp:p>';
+  }
+  const section = t.prefix + body + '</hs:sec>';
+  return [
+    {name:'mimetype', data:'application/hwp+zip', store:true},
+    {name:'version.xml', data:t.text['version.xml']},
+    {name:'settings.xml', data:t.text['settings.xml']},
+    {name:'META-INF/manifest.xml', data:t.text['META-INF__manifest.xml']},
+    {name:'META-INF/container.xml', data:t.text['META-INF__container.xml']},
+    {name:'META-INF/container.rdf', data:t.text['META-INF__container.rdf']},
+    {name:'Contents/content.hpf', data:t.text['Contents__content.hpf']},
+    {name:'Contents/header.xml', data:H.xml},
+    {name:'Contents/section0.xml', data:section}
+  ];
+}
+/* ===== converter.html 엔진 복사본 끝 ===== */
+
+/* ===================== 더양식 앱 ===================== */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+let tT; function toast(m){ const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => e.classList.remove('on'), 2600); }
+function busyOn(t){ $('#busyT').textContent = t; $('#busy').classList.add('on'); }
+function busyOff(){ $('#busy').classList.remove('on'); }
+const uid = () => 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const clone = o => JSON.parse(JSON.stringify(o));
+
+/* ---------- 기본 양식 5종 (converter 엔진의 '문서 전체 블록' 형식 그대로) ---------- */
+/* 칸 글자에 {{이름표:성격}} 를 넣으면 그 칸이 채울 자리가 된다 */
+const HB = '#EEF2F8';
+const TX = (text, o = {}) => ({t:'text', align:o.al || 'L', size:o.sz || 10, bg:o.bg || '', x:o.x || 0, w:o.w || 100, runs:[[text, o.b ? 1 : 0, o.c || '', '', '']]});
+const L = (t, o = {}) => Object.assign({t, b:1, bg:HB}, o);        /* 이름표 칸 */
+function TB(colWidths, rows, o = {}){
+  const cells = [];
+  rows.forEach((row, r) => { let c = 0; row.forEach(sp => {
+    if (sp === null){ c++; return; }                                 /* 위 행 병합이 덮은 칸 */
+    const x = typeof sp === 'string' ? {t:sp} : sp;
+    cells.push([r, c, x.rs || 1, x.cs || 1, x.t || '', x.b ? 1 : 0, x.al || (x.n ? 'R' : (/^\{\{/.test(x.t || '') ? 'L' : 'C')), x.bg || '', '', x.n ? 1 : 0, 0]);
+    c += x.cs || 1; }); });
+  return {t:'table', main:o.main ? 1 : 0, x:0, w:100, nRows:rows.length, nCols:colWidths.length, colWidths, cells, rh:o.rh || {}};
+}
+const BUILTIN = [
+ {id:'b_trade', name:'거래명세서', calc:{'금액1':'수량1*단가1','금액2':'수량2*단가2','금액3':'수량3*단가3','합계금액':'금액1+금액2+금액3'},
+  blocks:[
+   TX('거 래 명 세 서', {al:'C', sz:20, b:1}),
+   TB([16,34,16,34], [[L('작성일'),'{{작성일:date}}',L('번호'),'{{번호:text}}'],
+     [L('공급받는자'),'{{공급받는자:text}}',L('공급자'),'{{공급자:text}}'],
+     [L('합계금액'),{t:'{{합계금액:number}}', cs:3, n:1},null,null]]),
+   TX(''),
+   TB([8,30,14,12,16,20], [[L('No'),L('품목'),L('규격'),L('수량'),L('단가'),L('금액')],
+     ['1','{{품목1:text}}','{{규격1:text}}',{t:'{{수량1:number}}',n:1},{t:'{{단가1:number}}',n:1},{t:'{{금액1:number}}',n:1}],
+     ['2','{{품목2:text}}','{{규격2:text}}',{t:'{{수량2:number}}',n:1},{t:'{{단가2:number}}',n:1},{t:'{{금액2:number}}',n:1}],
+     ['3','{{품목3:text}}','{{규격3:text}}',{t:'{{수량3:number}}',n:1},{t:'{{단가3:number}}',n:1},{t:'{{금액3:number}}',n:1}],
+     [L('비고'),{t:'{{비고:text}}', cs:5},null,null,null,null]], {main:1}),
+   TX(''),
+   TX('위와 같이 거래합니다.', {al:'C'}),
+   TB([20,30,20,30], [[L('인수자'),'{{인수자:text}}',L('서명'),'{{인수자 서명:sign}}']], {rh:{0:56}})
+  ]},
+ {id:'b_quote', name:'견적서', calc:{'금액1':'수량1*단가1','금액2':'수량2*단가2','금액3':'수량3*단가3','공급가액':'금액1+금액2+금액3','부가세':'공급가액*0.1','총액':'공급가액+부가세'},
+  blocks:[
+   TX('견   적   서', {al:'C', sz:20, b:1}),
+   TB([16,34,16,34], [[L('수신'),'{{수신:text}}',L('견적일'),'{{견적일:date}}'],
+     [L('담당자'),'{{담당자:text}}',L('연락처'),'{{연락처:text}}'],
+     [L('유효기간'),{t:'{{유효기간:text}}', cs:3},null,null]]),
+   TX('아래와 같이 견적합니다.'),
+   TB([8,32,12,12,16,20], [[L('No'),L('품목'),L('규격'),L('수량'),L('단가'),L('금액')],
+     ['1','{{품목1:text}}','{{규격1:text}}',{t:'{{수량1:number}}',n:1},{t:'{{단가1:number}}',n:1},{t:'{{금액1:number}}',n:1}],
+     ['2','{{품목2:text}}','{{규격2:text}}',{t:'{{수량2:number}}',n:1},{t:'{{단가2:number}}',n:1},{t:'{{금액2:number}}',n:1}],
+     ['3','{{품목3:text}}','{{규격3:text}}',{t:'{{수량3:number}}',n:1},{t:'{{단가3:number}}',n:1},{t:'{{금액3:number}}',n:1}],
+     [{t:'공급가액', cs:5, b:1, bg:HB},null,null,null,null,{t:'{{공급가액:number}}',n:1}],
+     [{t:'부가세(10%)', cs:5, b:1, bg:HB},null,null,null,null,{t:'{{부가세:number}}',n:1}],
+     [{t:'총액', cs:5, b:1, bg:HB},null,null,null,null,{t:'{{총액:number}}',n:1}]], {main:1}),
+   TX(''),
+   TB([18,82], [[L('비고'),'{{비고:text}}']], {rh:{0:60}}),
+   TB([20,30,20,30], [[L('견적처'),'{{견적처:text}}',L('서명'),'{{견적처 서명:sign}}']], {rh:{0:56}})
+  ]},
+ {id:'b_labor', name:'근로계약서',
+  blocks:[
+   TX('근 로 계 약 서', {al:'C', sz:20, b:1}),
+   TX('사업주와 근로자는 아래 조건으로 근로계약을 맺고 성실히 지키기로 합니다.'),
+   TB([22,78], [[L('사업장(상호)'),'{{사업장:text}}'],[L('대표자'),'{{대표자:text}}'],[L('근로자 성명'),'{{근로자 성명:text}}'],
+     [L('생년월일'),'{{생년월일:date}}'],[L('근로자 주소'),'{{근로자 주소:text}}'],[L('연락처'),'{{연락처:text}}'],
+     [L('근로 시작일'),'{{근로 시작일:date}}'],[L('근무 장소'),'{{근무 장소:text}}'],[L('업무 내용'),'{{업무 내용:text}}'],
+     [L('근로 시간'),'{{근로 시간:text}}'],[L('휴게 시간'),'{{휴게 시간:text}}'],[L('근무일 · 휴일'),'{{근무일 휴일:text}}'],
+     [L('임금(월)'),{t:'{{임금:number}}', n:1}],[L('지급일 · 방법'),'{{지급일 방법:text}}']], {main:1}),
+   TX('사회보험: 고용보험 · 산재보험 · 국민연금 · 건강보험에 가입합니다.', {sz:9.5}),
+   TX('계약서 교부: 사업주는 계약을 맺는 즉시 이 계약서 사본을 근로자에게 건넵니다.', {sz:9.5}),
+   TX('기타: 이 계약에 없는 내용은 근로기준법 등 관계 법령에 따릅니다.', {sz:9.5}),
+   TB([22,78], [[L('작성일'),'{{작성일:date}}']]),
+   TB([20,30,20,30], [[L('사업주 서명'),'{{사업주 서명:sign}}',L('근로자 서명'),'{{근로자 서명:sign}}']], {rh:{0:60}})
+  ]},
+ {id:'b_privacy', name:'개인정보 수집·이용 동의서',
+  blocks:[
+   TX('개인정보 수집 · 이용 동의서', {al:'C', sz:18, b:1}),
+   TX('아래 목적으로 개인정보를 모으고 이용합니다. 내용을 읽고 동의 여부를 적어 주세요.'),
+   TB([24,76], [[L('모으는 항목'),{t:'성명, 생년월일, 연락처', al:'L'}],[L('이용 목적'),{t:'상담 · 계약 · 안내 연락', al:'L'}],
+     [L('보관 기간'),{t:'목적을 이룬 뒤 1년 (법령이 정한 경우 그 기간)', al:'L'}],
+     [L('동의 거부'),{t:'동의하지 않을 수 있으며, 이 경우 서비스 이용이 제한될 수 있습니다.', al:'L'}]]),
+   TX(''),
+   TB([24,76], [[L('동의 여부'),'{{동의 여부:text}}'],[L('성명'),'{{성명:text}}'],[L('생년월일'),'{{생년월일:date}}'],
+     [L('연락처'),'{{연락처:text}}'],[L('작성일'),'{{작성일:date}}'],[L('서명'),'{{서명:sign}}']], {main:1, rh:{5:56}}),
+   TX(''),
+   TX('{{수신처}} 귀중', {al:'R'})
+  ]},
+ {id:'b_apply', name:'신청서',
+  blocks:[
+   TX('신   청   서', {al:'C', sz:20, b:1}),
+   TB([22,78], [[L('신청인 성명'),'{{신청인 성명:text}}'],[L('생년월일'),'{{생년월일:date}}'],[L('주소'),'{{주소:text}}'],
+     [L('연락처'),'{{연락처:text}}'],[L('이메일'),'{{이메일:text}}'],[L('신청 내용'),'{{신청 내용:text}}'],
+     [L('신청 사유'),'{{신청 사유:text}}'],[L('첨부 서류'),'{{첨부 서류:text}}']], {main:1, rh:{5:84, 6:60}}),
+   TX(''),
+   TX('위와 같이 신청합니다.', {al:'C'}),
+   TB([22,78], [[L('신청일'),'{{신청일:date}}'],[L('수신'),'{{수신:text}}']]),
+   TB([20,30,20,30], [[L('신청인'),'{{신청인:text}}',L('서명'),'{{신청인 서명:sign}}']], {rh:{0:56}})
+  ]}
+];
+/* 글 블록 안 {{수신처}} 같은 자리 표시는 쓰지 않는다 — 기본 양식은 표 칸에만 빈칸을 둔다 */
+BUILTIN[3].blocks[BUILTIN[3].blocks.length - 1] = TB([60,30,10], [[{t:'', al:'R'},'{{수신처:text}}',{t:'귀중', al:'L'}]]);
+BUILTIN[3].blocks[BUILTIN[3].blocks.length - 1].cells.forEach(c => c[10] = 1);   /* 테두리 없음 */
+
+/* 기본 양식 → 양식 객체(빈칸 목록 + 칸 위치) */
+function compileBuiltin(b){
+  const raw = {blocks:clone(b.blocks)}, fields = [];
+  raw.blocks.forEach((bl, bi) => {
+    if (bl.t !== 'table') return;
+    bl.cells.forEach(c => {
+      const m = /^\{\{([^:}]+):(text|number|date|sign)\}\}$/.exec(c[4]);
+      if (!m) return;
+      c[4] = '';
+      fields.push({id:'k' + fields.length, label:m[1], type:m[2], cell:[bi, c[0], c[1]]});
+    });
+  });
+  const f = {id:b.id, name:b.name, builtin:true, raw, fields, calc:b.calc || null};
+  layoutPage(f);   /* 칸 좌표(%)를 계산해 fields[].x,y,w,h 를 채운다 */
+  return f;
+}
+
+/* ---------- 문서 블록 → A4 캔버스(빈 양식 배경) ---------- */
+const PW = 794, PH = 1123, MG = 60;
+function wrapText(g, text, maxW){
+  const out = []; String(text).split('\n').forEach(par => {
+    let line = '';
+    for (const ch of par){ if (g.measureText(line + ch).width > maxW && line){ out.push(line); line = ch; } else line += ch; }
+    out.push(line);
+  });
+  return out;
+}
+const FONT = '"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+function layoutPage(form, g){
+  /* g 가 있으면 그리고, 없으면 좌표만 계산 */
+  const cw = PW - MG * 2; let y = MG;
+  const rects = {};
+  form.raw.blocks.forEach((b, bi) => {
+    if (b.t === 'text'){
+      const sz = (b.size || 10) * 1.45, txt = (b.runs || []).map(r => r[0]).join(''), bold = (b.runs || []).some(r => +r[1]);
+      if (!txt){ y += sz * 0.9; return; }
+      const mg = g || document.createElement('canvas').getContext('2d');
+      mg.font = (bold ? '700 ' : '400 ') + sz + 'px ' + FONT;
+      const lines = wrapText(mg, txt, cw);
+      lines.forEach(l => {
+        if (g){ g.fillStyle = '#111'; g.textBaseline = 'top'; g.textAlign = b.align === 'C' ? 'center' : (b.align === 'R' ? 'right' : 'left');
+          g.fillText(l, b.align === 'C' ? PW / 2 : (b.align === 'R' ? PW - MG : MG), y); }
+        y += sz * 1.55;
+      });
+      y += 6; return;
+    }
+    if (b.t !== 'table') return;
+    const nR = b.nRows, nC = b.nCols, sum = b.colWidths.reduce((a, c) => a + c, 0);
+    const xs = [MG]; b.colWidths.forEach(w => xs.push(xs[xs.length - 1] + cw * w / sum));
+    const ys = [y]; for (let r = 0; r < nR; r++) ys.push(ys[r] + ((b.rh && b.rh[r]) || 34));
+    b.cells.forEach(c => {
+      const [r, k, rs, cs, text, bold, al, bg, , , nb] = c;
+      const x0 = xs[k], x1 = xs[Math.min(nC, k + cs)], y0 = ys[r], y1 = ys[Math.min(nR, r + rs)];
+      rects[bi + ',' + r + ',' + k] = {x:x0, y:y0, w:x1 - x0, h:y1 - y0};
+      if (!g) return;
+      if (bg){ g.fillStyle = bg; g.fillRect(x0, y0, x1 - x0, y1 - y0); }
+      if (!nb){ g.strokeStyle = '#333'; g.lineWidth = 1; g.strokeRect(x0 + .5, y0 + .5, x1 - x0, y1 - y0); }
+      if (text){
+        g.fillStyle = '#111'; g.textBaseline = 'middle'; let fs = 13.5;
+        g.font = (+bold ? '700 ' : '400 ') + fs + 'px ' + FONT;
+        while (fs > 9 && g.measureText(text).width > x1 - x0 - 10){ fs -= .5; g.font = (+bold ? '700 ' : '400 ') + fs + 'px ' + FONT; }
+        g.textAlign = al === 'L' ? 'left' : (al === 'R' ? 'right' : 'center');
+        g.fillText(text, al === 'L' ? x0 + 7 : (al === 'R' ? x1 - 7 : (x0 + x1) / 2), (y0 + y1) / 2);
+      }
+    });
+    y = ys[nR] + 8;
+  });
+  form.fields.forEach(f => {
+    if (!f.cell) return;
+    const r = rects[f.cell.join(',')]; if (!r) return;
+    f.x = (r.x + 3) / PW * 100; f.y = (r.y + 3) / PH * 100; f.w = (r.w - 6) / PW * 100; f.h = (r.h - 6) / PH * 100;
+  });
+  return y;
+}
+function renderBlank(form){
+  const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, PW, PH);
+  layoutPage(form, g);
+  return cv;
+}
+
+/* ---------- 저장소: 양식 정보는 localStorage, 사진은 IndexedDB ---------- */
+const LS_FORMS = 'tf_forms_v1', LS_VALS = 'tf_vals_', LS_Q = 'tf_inquiry_queue';
+const lsGet = (k, d) => { try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } };
+const lsSet = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ toast('기기 저장 공간이 부족합니다'); return false; } };
+function idb(){ return new Promise((res, rej) => { const q = indexedDB.open('tf_db', 1);
+  q.onupgradeneeded = () => q.result.createObjectStore('img'); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+async function imgPut(id, data){ const db = await idb(); return new Promise((res, rej) => { const t = db.transaction('img', 'readwrite'); t.objectStore('img').put(data, id); t.oncomplete = res; t.onerror = () => rej(t.error); }); }
+async function imgGet(id){ const db = await idb(); return new Promise(res => { const q = db.transaction('img').objectStore('img').get(id); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); }
+async function imgDel(id){ const db = await idb(); return new Promise(res => { const t = db.transaction('img', 'readwrite'); t.objectStore('img').delete(id); t.oncomplete = res; t.onerror = res; }); }
+const myForms = () => lsGet(LS_FORMS, []);
+const saveMyForms = a => lsSet(LS_FORMS, a);
+const BUILT = BUILTIN.map(compileBuiltin);
+const findForm = id => BUILT.find(f => f.id === id) || myForms().find(f => f.id === id) || null;
+
+/* ---------- 상태 ---------- */
+let STEP = 1;
+let CUR = null;          /* 지금 다루는 양식 */
+let BG = null;           /* 배경 이미지(Image 또는 Canvas) */
+let VALS = {};           /* 값 */
+let SEL = -1;            /* 선택한 칸 */
+let UNDO = [], REDO = [];
+let REG = null;          /* 등록 중 사진 {raw: canvas, fix: canvas} */
+
+async function loadBg(form){
+  if (form.builtin || form.fromBuiltin) return renderBlank(form);
+  const d = await imgGet(form.id);
+  if (!d) return renderBlank(form);
+  return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(renderBlank(form)); im.src = d; });
+}
+const bgW = () => BG ? (BG.naturalWidth || BG.width) : PW;
+const bgH = () => BG ? (BG.naturalHeight || BG.height) : PH;
+
+/* ---------- ① 등록: 사진 → 자동 기울기·테두리 보정 ---------- */
+function loadImageFile(file){
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('사진을 열지 못했습니다')); }; im.src = u; });
+}
+function toCanvas(im, maxSide){
+  const s = Math.min(1, maxSide / Math.max(im.naturalWidth || im.width, im.naturalHeight || im.height));
+  const w = Math.round((im.naturalWidth || im.width) * s), h = Math.round((im.naturalHeight || im.height) * s);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(im, 0, 0, w, h); return cv;
+}
+/* 종이(밝은 큰 덩어리)의 네 귀퉁이를 찾는다 */
+function findPaper(cv){
+  const S = 360, sc = Math.min(1, S / Math.max(cv.width, cv.height));
+  const w = Math.max(8, Math.round(cv.width * sc)), h = Math.max(8, Math.round(cv.height * sc));
+  const t = document.createElement('canvas'); t.width = w; t.height = h; const g = t.getContext('2d'); g.drawImage(cv, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data, gray = new Uint8Array(w * h), hist = new Array(256).fill(0);
+  for (let i = 0; i < w * h; i++){ const v = (d[i * 4] * 299 + d[i * 4 + 1] * 587 + d[i * 4 + 2] * 114) / 1000 | 0; gray[i] = v; hist[v]++; }
+  /* 오츠 문턱값 */
+  let sum = 0; for (let i = 0; i < 256; i++) sum += i * hist[i];
+  let sB = 0, wB = 0, best = 0, th = 128;
+  for (let i = 0; i < 256; i++){ wB += hist[i]; if (!wB) continue; const wF = w * h - wB; if (!wF) break; sB += i * hist[i];
+    const mB = sB / wB, mF = (sum - sB) / wF, v = wB * wF * (mB - mF) * (mB - mF); if (v > best){ best = v; th = i; } }
+  if (best / (w * h) / (w * h) < 200) return null;   /* 대비가 너무 약하면(종이가 화면을 꽉 채움) 보정 안 함 */
+  const lab = new Int32Array(w * h).fill(-1); let bestN = 0, bestL = -1, L = 0;
+  const st = new Int32Array(w * h);
+  for (let i = 0; i < w * h; i++){
+    if (gray[i] <= th || lab[i] >= 0) continue;
+    let sp = 0, n = 0; st[sp++] = i; lab[i] = L;
+    while (sp){ const p = st[--sp]; n++; const x = p % w, y = p / w | 0;
+      const nb = [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, y > 0 ? p - w : -1, y < h - 1 ? p + w : -1];
+      for (const q of nb) if (q >= 0 && lab[q] < 0 && gray[q] > th){ lab[q] = L; st[sp++] = q; } }
+    if (n > bestN){ bestN = n; bestL = L; } L++;
+  }
+  const area = bestN / (w * h);
+  if (area < 0.15 || area > 0.97) return null;
+  let tl = null, tr = null, br = null, bl = null, a = 1e9, b = -1e9, c = -1e9, e = 1e9;
+  for (let i = 0; i < w * h; i++){ if (lab[i] !== bestL) continue; const x = i % w, y = i / w | 0;
+    if (x + y < a){ a = x + y; tl = [x, y]; } if (x + y > b){ b = x + y; br = [x, y]; }
+    if (x - y > c){ c = x - y; tr = [x, y]; } if (x - y < e){ e = x - y; bl = [x, y]; } }
+  const k = 1 / sc;
+  return {pts:[tl, tr, br, bl].map(p => [p[0] * k, p[1] * k]), area};
+}
+/* 사각형 → 네 점 투영 변환 행렬(가우스 소거) */
+function homography(src, dst){
+  const A = [], B = [];
+  for (let i = 0; i < 4; i++){ const [x, y] = src[i], [u, v] = dst[i];
+    A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); B.push(u); A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); B.push(v); }
+  for (let i = 0; i < 8; i++){ let m = i; for (let j = i + 1; j < 8; j++) if (Math.abs(A[j][i]) > Math.abs(A[m][i])) m = j;
+    [A[i], A[m]] = [A[m], A[i]]; [B[i], B[m]] = [B[m], B[i]];
+    for (let j = i + 1; j < 8; j++){ const f = A[j][i] / A[i][i]; for (let k = i; k < 8; k++) A[j][k] -= f * A[i][k]; B[j] -= f * B[i]; } }
+  const h = new Array(8); for (let i = 7; i >= 0; i--){ let s = B[i]; for (let k = i + 1; k < 8; k++) s -= A[i][k] * h[k]; h[i] = s / A[i][i]; }
+  return h;
+}
+function warp(cv, pts){
+  const dist = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+  let W = Math.max(dist(pts[0], pts[1]), dist(pts[3], pts[2])), H = Math.max(dist(pts[0], pts[3]), dist(pts[1], pts[2]));
+  const s = Math.min(1, 1500 / Math.max(W, H)); W = Math.round(W * s); H = Math.round(H * s);
+  const h = homography([[0, 0], [W, 0], [W, H], [0, H]], pts);   /* 결과 좌표 → 원본 좌표 */
+  const sd = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, sw = cv.width, sh = cv.height;
+  const out = document.createElement('canvas'); out.width = W; out.height = H;
+  const og = out.getContext('2d'), od = og.createImageData(W, H), o = od.data;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const z = h[6] * x + h[7] * y + 1, sx = (h[0] * x + h[1] * y + h[2]) / z, sy = (h[3] * x + h[4] * y + h[5]) / z;
+    const x0 = Math.max(0, Math.min(sw - 2, sx | 0)), y0 = Math.max(0, Math.min(sh - 2, sy | 0)), fx = Math.max(0, Math.min(1, sx - x0)), fy = Math.max(0, Math.min(1, sy - y0));
+    const i00 = (y0 * sw + x0) * 4, i10 = i00 + 4, i01 = i00 + sw * 4, i11 = i01 + 4, j = (y * W + x) * 4;
+    for (let k = 0; k < 3; k++) o[j + k] = (sd[i00 + k] * (1 - fx) + sd[i10 + k] * fx) * (1 - fy) + (sd[i01 + k] * (1 - fx) + sd[i11 + k] * fx) * fy;
+    o[j + 3] = 255;
+  }
+  og.putImageData(od, 0, 0);
+  /* 종이 바탕을 하얗게(그림자·누런 끼 줄이기) */
+  const d2 = og.getImageData(0, 0, W, H), q = d2.data; let mx = 0; const hs = new Array(256).fill(0);
+  for (let i = 0; i < q.length; i += 16){ const v = (q[i] + q[i + 1] + q[i + 2]) / 3 | 0; hs[v]++; }
+  let acc = 0, tot = q.length / 16; for (let v = 255; v >= 0; v--){ acc += hs[v]; if (acc > tot * 0.25){ mx = v; break; } }
+  if (mx > 120 && mx < 250){ const f = 250 / mx; for (let i = 0; i < q.length; i += 4){ q[i] = Math.min(255, q[i] * f); q[i + 1] = Math.min(255, q[i + 1] * f); q[i + 2] = Math.min(255, q[i + 2] * f); } og.putImageData(d2, 0, 0); }
+  return out;
+}
+async function onPhoto(file){
+  if (!file) return;
+  busyOn('기울기와 테두리를 바로잡는 중…');
+  try{
+    const im = await loadImageFile(file);
+    const raw = toCanvas(im, 2000);
+    const p = findPaper(raw);
+    const fix = p ? warp(raw, p.pts) : toCanvas(raw, 1500);
+    REG = {raw, fix, found:!!p};
+    showReg('fix');
+    $('#regBox').style.display = 'block';
+    $('#regInfo').textContent = p ? `종이 네 귀퉁이를 찾아 반듯하게 폈습니다 (종이 면적 ${Math.round(p.area * 100)}%). 아래 [다음]을 누르면 빈칸 지정으로 갑니다.`
+      : '종이가 화면을 꽉 채워 보정 없이 그대로 씁니다. 아래 [다음]을 누르면 빈칸 지정으로 갑니다.';
+    /* 새 양식 */
+    const fix64 = REG.fix.toDataURL('image/jpeg', 0.86);
+    CUR = {id:uid(), name:'', fields:[], raw:null, _img:fix64, _new:true};
+    BG = await new Promise(res => { const i2 = new Image(); i2.onload = () => res(i2); i2.src = fix64; });
+    VALS = {}; SEL = -1; UNDO = []; REDO = []; $("#outName").value = "";
+    toast(p ? '자동 보정 완료' : '사진을 불러왔습니다');
+  }catch(e){ toast(e.message || '사진을 열지 못했습니다'); }
+  busyOff();
+}
+function showReg(which){
+  if (!REG) return;
+  const src = REG[which], cv = $('#regCv'); cv.width = src.width; cv.height = src.height; cv.getContext('2d').drawImage(src, 0, 0);
+  $$('#regSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === which));
+}
+
+/* ---------- 양식 목록 ---------- */
+function renderList(){
+  const mine = myForms();
+  const item = (f, mineFlag) => `<div class="fi"><div><div class="nm">${escH(f.name)}<span class="bd${mineFlag ? ' my' : ''}">${mineFlag ? '내 양식' : '기본'}</span></div>
+    <div class="ds">빈칸 ${f.fields.length}개${mineFlag && f.raw ? ' · 문서 틀 있음' : ''}</div></div>
+    <div class="acts"><button class="go" data-open="${f.id}">열기</button><button data-dup="${f.id}">복제</button>${mineFlag ? `<button data-del="${f.id}">삭제</button>` : ''}</div></div>`;
+  $('#formList').innerHTML = mine.map(f => item(f, true)).join('') + BUILT.map(f => item(f, false)).join('');
+}
+const escH = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+async function openForm(id, step){
+  const f = findForm(id); if (!f) return;
+  CUR = clone(f); BG = await loadBg(CUR); VALS = lsGet(LS_VALS + CUR.id, {}); SEL = -1; UNDO = []; REDO = []; $("#outName").value = "";
+  go(step || 3);
+}
+async function dupForm(id){
+  const f = findForm(id); if (!f) return;
+  const n = clone(f); n.id = uid(); n.name = f.name + ' (복제)'; delete n.builtin;
+  if (f.builtin) n.fromBuiltin = f.id;
+  const list = myForms(); list.unshift(n);
+  if (!f.builtin && !f.fromBuiltin){ const d = await imgGet(f.id); if (d) await imgPut(n.id, d); }
+  saveMyForms(list); renderList(); toast('내 양식으로 복제했습니다');
+  return n.id;
+}
+async function delForm(id){
+  saveMyForms(myForms().filter(f => f.id !== id)); await imgDel(id);
+  try{ localStorage.removeItem(LS_VALS + id); }catch(e){}
+  renderList(); toast('삭제했습니다');
+}
+$('#formList').onclick = async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.open) openForm(b.dataset.open, 3);
+  else if (b.dataset.dup) dupForm(b.dataset.dup);
+  else if (b.dataset.del) delForm(b.dataset.del);
+};
+
+/* ---------- ② 빈칸 지정 ---------- */
+function snap(){ UNDO.push(JSON.stringify(CUR.fields)); if (UNDO.length > 50) UNDO.shift(); REDO = []; }
+function undo(){ if (!UNDO.length) return toast('되돌릴 것이 없습니다'); REDO.push(JSON.stringify(CUR.fields)); CUR.fields = JSON.parse(UNDO.pop()); SEL = Math.min(SEL, CUR.fields.length - 1); drawEditor(); }
+function redo(){ if (!REDO.length) return toast('다시 할 것이 없습니다'); UNDO.push(JSON.stringify(CUR.fields)); CUR.fields = JSON.parse(REDO.pop()); drawEditor(); }
+const ro = () => !!(CUR && CUR.builtin);
+function addField(x, y){
+  if (ro()) return toast('기본 양식은 [복제] 후 고칠 수 있습니다');
+  snap();
+  const n = CUR.fields.length + 1, w = 26, h = 3.6;
+  CUR.fields.push({id:uid(), label:'칸' + n, type:'text', x:Math.max(0, Math.min(100 - w, x - w / 2)), y:Math.max(0, Math.min(100 - h, y - h / 2)), w, h});
+  SEL = CUR.fields.length - 1; drawEditor();
+  setTimeout(() => { const i = $('#fLabel'); i.focus(); i.select(); }, 30);
+}
+function delField(){
+  if (ro()) return toast('기본 양식은 [복제] 후 고칠 수 있습니다');
+  if (SEL < 0) return toast('지울 칸을 먼저 누르세요');
+  snap(); CUR.fields.splice(SEL, 1); SEL = -1; drawEditor();
+}
+function drawEditor(){
+  const st = $('#edStage');
+  st.innerHTML = '';
+  const c = document.createElement('canvas'); c.width = bgW(); c.height = bgH(); c.getContext('2d').drawImage(BG, 0, 0); st.appendChild(c);
+  CUR.fields.forEach((f, i) => {
+    const d = document.createElement('div'); d.className = 'fld' + (i === SEL ? ' sel' : ''); d.dataset.i = i;
+    d.style.cssText = `left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%`;
+    d.innerHTML = `<span>${escH(f.label)} · ${TYPE_NM[f.type]}</span><i class="hd2"></i>`;
+    st.appendChild(d);
+  });
+  const f = CUR.fields[SEL];
+  $('#fEdit').style.display = f ? 'block' : 'none';
+  if (f){ $('#fLabel').value = f.label; $$('#fType button').forEach(b => b.classList.toggle('on', b.dataset.v === f.type)); $('#fLabel').disabled = ro(); }
+  $('#fCount').textContent = `빈칸 ${CUR.fields.length}개 · 되돌리기 ${UNDO.length}단계 저장됨` + (ro() ? ' · 기본 양식은 보기 전용' : '');
+  $('#s2tip').textContent = ro() ? '기본 양식입니다. 칸 위치를 바꾸려면 목록에서 [복제]한 뒤 고치세요. 그대로 [다음]을 누르면 값 입력으로 갑니다.'
+    : '미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.';
+  $('#formName').value = CUR.name || '';
+  $('#formName').disabled = ro();
+}
+const TYPE_NM = {text:'글자', number:'숫자', date:'날짜', sign:'서명'};
+(function bindStage(){
+  const st = $('#edStage'); let drag = null;
+  const pct = e => { const r = st.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
+  st.addEventListener('pointerdown', e => {
+    const fd = e.target.closest('.fld');
+    const [px, py] = pct(e);
+    if (!fd){ addField(px, py); return; }
+    SEL = +fd.dataset.i;
+    if (ro()){ drawEditor(); return; }
+    const f = CUR.fields[SEL];
+    drag = {mode:e.target.classList.contains('hd2') ? 'size' : 'move', sx:px, sy:py, f0:Object.assign({}, f), snap:JSON.stringify(CUR.fields), moved:false};
+    drawEditor(); st.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  st.addEventListener('pointermove', e => {
+    if (!drag) return; const [px, py] = pct(e), f = CUR.fields[SEL], dx = px - drag.sx, dy = py - drag.sy;
+    if (Math.abs(dx) + Math.abs(dy) > .3) drag.moved = true;
+    if (drag.mode === 'move'){ f.x = Math.max(0, Math.min(100 - f.w, drag.f0.x + dx)); f.y = Math.max(0, Math.min(100 - f.h, drag.f0.y + dy)); }
+    else { f.w = Math.max(3, Math.min(100 - f.x, drag.f0.w + dx)); f.h = Math.max(1.5, Math.min(100 - f.y, drag.f0.h + dy)); }
+    const el = st.querySelector(`.fld[data-i="${SEL}"]`); if (el) el.style.cssText = `left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%`;
+  });
+  const end = () => { if (drag && drag.moved){ UNDO.push(drag.snap); if (UNDO.length > 50) UNDO.shift(); REDO = []; drawEditor(); } drag = null; };
+  st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+})();
+$('#addF').onclick = () => addField(50, 50);
+$('#delF').onclick = delField;
+$('#undoF').onclick = undo;
+$('#redoF').onclick = redo;
+let lblSnap = false;
+$('#fLabel').addEventListener('focus', () => lblSnap = false);
+$('#fLabel').addEventListener('input', e => { const f = CUR.fields[SEL]; if (!f) return; if (!lblSnap){ snap(); lblSnap = true; } f.label = e.target.value.trim() || '칸';
+  const el = $(`#edStage .fld[data-i="${SEL}"] span`); if (el) el.textContent = f.label + ' · ' + TYPE_NM[f.type]; });
+$("#formName").addEventListener("input", e => { if (CUR && !ro()) CUR.name = e.target.value; });
+$("#fType").onclick = e => { const b = e.target.closest('button'); const f = CUR.fields[SEL]; if (!b || !f || ro()) return; snap(); f.type = b.dataset.v; drawEditor(); };
+
+async function saveCurrent(){
+  if (ro()) return true;
+  const name = $('#formName').value.trim();
+  if (!name){ $('#formName').focus(); $('#formName').style.borderColor = 'var(--red)'; toast('양식 이름을 적어 주세요'); return false; }
+  if (!CUR.fields.length){ toast('채울 칸을 1개 이상 찍어 주세요'); return false; }
+  $('#formName').style.borderColor = '';
+  const labels = CUR.fields.map(f => f.label); const dup = labels.find((l, i) => labels.indexOf(l) !== i);
+  if (dup){ toast(`이름표 "${dup}"가 겹칩니다. 다르게 지어 주세요`); return false; }
+  CUR.name = name;
+  if (CUR._img){ await imgPut(CUR.id, CUR._img); }
+  const rec = clone(CUR); delete rec._img; delete rec._new;
+  const list = myForms().filter(f => f.id !== CUR.id); list.unshift(rec);
+  if (!saveMyForms(list)) return false;
+  delete CUR._new; delete CUR._img; renderList(); toast('내 전용 양식으로 저장했습니다');
+  return true;
+}
+
+/* ---------- ③ 값 입력 ---------- */
+const fmtNum = v => { const s = String(v == null ? '' : v).replace(/[^\d.-]/g, ''); if (s === '' || isNaN(+s)) return ''; const n = Math.round(+s * 100) / 100; return n.toLocaleString('ko-KR'); };
+const fmtDate = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? `${+m[1]}년 ${+m[2]}월 ${+m[3]}일` : (v || ''); };
+function shown(f){ const v = VALS[f.label]; if (v == null || v === '') return '';
+  if (f.type === 'number') return fmtNum(v); if (f.type === 'date') return fmtDate(v); if (f.type === 'sign') return '(서명)'; return String(v); }
+let LAST_INPUT = null;
+function renderInputs(){
+  $('#s3name').textContent = CUR.name + ' · 값 입력';
+  const h = CUR.fields.map((f, i) => {
+    const v = VALS[f.label] == null ? '' : VALS[f.label];
+    if (f.type === 'sign') return `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
+    const tp = f.type === 'date' ? 'date' : 'text', im = f.type === 'number' ? ' inputmode="decimal"' : '';
+    const auto = CUR.calc && CUR.calc[f.label] ? '<em>자동 계산</em>' : '';
+    return `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
+  }).join('');
+  $('#valList').innerHTML = h;
+  $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
+}
+$('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) LAST_INPUT = e.target; });
+$('#valList').addEventListener('input', e => {
+  const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
+  VALS[f.label] = f.type === 'number' ? e.target.value.replace(/[^\d.-]/g, '') : e.target.value;
+  runCalc(f.label); saveVals();
+});
+$('#valList').addEventListener('change', e => { const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i]; if (f.type === 'number') e.target.value = fmtNum(VALS[f.label]); });
+$('#valList').addEventListener('click', e => { const b = e.target.closest('[data-sigclr]'); if (!b) return; const f = CUR.fields[+b.dataset.sigclr]; delete VALS[f.label]; saveVals(); renderInputs(); });
+function runCalc(changed){
+  if (!CUR.calc) return;
+  for (let pass = 0; pass < 3; pass++) Object.keys(CUR.calc).forEach(k => {
+    if (k === changed) return;
+    const ex = CUR.calc[k].replace(/[가-힣A-Za-z][가-힣A-Za-z0-9 ]*/g, nm => { const v = +String(VALS[nm.trim()] || '').replace(/[^\d.-]/g, ''); return isFinite(v) ? '(' + v + ')' : '0'; });
+    if (!/^[\d+\-*/(). ]+$/.test(ex)) return;
+    let r; try{ r = Function('"use strict";return (' + ex + ')')(); }catch(e){ return; }
+    if (!isFinite(r)) return;
+    VALS[k] = r ? String(Math.round(r)) : '';
+    const fi = CUR.fields.findIndex(f => f.label === k), el = fi >= 0 ? $(`#valList input[data-f="${fi}"]`) : null;
+    if (el && el !== document.activeElement) el.value = fmtNum(VALS[k]);
+  });
+}
+function saveVals(){ if (CUR) lsSet(LS_VALS + CUR.id, VALS); }
+function bindSig(cv, f){
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+  if (VALS[f.label]){ const im = new Image(); im.onload = () => { const r = Math.min(cv.width / im.width, cv.height / im.height);
+    g.drawImage(im, (cv.width - im.width * r) / 2, (cv.height - im.height * r) / 2, im.width * r, im.height * r); }; im.src = VALS[f.label]; }
+  else { g.fillStyle = '#B8C2D0'; g.font = '26px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('여기에 손가락으로 서명', cv.width / 2, cv.height / 2); }
+  let on = false, first = true;
+  /* 잉크만 따로(투명 바탕) 모아 두었다가, 획이 있는 부분만 잘라 저장한다 — 종이 위에 흰 상자가 생기지 않게 */
+  const ink = document.createElement('canvas'); ink.width = cv.width; ink.height = cv.height; const k = ink.getContext('2d');
+  if (VALS[f.label]){ const im0 = new Image(); im0.onload = () => { const r = Math.min(ink.width / im0.width, ink.height / im0.height);
+    k.drawImage(im0, (ink.width - im0.width * r) / 2, (ink.height - im0.height * r) / 2, im0.width * r, im0.height * r); }; im0.src = VALS[f.label]; }
+  const p = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * cv.width, (e.clientY - r.top) / r.height * cv.height]; };
+  cv.addEventListener('pointerdown', e => { if (first && !VALS[f.label]){ g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); } first = false;
+    on = true; cv.setPointerCapture(e.pointerId); const [x, y] = p(e);
+    [g, k].forEach(c => { c.beginPath(); c.moveTo(x, y); c.lineWidth = 6; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = '#0B1A3A'; }); });
+  cv.addEventListener('pointermove', e => { if (!on) return; const [x, y] = p(e); [g, k].forEach(c => { c.lineTo(x, y); c.stroke(); }); });
+  const crop = () => {
+    const d = k.getImageData(0, 0, ink.width, ink.height).data; let x0 = ink.width, y0 = ink.height, x1 = -1, y1 = -1;
+    for (let y = 0; y < ink.height; y++) for (let x = 0; x < ink.width; x++) if (d[(y * ink.width + x) * 4 + 3] > 10){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 < 0) return '';
+    const m = 8; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(ink.width - 1, x1 + m); y1 = Math.min(ink.height - 1, y1 + m);
+    const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(ink, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
+    return o.toDataURL('image/png');
+  };
+  const end = () => { if (!on) return; on = false; VALS[f.label] = crop(); saveVals(); };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+}
+$('#clearVals').onclick = () => { VALS = {}; saveVals(); renderInputs(); toast('값을 모두 지웠습니다'); };
+const SAMPLE = {text:'홍길동', number:'150000', date:new Date().toISOString().slice(0, 10)};
+const SAMPLE_BY = {'품목1':'A4 복사용지','규격1':'80g 500매','수량1':'10','단가1':'4800','품목2':'볼펜(흑)','규격2':'0.7mm','수량2':'24','단가2':'500','품목3':'스테이플러','규격3':'중형','수량3':'2','단가3':'8500',
+  '공급받는자':'(주)한빛상사','공급자':'KTS 문구','번호':'2026-1118-01','비고':'납품 후 7일 내 결제','인수자':'김민수','수신':'(주)한빛상사','담당자':'이서연','연락처':'010-1234-5678','유효기간':'견적일로부터 30일',
+  '견적처':'KTS 문구','사업장':'KTS 카페','대표자':'박대표','근로자 성명':'최지우','근로자 주소':'서울시 마포구 독막로 1','근무 장소':'KTS 카페 본점','업무 내용':'매장 운영 · 고객 응대',
+  '근로 시간':'09:00 ~ 18:00','휴게 시간':'12:00 ~ 13:00','근무일 휴일':'주 5일(월~금) · 주휴일 일요일','임금':'2200000','지급일 방법':'매월 10일 · 근로자 계좌 입금',
+  '동의 여부':'동의함','성명':'정하늘','수신처':'KTS 원클릭','신청인 성명':'한가람','주소':'부산시 해운대구 센텀로 10','이메일':'sample@example.com','신청 내용':'사업자 등록 증명서 2부 발급','신청 사유':'거래처 제출용','첨부 서류':'신분증 사본 1부','신청인':'한가람'};
+$('#sampleVals').onclick = () => { CUR.fields.forEach(f => { if (f.type === 'sign') return; if (CUR.calc && CUR.calc[f.label]) return;
+  VALS[f.label] = SAMPLE_BY[f.label] != null ? SAMPLE_BY[f.label] : (f.type === 'number' ? SAMPLE.number : (f.type === 'date' ? SAMPLE.date : (f.label.indexOf('이름') >= 0 || f.label.indexOf('성명') >= 0 ? '홍길동' : f.label + ' 예시'))); });
+  runCalc(''); saveVals(); renderInputs(); toast('예시 값을 넣었습니다'); };
+
+/* 음성 메모 — 브라우저 내장 음성 인식(무료) */
+$('#voiceBtn').onclick = () => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다. 키보드의 마이크를 써 주세요');
+  const tgt = LAST_INPUT || $('#valList input[data-f]'); if (!tgt) return toast('먼저 넣을 칸을 눌러 주세요');
+  const r = new SR(); r.lang = 'ko-KR'; r.interimResults = false;
+  r.onresult = e => { const t = e.results[0][0].transcript; const f = CUR.fields[+tgt.dataset.f];
+    tgt.value = f.type === 'number' ? fmtNum(t) : t; tgt.dispatchEvent(new Event('input', {bubbles:true})); toast('넣었습니다: ' + t); };
+  r.onerror = () => toast('음성을 알아듣지 못했습니다'); r.start(); toast(`"${CUR.fields[+tgt.dataset.f].label}" 칸에 말씀하세요`);
+};
+
+/* ---------- AI (손님 자기 제미나이 무료 열쇠 · 그 기기에만 보관) ---------- */
+function myKey(){ let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){}
+  if (!k && window.KTS_FREE && window.KTS_FREE.p && window.KTS_FREE.p.length) k = window.KTS_FREE.p.join('');
+  return (k && !/^__/.test(k)) ? k : ''; }
+function updKey(){ $('#keyBtn').textContent = 'AI 열쇠 · ' + (myKey() ? '있음' : '없음'); }
+async function gemini(prompt, b64){
+  const key = myKey(); if (!key) throw new Error('NO_KEY');
+  const cfg = window.KTS_AI || {}, models = cfg.models || ['gemini-flash-lite-latest'];
+  const ep = cfg.endpoint || 'https://generativelanguage.googleapis.com/v1beta/models/';
+  let last = null;
+  for (const m of models){
+    try{
+      const r = await fetch(ep + m + ':generateContent?key=' + encodeURIComponent(key), {method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}, {inline_data:{mime_type:'image/jpeg', data:b64}}]}], generationConfig:{responseMimeType:'application/json', temperature:0}})});
+      if (!r.ok){ last = new Error(r.status === 429 ? 'QUOTA' : 'AI ' + r.status); continue; }
+      const j = await r.json(); const t = (((j.candidates || [])[0] || {}).content || {}).parts?.[0]?.text || '';
+      const o = parseJsonLoose(t); if (o) return o; last = new Error('AI 응답을 읽지 못했습니다');
+    }catch(e){ last = e; }
+  }
+  throw last || new Error('AI 실패');
+}
+const aiErr = e => e.message === 'NO_KEY' ? '오른쪽 위 [AI 열쇠]에 내 제미나이 무료 열쇠를 넣어 주세요' : (e.message === 'QUOTA' ? '오늘 무료 사용량을 다 썼습니다. 내일 다시 해 주세요' : 'AI 처리에 실패했습니다');
+const bgB64 = () => { const c = document.createElement('canvas'), s = Math.min(1, 1600 / Math.max(bgW(), bgH())); c.width = Math.round(bgW() * s); c.height = Math.round(bgH() * s);
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(BG, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.9).split(',')[1]; };
+$('#aiFind').onclick = async () => {
+  if (ro()) return toast('기본 양식은 이미 빈칸이 지정되어 있습니다');
+  if (!myKey()) return toast(aiErr(new Error('NO_KEY')));
+  busyOn('AI가 빈칸을 찾는 중…');
+  try{
+    const b64 = bgB64();
+    const o = await gemini('이미지는 빈 종이 양식입니다. 사람이 값을 적어 넣어야 하는 빈칸을 모두 찾아 JSON만 출력하세요. 형식: {"fields":[{"label":"이름표(양식에 인쇄된 항목 이름)","type":"text|number|date|sign","box":[왼쪽%,위%,너비%,높이%]}]} 좌표는 이미지 전체 너비·높이를 100으로 본 값. 금액·수량은 number, 날짜는 date, 서명·인 자리는 sign.', b64);
+    const add = (o.fields || []).filter(f => f && Array.isArray(f.box) && f.box.length === 4).map(f => ({id:uid(), label:String(f.label || '칸').slice(0, 30), type:TYPE_NM[f.type] ? f.type : 'text',
+      x:+f.box[0] || 0, y:+f.box[1] || 0, w:Math.max(3, +f.box[2] || 20), h:Math.max(1.5, +f.box[3] || 3)}));
+    if (add.length){ snap(); CUR.fields = CUR.fields.concat(add); }
+    busyOn('AI가 한글·엑셀용 문서 틀을 읽는 중…');
+    try{ const raw = await gemini(PROMPT, b64); if (raw && Array.isArray(raw.blocks)) CUR.raw = raw; }catch(e){}
+    drawEditor(); toast(`빈칸 ${add.length}개를 찾았습니다` + (CUR.raw ? ' · 문서 틀도 읽었습니다' : ''));
+  }catch(e){ toast(aiErr(e)); }
+  busyOff();
+};
+$('#handBtn').onclick = () => { if (!myKey()) return toast(aiErr(new Error('NO_KEY'))); $('#handIn').click(); };
+$('#handIn').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+  busyOn('손글씨를 읽는 중…');
+  try{
+    const img = await fileToImage(file, 1600);
+    const labels = CUR.fields.filter(f => f.type !== 'sign').map(f => f.label);
+    const o = await gemini('이미지는 손으로 적은 메모 또는 손글씨로 채운 양식입니다. 아래 항목 이름에 해당하는 값을 읽어 JSON 객체 {"항목 이름":"값"} 하나만 출력하세요. 없는 값은 빈 문자열. 지어내지 마세요. 항목: ' + JSON.stringify(labels), img.data);
+    let n = 0; labels.forEach(l => { if (o[l] != null && String(o[l]).trim()){ VALS[l] = String(o[l]).trim(); n++; } });
+    runCalc(''); saveVals(); renderInputs(); toast(`손글씨에서 ${n}칸을 채웠습니다`);
+  }catch(err){ toast(aiErr(err)); }
+  busyOff();
+};
+$('#keyBtn').onclick = () => { let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){} $('#keyIn').value = k; $('#keyModal').classList.add('on'); };
+$('#keyClose').onclick = () => $('#keyModal').classList.remove('on');
+$('#keySave').onclick = () => { const k = $('#keyIn').value.trim(); if (!/^AIza[\w-]{20,}$/.test(k)) return toast('AIza로 시작하는 열쇠를 넣어 주세요');
+  try{ localStorage.setItem('kts_ai_key', k); }catch(e){} updKey(); $('#keyModal').classList.remove('on'); toast('이 기기에만 저장했습니다'); };
+$('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catch(e){} $('#keyIn').value = ''; updKey(); toast('열쇠를 지웠습니다'); };
+
+/* ---------- ④ 미리보기(배경 + 값 얹기) ---------- */
+async function composite(maxW){
+  const W = bgW(), H = bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
+  const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(BG, 0, 0, cv.width, cv.height);
+  /* 글자 크기: 칸 높이(중간값)에 맞추고, 종이 너비의 3.5%를 넘지 않게 */
+  const hs = CUR.fields.map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
+  const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.55, cv.width * 0.035);
+  for (const f of CUR.fields){
+    const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
+    const v = VALS[f.label]; if (v == null || v === '') continue;
+    if (f.type === 'sign'){
+      const im = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = v; }); if (!im) continue;
+      const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
+    }
+    const t = shown(f); let fs = Math.min(h * 0.62, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(4, fs * 0.35);
+    g.fillStyle = '#10204A'; g.textBaseline = 'middle';
+    g.font = `${fw} ${fs}px ${FONT}`;
+    while (fs > 6 && g.measureText(t).width > w - pad * 2 && h < fs * 2.6){ fs -= .5; g.font = `${fw} ${fs}px ${FONT}`; }
+    if (g.measureText(t).width > w - pad * 2 && h >= fs * 2.6){   /* 높은 칸은 줄바꿈 */
+      const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.3; let yy = y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
+      g.textAlign = 'left'; lines.forEach(l => { if (yy < y + h) g.fillText(l, x + pad, yy); yy += lh; });
+    } else {
+      g.textAlign = f.type === 'number' ? 'right' : 'left';
+      g.fillText(t, f.type === 'number' ? x + w - pad : x + pad, y + h / 2);
+    }
+  }
+  return cv;
+}
+async function renderPreview(){ const c = await composite(), pv = $('#pvCv'); pv.width = c.width; pv.height = c.height; pv.getContext('2d').drawImage(c, 0, 0); }
+
+/* ---------- ⑤ 내보내기: converter 엔진(docFromRaw → buildHwpx / buildXlsx) 그대로 ---------- */
+function normLabel(s){ return String(s || '').replace(/[\s·:：()\[\]]/g, ''); }
+function exportRaw(){
+  const raw = CUR.raw ? clone(CUR.raw) : {blocks:[TX(CUR.name || '양식', {al:'C', sz:18, b:1})]};
+  const extras = [];
+  const cellOf = (b, r, c) => (b.cells || []).find(x => Array.isArray(x) ? (+x[0] === r && +x[1] === c) : (+x.r === r && +x.c === c));
+  const setCell = (cell, txt, num) => { if (Array.isArray(cell)){ cell[4] = txt; if (num) cell[9] = 1; cell.length = Math.min(cell.length, 11); } else { cell.text = txt; if (num) cell.num = 1; } };
+  CUR.fields.forEach(f => {
+    const v = shown(f);
+    if (f.cell){ const b = raw.blocks[f.cell[0]], cell = b && cellOf(b, f.cell[1], f.cell[2]); if (cell){ setCell(cell, v, f.type === 'number'); return; } }
+    if (CUR.raw){   /* AI가 읽은 문서 틀: 이름표가 같은 칸 오른쪽 칸에 넣는다 */
+      for (const b of raw.blocks){ if ((b.t || b.type) !== 'table') continue;
+        const lab = (b.cells || []).find(x => normLabel(Array.isArray(x) ? x[4] : x.text) === normLabel(f.label));
+        if (!lab) continue; const r = Array.isArray(lab) ? +lab[0] : +lab.r, c = (Array.isArray(lab) ? +lab[1] : +lab.c) + (Array.isArray(lab) ? (+lab[3] || 1) : (+lab.colSpan || 1));
+        const nx = cellOf(b, r, c); if (nx){ setCell(nx, v, f.type === 'number'); return; } }
+    }
+    extras.push(f);
+  });
+  if (extras.length){
+    raw.blocks.push(TX(''));
+    raw.blocks.push(TB([30, 70], extras.map(f => [L(f.label), {t:shown(f), al:f.type === 'number' ? 'R' : 'L', n:f.type === 'number' ? 1 : 0}]), {main:!raw.blocks.some(b => +b.main === 1)}));
+  }
+  raw.blocks.forEach(b => { delete b.rh; });
+  return raw;
+}
+async function exportBlob(kind){
+  const st = docFromRaw(exportRaw(), '');
+  if (!st) throw new Error('문서를 만들지 못했습니다');
+  const entries = kind === 'hwpx' ? await buildHwpx(st) : buildXlsx(st);
+  const z = await makeZip(entries);
+  return new Blob([z], {type:kind === 'hwpx' ? 'application/hwp+zip' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function outBase(){ const d = new Date(), p = n => String(n).padStart(2, '0'); return ($('#outName').value.trim() || CUR.name || '양식').replace(/[\\/:*?"<>|]/g, '_'); }
+function download(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
+async function doExport(kind){
+  busyOn(kind === 'hwpx' ? '한글 파일을 만드는 중…' : '엑셀 파일을 만드는 중…');
+  try{ const b = await exportBlob(kind); const nm = outBase() + '.' + kind; download(b, nm); $('#exInfo').innerHTML = `<span class="dot"></span>${escH(nm)} 저장 (${Math.max(1, Math.round(b.size / 1024))}KB). 더뷰(<a href="viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`; toast('저장했습니다'); }
+  catch(e){ toast('파일을 만들지 못했습니다: ' + (e.message || '')); }
+  busyOff();
+}
+$('#exHwpx').onclick = () => doExport('hwpx');
+$('#exXlsx').onclick = () => doExport('xlsx');
+$('#exPrint').onclick = async () => { const c = await composite(); $('#printArea').innerHTML = `<img src="${c.toDataURL('image/png')}" alt="">`; setTimeout(() => window.print(), 120); };
+
+/* ---------- 화면 이동 ---------- */
+function go(n){
+  if (n > 1 && !CUR){ toast('먼저 양식을 등록하거나 목록에서 고르세요'); n = 1; }
+  STEP = n;
+  $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's' + n));
+  $$('#steps button').forEach(b => { const k = +b.dataset.s; b.classList.toggle('on', k === n); b.classList.toggle('done', k < n); });
+  $('#backBtn').style.display = n === 1 ? 'none' : '';
+  $('#nextBtn').textContent = ['', '빈칸 지정으로', ro() ? '값 입력으로' : '내 양식으로 저장', '미리보기', '내보내기', '처음으로'][n];
+  if (n === 2) drawEditor();
+  if (n === 3) renderInputs();
+  if (n === 4) renderPreview();
+  if (n === 5 && !$('#outName').value) $('#outName').value = (CUR.name || '양식') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  if (n === 1) renderList();
+  window.scrollTo(0, 0);
+}
+$('#nextBtn').onclick = async () => {
+  if (STEP === 1){ if (!CUR) return toast('양식 사진을 고르거나 목록에서 [열기]를 누르세요'); go(2); }
+  else if (STEP === 2){ if (await saveCurrent()) go(3); }
+  else if (STEP < 5) go(STEP + 1);
+  else { CUR = null; REG = null; $('#regBox').style.display = 'none'; go(1); }
+};
+$('#backBtn').onclick = () => go(Math.max(1, STEP - 1));
+$('#steps').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.s); };
+$('#pickBtn').onclick = () => $('#photoIn').click();
+$('#photoIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; onPhoto(f); };
+$('#regSeg').onclick = e => { const b = e.target.closest('button'); if (b) showReg(b.dataset.v); };
+
+/* ---------- 60초 문의 (발송 없음 · 사람 승인 후) ---------- */
+function qDraft(){
+  const n = $('#qName').value.trim(), t = $('#qTel').value.trim(), m = $('#qMsg').value.trim();
+  let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).style.borderColor = v ? '' : 'var(--red)'; if (!v) bad = true; });
+  if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
+  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더양식',
+    draft:`${n}님, 안녕하세요. KTS 원클릭 더양식입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 5종은 지금 바로 무료로 쓰실 수 있습니다.`};
+}
+$('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
+$('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGet(LS_Q, []); a.push(q); lsSet(LS_Q, a);
+  $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
+
+/* 시험·설명서용 손잡이 */
+window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, onPhoto, addField, undo, redo, saveCurrent, myForms, BUILT,
+  get CUR(){ return CUR; }, get VALS(){ return VALS; }, set VALS(v){ VALS = v; }, get SEL(){ return SEL; }, set SEL(v){ SEL = v; }, get UNDO(){ return UNDO; }, drawEditor, runCalc, saveVals, renderInputs};
+updKey(); go(1);
+</script>
+</body></html>

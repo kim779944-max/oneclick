@@ -1,0 +1,1452 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 계약서 1초 생성기 — 매매·주택 임대차·상가 임대차</title>
+<meta name="description" content="계약 자리에서 조건만 넣으면 부동산 매매계약서·주택 임대차계약서·상가건물 임대차계약서가 바로 나옵니다. 한글 금액 자동 표기, 날짜 자동 계산, 3부 인쇄, 한글(.hwpx) 저장. 모든 처리는 이 기기 안에서만.">
+<meta name="theme-color" content="#0A1128">
+<link rel="icon" href="icon.png">
+<style>
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
+ --amber:#FF6B00;--amber2:#FFA24D;--on-amber:#0A1224;--red:#FF5A5A;--green:#2ED47A}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+ background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:flex;justify-content:center;min-height:100vh;word-break:keep-all}
+#app{width:100%;max-width:460px;min-height:100vh;position:relative;overflow-x:hidden;
+ background:radial-gradient(120% 50% at 50% -6%,rgba(255,107,0,.10) 0%,rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A 0%,#0C1730 46%,#0A1128 100%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:-.2px}
+input,select,textarea{font:inherit;color:var(--ink);background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 11px;width:100%;font-size:14px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--amber2)}
+input.miss,textarea.miss{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset}
+a{color:var(--amber2)}
+header.top{position:sticky;top:0;z-index:40;background:rgba(10,17,40,.96);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:8px;padding:10px 14px 8px}
+.brand{display:flex;align-items:center;gap:7px;font-size:16px;font-weight:900;color:#fff;letter-spacing:-.6px}
+.brand .mark{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224;font-size:12px;font-weight:900}
+.brand small{font-size:9.5px;font-weight:700;color:#7C8DA6}
+.sp{flex:1}
+.newb{font-size:11px;font-weight:800;color:var(--amber2);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:6px 10px}
+.legal{margin:0 14px 8px;font-size:10.5px;line-height:1.5;color:#FFD7B8;background:rgba(255,107,0,.10);border:1px solid rgba(255,107,0,.45);border-radius:9px;padding:6px 9px}
+.prog{padding:0 14px 10px}
+.prog .track{height:6px;border-radius:6px;background:#22335A;overflow:hidden}
+.prog .fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:6px;transition:width .25s}
+.prog .lbls{display:flex;margin-top:6px}
+.prog .lbls button{flex:1;font-size:11px;font-weight:800;color:#7C8DA6;text-align:center}
+.prog .lbls button.on{color:#fff}.prog .lbls button.done{color:var(--amber2)}
+.prog .lbls b{display:inline-block;min-width:16px;font-size:9.5px;color:#fff;background:var(--red);border-radius:8px;padding:0 4px;margin-left:3px}
+main{padding:12px 14px 120px}
+.scr{display:none}.scr.on{display:block}
+.card{background:linear-gradient(180deg,#12203C 0%,#0F1B33 100%);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+.card h2{font-size:14px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px}
+.card h2 .n{width:18px;height:18px;border-radius:6px;background:var(--amber);color:var(--on-amber);font-size:10.5px;font-weight:900;display:grid;place-items:center}
+.sub{font-size:11.5px;color:var(--gray);margin-top:4px;line-height:1.5}
+.seg{display:flex;gap:4px;background:#0B1729;border:1px solid var(--line);border-radius:11px;padding:3px;margin-top:8px}
+.seg button{flex:1;font-size:12.5px;font-weight:900;color:#94A3B8;border-radius:9px;padding:10px 4px;line-height:1.25}
+.seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
+label.lb{display:block;font-size:11.5px;font-weight:800;color:var(--ink2);margin:9px 0 4px}
+label.lb em{font-style:normal;color:var(--red);margin-left:3px}
+label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-size:10.5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.kor{font-size:11.5px;font-weight:800;color:var(--amber2);margin-top:4px;min-height:16px}
+.dd{display:flex;align-items:center;gap:6px}
+.dd input{flex:0 0 86px}
+.dd .when{font-size:12px;font-weight:800;color:#DCE6F2}
+.chips{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.chips button{font-size:11px;font-weight:800;color:#DCE6F2;border:1px solid var(--line2);border-radius:999px;padding:5px 9px;background:#12203C}
+.sp-list{margin-top:6px;display:flex;flex-direction:column;gap:6px}
+.sp-list label{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:#DCE6F2;background:#0B1729;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.sp-list input{width:18px;height:18px;flex:0 0 18px;margin-top:1px;accent-color:#FF6B00}
+.cp{display:flex;gap:6px;margin-top:6px}
+.cp label{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:800;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 4px}
+.cp input{width:16px;height:16px;accent-color:#FF6B00}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;border-radius:12px;padding:13px 12px;font-size:14.5px;font-weight:900}
+.btn.pri{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));box-shadow:0 8px 22px rgba(255,107,0,.3)}
+.btn.sec{color:#E6EDF7;background:#12203C;border:1px solid var(--line2)}
+.btn.sm{padding:9px 10px;font-size:12.5px;border-radius:10px}
+.row{display:flex;gap:7px;margin-top:8px}.row>*{flex:1}
+.missbox{margin-top:8px;font-size:12px;line-height:1.55;color:#FFC9C9;background:rgba(255,90,90,.10);border:1px solid rgba(255,90,90,.5);border-radius:10px;padding:8px 10px;display:none}
+.pvwrap{margin-top:8px;background:#fff;border-radius:8px;overflow:hidden}
+.pvwrap .paper{transform-origin:0 0}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;z-index:50;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+ background:linear-gradient(180deg,rgba(10,17,40,0) 0%,rgba(10,17,40,.96) 26%);display:flex;gap:8px}
+.bar .back{flex:0 0 86px}
+.bar .btn{padding:15px 12px;font-size:15.5px}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.25s;background:#1E2C4D;border:1px solid var(--amber);color:#fff;font-size:13px;font-weight:800;border-radius:12px;padding:10px 14px;z-index:90;max-width:360px;text-align:center;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.kv{font-size:11px;color:var(--gray);line-height:1.55;margin-top:6px}
+.qa .draft{white-space:pre-wrap;font-size:12px;line-height:1.55;background:#0B1729;border:1px dashed var(--amber2);border-radius:10px;padding:10px;margin-top:8px;color:#DCE6F2;display:none}
+.foot{font-size:10.5px;color:#6E7F99;text-align:center;margin-top:14px;line-height:1.6}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:6px;vertical-align:middle}
+/* 계약서 종이 */
+.paper{width:720px;background:#fff;color:#111;padding:34px 38px;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:11.5px;line-height:1.55;letter-spacing:-.1px}
+.paper p{margin:0 0 4px}
+.paper table{width:100%;border-collapse:collapse;margin:3px 0 7px;table-layout:fixed}
+.paper td{border:1px solid #333;padding:4px 6px;vertical-align:middle;word-break:keep-all;overflow-wrap:anywhere}
+.paper td.nb{border:0}
+.paper .copy{text-align:right;font-size:10.5px;font-weight:700;color:#555;margin-bottom:2px}
+#printArea{display:none}
+@media print{
+ body{background:#fff;display:block}
+ #app,.bar,#toast{display:none!important}
+ #printArea{display:block}
+ #printArea .paper{width:auto;padding:0;font-size:8.3pt;line-height:1.36;page-break-after:always}
+ #printArea .paper p{margin:0 0 1.5pt}
+ #printArea .paper table{margin:1pt 0 3pt}
+ #printArea .paper td{padding:1.6pt 4pt}
+ #printArea .paper:last-child{page-break-after:auto}
+ @page{size:A4;margin:10mm 12mm}
+}
+</style>
+</head><body>
+<div id="app">
+<header class="top">
+ <div class="hd">
+  <div class="brand"><span class="mark">계</span>계약서 1초 생성기 <small>KTS 원클릭</small></div>
+  <span class="sp"></span>
+  <button class="newb" id="newBtn">새로 쓰기</button>
+ </div>
+ <p class="legal" id="legalTop"></p>
+ <div class="prog"><div class="track"><div class="fill" id="pfill"></div></div>
+  <div class="lbls" id="plbls"><button data-s="1">1 당사자</button><button data-s="2">2 물건·금액</button><button data-s="3">3 특약·확인</button></div></div>
+</header>
+<main>
+<!-- 1 당사자 -->
+<section class="scr" id="s1">
+ <div class="card">
+  <h2><span class="n">1</span>계약서 종류</h2>
+  <div class="seg" id="typeSeg"><button data-v="sale">부동산<br>매매</button><button data-v="house">주택<br>임대차</button><button data-v="shop">상가건물<br>임대차</button></div>
+  <div class="seg" id="rentSeg" style="display:none"><button data-v="jeonse">전세</button><button data-v="wolse">월세</button></div>
+ </div>
+ <div class="card"><h2><span class="n">갑</span><span id="aTitle">매도인</span></h2><div id="aBox"></div></div>
+ <div class="card"><h2><span class="n">을</span><span id="bTitle">매수인</span></h2><div id="bBox"></div></div>
+</section>
+<!-- 2 물건·금액 -->
+<section class="scr" id="s2">
+ <div class="card"><h2><span class="n">2</span>물건 표시</h2><div id="propBox"></div></div>
+ <div class="card"><h2><span class="n">원</span>금액과 날짜</h2>
+  <p class="sub">숫자만 넣으면 한글 금액이 자동으로 붙습니다. 날짜는 계약일로부터 며칠 뒤인지(D+n)로 넣으세요.</p>
+  <div id="moneyBox"></div>
+ </div>
+</section>
+<!-- 3 특약·확인 -->
+<section class="scr" id="s3">
+ <div class="card"><h2><span class="n">3</span>특약사항</h2><p class="sub">자주 쓰는 특약을 고르고, 필요한 내용은 아래에 직접 적으세요.</p>
+  <div class="sp-list" id="spList"></div>
+  <label class="lb">직접 적는 특약<i>줄마다 한 항목</i></label><textarea id="spFree" rows="3" data-k="free"></textarea>
+ </div>
+ <div class="card"><h2><span class="n">중</span>개업공인중개사</h2><div id="brBox"></div></div>
+ <div class="card"><h2><span class="n">부</span>인쇄 부수</h2>
+  <div class="cp"><label><input type="checkbox" data-cp="a" checked><span id="cpA">매도인용</span></label><label><input type="checkbox" data-cp="b" checked><span id="cpB">매수인용</span></label><label><input type="checkbox" data-cp="c" checked>중개사용</label></div>
+  <div class="missbox" id="missBox"></div>
+  <div class="row"><button class="btn pri" id="printBtn">인쇄 · PDF</button><button class="btn pri" id="hwpxBtn">한글(.hwpx) 저장</button></div>
+  <p class="kv" id="outInfo">파일은 이 기기 안에서 만들어집니다. 더뷰(<a href="viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.</p>
+ </div>
+ <div class="card"><h2><span class="n">보</span>계약서 미리보기</h2><div class="pvwrap" id="pvWrap"></div></div>
+</section>
+
+<section class="card qa">
+ <h2><span class="n">?</span>60초 문의</h2>
+ <p class="sub">필요한 서식이나 특약 문구를 알려 주시면 다음 판에 넣어 드립니다. 남긴 내용은 이 기기에 보관되고, 담당자가 확인한 뒤 연락드립니다.</p>
+ <label class="lb">이름</label><input id="qName" maxlength="20">
+ <label class="lb">연락처</label><input id="qTel" maxlength="30" inputmode="tel" placeholder="010-0000-0000">
+ <label class="lb">문의 내용</label><textarea id="qMsg" rows="3" maxlength="500" placeholder="예: 토지 매매계약서도 있으면 좋겠습니다"></textarea>
+ <div class="row"><button class="btn sec sm" id="qMake">답장 초안 만들기</button><button class="btn sec sm" id="qSave">승인 대기에 담기</button></div>
+ <div class="draft" id="qDraft"></div>
+ <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
+</section>
+<p class="foot">계약서 1초 생성기 · KTS 원클릭 · 서버 0 · 유료 API 0<br>입력값은 이 기기 브라우저 안에만 저장됩니다.</p>
+</main>
+<div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
+</div>
+<div id="toast"></div>
+<div id="printArea"></div>
+<script>
+/* ===== 아래 엔진은 oneclick/converter.html 에서 그대로 가져온 복사본입니다(수정 금지·동기화 대상) ===== */
+const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
+/* ================= 사진 → 구조(JSON) ================= */
+/* 문서 전체 1:1 복제 — 표 하나가 아니라 사진 속 종이 한 장의 모든 요소를 위→아래 순서로 읽는다 */
+const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
+사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
+아래 형식의 JSON만 출력하세요. 다른 말은 절대 쓰지 마세요.
+
+{"blocks":[블록, 블록, ...]}
+
+블록은 두 종류입니다.
+1) 표 블록
+{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+ "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
+2) 글 블록(제목 배너·문단·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
+{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,
+ "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
+
+규칙:
+- x, w는 종이(문서 본문) 전체 너비를 100으로 본 가로 위치·너비입니다. 가운데 놓인 것은 좌우 여백이 같게.
+- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0.
+- 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
+- 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
+- 문단 안에서 색이 바뀌는 부분(빨간 글씨 등)은 runs를 나눠 color를 적으세요. 검정 글씨는 color 빈칸.
+- 노란 형광펜이 칠해진 글은 형광펜에 그 색(#FFFF00 등)을, 밑줄 친 글은 밑줄에 밑줄 색을 적으세요.
+- 본문 글자 크기는 10을 기준으로 상대 크기를 적으세요(작은 글 9, 큰 제목 22 등).
+- '- 아 래 -' 같은 가운데 한 줄, 하단 날짜, 회사명·직인 문구도 각각 글 블록으로 넣으세요. 로고 그림은 그 안의 글자만 적으세요.
+- 문단은 원본의 줄바꿈이 아니라 문단 단위로 한 블록에 이어 적으세요(띄어쓰기는 원본대로).
+- 표: nRows/nCols는 병합을 포함한 전체 격자. colWidths 길이 = nCols. cells는 병합 안 된 칸마다 하나씩(빈 칸 포함). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
+- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸). 칸 전체가 색 글씨면 color에 적으세요.
+- 한 칸 안에서 일부 글자만 색이 다르면(예: "…, 화물 1호기"의 '화물 1호기'만 빨강) 그 칸 배열 끝(12번째)에 runs를 붙이세요: [["인승 1~4호기, 비상 1호기, ",0,"","",""],["화물 1호기",0,"#C00000","",""]]. runs 글자를 이으면 5번째 "글자"와 같아야 합니다.
+- 숫자만 든 칸은 align "C". 긴 목록·설명 칸은 align "L". num은 금액·수량처럼 계산하는 숫자면 1(날짜·전화번호는 0).
+- 글자는 사진에 보이는 그대로. 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로. 없는 글자 절대 지어내지 마세요.
+- 사진 밖 배경(벽지·액자·게시판)은 무시하세요.
+- 압축된 JSON(줄바꿈/공백 없이)으로 출력하세요.`;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function fileToImage(file, maxSide){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(im.width, im.height));
+      const w = Math.max(1, Math.round(im.width * s)), h = Math.max(1, Math.round(im.height * s));
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(im, 0, 0, w, h);
+      const data = cv.toDataURL('image/jpeg', 0.92).split(',')[1];
+      URL.revokeObjectURL(url); res({data, w, h, preview: im.src});
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('사진을 열지 못했습니다')); };
+    im.src = url;
+  });
+}
+
+async function visionStruct(file, onStep){
+  const cfg = window.KTS_AI || {};
+  let key = cfg.key || '';
+  try{ key = localStorage.getItem('kts_ai_key') || key; }catch(e){}
+  if (!key || /^__/.test(key)) throw new Error('NO_KEY');
+  const img = await fileToImage(file, cfg.maxSide || 1800);
+  onStep && onStep('사진을 정리했습니다 · AI에게 보내는 중…', 26);
+  const models = cfg.models || ['gemini-3.5-flash'];
+  let lastErr = null, quotaHit = false;
+  for (const model of models){
+    for (let attempt = 0; attempt < 2; attempt++){
+    try{
+      const body = {contents:[{parts:[{text:PROMPT},{inline_data:{mime_type:'image/jpeg', data:img.data}}]}],
+        generationConfig:{responseMimeType:'application/json', temperature:0, maxOutputTokens:65535}};
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
+      const r = await fetch(cfg.endpoint + model + ':generateContent?key=' + encodeURIComponent(key),
+        {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
+      clearTimeout(to);
+      if (r.status === 429){ quotaHit = true; lastErr = new Error('QUOTA'); await sleep(1500); break; }
+      if (r.status === 503 || r.status === 500){ lastErr = new Error('AI_BUSY'); await sleep(800); break; }
+      if (!r.ok){ lastErr = new Error('AI ' + r.status); break; }
+      const j = await r.json();
+      const txt = (((j.candidates || [])[0] || {}).content || {}).parts?.[0]?.text || '';
+      const raw = parseJsonLoose(txt);
+      const st0 = raw ? docFromRaw(raw, img.preview) : null;
+      if (!st0) { lastErr = new Error('AI가 표를 찾지 못했습니다'); continue; }
+      onStep && onStep('문서 전체 구조를 정리하는 중…', 78);
+      return st0;
+    }catch(e){ lastErr = e; }
+    }
+  }
+  if (quotaHit) throw new Error('QUOTA');
+  throw lastErr || new Error('AI 변환에 실패했습니다');
+}
+function parseJsonLoose(txt){
+  let t = String(txt || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  try{ return JSON.parse(t); }catch(e){}
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a >= 0 && b > a){ try{ return JSON.parse(t.slice(a, b + 1)); }catch(e){} }
+  return null;
+}
+/* 병합·겹침·빈칸을 정리해 반드시 '딱 맞는 격자'로 만든다 */
+function normalize(raw, preview){
+  const toObj = c => Array.isArray(c)
+    ? {r:+c[0]||0, c:+c[1]||0, rs:Math.max(1, +c[2]||1), cs:Math.max(1, +c[3]||1),
+       text:String(c[4] == null ? '' : c[4]), bold:!!+c[5],
+       align:(c[6] === 'L' || c[6] === 'left') ? 'L' : ((c[6] === 'R' || c[6] === 'right') ? 'R' : 'C'),
+       bg:normHex(c[7]), color:normHex(c[8]), num:!!+c[9], nb:!!+c[10], runs:normRuns(c[11])}
+    : {r:+c.r||0, c:+c.c||0, rs:Math.max(1, +(c.rowSpan||1)), cs:Math.max(1, +(c.colSpan||1)),
+       text:String(c.text == null ? '' : c.text), bold:!!c.bold,
+       align:(c.align === 'left' || c.align === 'L') ? 'L' : ((c.align === 'right' || c.align === 'R') ? 'R' : 'C'),
+       bg:normHex(c.bg), color:normHex(c.color), num:!!c.num, nb:!!c.nb, runs:normRuns(c.runs)};
+  let cells = (raw.cells || []).map(toObj).filter(c => c.r >= 0 && c.c >= 0);
+  let nRows = Math.max(1, +raw.nRows || 1), nCols = Math.max(1, +raw.nCols || 1);
+  cells.forEach(c => { nRows = Math.max(nRows, c.r + c.rs); nCols = Math.max(nCols, c.c + c.cs); });
+  // 열 너비
+  let cw = (raw.colWidths || []).map(x => Math.max(0, Math.round(+x || 0)));
+  if (cw.length !== nCols){
+    const tmp = []; for (let i = 0; i < nCols; i++) tmp.push(cw[i] || Math.round(100 / nCols));
+    cw = tmp;
+  }
+  let sum = cw.reduce((a, b) => a + b, 0) || 1;
+  cw = cw.map(w => Math.max(2, Math.round(w / sum * 1000) / 10));
+  // 격자 채우기(겹치면 잘라내고, 빈칸은 빈 셀)
+  cells.sort((a, b) => a.r - b.r || a.c - b.c);
+  const occ = Array.from({length: nRows}, () => new Array(nCols).fill(false));
+  const out = [];
+  for (const c of cells){
+    if (c.r >= nRows || c.c >= nCols) continue;
+    let cs = 1, rs = 1;
+    while (c.c + cs < nCols && !occ[c.r][c.c + cs] && cs < c.cs) cs++;
+    while (c.r + rs < nRows && !occ[c.r + rs][c.c] && rs < c.rs) rs++;
+    let free = true;
+    for (let r = c.r; r < c.r + rs && free; r++) for (let k = c.c; k < c.c + cs; k++) if (occ[r][k]) { free = false; break; }
+    if (!free) continue;
+    for (let r = c.r; r < c.r + rs; r++) for (let k = c.c; k < c.c + cs; k++) occ[r][k] = true;
+    const o = {r:c.r, c:c.c, rs, cs, text:c.text, bold:c.bold, align:c.align, bg:c.bg, color:c.color, num:c.num};
+    if (c.nb) o.nb = true;
+    if (c.runs && c.runs.length > 1){ o.runs = c.runs; o.text = c.runs.map(x => x.text).join(''); }
+    out.push(o);
+  }
+  for (let r = 0; r < nRows; r++) for (let c = 0; c < nCols; c++){
+    if (!occ[r][c]) out.push({r, c, rs:1, cs:1, text:'', bold:false, align:'C', bg:'', color:'', num:false});
+  }
+  out.sort((a, b) => a.r - b.r || a.c - b.c);
+  // 열이 너무 좁아 '5/13' 같은 값이 두 줄로 쪼개지는 것 방지: 가장 긴 토큰 기준으로 최소 폭 확보
+  const minW = new Array(nCols).fill(0);
+  out.forEach(c => {
+    if (c.cs !== 1) return;
+    const toks = String(c.text || '').split(/\s+/).filter(Boolean);
+    const len = toks.length ? Math.max(...toks.map(t => t.length)) : 0;
+    minW[c.c] = Math.max(minW[c.c], Math.min(14, Math.max(3.5, len * 1.55)));
+  });
+  if (!raw.lockWidths) cw = cw.map((w, i) => Math.max(w, minW[i]));   /* 사진에서 읽은 원본 너비는 잠근다 */
+  const tot2 = cw.reduce((a, b) => a + b, 0) || 1;
+  cw = cw.map(w => Math.round(w / tot2 * 1000) / 10);
+  const st = {title:String(raw.title || '').trim(), nRows, nCols, colWidths:cw, cells:out, preview};
+  /* 실제 글자 폭(9pt)으로 다시 한 번 맞춤 — 미리보기·한글·엑셀이 같은 너비를 쓰게 */
+  if (raw.lockWidths) st.lockWidths = true;   /* 사진에서 읽은 원본 열 너비를 그대로 고정 */
+  else { try{ st.colWidths = fitColWidths(st, 41952); }catch(e){} }
+  return st;
+}
+function normHex(v){ const s = String(v || '').trim(); return /^#[0-9a-f]{6}$/i.test(s) ? s.toUpperCase() : ''; }
+
+/* ================= 문서 전체(배너·문단·작은 표·메인 표·서명) ================= */
+/* 글 조각(run): {text, b, color, hl(형광펜), ul(밑줄 색)} — 같은 모양이 이어지면 하나로 합친다 */
+function normRuns(a){
+  if (!Array.isArray(a)) return null;
+  const ulOf = v => normHex(v) || ((v === 1 || v === '1' || v === true) ? '#000000' : '');
+  const out = [];
+  a.forEach(x => {
+    if (Array.isArray(x)) out.push({text:String(x[0] == null ? '' : x[0]), b:!!+x[1], color:normHex(x[2]), hl:normHex(x[3]), ul:ulOf(x[4])});
+    else if (x && typeof x === 'object') out.push({text:String(x.text == null ? '' : x.text), b:!!(x.b || x.bold), color:normHex(x.color), hl:normHex(x.hl || x.highlight), ul:ulOf(x.ul || x.underline)});
+    else if (typeof x === 'string') out.push({text:x, b:false, color:'', hl:'', ul:''});
+  });
+  const m = [];
+  out.filter(r => r.text !== '').forEach(r => {
+    const p = m[m.length - 1];
+    if (p && p.b === r.b && p.color === r.color && p.hl === r.hl && p.ul === r.ul) p.text += r.text; else m.push(r);
+  });
+  return m;
+}
+function clampPct(v, d){ const n = +v; return isFinite(n) ? Math.max(0, Math.min(100, n)) : d; }
+function placeXW(b){
+  let x = clampPct(b.x, 0), w = clampPct(b.w, 100);
+  if (w < 5) w = 100;
+  if (x + w > 100) x = Math.max(0, 100 - w);
+  return {x: Math.round(x * 10) / 10, w: Math.round(w * 10) / 10};
+}
+/* AI 결과 → 구조. st 자체는 '메인 표'(편집 화면이 그대로 쓰는 표)이고, st.doc 에 종이 전체 순서가 담긴다 */
+function docFromRaw(raw, preview){
+  if (!raw || typeof raw !== 'object') return null;
+  if (!Array.isArray(raw.blocks)){                       /* 예전 형식(표 하나) */
+    if (!raw.cells || !raw.cells.length) return null;
+    return normalize(raw, preview);
+  }
+  const blocks = raw.blocks.filter(b => b && typeof b === 'object');
+  const isTbl = b => (b.t || b.type) === 'table' && Array.isArray(b.cells) && b.cells.length;
+  const tables = blocks.filter(isTbl);
+  const main = tables.find(b => +b.main === 1) || tables.slice().sort((a, b) => b.cells.length - a.cells.length)[0] || null;
+  const doc = []; let st = null, textN = 0;
+  for (const b of blocks){
+    const t = b.t || b.type;
+    if (t === 'table'){
+      if (!isTbl(b)) continue;
+      const p = placeXW(b);
+      if (b === main){ st = normalize(b, preview); doc.push({t:'table', main:true, x:p.x, w:p.w}); }
+      else doc.push({t:'table', x:p.x, w:p.w, tbl:normalize(Object.assign({}, b, {lockWidths:true}), '')});
+    } else if (t === 'text'){
+      let runs = normRuns(b.runs);
+      if ((!runs || !runs.length) && b.text) runs = [{text:String(b.text), b:!!+b.bold, color:normHex(b.color), hl:'', ul:''}];
+      runs = runs || [];
+      let size = +b.size; if (!isFinite(size) || size <= 0) size = 10; size = Math.max(7, Math.min(32, size));
+      const al = String(b.align || 'L').toUpperCase().charAt(0);
+      const p = placeXW(b);
+      if (runs.length) textN++;
+      doc.push({t:'text', runs, align:al === 'C' ? 'C' : (al === 'R' ? 'R' : 'L'), size, bg:normHex(b.bg), x:p.x, w:p.w});
+    }
+  }
+  if (!st){
+    if (!textN) return null;
+    /* 표가 없는 문서 — 글만 복제한다(메인 표 자리는 비워 둔다) */
+    st = normalize({nRows:1, nCols:1, colWidths:[100], cells:[[0, 0, 1, 1, '', 0, 'C', '', '', 0]]}, preview);
+    st._noMain = true;
+  }
+  st.title = '';
+  st.doc = doc;
+  return st;
+}
+function docCounts(st){
+  const d = (st && st.doc) || [];
+  return {tables: d.filter(b => b.t === 'table').length, texts: d.filter(b => b.t === 'text' && b.runs.length).length,
+    colors: [...new Set(docColors(st))]};
+}
+/* 문서에 쓰인 색(배경·글자·형광펜·밑줄)을 모두 모은다 — 검증·안내용 */
+function docColors(st){
+  const out = [];
+  const addCell = c => { if (c.bg) out.push(c.bg); if (c.color) out.push(c.color); (c.runs || []).forEach(r => { if (r.color) out.push(r.color); if (r.hl) out.push(r.hl); }); };
+  (st.cells || []).forEach(addCell);
+  ((st && st.doc) || []).forEach(b => {
+    if (b.t === 'text'){ if (b.bg) out.push(b.bg); b.runs.forEach(r => { if (r.color) out.push(r.color); if (r.hl) out.push(r.hl); if (r.ul) out.push(r.ul); }); }
+    else if (b.tbl) b.tbl.cells.forEach(addCell);
+  });
+  return out;
+}
+/* ================= 글꼴 (원본과 같게, 없으면 유사 폰트) ================= */
+const FONT_ALIAS = {'HY신명조':'바탕', 'HY중고딕':'돋움', '한컴바탕':'바탕', '새바탕':'바탕',
+  '한컴돋움':'돋움', '새돋움':'돋움', '맑은고딕':'맑은 고딕', 'Malgun Gothic':'맑은 고딕'};
+let CUR_FONT = '';
+function hwFont(xml, face){
+  if (!face) return xml;
+  xml = xml.replace(/<hh:fontface lang="([A-Z]+)" fontCnt="1">(<hh:font id="0"[^>]*\/>)<\/hh:fontface>/g,
+    (m, lang, f0) => `<hh:fontface lang="${lang}" fontCnt="2">${f0}<hh:font id="1" face="${face}" type="TTF" isEmbedded="0"/></hh:fontface>`);
+  xml = xml.replace(/<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"\/>/,
+    '<hh:fontRef hangul="1" latin="1" hanja="1" japanese="1" other="1" symbol="0" user="0"/>');
+  return xml;
+}
+
+/* ================= ZIP (store/deflate-raw) ================= */
+const CRC_TABLE = (() => { const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+  return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+async function deflateRaw(u8){
+  if (typeof CompressionStream === 'undefined') return null;
+  try{ const cs = new CompressionStream('deflate-raw');
+    return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(cs)).arrayBuffer());
+  }catch(e){ return null; }
+}
+async function makeZip(entries){
+  const enc = new TextEncoder(), chunks = [], central = []; let offset = 0;
+  for (const e of entries){
+    const nameBytes = enc.encode(e.name);
+    const data = typeof e.data === 'string' ? enc.encode(e.data) : e.data;
+    const crc = crc32(data);
+    let payload = data, method = 0;
+    if (!e.store){ const d = await deflateRaw(data); if (d && d.length < data.length){ payload = d; method = 8; } }
+    const lh = new Uint8Array(30 + nameBytes.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0, true);
+    dv.setUint16(8, method, true); dv.setUint16(10, 0, true); dv.setUint16(12, 0x2100, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, payload.length, true); dv.setUint32(22, data.length, true);
+    dv.setUint16(26, nameBytes.length, true); lh.set(nameBytes, 30);
+    chunks.push(lh, payload);
+    const ch = new Uint8Array(46 + nameBytes.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(10, method, true); cv.setUint16(14, 0x2100, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, payload.length, true); cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true); cv.setUint32(42, offset, true); ch.set(nameBytes, 46);
+    central.push(ch); offset += lh.length + payload.length;
+  }
+  const cs = central.reduce((a, b) => a + b.length, 0);
+  const eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, entries.length, true); ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cs, true); ev.setUint32(16, offset, true);
+  return new Blob([...chunks, ...central, eocd], {type:'application/zip'});
+}
+const xmlEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const colName = c => { let s = '', n = c + 1; while (n > 0){ const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+
+/* ================= XLSX (병합·색·테두리·정렬·숫자) ================= */
+function buildXlsx(st){
+  if (st.doc) return buildXlsxDoc(st);   /* 종이 전체(배너·문단·작은 표·서명)를 한 시트에 */
+  const fonts = [{b:false, color:''}], fills = ['', ''], borders = [false, true], xfs = [], numFmts = [];
+  const fidx = (b, color) => { const k = (b ? 1 : 0) + '|' + color; let i = fonts.findIndex(f => (f.b ? 1 : 0) + '|' + f.color === k); if (i < 0){ fonts.push({b, color}); i = fonts.length - 1; } return i; };
+  const gidx = bg => { if (!bg) return 0; let i = fills.indexOf(bg.toUpperCase()); if (i < 0){ fills.push(bg.toUpperCase()); i = fills.length - 1; } return i; };
+  const xf = (font, fill, border, align, numFmt) => {
+    const k = [font, fill, border, align, numFmt].join(';');
+    let i = xfs.findIndex(x => x.k === k);
+    if (i < 0){ xfs.push({k, font, fill, border, align, numFmt}); i = xfs.length - 1; }
+    return i;
+  };
+  xf(0, 0, 0, '', 0); // 0 = 기본
+  const totalW = 104; // A4 세로에 맞는 대략적 폭(문자 단위)
+  let colsXml = '<cols>' + st.colWidths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${Math.max(6, Math.round(w / 100 * totalW * 10) / 10)}" customWidth="1"/>`).join('') + '</cols>';
+  const rowsXml = [];
+  for (let r = 0; r < st.nRows; r++){
+    const rowCells = st.cells.filter(c => c.r === r).sort((a, b) => a.c - b.c);
+    let sx = `<row r="${r + 1}">`;
+    for (const c of rowCells){
+      const ref = colName(c.c) + (r + 1);
+      const txt = String(c.text || '');
+      let t = null, v = null, nf = 0;
+      if (c.num && XLET.test(txt.replace(/\s/g, ''))){
+        const cur = /^[₩$]/.test(txt.trim());
+        const raw = txt.replace(/[₩$,\s]/g, '');
+        if (raw !== '' && !isNaN(+raw)){ t = 'n'; v = raw; nf = cur ? 164 : 3; }
+      }
+      const s = xf(fidx(!!c.bold, c.color), gidx(c.bg), 1, c.align, nf);
+      if (t === 'n') sx += `<c r="${ref}" s="${s}"><v>${v}</v></c>`;
+      else if (txt !== '') sx += `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`;
+      else sx += `<c r="${ref}" s="${s}"/>`;
+    }
+    sx += '</row>'; rowsXml.push(sx);
+  }
+  let mergeXml = '';
+  const mg = st.cells.filter(c => c.rs > 1 || c.cs > 1)
+    .map(c => colName(c.c) + (c.r + 1) + ':' + colName(c.c + c.cs - 1) + (c.r + c.rs));
+  if (mg.length) mergeXml = `<mergeCells count="${mg.length}">` + mg.map(m => `<mergeCell ref="${m}"/>`).join('') + '</mergeCells>';
+  const lastRef = colName(st.nCols - 1) + st.nRows;
+  const sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + `<dimension ref="A1:${lastRef}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="17"/>`
+    + colsXml + '<sheetData>' + rowsXml.join('') + '</sheetData>' + mergeXml
+    + '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/></worksheet>';
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    + '<Default Extension="xml" ContentType="application/xml"/>'
+    + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+    + '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+    + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+    + '</Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheets><sheet name="표" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbrels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+    + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const fontsXml = fonts.map(f => `<font>${f.b ? '<b/>' : ''}${f.color ? `<color rgb="FF${f.color.replace('#', '')}"/>` : ''}<sz val="11"/><name val="맑은 고딕"/><family val="2"/></font>`).join('');
+  const fillsXml = fills.map((bg, i) => i === 0 ? '<fill><patternFill patternType="none"/></fill>' : (i === 1 ? '<fill><patternFill patternType="gray125"/></fill>' : `<fill><patternFill patternType="solid"><fgColor rgb="FF${bg.replace('#', '')}"/><bgColor indexed="64"/></patternFill></fill>`)).join('');
+  const bordersXml = borders.map(b => b
+    ? '<border><left style="thin"><color rgb="FF333333"/></left><right style="thin"><color rgb="FF333333"/></right><top style="thin"><color rgb="FF333333"/></top><bottom style="thin"><color rgb="FF333333"/></bottom><diagonal/></border>'
+    : '<border><left/><right/><top/><bottom/><diagonal/></border>').join('');
+  const xfsXml = xfs.map(x => {
+    const al = x.align ? `<alignment horizontal="${x.align === 'L' ? 'left' : (x.align === 'R' ? 'right' : 'center')}" vertical="center" wrapText="1"/>` : '<alignment vertical="center" wrapText="1"/>';
+    return `<xf numFmtId="${x.numFmt}" fontId="${x.font}" fillId="${x.fill}" borderId="${x.border}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1">${al}</xf>`;
+  }).join('');
+  const customFmts = '<numFmt numFmtId="164" formatCode="&quot;₩&quot;#,##0"/>';
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + `<numFmts count="1">${customFmts}</numFmts>`
+    + `<fonts count="${fonts.length}">${fontsXml}</fonts>`
+    + `<fills count="${fills.length}">${fillsXml}</fills>`
+    + `<borders count="${borders.length}">${bordersXml}</borders>`
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + `<cellXfs count="${xfs.length}">${xfsXml}</cellXfs>`
+    + '</styleSheet>';
+  return [
+    {name:'[Content_Types].xml', data:ct},
+    {name:'_rels/.rels', data:rels},
+    {name:'xl/workbook.xml', data:wb},
+    {name:'xl/_rels/workbook.xml.rels', data:wbrels},
+    {name:'xl/styles.xml', data:styles},
+    {name:'xl/worksheets/sheet1.xml', data:sheet}
+  ];
+}
+
+/* ================= XLSX — 문서 전체(시트 위아래에 제목 배너·본문·강조색·작은 표·서명까지) ================= */
+/* 모든 표의 열 경계를 하나의 격자로 합쳐, 작은 표·메인 표·문단이 한 시트에서 원본 위치 그대로 놓이게 한다 */
+function buildXlsxDoc(st){
+  const PW = 41952;
+  const tbls = [];
+  st.doc.forEach(b => {
+    if (b.t !== 'table') return;
+    if (b.main){ if (!st._noMain) tbls.push({tst:st, x:b.x || 0, w:b.w || 100, main:true}); }
+    else tbls.push({tst:b.tbl, x:b.x || 0, w:b.w || 100});
+  });
+  const edges = t => { const out = [t.x]; let acc = t.x; t.tst.colWidths.forEach(cw => { acc += cw * t.w / 100; out.push(acc); }); return out; };
+  /* 1) 열 경계 합치기(메인 표 먼저 — 1.2% 안쪽으로 붙은 경계는 하나로) */
+  const bounds = [0, 100];
+  const addB = v => { v = Math.max(0, Math.min(100, v)); if (!bounds.some(b => Math.abs(b - v) < 1.2)) bounds.push(v); };
+  tbls.filter(t => t.main).concat(tbls.filter(t => !t.main)).forEach(t => edges(t).forEach(addB));
+  bounds.sort((a, b) => a - b);
+  const NC = bounds.length - 1;
+  const snap = v => { let bi = 0, bd = 1e9; bounds.forEach((b, i) => { const d = Math.abs(b - v); if (d < bd){ bd = d; bi = i; } }); return bi; };
+  tbls.forEach(t => {
+    const ix = edges(t).map(snap);
+    for (let k = 1; k < ix.length; k++) if (ix[k] <= ix[k - 1]) ix[k] = Math.min(NC, ix[k - 1] + 1);
+    t.ix = ix;
+  });
+  /* 2) 스타일 표 */
+  const fonts = [{b:false, color:'', sz:11, u:false}], fills = ['', ''], xfs = [];
+  const fidx = (b, color, sz, u) => {
+    const k = [b ? 1 : 0, color || '', sz || 11, u ? 1 : 0].join('|');
+    let i = fonts.findIndex(f => [f.b ? 1 : 0, f.color || '', f.sz, f.u ? 1 : 0].join('|') === k);
+    if (i < 0){ fonts.push({b:!!b, color:color || '', sz:sz || 11, u:!!u}); i = fonts.length - 1; }
+    return i;
+  };
+  const gidx = bg => { if (!bg) return 0; const u = bg.toUpperCase(); let i = fills.indexOf(u); if (i < 0){ fills.push(u); i = fills.length - 1; } return i; };
+  const xf = (font, fill, border, align, numFmt) => {
+    const k = [font, fill, border, align, numFmt].join(';');
+    let i = xfs.findIndex(x => x.k === k);
+    if (i < 0){ xfs.push({k, font, fill, border, align, numFmt}); i = xfs.length - 1; }
+    return i;
+  };
+  xf(0, 0, 0, '', 0);
+  const rich = (runs, base) => runs.map(r => {
+    const b = base.b || r.b, color = r.color || base.color, sz = base.sz;
+    return '<r><rPr>' + (b ? '<b/>' : '') + (r.ul ? '<u/>' : '') + `<sz val="${sz}"/>`
+      + (color ? `<color rgb="FF${color.replace('#', '')}"/>` : '') + '<rFont val="맑은 고딕"/><family val="2"/></rPr>'
+      + `<t xml:space="preserve">${xmlEsc(r.text)}</t></r>`;
+  }).join('');
+  /* 3) 행 만들기 */
+  const grid = [];      /* grid[row] = {cells:{col:xml}, ht} */
+  const merges = [];
+  let R = 0;
+  const putRow = () => { grid[R] = grid[R] || {cells:{}, ht:0}; return grid[R]; };
+  const charsPerLine = sz => Math.max(8, Math.floor(104 / (sz / 11) / 1.9));   /* 한글 한 글자 ≈ 엑셀 1.9칸 */
+  st.doc.forEach(b => {
+    if (b.t === 'text'){
+      const row = putRow();
+      const sz = Math.max(8, Math.round(b.size * 1.1));
+      const txt = b.runs.map(r => r.text).join('');
+      if (!txt){ row.ht = 9; R++; return; }
+      const hlChars = b.runs.filter(r => r.hl).reduce((a, r) => a + r.text.length, 0);
+      const hl = b.runs.find(r => r.hl);
+      const fillBg = b.bg || (hl && hlChars >= txt.length * 0.6 ? hl.hl : '');
+      const uniform = b.runs.length === 1 && !b.runs[0].ul;
+      const f0 = uniform ? fidx(b.runs[0].b, b.runs[0].color, sz, false) : fidx(false, '', sz, false);
+      const s = xf(f0, gidx(fillBg), 0, b.align, 0);
+      const c0 = snap(b.x || 0), c1 = Math.max(c0, snap((b.x || 0) + (b.w || 100)) - 1);
+      const ref = colName(c0) + (R + 1);
+      row.cells[c0] = uniform
+        ? `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`
+        : `<c r="${ref}" s="${s}" t="inlineStr"><is>${rich(b.runs, {b:false, color:'', sz})}</is></c>`;
+      for (let k = c0 + 1; k <= c1; k++) row.cells[k] = `<c r="${colName(k) + (R + 1)}" s="${s}"/>`;
+      if (c1 > c0) merges.push(ref + ':' + colName(c1) + (R + 1));
+      const span = Math.max(0.1, ((b.w || 100)) / 100);
+      const lines = Math.max(1, Math.ceil(txt.length / (charsPerLine(sz) * span)));
+      row.ht = Math.round(lines * sz * 1.45 + (b.bg ? 14 : 5));
+      R++;
+      return;
+    }
+    if (b.t !== 'table') return;
+    const t = tbls.find(x => (b.main ? x.main : x.tst === b.tbl));
+    if (!t) return;
+    const tst = t.tst;
+    const tw = PW * t.w / 100;
+    const widthsH = tst.colWidths.map(w => tw * w / 100);
+    for (let r = 0; r < tst.nRows; r++){
+      const row = (grid[R + r] = grid[R + r] || {cells:{}, ht:0});
+      const n = rowLines(tst, r, widthsH, tw);
+      row.ht = Math.max(row.ht, n <= 1 ? 20 : n * 15 + 6);
+    }
+    tst.cells.forEach(c => {
+      const c0 = t.ix[c.c], c1 = Math.max(c0, t.ix[c.c + c.cs] - 1);
+      const r0 = R + c.r, r1 = R + c.r + c.rs - 1;
+      const txt = String(c.text || '');
+      let tN = null, v = null, nf = 0;
+      if (c.num && XLET.test(txt.replace(/\s/g, ''))){
+        const cur = /^[₩$]/.test(txt.trim()), raw = txt.replace(/[₩$,\s]/g, '');
+        if (raw !== '' && !isNaN(+raw)){ tN = 'n'; v = raw; nf = cur ? 164 : 3; }
+      }
+      const s = xf(fidx(!!c.bold, c.color, 11, false), gidx(c.bg), c.nb ? 0 : 1, c.align, nf);
+      const ref = colName(c0) + (r0 + 1);
+      let xml;
+      if (tN === 'n') xml = `<c r="${ref}" s="${s}"><v>${v}</v></c>`;
+      else if (c.runs && c.runs.length) xml = `<c r="${ref}" s="${s}" t="inlineStr"><is>${rich(c.runs, {b:!!c.bold, color:c.color || '', sz:11})}</is></c>`;
+      else if (txt !== '') xml = `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(txt)}</t></is></c>`;
+      else xml = `<c r="${ref}" s="${s}"/>`;
+      for (let y = r0; y <= r1; y++){
+        const row = (grid[y] = grid[y] || {cells:{}, ht:0});
+        for (let k = c0; k <= c1; k++) row.cells[k] = (y === r0 && k === c0) ? xml : `<c r="${colName(k) + (y + 1)}" s="${s}"/>`;   /* 병합 영역 전체에 테두리·배경 */
+      }
+      if (c1 > c0 || r1 > r0) merges.push(ref + ':' + colName(c1) + (r1 + 1));
+    });
+    R += tst.nRows;
+  });
+  const rowsXml = [];
+  for (let r = 0; r < Math.max(1, R); r++){
+    const row = grid[r] || {cells:{}, ht:0};
+    const cols = Object.keys(row.cells).map(Number).sort((a, b) => a - b);
+    rowsXml.push(`<row r="${r + 1}"${row.ht ? ` ht="${row.ht}" customHeight="1"` : ''}>` + cols.map(k => row.cells[k]).join('') + '</row>');
+  }
+  const totalW = 104;
+  const colsXml = '<cols>' + bounds.slice(1).map((b, i) => {
+    const w = Math.max(1.2, Math.round((b - bounds[i]) / 100 * totalW * 10) / 10);
+    return `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`;
+  }).join('') + '</cols>';
+  const mergeXml = merges.length ? `<mergeCells count="${merges.length}">` + merges.map(m => `<mergeCell ref="${m}"/>`).join('') + '</mergeCells>' : '';
+  const lastRef = colName(NC - 1) + Math.max(1, R);
+  const sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+    + `<dimension ref="A1:${lastRef}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="17"/>`
+    + colsXml + '<sheetData>' + rowsXml.join('') + '</sheetData>' + mergeXml
+    + '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>'
+    + '<pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="0"/></worksheet>';
+  const fontsXml = fonts.map(f => `<font>${f.b ? '<b/>' : ''}${f.u ? '<u/>' : ''}<sz val="${f.sz}"/>${f.color ? `<color rgb="FF${f.color.replace('#', '')}"/>` : ''}<name val="맑은 고딕"/><family val="2"/></font>`).join('');
+  const fillsXml = fills.map((bg, i) => i === 0 ? '<fill><patternFill patternType="none"/></fill>' : (i === 1 ? '<fill><patternFill patternType="gray125"/></fill>' : `<fill><patternFill patternType="solid"><fgColor rgb="FF${bg.replace('#', '')}"/><bgColor indexed="64"/></patternFill></fill>`)).join('');
+  const bordersXml = '<border><left/><right/><top/><bottom/><diagonal/></border>'
+    + '<border><left style="thin"><color rgb="FF333333"/></left><right style="thin"><color rgb="FF333333"/></right><top style="thin"><color rgb="FF333333"/></top><bottom style="thin"><color rgb="FF333333"/></bottom><diagonal/></border>';
+  const xfsXml = xfs.map(x => {
+    const al = x.align ? `<alignment horizontal="${x.align === 'L' ? 'left' : (x.align === 'R' ? 'right' : 'center')}" vertical="center" wrapText="1"/>` : '<alignment vertical="center" wrapText="1"/>';
+    return `<xf numFmtId="${x.numFmt}" fontId="${x.font}" fillId="${x.fill}" borderId="${x.border}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1">${al}</xf>`;
+  }).join('');
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;₩&quot;#,##0"/></numFmts>'
+    + `<fonts count="${fonts.length}">${fontsXml}</fonts>`
+    + `<fills count="${fills.length}">${fillsXml}</fills>`
+    + '<borders count="2">' + bordersXml + '</borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + `<cellXfs count="${xfs.length}">${xfsXml}</cellXfs>`
+    + '</styleSheet>';
+  const base = buildXlsx({nRows:1, nCols:1, colWidths:[100], cells:[]});   /* 통 껍데기(관계·통합문서)는 기존 것을 그대로 쓴다 */
+  return base.map(e => e.name === 'xl/worksheets/sheet1.xml' ? {name:e.name, data:sheet} : (e.name === 'xl/styles.xml' ? {name:e.name, data:styles} : e));
+}
+
+/* ================= HWPX (병합·열너비·배경·정렬·굵게) ================= */
+let TPL = null;
+async function loadTpl(){
+  if (TPL) return TPL;
+  const files = ['version.xml','settings.xml','META-INF__manifest.xml','META-INF__container.xml','META-INF__container.rdf','Contents__content.hpf','Contents__header.xml','sec_prefix.xml','tbl_parts.json'];
+  const text = {};
+  await Promise.all(files.map(async f => {
+    const r = await fetch('tpl/' + f);
+    if (!r.ok) throw new Error('tpl/' + f + ' 없음');
+    text[f] = f.endsWith('.json') ? await r.json() : await r.text();
+  }));
+  TPL = {text, prefix:text['sec_prefix.xml'], parts:text['tbl_parts.json']};
+  return TPL;
+}
+/* 글자 모양 열쇠 — 굵기|색|크기[|형광펜|밑줄] (형광펜·밑줄이 없으면 예전 열쇠와 같다) */
+const chKey = (b, color, h, hl, ul) => (b ? 1 : 0) + '|' + (color || '') + '|' + (h || 900) + ((hl || ul) ? '|' + (hl || '') + '|' + (ul || '') : '');
+function hwHeader(base, need){
+  // need: {bgs:[], nbBgs:[], chars:[{b,color,h,hl,ul}], aligns:[]}
+  let borderFills = '', chars = '', paras = '';
+  let bfCnt = 2, chCnt = 3, paCnt = 10;
+  const bfId = {}, chId = {}, paId = {};
+  const bfXml = (id, bg, line) => {
+    const side = s => `<hh:${s}Border type="${line ? 'SOLID' : 'NONE'}" width="${line ? '0.12 mm' : '0.1 mm'}" color="#000000"/>`;
+    return `<hh:borderFill id="${id}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">`
+      + '<hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>'
+      + side('left') + side('right') + side('top') + side('bottom')
+      + '<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>'
+      + (bg ? `<hc:fillBrush><hc:winBrush faceColor="${bg}" hatchColor="#999999" alpha="0"/></hc:fillBrush>` : '')
+      + '</hh:borderFill>';
+  };
+  need.bgs.forEach(bg => {
+    if (!bg){ bfId[''] = 2; return; }
+    if (bfId[bg]) return;
+    bfCnt++; bfId[bg] = 99 + bfCnt; borderFills += bfXml(bfId[bg], bg, true);
+  });
+  (need.nbBgs || []).forEach(bg => {          /* 테두리 없는 칸(좌우 작은 표 사이 빈 열·제목 배너) */
+    const k = 'nb|' + (bg || '');
+    if (bfId[k]) return;
+    if (!bg){ bfId[k] = 1; return; }
+    bfCnt++; bfId[k] = 99 + bfCnt; borderFills += bfXml(bfId[k], bg, false);
+  });
+  need.chars.forEach(c => {
+    const key = chKey(c.b, c.color, c.h, c.hl, c.ul);
+    if (chId[key]) return;
+    chCnt++; const id = 99 + chCnt; chId[key] = id;
+    chars += `<hh:charPr id="${id}" height="${c.h || 900}" textColor="${c.color || '#000000'}" shadeColor="${c.hl || 'none'}" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">`
+      + '<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + (c.b ? '<hh:bold/>' : '')
+      + `<hh:underline type="${c.ul ? 'BOTTOM' : 'NONE'}" shape="SOLID" color="${c.ul || '#000000'}"/><hh:strikeout shape="NONE" color="#000000"/>`
+      + '<hh:outline type="NONE"/><hh:shadow type="NONE" color="#000000" offsetX="0" offsetY="0"/></hh:charPr>';
+  });
+  const paBase = /<hh:paraPr id="0".*?<\/hh:paraPr>/s.exec(base)[0];
+  need.aligns.forEach(al => {
+    if (paId[al]) return;
+    paCnt++; const id = 99 + paCnt; paId[al] = id;
+    /* 'L'/'C'/'R' = 표 칸(줄간격 125%) · 'TL'/'TC'/'TR' = 본문 문단(줄간격 160%, 문단 아래 여백) */
+    const a = al.charAt(al.length - 1), text = al.length > 1;
+    const horiz = a === 'L' ? 'JUSTIFY' : (a === 'R' ? 'RIGHT' : 'CENTER');
+    let body = paBase.replace(/<hh:paraPr id="0"/, `<hh:paraPr id="${id}"`)
+      .replace(/<hh:align horizontal="[A-Z]+"/, `<hh:align horizontal="${horiz}"`);
+    if (text) body = body.replace(/<hc:next value="0" unit="HWPUNIT"\/>/g, '<hc:next value="500" unit="HWPUNIT"/>');
+    else body = body.replace(/value="160" unit="HWPUNIT"/g, 'value="125" unit="HWPUNIT"');
+    paras += body;
+  });
+  let xml = base;
+  xml = xml.replace('<hh:borderFills itemCnt="2">', `<hh:borderFills itemCnt="${bfCnt}">`);
+  xml = xml.replace('</hh:borderFills>', borderFills + '</hh:borderFills>');
+  xml = xml.replace(/<hh:charProperties itemCnt="3">/, `<hh:charProperties itemCnt="${chCnt}">`);
+  xml = xml.replace('</hh:charProperties>', chars + '</hh:charProperties>');
+  xml = xml.replace(/<hh:paraProperties itemCnt="10">/, `<hh:paraProperties itemCnt="${paCnt}">`);
+  xml = xml.replace('</hh:paraProperties>', paras + '</hh:paraProperties>');
+  return {xml, bfId, chId, paId};
+}
+/* ================= 열 너무·행 높이: 원본 1:1 보장 ================= */
+const HWPU_PER_PT = 100;           /* 1pt = 100 HWPUNIT */
+const CELL_MARGIN = 360;           /* 좌우 여백 합 170+170 + 여유 */
+function charUnits(ch){
+  const c = ch.charCodeAt(0);
+  if(c === 32) return 260;                       /* 공백 */
+  if(c < 128) return 470;                        /* 영문·숫자·기호 */
+  if(c >= 0x3130 && c <= 0x318F) return 480;      /* 한글 호환 자모 */
+  return 900;                                    /* 한글·한자·확장 */
+}
+function textUnits(s){
+  let n = 0;
+  const t = String(s == null ? '' : s);
+  for(const ch of t) n += charUnits(ch);
+  return n;
+}
+/* 원본 열 너비를 잠그고 글자를 줄여 넣는다 — 넘치면 임의 줄바꿈 대신 크기를 줄인다 */
+function shrinkH(text, w){
+  const avail = Math.max(600, w - CELL_MARGIN);
+  let h = 900;
+  while (h > 700 && textUnits(text) * (h / 900) > avail) h -= 50;
+  return h;
+}
+/* 열 너비(%): 원본 비율 유지하면서 ‘글자가 꾼기는 최소 폭’을 보장하고, 남는 폭에서 나눔 */
+function fitColWidths(st, totalW){
+  const n = st.nCols;
+  let pct = (st.colWidths || []).slice(0, n).map(x => Math.max(1, +x || 0));
+  while (pct.length < n) pct.push(100 / n);
+  const sum0 = pct.reduce((a, b) => a + b, 0) || 100;
+  pct = pct.map(x => x / sum0 * 100);
+  /* 열별 ‘절대 넓히면 안 꾼기는’ 최소 HWPUNIT */
+  const need = new Array(n).fill(0);
+  st.cells.forEach(c => {
+    if (c.cs > 1) return;                            /* 병합 칸은 기준에서 제외 */
+    const lines = String(c.text == null ? '' : c.text).split('\n');
+    let mx = 0;
+    lines.forEach(l => { const u = textUnits(l); if (u > mx) mx = u; });
+    if (mx > need[c.c]) need[c.c] = mx;
+  });
+  const minPct = need.map(u => Math.min(60, (u + CELL_MARGIN) / totalW * 100));
+  /* 공백이 있으면 먼저 분배, 모자라면 넓은 열에서 가져온다 */
+  for (let pass = 0; pass < 4; pass++){
+    let deficit = 0;
+    for (let i = 0; i < n; i++) if (pct[i] < minPct[i]) deficit += minPct[i] - pct[i];
+    if (deficit < 0.01) break;
+    let pool = 0;
+    for (let i = 0; i < n; i++) pool += Math.max(0, pct[i] - minPct[i]);
+    for (let i = 0; i < n; i++){
+      if (pct[i] < minPct[i]){ pct[i] = minPct[i]; continue; }
+      const flex = Math.max(0, pct[i] - minPct[i]);
+      if (pool > 0) pct[i] -= flex / pool * Math.min(deficit, pool);
+    }
+    const s = pct.reduce((a, b) => a + b, 0) || 100;
+    pct = pct.map(x => x / s * 100);
+  }
+  return pct.map(x => Math.max(1, Math.round(x * 10) / 10));
+}
+/* 행 높이 — 그 행에서 몇 줄까지 꾼이는지 계산해 1줄은 1:1로 유지 */
+function rowLines(st, r, widths, totalW){
+  let maxLines = 1;
+  st.cells.forEach(c => {
+    if (c.r > r || c.r + c.rs <= r) return;
+    let w = 0;
+    for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+    const avail = Math.max(600, w - CELL_MARGIN);
+    const lines = String(c.text == null ? '' : c.text).split('\n');
+    let need = 1;
+    lines.forEach(l => { need += Math.ceil(textUnits(l) / avail); });
+    need = Math.max(1, need - 1);
+    if (need > maxLines) maxLines = need;
+  });
+  return maxLines;
+}
+
+async function buildHwpx(st){
+  if (st.doc) return buildHwpxDoc(st);   /* AI가 종이 전체를 읽은 경우 — 배너·문단·작은 표까지 함께 */
+  const t = await loadTpl();
+  const totalW = t.parts.total_w;
+  /* 열 너비를 원본 비율로 시작해, 글자가 꺾이지 않는 최소 폭을 보장한다 (월일 열 3줄 꺾임 방지)
+     사진에서 읽은 원본 너비는 그대로 잠그고(st.lockWidths) 글자 크기를 줄여 맞춘다 */
+  if (!st.lockWidths) st.colWidths = fitColWidths(st, totalW);
+  const widths = st.colWidths.map(w => Math.max(600, Math.round(totalW * w / 100)));
+  // 폭 합 보정
+  let wsum = widths.reduce((a, b) => a + b, 0);
+  widths[widths.length - 1] += totalW - wsum;
+  const bgs = [...new Set(st.cells.map(c => c.bg || ''))];
+  const charKeys = [];
+  st.cells.forEach(c => {
+    let cw2 = 0; for (let k = 0; k < c.cs; k++) cw2 += widths[c.c + k] || 0;
+    c._h = st.lockWidths ? shrinkH(c.text, cw2) : 900;
+    const k = (c.bold ? 1 : 0) + '|' + (c.color || '') + '|' + c._h;
+    if (!charKeys.includes(k)) charKeys.push(k);
+  });
+  const chars = charKeys.map(k => { const p = k.split('|'); return {b:p[0] === '1', color:p[1], h:(+p[2] || 900)}; });
+  chars.push({b:true, color:'#111111', h:1100});
+  const aligns = [...new Set(st.cells.map(c => c.align || 'C'))];
+  const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
+  const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {bgs, chars, aligns});
+  const chGet = (b, color, h) => H.chId[(b ? 1 : 0) + '|' + (color || '') + '|' + (h || 900)] || 0;
+  const titleChar = H.chId['1|#111111|1100'];
+  const rowH = (r) => { const n = rowLines(st, r, widths, totalW); return n <= 1 ? 1150 : (n * 1100 + 300); };
+  st._rowLines = [];
+  for (let r = 0; r < st.nRows; r++) st._rowLines.push(rowLines(st, r, widths, totalW));
+  let totalH = 0; for (let r = 0; r < st.nRows; r++) totalH += rowH(r);
+  let body = '', pid = 200;
+  if (st.title){
+    body += `<hp:p id="${pid}" paraPrIDRef="${H.paId['C']}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${titleChar ? titleChar : 1}"><hp:t>${xmlEsc(st.title)}</hp:t></hp:run></hp:p>`;
+    pid++;
+  }
+  body += `<hp:p id="${pid}" paraPrIDRef="${H.paId['L'] || 0}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0">`;
+  body += `<hp:tbl id="1" zOrder="0" numberingType="NONE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${st.nRows}" colCnt="${st.nCols}" cellSpacing="0" borderFillIDRef="2" noAdjust="0">`;
+  body += `<hp:sz width="${totalW}" widthRelTo="ABSOLUTE" height="${totalH}" heightRelTo="ABSOLUTE" protect="0"/>`;
+  body += t.parts.pos + t.parts.outm + t.parts.inm;
+  const byRow = {}; st.cells.forEach(c => (byRow[c.r] = byRow[c.r] || []).push(c));
+  // 위쪽 행에서 내려온 병합이 덮고 있는 칸 표시(빈 칸 보충 시 겹침 방지)
+  const covered = Array.from({length: st.nRows}, () => new Array(st.nCols).fill(false));
+  st.cells.forEach(c => { for (let y = c.r; y < c.r + c.rs; y++) for (let x = c.c; x < c.c + c.cs; x++) if (covered[y]) covered[y][x] = true; });
+  let seq = 5000;
+  const blank = {bold:false, color:'', bg:'', align:'C'};
+  for (let r = 0; r < st.nRows; r++){
+    const list = (byRow[r] || []).sort((a, b) => a.c - b.c);
+    let acc = 0;
+    body += '<hp:tr>';
+    for (const c of list){
+      let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+      for (let k = acc; k < c.c; k++){ // 앞쪽 빈 칸(다른 행 병합이 덮은 칸은 건너뜀)
+        if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+      }
+      body += hwCell(c, r, c.c, c.cs, c.rs, c.text, w, rowH(r) * c.rs, H, seq++);
+      acc = c.c + c.cs;
+    }
+    for (let k = acc; k < st.nCols; k++){
+      if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+    }
+    body += '</hp:tr>';
+  }
+  body += '</hp:tbl></hp:run></hp:p>';
+  const section = t.prefix + body + '</hs:sec>';
+  return [
+    {name:'mimetype', data:'application/hwp+zip', store:true},
+    {name:'version.xml', data:t.text['version.xml']},
+    {name:'settings.xml', data:t.text['settings.xml']},
+    {name:'META-INF/manifest.xml', data:t.text['META-INF__manifest.xml']},
+    {name:'META-INF/container.xml', data:t.text['META-INF__container.xml']},
+    {name:'META-INF/container.rdf', data:t.text['META-INF__container.rdf']},
+    {name:'Contents/content.hpf', data:t.text['Contents__content.hpf']},
+    {name:'Contents/header.xml', data:H.xml},
+    {name:'Contents/section0.xml', data:section}
+  ];
+}
+function hwCell(cell, r, c, cs, rs, value, w, h, H, seq){
+  const bf = cell.nb ? (H.bfId['nb|' + (cell.bg || '')] || 1) : (H.bfId[cell.bg || ''] || 2);
+  const pa = H.paId[cell.align || 'C'] || 0;
+  let paras = '';
+  if (cell.runs && cell.runs.length){
+    paras = hwRunParas(cell.runs, {b:!!cell.bold, color:cell.color || '', h:cell._h || 900}, pa, H, seq * 10);
+  } else {
+    const ch = H.chId[chKey(cell.bold, cell.color, cell._h || 900)] || 0;
+    const lines = String(value == null ? '' : value).split('\n');
+    lines.forEach((line, k) => {
+      paras += `<hp:p id="${seq * 10 + k}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">`
+        + `<hp:run charPrIDRef="${ch}">` + (line === '' ? '<hp:t/>' : `<hp:t>${xmlEsc(line)}</hp:t>`) + '</hp:run></hp:p>';
+    });
+  }
+  const mg = cell._pad ? '<hp:cellMargin left="510" right="510" top="280" bottom="280"/>' : '<hp:cellMargin left="170" right="170" top="60" bottom="60"/>';
+  return `<hp:tc name="" header="0" hasMargin="${cell._pad ? 1 : 0}" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}">`
+    + `<hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${paras}</hp:subList>`
+    + `<hp:cellAddr colAddr="${c}" rowAddr="${r}"/><hp:cellSpan colSpan="${cs}" rowSpan="${rs}"/>`
+    + `<hp:cellSz width="${w}" height="${h}"/>${mg}</hp:tc>`;
+}
+
+/* 글 조각(run) → 한글 문단들. 조각마다 글자색·굵기·형광펜(음영)·밑줄을 따로 준다 */
+function runLines(runs){
+  const lines = [[]];
+  runs.forEach(r => String(r.text).split('\n').forEach((seg, i) => {
+    if (i > 0) lines.push([]);
+    if (seg !== '') lines[lines.length - 1].push(Object.assign({}, r, {text:seg}));
+  }));
+  return lines;
+}
+const runCharKey = (r, base) => chKey(base.b || r.b, r.color || base.color, base.h, r.hl, r.ul);
+function hwRunParas(runs, base, pa, H, idBase){
+  return runLines(runs).map((ln, k) =>
+    `<hp:p id="${idBase + k}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">`
+    + (ln.length
+      ? ln.map(r => `<hp:run charPrIDRef="${H.chId[runCharKey(r, base)] || 0}"><hp:t>${xmlEsc(r.text)}</hp:t></hp:run>`).join('')
+      : `<hp:run charPrIDRef="${H.chId[chKey(base.b, base.color, base.h)] || 0}"><hp:t/></hp:run>`)
+    + '</hp:p>').join('');
+}
+
+/* ================= HWPX — 문서 전체(작은 표·제목 배너·문단·색 글자·형광펜·메인 표·서명) ================= */
+/* 제목 배너(색 띠 안 흰 글씨)는 테두리 없는 1×1 표에 배경색을 깔아 똑같이 보이게 한다 */
+function bannerTable(b){
+  return {nRows:1, nCols:1, colWidths:[100], lockWidths:true, _banner:true,
+    cells:[{r:0, c:0, rs:1, cs:1, text:b.runs.map(x => x.text).join(''), bold:false, align:b.align, bg:b.bg, color:'',
+      nb:true, runs:b.runs, _h:Math.round(b.size * 100), _fixH:true, _pad:true}]};
+}
+async function buildHwpxDoc(st){
+  const t = await loadTpl();
+  const PW = t.parts.total_w;
+  /* 1) 종이 위→아래 순서로 놓을 것들 */
+  const items = [];
+  st.doc.forEach(b => {
+    if (b.t === 'table'){
+      if (b.main){ if (!st._noMain) items.push({kind:'tbl', tst:st, x:b.x, w:b.w, main:true}); }
+      else items.push({kind:'tbl', tst:b.tbl, x:b.x, w:b.w});
+    } else if (b.t === 'text'){
+      if (b.bg && b.runs.length) items.push({kind:'tbl', tst:bannerTable(b), x:b.x, w:b.w});
+      else items.push({kind:'txt', b});
+    }
+  });
+  /* 2) 표마다 열 너비·글자 크기·행 높이 계산 */
+  const need = {bgs:[''], nbBgs:[''], chars:[], aligns:['TL', 'TC', 'TR']};
+  const addChar = (b, color, h, hl, ul) => need.chars.push({b:!!b, color:color || '', h:h || 900, hl:hl || '', ul:ul || ''});
+  items.forEach(it => {
+    if (it.kind === 'txt'){
+      const h = Math.round(it.b.size * 100);
+      addChar(false, '', h);
+      it.b.runs.forEach(r => addChar(r.b, r.color, h, r.hl, r.ul));
+      return;
+    }
+    const tst = it.tst;
+    const tw = Math.max(3000, Math.round(PW * (it.w || 100) / 100));
+    if (it.main && !tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);
+    const widths = tst.colWidths.map(w => Math.max(600, Math.round(tw * w / 100)));
+    widths[widths.length - 1] += tw - widths.reduce((a, b) => a + b, 0);
+    it.tw = tw; it.widths = widths;
+    it.off = Math.max(0, Math.min(PW - tw, Math.round(PW * (it.x || 0) / 100)));
+    tst.cells.forEach(c => {
+      let cw2 = 0; for (let k = 0; k < c.cs; k++) cw2 += widths[c.c + k] || 0;
+      if (!c._fixH) c._h = tst.lockWidths ? shrinkH(c.text, cw2) : 900;
+      if (c.nb) need.nbBgs.push(c.bg || ''); else need.bgs.push(c.bg || '');
+      need.aligns.push(c.align || 'C');
+      const base = {b:!!c.bold, color:c.color || '', h:c._h};
+      addChar(base.b, base.color, base.h);
+      (c.runs || []).forEach(r => addChar(base.b || r.b, r.color || base.color, base.h, r.hl, r.ul));
+    });
+    it.rowH = [];
+    for (let r = 0; r < tst.nRows; r++){
+      const n = rowLines(tst, r, widths, tw);
+      let hMax = 900;
+      tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hMax = Math.max(hMax, c._h || 900); });
+      let h = n <= 1 ? 1150 : (n * 1100 + 300);
+      if (hMax > 900) h = Math.max(h, n * Math.round(hMax * 1.35) + (tst._banner ? 900 : 400));
+      it.rowH.push(h);
+    }
+  });
+  const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
+  const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {
+    bgs:[...new Set(need.bgs)], nbBgs:[...new Set(need.nbBgs)], chars:need.chars, aligns:[...new Set(need.aligns)]});
+  /* 3) 본문 */
+  let body = '', pid = 200, seq = 5000, tblId = 1;
+  for (const it of items){
+    if (it.kind === 'txt'){
+      const b = it.b, h = Math.round(b.size * 100);
+      const pa = H.paId['T' + b.align] || 0;
+      body += b.runs.length ? hwRunParas(b.runs, {b:false, color:'', h}, pa, H, pid * 10)
+        : `<hp:p id="${pid * 10}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${H.chId[chKey(false, '', h)] || 0}"><hp:t/></hp:run></hp:p>`;
+      pid++;
+      continue;
+    }
+    const tst = it.tst, widths = it.widths, rowH = r => it.rowH[r];
+    let totalH = 0; for (let r = 0; r < tst.nRows; r++) totalH += rowH(r);
+    body += `<hp:p id="${pid * 10}" paraPrIDRef="${H.paId['L'] || H.paId['TL'] || 0}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0">`;
+    pid++;
+    body += `<hp:tbl id="${tblId++}" zOrder="0" numberingType="NONE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${tst.nRows}" colCnt="${tst.nCols}" cellSpacing="0" borderFillIDRef="${tst._banner ? 1 : 2}" noAdjust="0">`;
+    body += `<hp:sz width="${it.tw}" widthRelTo="ABSOLUTE" height="${totalH}" heightRelTo="ABSOLUTE" protect="0"/>`;
+    body += t.parts.pos.replace('horzOffset="0"', `horzOffset="${it.off}"`) + t.parts.outm + t.parts.inm;
+    const byRow = {}; tst.cells.forEach(c => (byRow[c.r] = byRow[c.r] || []).push(c));
+    const covered = Array.from({length: tst.nRows}, () => new Array(tst.nCols).fill(false));
+    tst.cells.forEach(c => { for (let y = c.r; y < c.r + c.rs; y++) for (let x = c.c; x < c.c + c.cs; x++) if (covered[y]) covered[y][x] = true; });
+    const blank = {bold:false, color:'', bg:'', align:'C'};
+    for (let r = 0; r < tst.nRows; r++){
+      const list = (byRow[r] || []).sort((a, b) => a.c - b.c);
+      let acc = 0;
+      body += '<hp:tr>';
+      for (const c of list){
+        let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+        let h = 0; for (let k = 0; k < c.rs; k++) h += rowH(r + k) || rowH(r);
+        for (let k = acc; k < c.c; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+        body += hwCell(c, r, c.c, c.cs, c.rs, c.text, w, h, H, seq++);
+        acc = c.c + c.cs;
+      }
+      for (let k = acc; k < tst.nCols; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+      body += '</hp:tr>';
+    }
+    body += '</hp:tbl></hp:run></hp:p>';
+  }
+  const section = t.prefix + body + '</hs:sec>';
+  return [
+    {name:'mimetype', data:'application/hwp+zip', store:true},
+    {name:'version.xml', data:t.text['version.xml']},
+    {name:'settings.xml', data:t.text['settings.xml']},
+    {name:'META-INF/manifest.xml', data:t.text['META-INF__manifest.xml']},
+    {name:'META-INF/container.xml', data:t.text['META-INF__container.xml']},
+    {name:'META-INF/container.rdf', data:t.text['META-INF__container.rdf']},
+    {name:'Contents/content.hpf', data:t.text['Contents__content.hpf']},
+    {name:'Contents/header.xml', data:H.xml},
+    {name:'Contents/section0.xml', data:section}
+  ];
+}
+/* ===== converter.html 엔진 복사본 끝 ===== */
+
+/* ===================== 계약서 1초 생성기 ===================== */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+let tT; function toast(m){ const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => e.classList.remove('on'), 2600); }
+const escH = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const LEGAL = '본 서식은 작성 보조용이며, 법적 효력·특약 검토는 공인중개사 및 법률 전문가 확인이 필요합니다.';
+$('#legalTop').textContent = LEGAL;
+
+/* ---------- 한글 금액 ---------- */
+function korNum(n){
+  n = Math.floor(+n || 0); if (n <= 0) return '영';
+  const D = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'], S = ['', '십', '백', '천'], B = ['', '만', '억', '조', '경'];
+  let out = '', g = 0;
+  while (n > 0){
+    const part = n % 10000; n = Math.floor(n / 10000);
+    if (part){ let s = '', p = part, i = 0;
+      while (p > 0){ const d = p % 10; if (d) s = D[d] + S[i] + s; p = Math.floor(p / 10); i++; }
+      out = s + B[g] + out; }
+    g++;
+  }
+  return out;
+}
+const korWon = n => (+n > 0) ? `금 ${korNum(n)} 원정` : '';
+const comma = n => (+n || 0).toLocaleString('ko-KR');
+const num = v => +String(v == null ? '' : v).replace(/[^\d]/g, '') || 0;
+
+/* ---------- 날짜 ---------- */
+const WK = ['일', '월', '화', '수', '목', '금', '토'];
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const parseD = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+const korD = d => d ? `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일` : '';
+const korDW = d => d ? `${korD(d)} (${WK[d.getDay()]})` : '';
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const addMonths = (d, n) => { const x = new Date(d); const day = x.getDate(); x.setDate(1); x.setMonth(x.getMonth() + n); x.setDate(Math.min(day, new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate())); return x; };
+
+/* ---------- 상태(같은 기기 자동 저장) ---------- */
+const LS = 'kc_contract_v1', LS_Q = 'kc_inquiry_queue';
+const fresh = () => ({type:'sale', rent:'wolse', step:1, a:{}, b:{}, prop:{}, money:{contractDate:ymd(new Date()), balDays:'30', months:'24'}, sp:[], free:'', br:{}, cp:{a:1, b:1, c:1}});
+let S; try{ S = Object.assign(fresh(), JSON.parse(localStorage.getItem(LS) || 'null') || {}); }catch(e){ S = fresh(); }
+let saveT; const flush = () => { clearTimeout(saveT); saveT = null; try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} };
+const save = () => { clearTimeout(saveT); saveT = setTimeout(flush, 200); };
+/* 창을 닫거나 다른 앱으로 넘어갈 때 남은 입력을 바로 저장 */
+window.addEventListener('pagehide', () => { if (saveT) flush(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && saveT) flush(); });
+
+const ROLE = {sale:['매도인', '매수인'], house:['임대인', '임차인'], shop:['임대인', '임차인']};
+const TITLE = {sale:'부동산 매매계약서', house:'주택 임대차계약서', shop:'상가건물 임대차계약서'};
+const isLease = () => S.type !== 'sale';
+const hasRent = () => S.type === 'shop' || (S.type === 'house' && S.rent === 'wolse');
+
+/* ---------- 입력 칸 정의 ---------- */
+const PARTY = [['name', '성명(법인명)', 1], ['rrn', '주민번호 앞자리', 1, 'numeric', 6], ['addr', '주소', 1], ['tel', '연락처', 1, 'tel']];
+const PROP = [['addr', '소재지(도로명)', 1], ['lot', '지번', 0], ['bldg', '건물명', 0], ['floor', '층', 0, 'numeric'], ['ho', '호수', 0], ['area', '면적(㎡)', 1, 'decimal'], ['regNo', '등기 접수번호', 0]];
+const BROKER = [['office', '사무소 명칭', 1], ['reg', '등록번호', 1], ['rep', '대표', 1], ['tel', '연락처', 1, 'tel'], ['addr', '사무소 소재지', 0]];
+function fieldHtml(grp, [k, lab, req, im, max]){
+  const v = (S[grp] || {})[k] || '';
+  return `<div><label class="lb">${lab}${req ? '<em>*</em>' : '<i>선택</i>'}</label><input data-g="${grp}" data-k="${k}"${im ? ` inputmode="${im}"` : ''}${max ? ` maxlength="${max}"` : ''} value="${escH(v)}"></div>`;
+}
+function renderParty(){
+  const [ra, rb] = ROLE[S.type];
+  $('#aTitle').textContent = ra; $('#bTitle').textContent = rb; $('#cpA').textContent = ra + '용'; $('#cpB').textContent = rb + '용';
+  $('#aBox').innerHTML = '<div class="g2">' + PARTY.slice(0, 2).map(f => fieldHtml('a', f)).join('') + '</div>' + PARTY.slice(2).map(f => fieldHtml('a', f)).join('');
+  $('#bBox').innerHTML = '<div class="g2">' + PARTY.slice(0, 2).map(f => fieldHtml('b', f)).join('') + '</div>' + PARTY.slice(2).map(f => fieldHtml('b', f)).join('');
+  $$('#typeSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.type));
+  $('#rentSeg').style.display = S.type === 'house' ? 'flex' : 'none';
+  $$('#rentSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.rent));
+}
+function renderProp(){
+  $('#propBox').innerHTML = fieldHtml('prop', PROP[0]) + '<div class="g2">' + PROP.slice(1, 5).map(f => fieldHtml('prop', f)).join('') + '</div><div class="g2">' + PROP.slice(5).map(f => fieldHtml('prop', f)).join('') + '</div>';
+}
+function moneyInput(k, lab, req, extra){
+  const v = S.money[k] || '';
+  return `<label class="lb">${lab}${req ? '<em>*</em>' : '<i>선택</i>'}</label><input data-g="money" data-k="${k}" inputmode="numeric" value="${v ? comma(v) : ''}"${extra || ''}><div class="kor" data-kor="${k}">${escH(korWon(v))}</div>`;
+}
+function dayInput(k, lab, req){
+  return `<label class="lb">${lab}${req ? '<em>*</em>' : '<i>선택 · 비우면 없음</i>'}</label><div class="dd"><input data-g="money" data-k="${k}" inputmode="numeric" placeholder="D+일" value="${escH(S.money[k] || '')}"><span class="when" data-when="${k}"></span></div>
+    <div class="chips" data-chips="${k}">${[7, 14, 30, 60, 90].map(n => `<button data-d="${n}">D+${n}</button>`).join('')}</div>`;
+}
+function renderMoney(){
+  const total = isLease() ? '보증금' : '매매대금';
+  let h = moneyInput('total', total, 1);
+  if (hasRent()) h += moneyInput('rent', '차임(월세)', 1);
+  if (S.type === 'shop') h += moneyInput('mgmt', '관리비(월)', 0);
+  h += `<label class="lb">계약일<em>*</em></label><input type="date" data-g="money" data-k="contractDate" value="${escH(S.money.contractDate || '')}">`;
+  h += moneyInput('deposit', '계약금 (계약일에 지급)', 1);
+  h += moneyInput('mid', '중도금', 0) + dayInput('midDays', '중도금 지급일', 0);
+  h += `<label class="lb">잔금 <i>자동 계산 = ${total} − 계약금 − 중도금</i></label><input data-k="bal" readonly value=""><div class="kor" data-kor="bal"></div>`;
+  h += dayInput('balDays', isLease() ? '잔금 지급일(입주·인도일)' : '잔금 지급일(소유권 이전·인도일)', 1);
+  if (isLease()) h += `<label class="lb">임대 기간(개월)<em>*</em></label><input data-g="money" data-k="months" inputmode="numeric" value="${escH(S.money.months || '')}"><div class="kor" data-when="months"></div>`;
+  $('#moneyBox').innerHTML = h;
+  updMoney();
+}
+function dates(){
+  const c = parseD(S.money.contractDate) || new Date();
+  const md = S.money.midDays !== '' && S.money.midDays != null && num(S.money.midDays) > 0 ? addDays(c, num(S.money.midDays)) : null;
+  const bd = S.money.balDays !== '' && S.money.balDays != null ? addDays(c, num(S.money.balDays)) : null;
+  const m = num(S.money.months);
+  const end = bd && m ? addDays(addMonths(bd, m), -1) : null;
+  return {c, md, bd, end, m};
+}
+function balance(){ return Math.max(0, num(S.money.total) - num(S.money.deposit) - num(S.money.mid)); }
+function updMoney(){
+  const d = dates(), bal = balance();
+  const bi = $('#moneyBox input[data-k="bal"]'); if (bi) bi.value = bal ? comma(bal) : '';
+  $$('#moneyBox [data-kor]').forEach(e => { const k = e.dataset.kor; e.textContent = korWon(k === 'bal' ? bal : num(S.money[k])); });
+  const w = (k, t) => { const e = $(`#moneyBox [data-when="${k}"]`); if (e) e.textContent = t; };
+  w('midDays', d.md ? '→ ' + korDW(d.md) : '');
+  w('balDays', d.bd ? '→ ' + korDW(d.bd) : '');
+  w('months', d.bd && d.end ? `${korD(d.bd)} ~ ${korD(d.end)}` : '');
+  if (num(S.money.deposit) + num(S.money.mid) > num(S.money.total) && num(S.money.total)) w('balDays', '계약금·중도금이 전체 금액보다 큽니다');
+}
+
+/* ---------- 특약 10종 (우리 문구) ---------- */
+const SPECIALS = {
+ sale:['현 시설 상태 그대로 매매하며, 매수인은 현장을 직접 확인하였다.',
+  '매도인은 잔금일까지 등기사항증명서에 있는 근저당권 등 제한 물권을 말소한다.',
+  '관리비·공과금은 잔금일을 기준으로 정산한다.',
+  '매수인의 대출이 금융기관 사정으로 불가하면 매수인은 계약금을 돌려받고 계약을 해제할 수 있다(대출 신청은 계약 후 14일 이내).',
+  '현재 임차인과의 임대차는 매수인이 이어받고, 그 보증금은 매매대금에서 뺀다.',
+  '잔금 후 6개월 안에 드러난 누수·균열 등 숨은 하자는 매도인이 수리한다.',
+  '양 당사자는 잔금 전에 등기사항증명서를 다시 확인한다.',
+  '붙박이장·에어컨 등 건물에 붙은 시설은 매매 목적물에 포함한다.',
+  '이사(인도) 날짜는 잔금일을 기준으로 양 당사자가 협의해 정한다.',
+  '부동산 거래 신고는 개업공인중개사가 하며, 양 당사자는 이에 협조한다.'],
+ house:['임대인은 임차인의 전입신고와 확정일자 받는 일에 협조한다.',
+  '임대인은 잔금일 다음 날까지 이 주택에 새 담보권을 설정하지 않는다.',
+  '임대인은 임차인이 전세보증금 반환보증에 가입할 수 있도록 필요한 서류를 준다.',
+  '반려동물은 임대인과 미리 협의한 경우에만 기를 수 있다.',
+  '도배·장판은 입주 전에 임대인 부담으로 새로 한다.',
+  '관리비는 임차인이 내고, 공용 부분 수선비는 임대인이 낸다.',
+  '보일러·배관 등 주요 설비가 낡아서 생긴 고장은 임대인이, 임차인의 부주의로 생긴 고장은 임차인이 고친다.',
+  '계약이 끝날 때 통상 사용에 따른 자연 마모는 원상복구 범위에서 뺀다.',
+  '임차인이 기간 중간에 나가면 새 임차인을 구하는 중개보수는 임차인이 낸다.',
+  '임차인은 주택임대차보호법에 따른 계약갱신요구권이 있다는 설명을 들었다.'],
+ shop:['차임에는 부가가치세가 포함되지 않으며, 임대인은 세금계산서를 발행한다.',
+  '권리금은 이 계약과 따로이며, 별도 약정에 따른다.',
+  '업종을 바꾸려면 임대인과 미리 협의한다.',
+  '임차인이 설치한 인테리어·시설은 계약이 끝날 때 임차인 비용으로 철거하고 원상복구한다.',
+  '관리비는 매월 차임과 함께 내며, 임대인은 산정 내역을 알려 준다.',
+  '간판은 건물 관리 규정에 맞춰 임차인 비용으로 설치한다.',
+  '이 점포의 사정으로 임차인의 영업 허가·신고가 불가하면 임차인은 계약금을 돌려받고 계약을 해제할 수 있다.',
+  '인테리어 공사 기간(최대 1개월) 동안은 차임을 받지 않는다.',
+  '임차인은 화재보험에 가입하고 증권 사본을 임대인에게 준다.',
+  '임차인은 상가건물 임대차보호법에 따른 계약갱신요구권(최대 10년)이 있다는 설명을 들었다.']
+};
+function renderSpecials(){
+  $('#spList').innerHTML = SPECIALS[S.type].map((t, i) => `<label><input type="checkbox" data-sp="${i}"${S.sp.includes(i) ? ' checked' : ''}><span>${escH(t)}</span></label>`).join('');
+  $('#spFree').value = S.free || '';
+  $('#brBox').innerHTML = '<div class="g2">' + BROKER.slice(0, 4).map(f => fieldHtml('br', f)).join('') + '</div>' + fieldHtml('br', BROKER[4]);
+  $$('.cp input').forEach(c => c.checked = !!S.cp[c.dataset.cp]);
+}
+
+/* ---------- 미입력 검사 ---------- */
+function missing(){
+  const out = [];
+  const [ra, rb] = ROLE[S.type];
+  PARTY.forEach(([k, l, r]) => { if (r && !String(S.a[k] || '').trim()) out.push({s:1, g:'a', k, t:ra + ' ' + l}); });
+  PARTY.forEach(([k, l, r]) => { if (r && !String(S.b[k] || '').trim()) out.push({s:1, g:'b', k, t:rb + ' ' + l}); });
+  PROP.forEach(([k, l, r]) => { if (r && !String(S.prop[k] || '').trim()) out.push({s:2, g:'prop', k, t:l}); });
+  if (!num(S.money.total)) out.push({s:2, g:'money', k:'total', t:isLease() ? '보증금' : '매매대금'});
+  if (hasRent() && !num(S.money.rent)) out.push({s:2, g:'money', k:'rent', t:'차임(월세)'});
+  if (!S.money.contractDate) out.push({s:2, g:'money', k:'contractDate', t:'계약일'});
+  if (!num(S.money.deposit)) out.push({s:2, g:'money', k:'deposit', t:'계약금'});
+  if (S.money.balDays === '' || S.money.balDays == null) out.push({s:2, g:'money', k:'balDays', t:'잔금 지급일'});
+  if (isLease() && !num(S.money.months)) out.push({s:2, g:'money', k:'months', t:'임대 기간'});
+  BROKER.forEach(([k, l, r]) => { if (r && !String(S.br[k] || '').trim()) out.push({s:3, g:'br', k, t:'중개사 ' + l}); });
+  return out;
+}
+let SHOW_MISS = false;
+function markMissing(){
+  const ms = missing();
+  $$('input.miss').forEach(e => e.classList.remove('miss'));
+  if (SHOW_MISS) ms.forEach(m => { const e = $(`input[data-g="${m.g}"][data-k="${m.k}"]`); if (e) e.classList.add('miss'); });
+  [1, 2, 3].forEach(s => { const b = $(`#plbls button[data-s="${s}"]`), n = ms.filter(m => m.s === s).length;
+    b.innerHTML = ['', '1 당사자', '2 물건·금액', '3 특약·확인'][s] + (SHOW_MISS && n ? `<b>${n}</b>` : ''); b.classList.toggle('on', s === S.step); b.classList.toggle('done', s < S.step); });
+  const mb = $('#missBox');
+  if (SHOW_MISS && ms.length){ mb.style.display = 'block'; mb.innerHTML = `<b>미입력 ${ms.length}곳</b> (빨간 칸) — ` + ms.map(m => escH(m.t)).join(', ') + '<br>그대로 출력하면 그 자리는 빈칸(____)으로 나갑니다.'; }
+  else mb.style.display = 'none';
+  return ms;
+}
+
+/* ---------- 계약서 본문(엔진 '문서 블록' 형식) ---------- */
+const HB = '#EEF2F8';
+const TX = (text, o = {}) => ({t:'text', align:o.al || 'L', size:o.sz || 9.5, bg:'', x:0, w:100, runs:[[text, o.b ? 1 : 0, o.c || '', '', '']]});
+const L = (t, o = {}) => Object.assign({t, b:1, bg:HB}, o);
+function TB(colWidths, rows, o = {}){
+  const cells = [];
+  rows.forEach((row, r) => { let c = 0; row.forEach(sp => { if (sp === null){ c++; return; }
+    const x = typeof sp === 'string' ? {t:sp} : sp;
+    cells.push([r, c, x.rs || 1, x.cs || 1, x.t == null ? '' : String(x.t), x.b ? 1 : 0, x.al || 'L', x.bg || '', '', x.n ? 1 : 0, x.nb ? 1 : 0]); c += x.cs || 1; }); });
+  return {t:'table', main:o.main ? 1 : 0, x:0, w:100, nRows:rows.length, nCols:colWidths.length, colWidths, cells};
+}
+const B_ = v => String(v == null ? '' : v).trim() || '____________';
+const wonLine = n => num(n) ? `${korWon(n)} (₩${comma(n)})` : '금 ____________ 원정';
+function buildDoc(){
+  const [ra, rb] = ROLE[S.type], d = dates(), m = S.money, P = S.prop, bal = balance();
+  const blocks = [];
+  blocks.push(TX(TITLE[S.type] + (S.type === 'house' ? (S.rent === 'jeonse' ? ' (전세)' : ' (월세)') : ''), {al:'C', sz:17, b:1}));
+  blocks.push(TX(`${ra}과 ${rb}은 아래 부동산에 대하여 다음 내용으로 ${isLease() ? '임대차' : '매매'}계약을 맺는다.`, {al:'C'}));
+  blocks.push(TX('1. 부동산의 표시', {b:1, sz:10.5}));
+  const loc = [P.addr, P.lot ? '(지번 ' + P.lot + ')' : ''].filter(Boolean).join(' ');
+  const bl = [P.bldg, P.floor ? P.floor + '층' : '', P.ho ? P.ho + '호' : ''].filter(Boolean).join(' ');
+  blocks.push(TB([18, 37, 15, 30], [
+    [L('소재지'), {t:B_(loc), cs:3}, null, null],
+    [L('건물(층·호)'), B_(bl), L('면적'), P.area ? P.area + ' ㎡' : B_('')],
+    [L('등기 접수번호'), {t:P.regNo || '-', cs:3}, null, null]]));
+  blocks.push(TX('2. 계약 내용', {b:1, sz:10.5}));
+  const art = [];
+  const payRows = [];
+  const total = isLease() ? '보증금' : '매매대금';
+  payRows.push([L(total), {t:wonLine(m.total), cs:2}, null]);
+  payRows.push([L('계약금'), wonLine(m.deposit), `${korD(d.c)} 계약할 때 지급하고 영수함`]);
+  if (num(m.mid)) payRows.push([L('중도금'), wonLine(m.mid), d.md ? `${korD(d.md)}에 지급` : '지급일 ____________']);
+  payRows.push([L('잔금'), wonLine(bal), d.bd ? `${korD(d.bd)}에 지급` : '지급일 ____________']);
+  if (hasRent()) payRows.push([L('차임(월)'), wonLine(m.rent), `매월 ${d.bd ? d.bd.getDate() : '__'}일 지급(후불)` + (num(m.mgmt) ? ` · 관리비 월 ₩${comma(m.mgmt)} 별도` : '')]);
+  if (S.type === 'sale'){
+    art.push(['제1조(목적물과 대금)', `${ra}은 위 부동산을 ${rb}에게 팔고 ${rb}은 이를 사기로 하며, 대금과 지급 시기는 아래와 같이 정한다.`]);
+    art.push(['제2조(소유권 이전과 인도)', `${ra}은 잔금을 받는 날 소유권 이전등기에 필요한 서류를 ${rb}에게 건네고, 같은 날 부동산을 넘겨준다.`]);
+    art.push(['제3조(권리의 정리)', `${ra}은 잔금일까지 저당권·지상권·임차권 등 소유권 행사를 막는 권리와 밀린 세금·공과금을 정리하여 완전한 소유권을 넘긴다. 다만 양 당사자가 따로 정한 것은 예외로 한다.`]);
+    art.push(['제4조(수익과 세금의 구분)', `부동산에서 생긴 수익과 세금·공과금은 인도일을 기준으로, 그 전은 ${ra}이 그 뒤는 ${rb}이 부담한다. 지방세 납부 의무는 지방세법에 따른다.`]);
+    art.push(['제5조(계약의 해제)', `${rb}이 중도금(중도금이 없으면 잔금)을 주기 전까지 ${ra}은 받은 계약금의 두 배를 돌려주고, ${rb}은 낸 계약금을 포기하고 이 계약을 해제할 수 있다.`]);
+  } else {
+    const what = S.type === 'house' ? '주거' : '계약서에 적은 영업';
+    art.push(['제1조(보증금과 차임)', `${rb}은 위 부동산을 빌리는 대가로 ${hasRent() ? '보증금과 차임' : '보증금'}을 아래와 같이 ${ra}에게 지급한다.`]);
+    art.push(['제2조(임대 기간)', `${ra}은 위 부동산을 임대 목적대로 쓸 수 있는 상태로 ${d.bd ? korD(d.bd) : '____________'}까지 ${rb}에게 넘겨주며, 임대 기간은 그날부터 ${d.end ? korD(d.end) : '____________'}까지(${num(m.months) || '__'}개월)로 한다.`]);
+    art.push(['제3조(용도와 전대 제한)', `${rb}은 ${ra}의 동의 없이 구조를 바꾸거나 다른 사람에게 다시 빌려주거나 임차권을 넘기지 못하며, ${what} 외의 용도로 쓰지 않는다.`]);
+    art.push(['제4조(수리)', `${ra}은 ${rb}이 부동산을 쓰는 데 필요한 수리를 하고, ${rb}의 잘못으로 생긴 파손은 ${rb}이 고친다.`]);
+    art.push(['제5조(계약의 해지)', `${rb}이 차임을 ${S.type === 'shop' ? '세 번' : '두 번'} 이상 연체하거나 제3조를 어기면 ${ra}은 계약을 해지할 수 있다.`]);
+    art.push(['제6조(계약의 종료)', `계약이 끝나면 ${rb}은 부동산을 원래 상태로 되돌려 넘기고, ${ra}은 같은 날 보증금을 돌려준다. 밀린 차임·관리비·손해액이 있으면 빼고 돌려준다.`]);
+    art.push(['제7조(계약의 해제)', `${rb}이 중도금(중도금이 없으면 잔금)을 주기 전까지 ${ra}은 받은 계약금의 두 배를 돌려주고, ${rb}은 낸 계약금을 포기하고 이 계약을 해제할 수 있다.`]);
+  }
+  const n0 = art.length;
+  art.push([`제${n0 + 1}조(약속을 지키지 않을 때)`, '한쪽이 이 계약 내용을 지키지 않으면 상대방은 기한을 정해 서면으로 이행을 요구한 뒤 계약을 해제하고 손해배상을 청구할 수 있다. 따로 정한 것이 없으면 계약금을 손해배상의 기준으로 본다.']);
+  art.push([`제${n0 + 2}조(중개보수)`, `개업공인중개사의 중개보수는 계약이 맺어질 때 ${ra}과 ${rb}이 각각 지급한다. 개업공인중개사의 고의나 과실 없이 계약이 무효·취소·해제되어도 같다.`]);
+  art.push([`제${n0 + 3}조(확인·설명서 교부)`, '개업공인중개사는 중개대상물 확인·설명서를 작성하고 업무보증 관계증서 사본을 붙여 계약할 때 양 당사자에게 건넨다.']);
+  blocks.push(TX(art[0][0] + ' ' + art[0][1]));
+  blocks.push(TB([16, 44, 40], payRows, {main:1}));
+  art.slice(1).forEach(a => blocks.push(TX(a[0] + ' ' + a[1])));
+  blocks.push(TX('3. 특약사항', {b:1, sz:10.5}));
+  const sps = S.sp.slice().sort((a, b) => a - b).map(i => SPECIALS[S.type][i]).concat(String(S.free || '').split('\n').map(x => x.trim()).filter(Boolean));
+  if (sps.length) sps.forEach((t, i) => blocks.push(TX(`${i + 1}) ${t}`)));
+  else blocks.push(TX('없음'));
+  blocks.push(TX(`이 계약을 증명하기 위해 계약 당사자가 이의 없음을 확인하고 각각 서명·날인한다. 계약서는 ${ra}·${rb}·개업공인중개사가 1부씩 보관한다.`));
+  blocks.push(TX(korD(d.c), {al:'C', b:1, sz:10.5}));
+  const party = (role, p) => [
+    [L(role, {rs:3, al:'C'}), L('주소'), {t:B_(p.addr), cs:3}, null, null],
+    [null, L('주민번호 앞자리'), B_(p.rrn), L('연락처'), B_(p.tel)],
+    [null, L('성명'), B_(p.name), L('서명·날인'), {t:'(인)', al:'R'}]];
+  const br = S.br;
+  blocks.push(TB([14, 18, 26, 16, 26], [
+    ...party(ra, S.a), ...party(rb, S.b),
+    [L('개업\n공인중개사', {rs:3, al:'C'}), L('사무소 소재지'), {t:B_(br.addr), cs:3}, null, null],
+    [null, L('사무소 명칭'), B_(br.office), L('등록번호'), B_(br.reg)],
+    [null, L('대표'), B_(br.rep) + '   (인)', L('연락처'), B_(br.tel)]]));
+  blocks.push(TX(LEGAL, {sz:8, c:'#666666'}));
+  return {blocks};
+}
+
+/* ---------- 계약서 HTML(미리보기·인쇄) ---------- */
+function rawToHtml(raw, copyLabel){
+  let h = `<div class="paper">` + (copyLabel ? `<div class="copy">${escH(copyLabel)}</div>` : '');
+  raw.blocks.forEach(b => {
+    if (b.t === 'text'){
+      const r = b.runs[0] || ['']; const st = `text-align:${b.align === 'C' ? 'center' : (b.align === 'R' ? 'right' : 'left')};font-size:${(b.size / 9.5).toFixed(3)}em;${+r[1] ? 'font-weight:700;' : ''}${r[2] ? 'color:' + r[2] + ';' : ''}`;
+      h += `<p style="${st}">${escH(r[0]).replace(/\n/g, '<br>') || '&nbsp;'}</p>`; return;
+    }
+    const occ = {}; let t = '<table><colgroup>' + b.colWidths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
+    for (let r = 0; r < b.nRows; r++){
+      t += '<tr>';
+      b.cells.filter(c => c[0] === r).sort((x, y) => x[1] - y[1]).forEach(c => {
+        const [, , rs, cs, text, bold, al, bg, , , nb] = c;
+        t += `<td${rs > 1 ? ` rowspan="${rs}"` : ''}${cs > 1 ? ` colspan="${cs}"` : ''}${nb ? ' class="nb"' : ''} style="text-align:${al === 'C' ? 'center' : (al === 'R' ? 'right' : 'left')};${bg ? 'background:' + bg + ';' : ''}${+bold ? 'font-weight:700;' : ''}">${escH(text).replace(/\n/g, '<br>')}</td>`;
+      });
+      t += '</tr>';
+    }
+    h += t + '</table>';
+  });
+  return h + '</div>';
+}
+function renderPreview(){
+  const w = $('#pvWrap'); w.innerHTML = rawToHtml(buildDoc());
+  const p = w.firstChild, s = w.clientWidth / 720; p.style.transform = `scale(${s})`;
+  w.style.height = Math.ceil(p.offsetHeight * s) + 'px';
+}
+
+/* ---------- 출력 ---------- */
+function copies(){ const [ra, rb] = ROLE[S.type]; const out = [];
+  if (S.cp.a) out.push(ra + ' 보관용'); if (S.cp.b) out.push(rb + ' 보관용'); if (S.cp.c) out.push('개업공인중개사 보관용'); return out; }
+function doPrint(){
+  SHOW_MISS = true; const ms = markMissing();
+  const cs = copies(); if (!cs.length) return toast('인쇄할 부수를 1부 이상 고르세요');
+  const raw = buildDoc();
+  $('#printArea').innerHTML = cs.map(c => rawToHtml(raw, c)).join('');
+  if (ms.length) toast(`미입력 ${ms.length}곳은 빈칸으로 인쇄됩니다`);
+  setTimeout(() => window.print(), 150);
+}
+function fileBase(){ const [ra] = ROLE[S.type]; return `${TITLE[S.type].replace(/\s/g, '')}_${(S.a.name || ra).replace(/[\\/:*?"<>|\s]/g, '')}_${(S.money.contractDate || '').replace(/-/g, '')}`; }
+async function hwpxBlob(){
+  const st = docFromRaw(buildDoc(), ''); if (!st) throw new Error('문서를 만들지 못했습니다');
+  const z = await makeZip(await buildHwpx(st));
+  return new Blob([z], {type:'application/hwp+zip'});
+}
+async function doHwpx(){
+  SHOW_MISS = true; const ms = markMissing();
+  try{
+    const b = await hwpxBlob(), nm = fileBase() + '.hwpx';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = nm; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    $('#outInfo').innerHTML = `<span class="dot"></span>${escH(nm)} 저장 (${Math.max(1, Math.round(b.size / 1024))}KB)` + (ms.length ? ` · 미입력 ${ms.length}곳은 빈칸` : '') + '. 더뷰(<a href="viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.';
+    toast('한글 파일을 저장했습니다');
+  }catch(e){ toast('파일을 만들지 못했습니다: ' + (e.message || '')); }
+}
+
+/* ---------- 화면 ---------- */
+function renderAll(){ renderParty(); renderProp(); renderMoney(); renderSpecials(); go(S.step || 1, true); }
+function go(n, quiet){
+  S.step = n; save();
+  $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's' + n));
+  $('#pfill').style.width = (n / 3 * 100) + '%';
+  $('#backBtn').style.display = n === 1 ? 'none' : '';
+  $('#nextBtn').textContent = n === 3 ? '인쇄 · PDF' : (n === 1 ? '다음: 물건·금액' : '다음: 특약·확인');
+  if (n === 3) renderPreview();
+  markMissing();
+  if (!quiet) window.scrollTo(0, 0);
+}
+$('#nextBtn').onclick = () => { if (S.step < 3){ const ms = missing().filter(m => m.s === S.step); if (ms.length){ SHOW_MISS = true; } go(S.step + 1); } else doPrint(); };
+$('#backBtn').onclick = () => go(Math.max(1, S.step - 1));
+$('#plbls').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.s); };
+$('#printBtn').onclick = doPrint;
+$('#hwpxBtn').onclick = doHwpx;
+$('#typeSeg').onclick = e => { const b = e.target.closest('button'); if (!b || b.dataset.v === S.type) return; S.type = b.dataset.v; S.sp = [];
+  if (S.type === 'shop' && !S.money.months) S.money.months = '24'; save(); renderAll(); toast(TITLE[S.type] + '로 바꿨습니다'); };
+$('#rentSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.rent = b.dataset.v; save(); renderParty(); renderMoney(); markMissing(); };
+$('#newBtn').onclick = () => { const t = S.type; S = fresh(); S.type = t; SHOW_MISS = false; try{ localStorage.removeItem(LS); }catch(e){} renderAll(); toast('새 계약서를 시작합니다'); };
+document.addEventListener('input', e => {
+  const el = e.target, g = el.dataset.g, k = el.dataset.k;
+  if (g){
+    let v = el.value;
+    if (g === 'money' && k !== 'contractDate'){
+      if (['total', 'rent', 'mgmt', 'deposit', 'mid'].includes(k)){ v = String(num(v) || ''); const pos = el.value.length; el.value = v ? comma(v) : ''; }
+      else v = v.replace(/[^\d]/g, '');
+    }
+    if (k === 'rrn') v = el.value = v.replace(/[^\d]/g, '').slice(0, 6);
+    S[g][k] = v; save();
+    if (g === 'money') updMoney();
+    if (SHOW_MISS) markMissing();
+    if (S.step === 3) renderPreview();
+  } else if (el.id === 'spFree'){ S.free = el.value; save(); renderPreview(); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.sp != null){ const i = +el.dataset.sp; S.sp = S.sp.filter(x => x !== i); if (el.checked) S.sp.push(i); save(); renderPreview(); }
+  if (el.dataset.cp){ S.cp[el.dataset.cp] = el.checked ? 1 : 0; save(); }
+});
+$('#moneyBox').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (!b) return; const k = b.parentNode.dataset.chips;
+  S.money[k] = b.dataset.d; $(`#moneyBox input[data-k="${k}"]`).value = b.dataset.d; save(); updMoney(); if (SHOW_MISS) markMissing(); });
+window.addEventListener('resize', () => { if (S.step === 3) renderPreview(); });
+
+/* ---------- 60초 문의 (발송 없음 · 사람 승인 후) ---------- */
+function qDraft(){
+  const n = $('#qName').value.trim(), t = $('#qTel').value.trim(), m = $('#qMsg').value.trim();
+  let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).classList.toggle('miss', !v); if (!v) bad = true; });
+  if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
+  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'계약서 생성기',
+    draft:`${n}님, 안녕하세요. KTS 원클릭 계약서 1초 생성기입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 서식·특약을 살펴보고 ${t} 으로 하루 안에 연락드리겠습니다.\n지금 있는 3종 서식(매매·주택 임대차·상가 임대차)은 바로 무료로 쓰실 수 있습니다.`};
+}
+$('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
+$('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; try{ a = JSON.parse(localStorage.getItem(LS_Q) || '[]'); }catch(e){} a.push(q); try{ localStorage.setItem(LS_Q, JSON.stringify(a)); }catch(e){}
+  $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
+
+/* 시험·설명서용 손잡이 */
+window.KC = {get S(){ return S; }, set S(v){ S = v; }, renderAll, go, buildDoc, hwpxBlob, doPrint, korWon, korNum, missing, markMissing, copies, rawToHtml, fresh, save};
+renderAll();
+</script>
+</body></html>
