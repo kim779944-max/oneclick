@@ -193,6 +193,63 @@ h1 em{font-style:normal;color:var(--amber)}
 #mGo{background:linear-gradient(180deg,#FF8A2B,var(--amber));border:0;color:var(--on)}
 .mrow button.ghost{background:#12203C;border:1px solid var(--line2);color:#D9E3F0}
 .merr{margin:8px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
+
+/* 시연 상태 배지 (2026-11-19 · 적립메모 74번) — 추가분만, 기존 틀 무변경 */
+.sbadge{position:absolute;right:9px;top:9px;z-index:2;font-family:inherit;font-size:9.5px;font-weight:900;
+  letter-spacing:.02em;line-height:1;border:0;border-radius:999px;padding:4px 7px 4px 6px;cursor:pointer;
+  background:var(--sc,#94A3B8);color:var(--sk,#0B1726);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.sbadge:active{transform:translateY(1px)}
+.sbadge::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7;margin-right:3px;vertical-align:1px}
+.prow .pname{padding-right:58px}
+.slegend{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:5px 0 0;font-size:10px;font-weight:800;color:#8FA0B8}
+.slegend i{display:inline-flex;align-items:center;gap:4px;font-style:normal}
+.slegend i u{width:7px;height:7px;border-radius:50%;display:inline-block;text-decoration:none}
+.sscrim{position:fixed;inset:0;background:rgba(3,7,16,.74);z-index:85}
+.ssheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90vw,368px);max-height:80vh;overflow:auto;
+  z-index:86;background:#0F1B33;border:1px solid rgba(255,107,0,.45);border-radius:18px;padding:15px 15px 13px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);-webkit-overflow-scrolling:touch}
+.sHead{display:flex;align-items:center;gap:8px}
+.sPill{flex:0 0 auto;font-size:9.5px;font-weight:900;border-radius:999px;padding:4px 8px;background:var(--sc,#94A3B8);color:var(--sk,#0B1726)}
+.sName{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.4px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sX{margin-left:auto;flex:0 0 auto;width:26px;height:26px;font-family:inherit;font-size:12px;font-weight:900;color:#C7D3E3;
+  background:#12203C;border:1px solid var(--line2);border-radius:8px;cursor:pointer;line-height:1;padding:0}
+.sSub{margin:8px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
+.sList{margin:9px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.sList li{position:relative;font-size:11.5px;line-height:1.6;color:#DCE5F1;font-weight:700;padding-left:11px;word-break:keep-all}
+.sList li::before{content:"";position:absolute;left:0;top:6px;width:4px;height:4px;border-radius:50%;background:var(--sc,#FF6B00)}
+.sFoot{display:flex;gap:7px;margin-top:12px}
+.sFoot a,.sFoot button{flex:1;text-align:center;font-family:inherit;font-size:12px;font-weight:900;border-radius:11px;padding:10px 8px;text-decoration:none;cursor:pointer}
+.sFoot a{background:linear-gradient(180deg,#FF8A2B,var(--amber));border:1px solid var(--amber);color:var(--on)}
+.sFoot button{background:#12203C;border:1px solid var(--line2);color:#D9E3F0}
+/* 모바일 쿠폰 받기 (2026-11-19 · 적립메모 71번) — 누를 때만 번호 입력 */
+.cpn{margin-top:12px}
+.cpnBtn{width:100%;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;cursor:pointer;color:var(--ink);
+  border:1px solid rgba(255,107,0,.6);border-radius:15px;padding:13px 14px;
+  background:linear-gradient(100deg,rgba(255,107,0,.2),rgba(255,255,255,.02) 72%)}
+.cpnBtn:active{transform:translateY(1px)}
+.cpnBtn .ct{flex:1;min-width:0}
+.cpnBtn .ct b{display:block;font-size:14px;font-weight:900;letter-spacing:-.4px;color:#fff}
+.cpnBtn .ct b i{font-style:normal;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;
+  padding:3px 7px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
+.cpnBtn .ct small{display:block;font-size:10.5px;color:#AFBDD0;margin-top:3px;line-height:1.4}
+.cpnBtn .ca{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:900;color:var(--amber2);border:1px solid rgba(255,107,0,.5);background:rgba(255,107,0,.12)}
+.cpnIn{margin-top:10px}
+.cpnIn input{width:100%;font-family:inherit;font-size:17px;font-weight:800;letter-spacing:.03em;text-align:center;color:#fff;
+  background:#0B1730;border:1px solid #2E4370;border-radius:12px;padding:12px 10px}
+.cpnIn input::placeholder{font-size:14px;letter-spacing:0;color:#6F819C;font-weight:700}
+.cpnIn input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
+.cpnIn button{width:100%;margin-top:8px;font-family:inherit;font-size:14px;font-weight:900;color:var(--on);border:0;border-radius:12px;
+  padding:13px;background:linear-gradient(180deg,#FF8A2B,var(--amber));cursor:pointer}
+.cpnErr{margin:7px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
+.cpnDone{margin-top:10px;border:1px solid rgba(74,222,128,.45);border-radius:13px;padding:11px;background:rgba(74,222,128,.07)}
+.cpnDone .no{font-size:11px;font-weight:900;color:#4ADE80;letter-spacing:.03em}
+.cpnDone .sum{margin:5px 0 0;font-size:11.5px;line-height:1.55;color:#DCE5F1;font-weight:700;word-break:keep-all}
+.cpnActs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.cpnActs a{text-align:center;font-size:11.5px;font-weight:900;text-decoration:none;border-radius:10px;padding:10px 6px;
+  border:1px solid #2E4370;background:#12203C;color:#D9E3F0}
+.cpnActs a.go{grid-column:1/-1;background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
+.cpnFine{margin:7px 0 0;font-size:10px;line-height:1.55;color:#7F8FA8}
 </style>
 </head>
 <body>
@@ -232,6 +289,46 @@ h1 em{font-style:normal;color:var(--amber)}
     <p class="merr" id="mErr" hidden>PIN이 맞지 않습니다</p>
   </div>
 
+  <div class="sscrim" id="sscrim" hidden></div>
+  <div class="ssheet" id="ssheet" role="dialog" aria-modal="true" aria-label="시연 상태·수정 내역" hidden>
+    <div class="sHead">
+      <span class="sPill" id="sPill">수정중</span>
+      <span class="sName" id="sName">상품</span>
+      <button class="sX" id="sX" type="button" aria-label="닫기">✕</button>
+    </div>
+    <p class="sSub" id="sSub"></p>
+    <ul class="sList" id="sList"></ul>
+    <div class="sFoot">
+      <a id="sGo" href="#">이 상품 열기</a>
+      <button id="sClose" type="button">닫기</button>
+    </div>
+  </div>
+
+  <div class="sscrim" id="cscrim" hidden></div>
+  <div class="ssheet" id="csheet" role="dialog" aria-modal="true" aria-label="모바일 쿠폰 받기" hidden>
+    <div class="sHead">
+      <span class="sPill" style="--sc:#22C55E;--sk:#05260F">무료</span>
+      <span class="sName">모바일 쿠폰 받기</span>
+      <button class="sX" id="cxX" type="button" aria-label="닫기">✕</button>
+    </div>
+    <p class="sSub" id="cpGuide">번호만 남겨 주세요. 무료 이용권 1장을 문자로 보내 드리고, 결제는 없습니다.</p>
+    <form class="cpnIn" id="cpForm" novalidate>
+      <input id="cpTel" type="tel" inputmode="tel" maxlength="13" placeholder="010-0000-0000" autocomplete="tel" aria-label="연락처">
+      <button type="submit" id="cpGo">쿠폰 받기</button>
+      <p class="cpnErr" id="cpErr" hidden></p>
+    </form>
+    <div class="cpnDone" id="cpDone" hidden>
+      <div class="no" id="cpNo"></div>
+      <p class="sum" id="cpSum"></p>
+      <div class="cpnActs">
+        <a class="go" id="cpSms" href="#">문자로 받기</a>
+        <a id="cpImg" href="tickets/free_ticket_500k_share5.png" target="_blank" rel="noopener" download="KTS_무료이용권.png">이용권 저장</a>
+        <a id="cpHome" href="tickets/free_ticket_daangn_home.png" target="_blank" rel="noopener" download="KTS_당근홈피_제작권.png">홈피 제작권 저장</a>
+      </div>
+    </div>
+    <p class="cpnFine">번호는 쿠폰 발송 연락에만 씁니다. 이 화면에서는 결제하지 않습니다.</p>
+  </div>
+
   <a class="freebar" href="sale/">
     <span class="fb">무료</span>
     <span class="ft"><b>오늘의 특가 — 할인만 모은 가격비교</b>
@@ -240,37 +337,12 @@ h1 em{font-style:normal;color:var(--amber)}
   </a>
 
 
-  <section class="rsv" id="reserve">
-    <div class="rsvTop">
-      <span class="live">사전예약 진행 중</span>
-      <span class="pr"><s>기준가 500,000원</s> → 지금 <b>0원</b> 무료 개방</span>
-    </div>
-    <h2>현재 지역 <em>무료 세팅</em>,<br>10초 사전예약 받습니다</h2>
-    <p class="desc">업종과 연락처만 남겨 주세요. 오픈 순서대로 연락드리고, 무료 이용권 1장을 같이 드립니다.</p>
-    <form id="rsvForm" novalidate>
-      <div class="row">
-        <input id="rsvBiz" name="biz" maxlength="20" placeholder="업종 (예: 치킨집)" autocomplete="organization">
-        <input id="rsvTel" name="tel" type="tel" inputmode="tel" maxlength="20" placeholder="연락처 (010-0000-0000)" autocomplete="tel">
-      </div>
-      <input id="rsvArea" name="area" maxlength="20" placeholder="지역 (예: 하남 미사) — 안 써도 됩니다" autocomplete="address-level2">
-      <button type="submit" id="rsvGo">10초 사전예약 신청</button>
-      <p class="err" id="rsvErr" hidden></p>
-    </form>
-    <div class="rsvDone" id="rsvDone" hidden>
-      <div class="no" id="rsvNo"></div>
-      <p class="sum" id="rsvSum"></p>
-      <div class="acts">
-        <a class="go" id="rsvSms" href="#">문자로 접수 확정</a>
-        <button class="ghost" type="button" id="rsvCopy">내용 복사</button>
-      </div>
-    </div>
-    <div class="rsvPrev" id="rsvPrev"></div>
-    <div class="rsvShare">
-      <a href="tickets/free_ticket_500k_share5.png" target="_blank" rel="noopener" download="KTS_무료이용권_50만원.png">무료 이용권 저장</a>
-      <a href="tickets/free_ticket_daangn_home.png" target="_blank" rel="noopener" download="KTS_당근홈피_제작권.png">홈피 제작권 저장</a>
-    </div>
-    <p class="fine">지금은 <b>모객 기간이라 전부 무료</b>로 열어 둡니다. 나중에 유료로 바뀌어도 기본은 열어 두고
-      상위노출 같은 <b>초저가 옵션만</b> 선택제로 둡니다. 결제는 이 화면에서 하지 않습니다.</p>
+  <section class="cpn" id="coupon">
+    <button class="cpnBtn" id="cpnOpen" type="button" aria-haspopup="dialog">
+      <span class="ct"><b><i>무료</i>모바일 쿠폰 받기</b>
+        <small>번호만 남기면 무료 이용권 1장을 문자로 — 오픈 순서대로 연락드립니다</small></span>
+      <span class="ca">→</span>
+    </button>
   </section>
 
   <div class="hero">
@@ -300,6 +372,7 @@ h1 em{font-style:normal;color:var(--amber)}
     <button data-c="soon">준비 중</button>
   </div>
   <div class="count" id="count"></div>
+  <div class="slegend" id="slegend"></div>
   <div class="plist" id="plist"></div>
 
   <section class="hub" id="hub">
@@ -326,17 +399,43 @@ h1 em{font-style:normal;color:var(--amber)}
 
 <script src="master.js"></script>
 <script src="products.js"></script>
+<script src="status.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let cur = 'all';
 const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
 
+/* 시연 상태 배지 — status.js 한 파일만 바꾸면 카드·팝업이 따라옵니다(적립메모 74번) */
+function stMeta(p){
+  const S = window.KTS_STATUS; if (!S) return null;
+  if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) return null;
+  const it = (S.items || {})[p.k] || {};
+  const key = it.st || 'before';
+  const def = (S.states || {})[key] || { label:'수정전', color:'#94A3B8', ink:'#0B1726' };
+  return { key:key, def:def, it:it };
+}
+function renderLegend(){
+  const box = $('#slegend'); if (!box) return;
+  const S = window.KTS_STATUS; if (!S) { box.innerHTML = ''; return; }
+  if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) { box.innerHTML = ''; return; }
+  const cnt = {done:0, after:0, fix:0, before:0};
+  window.PRODUCTS.forEach(p => { cnt[((S.items || {})[p.k] || {}).st || 'before']++; });
+  box.innerHTML = ['done','after','fix','before'].map(k => {
+    const d = S.states[k];
+    return `<i><u style="background:${d.color}"></u>${d.label} ${cnt[k]}</i>`;
+  }).join('') + '<i style="color:#6F819C">· 배지를 누르면 수정 내역</i>';
+}
+
 function render(){
   const list = window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
   $('#count').textContent = list.length + '개';
-  $('#plist').innerHTML = list.map(p => `
+  renderLegend();
+  $('#plist').innerHTML = list.map(p => {
+    const m = stMeta(p);
+    return `
     <div class="prow${p.status==='soon'?' soon':''}">
+      ${m ? `<button class="sbadge" type="button" data-k="${p.k}" style="--sc:${m.def.color};--sk:${m.def.ink}" aria-label="${p.nm} 시연 상태 ${m.def.label} — 누르면 수정 내역">${m.def.label}</button>` : ''}
       <div class="pico"><img src="${p.icon}" alt="" loading="lazy"></div>
       <div class="pmain">
         <div class="pname">${p.nm}${p.badge ? `<span class="bd ${BADGE[p.badge]||'new'}">${p.badge}</span>` : ''}</div>
@@ -351,7 +450,7 @@ function render(){
           </div>
         </div>
       </div>
-    </div>`).join('');
+    </div>`; }).join('');
 }
 $$('#tabs button').forEach(b => b.onclick = () => {
   cur = b.dataset.c;
@@ -359,6 +458,8 @@ $$('#tabs button').forEach(b => b.onclick = () => {
   render();
 });
 render();
+/* 마스터 모드(PIN 2899)를 켜고 끌 때 배지 표시 기준(status.js show)이 바로 반영되게 */
+document.addEventListener('kts:master', () => { try { render(); } catch(e){} });
 
 /* 하단 전 도구 타일 허브 — products.js(열린 도구) + 직통 도구 */
 function buildTiles(){
@@ -407,60 +508,80 @@ document.querySelectorAll('.soonbtn').forEach(b => b.onclick = () => {
   t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2000);
 });
 
-/* 사전예약 10초 폼 (2026-11-18) — 서버 전송 없음, 문자 접수 확정 링크 생성 */
+/* 시연 상태 배지 팝업 (2026-11-19 · 적립메모 74번) — 배지를 누를 때만 뜨고 카드 이동은 막습니다 */
 (function(){
-  const f = $('#rsvForm'); if (!f) return;
+  const sheet = $('#ssheet'), scrim = $('#sscrim');
+  if (!sheet) return;
+  function openStatus(k){
+    const S = window.KTS_STATUS || { states:{}, items:{} };
+    const p = (window.PRODUCTS || []).filter(x => x.k === k)[0] || null;
+    const it = (S.items || {})[k] || {};
+    const key = it.st || 'before';
+    const def = (S.states || {})[key] || { label:'수정전', color:'#94A3B8', ink:'#0B1726' };
+    const pill = $('#sPill'), list = $('#sList'), go = $('#sGo');
+    pill.textContent = def.label;
+    pill.style.setProperty('--sc', def.color); pill.style.setProperty('--sk', def.ink);
+    list.style.setProperty('--sc', def.color);
+    $('#sName').textContent = p ? String(p.nm).split(' — ')[0] : k;
+    $('#sSub').textContent = it.sub || (key === 'before' ? '아직 시연·검수 전입니다.' : '');
+    const lines = (it.memo && it.memo.length) ? it.memo
+      : ['아직 시연·검수 전입니다. 대표님 시연 순서가 오면 여기서 바로 잡습니다.'];
+    list.innerHTML = lines.map(t => '<li>' + t + '</li>').join('');
+    if (p && p.link){ go.href = p.link; go.hidden = false;
+      go.textContent = key === 'done' ? '확정 상품 열기' : '이 상품 열기'; }
+    else { go.hidden = true; }
+    scrim.hidden = false; sheet.hidden = false; sheet.scrollTop = 0;
+  }
+  function closeStatus(){ sheet.hidden = true; scrim.hidden = true; }
+  document.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('.sbadge') : null;
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    openStatus(b.getAttribute('data-k'));
+  }, true);
+  scrim.onclick = closeStatus; $('#sX').onclick = closeStatus; $('#sClose').onclick = closeStatus;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) closeStatus(); });
+})();
+
+/* 모바일 쿠폰 받기 (2026-11-19 · 적립메모 71번) — 누를 때만 번호 입력, 서버 전송 없음 */
+(function(){
+  const open = $('#cpnOpen'), sheet = $('#csheet'), scrim = $('#cscrim');
+  if (!open || !sheet) return;
   const TEL = '01020022899';
   const onlyNum = s => String(s||'').replace(/[^0-9]/g,'');
   const fmt = v => { v = onlyNum(v).slice(0,11);
     return v.length === 11 ? v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7) : v; };
-  const err = $('#rsvErr');
-  const showErr = m => { err.textContent = m; err.hidden = false; };
-
-  $('#rsvTel').addEventListener('input', e => { e.target.value = fmt(e.target.value); });
-
-  f.addEventListener('submit', e => {
-    e.preventDefault();
-    err.hidden = true;
-    const biz = $('#rsvBiz').value.trim();
-    const tel = onlyNum($('#rsvTel').value);
-    const area = $('#rsvArea').value.trim();
-    if (!biz) return showErr('업종만 적어 주세요. 예) 치킨집·미용실·펜션');
-    if (tel.length < 9 || tel.length > 11) return showErr('연락처를 정확히 적어 주세요. 예) 010-1234-5678');
-
-    const no = 'R-1118-' + String(Math.floor(Math.random()*9000)+1000);
-    const body = '[KTS 원클릭 사전예약]\n'
-      + '예약번호: ' + no + '\n'
-      + '업종: ' + biz + '\n'
-      + '연락처: ' + fmt(tel) + '\n'
-      + (area ? '지역: ' + area + '\n' : '')
-      + '요청: 현재 지역 무료 세팅 (기준가 500,000원 → 지금 0원)\n'
-      + '※ 보낸 뒤 오픈 순서대로 연락드립니다.';
-    try { localStorage.setItem('kts_rsv', JSON.stringify({no, biz, tel: fmt(tel), area, at: new Date().toISOString()})); } catch(_){}
-    $('#rsvNo').textContent = '예약번호 ' + no;
-    $('#rsvSum').textContent = biz + ' · ' + fmt(tel) + (area ? ' · ' + area : '') + ' — 아래 문자로 확정해 주세요.';
-    $('#rsvSms').href = 'sms:' + TEL + '?body=' + encodeURIComponent(body);
-    $('#rsvDone').hidden = false;
-    $('#rsvDone').scrollIntoView({block:'center', behavior:'smooth'});
-    const t = $('#toast'); if (t){ t.textContent = '10초 사전예약 준비됐습니다 — 문자만 보내면 접수'; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2400); }
+  const tel = $('#cpTel'), err = $('#cpErr'), form = $('#cpForm'), done = $('#cpDone');
+  function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.add('on');
+    clearTimeout(toastMsg._t); toastMsg._t = setTimeout(()=>t.classList.remove('on'), 2400); }
+  function showDone(no, telText){
+    $('#cpNo').textContent = '쿠폰번호 ' + no;
+    $('#cpSum').textContent = (telText ? fmt(telText) + ' · ' : '') + '아래 문자를 보내면 접수 완료됩니다.';
+    $('#cpSms').href = 'sms:' + TEL + '?body=' + encodeURIComponent(
+      '[KTS 원클릭 모바일 쿠폰]\n쿠폰번호: ' + no + '\n연락처: ' + fmt(telText)
+      + '\n※ 보내신 순서대로 연락드립니다.');
+    done.hidden = false; form.hidden = true; $('#cpGuide').hidden = true;
+  }
+  function openSheet(){
+    let v = null; try { v = JSON.parse(localStorage.getItem('kts_rsv') || 'null'); } catch(_){}
+    if (v && v.no) showDone(v.no, v.tel || '');
+    scrim.hidden = false; sheet.hidden = false; sheet.scrollTop = 0;
+    if (form.hidden === false) setTimeout(()=>{ try { tel.focus(); } catch(_){} }, 90);
+  }
+  function closeSheet(){ sheet.hidden = true; scrim.hidden = true; }
+  open.onclick = e => { e.preventDefault(); openSheet(); };
+  scrim.onclick = closeSheet; $('#cxX').onclick = closeSheet;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
+  tel.addEventListener('input', e => { e.target.value = fmt(e.target.value); });
+  form.addEventListener('submit', e => {
+    e.preventDefault(); err.hidden = true;
+    const num = onlyNum(tel.value);
+    if (num.length < 9 || num.length > 11){
+      err.textContent = '번호를 정확히 적어 주세요. 예) 010-1234-5678'; err.hidden = false; return; }
+    const no = 'C-1119-' + String(Math.floor(Math.random()*9000)+1000);
+    try { localStorage.setItem('kts_rsv', JSON.stringify({no:no, tel:fmt(num), at:new Date().toISOString()})); } catch(_){}
+    showDone(no, num);
   });
-
-  $('#rsvCopy').onclick = () => {
-    const txt = $('#rsvNo').textContent + ' / ' + $('#rsvSum').textContent;
-    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject())
-      .then(() => { const t = $('#toast'); if (t){ t.textContent='복사했습니다'; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1600);} },
-            () => { const t = $('#toast'); if (t){ t.textContent='복사가 막혀 있습니다 — 길게 눌러 복사하세요'; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200);} });
-  };
-
-/* 이미 접수한 분 안내(중복 신청 방지) */
-(function(){
-  const box = $('#rsvPrev'); if (!box) return;
-  let v = null; try { v = JSON.parse(localStorage.getItem('kts_rsv') || 'null'); } catch(_){}
-  if (!v || !v.no) return;
-  box.innerHTML = '이미 접수하셨어요 · <b>' + v.no + '</b> (' + (v.biz||'') + ') — 오픈 순서대로 연락드립니다. '
-    + '<a href="sms:01020022899?body=' + encodeURIComponent('[KTS 원클릭 사전예약 확인] ' + v.no + ' / ' + (v.biz||'') + ' / ' + (v.tel||'')) + '">문자 다시 보내기</a>';
-  box.classList.add('on');
-})();
 })();
 
 /* ===== 대표님 전용 마스터 모드 (PIN 2899) — 추가만, 손님 화면은 그대로 ===== */
