@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KTS 어벤져스 광고유입기</title>
+<style>
+:root{
+  --navy:#0A1128; --navy2:#0A1224; --navy3:#111B36; --line:#21305A;
+  --orange:#FF6B00; --orange2:#FF8A33; --gold:#D8B76A;
+  --txt:#EDF1FA; --sub:#A9B6D4; --dim:#7688AE;
+  --ok:#28C08A; --warn:#FFC24B;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--navy);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  font-size:15px;line-height:1.62;letter-spacing:-0.2px;-webkit-text-size-adjust:100%}
+body{padding-bottom:96px}
+a{color:var(--orange);text-decoration:none}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{position:sticky;top:0;z-index:50;background:rgba(10,17,40,.97);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.hd{display:flex;align-items:center;gap:10px;padding:11px 14px;max-width:760px;margin:0 auto}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--orange),#FF4D00);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex:0 0 auto}
+.hd h1{font-size:15px;margin:0;font-weight:800;letter-spacing:-0.4px;line-height:1.3}
+.hd .sub{font-size:10.5px;color:var(--dim);display:block;font-weight:500;letter-spacing:0}
+.hd .back{margin-left:auto;font-size:11.5px;color:var(--sub);border:1px solid var(--line);
+  border-radius:999px;padding:6px 11px;white-space:nowrap}
+.hero{padding:18px 0 6px}
+.hero .tag{display:inline-block;font-size:10.5px;color:var(--orange);border:1px solid rgba(255,107,0,.45);
+  border-radius:999px;padding:3px 9px;margin-bottom:9px;letter-spacing:0}
+.hero h2{font-size:20px;margin:0 0 6px;line-height:1.34;font-weight:900;letter-spacing:-0.7px}
+.hero h2 em{font-style:normal;color:var(--orange)}
+.hero p{margin:0;color:var(--sub);font-size:12.5px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.panel h3{margin:0 0 4px;font-size:13px;font-weight:800;letter-spacing:-0.3px}
+.panel .hint{font-size:11px;color:var(--dim);margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:#0D1732;color:var(--sub);border-radius:999px;
+  padding:9px 13px;font-size:12.5px;font-weight:600;cursor:pointer;min-height:40px;
+  display:inline-flex;align-items:center;gap:5px;transition:.15s}
+.chip:active{transform:scale(.97)}
+.chip.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.chip.on .dot{background:#fff}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--orange);display:inline-block}
+input[type=text]{width:100%;background:#0D1732;border:1px solid var(--line);color:var(--txt);
+  border-radius:10px;padding:12px 13px;font-size:14px;font-family:inherit;min-height:46px}
+input[type=text]::placeholder{color:#5E6E93}
+input[type=text]:focus{outline:none;border-color:var(--orange)}
+.go{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--orange),#FF4D00);color:#fff;
+  border:0;border-radius:12px;padding:16px;font-size:15.5px;font-weight:900;font-family:inherit;
+  letter-spacing:-0.3px;cursor:pointer;min-height:54px;box-shadow:0 8px 22px rgba(255,107,0,.22)}
+.go:active{transform:translateY(1px)}
+.sec-h{display:flex;align-items:baseline;gap:8px;margin:26px 0 10px}
+.sec-h h3{margin:0;font-size:15px;font-weight:900;letter-spacing:-0.4px}
+.sec-h .cnt{font-size:11px;color:var(--dim)}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.card .top{display:flex;align-items:center;gap:8px;padding:12px 13px;border-bottom:1px solid var(--line);
+  background:#0C1530}
+.num{width:22px;height:22px;border-radius:6px;background:rgba(255,107,0,.16);color:var(--orange);
+  font-size:11.5px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.card .top b{font-size:12.5px;font-weight:800;letter-spacing:-0.3px}
+.card .top .why{font-size:10.5px;color:var(--dim);margin-left:auto;text-align:right;line-height:1.3;max-width:44%}
+.card pre{margin:0;padding:13px;font-family:inherit;font-size:12.7px;line-height:1.72;white-space:pre-wrap;
+  word-break:break-word;color:#DFE6F6;max-height:360px;overflow:auto;-webkit-overflow-scrolling:touch}
+.card .hint2{font-size:10.5px;color:#6C7CA3;padding:0 13px 4px;letter-spacing:-0.1px}
+.card .foot{display:flex;gap:8px;padding:0 13px 12px}
+.btn{flex:1;background:#132043;border:1px solid var(--line);color:var(--txt);border-radius:10px;
+  padding:11px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;min-height:44px}
+.btn.pri{background:var(--orange);border-color:var(--orange);color:#fff}
+.btn:active{transform:scale(.985)}
+.ticket{background:linear-gradient(135deg,#101C3C,#0A1128);border:1px solid var(--gold);
+  border-radius:12px;padding:13px;margin:0 13px 12px;position:relative;overflow:hidden}
+.ticket:before{content:"";position:absolute;left:-8px;top:50%;width:16px;height:16px;border-radius:50%;
+  background:var(--navy2);transform:translateY(-50%)}
+.ticket:after{content:"";position:absolute;right:-8px;top:50%;width:16px;height:16px;border-radius:50%;
+  background:var(--navy2);transform:translateY(-50%)}
+.ticket .tk-top{font-size:9.5px;letter-spacing:1.4px;color:var(--gold);font-weight:800}
+.ticket .tk-name{font-size:14.5px;font-weight:900;margin:3px 0 2px;letter-spacing:-0.4px}
+.ticket .tk-price{font-size:11.5px;color:var(--sub)}
+.ticket .tk-price s{color:var(--dim)}
+.ticket .tk-price b{color:var(--orange);font-size:14px}
+.ticket .tk-no{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--dim);margin-top:6px;
+  letter-spacing:.6px;border-top:1px dashed #2A3A66;padding-top:6px}
+.tk-act{display:flex;align-items:center;gap:8px;margin-top:8px}
+.tk-act span{font-size:11px;color:var(--sub);flex:1}
+.tk-act button{background:#16234A;border:1px solid #2A3A66;color:var(--sub);border-radius:8px;
+  font-size:11px;padding:8px 10px;font-family:inherit;cursor:pointer;min-height:36px}
+.bar{display:flex;gap:8px;margin:10px 0 2px}
+.bar button{flex:1;background:#101B3A;border:1px solid var(--line);color:var(--sub);border-radius:10px;
+  font-size:12px;font-weight:700;padding:11px;font-family:inherit;cursor:pointer;min-height:44px}
+.bar button.pri{background:rgba(255,107,0,.14);border-color:rgba(255,107,0,.5);color:var(--orange)}
+.quick{margin:12px 0 0}
+.quick .qh{font-size:12px;font-weight:900;color:var(--orange);letter-spacing:-0.2px;margin:0 0 8px}
+.quick .q{background:#0C1734;border:1px solid #1B2A55;border-radius:11px;padding:11px 12px;margin-bottom:8px}
+.quick .q .t1{font-size:11px;color:var(--dim)}
+.quick .q .t2{font-size:12.8px;font-weight:700;margin-top:3px;line-height:1.55}
+.quick .q button{margin-top:8px;background:#141F42;border:1px solid var(--line);color:var(--sub);
+  border-radius:8px;font-size:11px;padding:9px 12px;font-family:inherit;cursor:pointer;min-height:38px}
+.klist{margin-top:10px}
+.krow{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border-bottom:1px solid #17224A}
+.krow:last-child{border-bottom:0}
+.krow .kid{font-size:10px;color:var(--dim);min-width:22px;padding-top:2px;font-family:ui-monospace,monospace}
+.krow .kw{font-size:13px;font-weight:700;letter-spacing:-0.3px}
+.krow .meta{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.45}
+.krow .lc{font-size:11.5px;color:#BCC8E4;margin-top:3px;line-height:1.5}
+.krow button{background:#141F42;border:1px solid var(--line);color:var(--sub);border-radius:8px;
+  font-size:11px;padding:10px 10px;font-family:inherit;cursor:pointer;flex:0 0 auto;min-height:44px}
+.empty{padding:22px;text-align:center;color:var(--dim);font-size:12px}
+.more{width:100%;background:#101B3A;border:0;border-top:1px solid var(--line);color:var(--orange);
+  font-size:12.5px;font-weight:800;padding:14px;font-family:inherit;cursor:pointer;min-height:48px;letter-spacing:-0.2px}
+.sc{padding:12px;border-bottom:1px solid #17224A}
+.sc:last-child{border-bottom:0}
+.sc .sh{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.sc .g{font-size:9.5px;background:rgba(255,107,0,.13);color:var(--orange);border-radius:5px;padding:2px 6px;font-weight:700}
+.sc .p{font-size:9.5px;background:#152048;color:#9FB0D6;border-radius:5px;padding:2px 6px}
+.sc b{font-size:12.5px;font-weight:800;display:block;margin-top:6px;letter-spacing:-0.3px}
+.sc .t{font-size:10.8px;color:var(--dim);margin-top:3px}
+.sc q{display:block;font-size:12.2px;color:#E6ECFA;margin:7px 0 0;padding:8px 10px;
+  background:#0C1734;border-left:2px solid var(--orange);border-radius:0 7px 7px 0;quotes:none;line-height:1.6}
+.sc .m{font-size:10.5px;color:var(--dim);margin-top:6px}
+.sc .act{display:flex;gap:7px;margin-top:8px}
+.sc .act button{flex:1;background:#141F42;border:1px solid var(--line);color:var(--sub);border-radius:8px;
+  font-size:11px;padding:9px;font-family:inherit;cursor:pointer;min-height:38px}
+.sc .act button.done{color:#28C08A;border-color:#28C08A;background:rgba(40,192,138,.12);font-weight:800}
+.note{font-size:11px;color:var(--dim);line-height:1.65;margin:10px 0 0}
+.note b{color:var(--warn)}
+footer{border-top:1px solid var(--line);margin-top:26px;padding:16px 0 8px;font-size:10.5px;color:#5E6E93;line-height:1.7}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:#1B2A55;border:1px solid var(--orange);color:#fff;font-size:12.5px;font-weight:700;
+  padding:11px 18px;border-radius:999px;transition:.22s;z-index:200;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(10,17,40,.97);
+  border-top:1px solid var(--line);padding:9px 14px calc(9px + env(safe-area-inset-bottom));display:none}
+.dock.on{display:block}
+.dock button{width:100%;background:linear-gradient(135deg,var(--orange),#FF4D00);color:#fff;border:0;
+  border-radius:11px;padding:13px;font-size:14px;font-weight:900;font-family:inherit;min-height:48px}
+@media(min-width:561px){ body{font-size:15px} .hero h2{font-size:23px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="logo">KTS</div>
+    <div>
+      <h1>어벤져스 광고유입기</h1>
+      <span class="sub">상품·타겟 고르면 1초에 7종 문구</span>
+    </div>
+    <a class="back" href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="tag">유료 API 0원 · 전부 이 화면에서 생성</span>
+    <h2>사장님 고민 <em>한 줄</em>로<br>사람이 모인 곳에 붙입니다</h2>
+    <p>어디에 붙일지, 뭐라고 쓸지, 다음에 뭐라고 답할지까지 한 번에 나옵니다.</p>
+  </section>
+
+  <section class="panel">
+    <h3>① 상품</h3>
+    <p class="hint">파는 것 하나만 고르세요. 나머지는 여기서 조합합니다.</p>
+    <div class="chips" id="prodChips"></div>
+  </section>
+
+  <section class="panel">
+    <h3>② 타겟</h3>
+    <p class="hint">'식당'이 아니라 '이번 주에 알바가 급한 식당'으로 부릅니다.</p>
+    <div class="chips" id="targChips"></div>
+  </section>
+
+  <section class="panel">
+    <h3>③ 동네 (선택)</h3>
+    <p class="hint">비우면 '우리 동네'로 나옵니다.</p>
+    <input type="text" id="region" placeholder="예: 미사, 하남, 가평" maxlength="12" autocomplete="off">
+    <button class="go" id="goBtn">1초 생성</button>
+  </section>
+
+  <div id="result"></div>
+
+  <div class="sec-h">
+    <h3>틈새 롱테일 100선</h3>
+    <span class="cnt" id="kwCnt"></span>
+  </div>
+  <section class="panel" style="padding:11px">
+    <input type="text" id="kwSearch" placeholder="키워드·쓰임새 검색 (예: hwpx, 부재중, 펜션)" autocomplete="off">
+    <div class="chips" style="margin-top:9px" id="kwFilter"></div>
+    <div class="klist" id="kwList"></div>
+    <p class="note">자동완성 실측(N=네이버, G=구글)에서 뽑은 100개입니다. 검색량 수치는 없습니다 — 실제로 사람이 <b>입력 중인 말</b>만 담았습니다.</p>
+  </section>
+
+  <div class="sec-h">
+    <h3>기존 트래픽 실행 50선</h3>
+    <span class="cnt" id="scCnt"></span>
+  </div>
+  <section class="panel" style="padding:11px">
+    <input type="text" id="scSearch" placeholder="채널·첫 문장 검색 (예: 만렙, 펜션)" autocomplete="off" style="margin-bottom:9px">
+    <div class="chips" id="scFilter"></div>
+    <div id="scList" style="margin-top:6px"></div>
+    <p class="note"><b>허위 자작 댓글 금지.</b> 자기 계정으로 자기 글에 답 다는 식의 조작은 하지 않습니다. 남의 글에는 <b>해결 방법</b>을 먼저 쓰고 연락은 쪽지로만 받습니다.</p>
+  </section>
+
+  <footer>
+    KTS 어벤져스 광고유입기 · 서버·유료 API 0원<br>
+    문구는 복사해서 그대로 쓰셔도 되고, 상호만 바꿔 쓰셔도 됩니다. 실명·타사 상표를 넣지 마세요.<br>
+    무료 이용권은 실제로 받는 사람만 쓰고, 마감일은 실제 마감일 때만 씁니다.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="dock" id="dock"><button id="dockGo">1초 생성</button></div>
+
+<script type="application/json" id="kwData">[{"id": 1, "kw": "당일알바", "src": "N+G", "intent": "문제해결", "biz": "번개알바", "use": "파워링크·블로그 제목", "line": "오늘 급한 자리는 앱 설치보다 동네 공고가 빠릅니다. 공고 세팅 무료로 해드리는 자리."}, {"id": 2, "kw": "당일알바 추천", "src": "G", "intent": "비교", "biz": "번개알바", "use": "블로그 소제목", "line": "추천 기준(거리·시급·당일 지급)을 먼저 알려주고 마지막에 우리 공고로 연결."}, {"id": 3, "kw": "당일 알바 앱", "src": "N", "intent": "구매검토", "biz": "번개알바", "use": "파워링크", "line": "앱을 새로 깔게 아니라 이미 있는 동네 공고판을 보게 만드는 문장."}, {"id": 4, "kw": "당일 알바 구하는 방법", "src": "N", "intent": "정보탐색", "biz": "번개알바", "use": "지식iN 답변", "line": "방법 3가지를 다 알려주고 세 번째에 '사장님이 직접 올리는 공고'를 놓습니다."}, {"id": 5, "kw": "당일 알바 그만둘때", "src": "N", "intent": "문제해결", "biz": "번개알바", "use": "카페 댓글", "line": "구직자 고민 글에는 사장님 시선 한 줄을 보태면 대화가 열립니다."}, {"id": 6, "kw": "단기알바", "src": "N+G", "intent": "문제해결", "biz": "번개알바", "use": "파워링크", "line": "3일·1주 단기 자리만 모아 보여주는 공고 세팅."}, {"id": 7, "kw": "단기알바 사이트", "src": "N+G", "intent": "구매검토", "biz": "번개알바", "use": "블로그 제목", "line": "사이트를 비교해 주는 척하지 않고, 무료로 공고 올리는 방법만 남깁니다."}, {"id": 8, "kw": "주말알바", "src": "N+G", "intent": "문제해결", "biz": "번개알바", "use": "파워링크", "line": "주말만 나오는 분을 찾는 사장님과 주말만 일하는 분을 같은 글에서 만납니다."}, {"id": 9, "kw": "주부주말알바", "src": "N", "intent": "문제해결", "biz": "번개알바", "use": "카페·블로그", "line": "아이 등원 시간에 맞춘 4시간 자리. 시간대를 제목에 넣으면 클릭이 붙습니다."}, {"id": 10, "kw": "직장인주말알바", "src": "N", "intent": "문제해결", "biz": "번개알바", "use": "블로그", "line": "본업 있는 분은 '당일 지급'과 '거리'만 봅니다. 두 줄만 쓰세요."}, {"id": 11, "kw": "야간알바", "src": "N+G", "intent": "문제해결", "biz": "번개알바", "use": "파워링크", "line": "야간 자리는 늘 비어 있습니다. 사장님께는 '야간만 따로 올리기'를 권합니다."}, {"id": 12, "kw": "야간알바 시급", "src": "N+G", "intent": "비교", "biz": "번개알바", "use": "블로그 제목", "line": "시급 표를 정리해 주고 마지막에 동네 야간 공고 3건을 붙입니다."}, {"id": 13, "kw": "새벽알바", "src": "N+G", "intent": "문제해결", "biz": "번개알바", "use": "파워링크", "line": "새벽 4시~7시 자리. 상하차·청소·빵집으로 나눠 3줄로 보여주면 끝."}, {"id": 14, "kw": "새벽 알바 공고", "src": "N", "intent": "정보탐색", "biz": "번개알바", "use": "블로그", "line": "공고가 어디에 뜨는지 모르는 분께 '올리는 곳'을 알려주는 글."}, {"id": 15, "kw": "알바 구인 사이트", "src": "N+G", "intent": "비교", "biz": "번개알바", "use": "파워링크", "line": "사이트 3개를 나열하되, 수수료 없는 동네 공고를 맨 위에 둡니다."}, {"id": 16, "kw": "알바 구인 앱", "src": "N", "intent": "구매검토", "biz": "번개알바", "use": "파워링크", "line": "설치 없이 링크로 보는 공고판이라는 점을 첫 줄에 씁니다."}, {"id": 17, "kw": "알바 구인난", "src": "G", "intent": "정보탐색", "biz": "번개알바", "use": "카페 글 제목", "line": "사장님끼리 아픈 지점. '공고를 3번 올려도 안 오는 이유' 3개로 시작."}, {"id": 18, "kw": "알바 시급 계산기", "src": "N+G", "intent": "도구", "biz": "번개알바", "use": "블로그·숏츠", "line": "계산 결과 화면에서 '이 시급이면 하루 4시간 12만 원' 식으로 공고로 넘깁니다."}, {"id": 19, "kw": "알바 급여 계산기", "src": "N+G", "intent": "도구", "biz": "번개알바", "use": "파워링크", "line": "주휴수당·야간수당까지 계산해 주면 체류가 길어집니다."}, {"id": 20, "kw": "알바 문자 지원", "src": "G", "intent": "정보탐색", "biz": "번개알바", "use": "지식iN·블로그", "line": "문자 예시 3개를 그대로 복사하게 해주고, 사장님 쪽 답장 예시도 붙입니다."}, {"id": 21, "kw": "알바 문자 지원 양식", "src": "G", "intent": "구매검토", "biz": "번개알바", "use": "블로그 제목", "line": "양식 이미지를 무료로 뿌리고 저장 유도. 저장한 사람이 다시 옵니다."}, {"id": 22, "kw": "당근 알바 공고", "src": "N", "intent": "구매검토", "biz": "번개알바", "use": "파워링크", "line": "동네 앱에 공고 올리는 법을 사장님 언어로 3단계."}, {"id": 23, "kw": "당근 알바 지원서", "src": "N", "intent": "정보탐색", "biz": "번개알바", "use": "블로그", "line": "지원서에 뭘 쓰면 사장님이 바로 답하는지 5줄로 정리."}, {"id": 24, "kw": "구인 광고 문구", "src": "G", "intent": "구매검토", "biz": "번개알바", "use": "카페·블로그", "line": "문구 예시 5개를 무료로 주고, 세팅은 홈피에서 받게 합니다."}, {"id": 25, "kw": "직원 모집 공고", "src": "N", "intent": "정보탐색", "biz": "번개알바", "use": "파워링크", "line": "공고에 꼭 들어가야 하는 5칸(시간·시급·업무·인원·연락)을 표로."}, {"id": 26, "kw": "식당 직원 구하기", "src": "G", "intent": "문제해결", "biz": "번개알바", "use": "카페 댓글", "line": "홀·주방·설거지로 나눠 올리는 법. 한 줄에 하나씩."}, {"id": 27, "kw": "미용실 직원 찾는 방법", "src": "N", "intent": "문제해결", "biz": "번개알바", "use": "카페·블로그", "line": "미용실은 경력·손님 수가 관건. 그 두 칸을 공고에 넣는 법."}, {"id": 28, "kw": "구인구직 사이트 순위", "src": "N", "intent": "비교", "biz": "번개알바", "use": "블로그 제목", "line": "순위를 매기지 않고 '우리 동네 기준'으로 다시 정렬해 보여줍니다."}, {"id": 29, "kw": "hwp 뷰어", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크·블로그", "line": "설치 없이 여는 링크 하나. 첫 화면에 파일 고르기 버튼만."}, {"id": 30, "kw": "hwp 뷰어 없이 읽는법", "src": "N", "intent": "정보탐색", "biz": "원클릭", "use": "블로그 제목", "line": "'없이'를 제목에 그대로 씁니다. 검색자가 원하는 말이 그것입니다."}, {"id": 31, "kw": "hwpx 파일 열기", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크", "line": "갤럭시에서 zip으로 열리는 문제를 첫 문장에 씁니다."}, {"id": 32, "kw": "hwpx 안열림", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "지식iN 답변", "line": "원인 2개(앱 없음·확장자)를 짚고 링크 하나만 남깁니다."}, {"id": 33, "kw": "hwp hwpx 변환", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "파워링크", "line": "변환 후 서식이 깨지는지가 진짜 걱정. 그 답부터."}, {"id": 34, "kw": "한글파일 pdf 변환", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크·블로그", "line": "폰에서 3번 누르면 끝나는 순서를 화면 순서대로."}, {"id": 35, "kw": "한글 파일 합치기", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "블로그", "line": "여러 장 한 번에 합치기. 계약서·견적서 묶음에 바로 쓰입니다."}, {"id": 36, "kw": "한글파일 서명넣기", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "지식iN·블로그", "line": "도장 사진 1장 → 투명 PNG → 서명란 삽입 3단계로 설명."}, {"id": 37, "kw": "한글파일 용량줄이기", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "블로그", "line": "카톡 전송 한도에 걸린다는 말로 시작하면 공감이 먼저 옵니다."}, {"id": 38, "kw": "아이폰 한글파일 열기", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크", "line": "아이폰은 '공유 → 열기' 동선이 달라서 따로 한 편 씁니다."}, {"id": 39, "kw": "사진 pdf 변환", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "파워링크", "line": "사진 여러 장을 한 PDF로. 순서 바꾸는 법까지."}, {"id": 40, "kw": "사진 글자 추출", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크·블로그", "line": "글자만 뽑으면 표가 깨진다. 그래서 '표째로' 뽑는 도구를 내밉니다."}, {"id": 41, "kw": "이미지 글자 추출", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "블로그", "line": "캡처·스캔·사진 세 경우로 나눠 각각 한 줄."}, {"id": 42, "kw": "사진 문서 변환 어플", "src": "N", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "어플 설치 대신 링크. 첫 줄에 설치 없음을 씁니다."}, {"id": 43, "kw": "엑셀 만들기", "src": "N+G", "intent": "정보탐색", "biz": "원클릭", "use": "파워링크·블로그", "line": "표 사진 1장 → 엑셀 1:1. 열 너비까지 같게."}, {"id": 44, "kw": "ai 로 엑셀 만들기", "src": "G", "intent": "구매검토", "biz": "원클릭", "use": "블로그 제목", "line": "AI 붙여넣기와 사진 인식의 차이를 3줄로. 결과물 사진이 답."}, {"id": 45, "kw": "전자서명 만들기", "src": "N+G", "intent": "문제해결", "biz": "원클릭", "use": "파워링크", "line": "손글씨로 그려 저장 → 도장처럼 반복 사용. 두 문장이면 끝."}, {"id": 46, "kw": "무료 전자서명 만들기", "src": "N", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "'무료'를 빼지 않습니다. 무료 구간이 실제로 있으니."}, {"id": 47, "kw": "전자서명 넣는법", "src": "G", "intent": "정보탐색", "biz": "원클릭", "use": "지식iN 답변", "line": "서명란이 없는 문서에 넣는 법(여백에 찍고 크기 조절)까지."}, {"id": 48, "kw": "도장 만들기 무료", "src": "G", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "종이 도장을 폰으로 찍으면 배경이 지워지는 것부터."}, {"id": 49, "kw": "온라인 도장 만들기", "src": "N", "intent": "구매검토", "biz": "원클릭", "use": "블로그", "line": "이름·글꼴·크기만 넣어 인장을 만드는 4단계."}, {"id": 50, "kw": "부동산 계약서 양식", "src": "N+G", "intent": "구매검토", "biz": "원클릭", "use": "파워링크·블로그", "line": "표준 양식에 물건지·보증금만 채우면 끝나는 구조를 보여줍니다."}, {"id": 51, "kw": "상가 임대차 계약서 양식", "src": "N", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "상가 특약 3개(원상복구·권리금·관리비)를 미리 넣어 둡니다."}, {"id": 52, "kw": "근로계약서 양식", "src": "N+G", "intent": "구매검토", "biz": "원클릭", "use": "파워링크·카페", "line": "사장님은 알바생 1명당 1장 필요. 세트로 묶어 팔지 않고 무료로 엽니다."}, {"id": 53, "kw": "근로계약서 미작성", "src": "N", "intent": "문제해결", "biz": "원클릭", "use": "지식iN 답변", "line": "벌금 얘기부터 하면 겁먹습니다. '오늘 한 장 쓰면 끝'으로."}, {"id": 54, "kw": "견적서 양식", "src": "N+G", "intent": "구매검토", "biz": "원클릭", "use": "파워링크·블로그", "line": "종이 견적서 사진 1장이면 내 양식이 됩니다."}, {"id": 55, "kw": "견적서 무료양식", "src": "N", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "무료 양식 이미지 3종을 바로 내려받게 하고, 저장은 홈피에서."}, {"id": 56, "kw": "계약서 사진 효력", "src": "G", "intent": "정보탐색", "biz": "원클릭", "use": "지식iN 답변", "line": "사진은 증거, 전자서명은 문서. 둘을 구분해 주면 신뢰가 생깁니다."}, {"id": 57, "kw": "스캔 앱 추천", "src": "N+G", "intent": "비교", "biz": "원클릭", "use": "블로그 제목", "line": "모서리 조절·초점 대기 없이 그냥 찍는 앱. 그 한 가지로 비교."}, {"id": 58, "kw": "스캔 앱 무료", "src": "N+G", "intent": "구매검토", "biz": "원클릭", "use": "파워링크", "line": "월 10회까지 무료라는 사실을 숨기지 않고 첫 줄에."}, {"id": 59, "kw": "부재중 문자 보내기", "src": "N+G", "intent": "문제해결", "biz": "부재중 비서", "use": "파워링크", "line": "전화 못 받은 3초 뒤에 자동으로 나가는 문자. 그 순서를 보여줍니다."}, {"id": 60, "kw": "부재중 문자 멘트", "src": "N+G", "intent": "정보탐색", "biz": "부재중 비서", "use": "지식iN·블로그", "line": "멘트 예시 5종을 그대로 복사하게. 업종별로 다릅니다."}, {"id": 61, "kw": "부재중 문자 예시", "src": "N+G", "intent": "정보탐색", "biz": "부재중 비서", "use": "블로그 제목", "line": "예시 10개를 표로. 저장해 두고 쓰는 글이 오래 살아남습니다."}, {"id": 62, "kw": "부재중 전화 문자", "src": "G", "intent": "문제해결", "biz": "부재중 비서", "use": "파워링크", "line": "손님이 끊기 전에 답이 가야 합니다. 60초 안에 예약 폼까지."}, {"id": 63, "kw": "자동 문자 발송 프로그램", "src": "G", "intent": "구매검토", "biz": "부재중 비서", "use": "파워링크", "line": "프로그램 설치 없이 폰 1대. 서버비 0원 구조를 그대로 말합니다."}, {"id": 64, "kw": "가게 전화 핸드폰으로", "src": "G", "intent": "문제해결", "biz": "부재중 비서", "use": "블로그", "line": "가게 번호를 내 폰으로 돌리는 법 → 그다음이 부재중 자동 문자."}, {"id": 65, "kw": "가게 전화 멘트", "src": "N", "intent": "정보탐색", "biz": "부재중 비서", "use": "블로그", "line": "첫인사·주문·예약 세 가지 멘트를 그대로."}, {"id": 66, "kw": "전화 응대 매뉴얼", "src": "G", "intent": "구매검토", "biz": "부재중 비서", "use": "카페·블로그", "line": "직원 교육용 1장. 알바생이 바뀌어도 그대로 씁니다."}, {"id": 67, "kw": "가게 홍보 방법", "src": "N+G", "intent": "정보탐색", "biz": "부재중 비서", "use": "카페 댓글", "line": "돈 안 드는 것부터 3개. 그중 1개가 우리 세팅입니다."}, {"id": 68, "kw": "가게 홍보 릴스", "src": "N+G", "intent": "구매검토", "biz": "부재중 비서", "use": "블로그·숏츠", "line": "15초 촬영 3컷(재료·손·완성)으로 끝내는 법."}, {"id": 69, "kw": "네이버 플레이스 등록", "src": "N+G", "intent": "문제해결", "biz": "부재중 비서", "use": "파워링크", "line": "등록만 하면 끝이 아니라 사진·영업시간·메뉴가 채워져야 뜹니다."}, {"id": 70, "kw": "네이버 플레이스 리뷰", "src": "N+G", "intent": "정보탐색", "biz": "부재중 비서", "use": "블로그", "line": "리뷰 요청 문구 1줄을 영수증에 붙이는 방법."}, {"id": 71, "kw": "메뉴판 만들기", "src": "G", "intent": "구매검토", "biz": "부재중 비서", "use": "파워링크", "line": "가격 바뀔 때마다 다시 인쇄하지 않게, 폰에서 고치는 판."}, {"id": 72, "kw": "메뉴 사진 찍기", "src": "N+G", "intent": "구매검토", "biz": "부재중 비서", "use": "블로그·숏츠", "line": "조명 1개·각도 1개·배경 1개. 세 가지만 바꿔도 달라집니다."}, {"id": 73, "kw": "무료 홈페이지 제작", "src": "G", "intent": "구매검토", "biz": "부재중 비서", "use": "파워링크", "line": "가게 홈피 1장. 주소·영업시간·메뉴·전화 버튼이면 충분합니다."}, {"id": 74, "kw": "홈페이지 제작 비용", "src": "G", "intent": "비교", "biz": "부재중 비서", "use": "블로그 제목", "line": "견적 30만~300만 원 사이에서 왜 갈리는지 3줄로 설명."}, {"id": 75, "kw": "당근마켓 홍보 비용", "src": "N", "intent": "비교", "biz": "부재중 비서", "use": "파워링크", "line": "동네 앱 광고 단가를 먼저 알려주고, 무료 대안을 뒤에."}, {"id": 76, "kw": "당근마켓 홍보하는법", "src": "N", "intent": "정보탐색", "biz": "부재중 비서", "use": "블로그", "line": "비즈프로필 사진·소개·첫 글 3개 순서로."}, {"id": 77, "kw": "개업 홍보", "src": "N", "intent": "정보탐색", "biz": "부재중 비서", "use": "카페 댓글", "line": "오픈 전 2주·당일·후 2주로 나눠 할 일 3개씩."}, {"id": 78, "kw": "상세페이지 제작", "src": "N+G", "intent": "구매검토", "biz": "부재중 비서", "use": "파워링크", "line": "사진 5장 + 문장 5줄이면 되는 이유를 예시로."}, {"id": 79, "kw": "가평 펜션 추천", "src": "N+G", "intent": "비교", "biz": "여행패스", "use": "파워링크·블로그", "line": "지역명을 제목 앞에. 사진보다 '몇 명이 몇 박'이 먼저입니다."}, {"id": 80, "kw": "가평 펜션 독채", "src": "G", "intent": "구매검토", "biz": "여행패스", "use": "파워링크", "line": "독채는 가족·모임. 인원 기준으로 거르는 표를 붙입니다."}, {"id": 81, "kw": "펜션 저렴하게 찾는방법", "src": "N", "intent": "정보탐색", "biz": "여행패스", "use": "블로그 제목", "line": "평일·비수기·막판 세 가지. 막판은 위험하니 대안까지."}, {"id": 82, "kw": "펜션 할인 받는 법", "src": "N", "intent": "정보탐색", "biz": "여행패스", "use": "블로그", "line": "카드·지역상품권·직접 문의. 세 번째가 우리 패스입니다."}, {"id": 83, "kw": "펜션 당일 예약 할인", "src": "G", "intent": "구매검토", "biz": "여행패스", "use": "파워링크", "line": "당일 빈 방은 주인도 급합니다. 그 구조를 설명."}, {"id": 84, "kw": "숙박 할인권", "src": "N+G", "intent": "구매검토", "biz": "여행패스", "use": "파워링크", "line": "지자체 할인권과 우리 이용권을 구분해, 겹쳐 쓸 수 있는지까지."}, {"id": 85, "kw": "숙박 할인 쿠폰", "src": "N", "intent": "구매검토", "biz": "여행패스", "use": "블로그", "line": "쿠폰이 안 먹히는 날짜(성수기·연휴)를 먼저 알려줍니다."}, {"id": 86, "kw": "저렴한 펜션 추천", "src": "G", "intent": "비교", "biz": "여행패스", "use": "블로그 제목", "line": "가격순 정렬이 아니라 '1인당 얼마'로 다시 계산해 보여줍니다."}, {"id": 87, "kw": "단체 숙박 펜션", "src": "G", "intent": "구매검토", "biz": "여행패스", "use": "파워링크", "line": "10인 이상은 방 3개보다 독채 1개가 쌉니다. 계산 예시로."}, {"id": 88, "kw": "mt 숙소 찾는 법", "src": "G", "intent": "정보탐색", "biz": "여행패스", "use": "블로그", "line": "학교·회사 근처, 차로 1시간, 1인 3만 원. 세 조건으로 거르기."}, {"id": 89, "kw": "워크숍 장소 추천", "src": "N+G", "intent": "구매검토", "biz": "여행패스", "use": "파워링크", "line": "회의실+숙박+식사가 한 곳에서 되는지가 기준. 체크리스트로."}, {"id": 90, "kw": "주말 여행 1박2일", "src": "G", "intent": "정보탐색", "biz": "여행패스", "use": "블로그 제목", "line": "금요일 퇴근 후 출발 기준으로 동선을 짜 줍니다."}, {"id": 91, "kw": "주말 여행 추천", "src": "N+G", "intent": "비교", "biz": "여행패스", "use": "블로그", "line": "서울 출발 2시간 이내로 좁혀 3곳만. 선택지를 줄여야 예약이 됩니다."}, {"id": 92, "kw": "겨울 펜션 추천", "src": "N", "intent": "비교", "biz": "여행패스", "use": "파워링크", "line": "11월~2월은 온수·난방이 전부. 확인 질문 3개를 대신."}, {"id": 93, "kw": "펜션 예약 사이트 추천", "src": "G", "intent": "비교", "biz": "여행패스", "use": "블로그 제목", "line": "수수료 구조를 알려주면 사장님도 손님도 우리 쪽으로 옵니다."}, {"id": 94, "kw": "펜션 예약 취소 위약금", "src": "G", "intent": "정보탐색", "biz": "여행패스", "use": "지식iN 답변", "line": "규정을 정리해 주고, 우리 패스의 취소 규정을 같은 표에."}, {"id": 95, "kw": "롱테일 키워드 찾는 방법", "src": "G", "intent": "정보탐색", "biz": "원클릭", "use": "블로그 제목", "line": "자동완성·연관검색어·리뷰 단어 세 곳에서 캔다. 도구로 연결."}, {"id": 96, "kw": "롱테일 키워드 예시", "src": "G", "intent": "정보탐색", "biz": "원클릭", "use": "블로그", "line": "업종별 예시 30개를 표로 주고, 내 업종은 생성기로."}, {"id": 97, "kw": "네이버 파워링크 가격", "src": "N", "intent": "비교", "biz": "원클릭", "use": "파워링크", "line": "70원대 롱테일 입찰가를 실제 예시로. 클릭당 얼마인지 숫자로."}, {"id": 98, "kw": "파워링크 입찰가 조회", "src": "G", "intent": "도구", "biz": "원클릭", "use": "블로그", "line": "조회 방법 2개를 알려주고, 세팅은 대신 해준다고."}, {"id": 99, "kw": "키워드 광고 단가", "src": "G", "intent": "비교", "biz": "원클릭", "use": "블로그 제목", "line": "업종별 단가 차이를 3줄로. 우리는 롱테일만 친다는 점을 명확히."}, {"id": 100, "kw": "블로그 상위노출", "src": "N", "intent": "정보탐색", "biz": "원클릭", "use": "블로그", "line": "제목 1줄·사진 3장·표 1개. 이 셋만 맞추면 됩니다."}]</script>
+<script type="application/json" id="scData">[{"id": 1, "group": "네이버 카페", "channel": "아프니까 사장이다 (회원 198만·2026 광고페이지 기준)", "size": "하루 신규 600명 이상 유입, 국내 최대 자영업 카페", "product": "bungee", "trigger": "'알바 구합니다' 게시판에 올라온 구인 글 — 댓글이 0~2개인 글만 고른다", "hook": "사장님, 이 공고 그대로 두시면 오늘 안에 한 명도 안 옵니다.", "follow": "시간·시급·업무·인원·연락처 다섯 칸이 다 있어야 지원이 옵니다. 빠진 칸만 짚어 드릴게요.", "reply": "쪽지 주시면 저희가 쓰는 무료 공고 양식(5칸) 그대로 보내드립니다. 세팅도 무료로 해드리고 있습니다.", "cta": "쪽지 → 홈피 무료 이용권 5장", "minutes": 12, "risk": "구인 글에 무단 홍보 금지 — 조언 후 쪽지로만"}, {"id": 2, "group": "네이버 카페", "channel": "아프니까 사장이다", "size": "동일 카페 '홍보·마케팅' 질문 게시판", "product": "secr", "trigger": "'가게 홍보 어떻게 하세요' 질문 글 — 답변 3개 이하", "hook": "돈 쓰기 전에 세 개만 확인하세요. 사진, 영업시간, 전화 받는 사람.", "follow": "이 셋이 비어 있으면 광고비를 써도 안 됩니다. 저희가 그 셋만 채워 드리는 세팅을 무료로 합니다.", "reply": "어느 동네세요? 동네만 알려주시면 오늘 세팅 가능한지 바로 확인해 드립니다.", "cta": "댓글 → 쪽지 → 웹폼", "minutes": 10, "risk": "답변에 링크 넣지 않고 쪽지로 유도"}, {"id": 3, "group": "네이버 카페", "channel": "자영업자의 쉼터(장사의신 카페)", "size": "회원 15만~170만(출처별 편차, 공식 수치 미확인)", "product": "oneclick", "trigger": "'오픈 준비' 글이나 '간판·메뉴판' 질문 글", "hook": "오픈 전에 돈 쓸 곳 열 군데 중에 여섯 개는 안 써도 됩니다.", "follow": "메뉴판·전단·홈피는 폰에서 직접 만드는 게 지금은 낫습니다. 만드는 법은 20%만 알려드리고 나머지는 홈피에 올려 뒀습니다.", "reply": "필요하신 양식(메뉴판·전단·홈피) 말씀해 주시면 무료 이용권으로 열어 드립니다.", "cta": "댓글 → 홈피", "minutes": 8, "risk": "카페 홍보 게시판 규정 확인 후 작성"}, {"id": 4, "group": "네이버 카페", "channel": "만렙사장 (회원 94만·2026-02 기준)", "size": "장사하는 사람 중심 실사용 커뮤니티", "product": "secr", "trigger": "'전화 응대' '부재중' '예약 놓침' 하소연 글", "hook": "장사 중에 전화 못 받는 건 사장님 잘못이 아닙니다. 손에 기름 묻었는데 어쩝니까.", "follow": "문제는 그다음입니다. 세 시간 뒤에 걸면 손님은 이미 다른 집을 예약했죠.", "reply": "부재중 3초 뒤에 문자 한 통 나가게 하는 세팅이 있습니다. 서버비 0원이라 무료로 해드립니다.", "cta": "쪽지 → 홈피 웹폼", "minutes": 10, "risk": "공감 먼저, 해결책은 쪽지로"}, {"id": 5, "group": "네이버 카페", "channel": "커피작업실 (23만)", "size": "커피숍 창업 1세대 카페", "product": "secr", "trigger": "'오픈했는데 손님이 없다' 후기 글", "hook": "오픈하고 한 달은 원래 이렇습니다. 문제는 두 달째입니다.", "follow": "두 달째에 필요한 건 광고가 아니라 '찾아오는 사람이 헷갈리지 않는 것'입니다. 사진·영업시간·메뉴 가격 셋.", "reply": "지금 쓰시는 사진 있으시면 3장만 보여주세요. 뭘 고쳐야 하는지 3줄로 적어 드립니다.", "cta": "댓글 → 쪽지 → 무료 세팅", "minutes": 9, "risk": "사진 요청은 쪽지에서만(게시판 개인정보 주의)"}, {"id": 6, "group": "네이버 카페", "channel": "고창모(고기집 창업 13만)", "size": "업종 특화 카페, 예약·단체 문의가 많은 업종", "product": "secr", "trigger": "'단체 예약 받는 법' '전화 폭주' 글", "hook": "단체 예약은 전화 한 통에 30만 원입니다. 그 한 통을 놓치고 계십니다.", "follow": "피크 시간에 못 받는 건 당연합니다. 그래서 '못 받았을 때'를 준비하는 겁니다.", "reply": "부재중 문자에 단체 예약 폼 링크까지 붙여 드립니다. 손님이 60초 안에 인원·날짜를 남깁니다.", "cta": "쪽지 → 웹폼", "minutes": 8, "risk": "금액 약속은 하지 않고 세팅 범위만"}, {"id": 7, "group": "네이버 카페", "channel": "배창사(배달 창업 7만)·무점사(무인점포 4만)", "size": "배달·무인 매장 사장님 밀집", "product": "secr", "trigger": "'리뷰' '플레이스' '주문 누락' 글", "hook": "배달은 사장님 얼굴을 손님이 못 봅니다. 그래서 사진과 답장이 전부입니다.", "follow": "리뷰 답장 1줄, 사진 5장, 메뉴 설명 1줄. 이 셋이 매출을 가릅니다.", "reply": "답장 문구 10개를 무료로 드립니다. 필요하시면 쪽지 주세요.", "cta": "댓글 → 쪽지 → 홈피", "minutes": 7, "risk": "플랫폼 상표명 언급 없이 '배달앱'으로만"}, {"id": 8, "group": "네이버 카페", "channel": "테사모(9만)·호운사(10만)", "size": "테이크아웃·호프 업종 카페", "product": "bungee", "trigger": "'주말 알바' '야간 알바' 구인 글", "hook": "주말 이틀만 나오는 분을 구하시죠? 그 조건이 제목에 없으면 안 옵니다.", "follow": "'토·일 18시~24시, 시급 얼마, 할 일 셋' 이렇게 쓰시면 지원이 옵니다.", "reply": "공고를 이 형식으로 다시 써 드릴까요? 무료입니다. 동네만 알려주세요.", "cta": "쪽지 → 공고 세팅", "minutes": 7, "risk": "구인 글 도배 금지 — 하루 3건 이내"}, {"id": 9, "group": "네이버 카페", "channel": "피터팬의 좋은방 구하기(303만)·부동산 스터디(211만)", "size": "국내 최대 부동산 카페", "product": "oneclick", "trigger": "'계약서' '특약' '전자계약' 질문 글", "hook": "계약서는 도장 찍기 전 10분이 전부입니다. 그 10분에 뭘 봐야 하는지.", "follow": "특약 3줄, 날짜 두 개, 도장 위치. 이 다섯 개만 확인하시면 됩니다.", "reply": "표준 양식에 특약만 채우는 방식으로 정리해 드렸습니다. 필요하시면 링크 드립니다.", "cta": "댓글 → 홈피 더양식", "minutes": 9, "risk": "법률 자문 아님 1줄 명시"}, {"id": 10, "group": "네이버 카페", "channel": "공도사(28만)·공사모(43만)·네오비(2.7만)", "size": "중개사·중개 준비생 카페", "product": "oneclick", "trigger": "'중개 실무' '계약서 작성' '현장에서 수정' 글", "hook": "현장에서 계약서 한 줄 고치려고 사무실 돌아가신 적 있으시죠.", "follow": "폰에서 바로 고치고 서명·날인까지 하는 방법이 있습니다. 한컴 없이요.", "reply": "중개사무소에서 쓰시는 양식 사진 1장만 주시면 그 틀 그대로 만들어 드립니다.", "cta": "쪽지 → 더양식 시연", "minutes": 12, "risk": "중개사 개인정보 수집 금지 — 링크만"}, {"id": 11, "group": "네이버 카페", "channel": "전간조(29.8만)·요양·간호 커뮤니티", "size": "구인구직 게시판이 활발한 직종 카페", "product": "bungee", "trigger": "'야간 근무' '주말 당직' 구인 글", "hook": "야간·주말 근무는 급하게 구할수록 사람이 없습니다.", "follow": "대신 '오늘부터'를 제목에 쓰면 다릅니다. 조건보다 시점이 먼저입니다.", "reply": "오늘부터 근무 조건으로 공고 한 장 다시 써 드릴까요? 무료입니다.", "cta": "댓글 → 쪽지", "minutes": 6, "risk": "의료·요양 표현은 구인 사실만"}, {"id": 12, "group": "네이버 카페", "channel": "지역 맘카페·동네 카페(예: 미사·하남)", "size": "지역 단위 카페, 학부모·주부 구직자 밀집", "product": "bungee", "trigger": "'방과후 알바' '등하원 시간 맞춰 일할 곳' 글", "hook": "아이 등원 9시, 하원 3시. 그 사이 4시간 자리는 구인이 늘 급합니다.", "follow": "시간대를 제목에 그대로 쓰세요. '9시~2시' 이게 제목이어야 합니다.", "reply": "그 시간대 공고를 동네 공고판에 무료로 올려 드립니다.", "cta": "댓글 → 홈피 → 공고 등록", "minutes": 8, "risk": "지역 카페 광고 금지 규정 먼저 확인"}, {"id": 13, "group": "지식iN·블로그", "channel": "지식iN 'hwpx 파일 열기' 질문", "size": "검색 상위 노출, 하루 수백 건 유입되는 생활 질문", "product": "oneclick", "trigger": "답변이 0~1개인 질문에만 답한다", "hook": "갤럭시에서 hwpx가 zip 폴더로 열리는 건 앱이 없어서입니다.", "follow": "설치 없이 여는 방법이 있습니다. 링크 누르고 파일 고르면 끝입니다.", "reply": "(질문자 추가 질문 시) 인쇄는 여기서 바로 되고, 편집은 따로 알려드립니다.", "cta": "답변 내 링크 1개 → 더뷰", "minutes": 5, "risk": "광고성 답변 금지 — 해결 방법 먼저, 링크는 마지막"}, {"id": 14, "group": "지식iN·블로그", "channel": "지식iN '한글파일 서명 넣기'", "size": "계약·동의서 시즌(연말·이사철) 검색 급증", "product": "oneclick", "trigger": "서명란 없는 문서에 서명하는 법 질문", "hook": "서명란이 없으면 여백에 찍고 크기 줄여서 넣으면 됩니다.", "follow": "종이 도장을 폰으로 찍으면 배경이 지워져서 투명 도장이 됩니다.", "reply": "도장 사진 있으시면 순서대로 알려드릴게요.", "cta": "답변 → 더싸인", "minutes": 6, "risk": "전자서명 효력 단정 금지 — '문서에 넣는 방법'으로만"}, {"id": 15, "group": "지식iN·블로그", "channel": "지식iN '사진 글자 추출'", "size": "학생·직장인 상시 수요", "product": "oneclick", "trigger": "OCR 결과가 깨졌다는 후속 질문", "hook": "글자만 뽑으면 표가 깨집니다. 표째로 뽑아야 합니다.", "follow": "사진 1장 넣으면 칸·색·열 너비까지 같이 나오는 방식이 있습니다.", "reply": "어떤 표였는지 알려주시면 맞는 방법으로 안내드릴게요.", "cta": "답변 → 변환기", "minutes": 6, "risk": "무료 한도 고지"}, {"id": 16, "group": "지식iN·블로그", "channel": "지식iN '부재중 문자 멘트'", "size": "사장님·직장인 모두 검색", "product": "secr", "trigger": "멘트 예시를 요청하는 질문", "hook": "멘트는 짧아야 합니다. 세 줄 넘으면 안 읽습니다.", "follow": "예시 하나: '○○입니다. 지금 장사 중이라 못 받았습니다. 문자 주시면 바로 연락드립니다.'", "reply": "업종 알려주시면 그 업종용으로 세 개 더 만들어 드립니다.", "cta": "답변 → 부재중 비서", "minutes": 5, "risk": "번호·상호 노출 금지"}, {"id": 17, "group": "지식iN·블로그", "channel": "지식iN '당일 알바 구하는 방법'", "size": "구직자 검색 최상위 질문", "product": "bungee", "trigger": "학생·주부 구직 질문", "hook": "오늘부터 일하려면 앱 설치보다 동네 공고판이 빠릅니다.", "follow": "사장님이 직접 올린 공고는 연락이 바로 됩니다. 중간에 사람이 없어서요.", "reply": "어느 동네세요? 그 동네 공고 링크 보내드릴게요.", "cta": "답변 → 번개알바 지역 링크", "minutes": 5, "risk": "허위 공고 금지 — 실제 올라온 공고만"}, {"id": 18, "group": "지식iN·블로그", "channel": "지식iN '근로계약서 미작성'", "size": "사장님·알바생 양쪽 검색", "product": "oneclick", "trigger": "'써야 하나요' 질문", "hook": "한 장 안 썼다고 벌금 얘기부터 하면 아무것도 못 합니다.", "follow": "오늘 한 장 쓰면 끝납니다. 5분이면 됩니다.", "reply": "표준 양식에 이름·시급·시간만 채우는 방식으로 링크 드릴게요.", "cta": "답변 → 더양식", "minutes": 5, "risk": "법률 판단 금지 — 서식 제공만"}, {"id": 19, "group": "지식iN·블로그", "channel": "네이버 블로그 '가평 펜션 저렴하게'", "size": "주말·연휴 검색 폭발, 예약 의도 높음", "product": "trip", "trigger": "'3만 원대 없나요' 댓글이 붙는 글", "hook": "펜션은 평일·비수기·막판 세 가지로만 싸집니다.", "follow": "문제는 막판이 위험하다는 것. 그래서 미리 잡아두는 패스가 있습니다.", "reply": "인원·날짜 알려주시면 1인당 얼마인지 계산해 드립니다.", "cta": "댓글 → 여행패스", "minutes": 7, "risk": "'최저가' 단정 금지"}, {"id": 20, "group": "지식iN·블로그", "channel": "네이버 블로그 '무료 홈페이지 제작'", "size": "소상공인 상시 검색", "product": "secr", "trigger": "'진짜 무료 있나요' 의심 댓글", "hook": "진짜 무료는 있습니다. 대신 조건이 있습니다.", "follow": "주소·영업시간·메뉴·전화 버튼. 이 네 개만 있는 홈피입니다.", "reply": "업종 알려주시면 어떤 구성이 필요한지 3줄로 적어 드립니다.", "cta": "댓글 → 웹폼", "minutes": 7, "risk": "무료 범위(4개 항목)를 명확히"}, {"id": 21, "group": "당근", "channel": "동네생활 — '가게 홍보 어떻게 해요' 질문", "size": "월 이용자 2,100만 명(2026-11 보도), 체류 2시간40분", "product": "secr", "trigger": "동네 사장님 질문 글, 댓글 5개 이하", "hook": "동네는 광고보다 소문이 빠릅니다. 소문의 시작은 사진 한 장입니다.", "follow": "메뉴 사진 세 장만 다시 찍어도 달라집니다. 조명 하나면 됩니다.", "reply": "사장님 가게 동네만 알려주세요. 무료로 세팅해 드리는 자리 있습니다.", "cta": "댓글 → 쪽지 → 웹폼", "minutes": 6, "risk": "동네생활 광고·간접홍보 금지 — 정보 답변만"}, {"id": 22, "group": "당근", "channel": "무료나눔 — '무료 이용권 5장' 나눔 글", "size": "무료나눔 카테고리 자체 트래픽, 조건부 나눔 금지", "product": "bungee", "trigger": "월 1회 정기 나눔 글(조건 없이 진짜 나눔)", "hook": "개인으로 받은 무료 이용권 5장인데 3장 남았습니다. 필요한 분 가져가세요.", "follow": "가게 홈피·메뉴사진·부재중 문자 세팅 중 하나 고르시면 됩니다.", "reply": "'3장'이라고 댓글 남겨주시면 순서대로 쪽지드립니다.", "cta": "댓글 → 쪽지 → 이용권 번호", "minutes": 5, "risk": "조건부 나눔 금지 — 대가 요구 없이"}, {"id": 23, "group": "당근", "channel": "비즈프로필 소개문 교체", "size": "내 가게 프로필은 내가 통제하는 유일한 동네 노출면", "product": "secr", "trigger": "프로필 첫 줄·사진·소개 3종 교체", "hook": "소개 첫 줄에 '오늘 영업시간'을 쓰세요. 그게 제일 많이 읽힙니다.", "follow": "두 번째 줄에 전화 버튼 이유를 씁니다. '전화 못 받으면 문자 주세요'", "reply": "(방문자) 프로필 → 링크 → 웹폼", "cta": "프로필 링크 → 웹폼", "minutes": 15, "risk": "외부 채널 유도 금지 — 프로필 내 링크만"}, {"id": 24, "group": "당근", "channel": "동네생활 — '알바 구해요' 글", "size": "당근알바 누적 지원 5,000만 회 돌파(2026-11)", "product": "bungee", "trigger": "사장님 구인 글에 '아직 안 구해졌어요?' 댓글", "hook": "이 글 조건이면 지원이 안 옵니다. 시간이 없어서요.", "follow": "'오늘부터, 4시간, 시급 얼마' 이 세 개만 앞에 쓰세요.", "reply": "공고 다시 써 드릴까요? 무료입니다.", "cta": "댓글 → 공고 세팅", "minutes": 5, "risk": "구직자 가장 금지 — 사장님 글에만"}, {"id": 25, "group": "당근", "channel": "동네생활 — '메뉴사진 어디서 찍어요'", "size": "음식점 사장님 반복 질문", "product": "secr", "trigger": "촬영 업체 견적을 물어보는 글", "hook": "견적 30만 원은 조명 값입니다. 조명 하나면 30만 원 아낍니다.", "follow": "창가, 흰 도마, 접시 하나. 이 셋이면 됩니다.", "reply": "지금 사진 한 장 보여주시면 뭘 바꿀지 3줄로 적어 드립니다.", "cta": "댓글 → 쪽지", "minutes": 6, "risk": "타 업체 비방 금지 — 방법만"}, {"id": 26, "group": "당근", "channel": "동네생활 — '부재중 전화' 하소연", "size": "사장님·자영업자 공통 고민", "product": "secr", "trigger": "'전화 못 받아서 손님 놓쳤다' 글", "hook": "그 전화, 세 시간 뒤에 걸면 이미 늦습니다.", "follow": "못 받은 3초 뒤에 문자가 나가면 손님은 기다립니다.", "reply": "세팅 무료로 해드리는 자리 있습니다. 기기만 있으면 됩니다.", "cta": "댓글 → 웹폼", "minutes": 5, "risk": "자동화 오인 금지 — '문자 한 통'으로 설명"}, {"id": 27, "group": "당근", "channel": "무료나눔 — '당근 홈피 제작권' 나눔", "size": "대표님 확정 문구: '당근 홈피 제작권(제작 시 완전 무료 사용권 증정)'", "product": "secr", "trigger": "월 2회, 5장 단위로 나눔", "hook": "동네 사장님 홈피 만들어 드립니다. 제작은 무료, 사용권도 드립니다.", "follow": "메뉴·주소·전화만 주시면 당일 올려 드립니다.", "reply": "업종·동네만 댓글로 남겨주세요. 순서대로 연락드립니다.", "cta": "댓글 → 웹폼", "minutes": 5, "risk": "'당근' 상표는 대표님 확정 문구로만 사용"}, {"id": 28, "group": "당근", "channel": "동네 모임(모임 서비스 월 1,000만 명) — 사장님 모임", "size": "상권·업종 모임이 실제로 존재", "product": "bungee", "trigger": "모임 공지에 '구인 정보' 한 줄 요청", "hook": "모임에 구인 글 올리는 분들 많은데, 조건이 빠져서 안 옵니다.", "follow": "다섯 칸 양식 하나로 통일하면 반응이 다릅니다.", "reply": "양식 이미지 공유해 드릴게요. 모임 공지에 붙여 쓰세요.", "cta": "공지 → 양식 → 홈피", "minutes": 10, "risk": "모임 운영자 허락 후 게시"}, {"id": 29, "group": "중고나라", "channel": "끌올 — '무료로 해드립니다' 재능 글", "size": "월 이용자 126만~201만, 1인당 18분(체류 짧아 제목 승부)", "product": "secr", "trigger": "주 2회 끌올(같은 글 24시간 후)", "hook": "[무료] 동네 가게 홈피·메뉴사진 정리해 드립니다 (5분)", "follow": "조건 없습니다. 사진 3장과 가게 이름만 주세요.", "reply": "댓글 순서대로 쪽지드립니다. 오늘 3곳까지 가능합니다.", "cta": "댓글 → 쪽지 → 이용권", "minutes": 4, "risk": "'재능기부' 표기, 대가 요구 없음"}, {"id": 30, "group": "중고나라", "channel": "끌올 — '계약서 서식 나눔' 글", "size": "이사·계약 시즌 검색 유입", "product": "oneclick", "trigger": "서식 파일 나눔 글 + 댓글 요청", "hook": "[나눔] 근로·임대차 계약서 서식 정리해서 올립니다 (수정 가능)", "follow": "폰에서 바로 고칠 수 있는 파일로 올렸습니다.", "reply": "댓글 주시면 링크 드립니다.", "cta": "댓글 → 더양식", "minutes": 4, "risk": "표준서식 출처 표기"}, {"id": 31, "group": "중고나라", "channel": "'스캔 앱' 질문 댓글", "size": "학부모·직장인 상시 질문", "product": "oneclick", "trigger": "'스캔 앱 뭐 쓰세요' 글", "hook": "모서리 맞추는 앱 말고, 그냥 찍으면 펴지는 앱 있습니다.", "follow": "초점 기다리지도 않습니다. 들이대고 누르면 끝.", "reply": "링크 하나 드릴게요. 설치 없이 써보세요.", "cta": "댓글 → 더스캔", "minutes": 3, "risk": "타 앱 비방 금지"}, {"id": 32, "group": "중고나라", "channel": "'펜션 이용권 양도' 글", "size": "숙박권 양도·교환 글이 상시 올라오는 카테고리", "product": "trip", "trigger": "양도 글에 '더 싸게 있나요' 댓글", "hook": "양도보다 싼 게 있습니다. 다만 조건이 있습니다.", "follow": "평일·비수기 한정. 주말은 안 됩니다.", "reply": "날짜 알려주시면 되는지 바로 확인해 드립니다.", "cta": "댓글 → 여행패스", "minutes": 4, "risk": "양도글 방해 금지 — 질문 댓글에만"}, {"id": 33, "group": "중고나라", "channel": "'알바 구함' 게시판", "size": "단기 구인 글이 하루 수십 건", "product": "bungee", "trigger": "조건이 두 줄뿐인 구인 글", "hook": "이 조건이면 오늘 한 명도 안 옵니다.", "follow": "다섯 칸만 채우시면 됩니다.", "reply": "다시 써 드릴까요? 무료입니다.", "cta": "댓글 → 공고 세팅", "minutes": 4, "risk": "도배 금지 — 하루 3건"}, {"id": 34, "group": "유튜브 숏츠", "channel": "자영업 브이로그 영상 댓글", "size": "최근 30일 한국어 쇼츠 44편, 중앙값 조회 2.2만(2026-11 집계)", "product": "secr", "trigger": "'오픈 준비' '하루 매출' 브이로그에 공감 댓글", "hook": "이 영상 보면서 딱 하나 생각났습니다. 전화 받는 사람이 없을 때요.", "follow": "장사 중엔 못 받는 게 당연한데, 그 3초를 어떻게 버티느냐가 매출입니다.", "reply": "(답글) 부재중 문자 예시 필요하시면 세 개 드릴게요.", "cta": "댓글 → 프로필 링크", "minutes": 4, "risk": "영상과 무관한 홍보 금지 — 공감 먼저"}, {"id": 35, "group": "유튜브 숏츠", "channel": "비포애프터 영상(69편·53채널) 댓글", "size": "공간·제품 전후 비교 포맷, 이해 비용 낮음", "product": "secr", "trigger": "'가게 인테리어 전후' 영상", "hook": "전후 사진 좋은데, 손님이 이걸 볼 수 있게 올려두셨나요?", "follow": "인스타에만 있으면 검색으론 안 옵니다.", "reply": "플레이스·홈피에 올리는 법 알려드릴게요.", "cta": "댓글 → 프로필", "minutes": 4, "risk": "타 계정 지적 금지 — 질문 형식"}, {"id": 36, "group": "유튜브 숏츠", "channel": "생활꿀팁 영상(평균 조회 23.9만) 댓글", "size": "'버리면 손해' 구조가 강한 카테고리", "product": "oneclick", "trigger": "'폰으로 문서 스캔' 꿀팁 영상", "hook": "이거 모서리 맞추느라 3분 걸리죠. 안 맞춰도 됩니다.", "follow": "그냥 찍으면 알아서 펴집니다.", "reply": "앱 이름 궁금하다고 댓글 주시면 답글에 남깁니다.", "cta": "댓글 → 답글 → 링크", "minutes": 4, "risk": "댓글에 링크 직접 금지(차단) — 답글·프로필로"}, {"id": 37, "group": "유튜브 숏츠", "channel": "시장 상인 티키타카 영상(평균 77만) 댓글", "size": "현장 리액션·말맛 포맷", "product": "bungee", "trigger": "'사장님 화법' 영상", "hook": "이 사장님은 사람을 끌어들이는 말을 아십니다.", "follow": "구인 공고에도 같은 법칙이 있습니다. 조건보다 사람이 먼저 보이게.", "reply": "공고 예시 하나 보여드릴까요?", "cta": "댓글 → 프로필", "minutes": 4, "risk": "영상 주인공 실명·상호 언급 금지"}, {"id": 38, "group": "유튜브 숏츠", "channel": "상황극·POV 영상(120편·72채널) 댓글", "size": "착각→추궁→반전 15초 구조", "product": "oneclick", "trigger": "'알바가 사장님께 문자하는 상황' 류 영상", "hook": "현실은 이렇습니다. 사장님은 문자를 세 시간 뒤에 봅니다.", "follow": "그래서 요즘은 첫 문자를 자동으로 보냅니다.", "reply": "멘트 예시 궁금하시면 답글에.", "cta": "댓글 → 답글", "minutes": 4, "risk": "비하·조롱 톤 금지"}, {"id": 39, "group": "유튜브 숏츠", "channel": "내 채널 15초 시연 숏츠 + 고정댓글", "size": "고정댓글 클릭이 설명란 대비 2.1배(업계 분석)", "product": "oneclick", "trigger": "더뷰·더스캔·부재중 시연 15초", "hook": "폰에 한글 파일이 안 열려서 화났던 분, 15초만 보세요.", "follow": "설치 없이 열립니다. 링크는 고정댓글에.", "reply": "(고정댓글) 무료 이용권 5장 남았습니다. '5장' 댓글 주세요.", "cta": "고정댓글 → 홈피", "minutes": 3, "risk": "AI 생성 영상 표기 여부 대표님 결정 필요"}, {"id": 40, "group": "유튜브 숏츠", "channel": "댓글 답글로 15초 답변 영상", "size": "질문 댓글 1개 → 답변 영상 1편 재활용", "product": "secr", "trigger": "내 영상에 달린 실제 질문", "hook": "이 질문 답만 15초로 찍었습니다.", "follow": "다음 질문도 댓글로 주세요. 하나씩 영상으로 답합니다.", "reply": "(다음 영상 예고)", "cta": "영상 → 프로필", "minutes": 10, "risk": "질문자 얼굴·상호 노출 금지"}, {"id": 41, "group": "유튜브 숏츠", "channel": "지역 맛집·가게 소개 영상 댓글", "size": "지역 단위 조회수 낮지만 전환 높음", "product": "bungee", "trigger": "'이 동네 알바 구하는 곳' 류 영상", "hook": "이 동네는 공고가 하루에 세 건 올라옵니다.", "follow": "문제는 조건이 없어서 지원이 안 온다는 것.", "reply": "동네 이름 알려주시면 공고 링크 드릴게요.", "cta": "댓글 → 지역 링크", "minutes": 3, "risk": "없는 공고 언급 금지"}, {"id": 42, "group": "릴스·스레드", "channel": "인스타 릴스 '가게 홍보' 해시태그 댓글", "size": "댓글→DM 자동화 사례에서 거래액 85%↑(공식 사례)", "product": "secr", "trigger": "사장님 계정의 '홍보 어떻게' 릴스", "hook": "릴스 3편 올리셨네요. 근데 프로필에 전화번호가 없습니다.", "follow": "손님은 저장 안 하고 바로 전화합니다. 그 번호가 없으면 끝입니다.", "reply": "DM 주시면 프로필 정리 순서 알려드릴게요.", "cta": "DM → 웹폼", "minutes": 5, "risk": "DM 대량 발송 금지 — 공개 댓글에만"}, {"id": 43, "group": "릴스·스레드", "channel": "스레드 사장님 커뮤니티 글", "size": "짧은 글 확산, 자영업 고민 글 다수", "product": "secr", "trigger": "'전화 못 받아서 손님 놓침' 글에 답글", "hook": "저도 그거 때문에 세팅 하나 바꿨습니다.", "follow": "부재중 3초 문자. 그 뒤로는 손님이 먼저 문자를 줍니다.", "reply": "필요하신 분 계시면 방법 공유할게요.", "cta": "답글 → 프로필", "minutes": 4, "risk": "체험담 형식은 실제 사실만"}, {"id": 44, "group": "릴스·스레드", "channel": "릴스 카드뉴스 '5장 남았습니다'", "size": "카드 3장(이용권·혜택·신청) 9:16", "product": "bungee", "trigger": "월 2회 업로드, 고정댓글에 신청 안내", "hook": "무료 이용권 5장 남았습니다. 이번 주까지만.", "follow": "가게 홈피·메뉴사진·부재중 문자 중 하나 고르세요.", "reply": "'신청' 댓글 주시면 DM으로 번호 보내드립니다.", "cta": "댓글 → DM → 웹폼", "minutes": 8, "risk": "'이번 주까지만'은 실제 마감일 때만"}, {"id": 45, "group": "릴스·스레드", "channel": "인스타 댓글 키워드 → DM 자동응답", "size": "키워드 3대 = 정보·링크·궁금(업계 분석)", "product": "oneclick", "trigger": "릴스에 '무료' '신청' '링크' 키워드 댓글 시 자동 DM", "hook": "(릴스 마지막 컷) '무료'라고 댓글 남기면 링크 보내드립니다.", "follow": "DM: 무료 이용권 5장 중 3장 남았습니다. 링크입니다.", "reply": "(자동) 링크 → 홈피 → 이용권 번호", "cta": "DM → 홈피", "minutes": 20, "risk": "자동 DM은 1회만, 반복 발송 금지"}, {"id": 46, "group": "오프라인 기존 트래픽", "channel": "아파트·상가 게시판 QR (관리사무소 허락)", "size": "단지 500~1,500세대, 게시판 실제 열람률 높음", "product": "secr", "trigger": "'동네 가게 무료 세팅' A5 1장 + QR", "hook": "이 단지 사장님 5분만 — 가게 홈피 무료로 만들어 드립니다.", "follow": "QR 찍고 업종·연락처만 남기면 끝.", "reply": "(QR → 웹폼 → 당일 연락)", "cta": "QR → 웹폼", "minutes": 30, "risk": "무단 부착 금지 — 허락 받은 곳만"}, {"id": 47, "group": "오프라인 기존 트래픽", "channel": "시장·상가 입구 현수막·배너 QR", "size": "유동인구 많은 상권, 점주 협의 필요", "product": "bungee", "trigger": "'이 상가 알바 공고 무료' 배너 1개", "hook": "이 상가 알바 공고, 무료로 올려 드립니다.", "follow": "QR 찍으면 바로 공고 등록.", "reply": "(QR → 공고 등록)", "cta": "QR → 공고", "minutes": 40, "risk": "옥외광고 규정·점주 허락"}, {"id": 48, "group": "오프라인 기존 트래픽", "channel": "포장 스티커·영수증 QR (협조 매장)", "size": "하루 100~300건 결제, 손님이 직접 든다", "product": "secr", "trigger": "'전화 못 받으면 문자 주세요' 스티커", "hook": "전화 못 받았나요? 문자 주시면 바로 답합니다.", "follow": "QR로 예약·문의 60초.", "reply": "(QR → 웹폼 → 자동 문자)", "cta": "QR → 웹폼", "minutes": 20, "risk": "매장 동의 필수, 개인정보 수집 고지"}, {"id": 49, "group": "오프라인 기존 트래픽", "channel": "미사 46곳 등 기존 문자 발송 대상", "size": "이미 확보된 업소 연락처(과거 캠페인)", "product": "bungee", "trigger": "1:1 문자 — 수신 동의자에게만", "hook": "사장님, 지난번에 말씀드린 무료 공고 세팅 아직 남아 있습니다.", "follow": "이번 주 5장 중 2장 남았습니다. 필요하시면 회신만 주세요.", "reply": "(회신 → 당일 세팅)", "cta": "문자 → 회신 → 웹폼", "minutes": 15, "risk": "무동의 발송 금지 — 동의 이력 확인"}, {"id": 50, "group": "오프라인 기존 트래픽", "channel": "부동산 중개사무소 1:1 방문", "size": "동네 중개사 10~30곳, 계약서 수요 상시", "product": "oneclick", "trigger": "계약서 1장 시연(3분)", "hook": "사장님, 현장에서 계약서 한 줄 고치실 때 사무실 안 돌아가셔도 됩니다.", "follow": "폰에서 고치고 도장까지 찍습니다. 지금 3분만 보여드릴게요.", "reply": "(시연 → 명함 → 당일 링크)", "cta": "시연 → 더양식 → 더싸인", "minutes": 25, "risk": "방문 전 예약, 영업시간 회피"}]</script>
+<script>
+(function(){
+"use strict";
+var KW = JSON.parse(document.getElementById('kwData').textContent);
+var SC = JSON.parse(document.getElementById('scData').textContent);
+
+/* ---------- 상품 ---------- */
+var PRODUCTS = {
+  bungee:{name:'번개알바', short:'번개알바', kind:'구인구직',
+    anchor:'정가 500,000원', ancDetail:'공고 세팅 150,000 + 상권 포스터 100,000 + 부재중 자동문자 세팅 250,000',
+    perks:['공고 1건 무료 세팅(시간·시급·업무·인원·연락 5칸)','상권 포스터 1종','부재중 자동문자 1개월'],
+    give:'알바 공고가 안 오는 이유부터 짚어 드립니다',
+    hl:'알바 구하는 사장님께'},
+  oneclick:{name:'원클릭 올인원', short:'원클릭', kind:'업무도구',
+    anchor:'정가 500,000원', ancDetail:'사진→한글·엑셀 변환 1년 200,000 + 한글 전자서명·일괄 날인 150,000 + 혼합 장부취합 150,000',
+    perks:['사진 1장 → 한글·엑셀 1:1 변환','한글 전자서명·도장 날인 무제한','혼합 장부 취합'],
+    give:'한컴 없이 서류 끝내는 방법을 먼저 알려드립니다',
+    hl:'서류 때문에 막힌 사장님께'},
+  secr:{name:'부재중 비서', short:'부재중 비서', kind:'가게 응대',
+    anchor:'정가 500,000원', ancDetail:'부재중 방어 세팅 300,000 + 예약 웹폼·CRM·문구 12종 200,000',
+    perks:['부재중 0초 자동 문자','60초 예약·문의 웹폼','구글시트·노션 CRM 자동 저장'],
+    give:'못 받은 전화를 손님으로 되돌리는 방법',
+    hl:'전화 못 받는 사장님께'},
+  trip:{name:'여행패스', short:'여행패스', kind:'숙박',
+    anchor:'정가 500,000원', ancDetail:'전국 펜션 10박 × 50,000원',
+    perks:['평일 10박 이용권','1인당 요금 계산','예약 취소 규정 명시'],
+    give:'주말 말고 평일로 잡으면 절반이 되는 이유',
+    hl:'숙소 알아보는 분께'},
+  dview:{name:'더뷰·더스캔', short:'더뷰·더스캔', kind:'업무도구',
+    anchor:'정가 500,000원', ancDetail:'종이 양식 100종 변환 200,000 + 일괄 서명·날인 150,000 + 스캔 12개월 150,000',
+    perks:['한글·엑셀·PDF 바로 열람','찍으면 자동 스캔·정면 보정','종이 양식 → 내 양식'],
+    give:'폰에서 안 열리는 파일, 그 자리에서 여는 방법',
+    hl:'파일 안 열려서 급한 분께'},
+  exchange:{name:'교환급매물', short:'교환', kind:'부동산',
+    anchor:'정가 500,000원', ancDetail:'권리분석 A4 5건 250,000 + 사진 5대 세트 150,000 + 노출 1개월 100,000',
+    perks:['권리분석 A4 1장','사진 5대 세트','교환·급매 노출 1개월'],
+    give:'급매는 가격이 아니라 권리에서 갈립니다',
+    hl:'급매·교환 알아보는 분께'}
+};
+
+/* ---------- 타겟 ---------- */
+var TARGETS = {
+  resto:{label:'식당·카페', call:'점심 피크에 전화 못 받는', pain:'예약 전화를 놓쳐서 손님이 다른 집 감',
+    asset:'메뉴 사진·영업시간·자리', word:'홀·주방 알바'},
+  salon:{label:'미용실·네일', call:'예약이 겹치는', pain:'시술 중엔 전화를 못 받음',
+    asset:'시술 전후 사진·가격표', word:'디자이너·보조'},
+  realtor:{label:'공인중개사', call:'현장 나가 있는', pain:'계약서 한 줄 고치려 사무실 복귀',
+    asset:'매물 사진·권리분석', word:'현장 직원'},
+  store:{label:'편의점·소매', call:'혼자 매장 보는', pain:'야간에 손님과 전화를 동시에 못 봄',
+    asset:'상품 진열·영업시간', word:'야간 알바'},
+  pension:{label:'펜션·숙박', call:'주말마다 만실인', pain:'문의가 몰릴 때 답이 늦어 예약 이탈',
+    asset:'객실 사진·요금표', word:'청소·조리'},
+  person:{label:'개인(구직·주부)', call:'이번 주에 일자리 급한', pain:'어디에 물어봐야 하는지 모름',
+    asset:'가능한 시간·거리', word:'단기 알바'},
+  all:{label:'일반 사장님', call:'혼자 다 하는', pain:'돈은 없는데 할 일은 많음',
+    asset:'가게 사진·연락처', word:'직원'}
+};
+
+var DAY = ['일','월','화','수','목','금','토'];
+var state = {prod:'bungee', targ:'resto', region:''};
+var LEDGER = {used:0, last:''};
+var QUOTA = 5;
+
+function loadLedger(){
+  try{ var r=localStorage.getItem('kts_ticket_ledger'); if(r){ var o=JSON.parse(r);
+    if(typeof o.used==='number' && o.used>=0 && o.used<=QUOTA){ LEDGER.used=o.used; LEDGER.last=o.last||''; } } }catch(e){}
+}
+function saveLedger(){ try{ localStorage.setItem('kts_ticket_ledger', JSON.stringify(LEDGER)); }catch(e){} }
+function remain(){ return Math.max(0, QUOTA - LEDGER.used); }
+
+/* ---------- 유틸 ---------- */
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function regionName(){ return (state.region||'').trim() || '우리 동네'; }
+function pad(n){return n<10?'0'+n:''+n}
+function stamp(){ var d=new Date(); return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
+function toast(msg){ var t=el('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('on')},1700); }
+
+function copyText(text, label){
+  var done=false;
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast((label?label+' ':'')+'복사 완료'); },
+        function(){fallback(text,label);});
+      done=true;
+    }
+  }catch(e){}
+  if(!done) fallback(text,label);
+}
+function fallback(text,label){
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.setAttribute('readonly','');
+  ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,999999);
+  var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  toast(ok?((label?label+' ':'')+'복사 완료'):'길게 눌러 직접 복사해 주세요');
+}
+
+/* ---------- 문구 생성 ---------- */
+function ticketNo(i){
+  var p = state.prod.slice(0,2).toUpperCase();
+  return 'KTS-'+stamp()+'-'+p+(i+1);
+}
+
+function cardCopy(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[무료 이용권] '+P.anchor+' → 지금 0원');
+  L.push(R+' '+T.label+' 사장님께 먼저 드리는 5장');
+  L.push('');
+  L.push('· 정가 '+P.anchor.replace('정가 ','')+' 상당 ('+P.ancDetail+')');
+  L.push('· 지금은 초기라 100% 무료로 열어 뒀습니다');
+  if(remain()>0){
+    L.push(remain()===QUOTA
+      ? '· 이번 회차 5장 전부 남아 있습니다 (받는 분만 사용, 양도 가능)'
+      : '· 이번 회차 5장 중 '+remain()+'장 남았습니다 (받는 분만 사용, 양도 가능)');
+  }else{
+    L.push('· 이번 회차 5장 모두 나갔습니다 (다음 회차는 새 번호로 시작합니다)');
+  }
+  L.push('');
+  L.push('들어가는 것');
+  P.perks.forEach(function(x,n){ L.push(' '+(n+1)+') '+x); });
+  L.push('');
+  L.push('받는 방법');
+  L.push('홈페이지에서 [무료 이용권] 누르고 번호만 남기면 됩니다.');
+  if(remain()>0) L.push('이용권 번호: '+ticketNo(0)+' ~ '+ticketNo(remain()-1));
+  L.push('');
+  L.push('※ 지금은 무료 구간입니다. 유료 전환 요구는 없습니다.');
+  L.push('※ '+P.give+'.');
+  return L.join('\n');
+}
+
+function cardCafe(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[네이버 카페·블로그 — 질문 하나로 댓글 받기]');
+  L.push('');
+  L.push('▷ 제목 후보 3개');
+  L.push('1) '+R+' '+T.label+' 사장님, '+T.pain+' 이거 맞으시죠?');
+  L.push('2) '+T.call+' 사장님께 — 돈 안 드는 것부터 3개');
+  L.push('3) '+P.short+' 안 쓰고도 되는 경우 / 꼭 써야 하는 경우');
+  L.push('');
+  L.push('▷ 본문 첫 문장 (여기까지만 읽고 댓글 답니다)');
+  L.push('"'+R+' '+T.call+' 사장님이면 한 번은 겪으셨을 겁니다. '+T.pain+'.');
+  L.push('저도 그랬고, 지금은 방법 하나 바꿔서 안 겪습니다."');
+  L.push('');
+  L.push('▷ 질문 (답을 1초에 하게 만드는 것)');
+  L.push('"사장님은 어느 쪽이세요? ① 그냥 참는다 ② 광고비 쓴다 ③ 다른 방법 찾아본다"');
+  L.push('→ ①번만 댓글 남겨주세요. 그분들께만 순서대로 방법 보내드립니다.');
+  L.push('');
+  L.push('▷ 댓글에 다는 답글 (복붙)');
+  L.push('"①번이시군요. 그럼 이거 하나만 바꿔 보세요 — '+P.perks[0]+'.');
+  L.push('필요하신 양식은 쪽지로 드립니다. 광고 아닙니다."');
+  L.push('');
+  L.push('▷ 마무리 한 줄');
+  L.push('"정리본이 필요하시면 쪽지 주세요. '+R+' 기준으로 적어 드립니다."');
+  return L.join('\n');
+}
+
+function cardJunggo(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[중고나라 끌올 — 20%만 보여주고 나머지는 홈피로]');
+  L.push('');
+  L.push('▷ 제목 (24시간 뒤 끌올, 같은 문구)');
+  L.push('[나눔] '+R+' '+T.label+' '+P.short+' 세팅해 드립니다 (오늘 3곳)');
+  L.push('');
+  L.push('▷ 본문');
+  L.push('안녕하세요. '+R+'에서 '+T.label+' 하시는 분들 '+P.short+' 세팅 도와드립니다.');
+  L.push('돈 안 받습니다. 조건도 없습니다. 사진 1장이랑 연락처만 주세요.');
+  L.push('');
+  L.push('맛만 보여드리면 —');
+  L.push('· '+P.perks[0]);
+  L.push('· '+P.perks[1]);
+  L.push('(나머지 한 개는 홈피에서 직접 확인하시는 게 정확합니다. 여기 다 쓰면 글이 너무 길어져서요.)');
+  L.push('');
+  L.push('댓글 순서대로 쪽지드립니다. 오늘 3곳까지 가능합니다.');
+  L.push('※ 업체 안내 글입니다. 무료 구간 운영 중이라 비용은 없습니다.');
+  L.push('');
+  L.push('▷ 댓글 답변 (복붙)');
+  L.push('"네, 아직 자리 있습니다. '+T.label+' 맞으시죠? 쪽지 주시면 순서대로 보내드립니다."');
+  L.push('');
+  L.push('▷ 쪽지 1호 (복붙)');
+  L.push('"안녕하세요. '+P.short+' 무료 이용권 '+ticketNo(0)+' 보내드립니다.');
+  L.push('링크에서 번호만 넣으시면 됩니다. 오늘 안에 세팅해 드립니다."');
+  return L.join('\n');
+}
+
+function cardShorts(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[유튜브 숏츠 — 앞 2초 훅 + 고정댓글]');
+  L.push('');
+  L.push('▷ 훅 3개 (2초 안에 말이 끝나야 함)');
+  L.push('1) "'+R+' '+T.label+' 사장님, 이거 지금 확인해 보세요. 5초면 됩니다."');
+  L.push('2) "'+T.pain+'. 이거 사장님 잘못이 아닙니다."');
+  L.push('3) "'+P.anchor+'짜리를 지금 0원으로 열었습니다. 이유는 영상 끝에."');
+  L.push('');
+  L.push('▷ 15초 구성');
+  L.push('0-2초 훅 / 3-8초 문제 장면(폰 화면 그대로) / 9-13초 한 번에 해결 / 14-15초 "고정댓글 보세요"');
+  L.push('');
+  L.push('▷ 고정댓글 (링크는 여기에만)');
+  L.push('"무료 이용권 5장 남았습니다. \'5장\' 댓글 주시면 순서대로 보내드립니다. (광고·조건 없음)"');
+  L.push('');
+  L.push('▷ 답글용 (댓글마다 같은 말 금지)');
+  L.push('"네, '+T.label+'이면 그대로 됩니다. 쪽지 확인해 주세요."');
+  L.push('');
+  L.push('▷ 캡션');
+  L.push(R+' '+T.label+' | '+P.perks[0]+' | 무료 이용권 5장 | #'+R.replace(/\s/g,'')+' #'+T.label.replace(/[·\s]/g,'')+' #무료나눔');
+  L.push('');
+  L.push('※ 영상·설명란에 링크를 직접 넣지 마세요. 고정댓글·프로필로만.');
+  return L.join('\n');
+}
+
+function cardDanggn(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[당근 — 홈피 제작권 + 동네 답글]');
+  L.push('');
+  L.push('▷ 나눔 글 (무료나눔 카테고리)');
+  L.push('제목: '+R+' '+T.label+' 홈피 만들어 드립니다 (제작 무료 · 사용권 증정)');
+  L.push('본문: "사진 3장이랑 가게 이름만 주세요. 홈피 만들어서 주소 드립니다.');
+  L.push('제작은 무료고, 사용권도 같이 드립니다. 이번 주 5곳까지."');
+  L.push('※ 대가를 받지 않는 순수 나눔으로만 올립니다.');
+  L.push('');
+  L.push('▷ 동네생활 답글 ('+T.pain+' 글에)');
+  L.push('"저도 같은 일 겪었습니다. '+P.perks[0]+' 이거 하나로 좀 나아졌어요.');
+  L.push('필요하시면 방법만 알려드릴게요."');
+  L.push('');
+  L.push('▷ 비즈프로필 소개 3줄');
+  L.push('1줄: '+R+' '+T.label+' 전문 — 오늘 영업시간 먼저 표시');
+  L.push('2줄: 전화 못 받으면 문자 주세요. 3초 안에 답 갑니다.');
+  L.push('3줄: 무료 이용권 5장 운영 중 (번호만 남기면 됩니다)');
+  L.push('');
+  L.push('▷ 하지 말 것');
+  L.push('· 동네생활에 광고·간접홍보 글 금지 (계정 제재)');
+  L.push('· 조건부 나눔 금지 — "후기 남겨주세요" 붙이면 나눔 아님');
+  L.push('· 외부 채널 유도 금지 — 프로필 링크만');
+  return L.join('\n');
+}
+
+function cardShare(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[개인 나눔 톤 — 문자·쪽지·카톡]');
+  L.push('(업체가 뿌리는 광고가 아니라, 개인이 받은 이용권을 나눠주는 말투)');
+  L.push('');
+  L.push('▷ 첫 문자 (수신 동의자에게만)');
+  L.push('"사장님, '+R+'에서 '+T.label+' 하시는 거 알고 연락드립니다.');
+  L.push('제가 '+P.short+' 무료 이용권 5장을 받았는데 '+(remain()>0?remain()+'장이':'이번 회차는 다 나가서')+' 남아서요.');
+  L.push('필요하시면 하나 드릴까 싶어서 연락드렸습니다. 부담 없으시면 회신만 주세요."');
+  L.push('');
+  L.push('▷ 회신 왔을 때');
+  L.push('"네, 이용권 번호 '+ticketNo(0)+' 입니다.');
+  L.push('링크에서 번호만 넣으시면 되고, 세팅은 제가 도와드립니다. 오늘 가능합니다."');
+  L.push('');
+  L.push('▷ 30초 음성 멘트');
+  L.push('"사장님, 30초만요. '+P.perks[0]+' 이거 무료로 해드리는 자리 있어서 연락드렸습니다.');
+  L.push('안 하셔도 되고, 필요하시면 문자 주세요."');
+  L.push('');
+  L.push('▷ 마감 (실제 마감일 때만)');
+  L.push('"이번 주 금요일까지만 5장 받습니다. 그 뒤엔 유료로 바뀝니다."');
+  L.push('');
+  L.push('※ 무동의 번호로 보내지 마세요. 수신 동의 이력이 있는 곳에만.');
+  return L.join('\n');
+}
+
+function cardForm(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=[];
+  L.push('[10초 전예약 웹폼 — 문구 그대로 복사]');
+  L.push('');
+  L.push('▷ 제');
+  L.push(R+' '+T.label+' 무료 이용권 신청 (10초)');
+  L.push('');
+  L.push('▷ 칸 3개');
+  L.push('1) 업종 — 식당·카페 / 미용실·네일 / 공인중개 / 편의점·소매 / 펜션·숙박 / 기타');
+  L.push('2) 연락처 — 문자 받으실 번호');
+  L.push('3) 원하는 것 — ① 공고 세팅 ② 메뉴사진·홈피 ③ 부재중 문자 ④ 서류·계약서');
+  L.push('');
+  L.push('▷ 버튼');
+  L.push('무료 이용권 받기 (남은 '+remain()+'장)');
+  L.push('');
+  L.push('▷ 버튼 위 한 줄');
+  L.push('광고 전화는 드리지 않습니다. 신청 후 30분 안에 문자로만 안내드립니다.');
+  L.push('');
+  L.push('▷ 동의 1줄 (필수)');
+  L.push('위 연락처는 무료 이용권 안내 목적으로만 사용하며, 안내 완료 후 파기합니다. (동의 □)');
+  L.push('');
+  L.push('▷ 접수 후 화면');
+  L.push('접수됐습니다. 이용권 번호 '+ticketNo(0)+' — 30분 안에 문자 드립니다.');
+  L.push('급하시면 이 번호로 회신만 주세요.');
+  L.push('');
+  L.push('▷ 받은 뒤 첫 문자 (자동)');
+  L.push('"신청 감사합니다. 이용권 '+ticketNo(0)+' 입니다. 링크에서 번호만 넣으시면 됩니다. [홈피 링크]"');
+  return L.join('\n');
+}
+
+function build(silent){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var cards=[
+    {n:'01',t:'무료 이용권 카피',why:'앵커 50만 → 0원 → 5장',body:cardCopy(),key:'copy'},
+    {n:'02',t:'카페·블로그 질문 유도',why:'댓글 1초 답',body:cardCafe()},
+    {n:'03',t:'중고나라 끌올·맛보기',why:'20%만 보여주기',body:cardJunggo()},
+    {n:'04',t:'숏츠 훅·고정댓글',why:'앞 2초·링크는 고정댓글',body:cardShorts()},
+    {n:'05',t:'당근 홈피 제작권',why:'무료나눔·비즈프로필',body:cardDanggn()},
+    {n:'06',t:'개인 나눔 문자·쪽지',why:'받은 5장 중 남은 수 톤',body:cardShare()},
+    {n:'07',t:'10초 사전예약 웹폼',why:'칸 3개·동의 1줄',body:cardForm()}
+  ];
+  var h=[];
+  h.push('<div class="sec-h"><h3>'+esc(P.name)+' × '+esc(T.label)+'</h3><span class="cnt">'+esc(R)+' · '+cards.length+'종</span></div>');
+  h.push('<div class="bar"><button class="pri" id="copyAll">'+cards.length+'종 전체 복사</button>'+
+    '<button id="saveAll">파일로 저장</button></div>');
+  h.push('<div class="ticket"><div class="tk-top">KTS 무료 이용권 · 선착순 5장</div>');
+  h.push('<div class="tk-name">'+esc(P.name)+' — '+esc(T.label)+' 세팅</div>');
+  h.push('<div class="tk-price"><s>'+esc(P.anchor)+'</s> → 지금 <b>0원</b></div>');
+  h.push('<div class="tk-no">'+ticketNo(Math.min(LEDGER.used,QUOTA-1))+' / '+esc(R)+' / '+esc(T.word)+'</div>');
+  h.push('<div class="tk-act"><span>남은 '+remain()+'장 / 5장</span>'+
+    '<button id="useTk">1장 나감</button><button id="resetTk">초기화</button></div></div>');
+  cards.forEach(function(c,i){
+    h.push('<div class="card"><div class="top"><span class="num">'+c.n+'</span><b>'+esc(c.t)+'</b>'+
+      '<span class="why">'+esc(c.why)+'</span></div>');
+    h.push('<pre>'+esc(c.body)+'</pre>');
+    h.push('<div class="foot"><button class="btn pri" data-copy="'+i+'">복사</button>'+
+      (i===0?'<button class="btn" data-ticket="1">이용권 5장</button>':
+              '<button class="btn" data-save="'+i+'">저장</button>')+'</div></div>');
+  });
+  h.push('<div class="quick"><p class="qh">오늘 바로 할 3개 — '+esc(P.short)+'</p>');
+  pickScenarios(3).forEach(function(s,ix){
+    h.push('<div class="q"><div class="t1">'+esc(s.group)+' · '+s.minutes+'분 · '+esc(s.channel)+'</div>'+
+      '<div class="t2">'+esc(s.hook)+'</div>'+
+      '<button data-q="'+ix+'">첫 문장 복사</button></div>');
+  });
+  h.push('</div>');
+  el('result').innerHTML=h.join('');
+  var pres=el('result').querySelectorAll('.card pre');
+  for(var pi=0;pi<pres.length;pi++){
+    (function(p){
+      if(p.scrollHeight > p.clientHeight+8){
+        var d=document.createElement('div');
+        d.className='hint2'; d.textContent='↑ 문구 안에서 스크롤 · 복사하면 전체가 들어갑니다';
+        p.parentNode.insertBefore(d, p.nextSibling);
+      }
+    })(pres[pi]);
+  }
+  document.body.dataset.bodies=JSON.stringify(cards.map(function(c){return c.body}));
+  var btns=el('result').querySelectorAll('[data-copy]');
+  for(var i=0;i<btns.length;i++){
+    btns[i].onclick=function(){
+      var arr=JSON.parse(document.body.dataset.bodies||'[]');
+      copyText(arr[+this.dataset.copy], '문구');
+    };
+  }
+  var tks=el('result').querySelectorAll('[data-ticket]');
+  for(var j=0;j<tks.length;j++){
+    tks[j].onclick=function(){ copyText(ticketBlock(), '이용권 5장'); };
+  }
+  var svs=el('result').querySelectorAll('[data-save]');
+  for(var k=0;k<svs.length;k++){
+    svs[k].onclick=function(){
+      var arr=JSON.parse(document.body.dataset.bodies||'[]');
+      var idx=+this.dataset.save;
+      download('KTS_'+P.short.replace(/[^\w\uAC00-\uD7A3]/g,'')+'_'+T.label.replace(/[^\w\uAC00-\uD7A3]/g,'')+'_'+cards[idx].n+'.txt', arr[idx]);
+    };
+  }
+  var qb=el('result').querySelectorAll('[data-q]');
+  var picks=pickScenarios(3);
+  for(var m=0;m<qb.length;m++){
+    qb[m].onclick=function(){ copyText(picks[+this.dataset.q].hook, '첫 문장'); };
+  }
+  el('copyAll').onclick=function(){
+    var arr=JSON.parse(document.body.dataset.bodies||'[]');
+    copyText(arr.map(function(b,n){return '■ '+cards[n].t+'\n'+b}).join('\n\n────────\n\n'), '전체');
+  };
+  el('saveAll').onclick=function(){
+    var arr=JSON.parse(document.body.dataset.bodies||'[]');
+    download('KTS_광고문구_'+P.short.replace(/[^\w\uAC00-\uD7A3]/g,'')+'_'+stamp()+'.txt',
+      arr.map(function(b,n){return '■ '+cards[n].t+'\n'+b}).join('\n\n────────\n\n'));
+  };
+  var ut=el('useTk');
+  if(ut) ut.onclick=function(){
+    if(remain()>0){ LEDGER.used++; LEDGER.last=stamp(); saveLedger(); build(true);
+      toast('1장 나감 · 남은 '+(QUOTA-LEDGER.used)+'장'); }
+    else toast('이번 회차는 다 나갔습니다. 초기화하면 새 회차');
+  };
+  var rt=el('resetTk');
+  if(rt) rt.onclick=function(){ LEDGER.used=0; LEDGER.last=''; saveLedger(); build(true); toast('이용권 5장으로 초기화'); };
+  el('dock').classList.add('on');
+  renderKw();
+  renderSc();
+  if(!silent){ window.scrollTo({top:Math.max(0,el('result').offsetTop-70),behavior:'smooth'}); }
+  saveState();
+}
+
+function ticketBlock(){
+  var P=PRODUCTS[state.prod], T=TARGETS[state.targ], R=regionName();
+  var L=['[KTS 무료 이용권 5장 · '+P.name+' · '+T.label+']',''];
+  for(var i=0;i<QUOTA;i++){
+    var gone = i < LEDGER.used;
+    L.push((i+1)+'. '+ticketNo(i)+'   '+R+'   '+(gone?'[나감]':'[남음]')+'   '+P.anchor+' → 0원');
+  }
+  L.push('');
+  L.push('· 남은 '+remain()+'장 / 5장');
+  L.push('· 받는 사람만 사용, 양도 가능');
+  L.push('· 지금은 무료 구간 (유료 전환 요구 없음)');
+  L.push('· 사용: 홈페이지 [무료 이용권] → 번호 입력');
+  return L.join('\n');
+}
+
+function pickScenarios(n){
+  var pool=SC.filter(function(s){return s.product===state.prod});
+  var rest=SC.filter(function(s){return s.product!==state.prod});
+  var out=[], seen={};
+  function take(list){
+    list.forEach(function(s){
+      if(out.length>=n) return;
+      if(out.indexOf(s)>=0) return;
+      if(seen[s.group]) return;
+      seen[s.group]=1; out.push(s);
+    });
+  }
+  take(pool); take(rest);
+  if(out.length<n){ pool.concat(rest).forEach(function(s){ if(out.length<n && out.indexOf(s)<0) out.push(s); }); }
+  return out.slice(0,n);
+}
+
+function download(name, text){
+  try{
+    var blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); if(a.parentNode) a.parentNode.removeChild(a); },800);
+    toast('파일 저장 시작');
+  }catch(e){ toast('저장이 안 되면 복사해서 쓰세요'); }
+}
+
+/* ---------- 키워드 ---------- */
+var kwBiz='전체', kwSearch='', kwOpen=false;
+var BIZ_LABEL={'번개알바':'번개알바','원클릭':'원클릭','부재중 비서':'부재중','여행패스':'여행패스'};
+function renderKw(){
+  var box=el('kwList'); if(!box) return;
+  var q=kwSearch.trim().toLowerCase();
+  var rows=KW.filter(function(k){
+    if(kwBiz!=='전체' && k.biz!==kwBiz) return false;
+    if(!q) return true;
+    return (k.kw+' '+k.use+' '+k.line+' '+k.intent+' '+k.biz).toLowerCase().indexOf(q)>=0;
+  });
+  var open=kwOpen||!!q||kwBiz!=='전체';
+  var shown=open?rows:rows.slice(0,20);
+  el('kwCnt').textContent=shown.length+' / '+KW.length+'개';
+  if(!rows.length){ box.innerHTML='<div class="empty">해당 키워드가 없습니다. 다른 말로 검색해 보세요.</div>'; return; }
+  var h=[];
+  shown.forEach(function(k){
+    h.push('<div class="krow"><span class="kid">'+k.id+'</span><div style="flex:1;min-width:0">'+
+      '<div class="kw">'+esc(k.kw)+'</div>'+
+      '<div class="meta">'+esc(k.src)+' · '+esc(k.intent)+' · '+esc(k.biz)+' · '+esc(k.use)+'</div>'+
+      '<div class="lc">'+esc(k.line)+'</div></div>'+
+      '<button data-kw="'+k.id+'">복사</button></div>');
+  });
+  if(!open) h.push('<button class="more" id="kwMore">나머지 '+(rows.length-shown.length)+'개 보기</button>');
+  box.innerHTML=h.join('');
+  var mb=el('kwMore');
+  if(mb) mb.onclick=function(){ kwOpen=true; renderKw(); };
+  var bs=box.querySelectorAll('[data-kw]');
+  for(var i=0;i<bs.length;i++){
+    bs[i].onclick=function(){
+      var id=+this.dataset.kw;
+      var k=KW.filter(function(x){return x.id===id})[0];
+      copyText(k.kw, '키워드');
+    };
+  }
+}
+function renderKwFilter(){
+  var box=el('kwFilter');
+  var bizs=['전체','번개알바','원클릭','부재중 비서','여행패스'];
+  box.innerHTML=bizs.map(function(b){
+    return '<button class="chip'+(kwBiz===b?' on':'')+'" data-biz="'+b+'"><span class="dot"></span>'+
+      (b==='전체'?'전체 100':(BIZ_LABEL[b]||b))+'</button>';
+  }).join('');
+  var bs=box.querySelectorAll('[data-biz]');
+  for(var i=0;i<bs.length;i++){
+    bs[i].onclick=function(){ kwBiz=this.dataset.biz; renderKwFilter(); renderKw(); };
+  }
+}
+
+/* ---------- 시나리오 ---------- */
+var scGroup='전체', scOpen=false, scQ='', DONE={};
+function loadDone(){ try{ var r=localStorage.getItem('kts_sc_done'); if(r) DONE=JSON.parse(r)||{}; }catch(e){ DONE={}; } }
+function saveDone(){ try{ localStorage.setItem('kts_sc_done', JSON.stringify(DONE)); }catch(e){} }
+function doneCount(){ return Object.keys(DONE).filter(function(k){return DONE[k]}).length; }
+function renderSc(){
+  var box=el('scList'); if(!box) return;
+  var q=scQ.trim().toLowerCase();
+  var rows=SC.filter(function(s){
+    if(scGroup!=='전체' && s.group!==scGroup) return false;
+    if(!q) return true;
+    return (s.channel+' '+s.hook+' '+s.trigger+' '+s.cta+' '+s.size).toLowerCase().indexOf(q)>=0;
+  });
+  var open=scOpen||scGroup!=='전체'||!!q;
+  var shown=open?rows:rows.slice(0,8);
+  el('scCnt').textContent=shown.length+' / '+SC.length+'개 · 완료 '+doneCount();
+  if(!rows.length){ box.innerHTML='<div class="empty">없습니다.</div>'; return; }
+  var h=[];
+  shown.forEach(function(s){
+    h.push('<div class="sc"><div class="sh"><span class="g">'+esc(s.group)+'</span>'+
+      '<span class="p">'+esc(PRODUCTS[s.product]?PRODUCTS[s.product].short:s.product)+'</span>'+
+      '<span class="p">'+s.minutes+'분</span></div>'+
+      '<b>'+esc(s.channel)+'</b>'+
+      '<div class="t">'+esc(s.size)+'</div>'+
+      '<div class="t">트리거 · '+esc(s.trigger)+'</div>'+
+      '<q>'+esc(s.hook)+'</q>'+
+      '<div class="m">'+esc(s.follow)+'</div>'+
+      '<div class="m">전환 · '+esc(s.cta)+'</div>'+
+      '<div class="m">주의 · '+esc(s.risk)+'</div>'+
+      '<div class="act"><button data-sc1="'+s.id+'">첫 문장 복사</button>'+
+      '<button data-sc2="'+s.id+'">전체 복사</button>'+
+      '<button data-done="'+s.id+'" class="'+(DONE[s.id]?'done':'')+'">'+(DONE[s.id]?'✓ 완료':'완료 체크')+'</button></div></div>');
+  });
+  if(!open) h.push('<button class="more" id="scMore">나머지 '+(rows.length-shown.length)+'개 보기</button>');
+  box.innerHTML=h.join('');
+  var mb=el('scMore');
+  if(mb) mb.onclick=function(){ scOpen=true; renderSc(); };
+  var b1=box.querySelectorAll('[data-sc1]'), b2=box.querySelectorAll('[data-sc2]'), b3=box.querySelectorAll('[data-done]');
+  for(var i=0;i<b1.length;i++){
+    b1[i].onclick=function(){ var s=byId(+this.dataset.sc1); copyText(s.hook,'첫 문장'); };
+    b2[i].onclick=function(){ var s=byId(+this.dataset.sc2);
+      copyText(s.hook+'\n'+s.follow+'\n\n['+s.channel+']\n전환: '+s.cta,'실행 카드'); };
+    b3[i].onclick=function(){ var id=+this.dataset.done; DONE[id]=!DONE[id]; saveDone(); renderSc(); };
+  }
+}
+function byId(id){ return SC.filter(function(x){return x.id===id})[0]; }
+function renderScFilter(){
+  var box=el('scFilter');
+  var groups=['전체'];
+  SC.forEach(function(s){ if(groups.indexOf(s.group)<0) groups.push(s.group); });
+  box.innerHTML=groups.map(function(g){
+    return '<button class="chip'+(scGroup===g?' on':'')+'" data-g="'+g+'"><span class="dot"></span>'+g+'</button>';
+  }).join('');
+  var bs=box.querySelectorAll('[data-g]');
+  for(var i=0;i<bs.length;i++){
+    bs[i].onclick=function(){ scGroup=this.dataset.g; renderScFilter(); renderSc(); };
+  }
+}
+
+/* ---------- 선택 UI ---------- */
+function renderChips(){
+  var pc=el('prodChips'), tc=el('targChips');
+  pc.innerHTML=Object.keys(PRODUCTS).map(function(k){
+    return '<button class="chip'+(state.prod===k?' on':'')+'" data-p="'+k+'"><span class="dot"></span>'+
+      PRODUCTS[k].name+'</button>';
+  }).join('');
+  tc.innerHTML=Object.keys(TARGETS).map(function(k){
+    return '<button class="chip'+(state.targ===k?' on':'')+'" data-t="'+k+'"><span class="dot"></span>'+
+      TARGETS[k].label+'</button>';
+  }).join('');
+  var p=pc.querySelectorAll('[data-p]');
+  for(var i=0;i<p.length;i++){ p[i].onclick=function(){ state.prod=this.dataset.p; renderChips(); }; }
+  var t=tc.querySelectorAll('[data-t]');
+  for(var j=0;j<t.length;j++){ t[j].onclick=function(){ state.targ=this.dataset.t; renderChips(); }; }
+}
+function saveState(){
+  try{ localStorage.setItem('kts_ad_magnet', JSON.stringify(state)); }catch(e){}
+}
+function loadState(){
+  try{
+    var raw=localStorage.getItem('kts_ad_magnet');
+    if(!raw) return;
+    var s=JSON.parse(raw);
+    if(s&&PRODUCTS[s.prod]&&TARGETS[s.targ]){ state.prod=s.prod; state.targ=s.targ; state.region=s.region||''; }
+  }catch(e){}
+}
+
+/* ---------- 시작 ---------- */
+loadState();
+loadLedger();
+loadDone();
+renderChips();
+el('region').value=state.region;
+el('region').addEventListener('input', function(){ state.region=this.value; });
+el('goBtn').onclick=function(){ build(); };
+el('dockGo').onclick=function(){ build(); };
+el('kwSearch').addEventListener('input', function(){ kwSearch=this.value; renderKw(); });
+el('scSearch').addEventListener('input', function(){ scQ=this.value; renderSc(); });
+renderKwFilter(); renderKw(); renderScFilter(); renderSc();
+build(true);
+})();
+</script>
+</body>
+</html>

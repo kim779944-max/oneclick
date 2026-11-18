@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 더싸인 — 폰으로 사인·도장·간인까지 (한 장 무료)</title>
 <meta name="description" content="직접 사인·사인도장·도장 사진 자동 투명 PNG 중 골라 문서에 찍습니다. 한 장 무료, 여러 장·간인(사이간자) 월 4,900원.">
@@ -228,7 +229,8 @@ function fnv(s){ let h=0x811c9dc5; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(
 /* 월 이용권 코드: KS + 연월(YYMM) + '-' + 4자리. 그 달에만 유효 (간이 확인 — 실제 결제는 별도 채널) */
 function codeOk(c){ const m=String(c||'').trim().toUpperCase().match(/^KS(\d{4})-([0-9A-F]{4})$/); if(!m||m[1]!==ym()) return false;
   return (fnv('kts-sign-'+m[1]).toString(16).toUpperCase().padStart(8,'0').slice(0,4))===m[2]; }
-const isPro=()=>plan==='pro', unlocked=()=>codeOk(LS.get('kts_sign_code',''));
+const isPro=()=>window.KTS_MASTER===true||plan==='pro', unlocked=()=>window.KTS_MASTER===true||codeOk(LS.get('kts_sign_code',''));
+/* 마스터 모드(대표님 PIN 2899)면 이용권 확인 없이 전 기능 — 손님 화면은 그대로 */
 function paintPlan(){
   $$('.plan').forEach(b=>b.classList.toggle('on', b.dataset.p===plan));
   $('#unlock').classList.toggle('on', isPro());

@@ -159,6 +159,40 @@ h1 em{font-style:normal;color:var(--amber)}
 .rsvPrev.on{display:block}
 .rsvPrev b{color:#FFA24D}
 .rsvPrev a{color:#FFA24D;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(255,162,77,.4)}
+
+/* 마스터 모드 (대표님 전용 · PIN 2899) — 기존 틀은 그대로, 아래는 추가분만 */
+.mkey{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;font-family:inherit;font-size:13px;
+  color:#9DAEC5;background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:9px;cursor:pointer;padding:0;line-height:1}
+.mkey.on{width:auto;padding:0 8px;font-size:9px;font-weight:900;letter-spacing:.06em;color:var(--on);
+  background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
+.mst{margin-top:12px;border:1px solid rgba(255,107,0,.55);border-radius:16px;padding:12px 13px 11px;
+  background:linear-gradient(160deg,rgba(255,107,0,.15),rgba(255,107,0,.03) 50%,rgba(255,255,255,.015))}
+.mstTop{display:flex;align-items:center;gap:7px}
+.mstB{font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--on);background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:6px;padding:3px 7px;flex:0 0 auto}
+.mstTop b{font-size:13px;font-weight:900;letter-spacing:-.4px;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mstOff{margin-left:auto;font-family:inherit;font-size:10.5px;font-weight:900;color:#C7D3E3;background:#12203C;
+  border:1px solid var(--line2);border-radius:8px;padding:5px 8px;cursor:pointer;flex:0 0 auto}
+.mstLine{margin:8px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
+.mstLine b{color:#FFA24D}
+.mstGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+.mstGrid a{display:block;font-size:11px;font-weight:800;color:#DCE5F1;text-decoration:none;background:#101E38;
+  border:1px solid #26375F;border-radius:9px;padding:8px 9px;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mstGrid a:active{background:#152747}
+.mstNote{margin:8px 0 0;font-size:10px;line-height:1.5;color:#7F8FA8}
+.mscrim{position:fixed;inset:0;background:rgba(3,7,16,.72);z-index:80}
+.msheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(84vw,320px);z-index:81;
+  background:#0F1B33;border:1px solid rgba(255,107,0,.45);border-radius:18px;padding:16px 16px 14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.msheet b{display:block;font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.msheet p{margin:6px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
+.msheet input{width:100%;margin-top:10px;font-family:inherit;font-size:20px;font-weight:900;letter-spacing:.35em;
+  text-align:center;color:#fff;background:#0B1730;border:1px solid #2E4370;border-radius:12px;padding:11px 8px}
+.msheet input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
+.mrow{display:flex;gap:7px;margin-top:10px}
+.mrow button{flex:1;font-family:inherit;font-size:12.5px;font-weight:900;border-radius:11px;padding:11px 8px;cursor:pointer}
+#mGo{background:linear-gradient(180deg,#FF8A2B,var(--amber));border:0;color:var(--on)}
+.mrow button.ghost{background:#12203C;border:1px solid var(--line2);color:#D9E3F0}
+.merr{margin:8px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
 </style>
 </head>
 <body>
@@ -170,9 +204,33 @@ h1 em{font-style:normal;color:var(--amber)}
         <div class="brand">KTS <span>원클릭</span><small>만든 도구를 한자리에</small></div>
       </a>
       <div class="sp"></div>
+      <button class="mkey" id="mKey" type="button" aria-label="대표님 마스터 모드 열기">⚙</button>
       <a class="tel" href="tel:01020022899">010-2002-2899</a>
     </div>
   </header>
+
+  <section class="mst" id="mst" hidden>
+    <div class="mstTop">
+      <span class="mstB">MASTER</span>
+      <b>대표님 전용 마스터 쇼룸</b>
+      <button class="mstOff" id="mstOff" type="button">해제</button>
+    </div>
+    <p class="mstLine">전 상품 <b>횟수 제한·이용권 창 없이</b> 열립니다 · 열린 상품 <b id="mstN">0</b>종 · <span id="mstVer">-</span></p>
+    <div class="mstGrid" id="mstGrid"></div>
+    <p class="mstNote">신상품은 catalog.json에 항목 1개만 추가하면 이 목록에 자동으로 늘어납니다.</p>
+  </section>
+
+  <div class="mscrim" id="mscrim" hidden></div>
+  <div class="msheet" id="msheet" role="dialog" aria-modal="true" aria-label="마스터 모드 PIN" hidden>
+    <b>마스터 모드</b>
+    <p>대표님 전용입니다. PIN 4자리를 넣어 주세요.</p>
+    <input id="mPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" aria-label="PIN">
+    <div class="mrow">
+      <button id="mGo" type="button">열기</button>
+      <button id="mCancel" class="ghost" type="button">닫기</button>
+    </div>
+    <p class="merr" id="mErr" hidden>PIN이 맞지 않습니다</p>
+  </div>
 
   <a class="freebar" href="sale/">
     <span class="fb">무료</span>
@@ -266,6 +324,7 @@ h1 em{font-style:normal;color:var(--amber)}
 <div class="toast" id="toast"></div>
 <button class="totop" id="toTop" type="button" aria-label="원클릭 맨 위로">↑ 원클릭</button>
 
+<script src="master.js"></script>
 <script src="products.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -302,13 +361,15 @@ $$('#tabs button').forEach(b => b.onclick = () => {
 render();
 
 /* 하단 전 도구 타일 허브 — products.js(열린 도구) + 직통 도구 */
-(function(){
+function buildTiles(){
   const EXTRA = [
     {nm:'더스캔', sub:'찍으면 바로 스캔', link:'thescan/', ico:'▣', nw:1},
     {nm:'더싸인', sub:'사인·도장·간인', link:'sign/', ico:'✍', nw:1},
     {nm:'더지우개', sub:'글씨·얼룩 지우기', link:'theeraser/', ico:'⌫'},
     {nm:'더상세', sub:'상세페이지 1장', link:'thedetail/', ico:'▤'},
-    {nm:'더파일', sub:'표 사진 → 한글·엑셀', link:'converter.html', img:'shots/ic_photo2doc.png', nw:1}
+    {nm:'더파일', sub:'표 사진 → 한글·엑셀', link:'converter.html', img:'shots/ic_photo2doc.png', nw:1},
+    {nm:'광고유입기', sub:'광고·댓글 문구 1분', link:'ad_magnet/', ico:'✦', nw:1},
+    {nm:'원클릭 셀러', sub:'담기→올리기→발주', link:'seller/', ico:'▦', nw:1}
   ];
   const short = s => String(s||'').split(/ — | \(/)[0];
   const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => e.link === p.link))
@@ -316,7 +377,7 @@ render();
   const soon = window.PRODUCTS.filter(p => p.status === 'soon').map(p => ({nm:short(p.nm), sub:'준비 중', img:p.icon, off:1}));
   const all = [...EXTRA, ...live, ...soon];
   /* 대표님 확정 순서 — 더뷰 · 더스캔 · 더지우개 · 더상세 · 더파일 · 더싸인 · 롱테일 · 독심술 · 세이캡 · 오늘의 특가 먼저, 나머지는 뒤로 */
-  const PRIORITY = ['viewer.html','thescan/','theeraser/','thedetail/','converter.html','sign/','longtail.html','navi2/','saycap/','sale/'];
+  const PRIORITY = ['viewer.html','thescan/','theeraser/','thedetail/','converter.html','sign/','longtail.html','navi2/','saycap/','sale/','seller/','ad_magnet/'];
   const ord = t => { const i = PRIORITY.indexOf(t.link); return i < 0 ? 99 : i; };
   all.sort((a, b) => ord(a) - ord(b));
   $('#tiles').innerHTML = all.map(t => {
@@ -324,7 +385,8 @@ render();
     const inner = `${t.nw ? '<span class="nw"></span>' : ''}<span class="ti">${ic}</span><b>${t.nm}</b><small>${t.sub}</small>`;
     return t.off ? `<div class="tile off soonbtn">${inner}</div>` : `<a class="tile" href="${t.link}">${inner}</a>`;
   }).join('');
-})();
+}
+buildTiles();
 
 /* 상단 원클릭 복귀 — 로고·떠 있는 버튼 모두 맨 위(처음 화면)로 */
 (function(){
@@ -399,6 +461,45 @@ document.querySelectorAll('.soonbtn').forEach(b => b.onclick = () => {
     + '<a href="sms:01020022899?body=' + encodeURIComponent('[KTS 원클릭 사전예약 확인] ' + v.no + ' / ' + (v.biz||'') + ' / ' + (v.tel||'')) + '">문자 다시 보내기</a>';
   box.classList.add('on');
 })();
+})();
+
+/* ===== 대표님 전용 마스터 모드 (PIN 2899) — 추가만, 손님 화면은 그대로 ===== */
+function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.add('on');
+  clearTimeout(toastMsg._t); toastMsg._t = setTimeout(()=>t.classList.remove('on'), 2200); }
+(function(){
+  const mst = $('#mst'), key = $('#mKey'), sheet = $('#msheet'), scrim = $('#mscrim'), pin = $('#mPin'), err = $('#mErr');
+  const LIVE = () => (window.PRODUCTS || []).filter(p => p.status === 'live' && p.link);
+  function masterGrid(){
+    const cat = window.KTS_CATALOG || {};
+    $('#mstN').textContent = String(LIVE().length);
+    $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
+    $('#mstGrid').innerHTML = LIVE().map(p => `<a href="${p.link}">${String(p.nm).split(' — ')[0]}</a>`).join('')
+      + `<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a>`;
+  }
+  function paintMaster(){
+    const on = !!(window.KTS && window.KTS.isMaster());
+    mst.hidden = !on;
+    key.classList.toggle('on', on);
+    key.textContent = on ? 'MASTER' : '⚙';
+    key.setAttribute('aria-label', on ? '마스터 모드 사용 중 — 눌러 해제' : '대표님 마스터 모드 열기');
+    if (on) masterGrid();
+  }
+  function closeSheet(){ sheet.hidden = true; scrim.hidden = true; }
+  key.onclick = () => {
+    if (window.KTS && window.KTS.isMaster()){ window.KTS.clearMaster(); paintMaster();
+      toastMsg('마스터 모드를 껐습니다 · 손님 화면(한도 그대로)'); return; }
+    err.hidden = true; pin.value = ''; sheet.hidden = false; scrim.hidden = false; setTimeout(()=>pin.focus(), 60);
+  };
+  $('#mCancel').onclick = closeSheet; scrim.onclick = closeSheet;
+  $('#mGo').onclick = () => {
+    if (window.KTS && window.KTS.setMaster(pin.value)){ closeSheet(); paintMaster();
+      toastMsg('마스터 모드 — 전 상품 무제한으로 열립니다'); }
+    else { err.hidden = false; pin.value = ''; pin.focus(); }
+  };
+  pin.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('#mGo').click(); } });
+  $('#mstOff').onclick = () => { window.KTS.clearMaster(); paintMaster(); toastMsg('마스터 모드를 껐습니다'); };
+  document.addEventListener('kts:catalog', () => { render(); buildTiles(); if (window.KTS && window.KTS.isMaster()) masterGrid(); });
+  paintMaster();
 })();
 </script>
 </body>

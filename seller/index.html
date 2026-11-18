@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script src="../master.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 원클릭 셀러 — 담기·올리기·발주</title>
+<meta name="theme-color" content="#0A1224">
+<meta name="description" content="판매처·도매처·마진을 한 번만 세팅하면, 상품 담기 → 상세·숏츠 → 1초 올리기(쿠팡·스마트스토어 대량등록 엑셀) → 자동 발주까지 한 화면에서. 손해 파는 가격은 빨간 잠금으로 막습니다.">
+<link rel="icon" href="../icon.png">
+<link rel="apple-touch-icon" href="../icon.png">
+<style>
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;
+  --ok:#4ADE80;--red:#FF5C6C;--warn:#FCD34D}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 52% at 50% -8%,#132A4E 0%,transparent 62%),var(--bg2);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+#app{max-width:560px;margin:0 auto;padding:0 14px 40px}
+header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg2) 80%,rgba(10,18,36,0));
+  display:flex;align-items:center;gap:9px;padding:12px 2px 10px}
+header a.back{font-size:11.5px;font-weight:800;color:#9DAEC5;text-decoration:none;border:1px solid var(--line2);
+  border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.03)}
+header .brand{font-size:14px;font-weight:900;letter-spacing:-.4px}
+header .brand i{font-style:normal;color:var(--amber2)}
+header .sp{flex:1}
+header .st{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px;letter-spacing:.02em;
+  color:#0B2C1B;background:var(--ok)}
+header .st.wait{color:#3A2200;background:var(--warn)}
+.rsv{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 11px;border-radius:12px;
+  border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);
+  text-decoration:none;color:var(--ink)}
+.rsv b{font-size:11.5px;font-weight:900;letter-spacing:-.2px;display:block}
+.rsv span.t{flex:1;min-width:0}
+.rsv i{font-style:normal;display:block;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px}
+.rsv .tag{flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:var(--ok);border-radius:999px;padding:3px 7px}
+.card{border:1px solid var(--line);border-radius:16px;padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.card + .card{margin-top:10px}
+h1{font-size:19px;font-weight:900;letter-spacing:-.7px;margin:2px 0 0;line-height:1.34;word-break:keep-all}
+h1 em{font-style:normal;color:var(--amber)}
+.sub{font-size:11.5px;color:var(--gray);line-height:1.6;margin-top:6px;word-break:keep-all}
+.sub b{color:#DCE5F1}
+.lb{display:block;font-size:11px;font-weight:800;color:var(--gray);margin:11px 0 5px}
+input,select,textarea{width:100%;font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:#0B1730;
+  border:1px solid var(--line2);border-radius:11px;padding:11px 12px;letter-spacing:-.2px}
+input::placeholder,textarea::placeholder{color:#6F819C;font-weight:600}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.seg{display:flex;gap:6px;margin-top:2px}
+.seg button{flex:1;font-family:inherit;font-size:12px;font-weight:900;color:#9DAEC5;background:#0E1B33;
+  border:1px solid var(--line);border-radius:11px;padding:11px 6px;cursor:pointer;letter-spacing:-.3px}
+.seg button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;font-family:inherit;font-size:13.5px;
+  font-weight:900;color:var(--on);border:0;border-radius:12px;padding:13px 12px;cursor:pointer;letter-spacing:-.3px;
+  background:linear-gradient(180deg,#FF8A2B,var(--amber));box-shadow:0 8px 20px rgba(255,107,0,.24)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:#12203C;border:1px solid var(--line2);color:#D9E3F0;box-shadow:none}
+.btn.red{background:linear-gradient(180deg,#FF6371,#E93A4B);color:#fff;box-shadow:0 8px 20px rgba(255,77,94,.28)}
+.btn.small{font-size:11.5px;padding:9px 11px;border-radius:10px;width:auto;box-shadow:none}
+.btn[disabled],.btn.locked{opacity:.45;pointer-events:none;filter:grayscale(.25)}
+.sum{border:1px solid rgba(255,107,0,.4);border-radius:16px;padding:12px 13px;
+  background:linear-gradient(150deg,rgba(255,107,0,.1) 0%,rgba(22,35,74,.55) 70%)}
+.sum .r1{display:flex;align-items:center;gap:7px}
+.sum .r1 b{font-size:12.5px;font-weight:900;letter-spacing:-.3px}
+.sum .r1 .mk{font-size:9.5px;font-weight:900;color:var(--on);background:linear-gradient(90deg,var(--amber),var(--amber2));
+  border-radius:6px;padding:3px 7px}
+.sum .r1 .ed{margin-left:auto;font-size:10.5px;font-weight:900;color:#C7D3E3;background:#12203C;
+  border:1px solid var(--line2);border-radius:8px;padding:5px 8px;cursor:pointer;font-family:inherit}
+.sum .g{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.sum .g div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:9px 8px;text-align:center}
+.sum .g b{display:block;font-size:13px;font-weight:900;color:#fff}
+.sum .g span{display:block;font-size:9.5px;color:var(--gray);margin-top:2px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.act{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;
+  font-family:inherit;border:1px solid var(--line);border-radius:15px;padding:13px 12px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));color:var(--ink)}
+.act:active{transform:translateY(1px)}
+.act .ic{font-size:16px;line-height:1}
+.act b{font-size:13px;font-weight:900;letter-spacing:-.4px}
+.act small{font-size:10px;color:var(--gray);line-height:1.4}
+.act.pri{border-color:rgba(255,107,0,.5);background:linear-gradient(180deg,rgba(255,107,0,.12),rgba(255,255,255,.015))}
+.act.locked{opacity:.55;border-color:rgba(255,92,108,.5)}
+.act.locked::after{content:"잠김";position:absolute;right:9px;top:9px;font-size:8.5px;font-weight:900;color:#fff;
+  background:#E93A4B;border-radius:5px;padding:2px 5px}
+.lockb{margin-top:10px;border:1px solid rgba(255,92,108,.6);border-radius:14px;padding:11px 12px;
+  background:linear-gradient(100deg,rgba(255,92,108,.16),rgba(255,92,108,.04))}
+.lockb>b{display:block;font-size:12px;font-weight:900;color:#FFB3BC;letter-spacing:-.2px}
+.lockb>span{display:block;font-size:10.5px;line-height:1.55;color:#F0C3C8;margin-top:3px}
+.lockb button{margin-top:8px;font-family:inherit;font-size:11px;font-weight:900;color:#fff;background:#E93A4B;
+  border:0;border-radius:9px;padding:8px 11px;cursor:pointer}
+.cfgbox{margin-top:11px;border:1px solid var(--line);border-radius:15px;padding:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012))}
+.cfgbox .hd{display:flex;align-items:center;gap:6px}
+.cfgbox .hd b{font-size:12.5px;font-weight:900;letter-spacing:-.3px}
+.cfgbox .hd span{margin-left:auto;font-size:9.5px;font-weight:800;color:var(--gray)}
+.cfgbox input{margin-top:9px;font-weight:700}
+.cfglist{margin-top:8px;display:grid;gap:6px}
+.cfglist button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-family:inherit;
+  background:#0E1B33;border:1px solid var(--line);border-radius:10px;padding:9px 10px;cursor:pointer;color:var(--ink)}
+.cfglist button .k{font-size:11.5px;font-weight:900;letter-spacing:-.3px}
+.cfglist button .v{margin-left:auto;font-size:11px;font-weight:800;color:var(--amber2)}
+.cfglist button .ar{font-size:11px;color:var(--gray)}
+.cfglist .none{font-size:10.5px;color:#7F8FA8;padding:6px 2px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:16px 2px 8px}
+.sec-h b{font-size:13.5px;font-weight:900;letter-spacing:-.4px}
+.sec-h span{font-size:10.5px;font-weight:800;color:var(--gray)}
+.it{border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-top:8px;background:#101E38}
+.it.bad{border-color:rgba(255,92,108,.55);background:linear-gradient(180deg,rgba(255,92,108,.1),#101E38 60%)}
+.it .n{font-size:12.5px;font-weight:900;letter-spacing:-.3px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .m{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:10.5px;color:var(--ink2);font-weight:700}
+.it .m b{color:#fff;font-weight:900}
+.it .m .net{color:var(--ok);font-weight:900}
+.it .m .net.bad{color:#FF8A97}
+.it .row2{display:flex;gap:6px;margin-top:9px}
+.it .row2 button{font-family:inherit;font-size:10.5px;font-weight:900;border-radius:9px;padding:7px 10px;cursor:pointer;
+  border:1px solid var(--line2);background:#12203C;color:#D9E3F0}
+.it .row2 .go{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
+.empty{border:1px dashed var(--line2);border-radius:14px;padding:18px 12px;text-align:center;font-size:11.5px;
+  color:#8FA0B8;line-height:1.6;margin-top:8px}
+.foot{margin-top:22px;border-top:1px solid #1B2946;padding-top:14px;font-size:10px;line-height:1.75;color:#7D8CA6}
+.foot b{color:#C7D3E3}
+.foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
+.scrim{position:fixed;inset:0;background:rgba(3,7,16,.72);z-index:70;display:none}
+.scrim.on{display:block}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,102%);width:min(100%,560px);max-height:88vh;
+  overflow:auto;z-index:71;background:#0C1730;border:1px solid var(--line2);border-bottom:0;
+  border-radius:20px 20px 0 0;padding:0 14px 22px;transition:transform .24s ease}
+.sheet.on{transform:translate(-50%,0)}
+.sheet .bar{position:sticky;top:0;background:#0C1730;display:flex;align-items:center;gap:8px;padding:12px 0 9px;
+  border-bottom:1px solid var(--line);z-index:2}
+.sheet .bar b{font-size:14px;font-weight:900;letter-spacing:-.4px}
+.sheet .bar .x{margin-left:auto;font-family:inherit;font-size:11.5px;font-weight:900;color:#C7D3E3;background:#12203C;
+  border:1px solid var(--line2);border-radius:9px;padding:7px 10px;cursor:pointer}
+.sheet .body{padding-top:12px}
+.explain{border:1px solid rgba(255,162,77,.45);border-radius:12px;padding:10px 11px;
+  background:linear-gradient(100deg,rgba(255,107,0,.12),rgba(255,107,0,.02))}
+.explain>b{display:block;font-size:10px;font-weight:900;color:#FFA24D;letter-spacing:.06em}
+.explain p b{color:#FFD9B0}
+.explain p{margin:4px 0 0;font-size:11.5px;line-height:1.62;color:#E3EAF4;font-weight:700;word-break:keep-all}
+.prev{margin-top:9px;border:1px dashed var(--line2);border-radius:10px;padding:8px 10px;font-size:10.5px;
+  line-height:1.6;color:#AFBDD0;font-weight:700}
+.prev b{color:#FFA24D}
+.copy{display:flex;gap:6px;margin-top:7px}
+.copy button{flex:1;font-family:inherit;font-size:10.5px;font-weight:900;color:#D9E3F0;background:#12203C;
+  border:1px solid var(--line2);border-radius:9px;padding:8px;cursor:pointer}
+.txt{margin-top:9px;border:1px solid var(--line);border-radius:12px;background:#0B1730;padding:11px;
+  font-size:11.5px;line-height:1.72;color:#DCE5F1;white-space:pre-wrap;word-break:keep-all;font-weight:700}
+.txt.sm{font-size:11px}
+table.pv{width:100%;border-collapse:collapse;margin-top:9px;font-size:10px}
+table.pv th,table.pv td{border:1px solid var(--line);padding:5px 4px;text-align:left;color:#DCE5F1}
+table.pv th{background:#12203C;font-weight:900;color:#FFA24D;white-space:nowrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(10,17,40,.97);
+  border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:10px 14px;border-radius:999px;
+  opacity:0;transition:.25s;z-index:90;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1}
+.hint{font-size:10px;line-height:1.6;color:#7F8FA8;margin-top:8px}
+</style>
+</head>
+<body class="owner">
+<div id="app">
+  <header>
+    <a class="back" href="../index.html">← 원클릭</a>
+    <span class="brand">KTS <i>원클릭 셀러</i></span>
+    <span class="sp"></span>
+    <span class="st wait" id="stTag">설정 전</span>
+  </header>
+
+  <a class="rsv" href="../index.html#reserve">
+    <span class="tag">사전예약</span>
+    <span class="t"><b>현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b>
+      <i>기준가 500,000원 → 지금 0원 · 업종·연락처 10초</i></span>
+    <span style="color:#FFA24D;font-weight:900">→</span>
+  </a>
+
+  <!-- ===== ① 처음 한 번만: 세팅 ===== -->
+  <section id="setup">
+    <div class="card">
+      <h1>처음 <em>한 번만</em> 세팅하면,<br>담기 → 올리기 → 발주가 한 화면</h1>
+      <p class="sub">판매처·도매처·마진 <b>3가지만</b> 넣어 주세요. 나머지(수수료·배송비·제목 규칙)는
+        판매처 기준으로 자동으로 채워 두고, 필요할 때 <b>⚙ 세부 설정</b>에서 한 칸씩만 고치시면 됩니다.</p>
+
+      <label class="lb">① 판매처</label>
+      <div class="seg" id="setupMarket">
+        <button type="button" data-m="coupang" class="on">쿠팡</button>
+        <button type="button" data-m="smartstore">스마트스토어</button>
+      </div>
+
+      <label class="lb" for="setupSource">② 도매처 (어디서 사입하나요)</label>
+      <input id="setupSource" list="srcList" placeholder="예: 도매매 · 도매꾹 · 동대문 · 직접 사입" autocomplete="off">
+      <datalist id="srcList">
+        <option value="도매매"></option><option value="도매꾹"></option><option value="온채널"></option>
+        <option value="동대문 사입"></option><option value="공장 직거래"></option>
+      </datalist>
+
+      <label class="lb" for="setupMargin">③ 목표 마진 (%)</label>
+      <input id="setupMargin" type="number" inputmode="numeric" min="0" max="90" step="1" value="32">
+      <p class="hint" style="margin-top:5px">판매가에서 수수료·배송비를 빼고 <b style="color:#FFA24D">내게 남길 비율</b>입니다. 저장한 뒤 [상품 담기]에서 실제 금액으로 바로 확인하실 수 있습니다.</p>
+
+      <button class="btn" id="setupGo" style="margin-top:14px">저장하고 시작</button>
+      <p class="hint">저장한 값은 이 기기 브라우저에만 남습니다. 서버로 보내지 않고, 결제도 받지 않습니다.</p>
+    </div>
+  </section>
+
+  <!-- ===== ② 본 화면 ===== -->
+  <section id="main" hidden>
+    <div class="sum" id="sum"></div>
+
+    <div class="acts">
+      <button class="act pri" type="button" id="aAdd">
+        <span class="ic">＋</span><b>상품 담기</b><small>도매 상품 · 원가 · 수량</small>
+      </button>
+      <button class="act" type="button" id="aDetail">
+        <span class="ic">✎</span><b>상세 · 숏츠</b><small>상세 문구 + 15초 대본</small>
+      </button>
+      <button class="act" type="button" id="aUpload">
+        <span class="ic">⬆</span><b>1초 올리기</b><small>대량등록 엑셀 · CSV</small>
+      </button>
+      <button class="act" type="button" id="aOrder">
+        <span class="ic">📦</span><b>자동 발주</b><small>도매처 주문서 1초</small>
+      </button>
+    </div>
+
+    <div class="lockb" id="lockBar" hidden></div>
+
+    <div class="cfgbox">
+      <div class="hd"><b>⚙ 세부 설정 호출</b><span id="learnN"></span></div>
+      <input id="cfgQ" placeholder="배송비 · 마진 · 수수료 · 제목 … 찾는 단어 하나" autocomplete="off" aria-label="세부 설정 검색">
+      <div class="cfglist" id="cfgList"></div>
+    </div>
+
+    <div class="sec-h"><b>담은 상품</b><span id="itemN">0개</span></div>
+    <div id="items"></div>
+  </section>
+
+  <div class="foot">
+    <b>KTS 원클릭 셀러</b> · 사장님 전용 화면입니다. 원가·마진·도매처는 손님 화면에 나오지 않습니다.<br>
+    엑셀·CSV는 이 기기 안에서 만들어지고 서버로 보내지 않습니다 · 문의 <a href="sms:01020022899">010-2002-2899</a>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sh" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+  <div class="bar">
+    <b id="shTitle">설정</b>
+    <button class="x" type="button" id="shClose">닫기 ✕</button>
+  </div>
+  <div class="body" id="shBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============================================================================
+   KTS 원클릭 셀러 v1.0
+   · 세팅: 판매처 · 도매처 · 마진 (3개)
+   · 메인: 상품 담기 / 상세·숏츠 / 1초 올리기 / 자동 발주
+   · ⚙ 세부 설정 호출: 단어로 찾아 그 한 칸만 열고, 고치기 전에 결과를 쉬운 말로 먼저 설명
+   · 적자 방지 빨간 잠금: 원가+수수료+배송비 이하 판매가는 등록·엑셀 잠금
+   · 생성 파일: .xlsx / .csv (브라우저에서 직접 생성, 서버 전송 없음)
+   ============================================================================= */
+const $ = s => document.querySelector(s);
+const won = n => (Math.round(+n || 0)).toLocaleString('ko-KR') + '원';
+const num = v => { const n = +String(v == null ? '' : v).replace(/[^0-9.-]/g, ''); return isFinite(n) ? n : 0; };
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+let toastT;
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2400); }
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+};
+
+/* ---------- 판매처 기준값 (수수료는 카테고리별로 다르므로 대표값) ---------- */
+const MARKETS = {
+  coupang:     { name:'쿠팡',       fee:10.8, label:'쿠팡' },
+  smartstore:  { name:'스마트스토어', fee:5.5,  label:'스마트스토어' }
+};
+
+const DEFAULT_CFG = {
+  market:'coupang', source:'', margin:32, fee:null, ship:3000, shipMode:'seller',
+  freeShip:30000, titleRule:'{상품명} {핵심} {규격}', minMargin:8, qty:10, codePrefix:'KTS'
+};
+
+let cfg = Object.assign({}, DEFAULT_CFG, LS.get('kts_seller_cfg', {}));
+let items = LS.get('kts_seller_items', []);
+let learn = LS.get('kts_seller_learn', {});
+if (!Array.isArray(items)) items = [];
+
+const MK = () => MARKETS[cfg.market] || MARKETS.coupang;
+const feePct = () => (cfg.fee == null || cfg.fee === '') ? MK().fee : +cfg.fee;
+const shipCost = () => cfg.shipMode === 'buyer' ? 0 : num(cfg.ship);
+
+/* 권장 판매가 — 수수료·배송비를 빼고도 마진%가 남는 가격 */
+function recommend(cost){
+  const m = Math.min(89, Math.max(0, num(cfg.margin))), f = Math.min(40, Math.max(0, feePct()));
+  const denom = 1 - (f + m) / 100;
+  if (denom <= 0.05) return 0;
+  return Math.ceil(((num(cost) + shipCost()) / denom) / 100) * 100;
+}
+/* 실제 남는 돈 = 판매가 - 수수료 - 원가 - 내가 내는 배송비 */
+function netOf(it){
+  const price = num(it.price), fee = price * feePct() / 100;
+  return Math.round(price - fee - num(it.cost) - shipCost());
+}
+const isBad = it => netOf(it) <= 0;
+const badItems = () => items.filter(isBad);
+const savedCfg = () => !!(cfg.source && LS.get('kts_seller_cfg', null));
+
+/* =============================== 저장 =============================== */
+function saveCfg(){ LS.set('kts_seller_cfg', cfg); }
+function saveItems(){ LS.set('kts_seller_items', items); }
+function learnIt(key, val){
+  learn[key] = { v:val, at:new Date().toISOString(), n:((learn[key] && learn[key].n) || 0) + 1 };
+  LS.set('kts_seller_learn', learn);
+}
+
+/* =============================== 화면 =============================== */
+function render(){
+  const on = savedCfg();
+  $('#setup').hidden = on;
+  $('#main').hidden = !on;
+  $('#stTag').textContent = on ? '세팅 완료' : '설정 전';
+  $('#stTag').classList.toggle('wait', !on);
+  if (!on) return;
+
+  const totalNet = items.reduce((a, b) => a + netOf(b), 0);
+  $('#sum').innerHTML =
+    '<div class="r1"><span class="mk">' + MK().name + '</span>' +
+      '<b>' + esc(cfg.source) + ' → ' + MK().name + '</b>' +
+      '<button class="ed" type="button" id="sumEd">바꾸기</button></div>' +
+    '<div class="g">' +
+      '<div><b>' + num(cfg.margin) + '%</b><span>목표 마진</span></div>' +
+      '<div><b>' + items.length + '개</b><span>담은 상품</span></div>' +
+      '<div><b style="color:' + (totalNet > 0 ? '#fff' : '#FF8A97') + '">' + won(totalNet) + '</b><span>순익 합계</span></div>' +
+    '</div>';
+  $('#sumEd').onclick = () => openCfg('margin');
+
+  $('#itemN').textContent = items.length + '개';
+  $('#items').innerHTML = items.length ? items.map((it, i) =>
+    '<div class="it' + (isBad(it) ? ' bad' : '') + '">' +
+      '<div class="n">' + esc(it.name) + '</div>' +
+      '<div class="m">' +
+        '<span>원가 <b>' + won(it.cost) + '</b></span>' +
+        '<span>판매가 <b>' + won(it.price) + '</b></span>' +
+        '<span>수량 <b>' + num(it.qty) + '</b></span>' +
+        '<span>남는 돈 <b class="net' + (isBad(it) ? ' bad' : '') + '">' + won(netOf(it)) + '</b></span>' +
+      '</div>' +
+      '<div class="row2">' +
+        '<button class="go" type="button" data-edit="' + i + '">' + (isBad(it) ? '가격 고치기' : '고치기') + '</button>' +
+        '<button type="button" data-del="' + i + '">빼기</button>' +
+        '<button type="button" data-detail="' + i + '">상세·숏츠</button>' +
+      '</div>' +
+    '</div>').join('')
+    : '<div class="empty">아직 담은 상품이 없습니다.<br><b>[상품 담기]</b>로 도매 상품명과 원가만 넣어 보세요.</div>';
+
+  const bad = badItems();
+  $('#lockBar').hidden = !bad.length;
+  if (bad.length){
+    $('#lockBar').innerHTML =
+      '<b>⛔ 빨간 잠금 — 팔수록 손해인 상품 ' + bad.length + '개</b>' +
+      '<span>' + esc(bad[0].name) + ' · 판매가 ' + won(bad[0].price) + ' ≤ 원가+수수료+배송비. ' +
+        '고치기 전에는 <b>1초 올리기(등록·엑셀)</b>가 잠깁니다.</span>' +
+      '<button type="button" id="lockFix">바로 고치기</button>';
+    $('#lockFix').onclick = () => editItem(items.indexOf(bad[0]));
+  }
+  const locked = bad.length > 0 || !items.length;
+  ['#aUpload', '#aOrder'].forEach(sel => { $(sel).classList.toggle('locked', bad.length > 0); });
+  $('#aUpload').setAttribute('aria-disabled', locked ? 'true' : 'false');
+
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editItem(+b.dataset.edit));
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.del; const nm = items[i] && items[i].name; items.splice(i, 1); saveItems(); render();
+    toast('뺐습니다 · ' + (nm || ''));
+  });
+  document.querySelectorAll('[data-detail]').forEach(b => b.onclick = () => openDetail(+b.dataset.detail));
+  renderCfgList();
+  $('#learnN').textContent = Object.keys(learn).length ? ('학습 ' + Object.keys(learn).length + '건') : '학습 0건';
+}
+
+/* =============================== 세부 설정 정의 =============================== */
+const SETTINGS = [
+  { k:'market', label:'판매처', kw:'판매처 쿠팡 스마트스토어 스토어 마켓 채널', type:'market',
+    desc(){ return '쿠팡은 판매수수료가 10.8%, 스마트스토어는 5.5%입니다. 판매처를 바꾸면 <b>권장 판매가와 엑셀 양식</b>이 같이 바뀝니다.'; } },
+  { k:'source', label:'도매처', kw:'도매처 도매 공급처 사입 소싱 매입처', type:'text',
+    desc(){ return '발주서에 찍히는 곳입니다. 여기를 바꾸면 <b>[자동 발주]</b>의 주문 문구가 그 이름으로 나갑니다.'; } },
+  { k:'margin', label:'마진', kw:'마진 이익 남는돈 마진율 수익', type:'number', unit:'%',
+    desc(){ const r = recommend(10000);
+      return '지금 <b>' + num(cfg.margin) + '%</b>. 원가 10,000원 상품이면 권장 판매가 <b>' + won(r) + '</b>, 내게 남는 돈 <b>' +
+        won(Math.round(r - r * feePct() / 100 - 10000 - shipCost())) + '</b>입니다. 1%p 올리면 판매가가 약 ' +
+        won(Math.round(r * 0.01)) + ' 올라갑니다.'; } },
+  { k:'fee', label:'수수료율', kw:'수수료 판매수수료 카테고리 요율', type:'number', unit:'%',
+    desc(){ const f = feePct(); return '지금 <b>' + f.toFixed(1) + '%</b> (판매처 기준값). 카테고리에 따라 4~10.8%로 다릅니다. ' +
+      '1%p 오르면 판매가 ' + won(recommend(10000)) + '짜리에서 남는 돈이 <b>' + won(recommend(10000) * 0.01) + ' 줄어듭니다</b>.'; } },
+  { k:'ship', label:'배송비', kw:'배송비 택배비 배송 택배 운송', type:'number', unit:'원',
+    desc(){ const r0 = recommend(10000); const old = cfg.ship; cfg.ship = 0; const r1 = recommend(10000); cfg.ship = old;
+      return '내가 내는 배송비(편도)입니다. 지금 <b>' + won(shipCost()) + '</b>. 이걸 0원으로 낮추면 권장 판매가가 ' +
+        won(r0) + ' → <b>' + won(r1) + '</b>로 내려갑니다.'; } },
+  { k:'shipMode', label:'배송비 부담', kw:'배송방식 선불 착불 무료배송 누가부담', type:'shipMode',
+    desc(){ return cfg.shipMode === 'buyer'
+      ? '지금은 <b>손님 부담(선불)</b>입니다. 판매가는 내려가지만 결제 직전에 배송비가 붙어 이탈이 늘 수 있습니다.'
+      : '지금은 <b>내가 부담</b>입니다. 판매가에 배송비가 녹아 있어 "무료배송"으로 보이고, 대신 판매가가 올라갑니다.'; } },
+  { k:'freeShip', label:'무료배송 기준', kw:'무료배송 무배 묶음배송 기준금액', type:'number', unit:'원',
+    desc(){ return '손님이 이 금액 이상 담으면 배송비를 받지 않습니다. 지금 <b>' + won(cfg.freeShip) + '</b>. ' +
+      '낮추면 전환은 늘지만 묶음 단가가 떨어집니다.'; } },
+  { k:'title', label:'제목 규칙', kw:'제목 상품명 네이밍 이름 규칙', type:'text',
+    desc(){ return '상품명을 만드는 규칙입니다. <b>{상품명} {핵심} {규격}</b>처럼 중괄호로 자리를 비워 두면 담을 때 자동으로 채워집니다. 바꾸면 이미 담은 상품의 제목도 새 규칙으로 다시 만들어집니다.'; } },
+  { k:'minMargin', label:'안전 하한', kw:'안전 최소마진 하한 경고', type:'number', unit:'%',
+    desc(){ return '남는 돈이 판매가의 <b>' + num(cfg.minMargin) + '%</b>보다 적으면 경고합니다. 0%로 두면 "손해만 아니면 통과"입니다. ' +
+      '배송비가 오르거나 수수료가 바뀔 때를 대비한 여유분입니다.'; } },
+  { k:'qty', label:'기본 수량', kw:'수량 재고 개수 기본값', type:'number', unit:'개',
+    desc(){ return '상품을 담을 때 미리 채워지는 수량입니다. 지금 <b>' + num(cfg.qty) + '개</b>. 엑셀의 재고수량 칸에 그대로 들어갑니다.'; } },
+  { k:'codePrefix', label:'상품코드 접두', kw:'코드 상품코드 sku 접두', type:'text',
+    desc(){ return '자동으로 만드는 상품코드 앞에 붙는 글자입니다. 지금 <b>' + esc(cfg.codePrefix || '') + '</b>. 도매처 코드와 섞이지 않게 구분하는 용도입니다.'; } }
+];
+
+function cfgVal(k){
+  if (k === 'fee') return feePct().toFixed(1) + '%';
+  if (k === 'market') return MK().name;
+  if (k === 'shipMode') return cfg.shipMode === 'buyer' ? '손님 부담' : '내가 부담';
+  const s = SETTINGS.find(x => x.k === k);
+  return (cfg[k] === '' || cfg[k] == null ? '-' : String(cfg[k])) + (s && s.unit ? s.unit : '');
+}
+function renderCfgList(){
+  const q = ($('#cfgQ').value || '').trim().toLowerCase();
+  const list = q ? SETTINGS.filter(s => (s.label + ' ' + s.kw).toLowerCase().includes(q)) : SETTINGS.slice(0, 4);
+  $('#cfgList').innerHTML = list.length
+    ? list.map(s => '<button type="button" data-cfg="' + s.k + '"><span class="k">' + s.label + '</span>' +
+        '<span class="v">' + esc(cfgVal(s.k)) + '</span><span class="ar">›</span></button>').join('')
+    : '<div class="none">"' + esc(q) + '"에 해당하는 설정이 없습니다. 배송비 · 마진 · 수수료 · 제목처럼 한 단어로 넣어 보세요.</div>';
+  document.querySelectorAll('[data-cfg]').forEach(b => b.onclick = () => openCfg(b.dataset.cfg));
+  if (!q) $('#cfgList').insertAdjacentHTML('beforeend',
+    '<div class="none">단어를 넣으면 그 한 칸만 열립니다 (예: 배송비 · 수수료 · 제목)</div>');
+}
+
+/* =============================== 시트 =============================== */
+function openSheet(title){ $('#shTitle').textContent = title; $('#scrim').classList.add('on'); $('#sh').classList.add('on'); }
+function closeSheet(){ $('#scrim').classList.remove('on'); $('#sh').classList.remove('on'); }
+$('#shClose').onclick = closeSheet;
+$('#scrim').onclick = closeSheet;
+
+/* ---------- 세부 설정 한 칸 ---------- */
+let cfgDraft = null;
+function openCfg(k){
+  const s = SETTINGS.find(x => x.k === k); if (!s) return;
+  cfgDraft = k;
+  let field = '';
+  if (s.type === 'market'){
+    field = '<div class="seg" id="fSeg">' + Object.keys(MARKETS).map(m =>
+      '<button type="button" data-m="' + m + '" class="' + (cfg.market === m ? 'on' : '') + '">' + MARKETS[m].name + '</button>').join('') + '</div>';
+  } else if (s.type === 'shipMode'){
+    field = '<div class="seg" id="fSeg">' +
+      '<button type="button" data-s="seller" class="' + (cfg.shipMode === 'seller' ? 'on' : '') + '">내가 부담</button>' +
+      '<button type="button" data-s="buyer" class="' + (cfg.shipMode === 'buyer' ? 'on' : '') + '">손님 부담(선불)</button></div>';
+  } else {
+    field = '<input id="fVal" type="' + (s.type === 'number' ? 'number' : 'text') + '" ' +
+      (s.type === 'number' ? 'inputmode="numeric" ' : '') + 'value="' + esc(cfg[k] == null ? '' : cfg[k]) + '" aria-label="' + s.label + '">';
+  }
+  const last = learn[k] ? '<div class="hint">지난번 저장: <b style="color:#FFA24D">' + esc(String(learn[k].v)) + '</b> · ' +
+    new Date(learn[k].at).toLocaleDateString('ko-KR') + '</div>' : '';
+  $('#shBody').innerHTML =
+    '<div class="explain"><b>이걸 바꾸면</b><p>' + s.desc() + '</p></div>' +
+    '<label class="lb">' + s.label + ' 값</label>' + field + last +
+    '<div class="prev" id="fPrev"></div>' +
+    '<button class="btn" type="button" id="fSave" style="margin-top:12px">저장하고 바로 적용</button>' +
+    '<button class="btn ghost" type="button" id="fCancel" style="margin-top:7px">그만두기</button>';
+  openSheet('세부 설정 · ' + s.label);
+
+  const prev = () => {
+    /* 고치기 전에 "바꾸면 어떻게 달라지나"를 먼저 보여준다 */
+    let v = null;
+    if (s.type === 'market') v = (document.querySelector('#fSeg button.on') || {}).dataset && document.querySelector('#fSeg button.on').dataset.m;
+    else if (s.type === 'shipMode') v = (document.querySelector('#fSeg button.on') || {}).dataset && document.querySelector('#fSeg button.on').dataset.s;
+    else v = $('#fVal').value;
+    const before = { price:recommend(10000), net:0 };
+    before.net = Math.round(before.price - before.price * feePct() / 100 - 10000 - shipCost());
+    const snap = { market:cfg.market, fee:cfg.fee, ship:cfg.ship, shipMode:cfg.shipMode, margin:cfg.margin };
+    if (v != null && v !== ''){
+      if (k === 'market'){ cfg.market = v; }
+      else if (k === 'shipMode'){ cfg.shipMode = v; }
+      else if (k === 'fee'){ cfg.fee = num(v); }
+      else cfg[k] = (s.type === 'number' ? num(v) : v);
+    }
+    const after = { price:recommend(10000) };
+    after.net = Math.round(after.price - after.price * feePct() / 100 - 10000 - shipCost());
+    Object.assign(cfg, snap);
+    const diff = after.price - before.price;
+    $('#fPrev').innerHTML = '원가 10,000원 상품 기준 · 권장 판매가 <b>' + won(before.price) + '</b> → <b>' + won(after.price) + '</b>' +
+      (diff ? ' (' + (diff > 0 ? '+' : '') + won(diff) + ')' : ' (그대로)') +
+      '<br>내게 남는 돈 <b>' + won(before.net) + '</b> → <b>' + won(after.net) + '</b>' +
+      (after.net <= 0 ? ' · <span style="color:#FF8A97">손해</span>' : '');
+  };
+  if ($('#fSeg')) $('#fSeg').querySelectorAll('button').forEach(b => b.onclick = () => {
+    $('#fSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); prev();
+  });
+  if ($('#fVal')) $('#fVal').addEventListener('input', prev);
+  prev();
+
+  $('#fSave').onclick = () => {
+    let v;
+    if (s.type === 'market'){ v = ($('#fSeg button.on') || {}).dataset.m; if (v) cfg.market = v; if (cfg.fee == null) cfg.fee = ''; }
+    else if (s.type === 'shipMode'){ v = ($('#fSeg button.on') || {}).dataset.s; if (v) cfg.shipMode = v; }
+    else { v = $('#fVal').value; cfg[k] = (s.type === 'number' ? num(v) : String(v).trim()); }
+    saveCfg(); learnIt(k, cfgVal(k));
+    /* 즉시 반영 — 자동 가격으로 둔 상품의 판매가를 새 기준으로 다시 계산 */
+    items.forEach(it => { if (it.auto) it.price = recommend(it.cost); });
+    saveItems(); render(); closeSheet();
+    toast(s.label + ' ' + cfgVal(k) + ' 저장 · 바로 적용했습니다');
+  };
+  $('#fCancel').onclick = () => { closeSheet(); toast('바꾸지 않았습니다'); };
+}
+
+/* ---------- 상품 담기 / 고치기 ---------- */
+let editIdx = -1;
+function editItem(i){ editIdx = i; const it = items[i] || null;
+  const name = it ? it.name : '', cost = it ? it.cost : '', price = it ? it.price : '', qty = it ? it.qty : cfg.qty;
+  $('#shBody').innerHTML =
+    '<div class="explain"><b>이걸 바꾸면</b><p>원가를 넣으면 <b>권장 판매가</b>를 자동으로 계산합니다. ' +
+      '원가+수수료+배송비보다 싸면 <b>빨간 잠금</b>으로 등록이 막힙니다.</p></div>' +
+    '<label class="lb">상품명</label><input id="itName" value="' + esc(name) + '" placeholder="예: 접이식 무선 손난로" autocomplete="off">' +
+    '<div class="two"><div><label class="lb">원가(사입가)</label><input id="itCost" type="number" inputmode="numeric" value="' + (cost === '' ? '' : num(cost)) + '" placeholder="12000"></div>' +
+    '<div><label class="lb">수량</label><input id="itQty" type="number" inputmode="numeric" value="' + num(qty) + '" placeholder="10"></div></div>' +
+    '<label class="lb">판매가 <span style="font-weight:700;color:#7F8FA8">(비우면 권장가로 자동)</span></label>' +
+    '<input id="itPrice" type="number" inputmode="numeric" value="' + (it && !it.auto ? num(price) : '') + '" placeholder="자동">' +
+    '<div class="prev" id="itPrev"></div>' +
+    '<button class="btn" type="button" id="itSave" style="margin-top:12px">' + (it ? '고치기 저장' : '담기') + '</button>' +
+    '<button class="btn ghost" type="button" id="itCancel" style="margin-top:7px">닫기</button>';
+  openSheet(it ? '상품 고치기' : '상품 담기');
+  const calc = () => {
+    const c = num($('#itCost').value), p = num($('#itPrice').value) || recommend(c);
+    const net = Math.round(p - p * feePct() / 100 - c - shipCost());
+    $('#itPrev').innerHTML = '판매가 <b>' + won(p) + '</b> · 수수료 ' + won(p * feePct() / 100) + ' · 배송비 ' + won(shipCost()) +
+      '<br>내게 남는 돈 <b style="color:' + (net > 0 ? '#4ADE80' : '#FF8A97') + '">' + won(net) + '</b>' +
+      (net <= 0 ? ' · <span style="color:#FF8A97">이 가격은 팔 수 없습니다(잠금)</span>' : '');
+  };
+  ['#itCost', '#itPrice'].forEach(s => $(s).addEventListener('input', calc));
+  calc();
+  $('#itCancel').onclick = closeSheet;
+  $('#itSave').onclick = () => {
+    const nm = $('#itName').value.trim(); const c = num($('#itCost').value);
+    if (!nm) { toast('상품명을 넣어 주세요'); $('#itName').focus(); return; }
+    if (c <= 0) { toast('원가를 넣어 주세요'); $('#itCost').focus(); return; }
+    const typed = num($('#itPrice').value);
+    const obj = { name:nm, cost:c, qty:Math.max(1, num($('#itQty').value) || 1),
+      price: typed || recommend(c), auto: !typed,
+      code: (cfg.codePrefix || 'KTS') + '-' + String(Date.now()).slice(-6) };
+    if (editIdx >= 0) items[editIdx] = Object.assign({}, items[editIdx], obj); else items.unshift(obj);
+    editIdx = -1; saveItems(); render(); closeSheet();
+    const net = netOf(items[editIdx >= 0 ? editIdx : 0] || obj);
+    toast(obj.name + ' · 판매가 ' + won(obj.price) + (net > 0 ? (' · 남는 돈 ' + won(net)) : ' · 손해라 잠깁니다'));
+  };
+}
+
+/* ---------- 상세 · 숏츠 ---------- */
+function openDetail(i){
+  const it = items[i] || items[0];
+  if (!it){ toast('먼저 상품을 담아 주세요'); return; }
+  const p = num(it.price), net = netOf(it);
+  const oneline = it.name + ' · ' + won(p) + ' · 오늘 출발';
+  const detail =
+    '[상품명] ' + it.name + '\n' +
+    '판매가 ' + won(p) + ' / 배송 ' + (cfg.shipMode === 'buyer' ? '선불 ' + won(cfg.ship) : '무료배송') + '\n\n' +
+    '이런 분께 맞습니다\n' +
+    '· ' + it.name + '을(를) 처음 사시는 분\n' +
+    '· 값보다 오래 쓰는 걸 보시는 분\n' +
+    '· 선물용으로 포장까지 챙기고 싶은 분\n\n' +
+    '고른 이유 세 가지\n' +
+    '1. 매일 쓰는 자리에 두고 쓰기 좋은 크기와 무게입니다.\n' +
+    '2. 쓰고 나서 손이 가는 마감만 남겼습니다.\n' +
+    '3. 문제가 생기면 구매 기록으로 바로 확인해 드립니다.\n\n' +
+    '이렇게 보내드립니다\n' +
+    '· 결제 후 평일 오후 2시 이전 주문은 당일 출발\n' +
+    '· 받으신 뒤 7일 안에 교환·환불 신청 가능\n' +
+    '· 문의: 010-2002-2899 (문자)\n';
+  const shorts =
+    '[훅 1 · 0~3초]\n' + '이거 ' + won(p) + '인데, 이 가격이 이해가 안 되실 거예요.\n\n' +
+    '[훅 2 · 0~3초]\n' + it.name + ', 사기 전에 이 3초만 보세요.\n\n' +
+    '[훅 3 · 0~3초]\n' + '오늘 출발로 ' + won(p) + '. 재고 ' + num(it.qty) + '개 남았습니다.\n\n' +
+    '[15초 대본]\n' +
+    '0~3초  손에 들고 한 바퀴 돌리며 "이게 ' + won(p) + '예요."\n' +
+    '3~8초  실제로 쓰는 장면 2초 → 결과 화면 클로즈업\n' +
+    '8~12초 "매일 쓰는 물건이라, 싼 것보다 오래 쓰는 걸 골랐습니다."\n' +
+    '12~15초 "오늘 출발 · 재고 ' + num(it.qty) + '개." 화면에 가격 자막\n\n' +
+    '[고정댓글]\n' + oneline + '\n문의는 문자로 주세요. 순서대로 답 드립니다.\n';
+  $('#shBody').innerHTML =
+    '<div class="explain"><b>이걸 바꾸면</b><p>지금 담은 상품 기준으로 상세 문구와 15초 숏츠 대본을 만들었습니다. ' +
+      '가격·수량을 고치면 다시 만들면 됩니다.</p></div>' +
+    '<div class="copy"><span style="font-size:11px;font-weight:900;color:#FFA24D">상세페이지 문구</span></div>' +
+    '<div class="txt sm" id="dTxt">' + esc(detail) + '</div>' +
+    '<div class="copy"><button type="button" id="dCopy">상세 문구 복사</button></div>' +
+    '<div class="copy" style="margin-top:12px"><span style="font-size:11px;font-weight:900;color:#FFA24D">숏츠 훅 · 15초 대본</span></div>' +
+    '<div class="txt sm" id="sTxt">' + esc(shorts) + '</div>' +
+    '<div class="copy"><button type="button" id="sCopy">숏츠 대본 복사</button></div>' +
+    '<p class="hint">복사한 글은 그대로 붙여 넣어 쓰시면 됩니다. 조회수·노출을 보장하지는 않습니다.</p>';
+  openSheet('상세 · 숏츠');
+  $('#dCopy').onclick = () => copyText(detail, '상세 문구를 복사했습니다');
+  $('#sCopy').onclick = () => copyText(shorts, '숏츠 대본을 복사했습니다');
+}
+
+/* ---------- 클립보드 ---------- */
+function copyText(txt, okMsg){
+  let done = false;
+  const fallback = () => {
+    if (done) return; done = true;
+    const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast(okMsg); } catch(e){ toast('복사가 막혀 있습니다 — 길게 눌러 복사하세요'); }
+    document.body.removeChild(ta);
+  };
+  const ok = () => { if (done) return; done = true; toast(okMsg); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    try { navigator.clipboard.writeText(txt).then(ok, fallback); setTimeout(fallback, 700); }
+    catch(e){ fallback(); }
+  } else fallback();
+}
+
+/* ---------- 1초 올리기 (엑셀·CSV) ---------- */
+const COLS = {
+  coupang: ['노출상품명', '등록상품명', '브랜드', '카테고리코드', '판매가', '재고수량', '배송방법', '배송비', '상품상태', '대표이미지', '상세설명', '원산지', '상품코드'],
+  smartstore: ['상품명', '판매가', '재고수량', '카테고리', '대표이미지', '상세설명', '배송비', '원산지', '상품코드', '상품상태']
+};
+function titleOf(it){
+  return String(cfg.title || '{상품명}')
+    .replace(/\{상품명\}/g, it.name)
+    .replace(/\{핵심\}/g, '오늘출발')
+    .replace(/\{규격\}/g, '1개')
+    .replace(/\s+/g, ' ').trim();
+}
+function rowsFor(market){
+  const head = COLS[market];
+  const rows = items.map(it => {
+    const title = titleOf(it);
+    const common = {
+      '판매가': num(it.price), '배송비': cfg.shipMode === 'buyer' ? num(cfg.ship) : 0,
+      '배송방법': cfg.shipMode === 'buyer' ? '선불' : '무료배송',
+      '재고수량': num(it.qty), '상품상태': '판매중', '원산지': '상세페이지 참조',
+      '상품코드': it.code || '', '카테고리코드': '', '카테고리': '',
+      '대표이미지': '', '상세설명': (it.name + ' · 오늘 출발 · 문의 010-2002-2899'),
+      '노출상품명': title, '등록상품명': title, '상품명': title, '브랜드': 'KTS'
+    };
+    return head.map(h => common[h] === undefined ? '' : common[h]);
+  });
+  return { head, rows };
+}
+function openUpload(){
+  const bad = badItems();
+  if (!items.length){ toast('먼저 상품을 담아 주세요'); return; }
+  if (bad.length){ toast('빨간 잠금 — 손해 상품 ' + bad.length + '개를 먼저 고쳐 주세요'); return; }
+  const m = cfg.market, { head, rows } = rowsFor(m);
+  $('#shBody').innerHTML =
+    '<div class="explain"><b>이걸 바꾸면</b><p>' + MARKETS[m].name + ' 대량등록 양식(' + head.length + '열)으로 ' +
+      items.length + '개 상품을 한 번에 만듭니다. 손해 상품이 하나라도 있으면 버튼이 잠깁니다.</p></div>' +
+    '<table class="pv"><thead><tr>' + head.slice(0, 5).map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+      rows.slice(0, 3).map(r => '<tr>' + r.slice(0, 5).map(c => '<td>' + esc(String(c)) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table>' +
+    '<div class="copy" style="margin-top:12px"><button type="button" id="upX">엑셀(.xlsx) 받기</button>' +
+      '<button type="button" id="upC">CSV(.csv) 받기</button></div>' +
+    '<p class="hint">쿠팡 Wing · 스마트스토어 대량등록의 <b>기본 열</b> 구성입니다. 올리기 전에 카테고리 코드와 대표 이미지 주소만 채우시면 됩니다. ' +
+      '파일은 이 기기 안에서 만들어지고 서버로 보내지 않습니다.</p>';
+  openSheet('1초 올리기 · ' + MARKETS[m].name);
+  $('#upX').onclick = () => { download(xlsxBlob('상품등록', head, rows), 'KTS_' + (m === 'coupang' ? '쿠팡' : '스마트스토어') + '_상품등록_' + stamp() + '.xlsx'); toast(items.length + '개 상품 · 엑셀을 만들었습니다'); };
+  $('#upC').onclick = () => { download(new Blob(['\ufeff' + csvText(head, rows)], { type:'text/csv;charset=utf-8' }), 'KTS_' + (m === 'coupang' ? '쿠팡' : '스마트스토어') + '_상품등록_' + stamp() + '.csv'); toast(items.length + '개 상품 · CSV를 만들었습니다'); };
+}
+
+/* ---------- 자동 발주 ---------- */
+function openOrder(){
+  if (!items.length){ toast('먼저 상품을 담아 주세요'); return; }
+  const total = items.reduce((a, b) => a + num(b.cost) * num(b.qty), 0);
+  const body = '[' + (cfg.source || '도매처') + ' 발주]\n' +
+    '보내는 곳: ' + (cfg.source || '도매처') + '\n' +
+    '받는 곳: KTS 원클릭 셀러\n\n' +
+    items.map((it, i) => (i + 1) + '. ' + it.name + (it.code ? ' (' + it.code + ')' : '') + ' × ' + num(it.qty) + '개 · 단가 ' + won(it.cost) + ' · ' + won(num(it.cost) * num(it.qty))).join('\n') +
+    '\n\n합계: ' + won(total) + ' (' + items.reduce((a, b) => a + num(b.qty), 0) + '개)\n' +
+    '배송지·입금은 회신으로 알려 주세요. 오늘 출고 가능한지 함께 확인 부탁드립니다.';
+  $('#shBody').innerHTML =
+    '<div class="explain"><b>이걸 바꾸면</b><p>도매처 이름과 상품코드·수량·단가로 주문서를 만듭니다. ' +
+      '수량을 고치면 합계가 바로 바뀝니다.</p></div>' +
+    '<div class="txt sm" id="oTxt">' + esc(body) + '</div>' +
+    '<div class="copy"><button type="button" id="oCopy">발주서 복사</button>' +
+      '<a href="sms:?&body=' + encodeURIComponent(body) + '" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:900;color:#D9E3F0;background:#12203C;border:1px solid #2E4370;border-radius:9px;padding:8px;text-decoration:none">문자로 보내기</a></div>' +
+    '<div class="prev">합계 <b>' + won(total) + '</b> · 상품 ' + items.length + '종</div>';
+  openSheet('자동 발주');
+  $('#oCopy').onclick = () => copyText(body, '발주서를 복사했습니다');
+}
+
+/* ---------- 파일 만들기 ---------- */
+function stamp(){ const d = new Date(); const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()); }
+function download(blob, name){
+  const a = document.createElement('a'); const url = URL.createObjectURL(blob);
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+}
+function csvText(head, rows){
+  const q = v => { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return [head.map(q).join(',')].concat(rows.map(r => r.map(q).join(','))).join('\r\n') + '\r\n';
+}
+
+/* --- 최소 XLSX (외부 라이브러리 0, 브라우저에서 직접 조립) --- */
+const CRC_TABLE = (() => { const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+  return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files){
+  const enc = new TextEncoder(); const parts = [], central = []; let offset = 0;
+  files.forEach(f => {
+    const name = enc.encode(f.name), data = enc.encode(f.data), crc = crc32(data);
+    const lh = new Uint8Array(30 + name.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0, true); dv.setUint16(8, 0, true);
+    dv.setUint16(10, 0, true); dv.setUint16(12, 0x2100, true); dv.setUint32(14, crc, true);
+    dv.setUint32(18, data.length, true); dv.setUint32(22, data.length, true); dv.setUint16(26, name.length, true);
+    lh.set(name, 30); parts.push(lh, data);
+    const ch = new Uint8Array(46 + name.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(10, 0, true);
+    cv.setUint16(14, 0x2100, true); cv.setUint32(16, crc, true); cv.setUint32(20, data.length, true);
+    cv.setUint32(24, data.length, true); cv.setUint16(28, name.length, true); cv.setUint32(42, offset, true);
+    ch.set(name, 46); central.push(ch); offset += lh.length + data.length;
+  });
+  const cs = central.reduce((a, b) => a + b.length, 0);
+  const eo = new Uint8Array(22), ev = new DataView(eo.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cs, true); ev.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, eo], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+const xEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const colName = c => { let s = '', n = c + 1; while (n > 0){ const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+function sheetXml(head, rows){
+  let x = '<sheetData>';
+  const cell = (ref, v, s) => {
+    if (typeof v === 'number' && isFinite(v)) return '<c r="' + ref + '" s="' + s + '"><v>' + v + '</v></c>';
+    if (v === '' || v == null) return '';
+    return '<c r="' + ref + '" s="' + s + '" t="inlineStr"><is><t xml:space="preserve">' + xEsc(v) + '</t></is></c>';
+  };
+  x += '<row r="1">' + head.map((h, i) => cell(colName(i) + '1', h, 1)).join('') + '</row>';
+  rows.forEach((r, ri) => {
+    x += '<row r="' + (ri + 2) + '">' + r.map((v, ci) => cell(colName(ci) + (ri + 2), v, 2)).join('') + '</row>';
+  });
+  x += '</sheetData>';
+  const widths = '<cols>' + head.map((h, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + Math.min(42, Math.max(10, String(h).length * 2.2)) + '" customWidth="1"/>').join('') + '</cols>';
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<dimension ref="A1:' + colName(head.length - 1) + (rows.length + 1) + '"/>' + widths + x +
+    '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/></worksheet>';
+}
+function xlsxBlob(sheetName, head, rows){
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+    '</Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+    '<sheets><sheet name="' + xEsc(sheetName).slice(0, 30) + '" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbrels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+    '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0원"/></numFmts>' +
+    '<fonts count="2"><font><sz val="10"/><name val="맑은 고딕"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="맑은 고딕"/></font></fonts>' +
+    '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFFF6B00"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+    '<borders count="2"><border><left/><right/><top/><bottom/></border>' +
+    '<border><left style="thin"><color rgb="FF333333"/></left><right style="thin"><color rgb="FF333333"/></right><top style="thin"><color rgb="FF333333"/></top><bottom style="thin"><color rgb="FF333333"/></bottom></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    '<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+    '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>' +
+    '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="center"/></xf></cellXfs>' +
+    '</styleSheet>';
+  return zipStore([
+    { name:'[Content_Types].xml', data:ct },
+    { name:'_rels/.rels', data:rels },
+    { name:'xl/workbook.xml', data:wb },
+    { name:'xl/_rels/workbook.xml.rels', data:wbrels },
+    { name:'xl/styles.xml', data:styles },
+    { name:'xl/worksheets/sheet1.xml', data:sheetXml(head, rows) }
+  ]);
+}
+
+/* =============================== 버튼 연결 =============================== */
+$('#setupMarket').querySelectorAll('button').forEach(b => b.onclick = () => {
+  $('#setupMarket').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+});
+$('#setupGo').onclick = () => {
+  const src = $('#setupSource').value.trim();
+  const mg = num($('#setupMargin').value);
+  if (!src){ toast('도매처를 넣어 주세요 (예: 도매매)'); $('#setupSource').focus(); return; }
+  if (!(mg > 0) || mg > 90){ toast('마진은 1~90% 사이로 넣어 주세요'); $('#setupMargin').focus(); return; }
+  const m = $('#setupMarket button.on').dataset.m;
+  cfg = Object.assign({}, DEFAULT_CFG, { market:m, source:src, margin:mg, fee:'' });
+  saveCfg(); learnIt('margin', mg + '%'); learnIt('market', MARKETS[m].name);
+  render(); toast('세팅 완료 · 이제 [상품 담기]부터 누르시면 됩니다');
+};
+$('#aAdd').onclick = () => editItem(-1);
+$('#aDetail').onclick = () => openDetail(0);
+$('#aUpload').onclick = openUpload;
+$('#aOrder').onclick = openOrder;
+$('#cfgQ').addEventListener('input', renderCfgList);
+$('#cfgQ').addEventListener('focus', () => { $('#cfgQ').select(); });
+
+/* 시작 */
+if ($('#setupSource')) $('#setupSource').value = cfg.source || '';
+if ($('#setupMargin')) $('#setupMargin').value = num(cfg.margin) || 32;
+if (cfg.market && $('#setupMarket')) $('#setupMarket').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === cfg.market));
+render();
+</script>
+</body>
+</html>

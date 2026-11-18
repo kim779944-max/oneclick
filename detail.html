@@ -131,11 +131,10 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
   </div>
 </div>
 
+<script src="master.js"></script>
 <script src="products.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-const key = new URLSearchParams(location.search).get('k') || 'photo2doc';
-const p = window.PRODUCTS.find(x => x.k === key);
 const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
 
 function faqFor(p){
@@ -150,6 +149,9 @@ function faqFor(p){
   return base;
 }
 
+function renderDetail(){
+const key = new URLSearchParams(location.search).get('k') || 'photo2doc';
+const p = window.PRODUCTS.find(x => x.k === key);
 if (!p){
   $('#doc').innerHTML = '<div class="missing">상품을 찾지 못했습니다.<br><a href="index.html" style="color:#FFA24D">전체 도구로 돌아가기</a></div>';
 } else {
@@ -243,6 +245,10 @@ if (!p){
     dv.addEventListener('error', () => { const d = dv.closest('.demo'); if (d) d.remove(); });
   }
 }
+}
+renderDetail();
+/* catalog.json 을 받은 뒤 목록이 바뀌었으면 같은 화면을 다시 그린다(추가 상품 바로 열림) */
+document.addEventListener('kts:catalog', () => { renderDetail(); });
 </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<script src="master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 원클릭 변환기 — 사진 한 장이 원본 그대로 한글·엑셀이 됩니다</title>
 <meta name="description" content="카톡·문자로 받은 견적서·거래명세표 사진을 원본 양식(병합 칸·열 너비·배경색·정렬) 그대로 한글(.hwpx)·엑셀(.xlsx)로 복제합니다. 설치 없이 브라우저에서.">
@@ -1551,6 +1552,7 @@ function aiKey(){
 }
 function updateFree(){
   const el = $('#freeN'); if (!el) return;
+  if (window.KTS_MASTER){ el.textContent = ' 무제한'; return; }   /* 대표님 마스터 모드 */
   const n = Math.min(3, quotaLeft());
   el.textContent = n > 0 ? ' ' + n + '장' : ' 오늘 마감';
 }
@@ -1660,11 +1662,13 @@ async function runPhoto(file){
   }
 }
 function quotaLeft(){
+  if (window.KTS_MASTER) return 9999;     /* 마스터 모드 — 횟수 제한 없음 */
   const k = 'kts_ai_' + new Date().toISOString().slice(0, 10);
   const n = +(localStorage.getItem(k) || 0);
   return Math.max(0, (window.KTS_AI?.dailyPerDevice || 12) - n);
 }
 function useQuota(){
+  if (window.KTS_MASTER) return;          /* 마스터 모드 — 차감하지 않음 */
   const k = 'kts_ai_' + new Date().toISOString().slice(0, 10);
   localStorage.setItem(k, String((+localStorage.getItem(k) || 0) + 1));
 }

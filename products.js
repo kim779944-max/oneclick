@@ -183,3 +183,36 @@ window.PRODUCTS = [
    how:['권역을 고릅니다.','빈 날짜를 확인하고 예약 신청합니다.'],
    notes:['제휴처 확정 전에는 판매하지 않습니다.']}
 ];
+
+/* ============================================================================
+   catalog.json 단일 목록 연동 (2026-11-18)
+   ----------------------------------------------------------------------------
+   · 위 목록은 catalog.json을 못 불러올 때(오프라인·file://) 쓰는 내장 사본입니다.
+   · 실제 서비스에서는 catalog.json 이 이깁니다. 신상품이 늘어나면
+     catalog.json 의 products 배열에 항목 1개만 추가하면 허브·마스터 쇼룸·
+     상세 페이지가 자동으로 늘어납니다.
+   ============================================================================ */
+(function(){
+  window.KTS_CATALOG = { v:'', version:'', items:(window.PRODUCTS||[]).slice(), source:'내장 목록' };
+  function apply(json){
+    if (!json || !Array.isArray(json.products) || !json.products.length) return;
+    var v = json.v || '';
+    window.PRODUCTS.length = 0;
+    json.products.forEach(function(p){
+      var o = {};
+      for (var k in p) if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k];
+      /* 최신판으로 열리게 — 목록에서 넘어갈 때 카탈로그 판번호를 붙인다 */
+      if (v && o.link && o.link.indexOf('?') < 0 && !/^https?:/.test(o.link)) o.link += '?v=' + v;
+      window.PRODUCTS.push(o);
+    });
+    window.KTS_CATALOG = { v:v, version:v, updated:json.updated||'', items:window.PRODUCTS.slice(), source:'catalog.json' };
+    try { document.dispatchEvent(new CustomEvent('kts:catalog', { detail: window.KTS_CATALOG })); } catch(e){}
+  }
+  if (typeof fetch !== 'function') return;
+  /* file:// 로 열었을 때는 fetch가 막히므로 내장 목록을 그대로 쓴다(콘솔 오류 방지) */
+  if (location && location.protocol === 'file:') return;
+  fetch('catalog.json?v=' + Date.now(), { cache:'no-store' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){ if (j) apply(j); })
+    .catch(function(){ /* 내장 목록으로 계속 */ });
+})();
