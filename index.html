@@ -123,7 +123,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .rsvTop .live{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;
   border-radius:999px;padding:4px 8px;letter-spacing:.02em}
 .rsvTop .pr{font-size:11px;font-weight:800;color:#AFBDD0}
-.rsvTop .pr s{color:#7D8CA6;margin-right:4px}
+.rsvTop .pr s{color:#8494AC;margin-right:6px;text-decoration-thickness:1.5px;text-underline-offset:2px}
 .rsvTop .pr b{color:#FF6B00;font-size:13px;font-weight:900}
 .rsv h2{margin:9px 0 0;font-size:17px;font-weight:900;letter-spacing:-.6px;line-height:1.32;word-break:keep-all}
 .rsv h2 em{font-style:normal;color:var(--amber)}
@@ -149,6 +149,16 @@ h1 em{font-style:normal;color:var(--amber)}
   text-decoration:none;border-radius:10px;padding:10px 8px;border:1px solid #2E4370;background:#12203C;color:#D9E3F0}
 .rsvDone a.go{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
 .rsv .err{margin:2px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
+.rsvShare{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.rsvShare a{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:900;
+  text-decoration:none;color:#D9E3F0;background:#12203C;border:1px solid #2E4370;border-radius:10px;padding:9px 6px;
+  letter-spacing:-.2px;text-align:center}
+.rsvShare a:active{transform:translateY(1px)}
+.rsvPrev{margin-top:9px;border:1px dashed rgba(255,167,77,.45);border-radius:11px;padding:9px 11px;
+  font-size:10.5px;line-height:1.55;color:#C7D3E3;font-weight:700;word-break:keep-all;display:none}
+.rsvPrev.on{display:block}
+.rsvPrev b{color:#FFA24D}
+.rsvPrev a{color:#FFA24D;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(255,162,77,.4)}
 </style>
 </head>
 <body>
@@ -195,6 +205,11 @@ h1 em{font-style:normal;color:var(--amber)}
         <a class="go" id="rsvSms" href="#">문자로 접수 확정</a>
         <button class="ghost" type="button" id="rsvCopy">내용 복사</button>
       </div>
+    </div>
+    <div class="rsvPrev" id="rsvPrev"></div>
+    <div class="rsvShare">
+      <a href="tickets/free_ticket_500k_share5.png" target="_blank" rel="noopener" download="KTS_무료이용권_50만원.png">무료 이용권 저장</a>
+      <a href="tickets/free_ticket_daangn_home.png" target="_blank" rel="noopener" download="KTS_당근홈피_제작권.png">홈피 제작권 저장</a>
     </div>
     <p class="fine">지금은 <b>모객 기간이라 전부 무료</b>로 열어 둡니다. 나중에 유료로 바뀌어도 기본은 열어 두고
       상위노출 같은 <b>초저가 옵션만</b> 선택제로 둡니다. 결제는 이 화면에서 하지 않습니다.</p>
@@ -374,6 +389,16 @@ document.querySelectorAll('.soonbtn').forEach(b => b.onclick = () => {
       .then(() => { const t = $('#toast'); if (t){ t.textContent='복사했습니다'; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1600);} },
             () => { const t = $('#toast'); if (t){ t.textContent='복사가 막혀 있습니다 — 길게 눌러 복사하세요'; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200);} });
   };
+
+/* 이미 접수한 분 안내(중복 신청 방지) */
+(function(){
+  const box = $('#rsvPrev'); if (!box) return;
+  let v = null; try { v = JSON.parse(localStorage.getItem('kts_rsv') || 'null'); } catch(_){}
+  if (!v || !v.no) return;
+  box.innerHTML = '이미 접수하셨어요 · <b>' + v.no + '</b> (' + (v.biz||'') + ') — 오픈 순서대로 연락드립니다. '
+    + '<a href="sms:01020022899?body=' + encodeURIComponent('[KTS 원클릭 사전예약 확인] ' + v.no + ' / ' + (v.biz||'') + ' / ' + (v.tel||'')) + '">문자 다시 보내기</a>';
+  box.classList.add('on');
+})();
 })();
 </script>
 </body>
