@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <script src="master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>원클릭 창업·대출 세무구조 사전 내비 — 순서와 통장을 먼저 봅니다</title>
+<title>원클릭 대출·자금 길라잡이 — 지금 가능한 곳과 최대 한도, 순서까지</title>
 <meta name="theme-color" content="#0A1224">
-<meta name="description" content="직장 4대보험 유지 vs 개업 순서, 자금·통장 분리(실질과세 차단), 간이/일반·개인/법인 선택 기준과 세무사 확인용 체크리스트를 미리 진단합니다.">
+<meta name="description" content="서류를 올리거나 버튼 4개만 고르면 지금 가능한 정책자금·보증 기관과 한도, 앞으로 뽑을 수 있는 최대 한도와 매출·부채 유지선, 순서 함정 경고, 1·2·3 실행 순서를 한 장으로 보여 줍니다.">
 <link rel="icon" href="icon_tax.png">
 <link rel="apple-touch-icon" href="icon_tax.png">
 <style>
@@ -18,7 +18,7 @@ html,body{margin:0;padding:0;background:#0A1224}
 body{background:radial-gradient(110% 55% at 50% -8%,#14284C 0%,transparent 62%),var(--bg);color:var(--ink);
   font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
   -webkit-font-smoothing:antialiased}
-#app{max-width:560px;margin:0 auto;padding:0 16px 46px}
+#app{max-width:560px;margin:0 auto;padding:0 16px 52px;overflow-x:hidden}
 .hd{display:flex;align-items:center;gap:9px;padding:15px 2px 12px;position:sticky;top:0;z-index:20;
   background:linear-gradient(180deg,var(--bg) 74%,rgba(10,18,36,0))}
 .hd img{width:30px;height:30px;border-radius:8px}
@@ -26,77 +26,100 @@ body{background:radial-gradient(110% 55% at 50% -8%,#14284C 0%,transparent 62%),
 .hd b span{color:var(--amber2)}
 .hd .sp{flex:1}
 .hd a{font-size:11.5px;font-weight:800;color:#9DAEC5;text-decoration:none;border:1px solid var(--line2);
-  border-radius:999px;padding:6px 10px}
-h1{font-size:24px;line-height:1.3;letter-spacing:-1px;margin:12px 0 0;font-weight:900;word-break:keep-all}
+  border-radius:999px;padding:6px 10px;white-space:nowrap}
+h1{font-size:23px;line-height:1.3;letter-spacing:-.9px;margin:10px 0 0;font-weight:900;word-break:keep-all}
 h1 em{font-style:normal;color:var(--amber)}
-.sub{font-size:13px;line-height:1.7;color:var(--ink2);margin:10px 0 0;word-break:keep-all}
+.sub{font-size:13px;line-height:1.7;color:var(--ink2);margin:9px 0 0;word-break:keep-all}
 .sub b{color:#fff}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:12px}
 .ctit{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:900;color:var(--amber2);margin-bottom:9px}
 .ctit:before{content:"";width:5px;height:5px;border-radius:99px;background:var(--amber);box-shadow:0 0 8px var(--amber)}
 .ctit .r{margin-left:auto;font-size:10.5px;color:var(--gray);font-weight:700}
-.fld{margin-bottom:10px}
-.fld label{display:block;font-size:11.5px;font-weight:800;color:var(--gray);margin-bottom:5px}
-.fld input,.fld select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line2);background:#0B1730;
-  color:#fff;font-size:14.5px;font-family:inherit}
-.fld input:focus,.fld select:focus{outline:0;border-color:var(--amber)}
-.fld .hint{font-size:10.5px;color:#7C8DA6;margin-top:4px;line-height:1.5}
-.seg{display:flex;gap:7px;margin-top:2px}
-.seg button{flex:1;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--ink2);background:#0B1730;
-  border:1px solid var(--line2);border-radius:11px;padding:11px 8px;cursor:pointer;line-height:1.35}
+.q{margin-top:13px}
+.q:first-of-type{margin-top:4px}
+.q>label{display:block;font-size:12px;font-weight:800;color:#CFDBEB;margin-bottom:6px;letter-spacing:-.2px}
+.q>label i{font-style:normal;color:var(--gray);font-weight:700;font-size:10.5px;margin-left:4px}
+.seg{display:flex;flex-wrap:wrap;gap:7px}
+.seg button{flex:1 1 calc(50% - 7px);min-width:118px;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--ink2);
+  background:#0B1730;border:1px solid var(--line2);border-radius:11px;padding:12px 8px;cursor:pointer;line-height:1.35;letter-spacing:-.3px}
 .seg button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
+.seg.wide button{flex:1 1 100%}
 .btn{display:block;width:100%;border:0;border-radius:13px;padding:15px;font-size:15px;font-weight:900;
   font-family:inherit;cursor:pointer;text-align:center;letter-spacing:-.4px}
 .btn.main{background:linear-gradient(180deg,#FF8A2B,var(--amber));color:var(--on);box-shadow:0 10px 24px rgba(255,122,26,.26)}
 .btn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line2)}
 .btn.sm{padding:11px;font-size:13px;border-radius:11px}
-.verdict{border-radius:14px;padding:14px;border:1px solid rgba(255,122,26,.45);
-  background:linear-gradient(180deg,rgba(255,122,26,.1),rgba(16,29,56,.9))}
-.verdict .vt{font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--amber2);margin-bottom:6px}
-.verdict h3{margin:0;font-size:17px;font-weight:900;letter-spacing:-.6px;line-height:1.4;color:#fff;word-break:keep-all}
-.verdict p{margin:7px 0 0;font-size:12.5px;line-height:1.68;color:var(--ink2);word-break:keep-all}
-.verdict p b{color:#fff}
-.opt{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:9px;background:#0C1730}
-.opt .oh{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.opt .oh b{font-size:13px;color:#fff;font-weight:900}
-.opt .pick{margin-left:auto;font-size:10.5px;font-weight:900;border-radius:999px;padding:3px 9px;
-  color:#0B2C1B;background:linear-gradient(90deg,#34D399,#22C55E)}
-.opt .pick.no{color:#3A2200;background:#FCD34D}
-.opt p{margin:0;font-size:12px;line-height:1.65;color:var(--ink2);word-break:keep-all}
-.opt .why{font-size:11px;color:var(--gray);margin-top:6px;line-height:1.6}
-.seq{counter-reset:s;display:grid;gap:9px}
-.seq .q{display:flex;gap:10px}
-.seq .q:before{counter-increment:s;content:counter(s);flex:0 0 auto;width:20px;height:20px;border-radius:6px;
-  background:linear-gradient(180deg,var(--amber),#E05F00);color:var(--on);font-size:11px;font-weight:900;
-  display:grid;place-items:center;margin-top:2px}
-.seq .q .c{font-size:12.5px;line-height:1.62;word-break:keep-all}
-.seq .q .c b{display:block;color:#fff}
-.seq .q .c i{display:block;font-style:normal;color:var(--gray);font-size:11px;margin-top:3px;line-height:1.5}
-.chk{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #1B2946}
-.chk:last-child{border-bottom:0}
-.chk input{width:19px;height:19px;accent-color:#FF7A1A;margin:1px 0 0;flex:0 0 auto}
-.chk .t{font-size:12.5px;line-height:1.55;color:#DDE6F3}
-.chk .t small{display:block;color:var(--gray);font-size:10.5px;margin-top:1px}
-.warnbox{border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.08);border-radius:13px;padding:13px;margin-top:10px}
+.btn[disabled]{opacity:.45}
+/* 서류 올리기 */
+.drop{border:1.5px dashed rgba(255,122,26,.5);border-radius:14px;background:rgba(255,122,26,.05);padding:16px 14px;text-align:center;cursor:pointer;display:block}
+.drop h3{margin:0 0 4px;font-size:13.5px;font-weight:900}
+.drop p{margin:0;font-size:11.5px;color:var(--ink2);line-height:1.6}
+.drop .btn2{display:inline-block;margin-top:10px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);
+  font-size:12px;font-weight:800;border-radius:10px;padding:9px 13px}
+input[type=file]{display:none}
+.filechips{display:flex;flex-wrap:wrap;gap:12px 10px;margin-top:12px}
+.fchip{position:relative;display:flex;align-items:center;gap:7px;max-width:100%;border:1px solid var(--line2);
+  border-radius:11px;background:#0C1730;padding:9px 30px 9px 10px;cursor:pointer}
+.fchip .tx{min-width:0;font-size:11px;line-height:1.35;color:var(--gray)}
+.fchip .tx b{display:block;font-size:11.5px;color:#fff;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
+.fchip .bd{position:absolute;right:-7px;top:-7px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;font-weight:900;line-height:1;border:2px solid #0A1224;background:#22C55E;color:#08240F}
+.fileline{font-size:11px;color:var(--gray);margin-top:9px;line-height:1.6}
+/* 결과 */
+.lead{border-radius:15px;padding:14px;border:1px solid rgba(255,122,26,.45);
+  background:linear-gradient(180deg,rgba(255,122,26,.12),rgba(16,29,56,.9))}
+.lead .vt{font-size:10.5px;font-weight:900;letter-spacing:.14em;color:var(--amber2);margin-bottom:5px}
+.lead h3{margin:0;font-size:17px;font-weight:900;letter-spacing:-.6px;line-height:1.42;color:#fff;word-break:keep-all}
+.lead h3 b{color:var(--amber2)}
+.lead p{margin:7px 0 0;font-size:12px;line-height:1.65;color:var(--ink2);word-break:keep-all}
+.inst{border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:9px;background:#0C1730}
+.inst:last-child{margin-bottom:0}
+.inst .ih{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.inst .nm{font-size:13.5px;font-weight:900;color:#fff}
+.inst .amt{margin-left:auto;font-size:13px;font-weight:900;color:var(--amber2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.inst .stt{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.st-go{color:#0B2C1B;background:#4ADE80}
+.st-cond{color:#3A2200;background:#FCD34D}
+.st-no{color:#3A0000;background:#FCA5A5}
+.inst .why{font-size:11.5px;color:var(--ink2);line-height:1.6;word-break:keep-all}
+.inst .lim{font-size:10.5px;color:var(--gray);margin-top:5px;line-height:1.55}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+.kpi .k{border:1px solid var(--line);border-radius:12px;background:#0C1730;padding:11px}
+.kpi .k span{display:block;font-size:10.5px;font-weight:800;color:var(--gray)}
+.kpi .k b{display:block;font-size:15px;font-weight:900;color:#fff;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.kpi .k i{display:block;font-style:normal;font-size:10px;color:var(--amber2);margin-top:3px;line-height:1.45}
+.warnbox{border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.08);border-radius:13px;padding:13px}
 .warnbox b{color:#FCA5A5;font-size:12.5px}
-.warnbox p{margin:5px 0 0;font-size:11.5px;line-height:1.65;color:#E8C9C9}
+.warnbox p{margin:6px 0 0;font-size:11.5px;line-height:1.66;color:#E8C9C9;word-break:keep-all}
+.warnbox p b{color:#FFD9D9}
+.bestbox{border:1px solid rgba(34,197,94,.4);background:rgba(34,197,94,.08);border-radius:13px;padding:13px;margin-top:10px}
+.bestbox b{color:#86EFAC;font-size:12.5px}
+.bestbox p{margin:6px 0 0;font-size:11.5px;line-height:1.66;color:#CFEFD9;word-break:keep-all}
+.steps{counter-reset:s;display:grid;gap:10px}
+.step{display:flex;gap:10px}
+.step .n{flex:0 0 auto;width:42px;height:26px;border-radius:8px;background:linear-gradient(180deg,var(--amber),#E05F00);
+  color:var(--on);font-size:11px;font-weight:900;display:grid;place-items:center;margin-top:1px;letter-spacing:-.3px}
+.step .c{font-size:12.5px;line-height:1.66;word-break:keep-all;color:#DDE6F3}
+.step .c b{display:block;color:#fff;font-weight:900;margin-bottom:2px}
+.step .c ul{margin:5px 0 0;padding-left:15px}
+.step .c li{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:2px}
+.nolist{border:1px solid rgba(239,68,68,.35);border-radius:12px;padding:11px 12px;margin-top:10px;background:rgba(239,68,68,.06)}
+.nolist b{display:block;font-size:11.5px;color:#FCA5A5;margin-bottom:4px}
+.nolist span{display:block;font-size:11.5px;color:#E8C9C9;line-height:1.6}
 .note{font-size:10.5px;color:#7C8DA6;line-height:1.62;margin-top:10px}
-.tabs{display:flex;gap:6px;margin-top:14px;overflow:auto}
-.tabs button{flex:0 0 auto;font-family:inherit;font-size:12px;font-weight:800;color:var(--gray);background:#0E1B33;
-  border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
-.tabs button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
-.sec{display:none}.sec.on{display:block}
+.badge{display:inline-block;font-size:10.5px;font-weight:900;border-radius:999px;padding:4px 9px;margin:0 5px 5px 0;
+  background:rgba(56,189,248,.16);color:#7DD3FC;border:1px solid rgba(56,189,248,.4)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(10,17,40,.97);
   border:1px solid rgba(255,122,26,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;
   opacity:0;transition:.25s;z-index:90;pointer-events:none;max-width:90vw;text-align:center}
 .toast.on{opacity:1}
-.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
-.tbl th,.tbl td{border:1px solid var(--line2);padding:7px 8px;text-align:left;vertical-align:top;line-height:1.5}
-.tbl th{background:#132244;color:#fff;font-weight:900;font-size:11px}
 @media print{
   body{background:#fff;color:#000}
-  .hd,.tabs,.btn,.no-print{display:none!important}
+  .hd,.btn,.no-print,#inBox{display:none!important}
   .card{border:1px solid #ccc;background:#fff;color:#000;page-break-inside:avoid}
+  .ctit,.inst .why,.inst .lim,.step .c,.step .c li,.lead p,.warnbox p,.bestbox p,.note,.kpi .k i{color:#111}
+  .inst,.kpi .k,.warnbox,.bestbox,.lead,.nolist{background:#fff;border-color:#bbb}
+  .inst .nm,.kpi .k b,.step .c b,.lead h3{color:#000}
   #app{padding:0}
 }
 </style>
@@ -112,79 +135,80 @@ h1 em{font-style:normal;color:var(--amber)}
     <a href="index.html">← 원클릭</a>
   </div>
 
-  <h1>돈보다 먼저,<br><em>순서와 통장</em>을 봅니다.</h1>
-  <p class="sub">창업과 대출은 금액보다 <b>순서</b>에서 갈립니다. 직장 4대보험을 언제 정리할지,
-    사업 자금과 생활 자금을 언제부터 나눌지, 간이·일반과 개인·법인을 무엇으로 고를지 —
-    세무사에게 물어볼 것을 <b>미리 정리</b>해 드립니다.</p>
+  <h1>얼마가 <em>되는지</em>보다,<br><em>어디서·어떤 순서로</em> 받는지.</h1>
+  <p class="sub">서류를 <b>올리거나 버튼 4개만</b> 고르면 —
+    지금 가능한 곳과 한도, 앞으로 뽑을 수 있는 <b>최대 한도</b>, 그 한도를 지키는 <b>매출·부채 유지선</b>,
+    순서를 잘못 잡으면 막히는 <b>함정</b>까지 한 장으로 나옵니다.</p>
 
-  <div class="tabs no-print" id="tabs">
-    <button class="on" data-s="s1">1 · 상황 넣기</button>
-    <button data-s="s2">2 · 진단 결과</button>
-    <button data-s="s3">3 · 세무사 체크리스트</button>
-  </div>
-
-  <!-- ============ 1. 상황 ============ -->
-  <section class="sec on" id="s1">
+  <!-- ============ 입력 ============ -->
+  <section id="inBox">
     <div class="card">
-      <div class="ctit">지금 상황</div>
-      <div class="fld"><label>직장 4대보험</label>
-        <div class="seg" id="segJob">
-          <button class="on" data-v="keep">다니고 있고 유지 중</button>
-          <button data-v="leave">곧 그만둘 예정</button>
-          <button data-v="none">직장 아님</button>
+      <div class="ctit">① 서류로 한 번에 <span class="r">사진 · PDF 여러 장</span></div>
+      <label class="drop" for="file">
+        <h3>재무제표 · 부가세 신고서 · 납세증명 · 매출자료</h3>
+        <p>여러 장을 한 번에 올려도 됩니다. 파일은 <b>이 기기 안</b>에서만 열립니다.</p>
+        <span class="btn2">서류 고르기</span>
+        <input id="file" type="file" accept="image/*,application/pdf" multiple>
+      </label>
+      <div class="filechips" id="fileChips"></div>
+      <div class="fileline" id="fileLine">올린 서류가 없어도 아래 버튼 4개로 바로 진단됩니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">② 버튼 4개만 고르세요 <span class="r">10초</span></div>
+
+      <div class="q">
+        <label>필요한 금액은?<i>모르면 가장 가까운 칸</i></label>
+        <div class="seg" id="segNeed">
+          <button data-v="1000" class="on">1천만 원 이하</button>
+          <button data-v="3000">3천만 원</button>
+          <button data-v="10000">1억 원</button>
+          <button data-v="30000">3억 원 이상</button>
         </div>
       </div>
-      <div class="fld"><label>사업자등록</label>
-        <div class="seg" id="segBiz">
-          <button class="on" data-v="none">아직 없음</button>
-          <button data-v="plan">곧 낼 예정</button>
-          <button data-v="yes">이미 있음</button>
+
+      <div class="q">
+        <label>지금 사업 상태는?</label>
+        <div class="seg" id="segAge">
+          <button data-v="0" class="on">아직 창업 전</button>
+          <button data-v="1">1년 미만</button>
+          <button data-v="3">1~3년</button>
+          <button data-v="5">3년 이상</button>
         </div>
       </div>
-      <div class="fld"><label>사업 형태</label>
-        <div class="seg" id="segForm">
-          <button class="on" data-v="person">개인사업자</button>
-          <button data-v="corp">법인</button>
-          <button data-v="undecided">아직 모름</button>
+
+      <div class="q">
+        <label>연매출 규모는?</label>
+        <div class="seg" id="segSales">
+          <button data-v="0" class="on">아직 없음</button>
+          <button data-v="8000">1억 미만</button>
+          <button data-v="20000">1~3억</button>
+          <button data-v="50000">3억 이상</button>
         </div>
       </div>
-      <div class="fld"><label>예상 연매출</label><input id="f_sales" inputmode="numeric" placeholder="예: 120000000">
-        <div class="hint">간이·일반 과세 판단에 쓰입니다. 모르면 월 매출 × 12로 넣으세요.</div></div>
-      <div class="fld"><label>업종</label>
-        <select id="f_sector"><option value="food">음식점·카페</option><option value="retail">도소매·온라인</option>
-          <option value="lodging">숙박·펜션</option><option value="service">서비스·교육</option>
-          <option value="manufacture">제조·가공</option><option value="construct">건설·시공</option></select>
-      </div>
-      <div class="fld"><label>대출 예정</label>
-        <div class="seg" id="segLoan">
-          <button class="on" data-v="soon">6개월 안에</button>
-          <button data-v="later">1년 이후</button>
-          <button data-v="no">없음</button>
-        </div>
-      </div>
-      <div class="fld"><label>명의</label>
-        <div class="seg" id="segName">
-          <button class="on" data-v="self">본인</button>
-          <button data-v="spouse">배우자·가족</button>
-          <button data-v="both">둘 다 검토</button>
-        </div>
-      </div>
-      <div class="fld"><label>지금 통장 상태</label>
-        <div class="seg" id="segAcct">
-          <button class="on" data-v="mixed">생활비·사업비 같이</button>
-          <button data-v="sep">이미 나눠 씀</button>
+
+      <div class="q">
+        <label>심사에서 걸리는 것<i>여러 개 선택</i></label>
+        <div class="seg" id="segRisk">
+          <button data-v="none" class="on">걸리는 것 없음</button>
+          <button data-v="tax">세금 체납</button>
+          <button data-v="credit">신용 700점 미만</button>
+          <button data-v="debt">기존 대출이 많음</button>
+          <button data-v="ins">4대보험 밀림</button>
         </div>
       </div>
     </div>
-    <button class="btn main" id="btnRun" style="margin-top:12px">진단하기</button>
-    <div class="note">이 진단은 세무 자문이 아닙니다. 결정 전 세무사 확인이 필요한 항목을 <b>빠짐없이 모아 드리는 도구</b>입니다.</div>
+
+    <button class="btn main" id="btnRun" style="margin-top:12px">지금 가능한 곳 · 최대 한도 보기</button>
+    <div class="note">이 화면은 <b>참고용 길라잡이</b>입니다. 실제 한도·금리·자격은 기관 심사와 정책 변경에 따라 달라지므로,
+      신청 전 기관 상담과 세무사 확인을 거치세요. 개인정보는 저장·전송하지 않습니다.</div>
   </section>
 
-  <!-- ============ 2. 결과 ============ -->
-  <section class="sec" id="s2">
+  <!-- ============ 결과 ============ -->
+  <section id="outBox" style="display:none">
     <div class="card">
-      <div class="verdict">
-        <div class="vt">권장 순서</div>
+      <div class="lead">
+        <div class="vt">한 줄 결론</div>
         <h3 id="vHead"></h3>
         <p id="vBody"></p>
       </div>
@@ -192,64 +216,46 @@ h1 em{font-style:normal;color:var(--amber)}
     </div>
 
     <div class="card">
-      <div class="ctit">4대보험 — 유지할까, 정리할까</div>
-      <div id="rJob"></div>
+      <div class="ctit">① 지금 가능한 곳과 한도 <span class="r">위에서부터 순서대로</span></div>
+      <div id="rNow"></div>
+      <div class="note" id="rNowNote"></div>
     </div>
 
     <div class="card">
-      <div class="ctit">통장·자금 분리 <span class="r">실질과세 차단</span></div>
-      <div id="rAcct"></div>
+      <div class="ctit">② 앞으로 뽑을 수 있는 최대 한도 <span class="r">12~24개월 목표</span></div>
+      <div class="kpi">
+        <div class="k"><span>최대 대출(보증 포함)</span><b id="kMax">-</b><i id="kMaxWhy"></i></div>
+        <div class="k"><span>지켜야 할 연매출</span><b id="kSales">-</b><i>이 선을 넘겨야 다음 단계가 열립니다</i></div>
+        <div class="k"><span>부채 상한</span><b id="kDebt">-</b><i>이 선을 넘으면 보증·정책자금이 막힙니다</i></div>
+        <div class="k"><span>부채비율 유지선</span><b id="kRatio">-</b><i>200% 이하 유지가 안전</i></div>
+      </div>
     </div>
 
     <div class="card">
-      <div class="ctit">간이 vs 일반 <span class="r">과세 유형</span></div>
-      <div class="opt"><div class="oh"><b>권장</b><div class="pick" id="pickTax">간이</div></div>
-        <p id="taxWhy"></p><div class="why" id="taxNote"></div></div>
-      <table class="tbl" style="margin-top:10px">
-        <tr><th>구분</th><th>간이과세자</th><th>일반과세자</th></tr>
-        <tr><td>세금</td><td>부가세 부담이 낮음(업종별 부가율)</td><td>매출세액 − 매입세액</td></tr>
-        <tr><td>세금계산서</td><td>발급 가능(영세율·매입세액 불공제 주의)</td><td>발급·수취 모두 자유</td></tr>
-        <tr><td>거래처</td><td>법인·큰 거래처는 기피하는 경우 있음</td><td>B2B 거래에 유리</td></tr>
-        <tr><td>전환</td><td>기준 초과 시 자동 일반 전환</td><td>유지</td></tr>
-      </table>
-      <div class="note">간이과세 기준(연매출 1억 400만 원 미만 · 2024.7.1 이후)은 개정될 수 있습니다. 신청 직전 기준을 세무사에게 확인하세요.</div>
+      <div class="ctit">③ 순서 함정 — 지금 받으면 나중에 막히는 것</div>
+      <div id="rTrap"></div>
+      <div class="bestbox">
+        <b>기업지원금(무상) 받는 방법</b>
+        <p id="rGrant"></p>
+      </div>
     </div>
 
     <div class="card">
-      <div class="ctit">개인 vs 법인 <span class="r">고르는 기준</span></div>
-      <div id="rForm"></div>
+      <div class="ctit">④ 이 순서로만 하세요 <span class="r">1 → 2 → 3</span></div>
+      <div class="steps" id="rSteps"></div>
+      <div class="nolist">
+        <b>절대 금지선</b>
+        <span id="rNo"></span>
+      </div>
     </div>
 
     <div class="card no-print">
+      <div class="ctit">보관 · 공유</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-        <button class="btn ghost sm" onclick="go('s3')">세무사 체크리스트 →</button>
-        <button class="btn ghost sm" id="btnPrint">인쇄 / PDF</button>
+        <button class="btn ghost sm" id="btnPrint">인쇄 / PDF 저장</button>
+        <button class="btn ghost sm" id="btnAgain">다시 진단</button>
       </div>
-      <div class="note">체크리스트는 그대로 인쇄해 세무사에게 보여주시면 상담이 짧아집니다.</div>
-    </div>
-    <button class="btn main" style="margin-top:10px" onclick="go('s1')">상황 바꿔 다시 진단</button>
-  </section>
-
-  <!-- ============ 3. 체크리스트 ============ -->
-  <section class="sec" id="s3">
-    <div class="card">
-      <div class="ctit">세무사에게 확인할 것 <span class="r" id="ckCount">0개</span></div>
-      <div id="rCheck"></div>
-    </div>
-    <div class="card">
-      <div class="ctit">가져갈 서류</div>
-      <div id="rDocs"></div>
-    </div>
-    <div class="card warnbox">
-      <b>선을 넘으면 안 되는 것</b>
-      <p>① 배우자·가족 명의로 사업자를 내면서 실제 운영은 내가 하는 구조 — <b>실질과세 원칙</b>으로 소득이 실제 운영자에게 과세됩니다.
-        ② 사업 자금과 생활 자금의 혼용 — 비용 인정이 막히고 대출 심사에서도 불리합니다.
-        ③ 매출을 줄여 보이거나 직원을 4대보험에서 빼는 방식 — 나중에 정산·가산세로 돌아옵니다.
-        명의·자금 구조는 <b>세무사 확인 후</b> 진행하세요.</p>
-    </div>
-    <div class="no-print" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px">
-      <button class="btn ghost sm" onclick="go('s2')">← 진단 결과</button>
-      <button class="btn ghost sm" id="btnPrint2">인쇄 / PDF</button>
+      <div class="note">인쇄하면 위 1·2·3 순서와 금지선만 종이 한 장으로 나옵니다. 상담 때 그대로 보여 주세요.</div>
     </div>
   </section>
 </div>
@@ -257,147 +263,239 @@ h1 em{font-style:normal;color:var(--amber)}
 
 <script>
 const $ = s => document.querySelector(s);
-const fmt = n => (n==null||isNaN(n)) ? '-' : n.toLocaleString('ko-KR');
-let tT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),2100); }
-function go(id){ document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on')); $('#'+id).classList.add('on');
-  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.s===id)); window.scrollTo({top:0,behavior:'smooth'}); }
-document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.s));
+const $$ = s => [...document.querySelectorAll(s)];
+const fmt = n => (n == null || isNaN(n)) ? '-' : Math.round(n).toLocaleString('ko-KR');
+const eok = n => n >= 100000000 ? (n / 100000000).toFixed(n % 100000000 === 0 ? 0 : 1) + '억' : (n >= 10000 ? Math.round(n / 10000).toLocaleString('ko-KR') + '만' : fmt(n));
+let tT; function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), 2200); }
 
-const S = {job:'keep', biz:'none', form:'person', loan:'soon', name:'self', acct:'mixed', sales:0, sector:'food'};
-[['segJob','job'],['segBiz','biz'],['segForm','form'],['segLoan','loan'],['segName','name'],['segAcct','acct']].forEach(([id,key])=>{
-  const box = $('#'+id);
+/* ---------- 입력 상태 ---------- */
+const S = {need: 1000, age: 0, sales: 0, risk: ['none']};   /* 금액 단위: 만 원 */
+[['segNeed', 'need', false], ['segAge', 'age', false], ['segSales', 'sales', false], ['segRisk', 'risk', true]].forEach(([id, key, multi]) => {
+  const box = $('#' + id);
   box.querySelectorAll('button').forEach(b => b.onclick = () => {
-    box.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); S[key] = b.dataset.v;
+    if (multi){
+      const v = b.dataset.v;
+      if (v === 'none'){ S.risk = ['none']; }
+      else {
+        S.risk = S.risk.filter(x => x !== 'none');
+        if (S.risk.includes(v)) S.risk = S.risk.filter(x => x !== v); else S.risk.push(v);
+        if (!S.risk.length) S.risk = ['none'];
+      }
+      box.querySelectorAll('button').forEach(x => x.classList.toggle('on', S.risk.includes(x.dataset.v)));
+      return;
+    }
+    box.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    S[key] = +b.dataset.v;
   });
 });
 
-const SECTOR = {food:'음식점·카페', retail:'도소매·온라인', lodging:'숙박·펜션', service:'서비스·교육',
-  manufacture:'제조·가공', construct:'건설·시공'};
-
-function run(){
-  S.sales = Number(($('#f_sales').value||'').replace(/[^\d]/g,'')) || 0;
-  S.sector = $('#f_sector').value;
-
-  /* ---- 권장 순서 ---- */
-  let head = '', body = '';
-  if (S.job === 'keep' && S.biz === 'none'){
-    head = '직장은 유지한 채로, 사업 준비를 먼저 하세요.';
-    body = '지금 4대보험을 끊으면 소득 증빙이 끊깁니다. 준비는 <b>사업자등록 전 단계</b>에서 끝내고, 매출이 안정된 뒤에 정리하세요.';
-  } else if (S.job === 'keep' && (S.biz === 'plan' || S.biz === 'yes')){
-    head = '직장 유지 + 사업자등록은 하되, 소득 증빙을 끊지 마세요.';
-    body = '겸업 구조에서는 <b>사업소득과 근로소득이 함께</b> 잡힙니다. 4대보험은 직장에서 유지하고, 사업 쪽은 지역·사업장 가입 여부를 세무사와 먼저 확정하세요.';
-  } else if (S.job === 'leave'){
-    head = '그만두기 전에 사업자등록과 첫 매출을 먼저 만드세요.';
-    body = '퇴사 후 공백이 길어지면 대출 심사에서 소득 단절로 보입니다. <b>퇴사 → 개업 순서를 뒤집어</b> 개업(또는 매출) 후 퇴사하는 편이 안전합니다.';
-  } else {
-    head = '소득 증빙을 먼저 만들고, 그다음 사업자등록입니다.';
-    body = '직장이 없으면 <b>소득 증빙</b>이 대출의 전제입니다. 사업자등록만으로는 소득이 증명되지 않습니다 — 매출·부가세 신고 이력을 먼저 쌓으세요.';
-  }
-  if (S.loan === 'soon' && S.biz === 'none'){
-    head = '대출이 6개월 안이라면, 사업자등록 시점을 조정하세요.';
-    body = '개업 직후에는 업력이 짧아 정책자금·보증 심사에서 불리합니다. <b>기존 소득 증빙을 유지</b>하면서 필요한 자금의 성격(생활/사업)을 먼저 나누세요.';
-  }
-  $('#vHead').textContent = head;
-  $('#vBody').innerHTML = body;
-  $('#vBadges').innerHTML =
-    `<span class="badge" style="display:inline-block;font-size:10.5px;font-weight:900;border-radius:999px;padding:4px 9px;margin-right:5px;background:rgba(56,189,248,.16);color:#7DD3FC;border:1px solid rgba(56,189,248,.4)">${S.job==='keep'?'직장 유지':S.job==='leave'?'퇴사 예정':'직장 없음'}</span>`
-    + `<span class="badge" style="display:inline-block;font-size:10.5px;font-weight:900;border-radius:999px;padding:4px 9px;margin-right:5px;background:rgba(198,160,84,.16);color:#E5C98E;border:1px solid rgba(198,160,84,.4)">${S.biz==='yes'?'사업자 있음':S.biz==='plan'?'등록 예정':'미등록'}</span>`
-    + `<span class="badge" style="display:inline-block;font-size:10.5px;font-weight:900;border-radius:999px;padding:4px 9px;background:rgba(255,122,26,.16);color:#FFC08A;border:1px solid rgba(255,122,26,.4)">${S.loan==='soon'?'대출 6개월 내':S.loan==='later'?'대출 1년 이후':'대출 없음'}</span>`;
-
-  /* ---- 4대보험 ---- */
-  const jobOpts = [
-    {t:'직장 4대보험 유지', pick:S.job==='keep',
-     p:'직장을 다니는 동안 사업을 준비하는 구조입니다. 소득 증빙이 끊기지 않아 대출 심사에서 가장 안전합니다.',
-     w:'대신 사업소득이 연 2,000만 원을 넘으면 건강보험료가 추가로 부과될 수 있고, 겸업 금지 조항이 있는 직장은 별도 확인이 필요합니다.'},
-    {t:'퇴사 후 개업', pick:S.job==='leave',
-     p:'퇴사 → 개업 순서입니다. 마음은 편하지만 대출 심사에서는 소득 공백이 생깁니다.',
-     w:'가능하면 <b>개업(사업자등록·첫 매출) → 퇴사</b> 순서로 바꾸세요. 공백이 3개월을 넘으면 심사가 어려워집니다.'},
-    {t:'처음부터 사업장 가입', pick:S.job==='none',
-     p:'직장이 없고 사업장을 운영하면 사업장 4대보험에 가입합니다. 직원이 없으면 지역가입자로 처리됩니다.',
-     w:'직원 1명 이상이면 사업장 가입, 없으면 지역가입자가 기본입니다. 소득이 낮게 신고되면 보험료는 줄지만 대출 소득 증빙도 함께 줄어듭니다.'}
-  ];
-  $('#rJob').innerHTML = jobOpts.map(o =>
-    `<div class="opt"><div class="oh"><b>${o.t}</b><div class="pick ${o.pick?'':'no'}">${o.pick?'권장':'대안'}</div></div>
-      <p>${o.p}</p><div class="why">${o.w}</div></div>`).join('');
-
-  /* ---- 통장 분리 ---- */
-  const acctRows = [
-    {t:'사업용 계좌를 하나만 씁니다', p:'사업자등록증으로 사업용 계좌를 만들고, 매출·매입·급여·임대료를 전부 그 계좌로 통과시키세요.',
-     w:'현금영수증·카드 매출은 자동으로 잡히지만, 계좌이체 매출은 이 계좌에 들어와야 장부가 맞습니다.'},
-    {t:'생활비는 고정 이체로만', p:'매달 정한 날에 사업 계좌 → 생활 계좌로 급여처럼 고정 이체하세요.',
-     w:'생활비를 사업 계좌에서 그때그때 빼 쓰면 비용 인정이 막히고, 대표자 가수금으로 잡혀 부채비율을 올립니다.'},
-    {t:'차명·가족 계좌 금지', p:'매출을 가족 계좌로 받으면 실질과세로 소득이 실제 귀속자에게 과세됩니다.',
-     w:'부가세 신고 누락으로 이어지면 가산세가 붙습니다. 명의 문제는 세무사 확인 후에만 진행하세요.'},
-    {t:'대출 계좌와 사업 계좌 분리', p:'대출금은 별도 계좌로 받고, 사업 계좌로 필요한 만큼만 옮기세요.',
-     w:'대출금이 사업 계좌에 섞이면 자금 용도 증빙이 흐려져 정책자금 사후 점검에서 문제가 됩니다.'}
-  ];
-  $('#rAcct').innerHTML = (S.acct === 'mixed' ? acctRows : acctRows.slice(0,1).concat([
-    {t:'지금처럼 나눠 쓰는 구조를 유지하세요', p:'이미 분리되어 있으면 사업 계좌 하나로 매출·매입을 모두 통과시키는 것만 확인하면 됩니다.', w:'고정 이체일과 금액을 정해 두면 장부가 매달 자동으로 맞습니다.'}
-  ])).map(o => `<div class="opt"><div class="oh"><b>${o.t}</b></div><p>${o.p}</p><div class="why">${o.w}</div></div>`).join('');
-
-  /* ---- 과세 유형 ---- */
-  const small = S.sales > 0 && S.sales < 1.04e8;
-  $('#pickTax').textContent = S.sales === 0 ? '모름 (매출 입력 필요)' : (small ? '간이' : '일반');
-  $('#taxWhy').innerHTML = S.sales === 0
-    ? '예상 연매출을 넣으면 간이·일반을 바로 판단합니다.'
-    : small
-      ? `예상 연매출 ${fmt(S.sales)}원은 간이과세 기준(1억 400만 원 미만) 아래입니다. 세금 부담은 낮지만 <b>매입세액 공제가 제한</b>됩니다.`
-      : `예상 연매출 ${fmt(S.sales)}원은 간이과세 기준을 넘습니다. <b>일반과세</b>로 시작하고, 매입세액(재료·임대·설비)을 반드시 챙기세요.`;
-  $('#taxNote').textContent = (S.sector === 'food' || S.sector === 'retail')
-    ? '재료·임대 매입이 큰 업종은 일반과세가 오히려 유리한 경우가 많습니다. 첫 1년은 두 가지를 비교 견적해 보세요.'
-    : '업종별 부가율이 낮은 업종은 간이가 유리합니다. 반대로 설비·재료 매입이 많으면 일반이 유리합니다.';
-
-  /* ---- 개인 vs 법인 ---- */
-  const wantCorp = S.sales >= 3e8;
-  const formRows = [
-    {t:'개인사업자', pick: S.form === 'person' || (S.form === 'undecided' && !wantCorp),
-     p:'장부·신고가 단순하고, 폐업·전환도 쉽습니다. 소규모·1인 사업의 기본값입니다.',
-     w:'이익이 커지면 세율이 빠르게 올라가고, 대외 신용·투자 유치에는 불리합니다.'},
-    {t:'법인', pick: S.form === 'corp' || (S.form === 'undecided' && wantCorp),
-     p:'법인세율이 분리되고, 거래처 신용·정책자금·M&A에서 유리합니다. 대표 급여로 소득을 조절할 수 있습니다.',
-     w:'설립·기장·결산 비용이 매년 발생하고, 법인 자금을 대표가 임의로 빼 쓰면 가지급금 문제가 생깁니다.'}
-  ];
-  $('#rForm').innerHTML = formRows.map(o =>
-    `<div class="opt"><div class="oh"><b>${o.t}</b><div class="pick ${o.pick?'':'no'}">${o.pick?'현재 기준 권장':'조건 충족 시'}</div></div>
-      <p>${o.p}</p><div class="why">${o.w}</div></div>`).join('')
-    + `<div class="note">예상 연매출 ${fmt(S.sales)}원 기준입니다. 법인 전환은 <b>이익 규모·거래처 성격·투자 유치 계획</b> 세 가지로 결정하세요.</div>`;
-
-  /* ---- 체크리스트 ---- */
-  const ck = [];
-  if (S.job === 'keep') ck.push(['겸업 금지 조항이 있는지', '근로계약서·취업규칙 확인 — 겸업이 금지면 사업자등록 전에 정리해야 합니다.']);
-  if (S.job === 'keep') ck.push(['건강보험 피부양자 자격 유지 여부', '사업소득이 연 2,000만 원을 넘으면 피부양자에서 빠질 수 있습니다.']);
-  if (S.biz !== 'yes') ck.push(['사업자등록 시점', '첫 매출 예정일 기준으로 역산해 등록일을 정합니다. 너무 이르면 신고 의무만 먼저 생깁니다.']);
-  ck.push(['업종 코드 선택', '같은 가게라도 업종코드에 따라 부가세율·허가가 달라집니다. 세무사와 코드를 확정하세요.']);
-  ck.push(['간이·일반 선택', '첫 신고 때 되돌리기 어렵습니다. 매입 구조를 보고 정하세요.']);
-  if (S.loan === 'soon') ck.push(['대출 신청 시점과 사업자등록 순서', '업력 요건(보통 3개월·6개월)이 있습니다. 개업일과 신청일을 맞춰야 합니다.']);
-  if (S.loan === 'soon') ck.push(['소득 증빙 방식', '종합소득세 신고 이력이 없으면 매출 증빙(카드·세금계산서)으로 대체해야 합니다.']);
-  if (S.name !== 'self') ck.push(['명의와 실제 운영자 일치', '배우자·가족 명의라면 실질과세·증여·4대보험 문제를 반드시 확인해야 합니다.']);
-  if (S.acct === 'mixed') ck.push(['사업용 계좌 개설', '사업자등록증으로 개설하고, 매출·매입을 전부 통과시킵니다.']);
-  ck.push(['노란우산공제·소기업 소상공인 공제', '소득공제·폐업 대비 자금입니다. 가입 시점을 첫 해에 잡으세요.']);
-  ck.push(['직원 채용 시 4대보험 취득 신고', '채용 즉시 신고입니다. 늦으면 가산세와 대출 심사 불이익이 함께 옵니다.']);
-  if (S.sector === 'food') ck.push(['위생교육·영업신고', '업종별 인허가가 사업자등록보다 먼저일 수 있습니다.']);
-  if (S.sector === 'lodging') ck.push(['숙박업 신고·소방·위생', '숙박업은 인허가가 사업자등록의 전제입니다.']);
-  if (S.sector === 'construct') ck.push(['건설업 등록·노무 구조', '건설은 노무·하도급 구조에 따라 과세와 보험이 달라집니다.']);
-
-  $('#rCheck').innerHTML = ck.map(([t,d],i) => `
-    <label class="chk"><input type="checkbox" id="ck${i}"><div class="t">${t}<small>${d}</small></div></label>`).join('');
-  $('#ckCount').textContent = ck.length + '개';
-
-  $('#rDocs').innerHTML = [
-    ['사업자등록증(또는 신청서)', '업종코드·개업일 확인'],
-    ['임대차계약서', '주소·보증금·월세 — 비용 인정의 기본'],
-    ['신분증·주민등록등본', '명의·주소 확인'],
-    ['통장 사본(사업용)', '매출·매입 통과 계좌'],
-    ['기존 소득 증빙', '원천징수영수증·종합소득세 신고서'],
-    ['인허가 서류', '영업신고·위생교육 수료증 등']
-  ].map(([a,b]) => `<div class="chk"><div class="t">${a}<small>${b}</small></div></div>`).join('');
-
-  go('s2');
+/* ---------- 서류 여러 장 (칩 · 전체 장수/용량 합산) ---------- */
+let FILES = [], FID = 0;
+const kb = n => n >= 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB';
+function drawChips(){
+  $('#fileChips').innerHTML = FILES.map(x =>
+    `<div class="fchip" data-id="${x.id}"><div class="tx"><b>${x.file.name.replace(/[<>&]/g, '')}</b>${kb(x.file.size)}</div>`
+    + `<span class="bd" data-act="del">×</span></div>`).join('');
+  const n = FILES.length, bytes = FILES.reduce((a, x) => a + x.file.size, 0);
+  $('#fileLine').textContent = n
+    ? `서류 ${n}장 · 합계 ${kb(bytes)} — 장수와 용량을 모두 합산했습니다. × 를 누르면 뺍니다.`
+    : '올린 서류가 없어도 아래 버튼 4개로 바로 진단됩니다.';
 }
-$('#btnRun').onclick = run;
+$('#file').onchange = e => {
+  [...(e.target.files || [])].forEach(f => {
+    if (FILES.some(x => x.file.name === f.name && x.file.size === f.size)) return;
+    FILES.push({id: ++FID, file: f});
+  });
+  e.target.value = '';
+  drawChips();
+  if (FILES.length) toast(`서류 ${FILES.length}장을 받았습니다`);
+};
+$('#fileChips').onclick = e => {
+  const chip = e.target.closest('.fchip'); if (!chip) return;
+  FILES = FILES.filter(x => x.id !== +chip.dataset.id);
+  drawChips();
+};
+
+/* ---------- 계산 ---------- */
+function calc(){
+  const need = S.need * 10000;                  /* 원 */
+  const sales = S.sales * 10000;
+  const age = S.age;                            /* 업력(년) */
+  const R = S.risk;
+  const noStart = age === 0;
+  const passed = {
+    tax: !R.includes('tax'),
+    credit: !R.includes('credit'),
+    debt: !R.includes('debt'),
+    ins: !R.includes('ins')
+  };
+
+  /* 기관별 오늘 가능 여부 */
+  const now = [];
+  const push = (nm, ok, amt, why, lim) => now.push({nm, ok, amt, why, lim});
+
+  /* 소상공인시장진흥공단 — 소상공인 정책자금 */
+  {
+    const ok = !noStart && sales < 1200000000 && passed.tax && !passed.debt;
+    let amt = ok ? Math.min(70000000, Math.max(10000000, sales * 0.25)) : 0;
+    if (!passed.tax) amt = 0;
+    push('소상공인시장진흥공단 (소진공)', ok ? 'go' : 'no',
+      amt,
+      ok ? '소상공인 정책자금(일반경영안정·성장기반)은 <b>세금 체납이 없고 기대출이 적을 때</b> 가장 먼저 열립니다.'
+         : (!passed.tax ? '국세·지방세 체납이 있으면 접수 단계에서 막힙니다. 완납 또는 분납 약정이 먼저입니다.'
+                        : (noStart ? '사업자등록 전에는 신청 자체가 안 됩니다. 등록 후 업력이 쌓여야 합니다.'
+                                   : '기존 대출·보증 잔액이 많으면 한도가 거의 남지 않습니다.')),
+      '업력·매출·업종별 한도가 다르고, 접수 기간이 정해져 있습니다.');
+  }
+  /* 중소벤처기업진흥공단 — 시설·운전자금 */
+  {
+    const ok = !noStart && age >= 1 && passed.tax;
+    const amt = ok ? Math.min(300000000, Math.max(30000000, sales * 0.4)) : 0;
+    push('중소벤처기업진흥공단 (중진공)', ok ? (age >= 3 ? 'go' : 'cond') : 'no', amt,
+      ok ? (age >= 3 ? '업력 3년 이상이면 <b>운전자금</b>까지 문이 열립니다. 시설자금은 담보·사업성 심사가 붙습니다.'
+                     : '업력 3년 미만은 <b>창업기반지원</b> 쪽으로만 접수됩니다. 금액은 작지만 신용 이력이 쌓입니다.')
+         : (!passed.tax ? '체납이 있으면 정책자금 심사에서 즉시 걸립니다.' : '사업자등록 전에는 신청할 수 없습니다.'),
+      '제조·수출 기업이 유리하고, 서비스업은 한도가 낮게 잡힙니다.');
+  }
+  /* 신용보증기금 — 보증서 대출 */
+  {
+    const ok = !noStart && passed.tax && !passed.credit;
+    const amt = ok ? Math.min(200000000, Math.max(20000000, sales * 0.35)) : 0;
+    push('신용보증기금 (신보)', ok ? (passed.debt ? 'cond' : 'go') : 'no', amt,
+      ok ? (passed.debt ? '기존 보증 잔액이 있어 <b>남은 한도</b>만 계산됩니다. 먼저 잔액을 확인하세요.'
+                        : '매출과 부채비율이 기준 안에 있으면 <b>보증서 → 은행 대출</b>로 이어집니다.')
+         : (!passed.credit ? '대표자 신용점수가 700점 미만이면 보증 심사가 어렵습니다.'
+                           : '체납이 있으면 보증 심사에서 결격입니다.'),
+      '보증은 <b>총액 기준</b>입니다. 이미 받은 보증이 있으면 그만큼 차감됩니다.');
+  }
+  /* 기술보증기금 — 기술·특허 기반 */
+  {
+    const ok = !noStart && age >= 1 && passed.tax;
+    const amt = ok ? Math.min(150000000, Math.max(10000000, sales * 0.2)) : 0;
+    push('기술보증기금 (기보)', ok ? 'cond' : 'no', amt,
+      ok ? '특허·기술·개발 이력이 있으면 <b>담보 없이</b> 평가받는 길이 있습니다. 없으면 신보 쪽이 빠릅니다.'
+         : '사업자등록 전이거나 체납이 있으면 접수되지 않습니다.',
+      '기술평가 등급이 낮으면 한도가 급격히 줄어듭니다.');
+  }
+  /* 은행 */
+  {
+    const ok = !passed.credit || sales >= 300000000;
+    const amt = ok ? Math.min(100000000, Math.max(5000000, sales * 0.15 + (passed.credit ? 10000000 : 0))) : 0;
+    push('시중은행 (신용·담보대출)', ok ? (passed.credit ? 'go' : 'cond') : 'no', amt,
+      ok ? (passed.credit ? '4대보험·매출 이력이 있으면 은행 자체 신용대출도 함께 비교하세요. 금리는 보증대출보다 높습니다.'
+                          : '신용점수가 낮으면 은행 단독 대출은 어렵고, <b>보증서를 붙이는 방식</b>으로만 가능합니다.')
+         : '연체·체납이 있으면 은행 신용대출은 사실상 닫힙니다.',
+      '금리는 보증서 유무로 크게 갈립니다. 같은 한도라도 보증대출이 유리합니다.');
+  }
+
+  const available = now.filter(x => x.ok !== 'no' && x.amt > 0);
+  const sumNow = available.reduce((a, x) => a + x.amt, 0);
+  /* 지금 한 곳만 고르면: 가장 큰 단일 한도 */
+  const topNow = available.slice().sort((a, b) => b.amt - a.amt)[0] || null;
+
+  /* 최대 한도 — 목표 매출·부채 상한 */
+  const targetSales = Math.max(sales * 1.5, need * 4, 100000000);
+  const debtCap = Math.round(targetSales * 1.2);          /* 부채비율 200% 이내에서 여유 */
+  const maxLoan = Math.round(Math.min(targetSales * 0.8, debtCap * 0.55));
+
+  /* 순서 함정 */
+  const traps = [];
+  if (!passed.credit && !noStart) traps.push('<b>신용점수를 올리기 전에 은행 신용대출부터 받으면</b> — 보증기관(신보·기보) 심사에서 "이미 은행에서 받은 대출"이 부채로 잡혀 한도가 줄고, 이후 정책자금도 함께 막힙니다. 신용은 <b>대출을 받기 전에</b> 올려야 합니다.');
+  if (need * 10000 > 50000000) traps.push('<b>소액을 먼저 받고 나중에 큰 정책자금을 받으려 하면</b> — 같은 기관에서 받은 대출은 잔액으로 남아 <b>총 한도</b>에서 차감됩니다. 필요한 금액이 정해져 있으면 <b>한 번에 큰 문(정책자금·보증)</b>으로 가는 편이 낫습니다.');
+  traps.push('<b>기업지원금(무상)을 나중에 신청하려면</b> — 사업자등록 이후 <b>부채비율·매출·고용</b>을 함께 봅니다. 지금 대출을 받아 부채비율이 200%를 넘으면 지원금 심사에서 감점됩니다. <b>지원금 → 보증 → 은행</b> 순서가 안전합니다.');
+  if (passed.debt) traps.push('<b>기존 보증을 갚지 않고 새 보증을 신청하면</b> — 보증은 총액 기준이라 남은 한도가 0에 가깝습니다. 상환 후 신청하면 한도가 다시 열립니다.');
+  if (R.includes('ins')) traps.push('<b>4대보험 밀린 금액이 있으면</b> — 정책자금·보증 심사에서 "성실 납부" 항목이 감점됩니다. 밀린 보험료는 지원금 심사에도 그대로 잡힙니다.');
+
+  /* 지원금(무상) */
+  const grant = noStart
+    ? '아직 사업자등록 전이라면 <b>예비창업패키지·초기창업패키지</b> 계열이 문입니다. 사업계획서 1장과 견적서(시설·장비)를 준비해 공고 기간에 맞춰 접수하세요. 접수는 보통 1년에 1~2회, 기간이 짧습니다.'
+    : '지금은 <b>소상공인 지원사업(경영개선·시설개선·디지털 전환)</b>과 지자체 지원사업을 함께 보세요. 대부분 <b>세금 체납 없음 · 부채비율 200% 이하 · 매출 규모</b>를 봅니다. 무상 지원금은 <b>대출과 달리 갚지 않아도 되므로 가장 먼저</b> 신청하고, 그다음 보증·대출 순서로 가야 합니다.';
+
+  const steps = [
+    {n: '1 먼저', t: '통장과 체납부터 정리', li: [
+      '사업용 통장 1개로 매출·매입을 모두 통과시키기 (생활비는 고정 이체로만)',
+      '국세·지방세 체납 확인 → 완납 또는 분납 약정',
+      '4대보험 밀린 금액 정리 (건강보험·국민연금 포함)',
+      '기존 대출·보증 잔액을 종이에 적어 두기 (총액 기준으로 한도가 줄어듭니다)'
+    ]},
+    {n: '2 같이', t: '지원금과 보증을 동시에 접수', li: [
+      '기업지원금(무상) 공고 확인 → 사업계획서·견적서 준비',
+      '소진공 정책자금 접수 일정 확인 → 온라인 접수',
+      '신보·기보 보증 상담은 지원금 접수와 <b>같은 시기</b>에 (순서가 꼬이면 한도가 줄어듭니다)'
+    ]},
+    {n: '3 나중', t: '신용 올리고 마지막에 은행', li: [
+      '공과금(전기·통신·건강보험) 자동이체로 연체 0건 만들기',
+      'NICE·KCB 신용올리기 신청 (공과금 납부 실적 반영)',
+      '부채확인서(전 금융기관 대출 조회)로 실제 부채 확인',
+      '위 3개가 끝난 뒤에 은행 신용·담보대출 비교'
+    ]}
+  ];
+
+  /* 결과 문구 */
+  const head = available.length
+    ? (topNow ? `지금은 <b>${topNow.nm.split(' ')[0]}</b> 쪽이 가장 현실적이고, 확인된 한도는 <b>약 ${eok(topNow.amt)}원</b>입니다.` : '지금 바로 신청 가능한 곳이 있습니다.')
+    : '지금은 <b>바로 신청할 곳이 없습니다.</b> 3번(신용·체납 정리)을 먼저 하면 3~6개월 안에 문이 열립니다.';
+  const body = available.length
+    ? `한 곳만 고르면 ${eok(topNow.amt)}원, <b>여러 기관을 조합하면 최대 ${eok(sumNow)}원</b>까지 가능성이 있습니다. 단, 동시에 받으면 총 부채로 잡히므로 <b>지원금 → 보증 → 은행</b> 순서를 지키세요. 앞으로 목표는 <b>${eok(maxLoan)}원</b>입니다.`
+    : `체납·신용·기대출 중 걸리는 것을 먼저 풀어야 합니다. 지금 대출을 급히 받으면 이후 지원금·보증이 막히니, 아래 1·2·3 순서대로 3~6개월만 정리하세요. 목표 한도는 <b>${eok(maxLoan)}원</b>입니다.`;
+
+  return {now, available, sumNow, topNow, maxLoan, targetSales, debtCap, traps, grant, steps, head, body, noStart, passed};
+}
+
+/* ---------- 출력 ---------- */
+function render(){
+  const r = calc();
+  $('#vHead').innerHTML = r.head;
+  $('#vBody').innerHTML = r.body;
+  const riskTxt = {none: '걸리는 것 없음', tax: '체납', credit: '신용 700↓', debt: '기대출 많음', ins: '4대보험 밀림'};
+  $('#vBadges').innerHTML =
+    `<span class="badge">필요 ${eok(S.need * 10000)}원</span>`
+    + `<span class="badge">${S.age === 0 ? '창업 전' : '업력 ' + S.age + '년'}</span>`
+    + `<span class="badge">${S.sales ? '연매출 ' + eok(S.sales * 10000) : '매출 없음'}</span>`
+    + S.risk.map(x => `<span class="badge" style="background:rgba(239,68,68,.14);color:#FCA5A5;border-color:rgba(239,68,68,.4)">${riskTxt[x] || x}</span>`).join('');
+
+  $('#rNow').innerHTML = r.now.map(x => {
+    const cls = x.ok === 'go' ? 'st-go' : (x.ok === 'cond' ? 'st-cond' : 'st-no');
+    const tag = x.ok === 'go' ? '지금 가능' : (x.ok === 'cond' ? '조건 충족 시' : '지금 불가');
+    return `<div class="inst"><div class="ih"><span class="nm">${x.nm}</span><span class="stt ${cls}">${tag}</span>`
+      + `<span class="amt">${x.amt ? '최대 ' + eok(x.amt) + '원' : '한도 없음'}</span></div>`
+      + `<div class="why">${x.why}</div><div class="lim">${x.lim}</div></div>`;
+  }).join('');
+  $('#rNowNote').innerHTML = r.available.length
+    ? `합계 <b>${eok(r.sumNow)}원</b>은 기관별 한도를 단순 합산한 값입니다. 실제로는 <b>총 부채·보증 잔액</b> 기준으로 깎이므로, 한 곳씩 순서대로 받는 편이 안전합니다.`
+    : '지금은 한도가 0에 가깝습니다. 아래 1·2·3 순서를 3~6개월 지키면 다시 계산해 드립니다.';
+
+  $('#kMax').textContent = eok(r.maxLoan) + '원';
+  $('#kMaxWhy').textContent = `매출 ${eok(r.targetSales)}원 · 부채 ${eok(r.debtCap)}원 기준`;
+  $('#kSales').textContent = eok(r.targetSales) + '원';
+  $('#kDebt').textContent = eok(r.debtCap) + '원';
+  $('#kRatio').textContent = '200% 이하';
+
+  $('#rTrap').innerHTML = r.traps.map(t => `<div class="warnbox" style="margin-bottom:9px"><p style="margin:0">${t}</p></div>`).join('');
+  $('#rGrant').innerHTML = r.grant;
+
+  $('#rSteps').innerHTML = r.steps.map(s =>
+    `<div class="step"><div class="n">${s.n}</div><div class="c"><b>${s.t}</b><ul>${s.li.map(x => '<li>' + x + '</li>').join('')}</ul></div></div>`).join('');
+
+  const no = [];
+  no.push('부채비율 200% 넘기기 — 보증·정책자금·지원금이 한꺼번에 막힙니다.');
+  no.push('카드·대출 연체 만들기 — 6개월은 기록이 남아 신용대출이 닫힙니다.');
+  no.push('공과금(전기·통신·건강보험) 연체 — 신용평가에 그대로 반영됩니다.');
+  no.push('생활비를 사업 계좌에서 그때그때 빼 쓰기 — 비용 인정이 막히고 부채비율이 올라갑니다.');
+  no.push('지원금 신청 전에 은행 대출부터 받기 — 총 부채로 잡혀 지원금 심사에서 감점됩니다.');
+  $('#rNo').innerHTML = no.map(x => '· ' + x).join('<br>');
+
+  /* 진단서 저장 (이 기기) */
+  try{ localStorage.setItem('kts_tax_last', JSON.stringify({t: Date.now(), need: S.need, age: S.age, sales: S.sales, risk: S.risk, files: FILES.length})); }catch(e){}
+
+  $('#inBox').style.display = 'none';
+  $('#outBox').style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+$('#btnRun').onclick = render;
 $('#btnPrint').onclick = () => window.print();
-$('#btnPrint2').onclick = () => window.print();
+$('#btnAgain').onclick = () => { $('#outBox').style.display = 'none'; $('#inBox').style.display = 'block'; window.scrollTo({top: 0, behavior: 'smooth'}); };
+drawChips();
 </script>
 </body>
 </html>

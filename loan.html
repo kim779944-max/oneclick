@@ -37,7 +37,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .ctit{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:900;color:var(--amber2);margin-bottom:9px}
 .ctit:before{content:"";width:5px;height:5px;border-radius:99px;background:var(--amber);box-shadow:0 0 8px var(--amber)}
 .ctit .r{margin-left:auto;font-size:10.5px;color:var(--gray);font-weight:700}
-.drop{border:1.5px dashed rgba(255,122,26,.5);border-radius:14px;background:rgba(255,122,26,.05);padding:18px 14px;text-align:center}
+.drop{border:1.5px dashed rgba(255,122,26,.5);border-radius:14px;background:rgba(255,122,26,.05);padding:18px 14px;text-align:center;display:block;cursor:pointer}
 .drop h3{margin:0 0 4px;font-size:14px;font-weight:900}
 .drop p{margin:0;font-size:11.5px;color:var(--ink2);line-height:1.6}
 .drop input{display:none}
@@ -49,9 +49,24 @@ h1 em{font-style:normal;color:var(--amber)}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .btn2{display:inline-block;border:1px solid var(--line2);background:var(--card2);color:var(--ink);font-family:inherit;
   font-size:12px;font-weight:800;border-radius:10px;padding:9px 12px;cursor:pointer;text-decoration:none}
-.preview{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0B1730}
-.preview img{display:block;width:100%;height:auto}
+.preview{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0B1730;max-height:360px;display:flex;align-items:flex-start;justify-content:center}
+.preview img{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;object-position:top}
 .preview iframe{display:block;width:100%;height:300px;border:0;background:#fff}
+/* 여러 장 올린 서류 — 칩 목록 (선택 ✓ · 삭제 × 배지는 오른쪽 위 모서리 고정) */
+.filechips{display:flex;flex-wrap:wrap;gap:12px 10px;margin-top:12px}
+.fchip{position:relative;display:flex;align-items:center;gap:7px;max-width:100%;
+  border:1px solid var(--line2);border-radius:11px;background:#0C1730;padding:9px 30px 9px 10px;cursor:pointer}
+.fchip.on{border-color:var(--amber);background:rgba(255,122,26,.12)}
+.fchip .th{width:34px;height:34px;border-radius:7px;overflow:hidden;flex:0 0 auto;background:#12203C;display:grid;place-items:center;font-size:15px}
+.fchip .th img{width:100%;height:100%;object-fit:cover;display:block}
+.fchip .tx{min-width:0;font-size:11.5px;line-height:1.35;color:var(--ink2)}
+.fchip .tx b{display:block;font-size:12px;color:#fff;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.fchip .bd{position:absolute;right:-7px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;font-weight:900;line-height:1;border:2px solid #0A1224;cursor:pointer}
+.fchip .bd.ok{top:-7px;background:#22C55E;color:#08240F}
+.fchip .bd.ok.off{background:#334867;color:#9FB0C8}
+.fchip .bd.del{top:16px;background:#EF4444;color:#fff}
+.fchip .bd.del:hover{filter:brightness(1.1)}
 .filemeta{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:11.5px;color:var(--ink2)}
 .filemeta b{color:#fff;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -146,12 +161,14 @@ h1 em{font-style:normal;color:var(--amber)}
         <h3>대차대조표 · 손익계산서</h3>
         <p>사진을 찍거나 PDF를 고르세요. 파일은 <b>이 기기 안에서만</b> 열립니다.</p>
         <div style="margin-top:11px"><span class="btn2">파일 고르기</span></div>
-        <input id="file" type="file" accept="image/*,application/pdf">
+        <input id="file" type="file" accept="image/*,application/pdf" multiple>
       </label>
       <div class="filemeta" id="fileMeta" style="display:none"><b id="fileName">-</b><span id="fileSize"></span></div>
+      <div class="filechips" id="fileChips"></div>
       <div class="preview" id="preview" style="display:none"></div>
-      <div class="note">사진 글자를 자동으로 읽어 숫자를 채우는 기능은 <b>AI 키를 넣었을 때만</b> 동작합니다.
-        지금은 화면에 띄워 놓고 아래 칸에 옮겨 적으시면 됩니다 — 8칸이면 끝납니다.</div>
+      <div class="note">서류는 <b>여러 장을 한 번에</b> 올릴 수 있습니다(대차대조표·손익계산서·부가세 신고서 등).
+        올린 장수·용량이 합산되고, 칩을 누르면 선택(✓), 오른쪽 위 × 를 누르면 뺍니다.
+        사진 글자를 자동으로 읽어 숫자를 채우는 기능은 <b>AI 키를 넣었을 때만</b> 동작합니다.</div>
     </div>
 
     <div class="card">
@@ -258,27 +275,64 @@ function go(id){ document.querySelectorAll('.sec').forEach(s=>s.classList.remove
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.s===id)); window.scrollTo({top:0,behavior:'smooth'}); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.s));
 
-/* ---------- 파일 미리보기 ---------- */
-let FILE = null;
-$('#file').onchange = e => {
-  const f = e.target.files[0]; if (!f) return;
-  FILE = f;
-  $('#fileMeta').style.display = 'flex';
-  $('#fileName').textContent = f.name;
-  $('#fileSize').textContent = Math.round(f.size/1024) + 'KB';
-  const box = $('#preview'); box.style.display = 'block'; box.innerHTML = '';
-  if (/^image\//.test(f.type)){
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(f); img.alt = '재무제표 미리보기';
-    box.appendChild(img);
-  } else if (/pdf$/i.test(f.type) || /\.pdf$/i.test(f.name)){
-    const fr = document.createElement('iframe');
-    fr.src = URL.createObjectURL(f); fr.title = '재무제표 PDF';
-    box.appendChild(fr);
-  } else {
-    box.innerHTML = '<div style="padding:14px;font-size:12px;color:#AFBDD0">미리보기를 지원하지 않는 형식입니다. 숫자는 아래에 직접 넣어 주세요.</div>';
+/* ---------- 파일 여러 장 — 전체 순회 합산 · 칩 목록 ---------- */
+let FILES = [];              /* {id, file, on, url} */
+let FID = 0;
+function kb(n){ return n >= 1048576 ? (n/1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n/1024)) + 'KB'; }
+function isPdf(f){ return /pdf$/i.test(f.type || '') || /\.pdf$/i.test(f.name || ''); }
+function totalBytes(){ return FILES.reduce((a, x) => a + (x.on ? x.file.size : 0), 0); }
+function syncMeta(){
+  const m = $('#fileMeta'), on = FILES.filter(x => x.on);
+  if (!on.length){ m.style.display = 'none'; $('#preview').style.display = 'none'; return; }
+  m.style.display = 'flex';
+  $('#fileName').textContent = FILES.length === 1 ? on[0].file.name : `서류 ${on.length}장 선택`;
+  $('#fileSize').textContent = `${kb(totalBytes())} 합계 · 전체 ${FILES.length}장`;
+}
+function drawChips(){
+  const box = $('#fileChips');
+  box.innerHTML = FILES.map(x => {
+    const thumb = x.on && /^image\//.test(x.file.type)
+      ? `<img src="${x.url}" alt="">` : (isPdf(x.file) ? 'PDF' : '파일');
+    return `<div class="fchip${x.on ? ' on' : ''}" data-id="${x.id}">`
+      + `<div class="th">${thumb}</div>`
+      + `<div class="tx"><b>${x.file.name.replace(/[<>&]/g, '')}</b>${kb(x.file.size)}</div>`
+      + `<span class="bd ok${x.on ? '' : ' off'}" data-act="sel">✓</span>`
+      + `<span class="bd del" data-act="del">×</span>`
+      + `</div>`;
+  }).join('');
+  /* 선택된 장 가운데 첫 사진 1장만 미리보기로 (PDF는 칩으로만) */
+  const first = FILES.find(x => x.on && /^image\//.test(x.file.type));
+  const pv = $('#preview');
+  if (first){ pv.style.display = 'block'; pv.innerHTML = `<img src="${first.url}" alt="재무제표 미리보기">`; }
+  else {
+    const pdf = FILES.find(x => x.on && isPdf(x.file));
+    if (pdf){ pv.style.display = 'block'; pv.innerHTML = '<div style="padding:12px 14px;font-size:12px;color:#AFBDD0">PDF ' + FILES.filter(x => x.on && isPdf(x.file)).length + '장이 선택되어 있습니다. 아래 칸에 숫자를 옮겨 적어 주세요.</div>'; }
+    else pv.style.display = 'none';
   }
-};
+  syncMeta();
+}
+function addFiles(list){
+  [...list].forEach(f => {
+    if (FILES.some(x => x.file.name === f.name && x.file.size === f.size)) return;   /* 같은 파일 중복 방지 */
+    const id = ++FID;
+    FILES.push({id, file: f, on: true, url: /^image\//.test(f.type) ? URL.createObjectURL(f) : ''});
+  });
+  drawChips();
+}
+$('#file').onchange = e => { addFiles(e.target.files || []); e.target.value = ''; };
+$('#fileChips').addEventListener('click', e => {
+  const chip = e.target.closest('.fchip'); if (!chip) return;
+  const it = FILES.find(x => x.id === +chip.dataset.id); if (!it) return;
+  const badge = e.target.closest('.bd');
+  if (badge && badge.dataset.act === 'del'){
+    FILES = FILES.filter(x => x !== it);
+    if (it.url) URL.revokeObjectURL(it.url);
+    if (!FILES.length) $('#file').value = '';
+    drawChips(); toast('서류 1장을 뺐습니다'); return;
+  }
+  it.on = !it.on;                       /* 칩을 누르면 선택 / 해제(✓) */
+  drawChips();
+});
 /* 예시 값: 미사 상권 식당 (연매출 3.6억, 부채 1.9억) */
 $('#btnDemo').onclick = () => {
   const v = {f_asset:'320000000', f_liab:'190000000', f_equity:'', f_sales:'360000000',
@@ -311,7 +365,9 @@ function readInput(){
     sector: $('#f_sector').value,
     delay: $('#c_delay').checked, badCredit: $('#c_bad').checked,
     drop: $('#c_drop').checked, guar: $('#c_guar').checked,
-    fileName: FILE ? FILE.name : ''
+    fileName: FILES.filter(x => x.on).map(x => x.file.name).join(' · '),
+    fileCount: FILES.filter(x => x.on).length,
+    fileBytes: totalBytes()
   };
 }
 function ratios(d){

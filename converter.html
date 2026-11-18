@@ -84,11 +84,18 @@ textarea{width:100%;min-height:92px;margin-top:8px;background:#0B1729;border:1px
 #pvWrap{padding:10px 10px 96px;overflow:auto;-webkit-overflow-scrolling:touch}
 .pvbox{background:#fff;border-radius:8px;padding:8px;box-shadow:0 8px 22px rgba(0,0,0,.4)}
 .pvbox .ptitle{font-size:13px;font-weight:900;color:#111;text-align:center;margin:2px 0 6px;letter-spacing:1px}
-table.pv{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9px;color:#000;background:#fff}
+/* ===== A4 판박이 (210×297mm · 1:1.414) — 794×1123px 실제 용지 비율로 깔고 화면 폭에 맞춰 축소 ===== */
+.a4fit{position:relative;width:100%;overflow:hidden;background:#fff;border-radius:6px}
+.a4{position:relative;width:794px;height:1123px;background:#fff;transform-origin:top left}
+.a4 .a4in{position:absolute;left:14.3%;right:14.3%;top:6.7%;bottom:6.7%;overflow:hidden;box-sizing:border-box}
+.a4 .a4tag{position:absolute;left:0;top:-9px;font-size:9px;color:#9aa7b8;letter-spacing:.02em;z-index:2}
+.a4:before{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px #E4E9F1}
+table.pv{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt;color:#000;background:#fff}
 #pvWrap{overflow:auto}
 body.has-badge .dock{bottom:78px}
-table.pv td{border:1px solid #333;padding:2px 3px;vertical-align:middle;overflow-wrap:anywhere;line-height:1.25}
+table.pv td{border:1px solid #333;padding:1px 2px;vertical-align:middle;overflow-wrap:anywhere;line-height:1.22}
 table.pv td.b{font-weight:900}
+table.pv td[data-cell]:focus{outline:2px solid #FF6B00;outline-offset:-2px;background:#FFF7ED}
 .pvnote{font-size:10px;color:#7C8DA6;text-align:center;margin:7px 0 0}
 .sharebar{position:fixed;left:12px;right:12px;bottom:96px;display:flex;align-items:center;gap:8px;z-index:60;
   background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);border-radius:14px;padding:10px 12px;
@@ -102,7 +109,7 @@ table.pv td.b{font-weight:900}
   border:1px solid var(--line2);border-radius:9px;padding:7px 10px;cursor:pointer}
 .ptool.on{color:#0A1224;background:linear-gradient(180deg,#FF8A2B,#FF6B00);border-color:#FF6B00}
 .ptip{font-size:10px;color:#7C8DA6;line-height:1.4;flex:1;min-width:110px}
-.paperin{position:relative;padding:6.7% 14.3%;background:#fff;border-radius:6px}
+.paperin{position:relative;padding:0;background:#fff}
 .paperin .a4tag{position:absolute;top:4px;left:8px;font-size:8px;color:#9aa7b8;letter-spacing:.04em}
 table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 /* 문서 전체 미리보기(배너·문단·작은 표) */
@@ -143,6 +150,38 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 /* 결과 전체창 */
 #res{display:none}
 #res .rbody{padding:8px 8px 96px;overflow:auto}
+/* ---------- 상단 고정 바(뒤로·전환) + 확대/축소·전체폭·출력 고정 ---------- */
+.wtop{position:sticky;top:0;z-index:32;background:rgba(10,17,40,.97);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.wtop .wbar{position:static;background:none;border:0;padding:8px 12px 4px}
+.wtop .wr1{display:flex;align-items:center;gap:8px;width:100%}
+.sw{display:flex;background:#0B1729;border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px;flex:0 0 auto}
+.sw button{font-size:10.5px;font-weight:900;color:#94A3B8;border-radius:999px;padding:5px 9px;cursor:pointer;white-space:nowrap}
+.sw button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
+.wtools{display:flex;gap:6px;align-items:center;padding:0 12px 8px}
+.wtools button{flex:1;font-size:11.5px;font-weight:900;color:#DCE6F2;background:#12203C;border:1px solid var(--line2);border-radius:9px;padding:8px 2px;cursor:pointer;white-space:nowrap}
+.wtools button:active{transform:scale(.98)}
+.wtools .zt{flex:0 0 auto;font-size:10.5px;font-weight:900;color:var(--amber2);min-width:34px;text-align:right}
+.pvblank{border:0;background:transparent}
+#work .pvblank{outline:1px dashed #E3E9F2;outline-offset:-1px}
+.resume{display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,107,0,.45);
+  background:linear-gradient(100deg,rgba(255,107,0,.14),rgba(255,255,255,.02) 70%)}
+.resume .t{flex:1;min-width:0}
+.resume .t b{display:block;font-size:12.5px;font-weight:900;color:#fff}
+.resume .t span{display:block;font-size:10.5px;color:#AFBDD0;margin-top:2px}
+.resume button{flex:0 0 auto;font-size:11.5px;font-weight:900;border-radius:9px;padding:9px 11px;border:1px solid rgba(255,107,0,.55);background:rgba(255,107,0,.16);color:#FFC08A;cursor:pointer}
+.resume button.x{border-color:var(--line2);background:#12203C;color:#9DAEC5;padding:7px 9px}
+@media print{
+  header.top,.ktsRsv,.wtop,.pvtools,.dock,.pvnote,.src,.fontrow,#home,#busy,.toast,.sharebar,.upgcard,.blurbox,.resume{display:none!important}
+  body{background:#fff}
+  #app{max-width:none;box-shadow:none;background:#fff}
+  #work,#res{display:block!important}
+  #pvWrap,#res .rbody{padding:0;overflow:visible}
+  .pvbox{box-shadow:none;padding:0}
+  .a4fit{overflow:visible!important;height:auto!important}
+  .a4{transform:none!important;width:210mm;height:297mm;page-break-after:always}
+  .a4 .a4tag{display:none}
+  @page{size:A4;margin:0}
+}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:70;background:rgba(255,107,0,.96);color:#0A1224;
  font-size:12.5px;font-weight:900;border-radius:10px;padding:10px 14px;box-shadow:0 10px 26px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;max-width:86vw;text-align:center}
 .toast.on{opacity:1}
@@ -208,13 +247,22 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
     <div class="note" style="margin-top:6px">· 사진은 기기 안에서만 처리됩니다<br>· 100% 똑같이 나오지 않으면 다시 찍거나 붙여넣기<br>· 표 밖 내용은 복제하지 않습니다</div>
   </div>
 
+  <div class="resume" id="resumeCard" style="display:none">
+    <div class="t"><b>마지막 변환 결과가 남아 있습니다</b><span id="resumeMeta">-</span></div>
+    <button type="button" id="resumeOpen">이어 보기</button>
+    <button type="button" class="x" id="resumeDel" title="지우기">✕</button>
+  </div>
+
   <div class="card" id="planCard">
-    <h2><i>2</i>요금제 (7단)</h2>
+    <h2><i>2</i>요금제 (1탄 · 2탄 · 장당)</h2>
     <div class="pseg" id="pseg">
       <button class="on" data-p="p">개인용</button>
       <button data-p="b">기업용 B2B</button>
     </div>
     <div id="planP">
+      <div class="pl rec"><span class="led"><i></i>1탄</span><div><div class="nm">더뷰 — 원본 판박이로 열람 + 파일 받기</div><div class="ds">기업 기준가 <s>150,000원</s> → 무료 체험 후 <b>월 1,000원</b></div></div><div class="pr">월 1,000원</div></div>
+      <div class="pl"><div><div class="nm">2탄 — 그 자리에서 글자·칸 수정 저장</div><div class="ds">기업 기준가 <s>300,000원</s> → <b>월 1,500원</b> · 문서(.hwp·.xlsx) 또는 그림(.png·.jpg)</div></div><div class="pr">월 1,500원</div></div>
+      <div class="ds" style="font-size:10.5px;color:#8FA0B8;margin:8px 0 2px;line-height:1.6">이용자가 충분히 쌓이면 할인 폭을 단계적으로 조정하고, <b style="color:#FFC08A">그 전까지는 기한 없이 이 가격</b>으로 유지합니다.</div>
       <div class="pl"><div><div class="nm">3장 무료</div><div class="ds">먼저 써 보고 결정</div></div><div class="pr">0원</div></div>
       <div class="pl rec"><span class="led"><i></i>추천</span><div><div class="nm">13장</div><div class="ds">한 번에 13장 변환</div></div><div class="pr">4,900원</div></div>
       <div class="pl"><div><div class="nm">30장</div><div class="ds">월말 정산·거래명세서 모음</div></div><div class="pr">6,900원</div></div>
@@ -256,9 +304,21 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 
 <!-- ===== 작업 화면(변환 전 확인·수정) ===== -->
 <section id="work">
-  <div class="wbar">
-    <button class="back" id="btnBack">← 뒤로가기</button>
-    <div class="nm" id="wName">표 변환</div>
+  <div class="wtop">
+    <div class="wbar">
+      <div class="wr1">
+        <button class="back" id="btnBack">← 뒤로가기</button>
+        <div class="nm" id="wName">표 변환</div>
+        <div class="sw" id="swConv"><button class="on" data-v="conv">변환기</button><button data-v="view">더뷰</button></div>
+      </div>
+    </div>
+    <div class="wtools">
+      <button type="button" id="btnZoomOut">축소</button>
+      <button type="button" id="btnZoomIn">확대</button>
+      <button type="button" id="btnFit">전체폭 맞춤</button>
+      <button type="button" id="btnPrintOut">출력 · 저장</button>
+      <span class="zt" id="zoomTag">100%</span>
+    </div>
   </div>
   <div class="blurbox" id="blurBox" style="display:none">
     <b>표가 흐립니다</b>
@@ -296,7 +356,6 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
       <span class="ptip" id="pickTip">칸을 먼저 누르고, 사진에서 색을 눌러 주세요</span>
     </div>
     <div class="pvbox"><div class="paperin">
-      <div class="a4tag">A4 210×297mm · 원본 여백 유지</div>
       <div class="ptitle" id="pvTitle"></div><div id="pvTable"></div>
     </div></div>
     <div class="pvnote">위 화면은 저장될 파일 내용 그대로입니다 · 글자를 누르면 고칠 수 있습니다</div>
@@ -304,14 +363,27 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
   <div class="dock"><div class="dockin">
     <button class="btn pri" id="btnHwpx">한글 저장</button>
     <button class="btn sec" id="btnXlsx">엑셀 저장</button>
+    <button class="btn sec" id="btnWorkView">더뷰로</button>
   </div></div>
 </section>
 
 <!-- ===== 결과 전체창 ===== -->
 <section id="res">
-  <div class="wbar">
-    <button class="back" id="btnResBack">← 뒤로가기</button>
-    <div class="nm" id="rName">결과</div>
+  <div class="wtop">
+    <div class="wbar">
+      <div class="wr1">
+        <button class="back" id="btnResBack">← 뒤로가기</button>
+        <div class="nm" id="rName">결과</div>
+        <div class="sw" id="swRes"><button class="on" data-v="conv">변환기</button><button data-v="view">더뷰</button></div>
+      </div>
+    </div>
+    <div class="wtools">
+      <button type="button" id="btnZoomOut2">축소</button>
+      <button type="button" id="btnZoomIn2">확대</button>
+      <button type="button" id="btnFit2">전체폭 맞춤</button>
+      <button type="button" id="btnPrintOut2">출력 · 저장</button>
+      <span class="zt" id="zoomTag2">100%</span>
+    </div>
   </div>
   <div class="rbody"><div class="pvbox"><div class="ptitle" id="rTitle"></div><div id="rTable"></div></div>
     <div class="pvnote" id="rNote"></div>
@@ -387,16 +459,22 @@ const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견�
 
 {"blocks":[블록, 블록, ...]}
 
-블록은 두 종류입니다.
+블록은 세 종류입니다.
 1) 표 블록
-{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+ "rowHeights":[각 행 높이 %, 정수, 합 100],
  "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
 2) 글 블록(제목 배너·문단·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
-{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,
+{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,
  "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
+3) 빈 자리 블록(직인·도장·QR·로고·사진처럼 글자가 아닌 것)
+{"t":"blank","y":위쪽위치%,"h":높이%,"label":"직인 또는 로고"}
 
 규칙:
-- x, w는 종이(문서 본문) 전체 너비를 100으로 본 가로 위치·너비입니다. 가운데 놓인 것은 좌우 여백이 같게.
+- x, w, y, h는 종이(문서 본문) 전체를 100으로 본 비율입니다. y는 종이 맨 위에서부터의 위치입니다. 가운데 놓인 것은 좌우 여백이 같게.
+- 위→아래 순서대로 블록을 적으세요. y·h를 적으면 그 위치와 크기 그대로 A4 한 장에 되살립니다(사진 편집기처럼).
+- 표의 h는 그 표 전체 높이(%), rowHeights는 표 안에서 각 행이 차지하는 비율입니다. 사진에서줄 간격을 보고 적으세요.
+- 직인·도장·QR·로고는 글자로 지어내지 말고 3) empty 자리 블록으로 높이만 남기세요(원래 위치 그대로).
 - 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0.
 - 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
 - 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
@@ -529,6 +607,15 @@ function normalize(raw, preview){
   const tot2 = cw.reduce((a, b) => a + b, 0) || 1;
   cw = cw.map(w => Math.round(w / tot2 * 1000) / 10);
   const st = {title:String(raw.title || '').trim(), nRows, nCols, colWidths:cw, cells:out, preview};
+  /* 원본에서 읽은 표 높이·행 높이(있을 때만) — A4 위에 원래 위치·비율로 되살리는 데 쓴다 */
+  if (Array.isArray(raw.rowHeights) && raw.rowHeights.length){
+    const rh = raw.rowHeights.slice(0, nRows).map(x => Math.max(0.5, +x || 0));
+    while (rh.length < nRows) rh.push(rh[rh.length - 1] || 1);
+    const s0 = rh.reduce((a, b) => a + b, 0) || 1;
+    st.rowHeights = rh.map(x => Math.round(x / s0 * 1000) / 10);
+  }
+  if (isFinite(+raw.h) && +raw.h > 0) st.h = Math.min(100, +raw.h);
+  if (isFinite(+raw.y) && +raw.y >= 0) st.y = Math.min(100, +raw.y);
   /* 실제 글자 폭(9pt)으로 다시 한 번 맞춤 — 미리보기·한글·엑셀이 같은 너비를 쓰게 */
   if (raw.lockWidths) st.lockWidths = true;   /* 사진에서 읽은 원본 열 너비를 그대로 고정 */
   else { try{ st.colWidths = fitColWidths(st, 41952); }catch(e){} }
@@ -578,8 +665,12 @@ function docFromRaw(raw, preview){
     if (t === 'table'){
       if (!isTbl(b)) continue;
       const p = placeXW(b);
-      if (b === main){ st = normalize(b, preview); doc.push({t:'table', main:true, x:p.x, w:p.w}); }
-      else doc.push({t:'table', x:p.x, w:p.w, tbl:normalize(Object.assign({}, b, {lockWidths:true}), '')});
+      if (b === main){ st = normalize(b, preview); doc.push({t:'table', main:true, x:p.x, w:p.w, y:st.y, h:st.h}); }
+      else doc.push({t:'table', x:p.x, w:p.w, y:(isFinite(+b.y) ? +b.y : undefined), h:(isFinite(+b.h) ? +b.h : undefined), tbl:normalize(Object.assign({}, b, {lockWidths:true}), '')});
+    } else if (t === 'blank'){
+      /* 직인·도장·QR 자리 — 글자 대신 빈 자리만 원래 높이대로 남긴다 */
+      const hh = Math.max(2, Math.min(40, +b.h || 6));
+      doc.push({t:'blank', y:(isFinite(+b.y) ? +b.y : undefined), h:hh, label:String(b.label || '')});
     } else if (t === 'text'){
       let runs = normRuns(b.runs);
       if ((!runs || !runs.length) && b.text) runs = [{text:String(b.text), b:!!+b.bold, color:normHex(b.color), hl:'', ul:''}];
@@ -588,7 +679,8 @@ function docFromRaw(raw, preview){
       const al = String(b.align || 'L').toUpperCase().charAt(0);
       const p = placeXW(b);
       if (runs.length) textN++;
-      doc.push({t:'text', runs, align:al === 'C' ? 'C' : (al === 'R' ? 'R' : 'L'), size, bg:normHex(b.bg), x:p.x, w:p.w});
+      doc.push({t:'text', runs, align:al === 'C' ? 'C' : (al === 'R' ? 'R' : 'L'), size, bg:normHex(b.bg), x:p.x, w:p.w,
+        y:(isFinite(+b.y) ? +b.y : undefined), h:(isFinite(+b.h) ? +b.h : undefined)});
     }
   }
   if (!st){
@@ -628,14 +720,49 @@ function structFromText(txt){
   return normalize({title:'', nRows:rows.length, nCols, colWidths:Array.from({length:nCols}, () => Math.round(100 / nCols)), cells}, '');
 }
 
-/* ================= 미리보기 렌더 ================= */
+/* ================= 미리보기 렌더 — A4 판박이(794×1123px · 210×297mm) ================= */
+const PW = 794, PH = 1123;          /* A4 실제 픽셀(96dpi) */
+const PBODY = {l: 0.143, t: 0.067};  /* 여백: 좌우 30mm · 위아래 20mm */
+let ZOOM = 1;                        /* 화면 배율만 바꾼다(종이는 그대로) */
+function a4Wrap(inner){ return '<div class="a4fit"><div class="a4"><span class="a4tag">A4 210×297mm · 원본 좌표·폰트 크기 그대로</span><div class="a4in">' + inner + '</div></div></div>'; }
+function applyPageFit(){
+  document.querySelectorAll('.a4fit').forEach(fit => {
+    const page = fit.querySelector('.a4'); if (!page) return;
+    const w = fit.clientWidth || (fit.parentElement ? fit.parentElement.clientWidth : 0) || 340;
+    const s = (w / PW) * ZOOM;
+    page.style.transform = 'scale(' + s + ')';
+    fit.style.height = Math.round(PH * s) + 'px';
+    fit.style.overflowX = ZOOM > 1.001 ? 'auto' : 'hidden';
+  });
+}
+/* 내용이 A4 한 장을 넘으면 1장 안에 들어가게 줄인다 — 두 장으로 늘어나지 않게 */
+function fitInner(scope){
+  scope.querySelectorAll('.a4in').forEach(inner => {
+    inner.style.transform = 'none'; inner.style.right = ''; inner.style.bottom = ''; inner.style.width = ''; inner.style.height = '';
+    const cw = inner.clientWidth, ch = inner.clientHeight, sh = inner.scrollHeight;
+    if (ch > 0 && sh > ch + 1){
+      const k = Math.max(0.5, ch / sh);
+      inner.style.transformOrigin = 'top left';
+      inner.style.transform = 'scale(' + k.toFixed(4) + ')';
+      inner.style.width = Math.round(cw / k) + 'px';
+      inner.style.right = 'auto';
+      inner.style.height = Math.round(ch / k) + 'px';
+      inner.style.bottom = 'auto';
+      inner.dataset.shrunk = String(Math.round(k * 100));
+    } else { delete inner.dataset.shrunk; }
+  });
+}
 function renderPreview(host, st, editable){
   const byKey = {}; st.cells.forEach(c => byKey[c.r + ',' + c.c] = c);
   const occ = Array.from({length: st.nRows}, () => new Array(st.nCols).fill(false));
-  const fs = st.nCols >= 8 ? 8.6 : (st.nCols >= 6 ? 9.1 : 9.5);
-  let html = '<table class="pv" style="font-size:' + fs + 'px;min-width:' + Math.max(100, st.nCols * 9) + '%"><colgroup>' + st.colWidths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
+  /* 원본 글자 크기 기준: 폰트는 pt로 — A4 폭에 그대로 찍힌다(줄어도 비율 유지) */
+  const fs = st.nCols >= 8 ? '8pt' : (st.nCols >= 6 ? '8.5pt' : '9pt');
+  const tableH = st.h ? (PH * st.h / 100) : 0;
+  const rh = Array.isArray(st.rowHeights) && st.rowHeights.length === st.nRows ? st.rowHeights : null;
+  let html = '<table class="pv" style="font-size:' + fs + '">' + '<colgroup>' + st.colWidths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
   for (let r = 0; r < st.nRows; r++){
-    html += '<tr>';
+    const hpx = rh && tableH ? Math.max(10, Math.round(tableH * rh[r] / 100)) : 0;
+    html += '<tr' + (hpx ? ' style="height:' + hpx + 'px"' : '') + '>';
     for (let c = 0; c < st.nCols; c++){
       if (occ[r][c]) continue;
       const cell = byKey[r + ',' + c] || {r, c, rs:1, cs:1, text:'', align:'C'};
@@ -650,7 +777,9 @@ function renderPreview(host, st, editable){
     }
     html += '</tr>';
   }
-  host.innerHTML = wrapDoc(st, html + '</table>', editable, fs);
+  html += '</table>';
+  host.innerHTML = a4Wrap(wrapDoc(st, html, editable, fs));
+  fitInner(host); applyPageFit();
   if (editable && st.doc) bindDocEdit(host, st);
   if (editable){
     host.querySelectorAll('td[contenteditable][data-k]').forEach(td => {
@@ -695,9 +824,12 @@ function runsHtml(runs, bi){
 function subTableHtml(t, bi, editable, fs){
   const byKey = {}; t.cells.forEach(c => byKey[c.r + ',' + c.c] = c);
   const occ = Array.from({length: t.nRows}, () => new Array(t.nCols).fill(false));
-  let h = `<table class="pv sub" style="font-size:${fs}px"><colgroup>` + t.colWidths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
+  const tableH = t.h ? (PH * t.h / 100) : 0;
+  const rh = Array.isArray(t.rowHeights) && t.rowHeights.length === t.nRows ? t.rowHeights : null;
+  let h = `<table class="pv sub" style="font-size:${fs}"><colgroup>` + t.colWidths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
   for (let r = 0; r < t.nRows; r++){
-    h += '<tr>';
+    const hpx = rh && tableH ? Math.max(8, Math.round(tableH * rh[r] / 100)) : 0;
+    h += '<tr' + (hpx ? ' style="height:' + hpx + 'px"' : '') + '>';
     for (let c = 0; c < t.nCols; c++){
       if (occ[r][c]) continue;
       const cell = byKey[r + ',' + c] || {rs:1, cs:1, text:'', align:'C'};
@@ -712,20 +844,29 @@ function subTableHtml(t, bi, editable, fs){
   }
   return h + '</table>';
 }
+/* 문서 전체: 위→아래 순서를 지키고, AI가 준 y(위치%)·h(높이%)로 원본 여백까지 살린다 */
 function wrapDoc(st, mainHtml, editable, fs){
-  if (!st.doc) return mainHtml;
-  let h = '';
+  if (!st.doc) return '<div class="pvtxt" style="text-align:center;font-size:14pt;font-weight:900;margin:0 0 6px">' + escH(st.title || '') + '</div>' + mainHtml;
+  let h = '', prev = 0;
   st.doc.forEach((b, bi) => {
-    const box = `margin:0 0 0 ${b.x || 0}%;width:${b.w || 100}%`;
+    let mt = 0;
+    if (typeof b.y === 'number' && isFinite(b.y)){
+      mt = Math.round(Math.max(0, (b.y - prev) / 100 * PH));
+      if (mt > 90) mt = 90;                 /* 읽기 오차로 구멍이 커지지 않게 */
+      prev = Math.max(prev, b.y + (+b.h || 0));
+    }
+    const box = `margin-top:${mt}px`;
     if (b.t === 'table'){
       if (b.main){ if (!st._noMain) h += `<div class="pvblk" style="${box}">${mainHtml}</div>`; }
       else h += `<div class="pvblk" style="${box}">${subTableHtml(b.tbl, bi, editable, fs)}</div>`;
+    } else if (b.t === 'blank'){
+      const hp = Math.max(8, Math.round((+b.h || 4) / 100 * PH));
+      h += `<div class="pvblk pvblank" style="${box};height:${hp}px"></div>`;
     } else if (b.t === 'text'){
       const al = b.align === 'C' ? 'center' : (b.align === 'R' ? 'right' : 'left');
-      const sz = Math.round(b.size * fs / 9 * 10) / 10;
-      const bg = b.bg ? `background:${b.bg};padding:.35em .4em;` : '';
+      const bg = b.bg ? `background:${b.bg};padding:.25em .35em;` : '';
       const ed = editable ? ' contenteditable="true"' : '';
-      h += `<div class="pvtxt" style="${box};${bg}text-align:${al};font-size:${sz}px"${ed} data-blk="${bi}">${b.runs.length ? runsHtml(b.runs, bi) : '&nbsp;'}</div>`;
+      h += `<div class="pvtxt" style="${box};${bg}text-align:${al};font-size:${(+b.size || 10)}pt"${ed} data-blk="${bi}">${b.runs.length ? runsHtml(b.runs, bi) : '&nbsp;'}</div>`;
     }
   });
   return h;
@@ -1261,6 +1402,26 @@ function fitColWidths(st, totalW){
   return pct.map(x => Math.max(1, Math.round(x * 10) / 10));
 }
 /* 행 높이 — 그 행에서 몇 줄까지 꾼이는지 계산해 1줄은 1:1로 유지 */
+/* 원본 사진에서 읽은 표 높이·행 비율이 있으면 그 비율을 우선한다(위치·간격 복제) */
+function propRowH(tst, r, pageH){
+  if (!tst || !tst.h || !Array.isArray(tst.rowHeights) || !tst.rowHeights.length) return 0;
+  const rh = tst.rowHeights[r]; if (!rh) return 0;
+  return Math.round(pageH * (tst.h / 100) * (rh / 100));
+}
+/* A4 한 장 넘김 방지 — 행 높이만 비율로 줄여 한 장에 맞춘다(글자 크기는 그대로) */
+function fitRowsOnePage(items, limit){
+  const est = () => items.reduce((a, it) => a + (it.kind === 'tbl'
+    ? it.rowH.reduce((x, y) => x + y, 0)
+    : Math.round((+it.b.size || 10) * 100) * 1.7 + 500), 0);
+  let guard = 0;
+  while (est() > limit && guard < 24){
+    const k = Math.max(0.5, limit / est());
+    if (k >= 0.999) break;
+    items.forEach(it => { if (it.kind === 'tbl') it.rowH = it.rowH.map(h => Math.max(600, Math.round(h * k))); });
+    guard++;
+  }
+  return guard;
+}
 function rowLines(st, r, widths, totalW){
   let maxLines = 1;
   st.cells.forEach(c => {
@@ -1303,9 +1464,14 @@ async function buildHwpx(st){
   const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {bgs, chars, aligns});
   const chGet = (b, color, h) => H.chId[(b ? 1 : 0) + '|' + (color || '') + '|' + (h || 900)] || 0;
   const titleChar = H.chId['1|#111111|1100'];
-  const rowH = (r) => { const n = rowLines(st, r, widths, totalW); return n <= 1 ? 1150 : (n * 1100 + 300); };
+  const baseRowH = (r) => { const n = rowLines(st, r, widths, totalW); let h = n <= 1 ? 1150 : (n * 1100 + 300);
+    const p = propRowH(st, r, 84188); if (p) h = Math.max(h, Math.min(p, h * 4)); return h; };
   st._rowLines = [];
   for (let r = 0; r < st.nRows; r++) st._rowLines.push(rowLines(st, r, widths, totalW));
+  /* A4 한 장(본문 높이 73,000)을 넘으면 행 높이만 비율로 줄인다 — 2장으로 늘어나지 않게 */
+  let base = 0; for (let r = 0; r < st.nRows; r++) base += baseRowH(r);
+  const RK = base > 73000 ? Math.max(0.5, 73000 / base) : 1;
+  const rowH = (r) => Math.max(600, Math.round(baseRowH(r) * RK));
   let totalH = 0; for (let r = 0; r < st.nRows; r++) totalH += rowH(r);
   let body = '', pid = 200;
   if (st.title){
@@ -1447,9 +1613,12 @@ async function buildHwpxDoc(st){
       tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hMax = Math.max(hMax, c._h || 900); });
       let h = n <= 1 ? 1150 : (n * 1100 + 300);
       if (hMax > 900) h = Math.max(h, n * Math.round(hMax * 1.35) + (tst._banner ? 900 : 400));
+      const p = propRowH(tst, r, 84188); if (p) h = Math.max(h, Math.min(p, h * 4));
       it.rowH.push(h);
     }
   });
+  /* A4 한 장에 들어가게 행 높이를 맞춘다(본문 여백 20+15mm 뺀 높이 73,000) */
+  fitRowsOnePage(items, 73000);
   const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
   const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {
     bgs:[...new Set(need.bgs)], nbBgs:[...new Set(need.nbBgs)], chars:need.chars, aligns:[...new Set(need.aligns)]});
@@ -1673,10 +1842,11 @@ function useQuota(){
   localStorage.setItem(k, String((+localStorage.getItem(k) || 0) + 1));
 }
 
-function openWork(){
+function openWork(quiet){
   $('#home').style.display = 'none';
   $('#res').style.display = 'none';
   $('#work').style.display = 'block';
+  if (!quiet) pushHist('work');
   $('#wName').textContent = CUR_NAME;
   const dc = CUR.doc ? docCounts(CUR) : null;
   $('#srcTitle').textContent = dc ? ('문서 전체를 읽었습니다 · 표 ' + dc.tables + '개 · 글 ' + dc.texts + '덩이') : ('표를 읽었습니다 · ' + CUR.nRows + '행 × ' + CUR.nCols + '열');
@@ -1688,9 +1858,10 @@ function openWork(){
   if (CUR.preview){ img.src = CUR.preview; img.style.display = ''; } else { img.style.display = 'none'; }
   renderPreview($('#pvTable'), CUR, true);
   $('#pvTitle').textContent = CUR.title || '';
+  setZoom(ZOOM);
   window.scrollTo(0, 0);
 }
-$('#btnBack').onclick = () => { $('#work').style.display = 'none'; $('#home').style.display = 'block'; window.scrollTo(0, 0); };
+$('#btnBack').onclick = () => goBackStep(showHome);
 
 async function buildAndShow(autoSave){
   if (!CUR) return;
@@ -1705,6 +1876,9 @@ async function buildAndShow(autoSave){
     $('#home').style.display = 'none';
     $('#work').style.display = 'none';
     $('#res').style.display = 'block';
+    pushHist('res');
+    saveLast();
+    setZoom(ZOOM);
     $('#rName').textContent = CUR_NAME;
     $('#rTitle').textContent = CUR.title || '';
     renderPreview($('#rTable'), CUR, false);
@@ -1794,13 +1968,11 @@ function showShareBar(kind){
   setTimeout(() => bar.remove(), 20000);
 }
 $('#btnResBack').onclick = () => {
-  $('#res').style.display = 'none';
-  if (CUR){ openWork(); } else { $('#home').style.display = 'block'; }
+  goBackStep(() => { $('#res').style.display = 'none'; if (CUR){ openWork(true); } else { showHome(); } });
 };
 { const _ba = $('#btnAgain'); if (_ba) _ba.onclick = () => {
   CUR = null; LAST = {hwpx:null, xlsx:null};
-  $('#res').style.display = 'none'; $('#work').style.display = 'none'; $('#home').style.display = 'block';
-  $('#file').value = ''; window.scrollTo(0, 0);
+  showHome(); $('#file').value = ''; ZOOM = 1; setZoom(1);
 }; }
 /* 뷰어로 바로 열기 — 만든 파일을 기기 안 저장소(IndexedDB)에 넣고 뷰어에 넘긴다 */
 $('#btnRHwpx').onclick = () => saveOne('hwpx');
@@ -1829,6 +2001,73 @@ function idbPut(blob, name){
     };
   });
 }
+/* ================= 상단 전환 스위치 · 확대/축소 · 출력 · 뒤로가기 안전복귀 ================= */
+function setZoom(z){
+  ZOOM = Math.max(0.6, Math.min(2.4, Math.round(z * 100) / 100));
+  applyPageFit();
+  $$('.zt').forEach(e => e.textContent = Math.round(ZOOM * 100) + '%');
+}
+function bindViewTools(){
+  const pairs = [['#btnZoomOut', -1], ['#btnZoomIn', 1], ['#btnZoomOut2', -1], ['#btnZoomIn2', 1]];
+  pairs.forEach(([sel, d]) => { const b = $(sel); if (b) b.onclick = () => setZoom(ZOOM + d * 0.2); });
+  ['#btnFit', '#btnFit2'].forEach(sel => { const b = $(sel); if (b) b.onclick = () => { setZoom(1); toast('전체 폭에 맞췄습니다 · A4 한 장 기준'); }; });
+  ['#btnPrintOut', '#btnPrintOut2'].forEach(sel => { const b = $(sel); if (b) b.onclick = () => doPrintPage(); });
+  $$('.sw button[data-v="view"]').forEach(b => b.onclick = () => { location.href = 'viewer.html'; });
+  $('#btnWorkView').onclick = () => { location.href = 'viewer.html'; };
+}
+function doPrintPage(){
+  if (!CUR) return toast('먼저 사진을 변환해 주세요');
+  if (CUR._dirty) rebuildFiles().catch(() => {});
+  toast('인쇄 창에서 [PDF로 저장]을 고르면 A4 한 장으로 저장됩니다');
+  setTimeout(() => window.print(), 120);
+}
+/* 뒤로가기(popstate) — 폰의 < 버튼으로 창이 꺼지지 않고 직전 화면으로 돌아간다 */
+function showHome(){
+  $('#work').style.display = 'none'; $('#res').style.display = 'none'; $('#home').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+function pushHist(k){ try{ if (history.state && history.state.k === k) return; history.pushState({k: k}, '', k === 'home' ? location.pathname : location.pathname + '#' + k); }catch(e){} }
+function goBackStep(fallback){
+  if (history.state && history.state.k && history.state.k !== 'home'){ history.back(); }
+  else if (fallback) fallback();
+}
+window.addEventListener('popstate', e => {
+  const k = (e.state && e.state.k) || 'home';
+  if (k === 'res' && CUR){ $('#home').style.display = 'none'; $('#work').style.display = 'none'; $('#res').style.display = 'block'; renderPreview($('#rTable'), CUR, false); }
+  else if (k === 'work' && CUR){ openWork(true); }
+  else showHome();
+});
+window.addEventListener('resize', () => { applyPageFit(); });
+
+/* 마지막 변환 결과 임시 저장 — 사진을 다시 찍지 않고 이어서 본다 */
+const LASTKEY = 'kts_last_conv';
+function saveLast(){
+  if (!CUR) return;
+  try{
+    const st = JSON.parse(JSON.stringify({title: CUR.title, nRows: CUR.nRows, nCols: CUR.nCols, colWidths: CUR.colWidths, cells: CUR.cells,
+      doc: CUR.doc, h: CUR.h, y: CUR.y, rowHeights: CUR.rowHeights, _noMain: !!CUR._noMain, lockWidths: !!CUR.lockWidths}));
+    localStorage.setItem(LASTKEY, JSON.stringify({t: Date.now(), name: CUR_NAME, engine: CUR._engine || '', st}));
+    paintResume();
+  }catch(e){ console.warn('last save fail', e); }
+}
+function readLast(){ try{ return JSON.parse(localStorage.getItem(LASTKEY) || 'null'); }catch(e){ return null; } }
+function paintResume(){
+  const card = $('#resumeCard'); if (!card) return;
+  const r = readLast(); if (!r || !r.st){ card.style.display = 'none'; return; }
+  const d = new Date(r.t), p2 = n => (n < 10 ? '0' : '') + n;
+  card.style.display = 'flex';
+  $('#resumeMeta').textContent = (r.name || '변환 결과') + ' · ' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ' · A4 한 장';
+}
+$('#resumeOpen').onclick = () => {
+  const r = readLast(); if (!r || !r.st) return;
+  CUR = Object.assign({}, r.st, {cells: r.st.cells || [], doc: r.st.doc}); CUR_NAME = r.name || '변환 결과';
+  openWork(true);
+  toast('마지막 결과를 열었습니다 · 글자를 눌러 고칠 수 있습니다');
+  buildAndShow(true).catch(() => {});
+};
+$('#resumeDel').onclick = () => { try{ localStorage.removeItem(LASTKEY); }catch(e){} paintResume(); toast('저장된 결과를 지났습니다'); };
+bindViewTools(); paintResume();
+
 (function(){ function s(){ const b = document.querySelector('ship-page-badge'); document.body.classList.toggle('has-badge', !!(b && b.getBoundingClientRect().height > 0)); } s(); setInterval(s, 1200); })();
 </script>
 </body></html>

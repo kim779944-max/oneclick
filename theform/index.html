@@ -68,6 +68,13 @@ main{padding:12px 14px 120px}
 .tools{display:flex;gap:6px;margin-top:8px}
 .tools button{flex:1;font-size:13px;font-weight:900;border-radius:10px;padding:10px 4px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
 .tools button.pl{font-size:18px;color:var(--amber2)}
+.tools button.pl.txt{flex:1.3;font-size:13px;font-weight:900;color:#FFC9C9;border-color:rgba(239,68,68,.55);background:rgba(239,68,68,.14)}
+.delbox{position:absolute;z-index:6;font-family:inherit;font-size:11px;font-weight:900;color:#fff;background:#EF4444;
+  border:0;border-radius:6px;padding:4px 9px;box-shadow:0 4px 10px rgba(0,0,0,.35);cursor:pointer;letter-spacing:-.2px}
+.delbox:active{transform:scale(.96)}
+.microw{display:flex;gap:7px;margin-top:8px}.microw>*{flex:1}
+#voiceBtn.on{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
+#fillInfo{font-size:10.5px;color:var(--gray);margin-top:6px;line-height:1.55}
 .seg{display:flex;gap:4px;background:#0B1729;border:1px solid var(--line);border-radius:10px;padding:3px;margin-top:6px}
 .seg button{flex:1;font-size:12px;font-weight:900;color:#94A3B8;border-radius:8px;padding:8px 4px}
 .seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
@@ -147,7 +154,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
   <h2><span class="n">2</span>채울 자리 찍기</h2>
   <p class="sub" id="s2tip">미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.</p>
   <div class="tools">
-   <button class="pl" id="addF" title="칸 추가">+</button><button class="pl" id="delF" title="칸 삭제">−</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
+   <button class="pl" id="addF" title="칸 추가">+</button><button class="pl txt" id="delF" title="칸 삭제">칸 삭제</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
   </div>
   <div class="stage" id="edStage"></div>
   <div id="fEdit" style="display:none">
@@ -173,9 +180,12 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 <section class="scr" id="s3">
  <div class="card">
   <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
-  <p class="sub">입력한 값은 이 기기에 자동 저장됩니다. 칸을 누른 뒤 음성으로도 넣을 수 있습니다.</p>
-  <div class="row"><button class="btn sec sm" id="voiceBtn">음성 메모로 넣기</button><button class="btn sec sm" id="handBtn">손글씨 사진 읽기</button></div>
+  <p class="sub">칸을 누르고 <b style="color:#FFC08A">마이크</b>에 대고 말하면 그 칸에 그대로 들어갑니다. 명함·사업자등록증·신분증·메모지 사진으로 한 번에 채울 수도 있습니다.</p>
+  <div class="microw"><button class="btn sec sm" id="voiceBtn">🎤 말해서 넣기</button><button class="btn sec sm" id="photoFill">사진으로 자동 채우기</button></div>
+  <div class="microw"><button class="btn sec sm" id="handBtn">손글씨 사진 읽기</button></div>
   <input type="file" id="handIn" accept="image/*" hidden>
+  <input type="file" id="photoIn2" accept="image/*" hidden>
+  <div id="fillInfo">사진 자동 채우기: AI 열쇠가 있으면 정확하게, 없으면 기기 안 무료 글자 인식으로 읽습니다.</div>
   <div id="valList"></div>
   <div class="row"><button class="btn sec sm" id="clearVals">값 모두 지우기</button><button class="btn sec sm" id="sampleVals">예시 값 넣기</button></div>
  </div>
@@ -1533,6 +1543,19 @@ function drawEditor(){
     d.innerHTML = `<span>${escH(f.label)} · ${TYPE_NM[f.type]}</span><i class="hd2"></i>`;
     st.appendChild(d);
   });
+  /* 잘못 만든 칸을 누르면 박스 바로 위에 [삭제] 버튼이 즉시 뜬다 */
+  const sel = CUR.fields[SEL];
+  if (sel && !ro()){
+    const del = document.createElement('button');
+    del.type = 'button'; del.className = 'delbox'; del.dataset.del = String(SEL); del.textContent = '삭제';
+    const topPct = sel.y < 7 ? sel.y : Math.max(0, sel.y - 7);
+    const above = sel.y < 7 ? (sel.y + sel.h + 1) : topPct;
+    del.style.left = (sel.x + sel.w) + '%';   /* 박스 오른쪽 위 모서리에 맞춘다(이름표와 겹치지 않게) */
+    del.style.transform = 'translateX(-100%)';
+    del.style.top = above + '%';
+    del.title = '이 칸 삭제';
+    st.appendChild(del);
+  }
   const f = CUR.fields[SEL];
   $('#fEdit').style.display = f ? 'block' : 'none';
   if (f){ $('#fLabel').value = f.label; $$('#fType button').forEach(b => b.classList.toggle('on', b.dataset.v === f.type)); $('#fLabel').disabled = ro(); }
@@ -1547,6 +1570,13 @@ const TYPE_NM = {text:'글자', number:'숫자', date:'날짜', sign:'서명'};
   const st = $('#edStage'); let drag = null;
   const pct = e => { const r = st.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
   st.addEventListener('pointerdown', e => {
+    const delb = e.target.closest('.delbox');
+    if (delb){                       /* 박스 위 [삭제] 버튼 — 그 칸만 지운다 */
+      const i = +delb.dataset.del;
+      if (ro()) return toast('기본 양식은 [복제] 후 고칠 수 있습니다');
+      snap(); CUR.fields.splice(i, 1); SEL = -1; drawEditor(); toast('칸을 지웠습니다');
+      e.preventDefault(); return;
+    }
     const fd = e.target.closest('.fld');
     const [px, py] = pct(e);
     if (!fd){ addField(px, py); return; }
@@ -1672,14 +1702,30 @@ $('#sampleVals').onclick = () => { CUR.fields.forEach(f => { if (f.type === 'sig
   runCalc(''); saveVals(); renderInputs(); toast('예시 값을 넣었습니다'); };
 
 /* 음성 메모 — 브라우저 내장 음성 인식(무료) */
+function pickVoiceTarget(){
+  if (LAST_INPUT && document.body.contains(LAST_INPUT)) return LAST_INPUT;
+  const empty = $$('#valList input[data-f]').find(el => !el.value);
+  return empty || $('#valList input[data-f]') || null;
+}
 $('#voiceBtn').onclick = () => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다. 키보드의 마이크를 써 주세요');
-  const tgt = LAST_INPUT || $('#valList input[data-f]'); if (!tgt) return toast('먼저 넣을 칸을 눌러 주세요');
-  const r = new SR(); r.lang = 'ko-KR'; r.interimResults = false;
-  r.onresult = e => { const t = e.results[0][0].transcript; const f = CUR.fields[+tgt.dataset.f];
-    tgt.value = f.type === 'number' ? fmtNum(t) : t; tgt.dispatchEvent(new Event('input', {bubbles:true})); toast('넣었습니다: ' + t); };
-  r.onerror = () => toast('음성을 알아듣지 못했습니다'); r.start(); toast(`"${CUR.fields[+tgt.dataset.f].label}" 칸에 말씀하세요`);
+  const tgt = pickVoiceTarget(); if (!tgt) return toast('먼저 값을 넣을 칸을 눌러 주세요');
+  const f = CUR.fields[+tgt.dataset.f];
+  const r = new SR(); r.lang = 'ko-KR'; r.interimResults = false; r.continuous = false; r.maxAlternatives = 1;
+  const btn = $('#voiceBtn'); btn.classList.add('on');
+  r.onresult = e => {
+    const t = e.results[0][0].transcript.trim();
+    tgt.value = f.type === 'number' ? fmtNum(t) : (tgt.value && tgt.value.trim() ? tgt.value + ' ' + t : t);
+    tgt.dispatchEvent(new Event('input', {bubbles: true}));
+    tgt.focus();
+    toast('"' + f.label + '" 칸에 넣었습니다: ' + t);
+  };
+  r.onerror = ev => toast(ev.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : '음성을 알아듣지 못했습니다');
+  r.onend = () => btn.classList.remove('on');
+  try{ r.start(); }catch(err){ btn.classList.remove('on'); }
+  tgt.focus(); tgt.select();
+  toast('"' + f.label + '" 칸에 대고 말씀하세요');
 };
 
 /* ---------- AI (손님 자기 제미나이 무료 열쇠 · 그 기기에만 보관) ---------- */
@@ -1733,6 +1779,124 @@ $('#handIn').onchange = async e => {
     let n = 0; labels.forEach(l => { if (o[l] != null && String(o[l]).trim()){ VALS[l] = String(o[l]).trim(); n++; } });
     runCalc(''); saveVals(); renderInputs(); toast(`손글씨에서 ${n}칸을 채웠습니다`);
   }catch(err){ toast(aiErr(err)); }
+  busyOff();
+};
+/* ---------- 사진으로 자동 채우기 (명함·사업자등록증·신분증·메모지) ----------
+   ① AI 열쇠가 있으면 → 사진에서 항목을 읽어 각 칸에 넣는다(정확)
+   ② 열쇠가 없으면 → 기기 안 무료 글자 인식(tesseract, 키·서버 0)으로 읽고 규칙으로 골라낸다 */
+const SYN = [
+  [/(사업자|등록번호|법인등록)/, ['사업자등록번호']],
+  [/(상호|법인명|업체명|회사명|가게명|상점명|사업장명)/, ['상호', '법인명', '업체명']],
+  [/(대표|성명|이름|신청인|담당|수신|인수자|근로자|예금주)/, ['대표자', '성명', '이름']],
+  [/(주소|소재지|위치)/, ['주소', '소재지']],
+  [/(팩스|FAX|fax)/, ['팩스']],
+  [/(전화|연락처|휴대|TEL|tel|Tel)/, ['전화', '연락처']],
+  [/(이메일|메일|mail|E-?mail)/, ['이메일']],
+  [/(은행|계좌)/, ['은행', '계좌번호']],
+  [/(업종|업태|종목)/, ['업종']],
+  [/(날짜|일자|일시|개업)/, ['날짜', '개업일']],
+  [/(금액|대금|임금|급여|보증금|매매가|단가|합계)/, ['금액']]
+];
+function mapRecord(rec, fields){
+  let n = 0;
+  fields.forEach(f => {
+    if (f.type === 'sign') return;
+    const lab = String(f.label || '').replace(/\s/g, '');
+    let v = '';
+    Object.keys(rec).forEach(k => { if (!v && rec[k] && (String(k).replace(/\s/g, '') === lab || lab.includes(String(k).replace(/\s/g, '')))) v = rec[k]; });
+    if (!v){ for (const [re, keys] of SYN){ if (re.test(f.label || '')){ for (const k of keys){ if (rec[k]){ v = rec[k]; break; } } } if (v) break; } }
+    if (!v) return;
+    VALS[f.label] = f.type === 'number' ? String(v).replace(/[^\d.-]/g, '') : String(v);
+    n++;
+  });
+  if (n){ runCalc(''); saveVals(); renderInputs(); }
+  return n;
+}
+function parseDocText(txt){
+  const t = String(txt || '');
+  const rec = {};
+  const m1 = t.match(/\b\d{3}\s*[-–]?\s*\d{2}\s*[-–]?\s*\d{5}\b/);
+  if (m1) rec['사업자등록번호'] = m1[0].replace(/\s/g, '').replace(/^(\d{3})(\d{2})(\d{5})$/, '$1-$2-$3');
+  const lines = t.split(/\n/).map(x => x.trim()).filter(Boolean);
+  const after = (labelRe) => {
+    for (const ln of lines){
+      const m = ln.match(new RegExp('(?:' + labelRe.source + ')\\s*[:：]?\\s*(.{2,40})$'));
+      if (m && m[1] && !/[:：]/.test(m[1])) return m[1].replace(/^[-·•\s]+|[\s]+$/g, '');
+    }
+    return '';
+  };
+  rec['상호'] = after(/상호|법인명|업체명|회사명|가게명/);
+  rec['대표자'] = after(/대표자|대표|성명|이름/);
+  rec['주소'] = after(/주소|소재지/);
+  if (!rec['주소']){ const a = t.match(/([가-힣]{2,}(?:시|도)\s*[가-힣]{1,}(?:시|군|구)\s*[^\n]{4,40})/); if (a) rec['주소'] = a[1].trim(); }
+  const telAll = t.match(/0\d{1,2}\s*[-–]\s*\d{3,4}\s*[-–]\s*\d{4}/g) || [];
+  const faxLine = after(/팩스|FAX|fax/);
+  rec['팩스'] = (faxLine.match(/0\d{1,2}\s*[-–]\s*\d{3,4}\s*[-–]\s*\d{4}/) || [''])[0];
+  rec['전화'] = telAll.find(x => x !== rec['팩스']) || '';
+  const mail = t.match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/);
+  if (mail) rec['이메일'] = mail[0];
+  const dt = t.match(/(20\d{2})\s*[년.\-/]\s*(\d{1,2})\s*[월.\-/]\s*(\d{1,2})/);
+  if (dt) rec['날짜'] = dt[1] + '-' + String(+dt[2]).padStart(2, '0') + '-' + String(+dt[3]).padStart(2, '0');
+  const money = t.match(/(?:₩|금\s*)?([\d,]{4,})\s*원/);
+  if (money) rec['금액'] = money[1].replace(/,/g, '');
+  rec['업종'] = after(/업종|업태|종목/);
+  Object.keys(rec).forEach(k => { if (!rec[k]) delete rec[k]; });
+  return rec;
+}
+let TESS_P = null;
+function loadTess(){
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (TESS_P) return TESS_P;
+  TESS_P = new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    sc.onload = () => res(window.Tesseract);
+    sc.onerror = () => rej(new Error('OCR_LOAD'));
+    document.head.appendChild(sc);
+    setTimeout(() => rej(new Error('OCR_LOAD')), 20000);
+  });
+  return TESS_P;
+}
+async function localText(file){
+  const T = await loadTess();
+  const url = URL.createObjectURL(file);
+  try{ const r = await T.recognize(url, 'kor+eng'); return (r && r.data && r.data.text) || ''; }
+  finally{ URL.revokeObjectURL(url); }
+}
+const PICK = '이미지는 명함·사업자등록증·신분증·메모지 사진입니다. 사진에 적힌 내용을 읽어 아래 형식의 JSON 하나만 출력하세요(모르면 빈 문자열, 지어내지 마세요):\n{"상호":"","대표자":"","사업자등록번호":"","주소":"","전화":"","팩스":"","이메일":"","업종":"","날짜":"","금액":""}';
+$('#photoFill').onclick = () => {
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  $('#photoIn2').click();
+};
+$('#photoIn2').onchange = async e => {
+  const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
+  busyOn('사진에서 항목을 읽는 중…');
+  try{
+    let rec = null, how = '';
+    if (myKey()){
+      const img = await fileToImage(file, 1600);
+      rec = await gemini(PICK, img.data); how = 'AI';
+    }
+    if (!rec){
+      busyOn('기기 안 무료 인식으로 읽는 중… (처음 1회는 준비에 시간이 걸립니다)');
+      const txt = await localText(file);
+      rec = parseDocText(txt);
+      how = '기기 인식';
+      if (!Object.keys(rec).length) throw new Error('NO_READ');
+    }
+    const n = mapRecord(rec, CUR.fields);
+    if (!n){
+      toast('읽었지만 맞는 칸을 찾지 못했습니다 · 사진을 더 밝게 다시 찍어 보세요');
+      $('#fillInfo').textContent = '읽은 내용: ' + Object.entries(rec).slice(0, 4).map(([k, v]) => k + '=' + v).join(' · ');
+    } else {
+      toast(how + '로 ' + n + '칸을 채웠습니다');
+      $('#fillInfo').textContent = how + '로 ' + n + '칸을 채웠습니다 · 틀린 글자는 칸을 눌러 고치세요.';
+    }
+  }catch(err){
+    const m = err.message === 'NO_KEY' ? 'AI 열쇠가 없어 기기 인식도 쓰지 못했습니다(인터넷이 필요합니다)' : (err.message === 'NO_READ' ? '사진에서 글자를 읽지 못했습니다. 밝은 곳에서 다시 찍어 주세요' : (err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진을 읽지 못했습니다'));
+    toast(m);
+    $('#fillInfo').textContent = m;
+  }
   busyOff();
 };
 $('#keyBtn').onclick = () => { let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){} $('#keyIn').value = k; $('#keyModal').classList.add('on'); };

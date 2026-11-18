@@ -1,5 +1,7 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <script src="../master.js"></script>
+<script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
+<script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 계약서 1초 생성기 — 매매·주택 임대차·상가 임대차</title>
 <meta name="description" content="계약 자리에서 조건만 넣으면 부동산 매매계약서·주택 임대차계약서·상가건물 임대차계약서가 바로 나옵니다. 한글 금액 자동 표기, 날짜 자동 계산, 3부 인쇄, 한글(.hwpx) 저장. 모든 처리는 이 기기 안에서만.">
@@ -40,6 +42,14 @@ main{padding:12px 14px 120px}
 .card h2{font-size:14px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px}
 .card h2 .n{width:18px;height:18px;border-radius:6px;background:var(--amber);color:var(--on-amber);font-size:10.5px;font-weight:900;display:grid;place-items:center}
 .sub{font-size:11.5px;color:var(--gray);margin-top:4px;line-height:1.5}
+.gseg{flex-wrap:wrap}
+.gseg button{flex:1 1 calc(33.33% - 6px);font-size:11.5px;padding:10px 6px;line-height:1.3}
+.fillrow{display:flex;gap:7px;margin-top:10px}
+.fillrow button{flex:1;font-family:inherit;font-size:12px;font-weight:900;color:#E6EDF7;background:#12203C;
+  border:1px solid var(--line2);border-radius:11px;padding:11px 6px;cursor:pointer}
+.fillrow button.listening{color:var(--on);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
+.fillinfo{font-size:10.5px;color:#7C8DA6;margin-top:6px;line-height:1.55}
+.tlabel{font-size:11px;font-weight:900;color:var(--gray);margin:12px 0 6px;letter-spacing:-.2px}
 .seg{display:flex;gap:4px;background:#0B1729;border:1px solid var(--line);border-radius:11px;padding:3px;margin-top:8px}
 .seg button{flex:1;font-size:12.5px;font-weight:900;color:#94A3B8;border-radius:9px;padding:10px 4px;line-height:1.25}
 .seg button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
@@ -118,14 +128,23 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
   <h2><span class="n">1</span>계약서 종류</h2>
   <div class="seg" id="typeSeg"><button data-v="sale">부동산<br>매매</button><button data-v="house">주택<br>임대차</button><button data-v="shop">상가건물<br>임대차</button></div>
   <div class="seg" id="rentSeg" style="display:none"><button data-v="jeonse">전세</button><button data-v="wolse">월세</button></div>
+  <div class="tlabel">일반 표준서식 (부동산 외)</div>
+  <div class="seg gseg" id="typeSeg2">
+   <button data-v="labor">근로</button><button data-v="service">용역</button><button data-v="loan">차용증</button>
+   <button data-v="settle">합의서</button><button data-v="power">위임장</button><button data-v="goodwill">권리금</button>
+   <button data-v="exchange">교환</button><button data-v="nda">비밀유지</button><button data-v="terminate">해지합의</button>
+  </div>
+  <div class="fillrow"><button type="button" id="vFill">🎤 말로 채우기</button><button type="button" id="pFill">📷 사진으로 채우기</button></div>
+  <div class="fillinfo" id="fillInfo">칸을 누른 뒤 마이크에 대고 말하면 그 칸에 들어갑니다. 신분증·사업자등록증·명함 사진으로 한 번에 채울 수도 있습니다.</div>
+  <input type="file" id="pIn" accept="image/*" hidden>
  </div>
  <div class="card"><h2><span class="n">갑</span><span id="aTitle">매도인</span></h2><div id="aBox"></div></div>
  <div class="card"><h2><span class="n">을</span><span id="bTitle">매수인</span></h2><div id="bBox"></div></div>
 </section>
 <!-- 2 물건·금액 -->
 <section class="scr" id="s2">
- <div class="card"><h2><span class="n">2</span>물건 표시</h2><div id="propBox"></div></div>
- <div class="card"><h2><span class="n">원</span>금액과 날짜</h2>
+ <div class="card"><h2><span class="n">2</span><span id="s2t1">물건 표시</span></h2><div id="propBox"></div></div>
+ <div class="card"><h2><span class="n">원</span><span id="s2t2">금액과 날짜</span></h2>
   <p class="sub">숫자만 넣으면 한글 금액이 자동으로 붙습니다. 날짜는 계약일로부터 며칠 뒤인지(D+n)로 넣으세요.</p>
   <div id="moneyBox"></div>
  </div>
@@ -136,9 +155,9 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
   <div class="sp-list" id="spList"></div>
   <label class="lb">직접 적는 특약<i>줄마다 한 항목</i></label><textarea id="spFree" rows="3" data-k="free"></textarea>
  </div>
- <div class="card"><h2><span class="n">중</span>개업공인중개사</h2><div id="brBox"></div></div>
+ <div class="card" id="brCard"><h2><span class="n">중</span>개업공인중개사</h2><div id="brBox"></div></div>
  <div class="card"><h2><span class="n">부</span>인쇄 부수</h2>
-  <div class="cp"><label><input type="checkbox" data-cp="a" checked><span id="cpA">매도인용</span></label><label><input type="checkbox" data-cp="b" checked><span id="cpB">매수인용</span></label><label><input type="checkbox" data-cp="c" checked>중개사용</label></div>
+  <div class="cp"><label><input type="checkbox" data-cp="a" checked><span id="cpA">매도인용</span></label><label><input type="checkbox" data-cp="b" checked><span id="cpB">매수인용</span></label><label id="cpCLab"><input type="checkbox" data-cp="c" checked>중개사용</label></div>
   <div class="missbox" id="missBox"></div>
   <div class="row"><button class="btn pri" id="printBtn">인쇄 · PDF</button><button class="btn pri" id="hwpxBtn">한글(.hwpx) 저장</button></div>
   <p class="kv" id="outInfo">파일은 이 기기 안에서 만들어집니다. 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.</p>
@@ -1116,7 +1135,7 @@ const addMonths = (d, n) => { const x = new Date(d); const day = x.getDate(); x.
 
 /* ---------- 상태(같은 기기 자동 저장) ---------- */
 const LS = 'kc_contract_v1', LS_Q = 'kc_inquiry_queue';
-const fresh = () => ({type:'sale', rent:'wolse', step:1, a:{}, b:{}, prop:{}, money:{contractDate:ymd(new Date()), balDays:'30', months:'24'}, sp:[], free:'', br:{}, cp:{a:1, b:1, c:1}});
+const fresh = () => ({type:'sale', rent:'wolse', step:1, a:{}, b:{}, prop:{}, money:{contractDate:ymd(new Date()), balDays:'30', months:'24'}, sp:[], free:'', br:{}, cp:{a:1, b:1, c:1}, g:{}});
 let S; try{ S = Object.assign(fresh(), JSON.parse(localStorage.getItem(LS) || 'null') || {}); }catch(e){ S = fresh(); }
 let saveT; const flush = () => { clearTimeout(saveT); saveT = null; try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} };
 const save = () => { clearTimeout(saveT); saveT = setTimeout(flush, 200); };
@@ -1126,7 +1145,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && sav
 
 const ROLE = {sale:['매도인', '매수인'], house:['임대인', '임차인'], shop:['임대인', '임차인']};
 const TITLE = {sale:'부동산 매매계약서', house:'주택 임대차계약서', shop:'상가건물 임대차계약서'};
-const isLease = () => S.type !== 'sale';
+const isLease = () => !isGT() && S.type !== 'sale';
 const hasRent = () => S.type === 'shop' || (S.type === 'house' && S.rent === 'wolse');
 
 /* ---------- 입력 칸 정의 ---------- */
@@ -1143,10 +1162,24 @@ function renderParty(){
   $('#aBox').innerHTML = '<div class="g2">' + PARTY.slice(0, 2).map(f => fieldHtml('a', f)).join('') + '</div>' + PARTY.slice(2).map(f => fieldHtml('a', f)).join('');
   $('#bBox').innerHTML = '<div class="g2">' + PARTY.slice(0, 2).map(f => fieldHtml('b', f)).join('') + '</div>' + PARTY.slice(2).map(f => fieldHtml('b', f)).join('');
   $$('#typeSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.type));
+  $$('#typeSeg2 button').forEach(b => b.classList.toggle('on', b.dataset.v === S.type));
   $('#rentSeg').style.display = S.type === 'house' ? 'flex' : 'none';
   $$('#rentSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.rent));
 }
 function renderProp(){
+  if (isGT()){
+    $('#s2t1').textContent = GT[S.type].title.replace('계약서', '') + ' 계약 내용';
+    const g = GT[S.type].fields;
+    $('#propBox').innerHTML = g.map(([k, lab, tp]) => {
+      const v = (S.g && S.g[k]) || '';
+      const im = tp === 'money' ? ' inputmode="numeric"' : (tp === 'date' ? '' : '');
+      const it = tp === 'date' ? ' type="date"' : ' type="text"';
+      return `<label class="lb">${lab}${tp === 'money' ? '<em>숫자만</em>' : '<i>선택</i>'}</label>`
+        + `<input data-g="g" data-k="${k}"${it}${im} value="${tp === 'money' && v ? escH(comma(v)) : escH(v)}">`;
+    }).join('');
+    return;
+  }
+  $('#s2t1').textContent = '물건 표시';
   $('#propBox').innerHTML = fieldHtml('prop', PROP[0]) + '<div class="g2">' + PROP.slice(1, 5).map(f => fieldHtml('prop', f)).join('') + '</div><div class="g2">' + PROP.slice(5).map(f => fieldHtml('prop', f)).join('') + '</div>';
 }
 function moneyInput(k, lab, req, extra){
@@ -1158,6 +1191,12 @@ function dayInput(k, lab, req){
     <div class="chips" data-chips="${k}">${[7, 14, 30, 60, 90].map(n => `<button data-d="${n}">D+${n}</button>`).join('')}</div>`;
 }
 function renderMoney(){
+  if (isGT()){
+    $('#s2t2').textContent = '계약일';
+    $('#moneyBox').innerHTML = `<label class="lb">계약일<em>*</em></label><input type="date" data-g="money" data-k="contractDate" value="${escH(S.money.contractDate || '')}">`
+      + '<div class="kor">금액·기간은 위 계약 내용 칸에 적으면 그대로 들어갑니다.</div>';
+    return;
+  }
   const total = isLease() ? '보증금' : '매매대금';
   let h = moneyInput('total', total, 1);
   if (hasRent()) h += moneyInput('rent', '차임(월세)', 1);
@@ -1224,10 +1263,122 @@ const SPECIALS = {
   '임차인은 화재보험에 가입하고 증권 사본을 임대인에게 준다.',
   '임차인은 상가건물 임대차보호법에 따른 계약갱신요구권(최대 10년)이 있다는 설명을 들었다.']
 };
+/* ---------- 일반 표준서식 9종 (부동산 외) ---------- */
+const GT = {
+ labor: {title:'근로계약서', roles:['사용자', '근로자'], legal:'본 서식은 작성 보조용입니다. 근로조건은 근로기준법이 정한 기준보다 낮을 수 없으며, 최종 검토는 노무사·변호사 확인이 필요합니다.',
+  fields:[['workplace','근무 장소'],['job','업무 내용'],['start','근로 개시일','date'],['end','근로 종료일','date'],
+    ['hours','근로시간'],['brk','휴게시간'],['days','근무일·휴일'],['wage','임금(월)','money'],['payday','임금 지급일'],['insurance','4대보험']],
+  articles:[
+   ['제1조(근로계약)', '{a}는 {b}을(를) 다음과 같이 고용하고, {b}은(는) 이에 동의한다.'],
+   ['제2조(업무와 장소)', '{b}의 업무는 {job}이며, 근무 장소는 {workplace}이다. 업무·장소 변경은 양쪽 합의로 한다.'],
+   ['제3조(근로시간과 휴게)', '근로시간은 {hours}, 휴게시간은 {brk}로 하며, 근무일과 휴일은 {days}과 같다.'],
+   ['제4조(임금)', '임금은 월 {wage}으로 하고, 매월 {payday}에 {b}이(가) 지정한 계좌로 지급한다.'],
+   ['제5조(4대보험과 세금)', '{a}는 {insurance} 가입 등 법정 의무를 이행하고, 근로소득세는 원천징수한다.'],
+   ['제6조(계약 기간과 해지)', '계약 기간은 {start}부터 {end}까지이다. 기간을 정하지 않은 경우 근로기준법이 정한 해지 절차를 따른다.'],
+   ['제7조(비밀유지)', '{b}은(는) 업무 중 알게 된 {a}의 거래처·가격·운영 정보를 밖에 알리지 않는다.']],
+  specials:['수습 기간 3개월, 수습 중 임금은 정상 임금의 90%로 한다.','연장·휴일 근로는 근로자와 미리 합의하고 수당을 지급한다.','퇴직 시 업무 인수인계를 마친 뒤 퇴직금을 정산한다.','직장 내 괴롭힘 금지와 신고 절차를 안내받았다.','복무·휴가 규정은 취업규칙을 따르며, 사본을 교부받았다.'] },
+
+ service: {title:'용역계약서', roles:['발주자', '수급자'], legal:'본 서식은 작성 보조용입니다. 용역 범위·대금·지식재산 귀속은 계약 내용에 따라 달라지므로 법률 검토가 필요합니다.',
+  fields:[['scope','용역 내용'],['period','용역 기간'],['amount','용역 대금','money'],['pay','대금 지급일'],['result','결과물 형태'],['warranty','하자보수 기간']],
+  articles:[
+   ['제1조(용역의 내용)', '{b}은(는) {a}의 요청에 따라 {scope}을(를) 수행하고, 그 결과물은 {result} 형태로 제출한다.'],
+   ['제2조(기간과 장소)', '용역 기간은 {period}이며, 작업 장소와 방식은 양쪽이 합의로 정한다.'],
+   ['제3조(대금과 지급)', '용역 대금은 {amount}으로 하며, {a}는 {pay}에 지급한다.'],
+   ['제4조(검수와 하자보수)', '{a}는 결과물을 받은 뒤 7일 안에 검수하고, 지적한 하자는 {warranty} 안에 {b}이(가) 무상으로 보완한다.'],
+   ['제5조(지식재산)', '결과물에 대한 권리는 대금 완납 시 {a}에게 이전된다. 다만 {b}이(가) 원래 보유한 기술·도구는 제외한다.'],
+   ['제6조(비밀유지)', '양쪽은 계약 중 알게 된 상대방의 정보를 제3자에게 알리지 않는다.'],
+   ['제7조(해지)', '한쪽이 계약을 어기면 상대방은 기한을 정해 시정을 요구하고, 시정되지 않으면 계약을 해지할 수 있다.']],
+  specials:['중도 해지 시 이미 진행된 부분에 대해 진행률로 정산한다.','발주자의 사정으로 중단되면 착수금은 반환하지 않는다.','결과물의 2차 판매·양도는 별도 합의가 필요하다.','외주 인력 사용 시 사전에 서면으로 알린다.'] },
+
+ loan: {title:'차용증 (금전소비대차계약)', roles:['대여자', '차용자'], legal:'본 서식은 작성 보조용입니다. 이자율은 이자제한법 상한을 넘을 수 없으며, 담보·보증 여부는 별도 검토가 필요합니다.',
+  fields:[['amount','차용 금액','money'],['date','차용일','date'],['due','변제기일','date'],['interest','이자율(연 %)'],['repay','변제 방법'],['account','입금 계좌']],
+  articles:[
+   ['제1조(금전의 차용)', '{a}는 {b}에게 {amount}을(를) 빌려주고, {b}은(는) 이를 차용하였다.'],
+   ['제2조(이자)', '이자는 연 {interest}로 하며, 원금과 함께 지급한다. 이자율은 법이 정한 상한을 넘지 않는다.'],
+   ['제3조(변제기일과 방법)', '{b}은(는) {due}까지 {repay} 방법으로 갚는다. 입금 계좌는 {account}이다.'],
+   ['제4조(기한이익의 상실)', '{b}이(가) 이자를 두 번 이상 연체하거나 재산을 처분해 갚을 능력이 없게 되면, 남은 원금 전액을 바로 갚아야 한다.'],
+   ['제5조(비용)', '이 계약과 관련한 인지세·등기 비용은 양쪽이 절반씩 부담한다.'],
+   ['제6조(관할)', '분쟁이 생기면 {a}의 주소지 법원에서 다툰다.']],
+  specials:['원금 일부를 미리 갚을 수 있고, 이자는 남은 기간만 계산한다.','차용증은 공증을 받아 두면 집행력이 생긴다.','담보로 제공한 물건은 목록을 별지로 붙인다.','변제가 늦어지면 지연손해금을 연 12%로 더한다.'] },
+
+ settle: {title:'합의서', roles:['갑', '을'], legal:'본 서식은 작성 보조용입니다. 형사 사건의 합의는 처벌 불원 의사와 별개로 검토되어야 하므로 법률 검토가 필요합니다.',
+  fields:[['case','사건·분쟁 내용'],['amount','합의금','money'],['pay','지급일','date'],['duty','상대방 의무'],['close','종결 문구']],
+  articles:[
+   ['제1조(분쟁의 내용)', '{a}와 {b}은(는) {case}에 관하여 서로 다투던 것을 이 합의로 모두 정리한다.'],
+   ['제2조(합의금)', '{a}는 {b}에게 {amount}을(를) {pay}에 지급한다.'],
+   ['제3조(의무)', '{duty}'],
+   ['제4조(권리 포기)', '양쪽은 이 합의에 적힌 것 외에 다른 손해배상이나 이의를 제기하지 않는다. {close}'],
+   ['제5조(비밀유지)', '양쪽은 이 합의의 내용을 제3자에게 알리지 않는다. 다만 법령이나 수사기관의 요구가 있으면 예외로 한다.'],
+   ['제6조(효력)', '이 합의는 양쪽이 서명한 날부터 효력이 생긴다.']],
+  specials:['합의금을 받은 뒤에는 형사 고소를 취하하고 처벌을 원하지 않는다.','합의 내용을 어기면 합의금의 두 배를 배상한다.','이 합의는 민사상 효력만 있으며, 형사 절차는 별도로 진행된다.'] },
+
+ power: {title:'위임장', roles:['위임인', '수임인'], legal:'본 서식은 작성 보조용입니다. 권한 범위를 넘은 행위는 위임인에게 효력이 미치지 않을 수 있습니다.',
+  fields:[['matter','위임 사항'],['limit','권한 범위'],['period','위임 기간'],['attach','첨부 서류']],
+  articles:[
+   ['제1조(위임)', '{a}는 {b}에게 다음 사항을 위임한다. — {matter}'],
+   ['제2조(권한 범위)', '{b}의 권한은 {limit}에 한정되며, 이를 넘는 행위는 {a}의 별도 서면 동의가 필요하다.'],
+   ['제3조(위임 기간)', '위임 기간은 {period}까지이며, 기간이 끝나면 이 위임장의 효력도 끝난다.'],
+   ['제4조(보고와 서류)', '{b}은(는) 업무를 마친 뒤 결과와 관련 서류를 {a}에게 넘긴다.'],
+   ['제5조(철회)', '{a}는 언제든지 서면으로 이 위임을 철회할 수 있다.']],
+  specials:['이 위임장은 제출처에 원본을 내고 사본을 보관한다.','첨부 서류: 신분증 사본, 인감증명서(해당 시)','대리인이 서명할 때는 위임장 원본을 함께 제시한다.'] },
+
+ goodwill: {title:'상가 권리금 계약서', roles:['양도인', '양수인'], legal:'본 서식은 작성 보조용입니다. 상가건물 임대차보호법상 권리금 회수 기회 보호 규정과 임대인 동의 여부를 반드시 확인하세요.',
+  fields:[['shop','상가 소재지'],['amount','권리금','money'],['include','권리금 포함 범위'],['pay','지급일','date'],['landlord','임대인 동의 여부'],['handover','인도일','date']],
+  articles:[
+   ['제1조(목적)', '{a}는 {shop}에서 영업하던 권리(시설·거래처·영업상 이익)를 {b}에게 넘기고, {b}은(는) 그 대가로 권리금을 지급한다.'],
+   ['제2조(권리금과 범위)', '권리금은 {amount}으로 하며, 포함 범위는 {include}과 같다.'],
+   ['제3조(지급과 인도)', '{b}은(는) {pay}에 권리금을 지급하고, {a}는 {handover}에 시설과 영업을 인도한다.'],
+   ['제4조(임대인 동의)', '이 계약은 임대인의 동의를 받은 뒤에 효력이 생긴다. 동의 여부: {landlord}'],
+   ['제5조(채무 정리)', '{a}는 인도일까지 발생한 임대료·관리비·공과금·거래처 외상 등 모든 채무를 정리한다.'],
+   ['제6조(경업 금지)', '{a}는 인도일부터 2년 동안 같은 건물에서 같은 업종을 열지 않는다.'],
+   ['제7조(해제)', '임대인 동의가 없어 계약을 이행할 수 없으면 계약은 해제되고, 받은 금액은 돌려준다.']],
+  specials:['권리금 계약서는 임대인에게도 사본을 준다.','시설 목록은 사진과 함께 별지로 붙인다.','양수인은 기존 직원 승계 여부를 별도로 정한다.','보증금·월세 조건은 임대차계약에서 따로 정한다.'] },
+
+ exchange: {title:'부동산 교환계약서', roles:['갑', '을'], legal:'본 서식은 작성 보조용입니다. 교환은 매매와 같은 방식으로 취득세·양도세가 과세되며, 등기·감정 절차가 필요합니다.',
+  fields:[['propA','갑이 넘기는 목적물'],['propB','을이 넘기는 목적물'],['diff','차액(교환 차금)','money'],['deliver','인도일','date'],['register','등기 이전일','date']],
+  articles:[
+   ['제1조(교환)', '{a}는 {propA}을(를), {b}은(는) {propB}을(를) 서로 바꾸기로 한다.'],
+   ['제2조(차액)', '두 목적물의 가치 차액 {diff}은(는) {a}가 {b}에게 지급한다. 차액이 없으면 지급하지 않는다.'],
+   ['제3조(인도와 등기)', '양쪽은 {deliver}에 목적물을 인도하고, {register}까지 소유권 이전 등기를 마친다.'],
+   ['제4조(권리 정리)', '각자는 넘기는 목적물의 저당권·압류·임차권·체납을 인도일까지 정리해 완전한 소유권을 넘긴다.'],
+   ['제5조(세금과 비용)', '교환에 따르는 취득세·양도세·등기 비용은 각자가 받는 목적물에 대해 부담한다.'],
+   ['제6조(하자)', '인도 뒤 6개월 안에 드러난 숨은 하자는 넘긴 사람이 수리한다.'],
+   ['제7조(해제)', '어느 한쪽이 의무를 이행하지 않으면 상대방은 계약을 해제하고 손해배상을 청구할 수 있다.']],
+  specials:['교환 목적물의 감정평가는 양쪽이 함께 정한 감정평가사에게 맡긴다.','교환 후 임대차 승계 여부를 별도로 정한다.','세무상 교환은 매매로 보아 신고한다.','잔금일에 등기사항증명서를 다시 확인한다.'] },
+
+ nda: {title:'비밀유지계약서', roles:['제공자', '수령자'], legal:'본 서식은 작성 보조용입니다. 비밀정보의 범위와 예외(공개된 정보·법령에 따른 공개)를 명확히 해야 합니다.',
+  fields:[['info','비밀정보의 범위'],['purpose','사용 목적'],['period','비밀유지 기간'],['penalty','위반 시 조치']],
+  articles:[
+   ['제1조(비밀정보)', '{a}가 {b}에게 제공하는 {info}을(를) 비밀정보로 본다.'],
+   ['제2조(사용 목적)', '{b}은(는) 비밀정보를 {purpose} 목적으로만 쓴다.'],
+   ['제3조(비밀유지)', '{b}은(는) 비밀정보를 제3자에게 알리지 않고, 알 필요가 있는 직원에게만 최소한으로 제공한다.'],
+   ['제4조(예외)', '이미 공개된 정보, {b}이(가) 원래 알고 있던 정보, 법령·법원의 요구로 공개하는 정보는 비밀정보에서 빠진다.'],
+   ['제5조(기간)', '비밀유지 의무는 이 계약일부터 {period}까지 이어진다.'],
+   ['제6조(위반 시)', '{b}이(가) 이 계약을 어기면 {penalty}'],
+   ['제7조(반환)', '계약이 끝나면 비밀정보와 사본을 모두 반환하거나 삭제한다.']],
+  specials:['비밀정보임을 표시한 자료만 이 계약의 대상으로 본다.','계약이 끝나도 비밀유지 의무는 남는다.','손해액을 정하기 어려우면 위약금을 미리 정한다.'] },
+
+ terminate: {title:'계약해지 합의서', roles:['갑', '을'], legal:'본 서식은 작성 보조용입니다. 해지 시점의 정산·원상복구·보증금 반환 범위를 분명히 해 두어야 분쟁이 없습니다.',
+  fields:[['origin','원 계약(체결일·내용)'],['endDate','해지일','date'],['settle','정산 내용'],['restore','원상복구'],['deposit','보증금 반환','money']],
+  articles:[
+   ['제1조(해지)', '{a}와 {b}은(는) {origin} 계약을 {endDate}부로 합의로 해지한다.'],
+   ['제2조(정산)', '해지일까지의 정산은 다음과 같다. — {settle}'],
+   ['제3조(원상복구)', '{restore}'],
+   ['제4조(보증금 등 반환)', '{a}는 {deposit}을(를) 해지일부터 7일 안에 {b}에게 돌려준다. 미납금이 있으면 빼고 돌려준다.'],
+   ['제5조(권리 의무 종료)', '양쪽은 해지일 이후 원 계약에 따른 권리·의무를 주장하지 않는다. 다만 해지 전에 생긴 채무와 비밀유지 의무는 남는다.'],
+   ['제6조(확인)', '양쪽은 이 합의 내용을 확인하고 서명한다.']],
+  specials:['보증금 반환 계좌는 을이 지정한 계좌로 한다.','시설·집기는 해지일 현재 상태로 사진을 찍어 확인한다.','해지 후 게시물·간판은 3일 안에 철거한다.','정산이 끝나면 서로 채권·채무가 없음을 확인한다.'] }
+};
+const isGT = () => !!GT[S.type];
+Object.keys(GT).forEach(k => { ROLE[k] = GT[k].roles; TITLE[k] = GT[k].title; });
 function renderSpecials(){
-  $('#spList').innerHTML = SPECIALS[S.type].map((t, i) => `<label><input type="checkbox" data-sp="${i}"${S.sp.includes(i) ? ' checked' : ''}><span>${escH(t)}</span></label>`).join('');
+  const sps = isGT() ? GT[S.type].specials : SPECIALS[S.type];
+  $('#brCard').style.display = isGT() ? 'none' : '';
+  const cpC = $('#cpCLab'); if (cpC) cpC.style.display = isGT() ? 'none' : '';
+  if (isGT()){ $('#cpA').textContent = GT[S.type].roles[0] + ' 보관용'; $('#cpB').textContent = GT[S.type].roles[1] + ' 보관용'; }
+  $('#spList').innerHTML = sps.map((t, i) => `<label><input type="checkbox" data-sp="${i}"${S.sp.includes(i) ? ' checked' : ''}><span>${escH(t)}</span></label>`).join('');
   $('#spFree').value = S.free || '';
-  $('#brBox').innerHTML = '<div class="g2">' + BROKER.slice(0, 4).map(f => fieldHtml('br', f)).join('') + '</div>' + fieldHtml('br', BROKER[4]);
+  if (!isGT()) $('#brBox').innerHTML = '<div class="g2">' + BROKER.slice(0, 4).map(f => fieldHtml('br', f)).join('') + '</div>' + fieldHtml('br', BROKER[4]);
   $$('.cp input').forEach(c => c.checked = !!S.cp[c.dataset.cp]);
 }
 
@@ -1235,6 +1386,13 @@ function renderSpecials(){
 function missing(){
   const out = [];
   const [ra, rb] = ROLE[S.type];
+  if (isGT()){
+    PARTY.forEach(([k, l, r]) => { if (r && !String(S.a[k] || '').trim()) out.push({s:1, g:'a', k, t:ra + ' ' + l}); });
+    PARTY.forEach(([k, l, r]) => { if (r && !String(S.b[k] || '').trim()) out.push({s:1, g:'b', k, t:rb + ' ' + l}); });
+    GT[S.type].fields.forEach(([k, l]) => { if (!String((S.g || {})[k] || '').trim()) out.push({s:2, g:'g', k, t:l}); });
+    if (!S.money.contractDate) out.push({s:2, g:'money', k:'contractDate', t:'계약일'});
+    return out;
+  }
   PARTY.forEach(([k, l, r]) => { if (r && !String(S.a[k] || '').trim()) out.push({s:1, g:'a', k, t:ra + ' ' + l}); });
   PARTY.forEach(([k, l, r]) => { if (r && !String(S.b[k] || '').trim()) out.push({s:1, g:'b', k, t:rb + ' ' + l}); });
   PROP.forEach(([k, l, r]) => { if (r && !String(S.prop[k] || '').trim()) out.push({s:2, g:'prop', k, t:l}); });
@@ -1253,7 +1411,8 @@ function markMissing(){
   $$('input.miss').forEach(e => e.classList.remove('miss'));
   if (SHOW_MISS) ms.forEach(m => { const e = $(`input[data-g="${m.g}"][data-k="${m.k}"]`); if (e) e.classList.add('miss'); });
   [1, 2, 3].forEach(s => { const b = $(`#plbls button[data-s="${s}"]`), n = ms.filter(m => m.s === s).length;
-    b.innerHTML = ['', '1 당사자', '2 물건·금액', '3 특약·확인'][s] + (SHOW_MISS && n ? `<b>${n}</b>` : ''); b.classList.toggle('on', s === S.step); b.classList.toggle('done', s < S.step); });
+    const NM = ['', '1 당사자', isGT() ? '2 계약 내용' : '2 물건·금액', '3 특약·확인'];
+    b.innerHTML = NM[s] + (SHOW_MISS && n ? `<b>${n}</b>` : ''); b.classList.toggle('on', s === S.step); b.classList.toggle('done', s < S.step); });
   const mb = $('#missBox');
   if (SHOW_MISS && ms.length){ mb.style.display = 'block'; mb.innerHTML = `<b>미입력 ${ms.length}곳</b> (빨간 칸) — ` + ms.map(m => escH(m.t)).join(', ') + '<br>그대로 출력하면 그 자리는 빈칸(____)으로 나갑니다.'; }
   else mb.style.display = 'none';
@@ -1273,7 +1432,35 @@ function TB(colWidths, rows, o = {}){
 }
 const B_ = v => String(v == null ? '' : v).trim() || '____________';
 const wonLine = n => num(n) ? `${korWon(n)} (₩${comma(n)})` : '금 ____________ 원정';
+function buildGTDoc(){
+  const g = GT[S.type], [ra, rb] = g.roles, P = S.g || {}, d = dates();
+  const V = k => { const v = P[k]; return v != null && String(v).trim() ? String(v).trim() : '____________'; };
+  const fillT = t => String(t).replace(/\{a\}/g, ra).replace(/\{b\}/g, rb).replace(/\{(\w+)\}/g, (m2, k) => V(k));
+  const blocks = [];
+  blocks.push(TX(g.title, {al:'C', sz:17, b:1}));
+  blocks.push(TX(`${ra}(${B_(S.a.name)})과 ${rb}(${B_(S.b.name)})은 아래와 같이 계약을 맺는다.`, {al:'C'}));
+  blocks.push(TX('1. 계약 내용', {b:1, sz:10.5}));
+  const rows = g.fields.map(([k, lab]) => [L(lab), {t:V(k), cs:1}]);
+  rows.push([L('계약일'), {t: d.c ? korD(d.c) : '____________'}]);
+  blocks.push(TB([24, 76], rows));
+  blocks.push(TX('2. 계약 조항', {b:1, sz:10.5}));
+  g.articles.forEach(a => blocks.push(TX(fillT(a[0] + ' ' + a[1]))));
+  blocks.push(TX('3. 특약사항', {b:1, sz:10.5}));
+  const sps = S.sp.slice().sort((x, y) => x - y).map(i => g.specials[i]).concat(String(S.free || '').split('\n').map(x => x.trim()).filter(Boolean));
+  if (sps.length) sps.forEach((t, i) => blocks.push(TX(`${i + 1}) ${t}`)));
+  else blocks.push(TX('없음'));
+  blocks.push(TX('이 계약을 증명하기 위해 양쪽 당사자가 이의 없음을 확인하고 각각 서명·날인한다.'));
+  blocks.push(TX(korD(d.c), {al:'C', b:1, sz:10.5}));
+  const party = (role, p) => [
+    [L(role, {rs:3, al:'C'}), L('주소'), {t:B_(p.addr), cs:3}, null, null],
+    [null, L('주민번호 앞자리'), B_(p.rrn), L('연락처'), B_(p.tel)],
+    [null, L('성명'), B_(p.name), L('서명·날인'), {t:'(인)', al:'R'}]];
+  blocks.push(TB([14, 18, 26, 16, 26], [...party(ra, S.a), ...party(rb, S.b)]));
+  blocks.push(TX(g.legal || LEGAL, {sz:8, c:'#666666'}));
+  return {blocks};
+}
 function buildDoc(){
+  if (isGT()) return buildGTDoc();
   const [ra, rb] = ROLE[S.type], d = dates(), m = S.money, P = S.prop, bal = balance();
   const blocks = [];
   blocks.push(TX(TITLE[S.type] + (S.type === 'house' ? (S.rent === 'jeonse' ? ' (전세)' : ' (월세)') : ''), {al:'C', sz:17, b:1}));
@@ -1366,7 +1553,7 @@ function renderPreview(){
 
 /* ---------- 출력 ---------- */
 function copies(){ const [ra, rb] = ROLE[S.type]; const out = [];
-  if (S.cp.a) out.push(ra + ' 보관용'); if (S.cp.b) out.push(rb + ' 보관용'); if (S.cp.c) out.push('개업공인중개사 보관용'); return out; }
+  if (S.cp.a) out.push(ra + ' 보관용'); if (S.cp.b) out.push(rb + ' 보관용'); if (S.cp.c && !isGT()) out.push('개업공인중개사 보관용'); return out; }
 function doPrint(){
   SHOW_MISS = true; const ms = markMissing();
   const cs = copies(); if (!cs.length) return toast('인쇄할 부수를 1부 이상 고르세요');
@@ -1392,13 +1579,16 @@ async function doHwpx(){
 }
 
 /* ---------- 화면 ---------- */
-function renderAll(){ renderParty(); renderProp(); renderMoney(); renderSpecials(); go(S.step || 1, true); }
+function renderAll(){
+  $('#legalTop').textContent = isGT() ? GT[S.type].legal : LEGAL;
+  renderParty(); renderProp(); renderMoney(); renderSpecials(); go(S.step || 1, true);
+}
 function go(n, quiet){
   S.step = n; save();
   $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's' + n));
   $('#pfill').style.width = (n / 3 * 100) + '%';
   $('#backBtn').style.display = n === 1 ? 'none' : '';
-  $('#nextBtn').textContent = n === 3 ? '인쇄 · PDF' : (n === 1 ? '다음: 물건·금액' : '다음: 특약·확인');
+  $('#nextBtn').textContent = n === 3 ? '인쇄 · PDF' : (n === 1 ? ('다음: ' + (isGT() ? '계약 내용' : '물건·금액')) : '다음: 특약·확인');
   if (n === 3) renderPreview();
   markMissing();
   if (!quiet) window.scrollTo(0, 0);
@@ -1408,8 +1598,14 @@ $('#backBtn').onclick = () => go(Math.max(1, S.step - 1));
 $('#plbls').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.s); };
 $('#printBtn').onclick = doPrint;
 $('#hwpxBtn').onclick = doHwpx;
-$('#typeSeg').onclick = e => { const b = e.target.closest('button'); if (!b || b.dataset.v === S.type) return; S.type = b.dataset.v; S.sp = [];
-  if (S.type === 'shop' && !S.money.months) S.money.months = '24'; save(); renderAll(); toast(TITLE[S.type] + '로 바꿨습니다'); };
+function setType(v){
+  if (!v || v === S.type) return;
+  S.type = v; S.sp = [];
+  if (v === 'shop' && !S.money.months) S.money.months = '24';
+  save(); renderAll(); toast(TITLE[S.type] + '로 바꿨습니다');
+}
+$('#typeSeg').onclick = e => { const b = e.target.closest('button'); if (b) setType(b.dataset.v); };
+$('#typeSeg2').onclick = e => { const b = e.target.closest('button'); if (b) setType(b.dataset.v); };
 $('#rentSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.rent = b.dataset.v; save(); renderParty(); renderMoney(); markMissing(); };
 $('#newBtn').onclick = () => { const t = S.type; S = fresh(); S.type = t; SHOW_MISS = false; try{ localStorage.removeItem(LS); }catch(e){} renderAll(); toast('새 계약서를 시작합니다'); };
 document.addEventListener('input', e => {
@@ -1421,7 +1617,9 @@ document.addEventListener('input', e => {
       else v = v.replace(/[^\d]/g, '');
     }
     if (k === 'rrn') v = el.value = v.replace(/[^\d]/g, '').slice(0, 6);
-    S[g][k] = v; save();
+    if (g === 'g'){ v = String(num(v) || '') && ['amount', 'wage', 'diff', 'deposit'].includes(k) ? String(num(v) || '') : v; if (['amount', 'wage', 'diff', 'deposit'].includes(k)) el.value = v ? comma(v) : ''; }
+    if (!S[g]) S[g] = {};
+    S[g][k] = v; S._lastG = g; save();   /* 말로·사진으로 채울 때 어느 카드에 넣을지 기억 */
     if (g === 'money') updMoney();
     if (SHOW_MISS) markMissing();
     if (S.step === 3) renderPreview();
@@ -1449,6 +1647,162 @@ $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; tr
   $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
 
 /* 시험·설명서용 손잡이 */
+
+/* ---------- 말로 채우기 · 사진으로 채우기 (계약서) ---------- */
+function cKey(){ let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){}
+  if (!k && window.KTS_FREE && window.KTS_FREE.p && window.KTS_FREE.p.length) k = window.KTS_FREE.p.join('');
+  return (k && !/^__/.test(k)) ? k : ''; }
+async function cGemini(prompt, b64){
+  const key = cKey(); if (!key) throw new Error('NO_KEY');
+  const cfg = window.KTS_AI || {}, models = cfg.models || ['gemini-flash-lite-latest'];
+  const ep = cfg.endpoint || 'https://generativelanguage.googleapis.com/v1beta/models/';
+  let last = null;
+  for (const m of models){
+    try{
+      const r = await fetch(ep + m + ':generateContent?key=' + encodeURIComponent(key), {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}, {inline_data:{mime_type:'image/jpeg', data:b64}}]}],
+          generationConfig:{responseMimeType:'application/json', temperature:0}})});
+      if (!r.ok){ last = new Error(r.status === 429 ? 'QUOTA' : 'AI ' + r.status); continue; }
+      const j = await r.json();
+      const t = (((j.candidates || [])[0] || {}).content || {}).parts?.[0]?.text || '';
+      const o = parseJsonLoose(t); if (o) return o;
+      last = new Error('READ');
+    }catch(err){ last = err; }
+  }
+  throw last || new Error('AI');
+}
+function fileB64(file, maxSide){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, (maxSide || 1600) / Math.max(im.width, im.height));
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(im.width * s)); cv.height = Math.max(1, Math.round(im.height * s));
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(im, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', 0.9).split(',')[1]);
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('IMG')); };
+    im.src = url;
+  });
+}
+let CTESS = null;
+function cLoadTess(){
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (CTESS) return CTESS;
+  CTESS = new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    sc.onload = () => res(window.Tesseract); sc.onerror = () => rej(new Error('OCR_LOAD'));
+    document.head.appendChild(sc);
+    setTimeout(() => rej(new Error('OCR_LOAD')), 20000);
+  });
+  return CTESS;
+}
+async function cLocalText(file){
+  const T = await cLoadTess();
+  const url = URL.createObjectURL(file);
+  try{ const r = await T.recognize(url, 'kor+eng'); return (r && r.data && r.data.text) || ''; }
+  finally{ URL.revokeObjectURL(url); }
+}
+const CPICK = '이미지는 신분증·사업자등록증·등기사항증명서·명함·계약 관련 서류 사진입니다. 사진에 적힌 내용을 읽어 아래 JSON 하나만 출력하세요(없으면 빈 문자열, 지어내지 마세요):\n{"성명":"","주민번호앞자리":"","주소":"","연락처":"","상호":"","사업자등록번호":"","소재지":"","지번":"","면적":"","대표자":""}';
+function parseCText(txt){
+  const t = String(txt || ''), rec = {};
+  const lines = t.split(/\n/).map(x => x.trim()).filter(Boolean);
+  const after = re => { for (const ln of lines){ const m = ln.match(new RegExp('(?:' + re.source + ')\\s*[:：]?\\s*(.{2,40})$')); if (m && m[1]) return m[1].trim(); } return ''; };
+  rec['성명'] = after(/성명|이름|대표자/);
+  rec['대표자'] = after(/대표자|대표/);
+  rec['상호'] = after(/상호|법인명|업체명|회사명/);
+  const rrn = t.match(/\d{6}\s*[-–]\s*[1-4]\d{6}/); if (rrn) rec['주민번호앞자리'] = rrn[0].replace(/\D/g, '').slice(0, 6);
+  const biz = t.match(/\b\d{3}\s*[-–]?\s*\d{2}\s*[-–]?\s*\d{5}\b/); if (biz) rec['사업자등록번호'] = biz[0];
+  rec['주소'] = after(/주소|소재지/);
+  if (!rec['주소']){ const a = t.match(/([가-힣]{2,}(?:시|도)\s*[^\n]{4,40})/); if (a) rec['주소'] = a[1].trim(); }
+  const tel = t.match(/0\d{1,2}\s*[-–]\s*\d{3,4}\s*[-–]\s*\d{4}/); if (tel) rec['연락처'] = tel[0];
+  const ar = t.match(/([\d,.]+)\s*(?:㎡|m2|제곱미터)/); if (ar) rec['면적'] = ar[1].replace(/,/g, '');
+  Object.keys(rec).forEach(k => { if (!rec[k]) delete rec[k]; });
+  return rec;
+}
+function fillContract(rec, grp){
+  let n = 0;
+  const set = (g, k, v) => { if (v == null || String(v).trim() === '') return; if (!S[g]) S[g] = {}; S[g][k] = String(v).trim(); n++; };
+  if (grp === 'a' || grp === 'b'){
+    set(grp, 'name', rec['성명'] || rec['대표자'] || rec['상호']);
+    set(grp, 'rrn', String(rec['주민번호앞자리'] || '').replace(/\D/g, '').slice(0, 6));
+    set(grp, 'addr', rec['주소'] || rec['소재지']);
+    set(grp, 'tel', rec['연락처']);
+  } else if (grp === 'prop'){
+    set('prop', 'addr', rec['소재지'] || rec['주소']);
+    set('prop', 'lot', rec['지번']);
+    set('prop', 'area', rec['면적']);
+    set('prop', 'bldg', rec['상호']);
+  } else if (grp === 'g'){
+    const fields = GT[S.type] ? GT[S.type].fields : [];
+    const pick = [['근무 장소', '소재지', '주소'], ['업무 내용', '상호'], ['임금(월)', '금액'], ['권리금', '금액'], ['차용 금액', '금액'], ['용역 대금', '금액'], ['상가 소재지', '소재지', '주소']];
+    fields.forEach(([k, lab]) => {
+      let v = '';
+      const p = pick.find(x => lab.indexOf(x[0]) === 0);
+      if (p) v = rec[p[1]] || rec[p[2] || ''] || '';
+      if (!v && rec[lab]) v = rec[lab];
+      set('g', k, v);
+    });
+  } else {
+    set('br', 'office', rec['상호']); set('br', 'rep', rec['대표자'] || rec['성명']);
+    set('br', 'reg', rec['사업자등록번호']); set('br', 'tel', rec['연락처']); set('br', 'addr', rec['소재지'] || rec['주소']);
+  }
+  if (n){ save(); renderAll(); toast(n + '칸을 채웠습니다 · 틀린 글자는 칸을 눌러 고치세요'); }
+  return n;
+}
+let LASTEL = null;
+document.addEventListener('focusin', e => { if (e.target && e.target.dataset && e.target.dataset.k) LASTEL = e.target; });
+$('#vFill').onclick = () => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다. 키보드 마이크를 써 주세요');
+  const el = (LASTEL && document.body.contains(LASTEL)) ? LASTEL : document.querySelector('#s' + S.step + ' input[data-k]:not([type=date])');
+  if (!el) return toast('먼저 값을 넣을 칸을 눌러 주세요');
+  const btn = $('#vFill'), r = new SR();
+  r.lang = 'ko-KR'; r.interimResults = false; r.continuous = false; r.maxAlternatives = 1;
+  r.onresult = ev => {
+    const t = ev.results[0][0].transcript.trim();
+    el.value = el.value && el.value.trim() ? el.value + ' ' + t : t;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    toast('"' + (el.previousElementSibling ? el.previousElementSibling.textContent.replace(/[*선택*]/g, '') : '칸') + '"에 넣었습니다: ' + t);
+  };
+  r.onerror = ev => toast(ev.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : '음성을 알아듣지 못했습니다');
+  r.onend = () => btn.classList.remove('listening');
+  try{ r.start(); btn.classList.add('listening'); }catch(e){ btn.classList.remove('listening'); }
+  el.focus();
+  toast('선택한 칸에 대고 말씀하세요');
+};
+$('#pFill').onclick = () => { if (!isGT() && !S.type) return; $('#pIn').click(); };
+$('#pIn').onchange = async e => {
+  const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
+  const grp = (LASTEL && LASTEL.dataset && LASTEL.dataset.g) || (isGT() ? 'g' : 'a');
+  $('#fillInfo').textContent = '사진에서 글자를 읽는 중…';
+  try{
+    let rec = null, how = '';
+    if (cKey()){
+      $('#fillInfo').textContent = 'AI가 사진을 읽는 중…';
+      const b64 = await fileB64(file, 1600);
+      rec = await cGemini(CPICK, b64); how = 'AI';
+    }
+    if (!rec){
+      $('#fillInfo').textContent = '기기 안 무료 인식으로 읽는 중… (처음 1회는 준비에 시간이 걸립니다)';
+      const txt = await cLocalText(file);
+      rec = parseCText(txt); how = '기기 인식';
+      if (!Object.keys(rec).length) throw new Error('NO_READ');
+    }
+    const n = fillContract(rec, grp);
+    $('#fillInfo').textContent = n ? (how + '로 ' + n + '칸을 채웠습니다. 틀린 글자는 칸을 눌러 고치세요.')
+      : '읽었지만 맞는 칸을 찾지 못했습니다. 칸을 누르고 다시 시도해 보세요.';
+    if (!n) toast('맞는 칸을 찾지 못했습니다 · 넣을 칸을 먼저 눌러 주세요');
+  }catch(err){
+    const m = err.message === 'NO_KEY' ? 'AI 열쇠가 없어 기기 인식도 쓰지 못했습니다(인터넷 필요)' :
+      err.message === 'NO_READ' ? '사진에서 글자를 읽지 못했습니다. 밝은 곳에서 다시 찍어 주세요' :
+      err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진을 읽지 못했습니다';
+    $('#fillInfo').textContent = m; toast(m);
+  }
+};
+
 window.KC = {get S(){ return S; }, set S(v){ S = v; }, renderAll, go, buildDoc, hwpxBlob, doPrint, korWon, korNum, missing, markMissing, copies, rawToHtml, fresh, save};
 renderAll();
 </script>
