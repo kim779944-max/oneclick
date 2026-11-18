@@ -333,7 +333,7 @@ function render(){
     '<div class="g">' +
       '<div><b>' + num(cfg.margin) + '%</b><span>목표 마진</span></div>' +
       '<div><b>' + items.length + '개</b><span>담은 상품</span></div>' +
-      '<div><b style="color:' + (totalNet > 0 ? '#fff' : '#FF8A97') + '">' + won(totalNet) + '</b><span>순익 합계</span></div>' +
+      '<div><b style="color:' + (totalNet < 0 ? '#FF8A97' : '#fff') + '">' + won(totalNet) + '</b><span>순익 합계</span></div>' +
     '</div>';
   $('#sumEd').onclick = () => openCfg('margin');
 
