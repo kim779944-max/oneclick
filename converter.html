@@ -173,13 +173,18 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 .resume button.x{border-color:var(--line2);background:#12203C;color:#9DAEC5;padding:7px 9px}
 @media print{
   header.top,.ktsRsv,.wtop,.pvtools,.dock,.pvnote,.src,.fontrow,#home,#busy,.toast,.sharebar,.upgcard,.blurbox,.resume{display:none!important}
-  body{background:#fff}
-  #app{max-width:none;box-shadow:none;background:#fff}
-  #work,#res{display:block!important}
+  html,body{background:#fff;margin:0;padding:0;height:auto;min-height:0}
+  #app{max-width:none;box-shadow:none;background:#fff;min-height:0;padding:0;overflow:hidden;height:297mm}
+  #work,#res{margin:0;padding:0;height:297mm;overflow:hidden}
   #pvWrap,#res .rbody{padding:0;overflow:visible}
   .pvbox{box-shadow:none;padding:0}
   .a4fit{overflow:visible!important;height:auto!important}
-  .a4{transform:none!important;width:210mm;height:297mm;page-break-after:always}
+  .a4{transform:none!important;width:210mm;height:297mm;page-break-after:auto;box-shadow:none}
+  .a4 .a4in{position:static;left:auto;top:auto;right:auto;bottom:auto;width:auto;height:auto;
+    padding:20mm 30mm;transform:none!important}
+  .pvnote{display:none}
+  #work .pvblank{outline:0!important}
+  .pvblank:after{content:none!important}
   .a4 .a4tag{display:none}
   @page{size:A4;margin:0}
 }

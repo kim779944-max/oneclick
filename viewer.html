@@ -64,6 +64,20 @@ body.docopen{padding-top:84px}
 body.docopen header{display:none}
 body.docopen .doc .bar #backb{display:none}
 body.docopen .xltop .zoombox{display:none}
+/* A4 보기 — 화면을 실제 용지(210×297mm) 비율로 깔아 인쇄 결과를 그대로 확인 */
+.a4sheet{position:relative;width:100%;overflow:hidden;background:#fff;border-radius:6px}
+.a4sheet .pg{width:794px;background:#fff;transform-origin:top left;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.a4sheet .pgin{padding:20mm 30mm}
+.a4sheet .pgin table.xl{width:100%!important;min-width:0;font-size:8.5pt;background:#fff;color:#111}
+.a4sheet .pgin table.xl td,.a4sheet .pgin table.xl th{white-space:normal;word-break:break-all;font-size:8.5pt;
+  color:#111;background:#fff;border-color:#333}
+.a4sheet .pgin table.xl th{background:#EEF2F8}
+.a4sheet .pgin .xlwrap{overflow:visible;border:0;border-radius:0;background:#fff}
+.a4sheet .pgin .xltop{display:none}
+.a4sheet .pgin .hw p,.a4sheet .pgin .hw h4{color:#111}
+.a4sheet .pgmark{position:absolute;left:0;right:0;border-top:1px dashed #B9C4D4;pointer-events:none}
+.a4sheet .pgmark em{position:absolute;right:4px;top:2px;font-style:normal;font-size:9px;color:#7B889B}
+#vtA4.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber);border-color:var(--amber)}
 #vtool .r1{display:flex;align-items:center;gap:8px;padding:7px 12px 3px}
 #vtool .r1 .bk{font-size:12.5px;font-weight:900;color:var(--amber2);padding:5px 2px;white-space:nowrap}
 #vtool .r1 .fn{flex:1;min-width:0;font-size:11px;font-weight:800;color:#DCE6F2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -154,6 +168,7 @@ table.xl td.b{font-weight:900}
   <div class="r1">
     <button type="button" class="bk" id="vtBack">← 뒤로가기</button>
     <span class="fn" id="vtName">문서</span>
+    <button type="button" id="vtA4" style="font-size:10.5px;font-weight:900;color:#DCE6F2;background:#12203C;border:1px solid var(--line2);border-radius:999px;padding:5px 9px;white-space:nowrap">A4</button>
     <div class="sw"><button type="button" id="vtConv">변환기</button><button type="button" class="on" id="vtView">더뷰</button></div>
   </div>
   <div class="r2">
@@ -726,6 +741,7 @@ function loader(on, name, step, pct){
 }
 function resetView(){
   docEl.style.display = 'none'; docEl.classList.remove('paper');
+  A4MODE = false; const a4b = document.getElementById('vtA4'); if (a4b) a4b.classList.remove('on');
   document.body.classList.remove('docopen');
   document.getElementById('banner').classList.remove('hide');
   dropEl.classList.remove('mini'); loaderEl.classList.remove('on');
@@ -842,6 +858,37 @@ window.addEventListener('popstate', e => {
   if (st.v === 'doc') return;                       /* 앞으로 가기 — 화면 유지 */
   if (docEl && docEl.style.display !== 'none'){ resetView(); showToast('직전 화면으로 돌아왔습니다'); }
 });
+let A4MODE = false;
+function applyA4(){
+  const body = document.querySelector('.doc .body'); if (!body) return;
+  if (A4MODE){
+    if (body.querySelector('.a4sheet')) return;
+    const sheet = document.createElement('div'); sheet.className = 'a4sheet';
+    const pg = document.createElement('div'); pg.className = 'pg';
+    const inner = document.createElement('div'); inner.className = 'pgin';
+    pg.style.minHeight = '1123px';             /* 실제 A4 세로(297mm) — 비율 1:1.414 고정 */
+    while (body.firstChild) inner.appendChild(body.firstChild);
+    pg.appendChild(inner); sheet.appendChild(pg);
+    const mark = document.createElement('div'); mark.className = 'pgmark';
+    mark.innerHTML = '<em>여기까지가 A4 1장</em>';
+    sheet.appendChild(mark);
+    body.appendChild(sheet);
+    const s = Math.max(0.2, Math.min(1, (body.clientWidth - 4) / 794));
+    pg.style.transform = 'scale(' + s + ')';
+    const pageH = Math.round(1123 * s);
+    const contentH = Math.round(Math.max(pg.scrollHeight, inner.scrollHeight) * s);
+    sheet.style.height = Math.max(pageH, contentH) + 'px';
+    mark.style.top = pageH + 'px';
+    mark.style.display = contentH > pageH + 4 ? '' : 'none';
+  } else {
+    const sheet = body.querySelector('.a4sheet');
+    if (sheet){
+      const inner = sheet.querySelector('.pgin');
+      while (inner.firstChild) body.insertBefore(inner.firstChild, sheet);
+      sheet.remove();
+    }
+  }
+}
 (function bindVTool(){
   const q = id => document.getElementById(id);
   q('vtOut').onclick = () => vSet(VZOOM - 0.2);
@@ -850,6 +897,12 @@ window.addEventListener('popstate', e => {
   q('vtPrint').onclick = () => { showToast('인쇄 창에서 [PDF로 저장]을 고르면 종이로 나갑니다'); setTimeout(() => window.print(), 140); };
   q('vtConv').onclick = () => { location.href = 'converter.html'; };
   q('vtView').onclick = () => showToast('지금 더뷰입니다');
+  q('vtA4').onclick = () => {
+    A4MODE = !A4MODE;
+    q('vtA4').classList.toggle('on', A4MODE);
+    applyA4();
+    showToast(A4MODE ? 'A4 용지 비율로 봅니다 · 점선 아래는 2장째' : '원래 화면으로 돌아왔습니다');
+  };
   q('vtBack').onclick = () => {
     if (history.state && history.state.v === 'doc') history.back();
     else resetView();
