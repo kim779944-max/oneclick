@@ -117,6 +117,11 @@ h1 em{font-style:normal;color:var(--amber)}
 </style>
 </head>
 <body>
+<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:8px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;font-size:11.5px;font-weight:800;line-height:1.4;-webkit-tap-highlight-color:transparent">
+<span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px">사전예약</span>
+<span style="flex:1;min-width:0">현재 지역 <b style="color:#FFA24D">무료 세팅</b> 사전예약 · 10초</span>
+<span style="flex:0 0 auto;color:#FFA24D;font-weight:900">→</span></a>
+
 <div id="app">
   <div class="hd">
     <img src="icon_loan.png" alt="">
@@ -398,9 +403,9 @@ function fixes(d, r){
   if (r.debtRatio != null && r.debtRatio > 300) out.push({t:'부채비율 ' + Math.round(r.debtRatio) + '%', c:'자본이 부족하거나 가지급금·가수금이 자산에 섞여 있을 때 자주 발생합니다.',
     s:['가지급금을 회수하거나 가수금을 자본(출자전환)으로 정리하세요.','대표자 개인 차입금을 회사 차입금에서 분리하세요.','정리 후 재무제표를 다시 만들어 비율을 확인하세요.']});
   if (r.icr != null && r.icr < 1.5) out.push({t:'이자보상배율 ' + r.icr.toFixed(2) + '배', c:'영업이익으로 이자를 감당하기 어렵다는 뜻입니다. 은행이 가장 먼저 보는 지표입니다.',
-    s:['고금리 대출부터 저금리 정책자금으로 대환하세요.','이자비용이 큰 단기차입금을 장기로 돌리세요.','영업이익 개선 자료(원가 절감·매출 회복)를 3개월 치 준비하세요.']});
+    s:['고금리 대출부터 저금리 정책자금으로 대환하세요.','이자비용이 큰 단기차입금을 장기로 돌리세요.','영업이익 개선 자료(비용 절감·매출 회복)를 3개월 치 준비하세요.']});
   if (r.opMargin != null && r.opMargin < 3) out.push({t:'영업이익률 ' + (r.opMargin).toFixed(1) + '%', c:'매출은 있어도 남는 것이 적으면 상환 능력을 낮게 봅니다.',
-    s:['원가 항목(재료비·인건비·임대료)을 3줄로 쪼개 개선 폭을 숫자로 만드세요.','정부 지원사업(스마트상점 등)으로 설비·인건비를 줄이는 경로를 함께 검토하세요.']});
+    s:['비용 항목(재료비·인건비·임대료)을 3줄로 쪼개 개선 폭을 숫자로 만드세요.','정부 지원사업(스마트상점 등)으로 설비·인건비를 줄이는 경로를 함께 검토하세요.']});
   if (r.growth != null && r.growth < -30) out.push({t:'매출 급감 ' + Math.round(r.growth) + '%', c:'급감 자체보다 급감의 원인과 회복 계획이 심사 포인트입니다.',
     s:['급감 원인(공사·계절·상권)을 한 장으로 정리하세요.','회복 계획과 최근 3개월 매출 추이를 함께 제출하세요.']});
   if (d.guar && d.gbal > 50000000) out.push({t:'기존 보증 잔액 ' + fmt(d.gbal) + '원', c:'보증 한도는 총액 기준이라 새 보증이 막힐 수 있습니다.',
