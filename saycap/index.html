@@ -1531,10 +1531,9 @@ $('#editSave').onclick = async () => {
   let ok = false;
   try{ ok = await saveEdit(true); }catch(e){ ok = false; }
   if(ok){
+    /* v2.8 : 저장은 저장만 — 갤러리로 넘어가지 않고 이 화면(촬영·자막 작성)에 그대로 머문다 */
     lastSavedId = editing && editing.rec ? editing.rec.id : null;
-    show('gallery');
-    requestAnimationFrame(()=>{ try{ window.scrollTo({top:0,behavior:'auto'}); const f=document.getElementById('galFeed'); if(f) f.scrollTop=0; }catch(e){} });
-    showSaved(lastSavedId);      /* v1.5 ③ 저장 완료 — 공유 옆 '수정(연필)' */
+    toast('저장했습니다 · 이 화면에서 계속 자막을 다듬을 수 있습니다', 2400);
   }
 };
 async function saveEdit(keep){
@@ -2133,6 +2132,16 @@ async function paintViewer(){
   scale = 1; tx = 0; ty = 0; applyTransform();
   const c = p.caption || {};
   paintChip($('#viewChip'), c);
+  /* v2.8 : 왼쪽 위 주소는 1개만 — 날짜 칩의 장소가 아래 위치 주소와 같으면 날짜만 남긴다 */
+  (() => {
+    const chip = $('#viewChip'); if(!chip) return;
+    const norm = v => String(v || '').replace(/\s+/g, '');
+    const pl = norm(c.place), ad = norm(p.addr);
+    const same = !!(pl && ad && (pl === ad || ad.endsWith(pl) || pl.endsWith(ad)));
+    const pe = chip.querySelector('.p'), se = chip.querySelector('.sep');
+    if(pe) pe.style.display = same ? 'none' : '';
+    if(se) se.style.display = same ? 'none' : '';
+  })();
   const vm = $('#viewMemo');
   const txt = c.memo || '';
   if(vm.querySelector('.txt').textContent !== txt) vm.querySelector('.txt').textContent = txt;
@@ -2162,9 +2171,9 @@ function openMap(p){
   const d = 0.004;
   const bbox = [g.lng-d, g.lat-d, g.lng+d, g.lat+d].join(',');
   $('#mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${g.lat},${g.lng}`;
-  const addr = p.addr || (p.caption && p.caption.place) || '';
+  /* v2.8 : 주소 1개 + 지도 1개 — 지번·도로명을 겹쳐 보여 주지 않고 한 줄만 */
+  const addr = p.addr || (p.caption && p.caption.place) || p.road || '';
   $('#mapAddr').innerHTML = (addr ? `<b>${esc(addr)}</b>` : '<b>촬영 위치</b>') +
-    (p.road ? esc(p.road) : '') +
     `<span class="coord">위도 ${g.lat.toFixed(6)} · 경도 ${g.lng.toFixed(6)}</span>`;
   $('#mapKakao').href = `https://map.kakao.com/link/map/${encodeURIComponent(addr || '촬영 위치')},${g.lat},${g.lng}`;
   $('#mapNaver').href = `https://map.naver.com/p?c=${g.lng},${g.lat},17,0,0,0,dh`;
