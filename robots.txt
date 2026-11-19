@@ -1,0 +1,6 @@
+# KTS 원클릭 — autooneclick.com
+User-agent: *
+Allow: /
+Disallow: /ops/
+
+Sitemap: https://autooneclick.com/sitemap.xml
