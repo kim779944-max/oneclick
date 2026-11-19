@@ -67,6 +67,11 @@ img.pic{display:block;max-width:100%;margin:0 auto;border-radius:10px}
 .ppsheet table.xl th{background:#EEF2F8;font-weight:900;text-align:center}
 .ppsheet table.xl td.num{text-align:right}
 .ppsheet img{max-width:100%;height:auto}
+/* 엑셀처럼 열이 많은 표는 A4 폭에 우겨넣지 않고 표 원래 폭대로 종이를 넓힌다 */
+.ppsheet.wide{width:auto;max-width:none;padding:14mm 16mm}
+.ppsheet.wide table.xl{width:auto;min-width:0;table-layout:auto;font-size:9pt}
+.ppsheet.wide table.xl td,.ppsheet.wide table.xl th{white-space:nowrap;word-break:normal;min-width:0}
+.ppsheet.wide table.xl col{width:auto!important}
 .ppmark{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,107,0,.75);pointer-events:none;z-index:2}
 .ppmark em{position:absolute;right:4px;top:-15px;font-style:normal;font-size:9px;font-weight:800;color:#FFA24D}
 /* 안내 카드 — 구형 .hwp는 1:1 인화가 안 되므로 깨뜨려 띄우지 않고 안내만 */
@@ -671,7 +676,14 @@ function layoutPages(gap){
 }
 function fitZoom(){
   const sw = (out.clientWidth || 390) - 6;
-  return ppClamp(sw / (PP.w || 794), 0.06, 1.6);
+  const fit = sw / (PP.w || 794);
+  /* A4보다 넓은 표(엑셀 등)는 폭에 우겨넣지 않고, 세로가 다 보이는 배율(최대 100%)로 열어 옆으로 민다 */
+  if (PP.kind === 'html' && PP.w > 1000){
+    const realH = PP.realH || PP.h || 1123;
+    const hFit = ((out.clientHeight || 600) - 26) / realH;
+    return ppClamp(Math.min(1, Math.max(fit, hFit)), 0.1, 1.6);
+  }
+  return ppClamp(fit, 0.06, 1.6);
 }
 function applyZoom(z, opt){
   if (!PP.space || !PP.scale) return;
@@ -861,23 +873,30 @@ async function buildImage(url){
 function buildSheet(r){
   PP.kind = 'html';
   const sheet = document.createElement('div');
-  sheet.className = 'ppsheet';
+  sheet.className = 'ppsheet' + (r.kind === 'table' ? ' wide' : '');
   sheet.innerHTML = r.html;
   /* 화면용 px 글자크기는 버리고 용지(pt) 기준으로 — 화면 폭과 무관한 종이 배치 */
   sheet.querySelectorAll('table.xl').forEach(t => { t.style.removeProperty('font-size'); });
   PP.scale.appendChild(sheet);
   PP.sheet = sheet;
-  PP.w = 794;
+  /* 표가 A4 폭 안에 들어오면 A4 그대로, 넘으면 표 원래 폭만큼 종이를 넓힌다 */
+  let nat = 794;
+  if (r.kind === 'table'){
+    nat = Math.ceil(sheet.offsetWidth) || 794;
+    if (nat <= 794){ sheet.classList.remove('wide'); nat = 794; }
+  }
+  PP.w = nat;
   ppSheetMeasure();
 }
 function ppSheetMeasure(){
   if (!PP.sheet) return;
-  const h = Math.max(PP.sheet.offsetHeight, 1123);
-  PP.h = h; PP.pageH = 1123;
+  const real = PP.sheet.offsetHeight || 1123;
+  const h = Math.max(real, 1123);
+  PP.h = h; PP.realH = real; PP.pageH = 1123;
   const n = Math.max(1, Math.ceil(h / 1123 - 0.001));
   PP.tops = [];
   for (let i = 0; i < n; i++) PP.tops.push(i * 1123);
-  PP.pages = [{el: PP.sheet, w: 794, h: h}];
+  PP.pages = [{el: PP.sheet, w: PP.w, h: h}];
   PP.scale.querySelectorAll('.ppmark').forEach(m => m.remove());
   for (let i = 1; i < n; i++){
     const m = document.createElement('div');
