@@ -51,30 +51,48 @@ h1 em{font-style:normal;color:var(--amber)}
   background:#0E1B33;border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
 .tabs button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
 .count{font-size:11px;color:var(--gray);margin:11px 0 4px}
-.plist{display:grid;gap:10px;margin-top:8px}
-.prow{display:flex;gap:12px;border:1px solid var(--line);border-radius:16px;padding:13px;
+/* ⭐ 자주 쓰는 바로가기 (2026-11-19 · 적립메모 88번) — 추가분만, 기존 틀 무변경 */
+.fav{margin:7px 0 3px}
+.favH{display:flex;align-items:baseline;gap:7px;margin:0 0 7px}
+.favH b{font-size:12.5px;font-weight:900;color:#fff;letter-spacing:-.35px}
+.favH span{font-size:9.5px;color:#7F8FA8;font-weight:700}
+.favRow{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}
+.favRow::-webkit-scrollbar{display:none}
+.fchip{flex:0 0 auto;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);
+  border:1px solid var(--line2);border-radius:12px;padding:6px 10px 6px 6px;background:#0F1B33;max-width:178px}
+.fchip:active{transform:translateY(1px)}
+.fchip img{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid rgba(198,160,84,.3);flex:0 0 auto}
+.fchip .fnm{min-width:0}
+.fchip .fn{display:block;font-size:11px;font-weight:900;letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fchip .fk{display:block;font-size:8.5px;font-weight:900;color:var(--amber2);letter-spacing:.04em;margin-top:1px}
+.favEmpty{font-size:10.5px;color:#7F8FA8;font-weight:700;border:1px dashed #2A3C63;border-radius:11px;padding:9px 11px}
+.plist{display:grid;gap:8px;margin-top:8px}
+.prow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px 11px;
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));position:relative}
 .prow.soon{opacity:.72}
-.pico{width:52px;height:52px;border-radius:13px;flex:0 0 auto;overflow:hidden;background:#0B1730;
+.pico{width:44px;height:44px;border-radius:11px;flex:0 0 auto;overflow:hidden;background:#0B1730;
   border:1px solid rgba(198,160,84,.35)}
 .pico img{width:100%;height:100%;display:block;object-fit:cover}
 .pmain{flex:1;min-width:0}
-.pname{display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:900;letter-spacing:-.4px;color:#fff}
-.pname .bd{font-size:9px;font-weight:900;border-radius:999px;padding:2px 6px;letter-spacing:.05em}
+.pname{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:900;letter-spacing:-.4px;color:#fff}
+.pname .bd{font-size:9px;font-weight:900;border-radius:999px;padding:2px 6px;letter-spacing:.05em;flex:0 0 auto}
 .bd.new{color:var(--on);background:linear-gradient(90deg,#FF8A2B,#FFA24D)}
 .bd.free{color:#0B2C1B;background:#4ADE80}
 .bd.pro{color:#20180A;background:linear-gradient(90deg,#D9B876,#C6A054)}
 .bd.soon{color:#3A2200;background:#FCD34D}
-.psub{font-size:11px;color:var(--amber2);margin-top:2px;font-weight:700}
+.psub{font-size:10.5px;color:var(--amber2);margin-top:1px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pdesc{font-size:11.5px;color:var(--ink2);line-height:1.55;margin-top:5px;word-break:keep-all}
-.pbot{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
-.price{font-size:12px;font-weight:900;color:#fff}
+.pbot{display:flex;align-items:center;gap:6px;margin-top:5px}
+.price{font-size:11.5px;font-weight:900;color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .price small{display:block;font-size:10px;color:var(--gray);font-weight:700;margin-top:2px}
-.pbtns{margin-left:auto;display:flex;gap:6px}
-.pbtns a,.pbtns button{font-family:inherit;font-size:11.5px;font-weight:900;border-radius:10px;padding:8px 11px;
-  cursor:pointer;text-decoration:none;border:1px solid var(--line2);background:var(--card2);color:var(--ink)}
+.pbtns{margin-left:auto;display:flex;gap:5px;flex:0 0 auto}
+.pbtns a,.pbtns button{font-family:inherit;font-size:11px;font-weight:900;border-radius:9px;padding:6px 9px;
+  cursor:pointer;text-decoration:none;border:1px solid var(--line2);background:var(--card2);color:var(--ink);line-height:1.15}
 .pbtns a.go{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
 .pbtns .soonbtn{opacity:.6;pointer-events:none}
+.pbtns .star{width:26px;padding:6px 0;text-align:center;color:#7F8FA8;background:#0E1B33;font-size:12px}
+.pbtns .star.on{color:var(--amber2);border-color:rgba(255,107,0,.6);background:rgba(255,107,0,.12)}
 .foot{margin-top:26px;border-top:1px solid #1B2946;padding-top:16px;font-size:10.5px;line-height:1.75;color:#7D8CA6;word-break:keep-all}
 .foot b{color:#C7D3E3}
 .foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
@@ -373,6 +391,12 @@ h1 em{font-style:normal;color:var(--amber)}
   </div>
   <div class="count" id="count"></div>
   <div class="slegend" id="slegend"></div>
+
+  <section class="fav" id="fav" aria-label="자주 쓰는 바로가기">
+    <div class="favH"><b>★ 자주 쓰는 바로가기</b><span>카드의 ☆를 누르면 이 줄에 고정됩니다</span></div>
+    <div class="favRow" id="favRow"></div>
+  </section>
+
   <div class="plist" id="plist"></div>
 
   <section class="hub" id="hub">
@@ -428,30 +452,80 @@ function renderLegend(){
   }).join('') + '<i style="color:#6F819C">· 배지를 누르면 수정 내역</i>';
 }
 
+/* ⭐ 자주 쓰는 바로가기 (2026-11-19 · 적립메모 88번)
+   카드의 ☆로 고정한 도구 + 최근에 많이 연 도구를 최대 6개까지 위에 띄웁니다.
+   저장은 이 브라우저(localStorage)에만 합니다 — 서버로 보내지 않습니다. */
+var FAV_KEY = 'kts_favs', REC_KEY = 'kts_recent';
+var FAV_DEFAULT = ['viewer','photo2doc','thedetail','contract','navi','sign'];
+function lsArr(k){ try { var v = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
+function lsPut(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function isFav(k){ return lsArr(FAV_KEY).indexOf(k) >= 0; }
+function toggleFav(k){
+  var f = lsArr(FAV_KEY), i = f.indexOf(k);
+  if (i >= 0) f.splice(i, 1); else { f.unshift(k); if (f.length > 8) f = f.slice(0, 8); }
+  lsPut(FAV_KEY, f);
+  render();
+  toastMsg(i >= 0 ? '바로가기에서 뺐습니다' : '위 ★ 자주 쓰는 바로가기에 고정했습니다');
+}
+function markRecent(k){
+  if (!k) return;
+  var r = lsArr(REC_KEY).filter(x => x !== k);
+  r.unshift(k); if (r.length > 12) r = r.slice(0, 12);
+  lsPut(REC_KEY, r);
+  try { renderFav(); } catch(e){}
+}
+function renderFav(){
+  var box = $('#favRow'); if (!box) return;
+  var by = {}; (window.PRODUCTS || []).forEach(p => { by[p.k] = p; });
+  var pinned = lsArr(FAV_KEY).filter(k => by[k]);
+  var out = pinned.slice();
+  var add = k => { if (by[k] && out.indexOf(k) < 0 && out.length < 6) out.push(k); };
+  lsArr(REC_KEY).forEach(add);
+  FAV_DEFAULT.forEach(add);
+  if (!out.length){ box.innerHTML = '<span class="favEmpty">☆ 누르면 이 줄에 고정됩니다</span>'; return; }
+  box.innerHTML = out.map(k => {
+    var p = by[k], pin = pinned.indexOf(k) >= 0;
+    var href = p.link || ('detail.html?k=' + k);
+    var nm = String(p.nm).split(' — ')[0];
+    return `<a class="fchip" href="${href}"><img src="${p.icon}" alt=""><span class="fnm"><span class="fn">${nm}</span><span class="fk">${pin ? '★ 고정' : '최근'}</span></span></a>`;
+  }).join('');
+}
+/* 별표·열기 버튼은 카드가 다시 그려져도 한 곳에서 받습니다 */
+document.addEventListener('click', e => {
+  if (!e.target.closest) return;
+  var st = e.target.closest('[data-fav]');
+  if (st){ e.preventDefault(); e.stopPropagation(); toggleFav(st.getAttribute('data-fav')); return; }
+  var go = e.target.closest('.pbtns a.go');
+  if (go) markRecent(go.getAttribute('data-k'));
+}, true);
+
 function render(){
   const list = window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
   $('#count').textContent = list.length + '개';
   renderLegend();
   $('#plist').innerHTML = list.map(p => {
     const m = stMeta(p);
+    const fv = isFav(p.k);
+    const safeNm = String(p.nm).replace(/"/g,'&quot;');
     return `
     <div class="prow${p.status==='soon'?' soon':''}">
-      ${m ? `<button class="sbadge" type="button" data-k="${p.k}" style="--sc:${m.def.color};--sk:${m.def.ink}" aria-label="${p.nm} 시연 상태 ${m.def.label} — 누르면 수정 내역">${m.def.label}</button>` : ''}
+      ${m ? `<button class="sbadge" type="button" data-k="${p.k}" style="--sc:${m.def.color};--sk:${m.def.ink}" aria-label="${safeNm} 시연 상태 ${m.def.label} — 누르면 수정 내역">${m.def.label}</button>` : ''}
       <div class="pico"><img src="${p.icon}" alt="" loading="lazy"></div>
       <div class="pmain">
-        <div class="pname">${p.nm}${p.badge ? `<span class="bd ${BADGE[p.badge]||'new'}">${p.badge}</span>` : ''}</div>
+        <div class="pname"><span class="pnm">${p.nm}</span>${p.badge ? `<span class="bd ${BADGE[p.badge]||'new'}">${p.badge}</span>` : ''}</div>
         <div class="psub">${p.sub}</div>
-        <div class="pdesc">${p.line}</div>
         <div class="pbot">
-          <div class="price">${p.price}${p.price2 ? `<small>${p.price2}</small>` : ''}</div>
+          <div class="price">${p.price}</div>
           <div class="pbtns">
+            <button class="star${fv?' on':''}" type="button" data-fav="${p.k}" aria-pressed="${fv}" aria-label="${safeNm} 자주 쓰는 바로가기 ${fv?'해제':'고정'}">${fv?'★':'☆'}</button>
             <a href="detail.html?k=${p.k}">자세히</a>
-            ${p.link ? `<a class="go" href="${p.link}">열기</a>`
+            ${p.link ? `<a class="go" href="${p.link}" data-k="${p.k}">열기</a>`
                      : `<button class="soonbtn" type="button">준비 중</button>`}
           </div>
         </div>
       </div>
     </div>`; }).join('');
+  renderFav();
 }
 $$('#tabs button').forEach(b => b.onclick = () => {
   cur = b.dataset.c;
@@ -474,13 +548,15 @@ function buildTiles(){
     {nm:'원클릭 셀러', sub:'담기→올리기→발주', link:'seller/', ico:'▦', nw:1}
   ];
   const short = s => String(s||'').split(/ — | \(/)[0];
-  const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => e.link === p.link))
+  /* catalog.json이 링크 뒤에 ?v=판번호를 붙이므로 같은 도구인지는 물음표 앞으로 비교합니다 */
+  const norm = u => String(u||'').split('?')[0];
+  const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => norm(e.link) === norm(p.link)))
     .map(p => ({nm:short(p.nm), sub:p.sub.split(' · ')[0].split('→')[0].trim(), link:p.link, img:p.icon, nw:p.badge==='NEW'}));
   const soon = window.PRODUCTS.filter(p => p.status === 'soon').map(p => ({nm:short(p.nm), sub:'준비 중', img:p.icon, off:1}));
   const all = [...EXTRA, ...live, ...soon];
   /* 대표님 확정 순서 — 더뷰 · 더스캔 · 더지우개 · 더상세 · 더파일 · 더싸인 · 롱테일 · 독심술 · 세이캡 · 오늘의 특가 먼저, 나머지는 뒤로 */
   const PRIORITY = ['viewer.html','thescan/','theeraser/','thedetail/','converter.html','sign/','longtail.html','navi2/','saycap/','sale/','seller/','ad_magnet/'];
-  const ord = t => { const i = PRIORITY.indexOf(t.link); return i < 0 ? 99 : i; };
+  const ord = t => { const i = PRIORITY.indexOf(norm(t.link)); return i < 0 ? 99 : i; };
   all.sort((a, b) => ord(a) - ord(b));
   $('#tiles').innerHTML = all.map(t => {
     const ic = t.img ? `<img src="${t.img}" alt="" loading="lazy">` : t.ico;
@@ -590,6 +666,13 @@ function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; 
   clearTimeout(toastMsg._t); toastMsg._t = setTimeout(()=>t.classList.remove('on'), 2200); }
 (function(){
   const mst = $('#mst'), key = $('#mKey'), sheet = $('#msheet'), scrim = $('#mscrim'), pin = $('#mPin'), err = $('#mErr');
+  /* ?master=2899 로 들어오면 PIN 창 없이 바로 마스터 모드 (적립메모 86번) */
+  try{
+    const mm = (location.search.match(/[?&]master=([^&]+)/) || [])[1];
+    if (mm && window.KTS && window.KTS.setMaster(decodeURIComponent(mm))) {
+      setTimeout(() => { try { toastMsg('마스터 모드 — 전 상품 무제한으로 열립니다'); } catch(e){} }, 60);
+    }
+  }catch(e){}
   const LIVE = () => (window.PRODUCTS || []).filter(p => p.status === 'live' && p.link);
   function masterGrid(){
     const cat = window.KTS_CATALOG || {};

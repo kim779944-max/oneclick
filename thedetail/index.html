@@ -114,6 +114,12 @@
     background:rgba(6,11,26,.82);color:#fff;font-size:13px;line-height:1;display:grid;place-items:center;cursor:pointer
   }
   .th .cap{font-size:10px;color:var(--dim2);text-align:center;margin-top:4px}
+  /* 부동산 매물용 (2026-11-19 · 적립메모 85번) — 추가분만 */
+  body.eMode .onlyP{display:none}
+  .th .role{width:78px;margin-top:4px;font:inherit;font-size:10.5px;font-weight:800;color:#EAF0FA;
+    background:#0C1730;border:1px solid var(--line2);border-radius:7px;padding:4px 2px;text-align:center;text-align-last:center}
+  .th .role:focus{outline:none;border-color:var(--orange)}
+  .th.main .role{border-color:rgba(255,107,0,.55)}
   .clr{margin-top:2px;background:transparent;border:1px dashed rgba(255,255,255,.2);color:#8FA0BF;
     font:inherit;font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:9px;cursor:pointer}
   .clr:active{border-color:var(--orange);color:var(--orange)}
@@ -228,7 +234,7 @@
     </div>
   </div>
 </header>
-<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">기준가 500,000원 → 지금 <b style="color:#FF6B00;font-weight:900">0원</b> · 업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
+<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
 
 <div id="screenInput">
@@ -256,7 +262,35 @@
     </div>
   </div>
 
-  <div class="step">
+  <!-- ── 부동산 매물용 전용 입력 (2026-11-19 · 적립메모 85번) ── 부동산 모드에서만 보입니다 -->
+  <div class="step" id="stepEstate" hidden>
+    <div class="sh"><span class="no">02</span><span class="tt">매물 자리 · 가격</span><span class="opt">부동산</span></div>
+    <div class="card">
+      <label class="fl" for="fAddr">소재지</label>
+      <input type="text" id="fAddr" placeholder="예) 경기 의정부시 민락동 123-4, 3층">
+      <div style="height:11px"></div>
+      <div class="grid2">
+        <span class="k">매매/교환가</span><input type="text" id="fTrade" placeholder="예) 4억 2천만 원">
+        <span class="k">실투자금</span><input type="text" id="fInvest" placeholder="예) 1억 1천만 원">
+      </div>
+      <div style="height:11px"></div>
+      <label class="fl" for="fPhone">문의 전화</label>
+      <input type="tel" id="fPhone" inputmode="tel" placeholder="예) 010-2002-2899">
+      <div class="hint">전화번호는 브리핑 아래 <b>전화 문의</b> 버튼으로 그대로 들어갑니다.</div>
+    </div>
+  </div>
+
+  <div class="step" id="stepRights" hidden>
+    <div class="sh"><span class="no">03</span><span class="tt">권리분석 3줄</span><span class="opt">핵심만</span></div>
+    <div class="card">
+      <div class="pt"><span class="n">01</span><input type="text" id="fR0" placeholder="예) 갑구 근저당 3억 — 매도 시 말소"></div>
+      <div class="pt"><span class="n">02</span><input type="text" id="fR1" placeholder="예) 을구 해당 없음 · 세금 체납 0원"></div>
+      <div class="pt"><span class="n">03</span><input type="text" id="fR2" placeholder="예) 임차인 없음 · 즉시 인도 가능"></div>
+      <div class="hint">등기부 갑구·을구, 세금 체납, 임차인·보증금만 적어도 매수인 판단이 됩니다.</div>
+    </div>
+  </div>
+
+  <div class="step" id="stepPoints">
     <div class="sh"><span class="no">02</span><span class="tt" id="lbPoints">핵심 포인트 3가지</span><span class="opt">짧게</span></div>
     <div class="card">
       <div class="pt"><span class="n">01</span><input type="text" id="fP0" data-point="0" placeholder="가장 센 한 가지"></div>
@@ -267,7 +301,7 @@
   </div>
 
   <div class="step">
-    <div class="sh"><span class="no">03</span><span class="tt">제원 4줄</span><span class="opt">표로 들어갑니다</span></div>
+    <div class="sh"><span class="no" id="noSpecs">03</span><span class="tt" id="ttSpecs">제원 4줄</span><span class="opt" id="optSpecs">표로 들어갑니다</span></div>
     <div class="card">
       <div class="grid2">
         <span class="k" id="sk0">크기</span><input type="text" id="fS0" data-spec="0" placeholder="예) 120g · 15×5cm">
@@ -279,7 +313,7 @@
   </div>
 
   <div class="step">
-    <div class="sh"><span class="no">04</span><span class="tt">제품 사진</span><span class="opt">1~5장</span></div>
+    <div class="sh"><span class="no" id="noPhotos">04</span><span class="tt" id="ttPhotos">제품 사진</span><span class="opt" id="optPhotos">1~5장</span></div>
     <div class="card">
       <label class="drop" id="drop" for="fPhoto">
         <span class="pl"></span>
@@ -298,15 +332,15 @@
   <details class="adv">
     <summary>고급 설정 <span class="ar"></span></summary>
     <div class="body">
-      <div>
+      <div class="onlyP">
         <label class="fl" for="fGomin" id="lbGomin">고객의 고민 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
         <input type="text" id="fGomin" placeholder="비워두시면 자동 문장으로 채웁니다">
       </div>
-      <div>
+      <div class="onlyP">
         <label class="fl" for="fReason">가격 명분 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
         <input type="text" id="fReason" placeholder="예) 본품 120g + 도포기 포함, 배송비 포함">
       </div>
-      <div>
+      <div class="onlyP">
         <label class="fl" for="fNotice" id="lbNotice">안내 문구 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
         <input type="text" id="fNotice" placeholder="비워두시면 기본 안내로 채웁니다">
       </div>
@@ -406,9 +440,14 @@ var S={
   mode:'product',
   name:'', hook:'', points:['','',''], specs:['','','',''],
   gomin:'', reason:'', notice:'', brand:'', contact:'',
+  /* 부동산 매물용 (2026-11-19 · 적립메모 85번) */
+  addr:'', trade:'', invest:'', phone:'', rights:['','',''],
   mark:true, width:780,
-  photos:[]  // {url, img, ar, name}
+  photos:[]  // {url, img, ar, name, role}
 };
+
+/* 부동산 5대 사진 — 외경·도로·내부·지적도·입지 */
+var ESTATE_ROLES=['외경','도로','내부','지적도','입지'];
 
 var LABELS={
   product:{basic:'상품 기본',name:'상품명',hook:'한 줄 후킹',namePh:'예) 욕실 실리콘 곰팡이 제거젤 120g + 도포기',
@@ -416,7 +455,7 @@ var LABELS={
     gomin:'고객의 고민 한 줄',notice:'안내 문구',hint:'첫 장 사진이 대표 사진이 됩니다.'},
   estate:{basic:'매물 기본',name:'매물명',hook:'한 줄 헤드라인',namePh:'예) 의정부 민락동 근린상가 3층 132㎡',
     points:'핵심 포인트 3가지',specs:['면적','용도','구조','가격'],
-    gomin:'매수·교환 희망 조건',notice:'거래 안내',hint:'첫 장 사진이 대표 사진이 됩니다.'}
+    gomin:'매수·교환 희망 조건',notice:'거래 안내',hint:'첫 장 사진이 대표 사진(외경)이 됩니다.'}
 };
 
 /* ---------------- 숫자·조사 도우미 ---------------- */
@@ -526,6 +565,12 @@ function buildCopy(){
     isE:isE, name:name, title:title, hook:hook, points:pts,
     empathy:empathy, quote:quote, reasons:reasons, info:info, cta:cta,
     price:price, comp:comp, contact:contact,
+    /* 부동산 매물용 6요소 */
+    addr:(S.addr||'').trim(),
+    trade:(S.trade||'').trim() || price,
+    invest:(S.invest||'').trim(),
+    phone:(S.phone||'').trim(),
+    rights:(S.rights||[]).map(function(s){return String(s||'').trim();}).filter(Boolean),
     brand:(S.brand||'').trim(), mark:S.mark
   };
 }
@@ -868,12 +913,209 @@ function drawBlock(ctx,b){
   }
 }
 
+/* =========================================================================
+   부동산 매물용 레이아웃 (2026-11-19 · 적립메모 85번)
+   5대 사진 · 소재지 · 매매/교환가 · 실투자금 · 권리분석 3줄 · 문의 전화가
+   들어간 세로 매물 브리핑 1장.  쇼핑몰용 buildLayout 은 그대로 둡니다.
+   ========================================================================= */
+function buildEstateLayout(C,W){
+  var k=W/780;
+  var P=44*k, CW=W-2*P;
+  var F=function(s,w){ return fnt(s,w,k); };
+  var blocks=[], y=0;
+  var PH=S.photos;
+
+  function bg(x,yy,w,h,fill,r){ blocks.push({t:'rect',bg:true,x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
+  function rect(x,yy,w,h,fill,r){ blocks.push({t:'rect',x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
+  function text(x,yy,s,size,weight,fill,align,maxW,base){
+    blocks.push({t:'text',x:x,y:yy,text:s,font:F(size,weight),fill:fill,align:align||'left',maxW:maxW||0,base:base||'alphabetic'});
+  }
+  function img(x,yy,w,h,im,crop){ blocks.push({t:'image',x:x,y:yy,w:w,h:h,img:im,crop:crop===false?false:true}); }
+  function led(x,yy,r,fill){ blocks.push({t:'led',x:x,yy:yy,r:r,fill:fill}); }
+  function spaced(x,yy,s,size,fill,sp){ blocks.push({t:'spaced',x:x,y:yy,text:s,font:F(size,800),fill:fill,sp:sp*k}); }
+  function line(x,yy,w,h,fill){ blocks.push({t:'rect',x:x,yy:yy,w:w,h:h,fill:fill}); }
+
+  /* ---- 0. 상단 띠 ---- */
+  var badgeH=76*k;
+  bg(0,0,W,badgeH,NAVY);
+  led(P,badgeH/2,5*k,ORANGE);
+  text(P+18*k,badgeH/2,'KTS 매물 브리핑',19,800,'#FFFFFF','left');
+  text(W-P,badgeH/2,'PROPERTY BRIEF',13,600,'#8FA1C0','right');
+  rect(0,badgeH,W,3*k,ORANGE);
+  y=badgeH+3*k;
+
+  /* ---- 1. 대표 사진(외경) + 역할 태그 ---- */
+  var p0=PH[0];
+  if(p0){
+    var ph=W/(p0.ar||1);
+    ph=Math.max(Math.min(ph,820*k),420*k);
+    img(0,y,W,ph,p0.img,true);
+    var tag=p0.role||'외경';
+    var tf=F(15,800), twd=tw(tag,tf)+28*k;
+    rect(P,y+22*k,twd,36*k,'rgba(10,17,40,.8)',8*k);
+    text(P+14*k,y+22*k+18*k,tag,15,800,'#FFFFFF');
+    y+=ph;
+  }
+
+  /* ---- 2. 매물명 · 소재지 ---- */
+  var titleFont=F(43,800), titleLH=43*1.32*k;
+  var hookFont=F(22,400), hookLH=22*1.62*k;
+  var addrFont=F(20,700), addrLH=20*1.6*k;
+  var tLines=wrapText(C.title,titleFont,CW);
+  var hLines=C.hook?wrapText(C.hook,hookFont,CW):[];
+  var aLines=C.addr?wrapText(C.addr,addrFont,CW-28*k):[];
+  var tb=44*k+24*k+16*k + tLines.length*titleLH + 12*k
+        + (hLines.length?hLines.length*hookLH+12*k:0)
+        + (aLines.length?aLines.length*addrLH+18*k:0) + 40*k;
+  bg(0,y,W,tb,NAVY);
+  var ty=y+44*k;
+  spaced(P,ty,'LOCATION · PRICE · RIGHTS',12,ORANGE,2.2);
+  ty+=24*k+16*k;
+  tLines.forEach(function(ln){ text(P,ty,ln,43,800,'#FFFFFF'); ty+=titleLH; });
+  ty+=12*k;
+  hLines.forEach(function(ln){ text(P,ty,ln,22,400,'#BFCEE6'); ty+=hookLH; });
+  if(hLines.length) ty+=12*k;
+  if(aLines.length){
+    aLines.forEach(function(ln,i){
+      if(i===0){ led(P+6*k,ty-7*k,4.5*k,ORANGE); }
+      text(P+20*k,ty,ln,20,700,'#FFC79B'); ty+=addrLH;
+    });
+    ty+=18*k;
+  }
+  y+=tb;
+
+  /* ---- 3. 매매/교환가 · 실투자금 ---- */
+  var s=y;
+  y+=54*k;
+  spaced(P,y,'PRICE',13,ORANGE,2.6); y+=30*k;
+  text(P,y,'매매 · 교환가',19,700,'#5B6883'); y+=68*k;
+  var priceTxt=C.trade||'조건 협의';
+  var pf=F(50,900);
+  var pl=wrapText(priceTxt,pf,CW);
+  pl.slice(0,2).forEach(function(ln){ text(P,y,ln,50,900,ORANGE); y+=50*1.3*k; });
+  y+=14*k;
+  if(C.invest){
+    var ifont=F(21,800);
+    var il=wrapText('실투자금   '+C.invest,ifont,CW-56*k);
+    var ih=il.length*21*1.55*k+34*k;
+    rect(P,y,CW,ih,'#FFF3EA',13*k);
+    rect(P,y,6*k,ih,ORANGE,3*k);
+    var ly=y+17*k+21*1.55*k*0.72;
+    il.forEach(function(l){ text(P+26*k,ly,l,21,800,'#0A1128'); ly+=21*1.55*k; });
+    y+=ih+16*k;
+  }
+  y+=26*k;
+  bg(0,s,W,y-s,'#FFFFFF');
+
+  /* ---- 4. 권리분석 3줄 ---- */
+  if(C.rights.length){
+    s=y;
+    y+=54*k;
+    spaced(P,y,'RIGHTS',13,ORANGE,2.6); y+=30*k;
+    text(P,y,'권리분석',31,800,NAVY); y+=31*1.35*k+22*k;
+    var rf=F(21,700), rlh=21*1.55*k;
+    C.rights.forEach(function(r,i){
+      var ls=wrapText(r,rf,CW-96*k);
+      var ch=Math.max(104*k, ls.length*rlh+42*k);
+      rect(P,y,CW,ch,'#FFFFFF',16*k);
+      rect(P+20*k,y+ch/2-19*k,38*k,38*k,'#FFF0E4',10*k);
+      text(P+39*k,y+ch/2,String(i+1),16,900,ORANGE,'center',0,'middle');
+      var ly=y+ch/2-(ls.length-1)*rlh/2+rlh*0.34;
+      ls.forEach(function(l){ text(P+76*k,ly,l,21,700,'#101B33'); ly+=rlh; });
+      y+=ch+14*k;
+    });
+    y+=40*k;
+    bg(0,s,W,y-s,'#F3F5FA');
+  }
+
+  /* ---- 5. 남은 사진(도로·내부·지적도·입지) ---- */
+  for(var i=1;i<PH.length;i++){
+    var pi=PH[i];
+    var hh=W/(pi.ar||1);
+    hh=Math.max(Math.min(hh,820*k),360*k);
+    img(0,y,W,hh,pi.img,true);
+    y+=hh;
+    if(pi.role){
+      y+=28*k;
+      led(P+5*k,y-6*k,4.5*k,ORANGE);
+      text(P+20*k,y,pi.role,19,700,'#5B6883');
+      y+=19*1.4*k+8*k;
+    }
+  }
+  y+=14*k;
+
+  /* ---- 6. 매물 정보 표 ---- */
+  var rows=[];
+  if(C.addr) rows.push(['소재지',C.addr]);
+  if(S.specs[0]) rows.push(['면적',S.specs[0]]);
+  if(S.specs[1]) rows.push(['용도',S.specs[1]]);
+  if(S.specs[2]) rows.push(['구조',S.specs[2]]);
+  if(C.trade) rows.push(['매매/교환가',C.trade]);
+  if(C.invest) rows.push(['실투자금',C.invest]);
+  if(rows.length){
+    s=y;
+    y+=52*k;
+    spaced(P,y,'SPEC',13,ORANGE,2.6); y+=30*k;
+    text(P,y,'매물 정보',31,800,NAVY); y+=31*1.35*k+24*k;
+    var rowH=0;
+    rows.forEach(function(r,idx){
+      var vf=F(18,600), maxW=CW-210*k;
+      var ls=wrapText(r[1],vf,maxW);
+      var rh=Math.max(62*k, ls.length*18*1.55*k+34*k);
+      rect(P,y,CW,rh,(idx%2===0)?'#FFFFFF':'#F6F8FC',idx===rows.length-1?12*k:0);
+      if(idx>0) line(P,y,CW,1*k,'#E6EAF2');
+      text(P+24*k,y+rh/2,r[0],17,700,'#67758F','left',0,'middle');
+      var ly=y+rh/2-(ls.length-1)*18*1.55*k/2;
+      ls.forEach(function(l){ text(P+170*k,ly,l,18,600,'#0A1128','left',0,'middle'); ly+=18*1.55*k; });
+      y+=rh;
+    });
+    line(P,y,CW,1*k,'#E3E8F1');
+    y+=44*k;
+    bg(0,s,W,y-s,'#FFFFFF');
+  }
+
+  /* ---- 7. 문의 · 전화 버튼 ---- */
+  s=y;
+  y+=56*k;
+  var ct=wrapText('현장 확인 · 권리관계 확인 후 진행합니다',F(19,500),CW-40*k);
+  ct.forEach(function(l){ text(W/2,y,l,19,500,'#A9BAD6','center'); y+=19*1.7*k; });
+  y+=26*k;
+  if(C.phone){
+    var ptxt='전화 문의   '+C.phone;
+    var pfont=F(22,900), pw=Math.min(CW,tw(ptxt,pfont)+68*k), phh=72*k;
+    rect(W/2-pw/2,y,pw,phh,ORANGE,14*k);
+    text(W/2,y+phh/2,ptxt,22,900,'#12151C','center',0,'middle');
+    y+=phh+24*k;
+  } else {
+    text(W/2,y,'문의 번호를 넣으면 여기에 전화 버튼이 생깁니다',18,600,'#6E80A3','center'); y+=18*1.7*k;
+  }
+  if(C.contact && C.contact!==C.brand){ text(W/2,y,C.contact,17,600,'#A9BAD6','center'); y+=17*1.7*k; }
+  y+=40*k;
+  bg(0,s,W,y-s,NAVY2);
+
+  /* ---- 8. 푸터 ---- */
+  s=y;
+  y+=36*k;
+  if(C.mark){
+    text(W/2,y,C.brand||'KTS 더상세',19,800,'#FFFFFF','center'); y+=32*k;
+    text(W/2,y,'부동산 매물 브리핑 · 사진 '+PH.length+'장 → 1초 · KTS 더상세',14,500,'#6E80A3','center'); y+=26*k;
+    text(W/2,y,'autooneclick.com',14,700,ORANGE,'center'); y+=40*k;
+  } else {
+    text(W/2,y,C.brand||' ',19,800,'#FFFFFF','center'); y+=32*k;
+    if(C.contact){ text(W/2,y,C.contact,14,500,'#6E80A3','center'); y+=26*k; }
+    y+=36*k;
+  }
+  bg(0,s,W,y-s,'#070D1E');
+
+  return {blocks:blocks,W:W,H:Math.ceil(y)};
+}
+
 /* ---------------- 생성 ---------------- */
 var OUT=null, LAST=null;
 function generate(){
   var t0=performance.now();
   var C=buildCopy();
-  var L=buildLayout(C,S.width);
+  var L=(S.mode==='estate')?buildEstateLayout(C,S.width):buildLayout(C,S.width);
   var cv=$('out');
   paint(cv,L);
   OUT={canvas:cv,C:C,L:L};
@@ -903,10 +1145,95 @@ function save(kind){
 
 /* ---------------- HTML 코드 ---------------- */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function buildEstateHTML(C){
+  var photos=S.photos;
+  var tel=String(C.phone||'').replace(/[^0-9+]/g,'');
+  var h=[];
+  h.push('<!-- KTS 더상세 · 부동산 매물 브리핑 · '+new Date().toLocaleString('ko-KR')+' -->');
+  h.push('<div class="kts-prop">');
+  h.push('  <div class="kp-top"><span>KTS 매물 브리핑</span><em>PROPERTY BRIEF</em></div>');
+  if(photos[0]){
+    h.push('  <figure class="kp-hero"><img src="'+photos[0].url+'" alt="'+esc(C.name)+'"><figcaption>'+esc(photos[0].role||'외경')+'</figcaption></figure>');
+  }
+  h.push('  <section class="kp-head"><span class="kp-k">LOCATION · PRICE · RIGHTS</span>');
+  h.push('    <h1>'+esc(C.title)+'</h1>');
+  if(C.hook) h.push('    <p class="kp-hook">'+esc(C.hook)+'</p>');
+  if(C.addr) h.push('    <p class="kp-addr">'+esc(C.addr)+'</p>');
+  h.push('  </section>');
+  h.push('  <section class="kp-price"><span class="kp-k">PRICE</span><b>'+esc(C.trade||'조건 협의')+'</b>');
+  if(C.invest) h.push('    <p class="kp-invest">실투자금 <strong>'+esc(C.invest)+'</strong></p>');
+  h.push('  </section>');
+  if(C.rights.length){
+    h.push('  <section class="kp-rights"><span class="kp-k">RIGHTS</span><h2>권리분석</h2><ol>');
+    C.rights.forEach(function(r,i){ h.push('    <li><b>'+('0'+(i+1)).slice(-2)+'</b><span>'+esc(r)+'</span></li>'); });
+    h.push('  </ol></section>');
+  }
+  photos.slice(1).forEach(function(p){
+    h.push('  <figure class="kp-fig"><img src="'+p.url+'" alt=""><figcaption>'+esc(p.role||'')+'</figcaption></figure>');
+  });
+  var rows=[];
+  if(C.addr) rows.push(['소재지',C.addr]);
+  if(S.specs[0]) rows.push(['면적',S.specs[0]]);
+  if(S.specs[1]) rows.push(['용도',S.specs[1]]);
+  if(S.specs[2]) rows.push(['구조',S.specs[2]]);
+  if(C.trade) rows.push(['매매/교환가',C.trade]);
+  if(C.invest) rows.push(['실투자금',C.invest]);
+  if(rows.length){
+    h.push('  <section class="kp-spec"><span class="kp-k">SPEC</span><h2>매물 정보</h2><table>');
+    rows.forEach(function(r){ h.push('    <tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'); });
+    h.push('  </table></section>');
+  }
+  h.push('  <section class="kp-cta"><p>현장 확인 · 권리관계 확인 후 진행합니다</p>');
+  if(tel) h.push('    <a class="kp-tel" href="tel:'+tel+'">전화 문의 '+esc(C.phone)+'</a>');
+  if(C.contact) h.push('    <p class="kp-contact">'+esc(C.contact)+'</p>');
+  h.push('  </section>');
+  h.push('  <footer class="kp-foot">'+(C.mark?('<b>'+esc(C.brand||'KTS 더상세')+'</b><span>부동산 매물 브리핑 · 사진 '+photos.length+'장 · KTS 더상세</span>'):('<b>'+esc(C.brand||' ')+'</b>'))+'</footer>');
+  h.push('</div>');
+  h.push('<style>');
+  h.push('.kts-prop{max-width:780px;margin:0 auto;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#0A1128;line-height:1.6;word-break:keep-all;background:#fff}');
+  h.push('.kts-prop img{width:100%;display:block}');
+  h.push('.kp-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:20px 24px;background:#0A1128;color:#fff;font-size:14px;font-weight:800;border-bottom:3px solid #FF6B00}');
+  h.push('.kp-top em{font-style:normal;font-size:11px;letter-spacing:.2em;color:#8FA1C0}');
+  h.push('.kp-hero{position:relative;margin:0}');
+  h.push('.kp-hero figcaption{position:absolute;left:24px;top:20px;background:rgba(10,17,40,.8);color:#fff;font-size:12px;font-weight:800;border-radius:8px;padding:6px 12px}');
+  h.push('.kp-head{background:#0A1128;color:#fff;padding:34px 24px 38px}');
+  h.push('.kp-k{display:block;font-size:11px;letter-spacing:.22em;font-weight:800;color:#FF6B00}');
+  h.push('.kp-head h1{font-size:27px;line-height:1.32;margin:12px 0 8px;font-weight:800;letter-spacing:-.02em}');
+  h.push('.kp-hook{margin:0;font-size:14px;color:#BFCEE6}');
+  h.push('.kp-addr{margin:12px 0 0;font-size:14px;font-weight:700;color:#FFC79B}');
+  h.push('.kp-price{background:#fff;padding:34px 24px 40px}');
+  h.push('.kp-price b{display:block;font-size:32px;color:#FF6B00;font-weight:900;margin:8px 0 0;letter-spacing:-.02em}');
+  h.push('.kp-invest{margin:16px 0 0;background:#FFF3EA;border-left:6px solid #FF6B00;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:800}');
+  h.push('.kp-invest strong{color:#0A1128;margin-left:8px}');
+  h.push('.kp-rights{background:#F3F5FA;padding:34px 24px 40px}');
+  h.push('.kp-rights h2,.kp-spec h2{font-size:21px;margin:10px 0 16px;font-weight:800;letter-spacing:-.02em}');
+  h.push('.kp-rights ol{list-style:none;margin:0;padding:0}');
+  h.push('.kp-rights li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:16px;margin-bottom:10px}');
+  h.push('.kp-rights li b{color:#FF6B00;font-size:13px;background:#FFF0E4;border-radius:9px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}');
+  h.push('.kp-rights li span{font-size:15px;font-weight:700;color:#101B33}');
+  h.push('.kp-fig{margin:0;position:relative}');
+  h.push('.kp-fig figcaption{padding:10px 24px;font-size:12px;font-weight:700;color:#5B6883}');
+  h.push('.kp-spec{padding:34px 24px 40px}');
+  h.push('.kp-spec table{width:100%;border-collapse:collapse}');
+  h.push('.kp-spec th{background:#F6F8FC;color:#67758F;font-size:13px;font-weight:700;text-align:left;padding:14px 16px;width:34%;border-bottom:1px solid #E3E8F1}');
+  h.push('.kp-spec td{color:#0A1128;font-size:14px;font-weight:600;padding:14px 16px;border-bottom:1px solid #E3E8F1}');
+  h.push('.kp-cta{background:#111B36;color:#fff;text-align:center;padding:34px 24px 40px}');
+  h.push('.kp-cta p{margin:0 0 16px;font-size:14px;color:#A9BAD6}');
+  h.push('.kp-tel{display:inline-block;background:#FF6B00;color:#12151C;font-size:16px;font-weight:900;text-decoration:none;border-radius:999px;padding:16px 30px}');
+  h.push('.kp-contact{margin:14px 0 0;font-size:13px;color:#A9BAD6}');
+  h.push('.kp-foot{background:#070D1E;color:#6E80A3;text-align:center;padding:26px 24px 32px;font-size:12px}');
+  h.push('.kp-foot b{display:block;color:#fff;font-size:14px;margin-bottom:6px}');
+  h.push('.kp-foot span{display:block}');
+  h.push('@media(max-width:480px){.kp-head{padding:26px 18px 30px}.kp-head h1{font-size:22px}.kp-price,.kp-rights,.kp-spec,.kp-cta{padding-left:18px;padding-right:18px}}');
+  h.push('</style>');
+  return h.join('\n');
+}
+
 function buildHTML(){
   var C=LAST?LAST.C:buildCopy();
   var photos=S.photos;
   var isE=C.isE;
+  if(isE) return buildEstateHTML(C);
   var h=[];
   h.push('<!-- KTS 더상세 v1.0 · '+new Date().toLocaleString('ko-KR')+' -->');
   h.push('<div class="kts-detail">');
@@ -1000,24 +1327,41 @@ function toast(msg,warn){
 }
 
 function renderThumbs(){
+  var estate=S.mode==='estate';
   var box=$('thumbs'); box.innerHTML='';
   S.photos.forEach(function(p,i){
+    if(estate && !p.role) p.role=ESTATE_ROLES[i]||'기타';
     var d=document.createElement('div');
     d.className='th'+(i===0?' main':'');
     d.innerHTML='<div class="im"><img src="'+p.url+'" alt=""></div>'+
       (i===0?'<span class="badge">대표</span>':'')+
       '<button class="del" type="button" aria-label="사진 삭제">×</button>'+
-      '<div class="cap">'+(i===0?'대표':'사진 '+(i+1))+'</div>';
+      (estate?'':'<div class="cap">'+(i===0?'대표':'사진 '+(i+1))+'</div>');
     d.querySelector('.del').addEventListener('click',function(e){ e.stopPropagation(); S.photos.splice(i,1); renderThumbs(); });
     d.querySelector('.im').addEventListener('click',function(){
       if(i===0){ toast('이미 대표 사진입니다.'); return; }
       var t=S.photos.splice(i,1)[0]; S.photos.unshift(t); renderThumbs(); toast('대표 사진을 바꿨습니다.');
     });
+    /* 부동산 모드 — 사진마다 역할(외경·도로·내부·지적도·입지)을 고른다 */
+    if(estate){
+      var sel=document.createElement('select');
+      sel.className='role';
+      sel.setAttribute('aria-label','사진 역할');
+      ESTATE_ROLES.concat(['기타']).forEach(function(r){
+        var o=document.createElement('option'); o.value=r; o.textContent=r; o.selected=(p.role===r); sel.appendChild(o);
+      });
+      sel.addEventListener('click',function(e){ e.stopPropagation(); });
+      sel.addEventListener('change',function(e){ p.role=e.target.value; saveDraft(); });
+      d.appendChild(sel);
+    }
     box.appendChild(d);
   });
   $('photoHint').textContent = S.photos.length
-    ? (S.photos.length+'장 · 사진을 누르면 대표로 올라갑니다.')
-    : '사진을 누르면 대표 사진으로 바뀝니다.';
+    ? (estate
+        ? (S.photos.length+'장 · 사진을 누르면 대표(외경)로 · 아래 칸에서 역할을 고릅니다.')
+        : (S.photos.length+'장 · 사진을 누르면 대표로 올라갑니다.'))
+    : (estate ? '외경 · 도로 · 내부 · 지적도 · 입지 — 5장이면 충분합니다.'
+              : '사진을 누르면 대표 사진으로 바뀝니다.');
   $('btnClearPhotos').hidden = !S.photos.length;
 }
 
@@ -1063,6 +1407,8 @@ function readForm(){
   S.specs=[$('fS0').value,$('fS1').value,$('fS2').value,$('fS3').value];
   S.gomin=$('fGomin').value; S.reason=$('fReason').value; S.notice=$('fNotice').value;
   S.brand=$('fBrand').value; S.contact=$('fContact').value;
+  S.addr=$('fAddr').value; S.trade=$('fTrade').value; S.invest=$('fInvest').value;
+  S.phone=$('fPhone').value; S.rights=[$('fR0').value,$('fR1').value,$('fR2').value];
   S.mark=$('fMark').checked; S.width=parseInt($('fWidth').value,10)||780;
 }
 function writeForm(){
@@ -1071,6 +1417,9 @@ function writeForm(){
   $('fS0').value=S.specs[0]; $('fS1').value=S.specs[1]; $('fS2').value=S.specs[2]; $('fS3').value=S.specs[3];
   $('fGomin').value=S.gomin; $('fReason').value=S.reason; $('fNotice').value=S.notice;
   $('fBrand').value=S.brand; $('fContact').value=S.contact;
+  var R=S.rights||['','',''];
+  $('fAddr').value=S.addr||''; $('fTrade').value=S.trade||''; $('fInvest').value=S.invest||'';
+  $('fPhone').value=S.phone||''; $('fR0').value=R[0]||''; $('fR1').value=R[1]||''; $('fR2').value=R[2]||'';
   $('fMark').checked=S.mark; $('fWidth').value=String(S.width);
 }
 
@@ -1094,12 +1443,28 @@ function setMode(mode){
   $('fS1').placeholder = isE?'예) 근린생활시설':'예) 젤 타입';
   $('fS2').placeholder = isE?'예) 3층 전층 · 주차 2대':'예) 본품 + 도포기 1개';
   $('fS3').placeholder = isE?'예) 4억 2천만 원':'예) 9,900원';
+  /* ── 부동산 모드 전용 입력칸 ── */
+  $('stepEstate').hidden = !isE;
+  $('stepRights').hidden = !isE;
+  $('stepPoints').hidden = isE;
+  $('noSpecs').textContent = isE?'04':'03';
+  $('noPhotos').textContent = isE?'05':'04';
+  $('ttSpecs').textContent = isE?'매물 제원 4줄':'제원 4줄';
+  $('optSpecs').textContent = isE?'면적·용도·구조':'표로 들어갑니다';
+  $('ttPhotos').textContent = isE?'5대 사진':'제품 사진';
+  $('optPhotos').textContent = isE?'외경·도로·내부·지적도·입지':'1~5장';
+  document.body.classList.toggle('eMode',isE);
+  try{
+    var go=document.querySelector('.bar .go');
+    if(go) go.innerHTML='<i></i>'+(isE?'1초 만에 매물 브리핑 만들기':'1초 만에 상세페이지 만들기');
+  }catch(e){}
   document.querySelector('.intro h1').innerHTML = isE
     ? '매물 사진 넣고 <em>1초</em>,<br>중개사 브리핑이 나옵니다'
     : '사진 넣고 <em>1초</em>,<br>쿠팡형 상세페이지가 나옵니다';
   document.querySelector('.intro p').textContent = isE
     ? '매물명과 현장 사진 1~5장이면 됩니다. 위치·제원·거래 조건을 한 장에 정리해 드립니다.'
     : '상품명과 사진 1~5장만 있으면 됩니다. 나머지는 카피 4원칙으로 자동으로 채워 드립니다.';
+  renderThumbs();
   saveDraft();
 }
 
@@ -1107,7 +1472,8 @@ function setMode(mode){
 function saveDraft(){
   try{
     var d={mode:S.mode,name:S.name,hook:S.hook,points:S.points,specs:S.specs,gomin:S.gomin,
-      reason:S.reason,notice:S.notice,brand:S.brand,contact:S.contact,mark:S.mark,width:S.width};
+      reason:S.reason,notice:S.notice,brand:S.brand,contact:S.contact,mark:S.mark,width:S.width,
+      addr:S.addr,trade:S.trade,invest:S.invest,phone:S.phone,rights:S.rights};
     localStorage.setItem('kts.thedetail.draft',JSON.stringify(d));
   }catch(e){}
 }
@@ -1115,8 +1481,9 @@ function loadDraft(){
   try{
     var raw=localStorage.getItem('kts.thedetail.draft'); if(!raw) return;
     var d=JSON.parse(raw);
-    ['name','hook','gomin','reason','notice','brand','contact'].forEach(function(k){ if(d[k]) S[k]=d[k]; });
+    ['name','hook','gomin','reason','notice','brand','contact','addr','trade','invest','phone'].forEach(function(k){ if(d[k]) S[k]=d[k]; });
     if(Array.isArray(d.points)) S.points=d.points; if(Array.isArray(d.specs)) S.specs=d.specs;
+    if(Array.isArray(d.rights)) S.rights=d.rights;
     if(typeof d.mark==='boolean') S.mark=d.mark; if(d.width) S.width=d.width;
     if(d.mode) S.mode=d.mode;
     writeForm();
@@ -1164,19 +1531,24 @@ $('btnClearPhotos').addEventListener('click',function(){ S.photos=[]; renderThum
 });
 $('drop').addEventListener('drop',function(e){ if(e.dataTransfer&&e.dataTransfer.files) addFiles(e.dataTransfer.files); });
 
-document.querySelectorAll('input[type=text]').forEach(function(el){
+document.querySelectorAll('input[type=text],input[type=tel]').forEach(function(el){
   el.addEventListener('input',function(){ saveDraft(); });
 });
 
 $('btnDemo').addEventListener('click',function(){
   if(S.mode==='estate'){
     $('fName').value='의정부 민락동 근린상가 3층 132㎡';
-    $('fHook').value=''; $('fP0').value='역 도보 6분, 유동인구 하루 1만 2천';
-    $('fP1').value='권리금 0원, 보증금 3천 / 월 145만 원';
-    $('fP2').value='1층 출입, 전면 유리 8m';
+    $('fHook').value='역 도보 6분 · 유동인구 하루 1만 2천';
+    $('fAddr').value='경기 의정부시 민락동 123-4, 3층';
+    $('fTrade').value='4억 2천만 원 (교환 가능)';
+    $('fInvest').value='1억 1천만 원';
+    $('fPhone').value='010-2002-2899';
+    $('fR0').value='갑구 근저당 3억 — 매도 시 말소';
+    $('fR1').value='을구 해당 없음 · 세금 체납 0원';
+    $('fR2').value='임차인 없음 · 즉시 인도 가능';
     $('fS0').value='대지 330㎡ · 건평 132㎡'; $('fS1').value='제2종 근린생활시설';
     $('fS2').value='3층 전층 · 주차 2대'; $('fS3').value='4억 2천만 원';
-    $('fContact').value='010-0000-0000';
+    $('fContact').value=''; $('fBrand').value='KTS 부동산 교환';
   }else{
     $('fName').value='욕실 실리콘 곰팡이 제거젤 120g + 도포기';
     $('fHook').value=''; $('fP0').value='짜서 바르고, 8시간 뒤 물로 헹구면 끝';
@@ -1187,6 +1559,7 @@ $('btnDemo').addEventListener('click',function(){
     $('fContact').value='카카오톡 @kts';
   }
   toast('예시를 채웠습니다. 사진만 넣어보세요.');
+  try{ readForm(); }catch(e){}
   saveDraft();
 });
 
@@ -1209,12 +1582,12 @@ $('btnHtml').addEventListener('click',function(){
 function attemptGenerate(){
   readForm();
   if(!S.name.trim()){
-    toast('상품명을 먼저 넣어주세요.',true);
+    toast(S.mode==='estate'?'매물명을 먼저 넣어주세요.':'상품명을 먼저 넣어주세요.',true);
     $('fName').focus(); $('fName').scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   if(!S.photos.length){
-    toast('사진 1장만 넣어주세요.',true);
+    toast(S.mode==='estate'?'매물 사진 1장(외경)만 넣어주세요.':'사진 1장만 넣어주세요.',true);
     $('drop').scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
