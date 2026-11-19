@@ -331,7 +331,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
 <script src="js/lint.js?v=5"></script>
 <script src="js/data.cards.js?v=5"></script>
-<script src="js/data.modes.js?v=5"></script>
+<script src="js/data.modes.js?v=6"></script>
 <script src="js/data.subs.js?v=5"></script>
 <script src="js/engine.js?v=5"></script>
 <script>
@@ -471,6 +471,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     [/내가|직접|혼자서|스스로/, 'self']
   ];
   function optImage(o){
+    if (o.img) return o.img;
     var lb = String(o && o.label || '');
     for (var i = 0; i < IMG_RULES.length; i++){ if (IMG_RULES[i][0].test(lb)) return OPT_SRC[IMG_RULES[i][1]]; }
     return OPT_SRC[TYPE_IMG[o && o.t] || 'self'];

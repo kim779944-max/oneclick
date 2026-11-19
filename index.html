@@ -595,7 +595,7 @@ function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; 
     $('#mstN').textContent = String(LIVE().length);
     $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
     $('#mstGrid').innerHTML = LIVE().map(p => `<a href="${p.link}">${String(p.nm).split(' — ')[0]}</a>`).join('')
-      + `<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a>`;
+      + `<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a><a href="ops/">군단 상황판</a>`;
   }
   function paintMaster(){
     const on = !!(window.KTS && window.KTS.isMaster());
