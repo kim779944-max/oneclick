@@ -525,10 +525,11 @@ async function visionStruct(file, onStep){
   const models = cfg.models || ['gemini-3.5-flash'];
   let lastErr = null, quotaHit = false;
   for (const model of models){
-    for (let attempt = 0; attempt < 2; attempt++){
+    for (let attempt = 0; attempt < 3; attempt++){
     try{
+      /* 0번째는 온도 0(가장 정확) · 다시 부를 때는 온도를 조금 흔들어 '같은 깨진 JSON'이 또 나오는 것을 피한다 */
       const body = {contents:[{parts:[{text:PROMPT},{inline_data:{mime_type:'image/jpeg', data:img.data}}]}],
-        generationConfig:{responseMimeType:'application/json', temperature:0, maxOutputTokens:32768}};
+        generationConfig:{responseMimeType:'application/json', temperature: attempt ? 0.35 : 0, maxOutputTokens:32768}};
       const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
       const r = await fetch(cfg.endpoint + model + ':generateContent?key=' + encodeURIComponent(key),
         {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
@@ -553,7 +554,12 @@ function parseJsonLoose(txt){
   let t = String(txt || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
   try{ return JSON.parse(t); }catch(e){}
   const a = t.indexOf('{'), b = t.lastIndexOf('}');
-  if (a >= 0 && b > a){ try{ return JSON.parse(t.slice(a, b + 1)); }catch(e){} }
+  if (a >= 0 && b > a){
+    const s = t.slice(a, b + 1);
+    try{ return JSON.parse(s); }catch(e){}
+    /* AI가 가끔 객체를 닫은 뒤 키를 이어 붙이는 깨짐(`},”t”:“글”…`) — 중괄호만 되살려 본다 */
+    try{ return JSON.parse(s.replace(/},"t":/g, '},{"t":')); }catch(e){}
+  }
   return null;
 }
 
