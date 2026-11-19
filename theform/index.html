@@ -61,6 +61,9 @@ main{padding:12px 14px 120px}
 .stage img,.stage canvas{display:block;width:100%;height:auto;pointer-events:none}
 .fld{position:absolute;border:2px solid var(--amber);background:rgba(255,107,0,.16);border-radius:3px;touch-action:none}
 .fld span{position:absolute;left:3px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:900;color:#B84A00;white-space:nowrap;max-width:calc(100% - 6px);overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.stage.ro .fld{border:1px dashed rgba(255,107,0,.8);background:rgba(255,107,0,.05);border-radius:2px}
+.stage.ro .fld span{font-size:7px;font-weight:800;color:#B45309;opacity:.9}
+.sechd{font-size:11.5px;font-weight:900;color:var(--amber2);margin:16px 0 4px;padding-top:9px;border-top:1px solid var(--line2);letter-spacing:-.2px}
 .fld.sel{border-color:#1E6BFF;background:rgba(30,107,255,.18)}
 .fld.sel span{left:-2px;top:-17px;transform:none;font-size:10px;color:#fff;background:#1E6BFF;border-radius:4px 4px 0 0;padding:1px 5px;max-width:200px}
 .fld .hd2{position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#1E6BFF;border:2px solid #fff;display:none}
@@ -131,6 +134,13 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
   <p>거래명세서·견적서·계약서처럼 매번 처음부터 만들던 양식을 내 전용 양식으로 등록해 두세요. 사진과 값은 이 기기 안에만 저장됩니다.</p>
  </div>
  <div class="card">
+  <h2><span class="n">★</span>표준 양식 바로 쓰기 <small style="font-size:10.5px;color:var(--gray);font-weight:700">빈칸 지정 끝 · 열쇠 필요 없음</small></h2>
+  <p class="sub">부동산 매매계약서와 등기 위임장은 원본 양식 그대로 빈칸 자리가 다 지정돼 있습니다. 버튼을 누르면 바로 값 입력 화면으로 갑니다.</p>
+  <div class="row"><button class="btn pri" id="psSale">📄 매매계약서 바로쓰기</button></div>
+  <div class="row"><button class="btn pri" id="psPower">📄 등기위임장 바로쓰기</button></div>
+  <p class="kv">매매계약서 62칸(서명 6곳) · 등기위임장 12칸(서명 1곳) — 비워 둔 칸은 원본 그대로 빈칸으로 나옵니다.</p>
+ </div>
+ <div class="card">
   <h2><span class="n">1</span>새 양식 사진 등록</h2>
   <p class="sub">종이를 어두운 바닥에 놓고 찍으면 기울기와 테두리를 자동으로 바로잡아 배경으로 깝니다.</p>
   <div class="row"><button class="btn pri" id="pickBtn">양식 사진 찍기 · 고르기</button></div>
@@ -143,7 +153,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  </div>
  <div class="card">
   <h2><span class="n">2</span>내 양식 목록</h2>
-  <p class="sub">기본 양식 5종은 열쇠 없이 바로 씁니다. 복제하면 내 전용 양식으로 고쳐 쓸 수 있습니다.</p>
+  <p class="sub">기본 양식 7종(표준 매매계약서·등기위임장 포함)은 열쇠 없이 바로 씁니다. 복제하면 내 전용 양식으로 고쳐 쓸 수 있습니다.</p>
   <div class="flist" id="formList"></div>
  </div>
 </section>
@@ -195,7 +205,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 <section class="scr" id="s4">
  <div class="card">
   <h2><span class="n">4</span>미리보기</h2>
-  <p class="sub">종이 위에 값이 얹힌 모습 그대로 인쇄·PDF로 나갑니다.</p>
+  <p class="sub">종이 위에 값이 얹힌 모습 그대로 인쇄·PDF로 나갑니다. 값을 넣지 않은 칸은 아무 표시도 남기지 않고 원본 빈칸 그대로 나옵니다.</p>
   <canvas class="pv" id="pvCv"></canvas>
  </div>
 </section>
@@ -1280,6 +1290,92 @@ function compileBuiltin(b){
   return f;
 }
 
+/* ---------- 표준 양식 프리셋 2종 (원본 양식 이미지 + 빈칸 좌표) ----------
+   좌표는 원본 PDF(595.28×841.88pt)의 표 선·글자 위치를 PyMuPDF 로 뽑아 1489×2105 이미지 픽셀에 그대로 맞춘 값(%).
+   빈칸을 비워 두면 저장·인쇄 이미지에는 아무것도 찍히지 않고 원본 양식 그대로 나온다. */
+const PRESET_SALE_FIELDS = [
+    {id:'p0', sec:'1. 부동산의 표시', label:'소재지', type:'text', x:15.984, y:8.504, w:76.158, h:4.656},
+    {id:'p1', label:'토지 지목', type:'text', x:24.715, y:13.587, w:21.155, h:1.283},
+    {id:'p2', label:'토지 면적(㎡)', type:'text', x:51.713, y:13.587, w:38.818, h:1.283},
+    {id:'p3', label:'건물 구조·용도', type:'text', x:24.715, y:15.297, w:21.155, h:1.283},
+    {id:'p4', label:'건물 면적(㎡)', type:'text', x:51.713, y:15.297, w:38.818, h:1.283},
+    {id:'p5', sec:'2. 계약 내용 (대금 · 중도금 · 잔금)', label:'매매대금(한글)', type:'text', x:18.267, y:19.857, w:10.813, h:1.33},
+    {id:'p6', label:'매매대금(숫자)', type:'number', x:34.788, y:19.857, w:13.432, h:1.33},
+    {id:'p7', label:'계약금(금액)', type:'text', x:18.267, y:21.615, w:10.813, h:1.33},
+    {id:'p8', label:'계약금 영수자', type:'text', x:58.563, y:21.615, w:8.395, h:1.33},
+    {id:'p9', label:'융자금(금액)', type:'text', x:18.267, y:23.373, w:10.813, h:1.283},
+    {id:'p10', label:'융자금 승계내용', type:'text', x:32.572, y:23.373, w:4.433, h:1.283},
+    {id:'p11', label:'임대보증금(총액)', type:'text', x:64.674, y:23.373, w:9.134, h:1.283},
+    {id:'p12', label:'중도금1 금액', type:'text', x:18.267, y:25.083, w:10.813, h:1.33},
+    {id:'p13', label:'중도금1 년', type:'text', x:33.378, y:25.083, w:6.917, h:1.33},
+    {id:'p14', label:'중도금1 월', type:'text', x:41.639, y:25.083, w:3.156, h:1.33},
+    {id:'p15', label:'중도금1 일', type:'text', x:46.138, y:25.083, w:3.156, h:1.33},
+    {id:'p16', label:'중도금2 금액', type:'text', x:18.267, y:26.841, w:10.813, h:1.283},
+    {id:'p17', label:'중도금2 년', type:'text', x:33.378, y:26.841, w:6.917, h:1.283},
+    {id:'p18', label:'중도금2 월', type:'text', x:41.639, y:26.841, w:3.156, h:1.283},
+    {id:'p19', label:'중도금2 일', type:'text', x:46.138, y:26.841, w:3.156, h:1.283},
+    {id:'p20', label:'잔금 금액', type:'text', x:18.267, y:28.551, w:10.813, h:1.33},
+    {id:'p21', label:'잔금 년', type:'text', x:33.378, y:28.551, w:6.917, h:1.33},
+    {id:'p22', label:'잔금 월', type:'text', x:41.639, y:28.551, w:3.156, h:1.33},
+    {id:'p23', label:'잔금 일', type:'text', x:46.138, y:28.551, w:3.156, h:1.33},
+    {id:'p24', sec:'3. 조항별 날짜 · 특약사항', label:'인도일 년(제2조)', type:'text', x:33.58, y:30.831, w:3.895, h:1.378},
+    {id:'p25', label:'인도일 월(제2조)', type:'text', x:38.684, y:30.831, w:2.686, h:1.378},
+    {id:'p26', label:'인도일 일(제2조)', type:'text', x:42.713, y:30.831, w:2.686, h:1.378},
+    {id:'p27', label:'특약사항', type:'text', fs:23, multi:1, x:14.439, y:53.112, w:77.77, h:13.587, top:1},
+    {id:'p28', label:'교부일 년(제8조)', type:'text', x:12.895, y:49.691, w:4.164, h:1.235},
+    {id:'p29', label:'교부일 월(제8조)', type:'text', x:18.066, y:49.691, w:2.754, h:1.235},
+    {id:'p30', label:'교부일 일(제8조)', type:'text', x:21.827, y:49.691, w:2.888, h:1.235},
+    {id:'p31', label:'작성일 년', type:'text', x:72.263, y:67.696, w:3.627, h:1.14},
+    {id:'p32', label:'작성일 월', type:'text', x:77.166, y:67.696, w:3.358, h:1.14},
+    {id:'p33', label:'작성일 일', type:'text', x:81.8, y:67.696, w:2.754, h:1.14},
+    {id:'p34', sec:'4. 인적사항 (매도인 · 매수인 · 중개업자)', label:'매도인 주소', type:'text', x:23.002, y:69.181, w:61.954, h:1.781},
+    {id:'p35', label:'매도인 주민등록번호', type:'text', x:23.002, y:71.259, w:25.353, h:1.781},
+    {id:'p36', label:'매도인 전화', type:'text', x:57.337, y:71.259, w:12.257, h:1.781},
+    {id:'p37', label:'매도인 성명', type:'text', x:74.715, y:71.259, w:10.242, h:1.781},
+    {id:'p38', label:'매도인2 주소(공동명의)', type:'text', x:23.002, y:73.337, w:25.353, h:2.019},
+    {id:'p39', label:'매도인2 주민등록번호', type:'text', x:57.337, y:73.337, w:12.257, h:2.019},
+    {id:'p40', label:'매도인2 성명', type:'text', x:74.715, y:73.337, w:10.242, h:2.019},
+    {id:'p41', label:'매도인 서명·날인', type:'sign', x:85.376, y:69.359, w:6.8, h:5.938},
+    {id:'p42', label:'매수인 주소', type:'text', x:23.002, y:75.713, w:61.954, h:2.078},
+    {id:'p43', label:'매수인 주민등록번호', type:'text', x:23.002, y:78.147, w:25.353, h:2.078},
+    {id:'p44', label:'매수인 전화', type:'text', x:57.337, y:78.147, w:12.257, h:2.078},
+    {id:'p45', label:'매수인 성명', type:'text', x:74.715, y:78.147, w:10.242, h:2.078},
+    {id:'p46', label:'매수인 대리인', type:'text', x:23.002, y:80.463, w:25.353, h:2.078},
+    {id:'p47', label:'매수인 대리인 주민등록번호', type:'text', x:57.337, y:80.463, w:12.257, h:2.078},
+    {id:'p48', label:'매수인 대리인 성명', type:'text', x:74.715, y:80.463, w:10.242, h:2.078},
+    {id:'p49', label:'매수인 서명·날인', type:'sign', x:85.376, y:75.713, w:6.8, h:6.71},
+    {id:'p50', label:'중개업자 사무소 소재지', type:'text', x:23.002, y:82.898, w:25.353, h:1.722},
+    {id:'p51', label:'중개업자 사무소 소재지2', type:'text', x:57.337, y:82.898, w:34.839, h:1.722},
+    {id:'p52', label:'중개업자 사무소 명칭', type:'text', x:23.002, y:84.976, w:25.353, h:1.722},
+    {id:'p53', label:'중개업자 사무소 명칭2', type:'text', x:57.337, y:84.976, w:34.839, h:1.722},
+    {id:'p54', label:'중개업자 대표 서명·날인', type:'sign', x:30.725, y:87.055, w:13.264, h:1.722},
+    {id:'p55', label:'소속공인중개사 서명·날인(대표란)', type:'sign', x:57.421, y:87.055, w:31.229, h:1.722},
+    {id:'p56', label:'중개업자 등록번호', type:'text', x:23.002, y:89.133, w:12.592, h:1.722},
+    {id:'p57', label:'중개업자 전화', type:'text', x:40.128, y:89.133, w:8.227, h:1.722},
+    {id:'p58', label:'중개업자 등록번호2', type:'text', x:57.337, y:89.133, w:12.257, h:1.722},
+    {id:'p59', label:'중개업자 전화2', type:'text', x:74.715, y:89.133, w:17.461, h:1.722},
+    {id:'p60', label:'소속공인중개사 서명·날인', type:'sign', x:30.725, y:91.152, w:13.264, h:1.781},
+    {id:'p61', label:'소속공인중개사 서명·날인2', type:'sign', x:57.421, y:91.152, w:31.229, h:1.781}
+  ];
+const PRESET_POWER_FIELDS = [
+    {id:'p0', label:'부동산의 표시', type:'text', fs:26, multi:1, x:15.027, y:12.589, w:74.463, h:28.741, top:1},
+    {id:'p1', label:'등기원인 년(끝 2자리)', type:'text', al:'c', x:33.328, y:42.221, w:3.694, h:1.722},
+    {id:'p2', label:'등기원인 월', type:'text', al:'c', x:38.449, y:42.221, w:5.037, h:1.722},
+    {id:'p3', label:'등기원인 일', type:'text', al:'c', x:44.997, y:42.221, w:4.785, h:1.722},
+    {id:'p4', label:'등기의 목적', type:'text', x:30.138, y:44.893, w:59.352, h:6.057, top:1},
+    {id:'p5', label:'대리인', type:'text', x:30.138, y:51.425, w:59.352, h:5.344},
+    {id:'p6', label:'위임일 년', type:'text', al:'c', x:40.967, y:62.352, w:5.205, h:1.781},
+    {id:'p7', label:'위임일 월', type:'text', al:'c', x:47.599, y:62.352, w:2.854, h:1.781},
+    {id:'p8', label:'위임일 일', type:'text', al:'c', x:51.713, y:62.352, w:3.694, h:1.781},
+    {id:'p9', label:'위임인 주소', type:'text', x:24.009, y:66.39, w:41.135, h:1.9},
+    {id:'p10', label:'위임인 성명', type:'text', x:24.009, y:70.665, w:41.135, h:1.9},
+    {id:'p11', label:'위임인 서명·날인', type:'sign', x:67.159, y:67.696, w:21.827, h:8.314}
+  ];
+const PRESETS = [
+  {id:'p_sale',  name:'부동산 매매계약서', builtin:true, bgUrl:'tpl_sale.png',  fields:PRESET_SALE_FIELDS},
+  {id:'p_power', name:'등기 위임장',       builtin:true, bgUrl:'tpl_power.png', fields:PRESET_POWER_FIELDS}
+];
+
 /* ---------- 문서 블록 → A4 캔버스(빈 양식 배경) ---------- */
 const PW = 794, PH = 1123, MG = 60;
 function wrapText(g, text, maxW){
@@ -1355,7 +1451,7 @@ async function imgGet(id){ const db = await idb(); return new Promise(res => { c
 async function imgDel(id){ const db = await idb(); return new Promise(res => { const t = db.transaction('img', 'readwrite'); t.objectStore('img').delete(id); t.oncomplete = res; t.onerror = res; }); }
 const myForms = () => lsGet(LS_FORMS, []);
 const saveMyForms = a => lsSet(LS_FORMS, a);
-const BUILT = BUILTIN.map(compileBuiltin);
+const BUILT = BUILTIN.map(compileBuiltin).concat(PRESETS);
 const findForm = id => BUILT.find(f => f.id === id) || myForms().find(f => f.id === id) || null;
 
 /* ---------- 상태 ---------- */
@@ -1367,7 +1463,17 @@ let SEL = -1;            /* 선택한 칸 */
 let UNDO = [], REDO = [];
 let REG = null;          /* 등록 중 사진 {raw: canvas, fix: canvas} */
 
+const BG_CACHE = {};
+function loadUrlImg(src){                    /* 표준 양식 배경(같은 사이트 안 이미지) — 한 번만 내려받아 재사용 */
+  if (BG_CACHE[src]) return BG_CACHE[src];
+  BG_CACHE[src] = new Promise(res => { const im = new Image();
+    im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  return BG_CACHE[src];
+}
+function blankSheet(){ const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, PW, PH); return cv; }
 async function loadBg(form){
+  if (form.bgUrl){ const im = await loadUrlImg(form.bgUrl); if (im) return im; return blankSheet(); }
   if (form.builtin || form.fromBuiltin) return renderBlank(form);
   const d = await imgGet(form.id);
   if (!d) return renderBlank(form);
@@ -1508,6 +1614,8 @@ async function delForm(id){
   try{ localStorage.removeItem(LS_VALS + id); }catch(e){}
   renderList(); toast('삭제했습니다');
 }
+$('#psSale').onclick  = async () => { busyOn('매매계약서 양식을 여는 중…'); try{ await openForm('p_sale', 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
+$('#psPower').onclick = async () => { busyOn('등기위임장 양식을 여는 중…'); try{ await openForm('p_power', 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
 $('#formList').onclick = async e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.open) openForm(b.dataset.open, 3);
@@ -1536,11 +1644,12 @@ function delField(){
 function drawEditor(){
   const st = $('#edStage');
   st.innerHTML = '';
+  st.classList.toggle('ro', ro());
   const c = document.createElement('canvas'); c.width = bgW(); c.height = bgH(); c.getContext('2d').drawImage(BG, 0, 0); st.appendChild(c);
   CUR.fields.forEach((f, i) => {
     const d = document.createElement('div'); d.className = 'fld' + (i === SEL ? ' sel' : ''); d.dataset.i = i;
     d.style.cssText = `left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%`;
-    d.innerHTML = `<span>${escH(f.label)} · ${TYPE_NM[f.type]}</span><i class="hd2"></i>`;
+    d.innerHTML = (ro() ? '' : `<span>${escH(f.label)} · ${TYPE_NM[f.type]}</span>`) + '<i class="hd2"></i>';
     st.appendChild(d);
   });
   /* 잘못 만든 칸을 누르면 박스 바로 위에 [삭제] 버튼이 즉시 뜬다 */
@@ -1581,7 +1690,7 @@ const TYPE_NM = {text:'일반 글자', sign:'서명', number:'일반 글자', da
     const [px, py] = pct(e);
     if (!fd){ addField(px, py); return; }
     SEL = +fd.dataset.i;
-    if (ro()){ drawEditor(); return; }
+    if (ro()){ const ff = CUR.fields[SEL]; if (ff) toast('"' + ff.label + '" 칸' + (ff.type === 'sign' ? ' · 서명' : '')); drawEditor(); return; }
     const f = CUR.fields[SEL];
     drag = {mode:e.target.classList.contains('hd2') ? 'size' : 'move', sx:px, sy:py, f0:Object.assign({}, f), snap:JSON.stringify(CUR.fields), moved:false};
     drawEditor(); st.setPointerCapture(e.pointerId); e.preventDefault();
@@ -1634,10 +1743,12 @@ function renderInputs(){
   $('#s3name').textContent = CUR.name + ' · 값 입력';
   const h = CUR.fields.map((f, i) => {
     const v = VALS[f.label] == null ? '' : VALS[f.label];
-    if (f.type === 'sign') return `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
+    const hd = f.sec ? `<div class="sechd">${escH(f.sec)}</div>` : '';
+    if (f.type === 'sign') return hd + `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
+    if (f.multi) return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label><textarea data-f="${i}" rows="5" placeholder="여러 줄로 적으세요">${escH(v)}</textarea>`;
     const tp = f.type === 'date' ? 'date' : 'text', im = f.type === 'number' ? ' inputmode="decimal"' : '';
     const auto = CUR.calc && CUR.calc[f.label] ? '<em>자동 계산</em>' : '';
-    return `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
+    return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
   }).join('');
   $('#valList').innerHTML = h;
   $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
@@ -1920,16 +2031,19 @@ async function composite(maxW){
       const im = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = v; }); if (!im) continue;
       const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
     }
-    const t = shown(f); let fs = Math.min(h * 0.62, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(4, fs * 0.35);
+    const t = shown(f); const fsz = f.fs ? f.fs * (cv.width / 1489) : 0;
+    let fs = fsz || Math.min(h * 0.62, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(4, fs * 0.35);
     g.fillStyle = '#10204A'; g.textBaseline = 'middle';
     g.font = `${fw} ${fs}px ${FONT}`;
-    while (fs > 6 && g.measureText(t).width > w - pad * 2 && h < fs * 2.6){ fs -= .5; g.font = `${fw} ${fs}px ${FONT}`; }
-    if (g.measureText(t).width > w - pad * 2 && h >= fs * 2.6){   /* 높은 칸은 줄바꿈 */
-      const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.3; let yy = y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
+    while (fs > 6 && g.measureText(t).width > w - pad * 2 && h < fs * 2.6 && !f.top){ fs -= .5; g.font = `${fw} ${fs}px ${FONT}`; }
+    if (f.top || (g.measureText(t).width > w - pad * 2 && h >= fs * 2.6)){   /* 높은 칸·특약란은 줄바꿈, 위에서부터 */
+      const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.3;
+      let yy = f.top ? y + pad + fs * 0.55 : y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
       g.textAlign = 'left'; lines.forEach(l => { if (yy < y + h) g.fillText(l, x + pad, yy); yy += lh; });
     } else {
-      g.textAlign = f.type === 'number' ? 'right' : 'left';
-      g.fillText(t, f.type === 'number' ? x + w - pad : x + pad, y + h / 2);
+      const cent = f.al === 'c';
+      g.textAlign = cent ? 'center' : (f.type === 'number' ? 'right' : 'left');
+      g.fillText(t, cent ? x + w / 2 : (f.type === 'number' ? x + w - pad : x + pad), y + h / 2);
     }
   }
   return cv;
@@ -2013,7 +2127,7 @@ function qDraft(){
   let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).style.borderColor = v ? '' : 'var(--red)'; if (!v) bad = true; });
   if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
   return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더양식',
-    draft:`${n}님, 안녕하세요. KTS 원클릭 더양식입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 5종은 지금 바로 무료로 쓰실 수 있습니다.`};
+    draft:`${n}님, 안녕하세요. KTS 원클릭 더양식입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 7종(매매계약서·등기위임장 포함)은 지금 바로 무료로 쓰실 수 있습니다.`};
 }
 $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGet(LS_Q, []); a.push(q); lsSet(LS_Q, a);
