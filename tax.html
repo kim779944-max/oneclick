@@ -378,15 +378,55 @@ function calc(){
          : '사업자등록 전이거나 체납이 있으면 접수되지 않습니다.',
       '기술평가 등급이 낮으면 한도가 급격히 줄어듭니다.');
   }
-  /* 은행 */
+  /* 은행 — 사업자 신용대출 (체납·신용·업력·매출·기대출로 은행·한도 분기) */
   {
-    const ok = passed.credit || sales >= 300000000;
-    const amt = ok ? Math.min(100000000, Math.max(5000000, sales * 0.15 + (passed.credit ? 10000000 : 0))) : 0;
-    push('시중은행 (신용·담보대출)', ok ? (passed.credit ? 'go' : 'cond') : 'no', amt,
-      ok ? (passed.credit ? '4대보험·매출 이력이 있으면 은행 자체 신용대출도 함께 비교하세요. 금리는 보증대출보다 높습니다.'
-                          : '신용점수가 낮으면 은행 단독 대출은 어렵고, <b>보증서를 붙이는 방식</b>으로만 가능합니다.')
-         : '연체·체납이 있으면 은행 신용대출은 사실상 닫힙니다.',
-      '금리는 보증서 유무로 크게 갈립니다. 같은 한도라도 보증대출이 유리합니다.');
+    const bankOk = !noStart && passed.tax && passed.credit;
+    const base = Math.min(100000000, Math.max(5000000, sales * 0.15 + 10000000));
+    const won = n => Math.max(5000000, Math.round(n / 1000000) * 1000000);   /* 100만 원 단위 예상 한도 */
+    const debtCut = passed.debt ? 1 : 0.75;                                   /* 기대출이 많으면 한도가 깎인다 */
+    const banks = [];
+    if (bankOk){
+      const b = (nm, cap, amt, note) => banks.push({nm, amt: won(Math.min(cap, amt) * debtCut), note});
+      if (sales >= 300000000){
+        b('IBK기업은행', 100000000, base * 1.15 + 20000000,
+          '중소기업 전용 국책은행 — 타행보다 한도 산출이 후하고, 신보·기보 보증서를 붙이면 금리가 가장 낮습니다.');
+        b('KB국민은행', 100000000, base,
+          '카드 가맹 매출 자료로 담보 없이 승인 — 앱에서 서류 없이 10분 안에 한도 조회.');
+        b('신한은행', 80000000, base * 0.85,
+          '배달·이커머스 매출을 연동하면 금리 우대 — 비대면 심사로 2~3일 안에 입금.');
+      } else if (sales >= 100000000){
+        b('KB국민은행', 100000000, base,
+          '카드 가맹 매출 자료로 담보 없이 승인 — 앱에서 10분 안에 한도 조회.');
+        b('IBK기업은행', 80000000, base * 0.9,
+          '소상공인 전용 상품이 많고, 보증서를 붙이면 금리를 더 낮출 수 있습니다.');
+        b('토스뱅크', 100000000, base * 0.9,
+          '사장님 마이너스통장 — 서류 없이 앱에서 3분 만에 한도 확인·입금.');
+      } else {
+        b('카카오뱅크', 50000000, base * 0.6,
+          '개인사업자 보증서 대출 — 인증서로 세무 서류를 자동 수집, 최대 5,000만 원.');
+        b('토스뱅크', 50000000, base * 0.8,
+          '사장님 마이너스통장 — 서류 없이 앱에서 3분 만에 한도 확인.');
+        b('KB국민은행', 50000000, base * 0.7,
+          '카드·매장 매출이 쌓였으면 담보 없이 소액 승인 — 지점·앱에서 한도 조회.');
+      }
+      if (!passed.debt) banks.push({nm: '하나은행', amt: won(Math.min(70000000, base * 0.8) * debtCut),
+        note: '기대출·보증이 많은 경우 — 지역신보 보증서를 붙이면 승인률이 높아집니다.'});
+    }
+    const bankAmt = banks.length ? Math.max(...banks.map(x => x.amt)) : 0;
+    const bankWhy = bankOk
+      ? (age >= 3
+          ? '4대보험·매출 이력이 확인되면 <b>은행 자체 신용대출</b>도 보증대출과 함께 비교하세요. 아래는 지금 조건(매출·업력·기대출)에서 한도가 가장 잘 나오는 곳입니다.'
+          : '업력 1년 미만은 은행별로 6개월~1년 요건이 있어 지금은 <b>앱 한도 조회</b>만 해 두고, 매출 6개월치가 쌓인 뒤 신청하세요.')
+      : (!passed.tax
+          ? '<b>세금 체납이 있으면 은행 신용대출은 사실상 닫힙니다.</b> 완납·분납 약정으로 체납을 먼저 풀고, 보증기관(신보·기보)·정책자금을 먼저 준비해야 합니다.'
+          : (noStart
+              ? '사업자등록 전에는 은행 사업자 신용대출을 신청할 수 없습니다. 등록 후 매출 이력이 쌓여야 열리므로 <b>지원금·보증 준비가 먼저</b>입니다.'
+              : '<b>신용점수 700점 미만이면 은행 자체 신용대출은 어렵습니다.</b> 보증서를 붙이는 방식이나 정책자금으로 먼저 가고, 신용을 올린 뒤 은행을 비교하세요.'));
+    const bankLim = bankOk
+      ? '한도는 은행 앱 조회·심사에서 달라지는 예상치입니다. 부채비율 200%를 넘거나 기대출이 많으면 한도가 깎이고, 같은 한도라도 보증서(신보·기보)를 붙이면 금리가 낮아집니다. 우리은행은 지자체 이차보전으로 실부담 1~2%대까지 내려갈 수 있습니다.'
+      : '은행부터 받으면 그 대출이 부채로 잡혀 이후 보증·정책자금 한도가 줄어듭니다. 지원금 → 보증 → 은행 순서를 지키세요.';
+    push('시중은행 (사업자 신용대출)', bankOk ? (age >= 3 ? 'go' : 'cond') : 'no', bankAmt, bankWhy, bankLim);
+    now[now.length - 1].banks = banks;
   }
 
   const available = now.filter(x => x.ok !== 'no' && x.amt > 0);
@@ -458,9 +498,14 @@ function render(){
   $('#rNow').innerHTML = r.now.map(x => {
     const cls = x.ok === 'go' ? 'st-go' : (x.ok === 'cond' ? 'st-cond' : 'st-no');
     const tag = x.ok === 'go' ? '지금 가능' : (x.ok === 'cond' ? '조건 충족 시' : '지금 불가');
+    const banks = (x.banks && x.banks.length)
+      ? `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:3px">`
+        + x.banks.map(b => `<div style="margin-top:7px"><div style="font-size:11.5px;font-weight:900;color:#fff">${b.nm} <span style="color:var(--amber2)">${b.amt ? '최대 ' + eok(b.amt) + '원' : '한도 조회'}</span></div><div style="font-size:10.5px;color:var(--ink2);line-height:1.55;word-break:keep-all">${b.note}</div></div>`).join('')
+        + `</div>`
+      : '';
     return `<div class="inst"><div class="ih"><span class="nm">${x.nm}</span><span class="stt ${cls}">${tag}</span>`
       + `<span class="amt">${x.amt ? '최대 ' + eok(x.amt) + '원' : '한도 없음'}</span></div>`
-      + `<div class="why">${x.why}</div><div class="lim">${x.lim}</div></div>`;
+      + `<div class="why">${x.why}</div>${banks}<div class="lim">${x.lim}</div></div>`;
   }).join('');
   $('#rNowNote').innerHTML = r.available.length
     ? `합계 <b>${eok(r.sumNow)}원</b>은 기관별 한도를 단순 합산한 값입니다. 실제로는 <b>총 부채·보증 잔액</b> 기준으로 깎이므로, 한 곳씩 순서대로 받는 편이 안전합니다.`
