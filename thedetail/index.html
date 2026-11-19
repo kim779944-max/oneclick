@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 더상세 — 사진 넣고 1초, 쿠팡형 상세페이지</title>
-<meta name="description" content="상품명·핵심 포인트·제원·사진 1~5장만 넣으면 쿠팡·스마트스토어용 세로 긴 상세페이지 통이미지(PNG)를 1초에 만들어 드립니다.">
+<title>KTS 더상세 — 사진 넣고 1초, 상품 SEO 상세페이지 &amp; 부동산 브리핑</title>
+<meta name="description" content="상품명·키워드·사진만 넣으면 쿠팡·스마트스토어·블로그용 SEO 상세페이지를, 매물 정보와 사진을 넣으면 권리분석·입지·공시지가·시장조사까지 담은 블로그 3p+ 매물 브리핑을 1초에 만들어 드립니다.">
 <meta name="theme-color" content="#0A1128">
 <style>
   :root{
@@ -63,18 +63,18 @@
   .sh{display:flex;align-items:baseline;gap:9px;margin-bottom:9px}
   .sh .no{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--orange)}
   .sh .tt{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
-  .sh .opt{font-size:11px;color:var(--dim2);font-weight:600}
+  .sh .opt{font-size:11px;color:var(--dim2);font-weight:600;margin-left:auto;text-align:right}
   .card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022));border:1px solid var(--line);border-radius:var(--r);padding:13px}
 
   label.fl{display:block;font-size:12px;color:var(--dim);font-weight:700;margin:0 0 6px}
   .hint{font-size:11px;color:var(--dim2);margin-top:6px;line-height:1.5}
-  input[type=text],textarea{
+  input[type=text],input[type=tel],textarea,select.nat{
     width:100%;background:#0C1730;border:1px solid var(--line);border-radius:11px;
     color:var(--ink);font:inherit;font-size:16px;padding:12px 13px;outline:0;
     transition:border-color .15s,box-shadow .15s;
   }
   input[type=text]::placeholder,textarea::placeholder{color:#54658a}
-  input[type=text]:focus,textarea:focus{border-color:rgba(255,107,0,.75);box-shadow:0 0 0 3px rgba(255,107,0,.13)}
+  input[type=text]:focus,textarea:focus,select.nat:focus{border-color:rgba(255,107,0,.75);box-shadow:0 0 0 3px rgba(255,107,0,.13)}
   textarea{resize:vertical;min-height:64px;line-height:1.5}
   .row{display:flex;gap:8px}
   .row>*{flex:1;min-width:0}
@@ -86,9 +86,10 @@
     font-size:11px;font-weight:800;background:rgba(255,107,0,.14);color:#FF8B3D;border:1px solid rgba(255,107,0,.3)
   }
 
-  .grid2{display:grid;grid-template-columns:74px 1fr;gap:7px;align-items:center}
+  .grid2{display:grid;grid-template-columns:76px 1fr;gap:7px 8px;align-items:center}
   .grid2 .k{font-size:12px;color:var(--dim);font-weight:700;text-align:right;padding-right:2px}
   .grid2 input{padding:10px 12px;font-size:15px}
+  .grid2 .wide{grid-column:1 / -1}
 
   /* ---------- photos ---------- */
   .drop{
@@ -104,22 +105,22 @@
   .drop span{display:block;font-size:11px;color:var(--dim2);margin-top:2px}
   .thumbs{display:flex;gap:9px;margin-top:11px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
   .thumbs::-webkit-scrollbar{display:none}
-  .th{position:relative;flex:0 0 auto;width:78px}
-  .th .im{width:78px;height:78px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);background:#0C1730}
+  .th{position:relative;flex:0 0 auto;width:116px}
+  .th .im{width:116px;height:104px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);background:#0C1730;position:relative}
   .th.main .im{border-color:var(--orange)}
   .th img{width:100%;height:100%;object-fit:cover;display:block}
   .th .badge{position:absolute;left:5px;top:5px;font-size:9px;font-weight:800;background:var(--orange);color:#141414;border-radius:5px;padding:2px 5px;letter-spacing:.02em}
   .th .del{
     position:absolute;right:3px;top:3px;width:21px;height:21px;border-radius:50%;border:0;
-    background:rgba(6,11,26,.82);color:#fff;font-size:13px;line-height:1;display:grid;place-items:center;cursor:pointer
+    background:rgba(6,11,26,.82);color:#fff;font-size:13px;line-height:1;display:grid;place-items:center;cursor:pointer;z-index:2
   }
-  .th .cap{font-size:10px;color:var(--dim2);text-align:center;margin-top:4px}
-  /* 부동산 매물용 (2026-11-19 · 적립메모 85번) — 추가분만 */
-  body.eMode .onlyP{display:none}
-  .th .role{width:78px;margin-top:4px;font:inherit;font-size:10.5px;font-weight:800;color:#EAF0FA;
-    background:#0C1730;border:1px solid var(--line2);border-radius:7px;padding:4px 2px;text-align:center;text-align-last:center}
+  .th .role{width:116px;margin-top:4px;font:inherit;font-size:10.5px;font-weight:800;color:#EAF0FA;
+    background:#0C1730;border:1px solid var(--line2);border-radius:7px;padding:5px 2px;text-align:center;text-align-last:center}
   .th .role:focus{outline:none;border-color:var(--orange)}
   .th.main .role{border-color:rgba(255,107,0,.55)}
+  .th .cap{width:116px;margin-top:4px;font:inherit;font-size:10.5px;color:#C8D4E8;background:#0C1730;
+    border:1px solid var(--line);border-radius:7px;padding:6px 6px;line-height:1.35;text-align:left;height:46px;resize:none}
+  .th .cap:focus{outline:none;border-color:rgba(255,107,0,.7)}
   .clr{margin-top:2px;background:transparent;border:1px dashed rgba(255,255,255,.2);color:#8FA0BF;
     font:inherit;font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:9px;cursor:pointer}
   .clr:active{border-color:var(--orange);color:var(--orange)}
@@ -170,8 +171,20 @@
   .done b{font-size:16px;font-weight:800}
   .done .t{font-size:11px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
 
+  /* 3단 출력 선택 */
+  .modesw{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:12px 0 4px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04)}
+  .modesw button{
+    appearance:none;border:0;background:transparent;color:var(--dim);font:inherit;border-radius:11px;
+    padding:9px 4px;cursor:pointer;transition:.16s;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center
+  }
+  .modesw button b{font-size:12.5px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
+  .modesw button em{font-style:normal;font-size:9.5px;font-weight:700;color:var(--dim2);letter-spacing:-.01em}
+  .modesw button.on{background:var(--orange);color:#141414;box-shadow:0 6px 16px rgba(255,107,0,.28)}
+  .modesw button.on em{color:#4a2300}
+
   .meta{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 13px}
   .meta span{font-size:11px;color:#B9C6DE;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:7px;padding:4px 8px;font-variant-numeric:tabular-nums}
+  .meta span.hot{color:#FFC79B;border-color:rgba(255,107,0,.45);background:rgba(255,107,0,.1)}
 
   .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .acts .wide{grid-column:1 / -1}
@@ -184,9 +197,10 @@
   button.btn[disabled]{opacity:.5}
 
   .pv{margin-top:15px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
-  .pv .cap{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--navy2);font-size:11px;color:var(--dim)}
+  .pv .cap{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:var(--navy2);font-size:11px;color:var(--dim)}
   .pv .cap b{color:#DCE6F6;font-size:11.5px;font-weight:800}
-  .pv .sc{max-height:62vh;overflow:auto;background:#EDF0F6;padding:0}
+  .pv .cap span{font-variant-numeric:tabular-nums}
+  .pv .sc{max-height:66vh;overflow:auto;background:#E9EDF4;padding:0;-webkit-overflow-scrolling:touch}
   .pv canvas{display:block;width:100%;height:auto}
 
   .copybox{margin-top:12px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0C1730}
@@ -194,7 +208,7 @@
   .copybox .hd em{font-style:normal;font-size:10.5px;color:var(--dim2);font-weight:600}
   .copybox textarea{
     border:0;border-radius:0;background:#0C1730;font-family:ui-monospace,Menlo,Consolas,monospace;
-    font-size:11px;line-height:1.5;color:#9FB3D6;height:132px;padding:11px 12px
+    font-size:11px;line-height:1.5;color:#9FB3D6;height:150px;padding:11px 12px
   }
   .copybox textarea:focus{box-shadow:none;border:0}
   .foot{margin:22px 0 8px;text-align:center;font-size:11px;line-height:1.9;color:#5E6F91}
@@ -220,6 +234,8 @@
   .tips ul{margin:0;padding:0;list-style:none}
   .tips li{position:relative;padding-left:14px;font-size:11.5px;line-height:1.55;color:#93A3C2;margin-bottom:3px}
   .tips li:before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--orange)}
+  .mini{font-size:11px;color:#93A3C2;margin-top:8px;line-height:1.55}
+  .mini b{color:#FFC79B}
 </style>
 </head>
 <body>
@@ -237,133 +253,273 @@
 </header>
 <a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
-
 <div id="screenInput">
 <div class="wrap">
 
   <div class="intro">
-    <h1>사진 넣고 <em>1초</em>,<br>쿠팡형 상세페이지가 나옵니다</h1>
-    <p>상품명과 사진 1~5장만 있으면 됩니다. 나머지는 카피 4원칙으로 자동으로 채워 드립니다.</p>
+    <h1 id="introH1">사진 넣고 <em>1초</em>,<br>상품 상세페이지가 나옵니다</h1>
+    <p id="introP">상품명과 키워드, 사진만 있으면 됩니다. 쿠팡·네이버가 좋아하는 구조로 카피를 자동으로 채워 드립니다.</p>
     <div class="ticks">
-      <span class="tick"><i></i>세로 긴 통이미지 1장</span>
-      <span class="tick"><i></i>PNG · JPG 저장</span>
-      <span class="tick"><i></i>HTML 코드 복사</span>
+      <span class="tick"><i></i>키워드 자동 배치</span>
+      <span class="tick"><i></i>블로그급 서사</span>
+      <span class="tick"><i></i>전체 · 브리핑 · 한 장</span>
     </div>
   </div>
 
-  <div class="step">
-    <div class="sh"><span class="no">01</span><span class="tt" id="lbBasic">상품 기본</span></div>
-    <div class="card">
-      <label class="fl" for="fName" id="lbName">상품명</label>
-      <input type="text" id="fName" placeholder="예) 욕실 실리콘 곰팡이 제거젤 120g + 도포기">
-      <div style="height:12px"></div>
-      <label class="fl" for="fHook" id="lbHook">한 줄 후킹 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
-      <input type="text" id="fHook" placeholder="비워두시면 자동으로 채웁니다">
-      <div class="hint" id="hintName">첫 장 사진이 대표 사진이 됩니다.</div>
+  <!-- ══════════════════ 상품 모드 ══════════════════ -->
+  <div id="formProduct">
+
+    <div class="step">
+      <div class="sh"><span class="no">01</span><span class="tt">상품 기본</span><span class="opt">키워드</span></div>
+      <div class="card">
+        <label class="fl" for="fName">상품명</label>
+        <input type="text" id="fName" placeholder="예) 욕실 실리콘 곰팡이 제거젤 120g + 도포기">
+        <div style="height:11px"></div>
+        <label class="fl" for="fHook">첫 3초 후킹 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+        <input type="text" id="fHook" placeholder="비워두시면 키워드로 자동으로 씁니다">
+        <div style="height:11px"></div>
+        <div class="grid2">
+          <span class="k">메인 키워드</span><input type="text" id="fKwMain" placeholder="예) 실리콘 곰팡이 제거">
+          <span class="k">세부 키워드</span><input type="text" id="fKwSub" placeholder="예) 욕실 곰팡이, 줄눈 청소, 창틀 곰팡이">
+        </div>
+        <div class="hint">메인 키워드는 상품명·첫 소제목·스펙표·태그에 자동으로 한 번씩 들어갑니다.</div>
+      </div>
     </div>
+
+    <div class="step">
+      <div class="sh"><span class="no">02</span><span class="tt">특장점 · 차별 · 대상</span></div>
+      <div class="card">
+        <div class="pt"><span class="n">01</span><input type="text" id="fP0" data-point="0" placeholder="가장 센 한 가지"></div>
+        <div class="pt"><span class="n">02</span><input type="text" id="fP1" data-point="1" placeholder="두 번째"></div>
+        <div class="pt"><span class="n">03</span><input type="text" id="fP2" data-point="2" placeholder="세 번째"></div>
+        <div style="height:10px"></div>
+        <label class="fl" for="fTarget">이 상품이 필요한 사람</label>
+        <input type="text" id="fTarget" placeholder="예) 원룸·오피스텔에 사는 1인 가구, 이사 전후 청소하는 분">
+        <div style="height:10px"></div>
+        <label class="fl" for="fCompare">비교 · 차별 <span style="color:#5E6F91;font-weight:600">(한 줄에 하나)</span></label>
+        <textarea id="fCompare" placeholder="예) 일반 젤은 흘러내려 두 번 바릅니다 → 이 제품은 점도가 높아 한 번에 붙습니다&#10;예) 도포기가 따로 없어 손에 묻습니다 → 도포기 동봉"></textarea>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="no">03</span><span class="tt">제원 4줄</span><span class="opt">표로 들어갑니다</span></div>
+      <div class="card">
+        <div class="grid2">
+          <span class="k">크기</span><input type="text" id="fS0" data-spec="0" placeholder="예) 120g · 15×5cm">
+          <span class="k">재질</span><input type="text" id="fS1" data-spec="1" placeholder="예) 젤 타입">
+          <span class="k">구성</span><input type="text" id="fS2" data-spec="2" placeholder="예) 본품 + 도포기 1개">
+          <span class="k">가격</span><input type="text" id="fS3" data-spec="3" placeholder="예) 9,900원">
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="no">04</span><span class="tt">제품 사진</span><span class="opt" id="optPPhotos">1~8장 · 장면마다 설명</span></div>
+      <div class="card">
+        <label class="drop" for="fPhoto">
+          <span class="pl"></span>
+          <span style="min-width:0">
+            <b>사진 넣기</b>
+            <span>첫 장이 대표 · 사진마다 한 줄 설명을 붙이면 글이 됩니다</span>
+          </span>
+        </label>
+        <input type="file" id="fPhoto" accept="image/*" multiple hidden>
+        <div class="thumbs" id="thumbsP"></div>
+        <button class="clr" id="btnClearPhotos" type="button" hidden>사진 모두 지우기</button>
+        <div class="hint" id="photoHint">사진을 누르면 대표 사진으로 바뀝니다.</div>
+      </div>
+    </div>
+
+    <details class="adv">
+      <summary>고급 설정 · 실사용 스토리 <span class="ar"></span></summary>
+      <div class="body">
+        <div>
+          <label class="fl" for="fGomin">고객의 고민 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+          <input type="text" id="fGomin" placeholder="비워두시면 자동 문장으로 채웁니다">
+        </div>
+        <div>
+          <label class="fl" for="fStory">실사용 스토리 <span style="color:#5E6F91;font-weight:600">(선택 · 여러 줄)</span></label>
+          <textarea id="fStory" placeholder="예) 퇴근하고 욕실에 들어가면 늘 그 자리부터 눈이 갑니다.&#10;바르고 하루 지나니 손으로 만져도 미끌거림이 없었습니다."></textarea>
+        </div>
+        <div>
+          <label class="fl" for="fTrust">신뢰 · 안심 안내 <span style="color:#5E6F91;font-weight:600">(한 줄에 하나)</span></label>
+          <textarea id="fTrust" placeholder="예) 수령일부터 7일 이내 청약철회 안내에 따릅니다.&#10;예) 파손 시 사진 1장으로 교환 접수"></textarea>
+        </div>
+        <div>
+          <label class="fl" for="fReason">가격 명분 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+          <input type="text" id="fReason" placeholder="예) 본품 120g + 도포기 포함, 배송비 포함">
+        </div>
+        <div>
+          <label class="fl" for="fNotice">안내 문구 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+          <input type="text" id="fNotice" placeholder="비워두시면 기본 안내로 채웁니다">
+        </div>
+        <div>
+          <label class="fl" for="fTags">태그 <span style="color:#5E6F91;font-weight:600">(선택 · 쉼표)</span></label>
+          <input type="text" id="fTags" placeholder="비워두시면 키워드로 자동 생성">
+        </div>
+        <div>
+          <label class="fl" for="fBrand">상호 · 브랜드</label>
+          <input type="text" id="fBrand" placeholder="예) KTS">
+        </div>
+        <div>
+          <label class="fl" for="fContact">문의처</label>
+          <input type="text" id="fContact" placeholder="예) 카카오톡 @kts 또는 010-0000-0000">
+        </div>
+        <label class="chk"><input type="checkbox" id="fMark" checked> 하단에 KTS 더상세 표시 넣기</label>
+        <div>
+          <label class="fl" for="fWidth">이미지 크기</label>
+          <select id="fWidth" class="nat">
+            <option value="780">780px — 쿠팡·스마트스토어 표준</option>
+            <option value="1080">1080px — 고화질(스마트스토어·블로그)</option>
+          </select>
+        </div>
+        <button class="btn" id="btnDemo" type="button" style="height:44px;font-size:13px">예시로 채워보기</button>
+      </div>
+    </details>
   </div>
 
-  <!-- ── 부동산 매물용 전용 입력 (2026-11-19 · 적립메모 85번) ── 부동산 모드에서만 보입니다 -->
-  <div class="step" id="stepEstate" hidden>
-    <div class="sh"><span class="no">02</span><span class="tt">매물 자리 · 가격</span><span class="opt">부동산</span></div>
-    <div class="card">
-      <label class="fl" for="fAddr">소재지</label>
-      <input type="text" id="fAddr" placeholder="예) 경기 의정부시 민락동 123-4, 3층">
-      <div style="height:11px"></div>
-      <div class="grid2">
-        <span class="k">매매/교환가</span><input type="text" id="fTrade" placeholder="예) 4억 2천만 원">
-        <span class="k">실투자금</span><input type="text" id="fInvest" placeholder="예) 1억 1천만 원">
-      </div>
-      <div style="height:11px"></div>
-      <label class="fl" for="fPhone">문의 전화</label>
-      <input type="tel" id="fPhone" inputmode="tel" placeholder="예) 010-2002-2899">
-      <div class="hint">전화번호는 브리핑 아래 <b>전화 문의</b> 버튼으로 그대로 들어갑니다.</div>
-    </div>
-  </div>
+  <!-- ══════════════════ 부동산 모드 ══════════════════ -->
+  <div id="formEstate" hidden>
 
-  <div class="step" id="stepRights" hidden>
-    <div class="sh"><span class="no">03</span><span class="tt">권리분석 3줄</span><span class="opt">핵심만</span></div>
-    <div class="card">
-      <div class="pt"><span class="n">01</span><input type="text" id="fR0" placeholder="예) 갑구 근저당 3억 — 매도 시 말소"></div>
-      <div class="pt"><span class="n">02</span><input type="text" id="fR1" placeholder="예) 을구 해당 없음 · 세금 체납 0원"></div>
-      <div class="pt"><span class="n">03</span><input type="text" id="fR2" placeholder="예) 임차인 없음 · 즉시 인도 가능"></div>
-      <div class="hint">등기부 갑구·을구, 세금 체납, 임차인·보증금만 적어도 매수인 판단이 됩니다.</div>
+    <div class="step">
+      <div class="sh"><span class="no">01</span><span class="tt">매물 기본</span></div>
+      <div class="card">
+        <label class="fl" for="eName">매물명</label>
+        <input type="text" id="eName" placeholder="예) 서산 대산읍 세아빌딩 (근생통건물)">
+        <div style="height:11px"></div>
+        <label class="fl" for="eHook">한 줄 헤드라인 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+        <input type="text" id="eHook" placeholder="예) 대산항 배후 만실 임대 건물 · 감정 52억 대비 45억">
+        <div style="height:11px"></div>
+        <label class="fl" for="eAddr">소재지</label>
+        <input type="text" id="eAddr" placeholder="예) 충남 서산시 대산읍 대산리 148-8, 148-86 (2필지)">
+        <div class="hint">소재지를 넣으면 <b>지도 · 로드뷰 · 위성</b> 링크가 자동으로 붙습니다.</div>
+      </div>
     </div>
-  </div>
 
-  <div class="step" id="stepPoints">
-    <div class="sh"><span class="no">02</span><span class="tt" id="lbPoints">핵심 포인트 3가지</span><span class="opt">짧게</span></div>
-    <div class="card">
-      <div class="pt"><span class="n">01</span><input type="text" id="fP0" data-point="0" placeholder="가장 센 한 가지"></div>
-      <div class="pt"><span class="n">02</span><input type="text" id="fP1" data-point="1" placeholder="두 번째"></div>
-      <div class="pt"><span class="n">03</span><input type="text" id="fP2" data-point="2" placeholder="세 번째"></div>
-      <div class="hint">사진 한 장 안에 들어가는 길이면 충분합니다. 15자 안팎이 가장 잘 보입니다.</div>
+    <div class="step">
+      <div class="sh"><span class="no">02</span><span class="tt">물건 내용</span><span class="opt">표로 들어갑니다</span></div>
+      <div class="card">
+        <div class="grid2">
+          <span class="k">용도지역</span><input type="text" id="eZone" placeholder="예) 일반상업지역">
+          <span class="k">대지</span><input type="text" id="eLand" placeholder="예) 271평">
+          <span class="k">연면적</span><input type="text" id="eArea" placeholder="예) 775평">
+          <span class="k">구조·용도</span><input type="text" id="eStruct" placeholder="예) 철골조 · 제1,2종 근생">
+          <span class="k">규모·준공</span><input type="text" id="eScale" placeholder="예) 지하1~지상5층 · 2017.09 준공">
+          <span class="k">설비·주차</span><input type="text" id="eFacility" placeholder="예) 승강기 2대 · 주차 27대">
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="step">
-    <div class="sh"><span class="no" id="noSpecs">03</span><span class="tt" id="ttSpecs">제원 4줄</span><span class="opt" id="optSpecs">표로 들어갑니다</span></div>
-    <div class="card">
-      <div class="grid2">
-        <span class="k" id="sk0">크기</span><input type="text" id="fS0" data-spec="0" placeholder="예) 120g · 15×5cm">
-        <span class="k" id="sk1">재질</span><input type="text" id="fS1" data-spec="1" placeholder="예) 젤 타입">
-        <span class="k" id="sk2">구성</span><input type="text" id="fS2" data-spec="2" placeholder="예) 본품 + 도포기 1개">
-        <span class="k" id="sk3">가격</span><input type="text" id="fS3" data-spec="3" placeholder="예) 9,900원">
+    <div class="step">
+      <div class="sh"><span class="no">03</span><span class="tt">가격 · 수익</span><span class="opt">자동 계산</span></div>
+      <div class="card">
+        <div class="grid2">
+          <span class="k">매매/교환가</span><input type="text" id="eTrade" placeholder="예) 45억 원">
+          <span class="k">감정가</span><input type="text" id="eAppraise" placeholder="예) 52억 원">
+          <span class="k">공시지가</span><input type="text" id="eOfficial" placeholder="예) 12억 5,892만 원">
+          <span class="k">실투자금</span><input type="text" id="eInvest" placeholder="예) 14억 원">
+          <span class="k">대출금</span><input type="text" id="eDebt" placeholder="예) 27억 원 (수협) — 보증금 승계 시">
+          <span class="k">금리</span><input type="text" id="eRate" placeholder="예) 4.2%">
+          <span class="k">보증금 합계</span><input type="text" id="eDeposit" placeholder="예) 4억 3,000만 원">
+          <span class="k">월세 합계</span><input type="text" id="eRent" placeholder="예) 1,933만 원">
+          <span class="k">관리비</span><input type="text" id="eMgmt" placeholder="예) 240만 원 별도">
+        </div>
+        <div class="mini" id="calcEcho">숫자를 넣으면 <b>감정가 대비 · 평당 단가 · 순월세 · 수익률</b>을 자동으로 계산해 본문에 넣습니다.</div>
       </div>
     </div>
-  </div>
 
-  <div class="step">
-    <div class="sh"><span class="no" id="noPhotos">04</span><span class="tt" id="ttPhotos">제품 사진</span><span class="opt" id="optPhotos">1~5장</span></div>
-    <div class="card">
-      <label class="drop" id="drop" for="fPhoto">
-        <span class="pl"></span>
-        <span style="min-width:0">
-          <b>사진 넣기</b>
-          <span>첫 장이 대표 · 나머지는 본문에 배치됩니다</span>
-        </span>
-      </label>
-      <input type="file" id="fPhoto" accept="image/*" multiple hidden>
-      <div class="thumbs" id="thumbs"></div>
-      <button class="clr" id="btnClearPhotos" type="button" hidden>사진 모두 지우기</button>
-      <div class="hint" id="photoHint">사진을 누르면 대표 사진으로 바뀝니다.</div>
+    <div class="step">
+      <div class="sh"><span class="no">04</span><span class="tt">임대차 내역</span><span class="opt">한 줄에 한 호실</span></div>
+      <div class="card">
+        <textarea id="eLease" style="min-height:150px" placeholder="1층 101호 양꼬치집 7,000 / 350 (관 30)&#10;1층 102호 맘스터치 3,000 / 190 (관 20)&#10;2층 201호 공실 4,000 / 200 (관 25)&#10;옥상 중계기 27.5"></textarea>
+        <div class="hint">보증금 / 월세 순서로 적으면 표가 됩니다. 공실은 업종 자리에 <b>공실</b>이라고 적어 주세요. 만실·공실 합계는 자동으로 냅니다.</div>
+      </div>
     </div>
-  </div>
 
-  <details class="adv">
-    <summary>고급 설정 <span class="ar"></span></summary>
-    <div class="body">
-      <div class="onlyP">
-        <label class="fl" for="fGomin" id="lbGomin">고객의 고민 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
-        <input type="text" id="fGomin" placeholder="비워두시면 자동 문장으로 채웁니다">
+    <div class="step">
+      <div class="sh"><span class="no">05</span><span class="tt">권리분석</span><span class="opt">4줄 + 심층</span></div>
+      <div class="card">
+        <div class="pt"><span class="n">01</span><input type="text" id="fR0" placeholder="예) 갑구 근저당 30억 — 매도 시 말소"></div>
+        <div class="pt"><span class="n">02</span><input type="text" id="fR1" placeholder="예) 을구 해당 없음 · 세금 체납 0원"></div>
+        <div class="pt"><span class="n">03</span><input type="text" id="fR2" placeholder="예) 임대차 10호실 · 보증금 합계 4억 3,000만"></div>
+        <div class="pt"><span class="n">04</span><input type="text" id="fR3" placeholder="예) 201호 공실 · 즉시 인도 가능"></div>
+        <div style="height:10px"></div>
+        <label class="fl" for="eRightsNote">권리분석 심층 글 <span style="color:#5E6F91;font-weight:600">(선택 · 비우면 자동)</span></label>
+        <textarea id="eRightsNote" style="min-height:96px" placeholder="비워두시면 위 4줄과 등기·임대차 항목으로 전문가 톤의 글을 자동으로 씁니다."></textarea>
       </div>
-      <div class="onlyP">
-        <label class="fl" for="fReason">가격 명분 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
-        <input type="text" id="fReason" placeholder="예) 본품 120g + 도포기 포함, 배송비 포함">
-      </div>
-      <div class="onlyP">
-        <label class="fl" for="fNotice" id="lbNotice">안내 문구 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
-        <input type="text" id="fNotice" placeholder="비워두시면 기본 안내로 채웁니다">
-      </div>
-      <div>
-        <label class="fl" for="fBrand">상호 · 브랜드</label>
-        <input type="text" id="fBrand" placeholder="예) KTS">
-      </div>
-      <div>
-        <label class="fl" for="fContact">문의처</label>
-        <input type="text" id="fContact" placeholder="예) 카카오톡 @kts 또는 010-0000-0000">
-      </div>
-      <label class="chk"><input type="checkbox" id="fMark" checked> 하단에 KTS 더상세 표시 넣기</label>
-      <div>
-        <label class="fl" for="fWidth">이미지 크기</label>
-        <select id="fWidth" style="width:100%;background:#0C1730;border:1px solid var(--line);border-radius:11px;color:var(--ink);font:inherit;font-size:15px;padding:11px 12px;outline:0">
-          <option value="780">780px — 쿠팡·스마트스토어 표준</option>
-          <option value="1080">1080px — 고화질(스마트스토어·블로그)</option>
-        </select>
-      </div>
-      <button class="btn" id="btnDemo" type="button" style="height:44px;font-size:13px">예시로 채워보기</button>
     </div>
-  </details>
+
+    <div class="step">
+      <div class="sh"><span class="no">06</span><span class="tt">입지 · 시장조사</span><span class="opt">자동 추천</span></div>
+      <div class="card">
+        <div class="grid2">
+          <span class="k">배후 수요</span><input type="text" id="eLocBack" placeholder="예) 대산항·현대오일뱅크·코오롱·KCC 배후 상주 인구">
+          <span class="k">교통·접근</span><input type="text" id="eTraffic" placeholder="예) 대산IC 12분 · 간선도로 코너">
+          <span class="k">상권·업종</span><input type="text" id="eMarket2" placeholder="예) 1층 먹자·2~3층 학원·PC·4층 스포츠">
+          <span class="k">개발·호재</span><input type="text" id="eDev" placeholder="예) 대산산단 증설 · 배후 주거 확장">
+        </div>
+        <div style="height:10px"></div>
+        <label class="fl" for="eSpots">주변 명소 · 인프라 <span style="color:#5E6F91;font-weight:600">(한 줄에 하나 · 이름 — 설명)</span></label>
+        <textarea id="eSpots" placeholder="예) 대산항 — 차 8분, 배후 물동량과 상주 인구의 원천&#10;예) 대산종합병원 — 도보 6분&#10;예) 대산중앙시장 — 차 3분"></textarea>
+        <div style="height:10px"></div>
+        <label class="fl" for="eMarketNote">시장조사 메모 <span style="color:#5E6F91;font-weight:600">(선택 · 비우면 자동)</span></label>
+        <textarea id="eMarketNote" style="min-height:80px" placeholder="비워두시면 공시지가·평당 단가·임대 사례로 시장조사 글을 자동으로 씁니다."></textarea>
+        <button class="clr" id="btnAutoEstate" type="button" style="margin-top:10px">추천 문장 자동 채우기</button>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="no">07</span><span class="tt">현장 · 항공 · 로드뷰 사진</span><span class="opt" id="optEPhotos">최대 10장</span></div>
+      <div class="card">
+        <label class="drop" for="fPhotoE">
+          <span class="pl"></span>
+          <span style="min-width:0">
+            <b>사진 넣기</b>
+            <span>첫 장이 대표(외경) — 아래 칸에서 역할과 현장 설명을 고릅니다</span>
+          </span>
+        </label>
+        <input type="file" id="fPhotoE" accept="image/*" multiple hidden>
+        <div class="thumbs" id="thumbsE"></div>
+        <button class="clr" id="btnClearPhotosE" type="button" hidden>사진 모두 지우기</button>
+        <div class="hint" id="photoHintE">외경 · 도로 · 내부 · 지적도 · 항공(위성) · 로드뷰 · 주변명소 — 역할을 고르면 사진마다 현장 설명이 자동으로 붙습니다.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="no">08</span><span class="tt">연락처</span></div>
+      <div class="card">
+        <label class="fl" for="ePhone">문의 전화</label>
+        <input type="tel" id="ePhone" inputmode="tel" placeholder="예) 010-2002-2899">
+        <div style="height:11px"></div>
+        <label class="fl" for="eContact">추가 연락 · 카톡</label>
+        <input type="text" id="eContact" placeholder="예) 카카오톡 @kts">
+        <div class="hint">전화번호는 브리핑 아래 <b>전화 문의</b> 버튼으로 그대로 들어갑니다.</div>
+      </div>
+    </div>
+
+    <details class="adv">
+      <summary>고급 설정 <span class="ar"></span></summary>
+      <div class="body">
+        <div>
+          <label class="fl" for="eBrand">상호 · 브랜드</label>
+          <input type="text" id="eBrand" placeholder="예) KTS 부동산 교환">
+        </div>
+        <div>
+          <label class="fl" for="ePriceNote">가격 명분 한 줄 <span style="color:#5E6F91;font-weight:600">(선택)</span></label>
+          <input type="text" id="ePriceNote" placeholder="예) 감정 52억 대비 7억 낮은 급매 조건">
+        </div>
+        <label class="chk"><input type="checkbox" id="eMark" checked> 하단에 KTS 더상세 표시 넣기</label>
+        <div>
+          <label class="fl" for="eWidth">이미지 크기</label>
+          <select id="eWidth" class="nat">
+            <option value="780">780px — 기본</option>
+            <option value="1080">1080px — 고화질(인쇄·블로그)</option>
+          </select>
+        </div>
+        <button class="btn" id="btnDemoE" type="button" style="height:44px;font-size:13px">예시(세아빌딩)로 채워보기</button>
+      </div>
+    </details>
+  </div>
 
   <div class="bar">
     <div class="barin">
@@ -383,12 +539,20 @@
 <div id="screenResult">
 <div class="wrap">
   <div class="done">
-    <span class="ok"></span><b>상세페이지 완성</b><span class="t" id="elapsed">0.00초</span>
+    <span class="ok"></span><b id="doneTitle">상세페이지 완성</b><span class="t" id="elapsed">0.00초</span>
   </div>
+
+  <div class="modesw" id="modesw" role="tablist" aria-label="출력 형태">
+    <button type="button" data-out="full" class="on" role="tab" aria-selected="true"><b>전체 3p+</b><em>블로그·상세</em></button>
+    <button type="button" data-out="brief" role="tab" aria-selected="false"><b>브리핑용</b><em>중개사·상담</em></button>
+    <button type="button" data-out="poster" role="tab" aria-selected="false"><b>한 장 요약</b><em>포스터·문자</em></button>
+  </div>
+
   <div class="meta" id="meta"></div>
 
   <div class="acts">
-    <button class="btn prime wide" id="btnPng" type="button">PNG 저장</button>
+    <button class="btn prime" id="btnPng" type="button">PNG 저장</button>
+    <button class="btn prime" id="btnPdf" type="button">PDF 저장</button>
     <button class="btn" id="btnJpg" type="button">JPG 저장</button>
     <button class="btn" id="btnHtml" type="button">HTML 코드 복사</button>
     <button class="btn wide" id="btnBack" type="button">수정하기</button>
@@ -396,17 +560,17 @@
 
   <div id="negBox"></div>
 
-  <div class="tips">
+  <div class="tips" id="tipsBox">
     <b>올리는 곳별 3초 안내</b>
     <ul>
       <li>쿠팡 · 상세설명 이미지 항목에 <b style="display:inline;color:#C8D4E8">PNG</b>를 그대로 올립니다.</li>
       <li>스마트스토어 · 상세 HTML 편집기에 <b style="display:inline;color:#C8D4E8">HTML 코드</b>를 붙여넣습니다.</li>
-      <li>사진 순서 · 대표 → 제품 → 사용 장면 → 비포/애프터가 가장 잘 읽힙니다.</li>
+      <li>블로그 · <b style="display:inline;color:#C8D4E8">전체 3p+</b>를 PDF로 받아 글로 옮기면 한 편이 됩니다.</li>
     </ul>
   </div>
 
   <div class="pv">
-    <div class="cap"><b>생성된 통이미지</b><span id="pvSize">—</span></div>
+    <div class="cap"><b id="pvTitle">생성된 이미지</b><span id="pvSize">—</span></div>
     <div class="sc"><canvas id="out"></canvas></div>
   </div>
 
@@ -425,43 +589,57 @@
 
 <script>
 /* =========================================================================
-   KTS 더상세 v1.0 — 상품 제원 + 사진 → 쿠팡/스마트스토어 세로 긴 상세페이지
+   KTS 더상세 v2.0 — 2026-11-20 (적립 101·102번)
+   상품: 쿠팡·네이버 SEO 구조 + 블로그급 서사 / 부동산: 물건표 → 심층분석 → 현장사진
+   출력 3단: 전체(블로그 3p+) · 브리핑용 · 한 장 요약 포스터  (PNG/JPG/PDF)
    외부 요청 0건 · 서버 0 · 사진은 브라우저 안에서만 처리
    ========================================================================= */
 (function(){
 'use strict';
 
-var NAVY='#0A1128', NAVY2='#111B36', ORANGE='#FF6B00', DIM='#9AA8C4';
+var NAVY='#0A1128', NAVY2='#111B36', NAVY3='#16223C', ORANGE='#FF6B00', DIM='#9AA8C4';
 var FB='"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif';
-
 var $=function(id){return document.getElementById(id);};
 
 /* ---------------- 상태 ---------------- */
 var S={
-  mode:'product',
-  name:'', hook:'', points:['','',''], specs:['','','',''],
-  gomin:'', reason:'', notice:'', brand:'', contact:'',
-  /* 부동산 매물용 (2026-11-19 · 적립메모 85번) */
-  addr:'', trade:'', invest:'', phone:'', rights:['','',''],
-  mark:true, width:780,
-  photos:[]  // {url, img, ar, name, role}
+  mode:'product', out:'full',
+  name:'', hook:'', brand:'', contact:'', mark:true, width:780,
+  points:['','',''], specs:['','','',''],
+  gomin:'', reason:'', notice:'', story:'', trust:'', tags:'',
+  kwMain:'', kwSub:'', target:'', compare:'',
+  addr:'', trade:'', invest:'', phone:'', rights:['','','',''],
+  photos:[],   /* {url,img,ar,name,role,cap} */
+  e:{
+    name:'', hook:'', trade:'', invest:'', phone:'', contact:'',
+    zone:'', land:'', area:'', struct:'', scale:'', facility:'',
+    appraise:'', official:'', debt:'', rate:'', deposit:'', rent:'', mgmt:'',
+    lease:'', rightsNote:'', locBack:'', traffic:'', market2:'', dev:'', spots:'',
+    marketNote:'', priceNote:''
+  }
 };
 
-/* 부동산 5대 사진 — 외경·도로·내부·지적도·입지 */
-var ESTATE_ROLES=['외경','도로','내부','지적도','입지'];
+/* 사진 역할 */
+var ROLES_E=['외경','도로','내부','지적도','입지','항공(위성)','로드뷰','주변명소','기타'];
+var ROLES_P=['대표','제품','사용 장면','비포/애프터','구성','상세','기타'];
+var LIMIT_P=8, LIMIT_E=10;
 
-var LABELS={
-  product:{basic:'상품 기본',name:'상품명',hook:'한 줄 후킹',namePh:'예) 욕실 실리콘 곰팡이 제거젤 120g + 도포기',
-    points:'핵심 포인트 3가지',specs:['크기','재질','구성','가격'],
-    gomin:'고객의 고민 한 줄',notice:'안내 문구',hint:'첫 장 사진이 대표 사진이 됩니다.'},
-  estate:{basic:'매물 기본',name:'매물명',hook:'한 줄 헤드라인',namePh:'예) 의정부 민락동 근린상가 3층 132㎡',
-    points:'핵심 포인트 3가지',specs:['면적','용도','구조','가격'],
-    gomin:'매수·교환 희망 조건',notice:'거래 안내',hint:'첫 장 사진이 대표 사진(외경)이 됩니다.'}
+/* 역할별 자동 현장 설명 */
+var ROLE_CAP={
+  '외경':'정면에서 본 건물. 층수와 외벽 마감, 1층 점포 구성이 한 장에 들어옵니다.',
+  '도로':'정면 도로 조건. 차량 진입과 주차 동선, 보행 폭을 함께 확인했습니다.',
+  '내부':'내부 현황. 천장고와 마감 상태, 업종 변경 시 손볼 범위를 봤습니다.',
+  '지적도':'지적도. 필지 형상과 도로 접면을 확인했습니다.',
+  '입지':'입지 개요. 배후 주거와 산업 단지, 상권 동선이 함께 보입니다.',
+  '항공(위성)':'항공(위성) 사진. 블록 전체와 배후 동선이 한눈에 들어옵니다.',
+  '로드뷰':'로드뷰. 차량 시점에서 본 진입로와 주변 상가입니다.',
+  '주변명소':'주변 인프라. 생활 편의와 유동 인구를 만드는 시설입니다.',
+  '기타':'현장에서 추가로 담은 사진입니다.'
 };
 
-/* ---------------- 숫자·조사 도우미 ---------------- */
+/* ---------------- 숫자·문자 도우미 ---------------- */
+function nz(v){ return String(v==null?'':v).trim(); }
 function num(v){ var n=parseFloat(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
-
 var DIGIT_JONG={ '0':true,'1':true,'2':false,'3':true,'4':false,'5':false,'6':true,'7':true,'8':true,'9':false };
 function hasJong(word){
   var w=String(word||'').trim().replace(/[\s\)\]\}~!?.,:;'"”’]+$/,'');
@@ -470,11 +648,86 @@ function hasJong(word){
   if(c>=0xAC00&&c<=0xD7A3) return ((c-0xAC00)%28)!==0;
   if(DIGIT_JONG[ch]!==undefined) return DIGIT_JONG[ch];
   if(/[a-zA-Z]/.test(ch)) return false;
-  return true; // %·원 등 한글 단위로 읽히는 기호
+  return true;
 }
 function J(word,pair){ var p=pair.split('/'); return hasJong(word)?p[0]:p[1]; }
+function hash(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return Math.abs(h); }
 
-/* ---------------- 카피 엔진 (설득 4원칙) ---------------- */
+/* "12억 5,892만 원" · "1,933만" · "45억 원" · "27.5" → 원 단위 숫자 */
+function parseWon(v, bareUnit){
+  var s=String(v==null?'':v).replace(/,/g,'').replace(/\s/g,'');
+  if(!s) return 0;
+  var total=0, found=false, m, re=/([0-9]+(?:\.[0-9]+)?)(억|만|천)?/g;
+  while((m=re.exec(s))!==null){
+    var n=parseFloat(m[1]); if(isNaN(n)) continue;
+    var u=m[2];
+    if(u==='억') { total+=n*1e8; found=true; }
+    else if(u==='만') { total+=n*1e4; found=true; }
+    else if(u==='천') { total+=n*1e3; found=true; }
+    else {
+      // 단위 없는 숫자 — 뒤에 '원'이 오면 원, 아니면 만원 관행
+      var after=s.slice(m.index+m[0].length);
+      if(bareUnit==='won'||after.indexOf('원')===0){ total+=n; found=true; }
+      else { total+=n*1e4; found=true; }
+    }
+  }
+  return found?Math.round(total):0;
+}
+function wonText(n){
+  n=Math.round(n||0);
+  if(n<=0) return '';
+  var eok=Math.floor(n/1e8), man=Math.round((n%1e8)/1e4);
+  if(eok&&man) return eok+'억 '+man.toLocaleString('ko-KR')+'만';
+  if(eok) return eok+'억';
+  if(man) return man.toLocaleString('ko-KR')+'만';
+  return n.toLocaleString('ko-KR');
+}
+function pyeong(v){
+  var m=String(v||'').match(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*(평|㎡|m2|제곱)/);
+  if(!m) return 0;
+  var n=parseFloat(m[1].replace(/,/g,''));
+  if(isNaN(n)) return 0;
+  return /평/.test(m[2])?n:n/3.3058;
+}
+function pctText(part,whole){
+  if(!whole) return '';
+  var p=part/whole*100;
+  return (Math.round(p*10)/10).toFixed(1);
+}
+function manText(man){ // 만원 단위 → "1,933" / "27.5"
+  var v=Math.round((man||0)*10)/10;
+  return (v%1===0? v.toLocaleString('ko-KR') : v.toFixed(1));
+}
+
+/* 임대차 내역 파서 — "1층 101호 양꼬치집 7,000 / 350 (관 30)" */
+function parseLease(txt){
+  var rows=[];
+  String(txt||'').split(/\r?\n/).forEach(function(line){
+    var s=line.trim(); if(!s) return;
+    var mgmt=0, mm=s.match(/[\(\[]\s*관\s*([0-9][0-9,\.]*)\s*[\)\]]/);
+    if(mm){ mgmt=num(mm[1]); s=s.replace(mm[0],'').trim(); }
+    var dep=0, rent=0, label=s;
+    var pair=s.match(/([0-9][0-9,\.]*)\s*\/\s*([0-9][0-9,\.]*)/);
+    if(pair){
+      dep=num(pair[1]); rent=num(pair[2]);
+      label=s.slice(0,pair.index).trim();
+    }else{
+      var one=s.match(/([0-9][0-9,\.]*)\s*$/);
+      if(one){ rent=num(one[1]); label=s.slice(0,one.index).trim(); }
+    }
+    var floor='', room='', fm=label.match(/(지하\s*[0-9]+|[0-9]+층)/);
+    if(fm) floor=fm[1].replace(/\s/g,'');
+    var rm=label.match(/([0-9]{3}호)/);
+    if(rm) room=rm[1];
+    var kind=label.replace(/(지하\s*[0-9]+|[0-9]+층)/,'').replace(/[0-9]{3}호/,'').trim();
+    if(!kind) kind=(dep||rent)?'임차':'—';
+    rows.push({floor:floor,room:room,kind:kind,deposit:dep,rent:rent,mgmt:mgmt,
+      vacant:/공실|공가|임대\s*예정|비어/.test(kind+s)});
+  });
+  return rows;
+}
+
+/* ---------------- 카피 엔진 공통 ---------------- */
 var NEG=[ // 부정어·금기어 → 대체어
   ['없어','있어'],['없이','함께'],['없는','있는'],['없습니다','있습니다'],
   ['안 되','됩니다'],['안돼','됩니다'],['안됩','됩니다'],['못하','하실 수 있'],
@@ -486,99 +739,352 @@ var NEG=[ // 부정어·금기어 → 대체어
 function findNegatives(text){
   var out=[], t=String(text||'');
   NEG.forEach(function(pair){
-    var key=pair[0];
-    var idx=t.indexOf(key);
+    var key=pair[0], idx=t.indexOf(key);
     if(idx>=0){
-      // '안내·안심·안전·판매' 같은 정상 단어는 건너뜀
       var before=t.slice(Math.max(0,idx-1),idx), after=t.charAt(idx+key.length);
-      var safe=('안'===key&&('내심전정' ).indexOf(after)>=0);
+      var safe=('안'===key&&('내심전정').indexOf(after)>=0);
       if(!safe) out.push({word:key,alt:pair[1]});
     }
   });
   return out;
 }
+function lines(txt){
+  return String(txt||'').split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+}
+function bullets(txt){ return lines(txt); }
 
-function hash(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return Math.abs(h); }
+/* =========================================================================
+   부동산 — 심층 분석 데이터 만들기
+   ========================================================================= */
+function estateMetrics(){
+  var e=S.e;
+  var m={};
+  m.trade=parseWon(e.trade); m.appraise=parseWon(e.appraise); m.official=parseWon(e.official);
+  m.debt=parseWon(e.debt); m.invest=parseWon(e.invest);
+  m.rate=parseFloat(String(e.rate).replace(/[^0-9.]/g,''))||0;
+  m.deposit=parseWon(e.deposit);
+  m.areaP=pyeong(e.area); m.landP=pyeong(e.land);
+  m.rows=parseLease(e.lease);
+  var rentAll=0, rentLeased=0, depAll=0, mgmtAll=0, vacantRent=0;
+  m.rows.forEach(function(r){
+    rentAll+=r.rent; depAll+=r.deposit; mgmtAll+=r.mgmt;
+    if(r.vacant) vacantRent+=r.rent; else rentLeased+=r.rent;
+  });
+  if(!m.rows.length){ rentAll=rentLeased=parseWon(e.rent)/1e4; depAll=parseWon(e.deposit)/1e4; }
+  m.rentAll=rentAll; m.rentLeased=rentLeased||rentAll; m.vacantRent=vacantRent;
+  m.depAll=depAll; m.mgmtAll=mgmtAll;
+  m.rentWon=rentAll>0?rentAll*1e4:parseWon(e.rent);
+  m.leasedWon=(m.rentLeased?m.rentLeased*1e4:0);
+  m.interest=m.debt&&m.rate?m.debt*m.rate/100/12:0;
+  m.net=m.leasedWon-m.interest;
+  m.netFull=m.rentWon-m.interest;
+  m.gross=m.trade?m.rentWon*12/m.trade*100:0;
+  m.netYield=m.invest&&m.net>0?m.net*12/m.invest*100:0;
+  m.diff=(m.appraise&&m.trade)?m.appraise-m.trade:0;
+  m.ratio=(m.official&&m.trade)?m.trade/m.official:0;
+  m.perArea=(m.trade&&m.areaP)?m.trade/m.areaP:0;
+  m.perLand=(m.trade&&m.landP)?m.trade/m.landP:0;
+  m.vacantCount=m.rows.filter(function(r){return r.vacant;}).length;
+  return m;
+}
 
-var HOOK_BANK={
-  product:['구성부터 사진까지, 그대로 담았습니다.','사진 그대로, 구성 그대로.','한 번 고르면 오래 쓰는 물건.','오늘부터 달라지는 하루의 시작.'],
-  estate:['위치와 조건, 한 장에 정리했습니다.','숫자로 확인하는 매물.','현장 사진부터 거래 조건까지.','판단에 필요한 것만 담았습니다.']
-};
+function rightsExplain(line,M){
+  var t=nz(line);
+  if(!t) return '';
+  if(/근저당|저당|담보|대출/.test(t))
+    return '갑구의 근저당은 소유권 위에 얹힌 담보입니다. 잔금일에 매도인이 말소하는 것을 조건으로 걸어 두면, 매수인에게는 채무가 따라오지 않는 소유권으로 넘어옵니다. 등기부등본은 계약일과 잔금일, 두 번 모두 새로 떼어 확인합니다.';
+  if(/을구/.test(t))
+    return '을구는 소유권 이외의 권리(지상권·전세권·임차권 등기)를 보는 칸입니다. 해당 없음이라면 건물에 얹힌 권리가 없다는 뜻이고, 그만큼 처분과 업종 변경의 자유가 그대로 남아 있습니다.';
+  if(/체납|국세|지방세|세금/.test(t))
+    return '세금 체납은 매매든 경매든 가장 자주 발목을 잡는 항목입니다. 체납이 정리되어 있으면 잔금일에 압류가 얹힐 변수 없이 등기를 넘길 수 있고, 이는 곧 거래 일정이 흔들리지 않는다는 뜻입니다.';
+  if(/임대차|임차|보증금/.test(t))
+    return '임대차는 이 물건의 수익 그 자체이자 함께 넘겨받는 의무입니다. 호실별 보증금과 월세, 계약서의 존속기간·갱신 조건을 대조해 두면 잔금 이후에도 월세가 끊기지 않고 그대로 이어집니다.';
+  if(/공실|인도|명도/.test(t))
+    return '공실과 인도 조건은 곧바로 새 임차인을 받을 수 있다는 뜻입니다. 업종만 맞으면 보증금과 월세를 지금 시세로 다시 세팅할 수 있어, 만실이 되는 시점의 수익을 한 단계 올릴 여지가 남습니다.';
+  return '등기부등본과 건축물대장, 임대차계약서를 같은 날짜 기준으로 맞춰 확인합니다. 서류 세 장이 같은 이야기를 하면 권리는 정리된 것입니다.';
+}
 
-function buildCopy(){
-  var isE=S.mode==='estate';
-  var name=(S.name||'').trim() || (isE?'매물':'상품');
-  var pts=S.points.map(function(s){return (s||'').trim();}).filter(Boolean);
-  var p1=pts[0]||'', p2=pts[1]||'', p3=pts[2]||'';
-  var spec=S.specs.map(function(s){return (s||'').trim();});
-  var price=spec[3]||'', comp=spec[2]||'';
-  var contact=(S.contact||'').trim() || (S.brand||'').trim() || '';
-  var bank=HOOK_BANK[isE?'estate':'product'];
+function estateCopy(){
+  var e=S.e, M=estateMetrics();
+  var name=nz(e.name)||'매물';
+  var addr=nz(S.addr);
+  var hook=nz(e.hook)|| (M.appraise&&M.trade
+      ? ('감정 '+wonText(M.appraise)+' 대비 '+wonText(M.diff)+' 낮은 '+wonText(M.trade)+' — 숫자로 확인하는 매물')
+      : '위치와 조건, 숫자로 정리했습니다.');
+  var zone=nz(e.zone), land=nz(e.land), area=nz(e.area);
+  var struct=nz(e.struct), scale=nz(e.scale), facility=nz(e.facility);
 
-  var title=name;
-  var hook=(S.hook||'').trim() || bank[hash(name)%bank.length];
+  /* ── 물건 내용 표 ── */
+  var rows=[];
+  if(addr) rows.push(['소재지',addr]);
+  if(zone||land||area){
+    var lz=(zone?zone:'')+(land?' · 대지 '+land:'')+(area?' · 연면적 '+area:'');
+    rows.push(['규모·지역',lz.replace(/^ · /,'')]);
+  }
+  if(struct) rows.push(['구조·용도',struct]);
+  if(scale) rows.push(['층·준공',scale]);
+  if(facility) rows.push(['설비·주차',facility]);
+  if(nz(e.trade)) rows.push(['매매 · 교환가',nz(e.trade)]);
+  if(nz(e.appraise)) rows.push(['감정가',nz(e.appraise)+(M.diff>0?' · 매매가 '+wonText(M.diff)+' 낮음':'')]);
+  if(nz(e.official)) rows.push(['공시지가',nz(e.official)]);
+  if(nz(e.debt)) rows.push(['대출금',nz(e.debt)+(M.rate?' · 연 '+M.rate+'%':'')]);
+  if(nz(e.deposit)||nz(e.rent)){
+    var lr=[];
+    if(nz(e.deposit)) lr.push('보증금 '+nz(e.deposit));
+    if(nz(e.rent)) lr.push('월세 '+nz(e.rent));
+    if(nz(e.mgmt)) lr.push('관리비 '+nz(e.mgmt)+' 별도');
+    rows.push(['임대 합계',lr.join(' · ')]);
+  }
+  if(nz(e.invest)) rows.push(['실투자금',nz(e.invest)]);
+  if(M.net>0) rows.push(['수익 요약','순월세 '+wonText(M.net)+' 원 · 표면 '+ (M.gross?Math.round(M.gross*10)/10+'%':'—')]);
+  if(!rows.length) rows.push(['소재지','—']);
 
-  var empathy={
-    title: isE?'이 매물, 누구를 위한 것일까요?':'이런 순간, 있으시죠?',
-    lines:[
-      (S.gomin||'').trim() || (isE
-        ? '매물은 넘치는데, 조건이 맞는 한 건은 좀처럼 없으시죠.'
-        : '늘 쓰는 물건일수록, 살 때마다 한 번씩 망설이게 되시죠.'),
-      isE ? ('그래서 '+name+', 한 장에 정리했습니다.')
-          : ('그래서 '+name+' 하나에 담아봤습니다.'),
-      isE ? '위치·현황·거래 조건을 한눈에. 판단은 그다음입니다.'
-          : '고르는 시간은 줄이고, 쓰는 시간은 길게. 그게 이 페이지의 목적입니다.'
-    ]
-  };
+  /* ── 가격 안전마진 ── */
+  var priceParas=[];
+  if(M.appraise&&M.trade){
+    priceParas.push('기준점은 감정가입니다. 감정 '+nz(e.appraise)+' 대비 매매가는 '+nz(e.trade)+' — 차액 '+wonText(M.diff)+' 원, 비율로는 '+pctText(M.diff,M.appraise)+'%가 처음부터 비워진 자리에서 시작합니다. 같은 조건의 물건을 감정가로 담는다면 준비해야 할 금액과, 지금 준비할 금액 사이에 그만큼의 완충이 이미 놓여 있는 셈입니다.');
+  }else if(M.trade){
+    priceParas.push('이 물건의 출발점은 '+nz(e.trade)+'입니다. 감정가와 공시지가를 함께 넣으면 그 가격이 어디에서 나온 숫자인지 이 페이지에 같이 적힙니다.');
+  }
+  if(M.official&&M.trade&&M.ratio){
+    var zoneTxt=zone?('('+zone+')'):'';
+    var comment='';
+    if(M.ratio>=2.2&&M.ratio<=4.6) comment=' 상업지역에서 공시지가의 3~4배 선이 통상 거래선으로 읽히는데, 이 물건은 그 범위 안에 들어옵니다. 공시지가와 감정가가 서로 다른 방향에서 같은 가격을 지지하는 셈입니다.';
+    else if(M.ratio>4.6) comment=' 공시지가 대비 배수가 높은 편이라, 가격의 근거는 공시지가보다 임대 수익과 감정가에서 찾는 것이 정확합니다.';
+    else comment=' 공시지가 대비 배수가 낮은 편이라, 땅값만 놓고 보면 여유가 있는 자리입니다.';
+    priceParas.push('공시지가는 '+nz(e.official)+zoneTxt+'. 매매가를 공시지가로 나누면 '+ (Math.round(M.ratio*10)/10) +'배입니다.'+comment);
+  }
+  if(M.perArea||M.perLand){
+    var pp=[];
+    if(M.perArea) pp.push('연면적 '+(area||'—')+' 기준 평당 '+wonText(M.perArea)+' 원');
+    if(M.perLand) pp.push('대지 '+(land||'—')+' 기준 평당 '+wonText(M.perLand)+' 원');
+    priceParas.push(pp.join(', ')+'. 같은 동·같은 용도지역의 거래 사례를 평당 단가로 옮겨 놓으면 이 두 숫자와 바로 비교됩니다. 단가로 보는 습관이 붙으면, 가격을 감으로 말하지 않게 됩니다.');
+  }
+  if(nz(e.priceNote)) priceParas.push(nz(e.priceNote));
 
-  var quote = (p1 ? p1+' — 그죠?' : (isE?'조건은 한눈에 — 그죠?':'구성 그대로, 사진 그대로 — 그죠?'));
+  /* ── 수익 구조 ── */
+  var incomeRows=[], incomeParas=[];
+  if(M.rentWon){
+    incomeRows.push(['만실 월세 합계', manText(M.rentAll)+'만 원'+(M.vacantRent?' (공실 '+manText(M.vacantRent)+'만 포함)':'')]);
+    if(M.rentLeased&&M.vacantRent) incomeRows.push(['현재 월세', manText(M.rentLeased)+'만 원']);
+    if(M.depAll) incomeRows.push(['보증금 합계', wonText(M.depAll*1e4)+' 원']);
+    if(M.mgmtAll) incomeRows.push(['관리비', manText(M.mgmtAll)+'만 원 별도']);
+    if(M.interest) incomeRows.push(['월 이자', wonText(M.interest)+' 원'+(M.debt?' ('+wonText(M.debt)+' × '+(M.rate||'')+'%':'')]);
+    if(M.net>0) incomeRows.push(['순월세', wonText(M.net)+' 원']);
+    if(M.net>0&&M.invest) incomeRows.push(['실투자금 수익률', Math.round(M.netYield*10)/10+'% / 년']);
+    incomeParas.push('임대는 이미 채워진 상태로 넘어옵니다. 만실 기준 월세 '+manText(M.rentAll)+'만 원'+(M.vacantRent?', 그중 공실 '+manText(M.vacantRent)+'만 원을 빼면 현재 '+manText(M.rentLeased)+'만 원':'')+'입니다. 여기서 대출 이자 '+(M.interest?wonText(M.interest)+' 원':'—')+'을 빼면 손에 남는 순월세는 '+(M.net>0?wonText(M.net)+' 원':'—')+'입니다.');
+    if(M.invest&&M.net>0) incomeParas.push('실투자금 '+nz(e.invest)+' 기준으로 1년이면 '+wonText(M.net*12)+' 원, 수익률로는 '+Math.round(M.netYield*10)/10+'%입니다. 예금 금리와 비교해 보고, 공실이 채워지는 시점의 숫자까지 함께 계산하면 판단이 훨씬 빨라집니다.');
+    if(M.vacantRent) incomeParas.push('지금 비어 있는 자리는 하나입니다. 그 한 칸이 채워지면 순월세는 '+wonText(M.net+M.vacantRent*1e4)+' 원으로 올라섭니다. 임차인을 고르는 일만 남아 있는 셈이라, 인수 후 가장 먼저 할 일도 분명합니다.');
+  }else{
+    incomeParas.push('임대 수익은 임대차 내역을 넣는 순간 표와 계산이 함께 만들어집니다. 호실별 보증금·월세를 한 줄씩 적으면 만실 합계와 순월세가 자동으로 정리됩니다.');
+  }
 
-  var reasons = isE ? [
-      '면적과 용도를 표에 그대로 적었습니다.',
-      price?('가격은 '+price+'입니다.'):'가격은 상담 시 자세히 안내드립니다.',
-      '현장 확인과 권리관계 확인 후 진행합니다.'
-    ] : [
-      comp?(comp+'까지 포함된 구성입니다.'):'사진에 보이는 구성 그대로입니다.',
-      price?(price+' — 이 구성 기준 금액입니다.'):'가격은 구성 기준으로 안내드립니다.',
-      '사진과 구성, 가격을 같은 페이지에 담았습니다.'
-    ];
-  if((S.reason||'').trim()) reasons[1]=S.reason.trim();
+  /* ── 권리분석 ── */
+  var rights=nz(S.rights[0])||nz(S.rights[1])||nz(S.rights[2])||nz(S.rights[3])
+    ? S.rights.map(function(r){return nz(r);}).filter(Boolean) : [];
+  var rightItems=rights.map(function(r,i){
+    return {no:('0'+(i+1)).slice(-2), title:r, body:rightsExplain(r,M)};
+  });
+  var rightsDeep=[];
+  if(nz(e.rightsNote)) rightsDeep.push(nz(e.rightsNote));
+  else{
+    var sum=[];
+    if(rights.length) sum.push('이 물건의 권리는 '+rights.length+'줄로 정리됩니다.');
+    if(nz(e.debt)) sum.push('담보는 '+(/말소/.test(rights.join(' '))?'매도인이 잔금일에 정리하는 조건':'승계 여부를 서면으로 확인하는 조건')+'으로 두고, 대출 '+wonText(M.debt)+(M.rate?' 연 '+M.rate+'%':'')+'는 승계와 상환 중 어느 쪽이 유리한지 잔금 전에 계산합니다.');
+    if(M.depAll) sum.push('임대 보증금 '+wonText(M.depAll*1e4)+' 원은 임차인에게 돌려줄 돈이지만, 동시에 매수인이 인수하는 채무이기도 합니다. 승계 조건을 계약서에 적어 두면 잔금 뒤 분쟁이 생길 자리가 줄어듭니다.');
+    if(M.vacantCount) sum.push('공실 '+M.vacantCount+'호는 인도 시점을 계약서에 못 박아 두면, 새 임차인을 받는 일정까지 앞당길 수 있습니다.');
+    sum.push('계약 전에는 등기부등본(갑구·을구), 건축물대장, 임대차계약서 전 호실, 국세·지방세 완납증명, 보증금·대출 승계 조건 — 이 다섯 가지를 같은 날짜로 맞춰 확인합니다. 서류가 서로 어긋나지 않으면 권리는 정리된 것입니다.');
+    rightsDeep.push(sum.join(' '));
+  }
+  var checklist=[
+    '등기부등본 갑구·을구 — 계약일과 잔금일 두 번, 새로 발급',
+    '건축물대장 — 용도와 위반건축물 표기 확인',
+    '임대차계약서 전 호실 — 보증금·기간·갱신 조건',
+    '국세·지방세 완납증명 — 잔금일 기준',
+    '보증금·대출 승계 조건 — 계약서 특약에 명시'
+  ];
 
-  var info = isE ? [
-      {k:'거래 형태', v:(S.notice||'').trim() || '매매 · 교환 모두 상담 가능'},
-      {k:'확인 사항', v:'권리관계 · 현장 확인 후 계약'},
-      {k:'문의',     v:contact || '판매자 문의'}
-    ] : [
-      {k:'구성', v:comp || '본품 구성 그대로'},
-      {k:'안내', v:(S.notice||'').trim() || '수령일부터 7일 이내 청약철회 안내에 따릅니다.'},
-      {k:'문의', v:contact || '판매자 문의'}
-    ];
+  /* ── 입지 ── */
+  var loc=[
+    {h:'배후 수요', t:nz(e.locBack)||('이 건물이 서 있는 자리는 유동 인구가 아니라 상주 인구가 만드는 자리입니다. '+(zone?zone+' ':'')+'블록 안에서 일하고 머무는 사람이 매일 같은 시간에 지나가고, 그 동선이 1층 점포와 위층 업종을 함께 먹여 살립니다.')},
+    {h:'교통·접근', t:nz(e.traffic)||('차량 접근은 간선도로에서 블록 안으로 한 번에 들어오는 구조입니다. '+(facility?('주차·설비는 '+facility+'로, '):'주차 동선이 건물 앞에서 해결된다면, ')+'1층 점포를 고르는 임차인의 첫 번째 조건이 채워집니다.')},
+    {h:'상권·업종', t:nz(e.market2)||('업종 구성은 층별로 나뉘어 있습니다. 아래층은 먹거리와 생활 서비스, 위층은 학원·PC·스포츠처럼 체류 시간이 긴 업종이 자리합니다. 서로 다른 시간대에 손님을 만들어 내는 조합입니다.')},
+    {h:'개발·호재', t:nz(e.dev)||('주변 개발은 임대 수요로 이어질 때만 의미가 있습니다. 배후 산업 단지와 주거지의 확장은 곧 상주 인구의 증가이고, 그 숫자가 이 건물의 공실을 채우는 속도를 결정합니다.')}
+  ];
+  var spots=lines(e.spots).map(function(s){
+    var p=s.split(/\s*(?:—|–|::|:)\s*/);
+    return {name:p[0], desc:p.slice(1).join(' · ')};
+  });
 
-  var cta = isE ? {
-      title:'판단은 3분이면 충분합니다.',
-      sub:'사진 · 제원 · 거래 조건, 이 페이지에 모두 있습니다. 그죠?'
-    } : {
-      title:'지금 담아두시면, 오늘 준비가 끝납니다.',
-      sub:name+J(name,'은/는')+' 사진과 구성 그대로. 그죠?'
-    };
+  /* ── 시장조사 ── */
+  var market=[];
+  if(nz(e.marketNote)) market.push(nz(e.marketNote));
+  else{
+    if(M.perArea) market.push('시세를 볼 때 가장 먼저 놓는 기준은 평당 단가입니다. 이 물건은 연면적 기준 평당 '+wonText(M.perArea)+' 원, 대지 기준 평당 '+wonText(M.perLand)+' 원입니다. 같은 블록의 비슷한 준공 연도 건물과 이 두 숫자를 나란히 놓으면, 가격이 시장의 어디쯤에 서 있는지 금방 드러납니다.');
+    if(M.rentWon) market.push('임대 시장은 더 직접적입니다. 지금 이 건물이 받고 있는 월세는 협상으로 만든 숫자가 아니라, 임차인들이 실제로 지불하고 있는 숫자입니다. 만실 기준 월세 '+manText(M.rentAll)+'만 원은 그 자체로 이 지역 상권의 임대료 수준을 보여 주는 표본입니다.');
+    if(M.official&&M.trade&&M.ratio) market.push('공시지가 '+nz(e.official)+'에 매매가 배수 '+(Math.round(M.ratio*10)/10)+'배를 얹어 보면, 땅값이 설명하는 부분과 건물·임대가 설명하는 부분이 나뉩니다. 이 물건은 후자가 더 두꺼운 물건입니다.');
+    if(nz(e.invest)&&M.net>0) market.push('매수자가 실제로 넣는 돈은 '+nz(e.invest)+'입니다. 이 금액 대비 연 순수익 '+wonText(M.net*12)+' 원은, 같은 돈을 다른 자산에 두었을 때와 비교해야 하는 숫자입니다. 상업용 부동산은 결국 이 한 줄로 정리됩니다.');
+    if(!market.length) market.push('시장조사는 공시지가·평당 단가·실제 임대 사례, 이 세 가지를 나란히 놓는 일입니다. 매물 정보를 넣으면 이 칸이 자동으로 채워집니다.');
+  }
+
+  /* ── 사진 ── */
+  var photoItems=S.photos.map(function(p,i){
+    return {img:p.img, ar:p.ar, role:p.role||(i===0?'외경':'기타'),
+      caption:nz(p.cap)||ROLE_CAP[p.role]||'현장 사진입니다.'};
+  });
+
+  /* ── 지도 링크 ── */
+  var links=mapLinks(addr);
 
   return {
-    isE:isE, name:name, title:title, hook:hook, points:pts,
-    empathy:empathy, quote:quote, reasons:reasons, info:info, cta:cta,
-    price:price, comp:comp, contact:contact,
-    /* 부동산 매물용 6요소 */
-    addr:(S.addr||'').trim(),
-    trade:(S.trade||'').trim() || price,
-    invest:(S.invest||'').trim(),
-    phone:(S.phone||'').trim(),
-    rights:(S.rights||[]).map(function(s){return String(s||'').trim();}).filter(Boolean),
-    brand:(S.brand||'').trim(), mark:S.mark
+    isE:true, name:name, title:name, hook:hook, addr:addr,
+    trade:nz(e.trade)||'조건 협의', invest:nz(e.invest),
+    phone:nz(e.phone), contact:nz(e.contact), brand:nz(S.brand)||'KTS 부동산 교환',
+    rows:rows, priceParas:priceParas, incomeRows:incomeRows, incomeParas:incomeParas,
+    rightItems:rightItems, rightsDeep:rightsDeep, checklist:checklist,
+    loc:loc, spots:spots, market:market, photos:photoItems, links:links,
+    M:M, zone:zone, land:land, area:area, struct:struct, scale:scale,
+    deposit:nz(e.deposit), rent:nz(e.rent), mgmt:nz(e.mgmt), debt:nz(e.debt), rate:nz(e.rate),
+    appraise:nz(e.appraise), official:nz(e.official), leaseRows:M.rows,
+    mark:S.mark
   };
 }
 
-/* ---------------- 캔버스 텍스트 유틸 ---------------- */
+function mapLinks(addr){
+  var q=nz(addr);            /* 브라우저가 알아서 인코딩한다 — 화면에는 읽히는 주소로 */
+  return {
+    naver:'https://map.naver.com/p/search/'+q,
+    kakao:'https://map.kakao.com/link/search/'+q,
+    sky:'https://www.google.com/maps/search/?api=1&query='+q+'&t=k',
+    label:q||'소재지'
+  };
+}
+
+/* =========================================================================
+   상품 — SEO 서사 데이터 만들기
+   ========================================================================= */
+function kwList(){
+  var main=nz(S.kwMain);
+  var subs=String(S.kwSub||'').split(/[,\n#]/).map(function(s){return s.trim();}).filter(Boolean);
+  var out=[], seen={};
+  if(main){ out.push(main); seen[main]=1; }
+  subs.forEach(function(s){ if(!seen[s]){ out.push(s); seen[s]=1; } });
+  return out;
+}
+function tagsList(){
+  var manual=String(S.tags||'').split(/[,\n#]/).map(function(s){return s.trim();}).filter(Boolean);
+  var base=kwList();
+  var out=[], seen={};
+  manual.concat(base).forEach(function(s){
+    var k=s.replace(/\s+/g,'');
+    if(k&&!seen[k]){ seen[k]=1; out.push(s); }
+  });
+  return out.slice(0,12);
+}
+var HOOK_BANK=[
+  '매일 쓰는 물건일수록, 고르는 기준은 단순해야 합니다.',
+  '사진 한 장으로 끝내지 않고, 쓰는 순간까지 담았습니다.',
+  '처음 한 번의 선택이 6개월 뒤의 하루를 바꿉니다.',
+  '설명이 길어질수록 좋은 물건입니다. 이유는 아래에 있습니다.'
+];
+
+function productCopy(){
+  var name=nz(S.name)||'상품';
+  var kws=kwList(), main=kws[0]||'';
+  var subs=kws.slice(1);
+  var pts=S.points.map(nz).filter(Boolean);
+  var specs=S.specs.map(nz);
+  var price=specs[3], comp=specs[2];
+  var contact=nz(S.contact)||nz(S.brand);
+  var hook=nz(S.hook)|| (main? (main+' — '+HOOK_BANK[hash(name)%HOOK_BANK.length]) : HOOK_BANK[hash(name)%HOOK_BANK.length]);
+  var target=nz(S.target);
+
+  /* 1) 3초 후킹 */
+  var firstLines=[];
+  firstLines.push(hook);
+  if(target) firstLines.push(target+J(target,'을/를')+' 위해 만든 구성입니다.');
+
+  /* 2) 불편 공감 */
+  var gomin=nz(S.gomin)|| (main? (main+'을(를) 찾다가 결국 비슷한 것만 여러 번 사게 되시죠.') : '살 때마다 같은 자리에서 망설이게 되시죠.');
+  var empathy=[
+    gomin,
+    '고르는 시간은 길어지고, 정작 써 보면 아쉬운 부분이 하나씩 남습니다. 사진은 그럴듯한데 손에 쥐면 다른 경우도 많습니다.',
+    '그래서 이 페이지는 사진을 예쁘게 늘어놓는 대신, 무엇이 들어 있고 어떻게 쓰는지 순서대로 적었습니다. 읽고 나면 살지 말지가 3분 안에 정리됩니다.'
+  ];
+  if(target) empathy[2]=target+J(target,'이/가')+' 실제로 겪는 장면부터 적었습니다. '+empathy[2];
+
+  /* 3) 특장점 */
+  var pointCards=pts.map(function(p,i){ return {no:('0'+(i+1)).slice(-2), text:p}; });
+  if(!pointCards.length) pointCards=[{no:'01',text:'사진과 구성 그대로 담았습니다.'}];
+
+  /* 4) 비교 */
+  var compare=lines(S.compare).map(function(l){
+    var p=l.split(/\s*(?:→|->|▶|=>)\s*/);
+    return p.length>1? {before:p[0], after:p.slice(1).join(' ')} : {before:'', after:p[0]};
+  });
+  var compareNote='';
+  if(compare.length){
+    compareNote=main? (main+J(main,'을/를')+' 고를 때 가장 많이 갈리는 지점만 표로 세웠습니다.') : '고를 때 가장 많이 갈리는 지점만 표로 세웠습니다.';
+  }
+
+  /* 5) 사진별 실사용 스토리 */
+  var storyLines=lines(S.story);
+  var photoItems=S.photos.map(function(p,i){
+    var role=p.role||(i===0?'대표':'사용 장면');
+    var cap=nz(p.cap);
+    if(!cap){
+      if(role==='대표') cap='받자마자 찍은 모습. 구성과 크기가 사진 그대로입니다.';
+      else if(role==='구성') cap='구성품 전체. 무엇이 몇 개 들어 있는지 한 장에 담았습니다.';
+      else if(role==='사용 장면') cap='실제로 쓰는 장면. 손이 가는 순서 그대로입니다.';
+      else if(role==='비포/애프터') cap='쓰기 전과 후. 같은 자리에서 같은 각도로 찍었습니다.';
+      else if(role==='상세') cap='가까이에서 본 마감과 재질입니다.';
+      else cap='사진으로 확인하는 '+name+'입니다.';
+    }
+    return {img:p.img, ar:p.ar, role:role, caption:cap,
+      story: storyLines[i]||storyLines[i%Math.max(1,storyLines.length)]||''};
+  });
+
+  /* 6) 신뢰 */
+  var trust=bullets(S.trust);
+  if(!trust.length){
+    trust=[
+      '수령일부터 7일 이내 청약철회 안내에 따릅니다.',
+      '파손·오배송은 사진 1장으로 접수하고, 확인 후 바로 교환합니다.',
+      '문의 '+(contact||'판매자')+' — 영업일 기준 24시간 안에 답 드립니다.'
+    ];
+  }
+  var info=[
+    {k:'구성', v:comp||'본품 구성 그대로'},
+    {k:'안내', v:nz(S.notice)||'수령일부터 7일 이내 청약철회 안내에 따릅니다.'},
+    {k:'문의', v:contact||'판매자 문의'}
+  ];
+  var reasons=[];
+  if(comp) reasons.push(comp+' — 사진에 보이는 구성 그대로입니다.');
+  if(price) reasons.push(price+' — 이 구성 기준 금액입니다.');
+  if(nz(S.reason)) reasons.push(nz(S.reason));
+  if(!reasons.length) reasons.push('사진에 보이는 구성 그대로입니다.');
+
+  return {
+    isE:false, name:name, title:name, hook:hook, tagline:firstLines[1]||'',
+    mainKw:main, subKws:subs, kws:kws, tags:tagsList(),
+    empathy:empathy, points:pointCards, compare:compare, compareNote:compareNote,
+    photos:photoItems, storyLines:storyLines,
+    specs:specs, price:price||'', comp:comp||'',
+    reasons:reasons, info:info, trust:trust,
+    target:target, contact:contact, brand:nz(S.brand)||'KTS 더상세',
+    cta:{title:'오늘 담아두시면, 준비는 여기서 끝납니다.',
+         sub:name+J(name,'은/는')+' 사진과 구성 그대로. 궁금한 점은 문의로 남겨 주세요.'},
+    mark:S.mark
+  };
+}
+
+function buildCopy(){ return S.mode==='estate'?estateCopy():productCopy(); }
+
+/* =========================================================================
+   캔버스 문서 도우미
+   ========================================================================= */
 var meas=(function(){ var c=document.createElement('canvas'); c.width=8;c.height=8; return c.getContext('2d'); })();
-function fnt(size,weight,scale){ return (weight||400)+' '+Math.round(size*(scale||1))+'px '+FB; }
+function fnt(size,weight,k){ return (weight||400)+' '+Math.max(8,Math.round(size*k))+'px '+FB; }
 function tw(text,font){ meas.font=font; return meas.measureText(text).width; }
 function wrapText(text,font,maxW){
   meas.font=font;
@@ -588,7 +1094,7 @@ function wrapText(text,font,maxW){
     var words=para.split(' '), line='';
     for(var i=0;i<words.length;i++){
       var wd=words[i];
-      if(meas.measureText(wd).width>maxW){            // 단어 하나가 한 줄보다 길 때만 글자 단위로
+      if(meas.measureText(wd).width>maxW){
         if(line){ out.push(line); line=''; }
         var seg='';
         for(var j=0;j<wd.length;j++){
@@ -606,245 +1112,949 @@ function wrapText(text,font,maxW){
   return out.length?out:[''];
 }
 
-/* ---------------- 레이아웃 ---------------- */
-function buildLayout(C,W){
-  var k=W/780;
-  var P=44*k, CW=W-2*P;
-  var F=function(s,w){ return fnt(s,w,k); };
-  var blocks=[], y=0;
-  var PH=S.photos;
+function mkDoc(W){
+  var k=W/780, P=Math.round(44*k), CW=W-2*P;
+  var d={W:W,k:k,P:P,CW:CW,blocks:[],y:0};
+  d.F=function(size,weight){ return fnt(size,weight,k); };
+  d.bg=function(x,y,w,h,fill,r){ d.blocks.push({t:'rect',bg:true,x:x,y:y,w:w,h:h,fill:fill,r:r||0}); };
+  d.rect=function(x,y,w,h,fill,r){ d.blocks.push({t:'rect',x:x,y:y,w:w,h:h,fill:fill,r:r||0}); };
+  d.stroke=function(x,y,w,h,fill,r){ d.blocks.push({t:'stroke',x:x,y:y,w:w,h:h,fill:fill,r:r||0}); };
+  d.line=function(x,y,w,h,fill){ d.blocks.push({t:'rect',x:x,y:y,w:w,h:h||Math.max(1,1*k),fill:fill||'#E6EAF2'}); };
+  d.text=function(x,y,s,size,weight,color,align,base){
+    d.blocks.push({t:'text',x:x,y:y,text:s,font:d.F(size,weight),fill:color||NAVY,align:align||'left',base:base||'alphabetic'});
+  };
+  d.spaced=function(x,y,s,size,color,sp){
+    d.blocks.push({t:'spaced',x:x,y:y,text:s,font:d.F(size,800),fill:color||ORANGE,sp:sp*k});
+  };
+  d.img=function(x,y,w,h,im){ if(im) d.blocks.push({t:'image',x:x,y:y,w:w,h:h,img:im}); };
+  d.led=function(x,y,r,fill){ d.blocks.push({t:'led',x:x,y:y,r:r,fill:fill||ORANGE}); };
 
-  function bg(x,yy,w,h,fill,r){ blocks.push({t:'rect',bg:true,x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
-  function rect(x,yy,w,h,fill,r){ blocks.push({t:'rect',x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
-  function text(x,yy,s,size,weight,fill,align,maxW,base){
-    blocks.push({t:'text',x:x,y:yy,text:s,font:F(size,weight),fill:fill,align:align||'left',maxW:maxW||0,base:base||'alphabetic'});
-  }
-  function img(x,yy,w,h,im,crop){
-    blocks.push({t:'image',x:x,y:yy,w:w,h:h,img:im,crop:crop===false?false:true});
-  }
-  function led(x,yy,r,fill){ blocks.push({t:'led',x:x,y:yy,r:r,fill:fill}); }
-  function spaced(x,yy,s,size,fill,sp){
-    blocks.push({t:'spaced',x:x,y:yy,text:s,font:F(size,800),fill:fill,sp:sp*k});
-  }
-  function line(x,yy,w,h,fill){ blocks.push({t:'rect',x:x,y:yy,w:w,h:h,fill:fill}); }
-
-  /* ---- 0. 상단 배지 ---- */
-  var badgeH=76*k;
-  bg(0,0,W,badgeH,NAVY);
-  led(P,badgeH/2,5*k,ORANGE);
-  text(P+18*k,badgeH/2,'KTS 더상세',19,800,'#FFFFFF','left');
-  text(W-P,badgeH/2,C.isE?'부동산 브리핑':'상품 상세',15,500,'#8FA1C0','right');
-  rect(0,badgeH,W,3*k,ORANGE);
-  y=badgeH+3*k;
-
-  /* ---- 1. 대표 사진 + 제목 ---- */
-  var p0=PH[0];
-  var ph=W/(p0.ar||1);
-  ph=Math.max(Math.min(ph,850*k),400*k);
-  img(0,y,W,ph,p0.img,true);
-  y+=ph;
-
-  var titleFont=F(45,800), titleLH=45*1.33*k;
-  var hookFont=F(23,400), hookLH=23*1.62*k;
-  var tLines=wrapText(C.title,titleFont,CW);
-  var hLines=wrapText(C.hook,hookFont,CW);
-  var tb=46*k + 26*k + tLines.length*titleLH + 15*k + hLines.length*hookLH + 46*k;
-  bg(0,y,W,tb,NAVY);
-  var ty=y+46*k;
-  spaced(P,ty,C.isE?'PROPERTY BRIEF':'PRODUCT DETAIL',13,ORANGE,2.6);
-  ty+=26*k+18*k;
-  tLines.forEach(function(ln){ text(P,ty,ln,45,800,'#FFFFFF'); ty+=titleLH; });
-  ty+=15*k;
-  hLines.forEach(function(ln){ text(P,ty,ln,23,400,'#BFCEE6'); ty+=hookLH; });
-  y+=tb;
-
-  /* ---- 2. 공감(전제) ---- */
-  var s=y;
-  y+=58*k;
-  spaced(P,y,'WHY',13,ORANGE,2.6); y+=30*k;
-  text(P,y,C.empathy.title,31,800,NAVY); y+=31*1.35*k+20*k;
-  var bodyFont=F(21,400), bodyLH=21*1.72*k;
-  C.empathy.lines.forEach(function(l){
-    var ls=wrapText(l,bodyFont,CW);
-    ls.forEach(function(x){ text(P,y,x,21,400,'#3D4A63'); y+=bodyLH; });
-    y+=6*k;
-  });
-  y+=18*k;
-  // 인용 박스
-  var qFont=F(24,800), qCW=CW-52*k;
-  var qLines=wrapText(C.quote,qFont,qCW), qLH=24*1.55*k;
-  var qh=qLines.length*qLH+48*k;
-  rect(P,y,CW,qh,'#FFF3EA',14*k);
-  rect(P,y,6*k,qh,ORANGE,3*k);
-  var qy=y+24*k+qLH*0.78;
-  qLines.forEach(function(l){ text(P+26*k,qy,l,24,800,NAVY); qy+=qLH; });
-  y+=qh+58*k;
-  bg(0,s,W,y-s,'#FFFFFF');
-
-  /* ---- 3. 핵심 포인트 ---- */
-  s=y;
-  y+=56*k;
-  spaced(P,y,C.isE?'KEY POINTS':'POINT',13,ORANGE,2.6); y+=30*k;
-  text(P,y,C.isE?'핵심 3가지':'이 세 가지면 충분합니다',31,800,'#0A1128'); y+=31*1.35*k+26*k;
-  var ptFont=F(24,800), ptLH=24*1.55*k;
-  var cardW=CW;
-  (C.points.length?C.points:['—']).forEach(function(p,i){
-    var ls=wrapText(p,ptFont,cardW-96*k);
-    var cardH=Math.max(112*k, ls.length*ptLH+56*k);
-    rect(P,y,cardW,cardH,'#FFFFFF',18*k);
-    rect(P+22*k,y+cardH/2-20*k,40*k,40*k,'#FFF0E4',11*k);
-    text(P+42*k,y+cardH/2,String(i+1),17,900,ORANGE,'center',0,'middle');
-    var lx=P+80*k, ly=y+cardH/2-(ls.length-1)*ptLH/2+ptLH*0.34;
-    ls.forEach(function(l){ text(lx,ly,l,24,800,'#101B33'); ly+=ptLH; });
-    y+=cardH+16*k;
-  });
-  y+=46*k;
-  bg(0,s,W,y-s,'#F3F5FA');
-
-  /* ---- 4. 사진2 ---- */
-  function photoBand(ph1,caption,idxLabel){
-    var yy=y;
-    var h=W/(ph1.ar||1);
-    h=Math.max(Math.min(h,860*k),380*k);
-    img(0,y,W,h,ph1.img,true);
-    y+=h;
-    if(caption){
-      var cFont=F(19,500), cLH=19*1.6*k;
-      var cls=wrapText(caption,cFont,CW);
-      y+=34*k;
-      cls.forEach(function(l){ text(P,y,l,19,500,'#5B6883'); y+=cLH; });
-      y+=8*k;
-    }
-    return y-yy;
-  }
-  var CAP = C.isE ? {p2:'현장 전경', p3:'내부와 주변'} : {p2:'제품을 자세히', p3:'쓰는 모습 그대로'};
-  if(PH[1]){ photoBand(PH[1],CAP.p2); }
-
-  /* ---- 5. 제원 표 ---- */
-  s=y;
-  y+=56*k;
-  spaced(P,y,C.isE?'SPEC':'SPEC',13,ORANGE,2.6); y+=30*k;
-  text(P,y,C.isE?'매물 제원':'제품 제원',31,800,NAVY); y+=31*1.35*k+24*k;
-  var labels=LABELS[S.mode].specs;
-  var rowH=68*k;
-  // 헤더
-  rect(P,y,CW,58*k,NAVY,12*k);
-  text(P+24*k,y+58*k/2+7*k,'항목',17,700,'#A9BAD6');
-  text(P+150*k,y+58*k/2+7*k,'내용',17,700,'#A9BAD6');
-  y+=58*k;
-  S.specs.forEach(function(v,i){
-    var fill=(i%2===0)?'#FFFFFF':'#F6F8FC';
-    rect(P,y,CW,rowH,fill,i===S.specs.length-1?12*k:0);
-    text(P+24*k,y+rowH/2+6*k,labels[i],17,700,'#67758F');
-    var val=(v||'').trim()||'—';
-    var vf=F(18,600), maxW=CW-190*k;
-    var ls=wrapText(val,vf,maxW);
-    var ly=y+rowH/2-(ls.length-1)*18*1.5*k/2+6*k;
-    ls.slice(0,2).forEach(function(l){ text(P+150*k,ly,l,18,600,'#0A1128'); ly+=18*1.5*k; });
-    if(ls.length>2){} // 2줄까지만 표시
-    y+=rowH;
-  });
-  rect(P,y,CW,1*k,'#E3E8F1');
-  y+=56*k;
-  bg(0,s,W,y-s,'#FFFFFF');
-
-  /* ---- 6. 사진3 ---- */
-  if(PH[2]){ photoBand(PH[2],CAP.p3); }
-
-  /* ---- 7. 사진4·5 ---- */
-  if(PH[3]||PH[4]){
-    s=y;
-    y+=36*k;
-    var gap=12*k, cellW=(CW-gap)/2;
-    var cells=[PH[3],PH[4]].filter(Boolean);
-    var ch=cellW;
-    cells.forEach(function(p,i){
-      var x=P+i*(cellW+gap);
-      img(x,y,cellW,ch,p.img,true);
+  /* 한 줄 — d.y 를 위쪽 기준으로 쓰고, baseline 은 size 만큼 내린다 */
+  d.line1=function(txt,size,weight,color,o){
+    o=o||{};
+    var lh=(o.lh||1.36)*size*k;
+    d.text(o.x==null?P:o.x, d.y+size*k*0.98, txt, size, weight, color||NAVY, o.align||'left', o.base);
+    d.y+=lh+(o.mb||0)*k;
+    return lh;
+  };
+  d.para=function(txt,o){
+    o=o||{};
+    var size=o.size||19, weight=o.weight||400, color=o.color||'#3D4A63';
+    var lh=(o.lh||1.78)*size*k, maxW=o.maxW||CW;
+    var x=o.x==null?((o.align==='center')?W/2:((o.align==='right')?W-P:P)):o.x;
+    var font=d.F(size,weight);
+    var ls=wrapText(txt,font,maxW);
+    ls.forEach(function(ln){
+      d.text(x,d.y+size*k*0.98,ln,size,weight,color,o.align||'left');
+      d.y+=lh;
     });
-    y+=ch+40*k;
-    bg(0,s,W,y-s,'#F3F5FA');
-  }
-
-  /* ---- 8. 가격 · 명분 ---- */
-  s=y;
-  y+=62*k;
-  spaced(P,y,C.isE?'CONDITION':'PRICE',13,ORANGE,2.6); y+=46*k;
-  if(C.price){
-    text(P,y,C.price,52,900,ORANGE); y+=52*1.32*k;
-  } else {
-    text(P,y,C.isE?'조건 협의':'가격 문의',45,900,ORANGE); y+=45*1.32*k;
-  }
-  y+=8*k;
-  var rFont=F(20,500), rLH=20*1.6*k;
-  var lead = C.isE ? '거래 조건은 이렇게 정리했습니다.' : '왜 이 구성에 이 가격인지, 그대로 적었습니다.';
-  wrapText(lead,rFont,CW).forEach(function(l){ text(P,y,l,20,500,'#A9BAD6'); y+=rLH; });
-  y+=26*k;
-  line(P,y,CW,1*k,'rgba(255,255,255,.13)'); y+=30*k;
-  C.reasons.forEach(function(r){
-    var ls=wrapText(r,F(21,600),CW-24*k);
-    led(P+4*k,y-7*k,4.5*k,ORANGE);
-    ls.forEach(function(l){ text(P+22*k,y,l,21,600,'#E4EBF7'); y+=21*1.6*k; });
-    y+=14*k;
-  });
-  y+=48*k;
-  bg(0,s,W,y-s,NAVY);
-
-  /* ---- 9. 안내 3줄 ---- */
-  s=y;
-  y+=54*k;
-  spaced(P,y,'INFO',13,ORANGE,2.6); y+=32*k;
-  C.info.forEach(function(row){
-    var vf=F(20,600), maxW=CW-118*k;
-    var ls=wrapText(row.v,vf,maxW);
-    var rowH=Math.max(46*k, ls.length*20*1.6*k);
-    text(P,y+22*k,row.k,16,800,'#67758F');
-    var ly=y+22*k;
-    ls.forEach(function(l){ text(P+118*k,ly,l,20,600,'#16223C'); ly+=20*1.6*k; });
-    y+=rowH+22*k;
-    line(P,y-11*k,CW,1*k,'#EDF0F6');
-  });
-  y+=26*k;
-  bg(0,s,W,y-s,'#FFFFFF');
-
-  /* ---- 10. 마무리 ---- */
-  s=y;
-  y+=58*k;
-  var ctFont=F(30,800);
-  var ct=wrapText(C.cta.title,ctFont,CW-40*k);
-  var cth=ct.length*30*1.5*k;
-  y+=Math.max(0,(180*k-cth)/2);
-  ct.forEach(function(l){ text(W/2,y,l,30,800,'#FFFFFF','center'); y+=30*1.5*k; });
-  y+=18*k;
-  var csFont=F(20,400);
-  wrapText(C.cta.sub,csFont,CW-40*k).forEach(function(l){ text(W/2,y,l,20,400,'#A9BAD6','center'); y+=20*1.7*k; });
-  y+=26*k;
-  // 문의 알약
-  var pillTxt=(C.contact?('문의 '+C.contact):'문의 남겨주시면 답 드립니다');  var pf=F(18,700), pw=Math.min(CW,tw(pillTxt,pf)+68*k);
-  rect(W/2-pw/2,y,pw,62*k,'rgba(255,107,0,.14)',999);
-  blocks.push({t:'stroke',x:W/2-pw/2,y:y,w:pw,h:62*k,fill:'rgba(255,107,0,.55)',r:999});
-  text(W/2,y+62*k/2+6*k,pillTxt,18,700,ORANGE,'center');
-  y+=62*k+58*k;
-  bg(0,s,W,y-s,NAVY2);
-
-  /* ---- 11. 푸터 ---- */
-  s=y;
-  y+=44*k;
-  if(C.mark){
-    text(W/2,y,C.brand||'KTS 더상세',20,800,'#FFFFFF','center'); y+=34*k;
-    text(W/2,y,'사진 '+S.photos.length+'장 → 상세페이지 1초 · KTS 더상세',15,500,'#6E80A3','center'); y+=28*k;
-    text(W/2,y,'autooneclick.com',15,700,ORANGE,'center'); y+=44*k;
-  } else {
-    text(W/2,y,C.brand||' ',20,800,'#FFFFFF','center'); y+=34*k;
-    if(C.contact){ text(W/2,y,C.contact,15,500,'#6E80A3','center'); y+=28*k; }
-    y+=44*k;
-  }
-  bg(0,s,W,y-s,'#070D1E');
-
-  return {blocks:blocks,W:W,H:Math.ceil(y)};
+    if(o.mb) d.y+=o.mb*k;
+    return ls.length;
+  };
+  d.eyebrow=function(txt,color){
+    d.spaced(P,d.y+12*k,txt,11,color||ORANGE,2.2); d.y+=30*k;
+  };
+  d.h2=function(txt,color,size){
+    d.text(P,d.y+(size||30)*k*0.98,txt,size||30,800,color||NAVY); d.y+=(size||30)*1.4*k;
+  };
+  d.bullet=function(txt,o){
+    o=o||{};
+    var size=o.size||18, color=o.color||'#16223C', x=o.x==null?P:o.x, maxW=o.maxW||(CW-22*k);
+    var ls=wrapText(txt,d.F(size,o.weight||600),maxW);
+    var top=d.y;
+    d.led(x+4*k,top+size*k*0.72,3.6*k,o.dot||ORANGE);
+    ls.forEach(function(ln){
+      d.text(x+18*k,d.y+size*k*0.98,ln,size,o.weight||600,color);
+      d.y+=(o.lh||1.62)*size*k;
+    });
+    d.y+=(o.mb==null?8:o.mb)*k;
+    return d.y-top;
+  };
+  d.table=function(rows,o){
+    o=o||{};
+    var labelW=o.labelW||170*k, rowPad=(o.rowPad||16)*k, size=o.size||17;
+    var x=o.x==null?P:o.x, w=o.w||CW;
+    var vf=d.F(size,600), maxW=w-labelW-46*k;
+    rows.forEach(function(r,idx){
+      var ls=wrapText(r[1],vf,maxW);
+      var rh=Math.max((o.rowH||58)*k, ls.length*size*1.55*k+rowPad*2);
+      d.rect(x,d.y,w,rh,(idx%2===0)?'#FFFFFF':'#F6F8FC');
+      d.line(x,d.y,w,Math.max(1,1*k),'#E6EAF2');
+      d.text(x+22*k,d.y+rh/2,r[0],(size-1),700,'#67758F','left','middle');
+      var ly=d.y+rh/2-(ls.length-1)*size*1.55*k/2;
+      ls.forEach(function(ln){ d.text(x+labelW,ly,ln,size,600,'#0A1128','left','middle'); ly+=size*1.55*k; });
+      d.y+=rh;
+    });
+    d.line(x,d.y,w,Math.max(1,1*k),'#DDE3EE');
+  };
+  d.chip=function(txt,x,y,size,fill,color){
+    var f=d.F(size||15,800), w=tw(txt,f)+26*k, h=(size||15)*2.2*k;
+    d.rect(x,y,w,h,fill||'rgba(10,17,40,.82)',8*k);
+    d.text(x+w/2,y+h/2+ (size||15)*k*0.36,txt,size||15,800,color||'#FFFFFF','center','middle');
+    return w;
+  };
+  d.photoBand=function(p,minH,maxH){
+    var h=W/(p.ar||1);
+    var lo=(minH||360)*k, hi=(maxH||820)*k;
+    h=Math.max(Math.min(h,hi),lo);
+    d.img(0,d.y,W,h,p.img);
+    d.y+=h;
+    return h;
+  };
+  d.kpiRow=function(items,o){
+    o=o||{};
+    var gap=(o.gap||12)*k, n=items.length, w=(CW-gap*(n-1))/n, h=(o.h||104)*k, top=d.y;
+    items.forEach(function(it,i){
+      var x=P+i*(w+gap);
+      d.rect(x,top,w,h,o.fill||'#FFFFFF',14*k);
+      d.rect(x,top,w,4*k,ORANGE,2*k);
+      d.stroke(x,top,w,h,o.border||'#E3E8F1',14*k);
+      d.text(x+16*k,top+34*k,it.k,12,700,'#67758F');
+      d.text(x+16*k,top+h- (it.note?30:16)*k,it.v,(o.vs||22),900,it.color||NAVY);
+      if(it.note) d.text(x+16*k,top+h-12*k,it.note,11,600,'#8A97AD');
+    });
+    d.y=top+h;
+  };
+  return d;
 }
 
-/* ---------------- 그리기 ---------------- */
+/* 색상 */
+var C_INK='#0A1128', C_BODY='#3D4A63', C_MUT='#67758F', C_LINE='#E6EAF2';
+var BG_WHITE='#FFFFFF', BG_SOFT='#F4F6FA', BG_CREAM='#FFF3EA';
+
+/* =========================================================================
+   부동산 · 전체 (블로그 3p+)
+   ========================================================================= */
+function buildEstateFull(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos;
+  var M=C.M;
+
+  /* 0. 상단 띠 */
+  var badgeH=72*k;
+  d.bg(0,0,W,badgeH,NAVY);
+  d.led(P,badgeH/2,5*k,ORANGE);
+  d.text(P+18*k,badgeH/2+6*k,'KTS 매물 브리핑',18,800,'#FFFFFF');
+  d.text(W-P,badgeH/2+5*k,'PROPERTY BRIEF',12,600,'#8FA1C0','right');
+  d.rect(0,badgeH,W,3*k,ORANGE);
+  d.y=badgeH+3*k;
+
+  /* 1. 대표 사진 */
+  var p0=PH[0];
+  if(p0){
+    var h=d.photoBand(p0,420,820);
+    if(p0.role) d.chip(p0.role,P,d.y-h+22*k,14);
+  }
+
+  /* 2. 제목 */
+  var s=d.y;
+  d.y+=46*k;
+  d.eyebrow('LOCATION · PRICE · RIGHTS');
+  d.y+=6*k;
+  var tFont=d.F(42,800);
+  wrapText(C.title,tFont,CW).forEach(function(ln){ d.line1(ln,42,800,'#FFFFFF'); });
+  d.y+=8*k;
+  if(C.hook) d.para(C.hook,{size:21,color:'#BFCEE6',lh:1.62,mb:12});
+  if(C.addr){
+    d.led(P+5*k,d.y+14*k,4.5*k,ORANGE);
+    d.para(C.addr,{size:18,weight:700,color:'#FFC79B',lh:1.6,x:P+18*k,maxW:CW-18*k});
+  }
+  d.y+=40*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  /* 3. 물건 내용 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('FACT SHEET');
+  d.h2('물건 내용');
+  d.y+=6*k;
+  d.table(C.rows,{rowH:54,labelW:150*k});
+  d.y+=34*k;
+  /* 수익 요약 스트립 */
+  var kpis=[];
+  if(C.trade) kpis.push({k:'매매 · 교환가',v:C.trade});
+  if(C.invest) kpis.push({k:'실투자금',v:C.invest});
+  if(M.net>0) kpis.push({k:'순월세',v:wonText(M.net)+' 원'});
+  if(kpis.length){
+    d.kpiRow(kpis,{h:96,vs:22});
+    d.y+=18*k;
+  }
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 4. 가격 안전마진 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('PRICE');
+  d.h2('가격의 안전마진');
+  d.y+=4*k;
+  if(M.diff>0&&M.appraise){
+    var gapItems=[
+      {k:'감정가',v:wonText(M.appraise)+' 원'},
+      {k:'매매가',v:wonText(M.trade)+' 원',color:ORANGE},
+      {k:'감정가 대비',v:'-'+pctText(M.diff,M.appraise)+'%',color:'#0F8A4A'}
+    ];
+    if(M.ratio) gapItems.push({k:'공시지가 대비',v:(Math.round(M.ratio*10)/10)+'배'});
+    d.kpiRow(gapItems.slice(0,4),{h:96,vs:20,gap:10});
+    d.y+=24*k;
+  }
+  C.priceParas.forEach(function(t){ d.para(t,{size:18,mb:14}); });
+  d.y+=32*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 5. 수익 구조 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('INCOME');
+  d.h2('수익 구조');
+  d.y+=4*k;
+  if(C.incomeRows.length){ d.table(C.incomeRows,{rowH:52,labelW:170*k}); d.y+=26*k; }
+  C.incomeParas.forEach(function(t){ d.para(t,{size:18,mb:14}); });
+  d.y+=30*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 6. 권리분석 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('RIGHTS');
+  d.h2('권리분석');
+  d.y+=2*k;
+  C.rightItems.forEach(function(it){
+    var bodyTop=d.y;
+    var titleLines=wrapText(it.title,d.F(19,800),CW-90*k);
+    var bodyLines=wrapText(it.body,d.F(16,400),CW-90*k);
+    var cardH=44*k+titleLines.length*19*1.5*k+10*k+bodyLines.length*16*1.75*k+26*k;
+    d.rect(P,d.y,CW,cardH,'#FFFFFF',16*k);
+    d.rect(P+18*k,d.y+18*k,38*k,38*k,BG_CREAM,10*k);
+    d.text(P+37*k,d.y+18*k+19*k,it.no,15,900,ORANGE,'center','middle');
+    var ty=d.y+30*k;
+    titleLines.forEach(function(ln){ d.text(P+72*k,ty+19*k*0.98,ln,19,800,C_INK); ty+=19*1.5*k; });
+    ty+=6*k;
+    bodyLines.forEach(function(ln){ d.text(P+72*k,ty+16*k*0.98,ln,16,400,'#4A5872'); ty+=16*1.75*k; });
+    d.y+=cardH+12*k;
+  });
+  if(!C.rightItems.length){ d.para('권리분석 항목을 넣으면 이 자리에 항목별 해설이 들어갑니다.',{size:17,color:C_MUT,mb:8}); }
+  d.y+=16*k;
+  C.rightsDeep.forEach(function(t){ d.para(t,{size:18,mb:14}); });
+  /* 계약 전 확인 5 */
+  d.y+=8*k;
+  d.text(P,d.y+14*k,'계약 전 확인 다섯 가지',15,800,NAVY); d.y+=34*k;
+  C.checklist.forEach(function(t,i){
+    d.text(P+2*k,d.y+15*k,String(i+1)+'.',14,900,ORANGE);
+    d.para(t,{size:16,x:P+24*k,maxW:CW-24*k,color:'#4A5872',lh:1.6,mb:4});
+  });
+  d.y+=30*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 7. 입지 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('LOCATION');
+  d.h2('입지 — 사람이 지나가는 자리');
+  d.y+=4*k;
+  C.loc.forEach(function(b){
+    d.text(P,d.y+17*k,b.h,18,800,ORANGE); d.y+=30*k;
+    d.para(b.t,{size:17,mb:16});
+  });
+  if(C.spots.length){
+    d.y+=4*k;
+    d.rect(P,d.y,CW,0.6*k,'#E3E8F1'); d.y+=24*k;
+    d.text(P,d.y+15*k,'주변 인프라',15,800,NAVY); d.y+=32*k;
+    C.spots.forEach(function(sp){
+      d.led(P+4*k,d.y+11*k,3.6*k,ORANGE);
+      d.text(P+18*k,d.y+15*k,sp.name,15.5,800,C_INK);
+      d.y+=24*k;
+      if(sp.desc) d.para(sp.desc,{size:14.5,x:P+18*k,maxW:CW-18*k,color:C_MUT,lh:1.62,mb:6});
+      else d.y+=4*k;
+    });
+  }
+  d.y+=32*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 8. 시장조사 */
+  s=d.y;
+  d.y+=48*k;
+  d.eyebrow('MARKET');
+  d.h2('시장조사');
+  d.y+=4*k;
+  C.market.forEach(function(t){ d.para(t,{size:18,mb:14}); });
+  d.y+=32*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 9. 현장 사진 */
+  if(PH.length>1){
+    s=d.y;
+    d.y+=44*k;
+    d.eyebrow('SITE PHOTO');
+    d.h2('현장 사진');
+    d.y+=4*k;
+    d.para('현장은 사진 순서대로 봅니다. 외경에서 도로, 내부, 지적도, 항공 순으로 이어지면 건물과 자리가 한 번에 이해됩니다.',{size:16,color:C_MUT,mb:14});
+    PH.slice(1).forEach(function(p,i){
+      var h=W/(p.ar||1);
+      h=Math.max(Math.min(h,760*k),340*k);
+      d.img(0,d.y,W,h,p.img);
+      if(p.role) d.chip(p.role,P,d.y+20*k,13);
+      d.y+=h;
+      if(p.caption){
+        d.y+=16*k;
+        d.led(P+4*k,d.y+12*k,4*k,ORANGE);
+        d.para(p.caption,{size:16,color:'#5B6883',x:P+18*k,maxW:CW-18*k,lh:1.7,mb:8});
+      }
+      d.y+=26*k;
+    });
+    d.bg(0,s,W,d.y-s,BG_WHITE);
+  }
+
+  /* 10. 지도 · 로드뷰 */
+  s=d.y;
+  d.y+=44*k;
+  d.spaced(P,d.y+12*k,'MAP · ROADVIEW · SATELLITE',11,ORANGE,2.2); d.y+=34*k;
+  d.text(P,d.y+26*k,'지도 · 로드뷰 · 위성',26,800,'#FFFFFF'); d.y+=26*1.4*k+10*k;
+  d.para('소재지로 바로 열립니다. 인쇄물에서는 주소를 그대로 검색하시면 같은 화면이 나옵니다.',{size:15,color:'#A9BAD6',mb:12});
+  var linkRows=[['네이버 지도','map.naver.com — 소재지로 검색'],
+                ['카카오맵 · 로드뷰','map.kakao.com — 로드뷰까지 한 번에'],
+                ['구글 위성','maps.google.com — 위성(항공) 화면']];
+  linkRows.forEach(function(r){
+    d.led(P+4*k,d.y+12*k,3.4*k,ORANGE);
+    d.text(P+18*k,d.y+16*k,r[0],14.5,800,'#FFC79B');
+    d.y+=27*k;
+    d.para(r[1],{size:12.5,x:P+18*k,maxW:CW-18*k,color:'#8FA1C0',lh:1.5,mb:9});
+  });
+  if(C.addr){
+    d.y+=6*k;
+    d.rect(P,d.y,CW,0.6*k,'rgba(255,255,255,.16)'); d.y+=18*k;
+    d.para(C.addr,{size:15,weight:700,color:'#DCE6F6',mb:6});
+  }
+  d.y+=34*k;
+  d.bg(0,s,W,d.y-s,NAVY2);
+
+  /* 11. CTA */
+  s=d.y;
+  d.y+=50*k;
+  d.text(P,d.y+24*k,'현장 확인 · 권리관계 확인 후 진행합니다',22,800,'#FFFFFF'); d.y+=24*1.5*k+8*k;
+  d.para('궁금한 점은 전화로 바로 여쭤보세요. 호실별 임대 조건과 등기 사항은 통화로 더 자세히 안내드립니다.',{size:16,color:'#A9BAD6',mb:18});
+  if(C.phone){
+    var tel=String(C.phone).replace(/[^0-9+]/g,'');
+    var ptxt='전화 문의   '+C.phone;
+    var pf=d.F(21,900), pw=Math.min(CW,tw(ptxt,pf)+64*k), phh=68*k;
+    d.rect(W/2-pw/2,d.y,pw,phh,ORANGE,14*k);
+    d.text(W/2,d.y+phh/2,ptxt,21,900,'#12151C','center','middle');
+    d.y+=phh+16*k;
+    d.para(tel,{size:13,color:'#6E80A3',align:'center',mb:0});
+  }else{
+    d.text(W/2,d.y+20*k,'연락처를 넣으면 여기에 전화 버튼이 생깁니다',15,600,'#6E80A3','center');
+    d.y+=40*k;
+  }
+  if(C.contact) d.para(C.contact,{size:14,color:'#A9BAD6',align:'center',mb:0});
+  d.y+=40*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  /* 12. 푸터 */
+  s=d.y;
+  d.y+=30*k;
+  if(C.mark){
+    d.text(W/2,d.y+18*k,C.brand,17,800,'#FFFFFF','center'); d.y+=30*k;
+    d.text(W/2,d.y+14*k,'부동산 매물 브리핑 · 사진 '+PH.length+'장 → 1초 · KTS 더상세',12,500,'#6E80A3','center'); d.y+=24*k;
+    d.text(W/2,d.y+14*k,'autooneclick.com',12,700,ORANGE,'center'); d.y+=32*k;
+  }else{
+    d.text(W/2,d.y+18*k,C.brand||' ',17,800,'#FFFFFF','center'); d.y+=34*k;
+  }
+  d.bg(0,s,W,d.y-s,'#070D1E');
+
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   부동산 · 브리핑용 (상담·문자 1~2장)
+   ========================================================================= */
+function buildEstateBrief(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos, M=C.M;
+
+  var badgeH=64*k;
+  d.bg(0,0,W,badgeH,NAVY);
+  d.led(P,badgeH/2,5*k,ORANGE);
+  d.text(P+18*k,badgeH/2+6*k,'KTS 매물 브리핑',17,800,'#FFFFFF');
+  d.text(W-P,badgeH/2+5*k,'BRIEF',11,700,'#8FA1C0','right');
+  d.rect(0,badgeH,W,3*k,ORANGE);
+  d.y=badgeH+3*k;
+
+  var p0=PH[0];
+  if(p0){
+    var h=W/(p0.ar||1); h=Math.max(Math.min(h,430*k),320*k);
+    d.img(0,d.y,W,h,p0.img);
+    if(p0.role) d.chip(p0.role,P,d.y+18*k,13);
+    d.y+=h;
+  }
+
+  var s=d.y;
+  d.y+=30*k;
+  d.eyebrow('LOCATION · PRICE · RIGHTS');
+  d.y+=2*k;
+  wrapText(C.title,d.F(30,800),CW).forEach(function(ln){ d.line1(ln,30,800,'#FFFFFF'); });
+  d.y+=6*k;
+  if(C.hook) d.para(C.hook,{size:17,color:'#BFCEE6',lh:1.55,mb:8});
+  if(C.addr) d.para(C.addr,{size:15,weight:700,color:'#FFC79B',lh:1.5,mb:0});
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  s=d.y;
+  d.y+=30*k;
+  var kp=[];
+  if(C.trade) kp.push({k:'매매 · 교환가',v:C.trade,color:ORANGE});
+  if(C.invest) kp.push({k:'실투자금',v:C.invest});
+  if(M.net>0) kp.push({k:'순월세',v:wonText(M.net)+' 원'});
+  if(kp.length){ d.kpiRow(kp,{h:88,vs:19,gap:9}); d.y+=22*k; }
+  var briefRows=C.rows.filter(function(r){
+    return /소재지|규모|구조|층|설비|임대 합계|감정가|공시지가|대출/.test(r[0]);
+  }).slice(0,8);
+  d.table(briefRows.length?briefRows:C.rows.slice(0,8),{rowH:44,labelW:132*k,size:15,rowPad:11});
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 핵심 4줄 */
+  s=d.y;
+  d.y+=30*k;
+  d.eyebrow('KEY');
+  d.h2('상담 때 먼저 말할 네 가지',NAVY,22);
+  d.y+=2*k;
+  var keyLines=[];
+  if(M.diff>0&&M.appraise) keyLines.push('가격 — 감정 '+nz(C.appraise)+' 대비 '+wonText(M.diff)+' 원('+pctText(M.diff,M.appraise)+'%) 낮은 '+C.trade);
+  if(M.net>0) keyLines.push('수익 — 월세 '+manText(M.rentLeased)+'만, 이자 '+(M.interest?wonText(M.interest)+' 원':'—')+' 빼면 순월세 '+wonText(M.net)+' 원');
+  if(C.rightItems.length) keyLines.push('권리 — '+C.rightItems.map(function(i){return i.title;}).slice(0,2).join(' / '));
+  if(C.loc[0]) keyLines.push('입지 — '+C.loc[0].t.split('.')[0]+'.');
+  keyLines.slice(0,5).forEach(function(t){ d.bullet(t,{size:16,mb:8}); });
+  d.y+=20*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 사진 3장 */
+  if(PH.length>1){
+    s=d.y;
+    d.y+=28*k;
+    d.eyebrow('SITE');
+    var cells=PH.slice(1,4);
+    var gap=8*k, cw=(CW-gap*(cells.length-1))/Math.max(1,cells.length), ch=cw*0.86;
+    cells.forEach(function(p,i){
+      var x=P+i*(cw+gap);
+      d.img(x,d.y,cw,ch,p.img);
+      if(p.role){
+        d.rect(x,d.y+ch-24*k,cw,24*k,'rgba(10,17,40,.78)');
+        d.text(x+8*k,d.y+ch-11*k,p.role,11,800,'#FFFFFF');
+      }
+    });
+    d.y+=ch+18*k;
+    if(cells[0]&&cells[0].caption){
+      d.para(cells[0].caption,{size:14,color:C_MUT,mb:0});
+    }
+    d.y+=24*k;
+    d.bg(0,s,W,d.y-s,BG_WHITE);
+  }
+
+  /* 전화 */
+  s=d.y;
+  d.y+=34*k;
+  d.text(P,d.y+18*k,'현장 · 권리 확인 후 진행합니다',15,700,'#A9BAD6'); d.y+=34*k;
+  if(C.phone){
+    var ptxt='전화 문의   '+C.phone, pf=d.F(19,900);
+    var pw=Math.min(CW,tw(ptxt,pf)+54*k), phh=58*k;
+    d.rect(W/2-pw/2,d.y,pw,phh,ORANGE,12*k);
+    d.text(W/2,d.y+phh/2,ptxt,19,900,'#12151C','center','middle');
+    d.y+=phh+14*k;
+  }
+  if(C.contact) d.para(C.contact,{size:13,color:'#A9BAD6',align:'center',mb:0});
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,NAVY2);
+
+  s=d.y; d.y+=18*k;
+  if(C.mark) d.text(W/2,d.y+12*k,C.brand+' · KTS 더상세',11,600,'#6E80A3','center');
+  d.y+=30*k;
+  d.bg(0,s,W,d.y-s,'#070D1E');
+
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   부동산 · 한 장 요약 포스터 (물건표 1장)
+   ========================================================================= */
+function buildEstatePoster(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos, M=C.M;
+
+  /* 1. 헤더 띠 */
+  var hh=118*k;
+  d.bg(0,0,W,hh,NAVY);
+  d.led(P,hh/2-16*k,5*k,ORANGE);
+  d.text(P+16*k,hh/2-4*k,C.name,26,800,'#FFFFFF');
+  if(C.addr) d.text(P+16*k,hh/2+22*k,C.addr,13,500,'#A9BAD6');
+  /* 우측 가격 배지 */
+  var bw=Math.min(CW*0.42,330*k), bh=hh-28*k, bx=W-P-bw, by=14*k;
+  d.rect(bx,by,bw,bh,ORANGE,10*k);
+  d.text(bx+bw/2,by+30*k,C.trade,19,900,'#12151C','center');
+  var sub=[];
+  if(C.appraise) sub.push('감정 '+C.appraise.replace(/\s*원$/,''));
+  if(C.invest) sub.push('실투 '+C.invest.replace(/\s*원$/,''));
+  if(sub.length) d.text(bx+bw/2,by+bh-16*k,sub.join(' · '),11,700,'#4A2300','center');
+  d.y=hh+10*k;
+
+  /* 2. KPI 4칸 */
+  var tiles=[];
+  if(C.invest) tiles.push({k:'실투자금',v:C.invest,note: M.depAll?('보증금 '+manText(M.depAll)+'만 기준'):''});
+  if(C.debt) tiles.push({k:'대출금'+(M.rate?' ('+M.rate+'%)':''),v:C.debt,note:M.interest?('월 이자 '+wonText(M.interest)+' 원'):''});
+  if(M.rentWon) tiles.push({k:'월 임대수익',v:manText(M.rentAll)+'만',note:'관리비 '+manText(M.mgmtAll)+'만 별도'});
+  if(C.land||C.area) tiles.push({k:'대지 / 연면적',v:(C.land||'—')+' / '+(C.area||'—'),note:C.official?('공시지가 '+C.official):''});
+  if(!tiles.length) tiles.push({k:'매매가',v:C.trade,note:''});
+  d.kpiRow(tiles.slice(0,4),{h:96,vs:18,gap:10});
+  d.y+=12*k;
+
+  /* 3. 사진 + 물건 기본 개요 */
+  var rowTop=d.y;
+  var photoW=Math.round(CW*0.40), gap=10*k, tblW=CW-photoW-gap;
+  var p0=PH[0];
+  var phH=Math.min(380*k, photoW*1.24);
+  if(p0){ d.img(P,rowTop,photoW,phH,p0.img); }
+  else { d.rect(P,rowTop,photoW,phH,'#E9EDF4',12*k); }
+  if(p0&&p0.role) d.chip(p0.role,P+8*k,rowTop+8*k,11);
+
+  var tx=P+photoW+gap;
+  d.rect(tx,rowTop,tblW,phH,'#FFFFFF',12*k);
+  d.stroke(tx,rowTop,tblW,phH,'#DDE3EE',12*k);
+  d.text(tx+14*k,rowTop+24*k,'물건 기본 개요',14,800,NAVY);
+  if(C.scale) d.text(tx+tblW-14*k,rowTop+24*k,C.scale.split('·').slice(-1)[0],10,700,ORANGE,'right');
+  d.rect(tx+14*k,rowTop+32*k,tblW-28*k,1.4*k,ORANGE);
+  var posterRows=[];
+  if(C.addr) posterRows.push(['소재지',C.addr]);
+  if(C.zone||C.land) posterRows.push(['용도지역',(C.zone||'')+(C.land?' ('+C.land+')':'')]);
+  if(C.area) posterRows.push(['연면적',C.area]);
+  if(C.official) posterRows.push(['공시지가',C.official]);
+  if(C.struct) posterRows.push(['구조·용도',C.struct]);
+  if(C.scale) posterRows.push(['규모·준공',C.scale]);
+  if(C.deposit||C.rent) posterRows.push(['임대 합계','보증금 '+(C.deposit||'—')+' / 월세 '+(C.rent||'—')]);
+  if(M.net>0) posterRows.push(['순월세',wonText(M.net)+' 원'+(M.gross?' · 표면 '+Math.round(M.gross*10)/10+'%':'')]);
+  var rowH=Math.max(20*k, (phH-52*k)/Math.max(1,Math.min(posterRows.length,7)));
+  var py=rowTop+44*k;
+  posterRows.slice(0,7).forEach(function(r,i){
+    if(i>0) d.rect(tx+14*k,py,tblW-28*k,0.6*k,'#EDF0F6');
+    d.text(tx+14*k,py+rowH/2,r[0],9.5,700,'#7A879C','left','middle');
+    var valF=d.F(9.5,600);
+    var ls=wrapText(r[1],valF,tblW-86*k).slice(0,2);
+    var vy=py+rowH/2-(ls.length-1)*9.5*1.4*k/2;
+    ls.forEach(function(ln){ d.text(tx+72*k,vy,ln,9.5,600,C_INK,'left','middle'); vy+=9.5*1.4*k; });
+    py+=rowH;
+  });
+  d.y=rowTop+Math.max(phH,0)+14*k;
+
+  /* 4. 층별 임대차 내역 */
+  var lease=C.leaseRows||[];
+  if(lease.length){
+    d.text(P,d.y+18*k,'층별 임대차 내역',15,800,NAVY);
+    d.text(W-P,d.y+18*k,'단위: 만 원 (관리비 별도)',10,600,'#8A97AD','right');
+    d.y+=30*k;
+    var cols=[{w:44*k,t:'층',a:'center'},{w:54*k,t:'호실',a:'center'},{w:0,t:'업종 / 임차인',a:'left'},
+              {w:74*k,t:'보증금',a:'right'},{w:66*k,t:'월세',a:'right'},{w:52*k,t:'관리비',a:'right'}];
+    var fixed=cols.reduce(function(a,c){return a+c.w;},0);
+    cols[2].w=CW-fixed;
+    var hh2=28*k;
+    d.rect(P,d.y,CW,hh2,NAVY,4*k);
+    var cx=P;
+    cols.forEach(function(c){
+      var x=c.a==='right'?cx+c.w-8*k:(c.a==='center'?cx+c.w/2:cx+10*k);
+      d.text(x,d.y+hh2/2+3*k,c.t,9.5,800,'#DCE6F6',c.a==='left'?'left':c.a,'middle');
+      cx+=c.w;
+    });
+    d.y+=hh2;
+    var lh=Math.max(20*k,Math.min(26*k,300*k/Math.max(1,lease.length)));
+    lease.slice(0,12).forEach(function(r,i){
+      var vacant=r.vacant;
+      d.rect(P,d.y,CW,lh,vacant?BG_CREAM:(i%2?'#F7F9FC':'#FFFFFF'));
+      var cx=P;
+      var cells=[r.floor||'—',r.room||'—',r.kind,r.deposit?manText(r.deposit):'—',r.rent?manText(r.rent):'—',r.mgmt?manText(r.mgmt):'—'];
+      cols.forEach(function(c,ci){
+        var a=c.a, x=a==='right'?cx+c.w-8*k:(a==='center'?cx+c.w/2:cx+10*k);
+        d.text(x,d.y+lh/2+3*k,cells[ci],9.8,(ci===2?700:600),vacant?ORANGE:C_INK,a==='left'?'left':a,'middle');
+        cx+=c.w;
+      });
+      d.y+=lh;
+    });
+    d.rect(P,d.y,CW,1.2*k,NAVY);
+    d.y+=6*k;
+    var sumDep=0,sumRent=0,sumMgmt=0;
+    lease.forEach(function(r){ sumDep+=r.deposit; sumRent+=r.rent; sumMgmt+=r.mgmt; });
+    var xs=[], cx2=P;
+    cols.forEach(function(c){ xs.push(cx2); cx2+=c.w; });
+    d.text(P+10*k,d.y+11*k,'만실 기준 합계'+(M.vacantRent?' (공실 '+manText(M.vacantRent)+'만 제외 시 월세 '+manText(M.rentLeased)+'만)':''),9.5,800,NAVY);
+    d.text(xs[3]+cols[3].w-8*k,d.y+11*k,manText(sumDep),9.5,800,NAVY,'right');
+    d.text(xs[4]+cols[4].w-8*k,d.y+11*k,manText(sumRent),9.5,800,ORANGE,'right');
+    d.text(xs[5]+cols[5].w-8*k,d.y+11*k,manText(sumMgmt),9.5,800,NAVY,'right');
+    d.y+=24*k;
+  }
+
+  /* 5. 권리분석 · 투자 포인트 */
+  var band=d.y+6*k;
+  var bullets=[];
+  if(M.diff>0&&C.appraise) bullets.push('가치 안전성 — 감정 '+C.appraise+' 대비 '+wonText(M.diff)+' 원('+pctText(M.diff,M.appraise)+'%) 낮은 '+C.trade+(M.ratio?', 공시지가 대비 '+(Math.round(M.ratio*10)/10)+'배 선':''));
+  if(M.net>0) bullets.push('수익 — 월세 '+manText(M.rentAll)+'만(만실), 이자 '+(M.interest?wonText(M.interest)+' 원':'—')+' 제외 순월세 '+wonText(M.net)+' 원'+(M.invest?', 실투자금 '+C.invest+' 기준 연 '+Math.round(M.netYield*10)/10+'%':''));
+  if(C.rightItems.length) bullets.push('권리 — '+C.rightItems.map(function(i){return i.title;}).slice(0,3).join(' · '));
+  if(C.loc[0]) bullets.push('입지 — '+C.loc[0].t.split('.')[0]+'.');
+  if(C.phone) bullets.push('문의 — '+C.phone);
+  var bandH=44*k;
+  var wrapped=bullets.map(function(t){ return {t:t, ls:wrapText(t,d.F(11,600),CW-40*k)}; });
+  wrapped.forEach(function(b){ bandH+=b.ls.length*11*1.6*k+4*k; });
+  bandH+=10*k;
+  d.rect(0,band,W,bandH,NAVY);
+  d.text(P,band+22*k,'권리분석 및 투자 포인트',13,800,ORANGE);
+  var by=band+34*k;
+  wrapped.forEach(function(b){
+    d.led(P+4*k,by+7*k,2.6*k,ORANGE);
+    b.ls.forEach(function(ln){ d.text(P+14*k,by+10*k,ln,11,600,'#DCE6F6'); by+=11*1.6*k; });
+    by+=4*k;
+  });
+  d.y=band+bandH;
+
+  /* 6. 푸터 */
+  if(C.mark){
+    d.rect(0,d.y,W,26*k,'#070D1E');
+    d.text(W/2,d.y+17*k,C.brand+' · KTS 더상세 · autooneclick.com',9,600,'#6E80A3','center');
+    d.y+=26*k;
+  }
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   상품 · 전체 (블로그 1편 · 쿠팡 풀 상세)
+   ========================================================================= */
+function buildProductFull(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos;
+
+  var badgeH=64*k;
+  d.bg(0,0,W,badgeH,NAVY);
+  d.led(P,badgeH/2,5*k,ORANGE);
+  d.text(P+18*k,badgeH/2+6*k,'KTS 더상세',17,800,'#FFFFFF');
+  d.text(W-P,badgeH/2+5*k,'PRODUCT DETAIL',11,700,'#8FA1C0','right');
+  d.rect(0,badgeH,W,3*k,ORANGE);
+  d.y=badgeH+3*k;
+
+  var p0=PH[0];
+  if(p0){ d.photoBand(p0,380,760); }
+
+  var s=d.y;
+  d.y+=40*k;
+  d.eyebrow('WHY THIS · 3 SEC');
+  d.y+=2*k;
+  wrapText(C.title,d.F(40,800),CW).forEach(function(ln){ d.line1(ln,40,800,'#FFFFFF'); });
+  d.y+=10*k;
+  if(C.hook) d.para(C.hook,{size:21,weight:700,color:'#FFC79B',lh:1.55,mb:6});
+  if(C.tagline) d.para(C.tagline,{size:17,color:'#BFCEE6',lh:1.55,mb:0});
+  if(C.kws.length){
+    d.y+=6*k;
+    d.para('검색 키워드  '+C.kws.slice(0,5).join(' · '),{size:13.5,weight:700,color:'#8FA1C0',mb:0});
+  }
+  d.y+=30*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  /* 불편 공감 */
+  s=d.y;
+  d.y+=44*k;
+  d.eyebrow('EMPATHY');
+  d.h2(C.mainKw?(C.mainKw+' — 왜 이 상품인가'):'왜 이 상품인가');
+  d.y+=4*k;
+  C.empathy.forEach(function(t){ d.para(t,{size:18,mb:12}); });
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 특장점 */
+  s=d.y;
+  d.y+=44*k;
+  d.eyebrow('POINT');
+  d.h2('이 세 가지면 충분합니다');
+  d.y+=8*k;
+  C.points.forEach(function(p){
+    var ls=wrapText(p.text,d.F(20,800),CW-92*k);
+    var ch=Math.max(92*k, ls.length*20*1.5*k+40*k);
+    d.rect(P,d.y,CW,ch,'#FFFFFF',16*k);
+    d.rect(P+20*k,d.y+ch/2-19*k,38*k,38*k,BG_CREAM,10*k);
+    d.text(P+39*k,d.y+ch/2,p.no,14,900,ORANGE,'center','middle');
+    var ly=d.y+ch/2-(ls.length-1)*20*1.5*k/2;
+    ls.forEach(function(ln){ d.text(P+72*k,ly+14*k,ln,20,800,C_INK); ly+=20*1.5*k; });
+    d.y+=ch+12*k;
+  });
+  d.y+=28*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 비교 */
+  if(C.compare.length){
+    s=d.y;
+    d.y+=40*k;
+    d.eyebrow('COMPARE');
+    d.h2('무엇이 다른가');
+    if(C.compareNote){ d.y+=4*k; d.para(C.compareNote,{size:16,color:C_MUT,mb:10}); }
+    if(C.compare.length===1 || C.compare.some(function(c){return c.before;})){
+      var colW=(CW-10*k)/2;
+      d.rect(P,d.y,colW,34*k,'#EDF0F6',8*k);
+      d.rect(P+colW+10*k,d.y,colW,34*k,NAVY,8*k);
+      d.text(P+colW/2,d.y+17*k,'흔한 방식',12,800,'#67758F','center','middle');
+      d.text(P+colW+10*k+colW/2,d.y+17*k,'이 상품',12,800,'#FFFFFF','center','middle');
+      d.y+=34*k;
+      var cmp=C.compare.map(function(c){
+        return {a:wrapText(c.before||'—',d.F(15,500),colW-26*k), b:wrapText(c.after||'—',d.F(15,700),colW-26*k)};
+      });
+      var maxL=1; cmp.forEach(function(c){ maxL=Math.max(maxL,c.a.length,c.b.length); });
+      var rowH2=Math.max(56*k,maxL*15*1.55*k+24*k);
+      cmp.forEach(function(c){
+        var rh=rowH2;
+        d.rect(P,d.y,colW,rh,'#F7F9FC',4*k);
+        d.rect(P+colW+10*k,d.y,colW,rh,BG_CREAM,4*k);
+        var ay=d.y+rh/2-(c.a.length-1)*15*1.55*k/2;
+        c.a.forEach(function(ln){ d.text(P+13*k,ay+11*k,ln,15,500,'#5B6883'); ay+=15*1.55*k; });
+        var byy=d.y+rh/2-(c.b.length-1)*15*1.55*k/2;
+        c.b.forEach(function(ln){ d.text(P+colW+10*k+13*k,byy+11*k,ln,15,700,C_INK); byy+=15*1.55*k; });
+        d.y+=rh+8*k;
+      });
+    }else{
+      C.compare.forEach(function(c){
+        d.rect(P,d.y,CW,0,0);
+        d.bullet(c.after,{size:17,mb:8});
+      });
+    }
+    d.y+=26*k;
+    d.bg(0,s,W,d.y-s,BG_WHITE);
+  }
+
+  /* 실사용 스토리 */
+  if(C.storyLines.length){
+    s=d.y;
+    d.y+=44*k;
+    d.eyebrow('STORY');
+    d.h2('써 본 사람의 하루');
+    d.y+=4*k;
+    C.storyLines.forEach(function(t){ d.para(t,{size:18,mb:12}); });
+    d.y+=24*k;
+    d.bg(0,s,W,d.y-s,BG_SOFT);
+  }
+
+  /* 사진 + 장면 설명 */
+  if(PH.length>1){
+    s=d.y;
+    d.y+=36*k;
+    d.eyebrow('PHOTO');
+    d.h2('사진으로 보는 사용 장면');
+    d.y+=6*k;
+    PH.slice(1).forEach(function(p){
+      var h=W/(p.ar||1); h=Math.max(Math.min(h,720*k),320*k);
+      d.img(0,d.y,W,h,p.img);
+      if(p.role) d.chip(p.role,P,d.y+18*k,12);
+      d.y+=h;
+      if(p.caption){
+        d.y+=14*k;
+        d.led(P+4*k,d.y+11*k,4*k,ORANGE);
+        d.para(p.caption,{size:16,color:'#5B6883',x:P+18*k,maxW:CW-18*k,lh:1.7,mb:6});
+      }
+      if(p.story) d.para(p.story,{size:16,color:C_BODY,x:P+18*k,maxW:CW-18*k,lh:1.7,mb:4});
+      d.y+=22*k;
+    });
+    d.bg(0,s,W,d.y-s,BG_WHITE);
+  }
+
+  /* 제원 */
+  s=d.y;
+  d.y+=44*k;
+  d.eyebrow('SPEC');
+  d.h2('제원');
+  d.y+=4*k;
+  var labels=['크기','재질','구성','가격'];
+  var rows=labels.map(function(l,i){ return [l, C.specs[i]||'—']; });
+  d.table(rows,{rowH:56,labelW:132*k});
+  if(C.subKws.length){
+    d.y+=16*k;
+    d.para('함께 찾는 말 — '+C.subKws.slice(0,5).join(' · '),{size:13.5,weight:600,color:C_MUT,mb:0});
+  }
+  d.y+=28*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 가격 · 명분 */
+  s=d.y;
+  d.y+=44*k;
+  d.eyebrow('PRICE');
+  d.line1(C.price||'가격 문의',44,900,ORANGE);
+  d.y+=6*k;
+  C.reasons.forEach(function(r){ d.bullet(r,{size:17,color:'#33415C',mb:6}); });
+  d.y+=24*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  /* 신뢰 */
+  s=d.y;
+  d.y+=44*k;
+  d.eyebrow('TRUST');
+  d.h2('받고 나서도 안심');
+  d.y+=4*k;
+  C.trust.forEach(function(t){ d.bullet(t,{size:17,color:'#33415C',mb:8}); });
+  d.y+=14*k;
+  d.table(C.info.map(function(r){return [r.k,r.v];}),{rowH:50,labelW:110*k,size:16});
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  /* 태그 */
+  if(C.tags.length){
+    s=d.y;
+    d.y+=32*k;
+    d.eyebrow('TAG');
+    d.y+=2*k;
+    var tx=P, ty=d.y;
+    C.tags.forEach(function(t){
+      var label='#'+t.replace(/\s+/g,'');
+      var f=d.F(14,700), w=tw(label,f)+24*k, h=32*k;
+      if(tx+w>W-P){ tx=P; ty+=h+8*k; }
+      d.rect(tx,ty,w,h,'#EEF2F8',999);
+      d.text(tx+w/2,ty+h/2+1*k,label,14,700,'#4A5872','center','middle');
+      tx+=w+7*k;
+    });
+    d.y=ty+32*k+24*k;
+    d.bg(0,s,W,d.y-s,BG_WHITE);
+  }
+
+  /* CTA */
+  s=d.y;
+  d.y+=48*k;
+  wrapText(C.cta.title,d.F(28,800),CW-30*k).forEach(function(ln){
+    d.text(W/2,d.y+26*k,ln,28,800,'#FFFFFF','center'); d.y+=28*1.45*k;
+  });
+  d.y+=10*k;
+  d.para(C.cta.sub,{size:17,color:'#A9BAD6',align:'center',mb:16});
+  var pill=C.contact?('문의 '+C.contact):'문의 남겨주시면 답 드립니다';
+  var pf=d.F(17,700), pw=Math.min(CW,tw(pill,pf)+60*k), phh=58*k;
+  d.rect(W/2-pw/2,d.y,pw,phh,'rgba(255,107,0,.16)',999);
+  d.stroke(W/2-pw/2,d.y,pw,phh,'rgba(255,107,0,.55)',999);
+  d.text(W/2,d.y+phh/2+1*k,pill,17,700,ORANGE,'center','middle');
+  d.y+=phh+34*k;
+  d.bg(0,s,W,d.y-s,NAVY2);
+
+  /* 푸터 */
+  s=d.y;
+  d.y+=26*k;
+  if(C.mark){
+    d.text(W/2,d.y+16*k,C.brand,15,800,'#FFFFFF','center'); d.y+=28*k;
+    d.text(W/2,d.y+12*k,'사진 '+PH.length+'장 → 상세페이지 1초 · KTS 더상세',11,500,'#6E80A3','center'); d.y+=22*k;
+    d.text(W/2,d.y+12*k,'autooneclick.com',11,700,ORANGE,'center'); d.y+=28*k;
+  }else{
+    d.text(W/2,d.y+16*k,C.brand||' ',15,800,'#FFFFFF','center'); d.y+=30*k;
+  }
+  d.bg(0,s,W,d.y-s,'#070D1E');
+
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   상품 · 브리핑용
+   ========================================================================= */
+function buildProductBrief(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos;
+  var badgeH=60*k;
+  d.bg(0,0,W,badgeH,NAVY);
+  d.led(P,badgeH/2,5*k,ORANGE);
+  d.text(P+18*k,badgeH/2+6*k,'KTS 더상세',16,800,'#FFFFFF');
+  d.text(W-P,badgeH/2+5*k,'BRIEF',11,700,'#8FA1C0','right');
+  d.rect(0,badgeH,W,3*k,ORANGE);
+  d.y=badgeH+3*k;
+
+  var p0=PH[0];
+  if(p0){ var h=W/(p0.ar||1); h=Math.max(Math.min(h,400*k),300*k); d.img(0,d.y,W,h,p0.img); d.y+=h; }
+
+  var s=d.y;
+  d.y+=28*k;
+  d.eyebrow('PRODUCT BRIEF');
+  d.y+=2*k;
+  wrapText(C.title,d.F(29,800),CW).forEach(function(ln){ d.line1(ln,29,800,'#FFFFFF'); });
+  d.y+=6*k;
+  if(C.hook) d.para(C.hook,{size:17,weight:700,color:'#FFC79B',lh:1.5,mb:0});
+  if(C.mainKw) d.text(P,d.y+12*k,'#'+C.mainKw.replace(/\s+/g,''),12,700,'#8FA1C0');
+  d.y+=26*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  s=d.y;
+  d.y+=30*k;
+  C.points.forEach(function(p){
+    d.led(P+4*k,d.y+12*k,3.8*k,ORANGE);
+    d.para(p.text,{size:17,weight:700,color:C_INK,x:P+18*k,maxW:CW-18*k,lh:1.6,mb:8});
+  });
+  d.y+=14*k;
+  var rows=[['크기',C.specs[0]||'—'],['재질',C.specs[1]||'—'],['구성',C.specs[2]||'—'],['가격',C.specs[3]||'—']];
+  d.table(rows,{rowH:44,labelW:110*k,size:15,rowPad:11});
+  d.y+=24*k;
+  d.bg(0,s,W,d.y-s,BG_WHITE);
+
+  s=d.y;
+  d.y+=26*k;
+  if(C.price) d.line1(C.price,34,900,ORANGE);
+  C.reasons.slice(0,2).forEach(function(r){ d.bullet(r,{size:15,color:'#33415C',mb:4}); });
+  d.y+=18*k;
+  d.bg(0,s,W,d.y-s,BG_SOFT);
+
+  s=d.y;
+  d.y+=24*k;
+  var pill=C.contact?('문의 '+C.contact):'문의 남겨주시면 답 드립니다';
+  var pf=d.F(17,800), pw=Math.min(CW,tw(pill,pf)+54*k), phh=54*k;
+  d.rect(P,d.y,pw,phh,ORANGE,12*k);
+  d.text(P+pw/2,d.y+phh/2+1*k,pill,17,800,'#12151C','center','middle');
+  d.y+=phh+18*k;
+  if(C.mark) d.text(W-P,d.y+10*k,C.brand,11,600,'#6E80A3','right');
+  d.y+=22*k;
+  d.bg(0,s,W,d.y-s,NAVY);
+
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   상품 · 한 장 요약
+   ========================================================================= */
+function buildProductPoster(C,W){
+  var d=mkDoc(W), k=d.k, P=d.P, CW=d.CW, PH=C.photos;
+  var hh=108*k;
+  d.bg(0,0,W,hh,NAVY);
+  d.led(P,hh/2-14*k,5*k,ORANGE);
+  d.text(P+16*k,hh/2-2*k,(C.mainKw||C.name).slice(0,26),24,800,'#FFFFFF');
+  if(C.mainKw) d.text(P+16*k,hh/2+22*k,C.name.slice(0,40),11,500,'#A9BAD6');
+  var bw=Math.min(CW*0.34,260*k), bx=W-P-bw, by=14*k, bh=hh-28*k;
+  d.rect(bx,by,bw,bh,ORANGE,10*k);
+  d.text(bx+bw/2,by+30*k,C.price||'가격 문의',18,900,'#12151C','center');
+  d.text(bx+bw/2,by+bh-16*k,'문의 '+(C.contact||'판매자'),9.5,700,'#4A2300','center');
+  d.y=hh+10*k;
+
+  var p0=PH[0];
+  if(p0){
+    var h=Math.min(340*k,W/(p0.ar||1)); h=Math.max(h,260*k);
+    d.img(P,d.y,CW,h,p0.img);
+    d.y+=h+12*k;
+  }
+  d.text(P,d.y+18*k,C.title.slice(0,34),19,800,NAVY);
+  d.y+=30*k;
+  if(C.hook) d.para(C.hook,{size:14,weight:700,color:'#4A5872',lh:1.5,mb:6});
+  d.y+=4*k;
+  C.points.slice(0,3).forEach(function(p,i){
+    d.rect(P,d.y,CW,0,0);
+    d.text(P+2*k,d.y+14*k,p.no,12,900,ORANGE);
+    d.para(p.text,{size:14,weight:700,x:P+28*k,maxW:CW-28*k,color:C_INK,lh:1.5,mb:6});
+  });
+  d.y+=6*k;
+  var specs=[['크기',C.specs[0]],['재질',C.specs[1]],['구성',C.specs[2]]].filter(function(r){return r[1];});
+  var gap=8*k, cw=(CW-gap)/2;
+  specs.forEach(function(r,i){
+    var x=P+(i%2)*(cw+gap), y=d.y+Math.floor(i/2)*(46*k);
+    d.rect(x,y,cw,40*k,'#F4F6FA',8*k);
+    d.text(x+10*k,y+13*k,r[0],9.5,700,'#8A97AD');
+    d.text(x+10*k,y+30*k,r[1].slice(0,22),12.5,700,C_INK);
+  });
+  d.y+=Math.ceil(specs.length/2)*46*k+16*k;
+  if(C.trust&&C.trust.length){
+    d.para(C.trust[0],{size:12.5,color:C_MUT,mb:4});
+    d.y+=4*k;
+  }
+  d.rect(0,d.y,W,1*k,'#E6EAF2');
+  d.y+=10*k;
+  var band=d.y;
+  d.rect(0,band,W,34*k,NAVY);
+  d.text(W/2,band+17*k,'KTS 더상세 · autooneclick.com',10,700,'#DCE6F6','center','middle');
+  d.y=band+34*k;
+  return {blocks:d.blocks,W:W,H:Math.ceil(d.y)};
+}
+
+/* =========================================================================
+   그리기
+   ========================================================================= */
 function roundRect(ctx,x,y,w,h,r){
   r=Math.min(r,w/2,h/2);
   ctx.beginPath();
@@ -855,22 +2065,11 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
   ctx.closePath();
 }
-
 function drawCover(ctx,im,x,y,w,h){
   var ir=im.width/im.height, br=w/h, sx,sy,sw,sh;
   if(ir>br){ sh=im.height; sw=sh*br; sx=(im.width-sw)/2; sy=0; }
   else { sw=im.width; sh=sw/br; sx=0; sy=(im.height-sh)/2; }
   ctx.drawImage(im,sx,sy,sw,sh,x,y,w,h);
-}
-
-function paint(cv,L){
-  var ctx=cv.getContext('2d');
-  cv.width=L.W; cv.height=L.H;
-  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,L.W,L.H);
-  ctx.textBaseline='alphabetic';
-  var i,b;
-  for(i=0;i<L.blocks.length;i++){ b=L.blocks[i]; if(!b.bg) continue; drawBlock(ctx,b); }
-  for(i=0;i<L.blocks.length;i++){ b=L.blocks[i]; if(b.bg) continue; drawBlock(ctx,b); }
 }
 function drawBlock(ctx,b){
   if(b.t==='rect'){
@@ -880,7 +2079,7 @@ function drawBlock(ctx,b){
     return;
   }
   if(b.t==='stroke'){
-    ctx.strokeStyle=b.fill; ctx.lineWidth=Math.max(1,b.h*0.02);
+    ctx.strokeStyle=b.fill; ctx.lineWidth=Math.max(1,b.h*0.012);
     roundRect(ctx,b.x,b.y,b.w,b.h,b.r); ctx.stroke();
     return;
   }
@@ -890,10 +2089,8 @@ function drawBlock(ctx,b){
   }
   if(b.t==='image'){
     var im=b.img; if(!im||!im.width) return;
-    ctx.save();
-    roundRect(ctx,b.x,b.y,b.w,b.h,0); ctx.clip();
-    drawCover(ctx,im,b.x,b.y,b.w,b.h);
-    ctx.restore();
+    ctx.save(); roundRect(ctx,b.x,b.y,b.w,b.h,0); ctx.clip();
+    drawCover(ctx,im,b.x,b.y,b.w,b.h); ctx.restore();
     return;
   }
   if(b.t==='text'){
@@ -904,466 +2101,642 @@ function drawBlock(ctx,b){
     return;
   }
   if(b.t==='spaced'){
-    ctx.font=b.font; ctx.fillStyle=b.fill; ctx.textAlign='left';
+    ctx.font=b.font; ctx.fillStyle=b.fill; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     var x=b.x;
     for(var i=0;i<b.text.length;i++){
       var ch=b.text[i]; ctx.fillText(ch,x,b.y);
       x+=ctx.measureText(ch).width+b.sp;
     }
-    return;
   }
+}
+function paint(cv,L){
+  var ctx=cv.getContext('2d');
+  cv.width=L.W; cv.height=L.H;
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,L.W,L.H);
+  ctx.textBaseline='alphabetic';
+  var i,b;
+  for(i=0;i<L.blocks.length;i++){ b=L.blocks[i]; if(b.bg) drawBlock(ctx,b); }
+  for(i=0;i<L.blocks.length;i++){ b=L.blocks[i]; if(!b.bg) drawBlock(ctx,b); }
 }
 
 /* =========================================================================
-   부동산 매물용 레이아웃 (2026-11-19 · 적립메모 85번)
-   5대 사진 · 소재지 · 매매/교환가 · 실투자금 · 권리분석 3줄 · 문의 전화가
-   들어간 세로 매물 브리핑 1장.  쇼핑몰용 buildLayout 은 그대로 둡니다.
+   PDF (A4 쪽 나눠 담기 · JPEG DCTDecode)
    ========================================================================= */
-function buildEstateLayout(C,W){
-  var k=W/780;
-  var P=44*k, CW=W-2*P;
-  var F=function(s,w){ return fnt(s,w,k); };
-  var blocks=[], y=0;
-  var PH=S.photos;
+function pad(n){ return (n<10?'0':'')+n; }
+function binFromDataURL(url){
+  var b64=url.split(',')[1]||'', bin=atob(b64), n=bin.length, out=new Uint8Array(n);
+  for(var i=0;i<n;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+function encodeStr(s){ return new TextEncoder().encode(s); }
 
-  function bg(x,yy,w,h,fill,r){ blocks.push({t:'rect',bg:true,x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
-  function rect(x,yy,w,h,fill,r){ blocks.push({t:'rect',x:x,y:yy,w:w,h:h,fill:fill,r:r||0}); }
-  function text(x,yy,s,size,weight,fill,align,maxW,base){
-    blocks.push({t:'text',x:x,y:yy,text:s,font:F(size,weight),fill:fill,align:align||'left',maxW:maxW||0,base:base||'alphabetic'});
-  }
-  function img(x,yy,w,h,im,crop){ blocks.push({t:'image',x:x,y:yy,w:w,h:h,img:im,crop:crop===false?false:true}); }
-  function led(x,yy,r,fill){ blocks.push({t:'led',x:x,yy:yy,r:r,fill:fill}); }
-  function spaced(x,yy,s,size,fill,sp){ blocks.push({t:'spaced',x:x,y:yy,text:s,font:F(size,800),fill:fill,sp:sp*k}); }
-  function line(x,yy,w,h,fill){ blocks.push({t:'rect',x:x,yy:yy,w:w,h:h,fill:fill}); }
-
-  /* ---- 0. 상단 띠 ---- */
-  var badgeH=76*k;
-  bg(0,0,W,badgeH,NAVY);
-  led(P,badgeH/2,5*k,ORANGE);
-  text(P+18*k,badgeH/2,'KTS 매물 브리핑',19,800,'#FFFFFF','left');
-  text(W-P,badgeH/2,'PROPERTY BRIEF',13,600,'#8FA1C0','right');
-  rect(0,badgeH,W,3*k,ORANGE);
-  y=badgeH+3*k;
-
-  /* ---- 1. 대표 사진(외경) + 역할 태그 ---- */
-  var p0=PH[0];
-  if(p0){
-    var ph=W/(p0.ar||1);
-    ph=Math.max(Math.min(ph,820*k),420*k);
-    img(0,y,W,ph,p0.img,true);
-    var tag=p0.role||'외경';
-    var tf=F(15,800), twd=tw(tag,tf)+28*k;
-    rect(P,y+22*k,twd,36*k,'rgba(10,17,40,.8)',8*k);
-    text(P+14*k,y+22*k+18*k,tag,15,800,'#FFFFFF');
-    y+=ph;
-  }
-
-  /* ---- 2. 매물명 · 소재지 ---- */
-  var titleFont=F(43,800), titleLH=43*1.32*k;
-  var hookFont=F(22,400), hookLH=22*1.62*k;
-  var addrFont=F(20,700), addrLH=20*1.6*k;
-  var tLines=wrapText(C.title,titleFont,CW);
-  var hLines=C.hook?wrapText(C.hook,hookFont,CW):[];
-  var aLines=C.addr?wrapText(C.addr,addrFont,CW-28*k):[];
-  var tb=44*k+24*k+16*k + tLines.length*titleLH + 12*k
-        + (hLines.length?hLines.length*hookLH+12*k:0)
-        + (aLines.length?aLines.length*addrLH+18*k:0) + 40*k;
-  bg(0,y,W,tb,NAVY);
-  var ty=y+44*k;
-  spaced(P,ty,'LOCATION · PRICE · RIGHTS',12,ORANGE,2.2);
-  ty+=24*k+16*k;
-  tLines.forEach(function(ln){ text(P,ty,ln,43,800,'#FFFFFF'); ty+=titleLH; });
-  ty+=12*k;
-  hLines.forEach(function(ln){ text(P,ty,ln,22,400,'#BFCEE6'); ty+=hookLH; });
-  if(hLines.length) ty+=12*k;
-  if(aLines.length){
-    aLines.forEach(function(ln,i){
-      if(i===0){ led(P+6*k,ty-7*k,4.5*k,ORANGE); }
-      text(P+20*k,ty,ln,20,700,'#FFC79B'); ty+=addrLH;
-    });
-    ty+=18*k;
-  }
-  y+=tb;
-
-  /* ---- 3. 매매/교환가 · 실투자금 ---- */
-  var s=y;
-  y+=54*k;
-  spaced(P,y,'PRICE',13,ORANGE,2.6); y+=30*k;
-  text(P,y,'매매 · 교환가',19,700,'#5B6883'); y+=68*k;
-  var priceTxt=C.trade||'조건 협의';
-  var pf=F(50,900);
-  var pl=wrapText(priceTxt,pf,CW);
-  pl.slice(0,2).forEach(function(ln){ text(P,y,ln,50,900,ORANGE); y+=50*1.3*k; });
-  y+=14*k;
-  if(C.invest){
-    var ifont=F(21,800);
-    var il=wrapText('실투자금   '+C.invest,ifont,CW-56*k);
-    var ih=il.length*21*1.55*k+34*k;
-    rect(P,y,CW,ih,'#FFF3EA',13*k);
-    rect(P,y,6*k,ih,ORANGE,3*k);
-    var ly=y+17*k+21*1.55*k*0.72;
-    il.forEach(function(l){ text(P+26*k,ly,l,21,800,'#0A1128'); ly+=21*1.55*k; });
-    y+=ih+16*k;
-  }
-  y+=26*k;
-  bg(0,s,W,y-s,'#FFFFFF');
-
-  /* ---- 4. 권리분석 3줄 ---- */
-  if(C.rights.length){
-    s=y;
-    y+=54*k;
-    spaced(P,y,'RIGHTS',13,ORANGE,2.6); y+=30*k;
-    text(P,y,'권리분석',31,800,NAVY); y+=31*1.35*k+22*k;
-    var rf=F(21,700), rlh=21*1.55*k;
-    C.rights.forEach(function(r,i){
-      var ls=wrapText(r,rf,CW-96*k);
-      var ch=Math.max(104*k, ls.length*rlh+42*k);
-      rect(P,y,CW,ch,'#FFFFFF',16*k);
-      rect(P+20*k,y+ch/2-19*k,38*k,38*k,'#FFF0E4',10*k);
-      text(P+39*k,y+ch/2,String(i+1),16,900,ORANGE,'center',0,'middle');
-      var ly=y+ch/2-(ls.length-1)*rlh/2+rlh*0.34;
-      ls.forEach(function(l){ text(P+76*k,ly,l,21,700,'#101B33'); ly+=rlh; });
-      y+=ch+14*k;
-    });
-    y+=40*k;
-    bg(0,s,W,y-s,'#F3F5FA');
-  }
-
-  /* ---- 5. 남은 사진(도로·내부·지적도·입지) ---- */
-  for(var i=1;i<PH.length;i++){
-    var pi=PH[i];
-    var hh=W/(pi.ar||1);
-    hh=Math.max(Math.min(hh,820*k),360*k);
-    img(0,y,W,hh,pi.img,true);
-    y+=hh;
-    if(pi.role){
-      y+=28*k;
-      led(P+5*k,y-6*k,4.5*k,ORANGE);
-      text(P+20*k,y,pi.role,19,700,'#5B6883');
-      y+=19*1.4*k+8*k;
+function textBands(blocks){
+  var bands=[];
+  (blocks||[]).forEach(function(b){
+    if(b.t!=='text'&&b.t!=='spaced') return;
+    var m=String(b.font||'').match(/([0-9.]+)px/);
+    var sz=m?parseFloat(m[1]):16;
+    var mid=(b.base==='middle');
+    bands.push([b.y-sz*(mid?0.66:1.02), b.y+sz*(mid?0.66:0.34)]);
+  });
+  return bands;
+}
+function pickCuts(H,target,bands){
+  /* 글자 줄을 피해 자른다 — 줄 사이 빈 틈을 후보로 모은다 */
+  var bs=(bands||[]).slice().sort(function(a,b){return a[0]-b[0];});
+  var gaps=[], prevEnd=-1;
+  bs.forEach(function(b){
+    if(prevEnd<0) gaps.push(Math.max(0,b[0]-8));
+    else if(b[0]>prevEnd) gaps.push((prevEnd+b[0])/2);
+    prevEnd=Math.max(prevEnd,b[1]);
+  });
+  gaps.push(H);
+  var cuts=[], y=0, guard=0;
+  while(H-y>target*1.02 && guard++<80){
+    var want=y+target, best=null, bestd=1e9;
+    for(var i=0;i<gaps.length;i++){
+      var g=gaps[i];
+      if(g<=y+target*0.55) continue;
+      var dd=Math.abs(g-want);
+      if(dd<bestd){ bestd=dd; best=g; }
+      if(g>want+320) break;
     }
+    if(best==null || bestd>320 || best<=y) best=Math.min(H,y+target);
+    cuts.push(best); y=best;
   }
-  y+=14*k;
-
-  /* ---- 6. 매물 정보 표 ---- */
-  var rows=[];
-  if(C.addr) rows.push(['소재지',C.addr]);
-  if(S.specs[0]) rows.push(['면적',S.specs[0]]);
-  if(S.specs[1]) rows.push(['용도',S.specs[1]]);
-  if(S.specs[2]) rows.push(['구조',S.specs[2]]);
-  if(C.trade) rows.push(['매매/교환가',C.trade]);
-  if(C.invest) rows.push(['실투자금',C.invest]);
-  if(rows.length){
-    s=y;
-    y+=52*k;
-    spaced(P,y,'SPEC',13,ORANGE,2.6); y+=30*k;
-    text(P,y,'매물 정보',31,800,NAVY); y+=31*1.35*k+24*k;
-    var rowH=0;
-    rows.forEach(function(r,idx){
-      var vf=F(18,600), maxW=CW-210*k;
-      var ls=wrapText(r[1],vf,maxW);
-      var rh=Math.max(62*k, ls.length*18*1.55*k+34*k);
-      rect(P,y,CW,rh,(idx%2===0)?'#FFFFFF':'#F6F8FC',idx===rows.length-1?12*k:0);
-      if(idx>0) line(P,y,CW,1*k,'#E6EAF2');
-      text(P+24*k,y+rh/2,r[0],17,700,'#67758F','left',0,'middle');
-      var ly=y+rh/2-(ls.length-1)*18*1.55*k/2;
-      ls.forEach(function(l){ text(P+170*k,ly,l,18,600,'#0A1128','left',0,'middle'); ly+=18*1.55*k; });
-      y+=rh;
-    });
-    line(P,y,CW,1*k,'#E3E8F1');
-    y+=44*k;
-    bg(0,s,W,y-s,'#FFFFFF');
-  }
-
-  /* ---- 7. 문의 · 전화 버튼 ---- */
-  s=y;
-  y+=56*k;
-  var ct=wrapText('현장 확인 · 권리관계 확인 후 진행합니다',F(19,500),CW-40*k);
-  ct.forEach(function(l){ text(W/2,y,l,19,500,'#A9BAD6','center'); y+=19*1.7*k; });
-  y+=26*k;
-  if(C.phone){
-    var ptxt='전화 문의   '+C.phone;
-    var pfont=F(22,900), pw=Math.min(CW,tw(ptxt,pfont)+68*k), phh=72*k;
-    rect(W/2-pw/2,y,pw,phh,ORANGE,14*k);
-    text(W/2,y+phh/2,ptxt,22,900,'#12151C','center',0,'middle');
-    y+=phh+24*k;
-  } else {
-    text(W/2,y,'문의 번호를 넣으면 여기에 전화 버튼이 생깁니다',18,600,'#6E80A3','center'); y+=18*1.7*k;
-  }
-  if(C.contact && C.contact!==C.brand){ text(W/2,y,C.contact,17,600,'#A9BAD6','center'); y+=17*1.7*k; }
-  y+=40*k;
-  bg(0,s,W,y-s,NAVY2);
-
-  /* ---- 8. 푸터 ---- */
-  s=y;
-  y+=36*k;
-  if(C.mark){
-    text(W/2,y,C.brand||'KTS 더상세',19,800,'#FFFFFF','center'); y+=32*k;
-    text(W/2,y,'부동산 매물 브리핑 · 사진 '+PH.length+'장 → 1초 · KTS 더상세',14,500,'#6E80A3','center'); y+=26*k;
-    text(W/2,y,'autooneclick.com',14,700,ORANGE,'center'); y+=40*k;
-  } else {
-    text(W/2,y,C.brand||' ',19,800,'#FFFFFF','center'); y+=32*k;
-    if(C.contact){ text(W/2,y,C.contact,14,500,'#6E80A3','center'); y+=26*k; }
-    y+=36*k;
-  }
-  bg(0,s,W,y-s,'#070D1E');
-
-  return {blocks:blocks,W:W,H:Math.ceil(y)};
+  cuts.push(H);
+  return cuts;
 }
 
-/* ---------------- 생성 ---------------- */
+function buildPDF(cv,blocks){
+  var PW=595.28, PH=841.89;
+  var sliceH=Math.round(cv.width*PH/PW);
+  if(cv.height<=sliceH*1.12){
+    /* 한 장(포스터·브리핑)은 A4 한 쪽에 통째로 앉힌다 */
+    var one=document.createElement('canvas'), octx=one.getContext('2d');
+    var sc=Math.min(PW/cv.width, PH/cv.height), w=cv.width*sc, h=cv.height*sc;
+    one.width=Math.round(cv.width*sc); one.height=Math.round(cv.height*sc);
+    octx.fillStyle='#FFFFFF'; octx.fillRect(0,0,one.width,one.height);
+    octx.imageSmoothingQuality='high';
+    octx.drawImage(cv,0,0,one.width,one.height);
+    var jpgOne=binFromDataURL(one.toDataURL('image/jpeg',0.94));
+    var objs1=[null,'<</Type/Catalog/Pages 2 0 R>>','<</Type/Pages/Kids[3 0 R]/Count 1>>',
+      '<</Type/Page/Parent 2 0 R/MediaBox[0 0 '+PW.toFixed(2)+' '+PH.toFixed(2)+']/Resources<</XObject<</Im0 5 0 R>>>>/Contents 4 0 R>>',
+      null, null];
+    var dx=(PW-w)/2, dy=(PH-h)/2;
+    var cont='q\n'+w.toFixed(2)+' 0 0 '+h.toFixed(2)+' '+dx.toFixed(2)+' '+dy.toFixed(2)+' cm\n/Im0 Do\nQ\n';
+    objs1[4]={raw:encodeStr('<< /Length '+cont.length+' >>\nstream\n'+cont+'endstream')};
+    objs1[5]={raw:jpgOne,dict:'<</Type/XObject/Subtype/Image/Width '+one.width+'/Height '+one.height+
+      '/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length '+jpgOne.length+'>>'};
+    return {blob:pdfSerialize(objs1),pages:1};
+  }
+  var images=[], y=0;
+  var cuts=pickCuts(cv.height,sliceH,textBands(blocks));
+  var tmp=document.createElement('canvas'), tctx=tmp.getContext('2d');
+  cuts.forEach(function(cut){
+    var h=Math.min(sliceH,cut-y);
+    if(h<=0) return;
+    tmp.width=cv.width; tmp.height=sliceH;
+    tctx.fillStyle='#FFFFFF'; tctx.fillRect(0,0,tmp.width,tmp.height);
+    tctx.drawImage(cv,0,y,cv.width,h,0,0,cv.width,h);
+    var jpg=binFromDataURL(tmp.toDataURL('image/jpeg',0.92));
+    images.push({data:jpg,w:cv.width,h:sliceH,drawH:h});
+    y=cut;
+  });
+  var objs=[]; // 1-based
+  var pagesId=[];
+  objs.push(null); // 0
+  objs.push('<</Type/Catalog/Pages 2 0 R>>');
+  // object 2 = pages, filled later
+  objs.push(null);
+  var kids=[];
+  images.forEach(function(img,i){
+    var pageNo=objs.length; objs.push(null); // page
+    var contNo=objs.length; objs.push(null); // contents
+    var imgNo=objs.length; objs.push(null); // image
+    var ph=img.drawH*cv.width?0:0;
+    var imgH=img.h*(PW/img.w); // full slice height in points
+    var drawHpt=img.drawH*(PW/img.w);
+    var content='q\n'+PW.toFixed(2)+' 0 0 '+imgH.toFixed(2)+' 0 '+(PH-imgH).toFixed(2)+' cm\n/Im0 Do\nQ\n';
+    objs[contNo]={raw:encodeStr('<< /Length '+content.length+' >>\nstream\n'+content+'endstream')};
+    objs[imgNo]={raw:img.data, dict:'<</Type/XObject/Subtype/Image/Width '+img.w+'/Height '+img.h+
+      '/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length '+img.data.length+'>>'};
+    objs[pageNo]='<</Type/Page/Parent 2 0 R/MediaBox[0 0 '+PW.toFixed(2)+' '+PH.toFixed(2)+
+      ']/Resources<</XObject<</Im0 '+imgNo+' 0 R>>>>/Contents '+contNo+' 0 R>>';
+    kids.push(pageNo+' 0 R');
+  });
+  objs[2]='<</Type/Pages/Kids['+kids.join(' ')+']/Count '+kids.length+'>>';
+
+  return {blob:pdfSerialize(objs),pages:images.length};
+}
+
+function pdfSerialize(objs){
+  var parts=[], offset=0;
+  function push(u8){ parts.push(u8); offset+=u8.length; }
+  function pushStr(str){ push(encodeStr(str)); }
+  pushStr('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  var offsets=[];
+  for(var i=1;i<objs.length;i++){
+    var o=objs[i]; if(o==null) continue;
+    offsets[i]=offset;
+    if(typeof o==='string'){ pushStr(i+' 0 obj\n'+o+'\nendobj\n'); }
+    else if(o.raw && !o.dict){
+      pushStr(i+' 0 obj\n'); push(o.raw); pushStr('\nendobj\n');
+    }else{
+      pushStr(i+' 0 obj\n'+o.dict+'\nstream\n'); push(o.raw); pushStr('\nendstream\nendobj\n');
+    }
+  }
+  var xref=offset;
+  var x='xref\n0 '+objs.length+'\n0000000000 65535 f \n';
+  for(var j=1;j<objs.length;j++){
+    var off=offsets[j]||0;
+    x+=('0000000000'+off).slice(-10)+' 00000 n \n';
+  }
+  x+='trailer\n<</Size '+objs.length+'/Root 1 0 R>>\nstartxref\n'+xref+'\n%%EOF\n';
+  pushStr(x);
+  var total=0; parts.forEach(function(pt){ total+=pt.length; });
+  var all=new Uint8Array(total), pos=0;
+  parts.forEach(function(pt){ all.set(pt,pos); pos+=pt.length; });
+  return new Blob([all],{type:'application/pdf'});
+}
+
+/* =========================================================================
+   생성
+   ========================================================================= */
 var OUT=null, LAST=null;
+var OUT_LABEL={full:'전체 3p+',brief:'브리핑용',poster:'한 장 요약'};
+
+function buildLayout(C,W){
+  if(S.mode==='estate'){
+    if(S.out==='poster') return buildEstatePoster(C,W);
+    if(S.out==='brief') return buildEstateBrief(C,W);
+    return buildEstateFull(C,W);
+  }
+  if(S.out==='poster') return buildProductPoster(C,W);
+  if(S.out==='brief') return buildProductBrief(C,W);
+  return buildProductFull(C,W);
+}
+
 function generate(){
   var t0=performance.now();
   var C=buildCopy();
-  var L=(S.mode==='estate')?buildEstateLayout(C,S.width):buildLayout(C,S.width);
+  var W=S.width||780;
+  var L=buildLayout(C,W);
   var cv=$('out');
   paint(cv,L);
   OUT={canvas:cv,C:C,L:L};
   LAST={C:C,L:L};
   var ms=performance.now()-t0;
-  return {ms:ms,W:L.W,H:L.H};
+  return {ms:ms,W:L.W,H:L.H,pages:L.H/(L.W*297/210)};
 }
 
-/* ---------------- 파일 저장 ---------------- */
+/* =========================================================================
+   파일 저장
+   ========================================================================= */
+function safeName(){
+  return (S.mode==='estate'? (nz(S.name)||nz(S.addr)||'매물') : (nz(S.name)||'상세페이지'))
+    .replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,'_').slice(0,34);
+}
 function fileName(ext){
-  var base=(S.name||'상세페이지').replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,'_').slice(0,40);
-  var d=new Date(), p=function(n){return (n<10?'0':'')+n;};
-  return 'KTS_더상세_'+base+'_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.'+ext;
+  var d=new Date();
+  return 'KTS_더상세_'+safeName()+'_'+OUT_LABEL[S.out]+'_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.'+ext;
+}
+function dl(blob,name){
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1500);
 }
 function save(kind){
   if(!OUT) return;
+  if(kind==='pdf'){
+    toast('PDF 만드는 중…');
+    setTimeout(function(){
+      try{
+        var r=buildPDF(OUT.canvas, OUT.L&&OUT.L.blocks);
+        dl(r.blob,fileName('pdf'));
+        toast('PDF 저장 · '+r.pages+'쪽');
+      }catch(e){ toast('PDF 저장에 실패했습니다: '+e.message,true); }
+    },60);
+    return;
+  }
   var mime=kind==='jpg'?'image/jpeg':'image/png';
   OUT.canvas.toBlob(function(blob){
     if(!blob){ toast('저장에 실패했습니다. 다시 시도해 주세요.',true); return; }
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url; a.download=fileName(kind); document.body.appendChild(a); a.click();
-    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1200);
+    dl(blob,fileName(kind));
     toast(kind.toUpperCase()+' 저장했습니다 · '+(blob.size/1048576).toFixed(1)+'MB');
   },mime, kind==='jpg'?0.94:undefined);
 }
 
-/* ---------------- HTML 코드 ---------------- */
+/* =========================================================================
+   HTML 코드 (스마트스토어·블로그 붙여넣기)
+   ========================================================================= */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function hList(arr,cls){ return arr.map(function(t){ return '    <p>'+esc(t)+'</p>'; }).join('\n'); }
+
+var ESTATE_CSS=[
+'.kts-prop{max-width:780px;margin:0 auto;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#0A1128;line-height:1.7;word-break:keep-all;background:#fff}',
+'.kts-prop img{width:100%;display:block}',
+'.kp-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 24px;background:#0A1128;color:#fff;font-size:14px;font-weight:800;border-bottom:3px solid #FF6B00}',
+'.kp-top em{font-style:normal;font-size:11px;letter-spacing:.2em;color:#8FA1C0}',
+'.kp-hero{position:relative;margin:0}',
+'.kp-hero figcaption{position:absolute;left:24px;top:18px;background:rgba(10,17,40,.8);color:#fff;font-size:12px;font-weight:800;border-radius:8px;padding:6px 12px}',
+'.kp-head{background:#0A1128;color:#fff;padding:32px 24px 36px}',
+'.kp-k{display:block;font-size:11px;letter-spacing:.22em;font-weight:800;color:#FF6B00;margin-bottom:10px}',
+'.kp-head h1{font-size:27px;line-height:1.32;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}',
+'.kp-hook{margin:0;font-size:15px;color:#BFCEE6}',
+'.kp-addr{margin:12px 0 0;font-size:14px;font-weight:700;color:#FFC79B}',
+'.kts-prop section{margin:0;padding:34px 24px 38px}',
+'.kts-prop h2{font-size:21px;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}',
+'.kts-prop p{margin:0 0 12px;font-size:15px;color:#3D4A63}',
+'.kp-fact{background:#fff}',
+'.kp-fact table,.kp-income table,.kp-spec table{width:100%;border-collapse:collapse;margin:0 0 8px}',
+'.kts-prop th{background:#F6F8FC;color:#67758F;font-size:13px;font-weight:700;text-align:left;padding:13px 14px;width:34%;border-bottom:1px solid #E3E8F1;vertical-align:middle}',
+'.kts-prop td{color:#0A1128;font-size:14px;font-weight:600;padding:13px 14px;border-bottom:1px solid #E3E8F1}',
+'.kp-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px}',
+'.kp-kpi div{background:#F6F8FC;border-top:3px solid #FF6B00;border-radius:10px;padding:12px}',
+'.kp-kpi b{display:block;font-size:10px;color:#7A879C;font-weight:700;margin-bottom:4px}',
+'.kp-kpi span{font-size:15px;font-weight:800;color:#0A1128}',
+'.kp-price{background:#F4F6FA}',
+'.kp-income{background:#fff}',
+'.kp-rights{background:#F4F6FA}',
+'.kp-rights article{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:10px}',
+'.kp-rights article b{display:block;font-size:15px;font-weight:800;color:#0A1128;margin-bottom:6px}',
+'.kp-rights article span{font-size:14px;color:#4A5872}',
+'.kp-check{margin:16px 0 0;padding:0;list-style:none;counter-reset:c}',
+'.kp-check li{position:relative;padding-left:28px;font-size:14px;color:#4A5872;margin-bottom:8px;counter-increment:c}',
+'.kp-check li:before{content:counter(c);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:6px;background:#FFF0E4;color:#FF6B00;font-size:11px;font-weight:900;text-align:center;line-height:20px}',
+'.kp-loc{background:#fff}',
+'.kp-loc h3{margin:18px 0 6px;font-size:16px;font-weight:800;color:#FF6B00}',
+'.kp-loc ul{margin:8px 0 0;padding-left:18px;color:#4A5872;font-size:14px}',
+'.kp-market{background:#F4F6FA}',
+'.kp-site{background:#fff;padding:0!important}',
+'.kp-site figure{margin:0}',
+'.kp-site figcaption{padding:12px 24px 22px;font-size:14px;color:#5B6883}',
+'.kp-site figcaption b{display:block;font-size:12px;color:#FF6B00;font-weight:800;margin-bottom:4px}',
+'.kp-map{background:#111B36;color:#fff}',
+'.kp-map h2{color:#fff}',
+'.kp-map a{color:#FFB27A;font-size:14px;font-weight:700;text-decoration:none;display:block;margin-bottom:8px}',
+'.kp-map p{color:#8FA1C0;font-size:13px}',
+'.kp-cta{background:#111B36;color:#fff;text-align:center}',
+'.kp-cta p{color:#A9BAD6}',
+'.kp-tel{display:inline-block;background:#FF6B00;color:#12151C;font-size:16px;font-weight:900;text-decoration:none;border-radius:999px;padding:15px 30px;margin:6px 0 10px}',
+'.kp-foot{background:#070D1E;color:#6E80A3;text-align:center;padding:22px 24px 28px;font-size:12px}',
+'.kp-foot b{display:block;color:#fff;font-size:13px;margin-bottom:5px}',
+'@media(max-width:480px){.kts-prop section{padding:26px 18px 30px}.kp-head{padding:24px 18px 28px}.kp-head h1{font-size:22px}.kp-kpi{grid-template-columns:1fr 1fr}}'
+].join('\n');
+
 function buildEstateHTML(C){
-  var photos=S.photos;
   var tel=String(C.phone||'').replace(/[^0-9+]/g,'');
   var h=[];
-  h.push('<!-- KTS 더상세 · 부동산 매물 브리핑 · '+new Date().toLocaleString('ko-KR')+' -->');
-  h.push('<div class="kts-prop">');
-  h.push('  <div class="kp-top"><span>KTS 매물 브리핑</span><em>PROPERTY BRIEF</em></div>');
-  if(photos[0]){
-    h.push('  <figure class="kp-hero"><img src="'+photos[0].url+'" alt="'+esc(C.name)+'"><figcaption>'+esc(photos[0].role||'외경')+'</figcaption></figure>');
-  }
+  h.push('<!-- KTS 더상세 v2.0 · 부동산 매물 브리핑 · '+new Date().toLocaleString('ko-KR')+' -->');
+  h.push('<article class="kts-prop">');
+  h.push('  <header class="kp-top"><span>KTS 매물 브리핑</span><em>PROPERTY BRIEF</em></header>');
+  if(C.photos[0]) h.push('  <figure class="kp-hero"><img src="'+C.photos[0].img.src+'" alt="'+esc(C.name+' '+C.addr+' '+C.photos[0].role)+'"><figcaption>'+esc(C.photos[0].role)+'</figcaption></figure>');
   h.push('  <section class="kp-head"><span class="kp-k">LOCATION · PRICE · RIGHTS</span>');
   h.push('    <h1>'+esc(C.title)+'</h1>');
   if(C.hook) h.push('    <p class="kp-hook">'+esc(C.hook)+'</p>');
   if(C.addr) h.push('    <p class="kp-addr">'+esc(C.addr)+'</p>');
   h.push('  </section>');
-  h.push('  <section class="kp-price"><span class="kp-k">PRICE</span><b>'+esc(C.trade||'조건 협의')+'</b>');
-  if(C.invest) h.push('    <p class="kp-invest">실투자금 <strong>'+esc(C.invest)+'</strong></p>');
-  h.push('  </section>');
-  if(C.rights.length){
-    h.push('  <section class="kp-rights"><span class="kp-k">RIGHTS</span><h2>권리분석</h2><ol>');
-    C.rights.forEach(function(r,i){ h.push('    <li><b>'+('0'+(i+1)).slice(-2)+'</b><span>'+esc(r)+'</span></li>'); });
-    h.push('  </ol></section>');
-  }
-  photos.slice(1).forEach(function(p){
-    h.push('  <figure class="kp-fig"><img src="'+p.url+'" alt=""><figcaption>'+esc(p.role||'')+'</figcaption></figure>');
-  });
-  var rows=[];
-  if(C.addr) rows.push(['소재지',C.addr]);
-  if(S.specs[0]) rows.push(['면적',S.specs[0]]);
-  if(S.specs[1]) rows.push(['용도',S.specs[1]]);
-  if(S.specs[2]) rows.push(['구조',S.specs[2]]);
-  if(C.trade) rows.push(['매매/교환가',C.trade]);
-  if(C.invest) rows.push(['실투자금',C.invest]);
-  if(rows.length){
-    h.push('  <section class="kp-spec"><span class="kp-k">SPEC</span><h2>매물 정보</h2><table>');
-    rows.forEach(function(r){ h.push('    <tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'); });
-    h.push('  </table></section>');
-  }
-  h.push('  <section class="kp-cta"><p>현장 확인 · 권리관계 확인 후 진행합니다</p>');
-  if(tel) h.push('    <a class="kp-tel" href="tel:'+tel+'">전화 문의 '+esc(C.phone)+'</a>');
-  if(C.contact) h.push('    <p class="kp-contact">'+esc(C.contact)+'</p>');
-  h.push('  </section>');
-  h.push('  <footer class="kp-foot">'+(C.mark?('<b>'+esc(C.brand||'KTS 더상세')+'</b><span>부동산 매물 브리핑 · 사진 '+photos.length+'장 · KTS 더상세</span>'):('<b>'+esc(C.brand||' ')+'</b>'))+'</footer>');
-  h.push('</div>');
-  h.push('<style>');
-  h.push('.kts-prop{max-width:780px;margin:0 auto;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#0A1128;line-height:1.6;word-break:keep-all;background:#fff}');
-  h.push('.kts-prop img{width:100%;display:block}');
-  h.push('.kp-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:20px 24px;background:#0A1128;color:#fff;font-size:14px;font-weight:800;border-bottom:3px solid #FF6B00}');
-  h.push('.kp-top em{font-style:normal;font-size:11px;letter-spacing:.2em;color:#8FA1C0}');
-  h.push('.kp-hero{position:relative;margin:0}');
-  h.push('.kp-hero figcaption{position:absolute;left:24px;top:20px;background:rgba(10,17,40,.8);color:#fff;font-size:12px;font-weight:800;border-radius:8px;padding:6px 12px}');
-  h.push('.kp-head{background:#0A1128;color:#fff;padding:34px 24px 38px}');
-  h.push('.kp-k{display:block;font-size:11px;letter-spacing:.22em;font-weight:800;color:#FF6B00}');
-  h.push('.kp-head h1{font-size:27px;line-height:1.32;margin:12px 0 8px;font-weight:800;letter-spacing:-.02em}');
-  h.push('.kp-hook{margin:0;font-size:14px;color:#BFCEE6}');
-  h.push('.kp-addr{margin:12px 0 0;font-size:14px;font-weight:700;color:#FFC79B}');
-  h.push('.kp-price{background:#fff;padding:34px 24px 40px}');
-  h.push('.kp-price b{display:block;font-size:32px;color:#FF6B00;font-weight:900;margin:8px 0 0;letter-spacing:-.02em}');
-  h.push('.kp-invest{margin:16px 0 0;background:#FFF3EA;border-left:6px solid #FF6B00;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:800}');
-  h.push('.kp-invest strong{color:#0A1128;margin-left:8px}');
-  h.push('.kp-rights{background:#F3F5FA;padding:34px 24px 40px}');
-  h.push('.kp-rights h2,.kp-spec h2{font-size:21px;margin:10px 0 16px;font-weight:800;letter-spacing:-.02em}');
-  h.push('.kp-rights ol{list-style:none;margin:0;padding:0}');
-  h.push('.kp-rights li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:16px;margin-bottom:10px}');
-  h.push('.kp-rights li b{color:#FF6B00;font-size:13px;background:#FFF0E4;border-radius:9px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}');
-  h.push('.kp-rights li span{font-size:15px;font-weight:700;color:#101B33}');
-  h.push('.kp-fig{margin:0;position:relative}');
-  h.push('.kp-fig figcaption{padding:10px 24px;font-size:12px;font-weight:700;color:#5B6883}');
-  h.push('.kp-spec{padding:34px 24px 40px}');
-  h.push('.kp-spec table{width:100%;border-collapse:collapse}');
-  h.push('.kp-spec th{background:#F6F8FC;color:#67758F;font-size:13px;font-weight:700;text-align:left;padding:14px 16px;width:34%;border-bottom:1px solid #E3E8F1}');
-  h.push('.kp-spec td{color:#0A1128;font-size:14px;font-weight:600;padding:14px 16px;border-bottom:1px solid #E3E8F1}');
-  h.push('.kp-cta{background:#111B36;color:#fff;text-align:center;padding:34px 24px 40px}');
-  h.push('.kp-cta p{margin:0 0 16px;font-size:14px;color:#A9BAD6}');
-  h.push('.kp-tel{display:inline-block;background:#FF6B00;color:#12151C;font-size:16px;font-weight:900;text-decoration:none;border-radius:999px;padding:16px 30px}');
-  h.push('.kp-contact{margin:14px 0 0;font-size:13px;color:#A9BAD6}');
-  h.push('.kp-foot{background:#070D1E;color:#6E80A3;text-align:center;padding:26px 24px 32px;font-size:12px}');
-  h.push('.kp-foot b{display:block;color:#fff;font-size:14px;margin-bottom:6px}');
-  h.push('.kp-foot span{display:block}');
-  h.push('@media(max-width:480px){.kp-head{padding:26px 18px 30px}.kp-head h1{font-size:22px}.kp-price,.kp-rights,.kp-spec,.kp-cta{padding-left:18px;padding-right:18px}}');
-  h.push('</style>');
-  return h.join('\n');
-}
-
-function buildHTML(){
-  var C=LAST?LAST.C:buildCopy();
-  var photos=S.photos;
-  var isE=C.isE;
-  if(isE) return buildEstateHTML(C);
-  var h=[];
-  h.push('<!-- KTS 더상세 v1.0 · '+new Date().toLocaleString('ko-KR')+' -->');
-  h.push('<div class="kts-detail">');
-  h.push('  <div class="kts-hero">');
-  h.push('    <img src="'+photos[0].url+'" alt="'+esc(C.name)+'">');
-  h.push('    <div class="kts-hb"><span>'+esc(isE?'PROPERTY BRIEF':'PRODUCT DETAIL')+'</span>');
-  h.push('      <h1>'+esc(C.title)+'</h1><p>'+esc(C.hook)+'</p></div>');
-  h.push('  </div>');
-  h.push('  <section class="kts-why"><span class="k">WHY</span><h2>'+esc(C.empathy.title)+'</h2>');
-  C.empathy.lines.forEach(function(l){ h.push('    <p>'+esc(l)+'</p>'); });
-  h.push('    <blockquote>'+esc(C.quote)+'</blockquote></section>');
-  h.push('  <section class="kts-points"><span class="k">POINT</span><h2>'+esc(isE?'핵심 3가지':'이 세 가지면 충분합니다')+'</h2><ol>');
-  C.points.forEach(function(p,i){ h.push('    <li><b>'+('0'+(i+1)).slice(-2)+'</b><span>'+esc(p)+'</span></li>'); });
-  h.push('  </ol></section>');
-  var caps = isE ? ['','현장 전경','내부와 주변'] : ['','제품을 자세히','쓰는 모습 그대로'];
-  if(photos[1]){ h.push('  <figure class="kts-fig"><img src="'+photos[1].url+'" alt=""><figcaption>'+caps[1]+'</figcaption></figure>'); }
-  h.push('  <section class="kts-spec"><span class="k">SPEC</span><h2>'+esc(isE?'매물 제원':'제품 제원')+'</h2><table>');
-  S.specs.forEach(function(v,i){
-    h.push('    <tr><th>'+esc(LABELS[S.mode].specs[i])+'</th><td>'+esc((v||'').trim()||'—')+'</td></tr>');
-  });
-  h.push('  </table></section>');
-  if(photos[2]){ h.push('  <figure class="kts-fig"><img src="'+photos[2].url+'" alt=""><figcaption>'+caps[2]+'</figcaption></figure>'); }
-  if(photos[3]||photos[4]){
-    h.push('  <div class="kts-duo">');
-    [photos[3],photos[4]].forEach(function(p){ if(p) h.push('    <img src="'+p.url+'" alt="">'); });
+  /* 물건 내용 */
+  h.push('  <section class="kp-fact"><span class="kp-k">FACT SHEET</span><h2>물건 내용</h2><table>');
+  C.rows.forEach(function(r){ h.push('    <tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'); });
+  h.push('  </table>');
+  var kp=[];
+  if(C.trade) kp.push(['매매 · 교환가',C.trade]);
+  if(C.invest) kp.push(['실투자금',C.invest]);
+  if(C.M&&C.M.net>0) kp.push(['순월세',wonText(C.M.net)+' 원']);
+  if(kp.length){
+    h.push('  <div class="kp-kpi">');
+    kp.forEach(function(k){ h.push('    <div><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>'); });
     h.push('  </div>');
   }
-  h.push('  <section class="kts-price"><span class="k">'+(isE?'CONDITION':'PRICE')+'</span>');
-  h.push('    <strong>'+(C.price?esc(C.price):(isE?'조건 협의':'가격 문의'))+'</strong>');
-  h.push('    <p class="lead">'+esc(isE?'거래 조건은 이렇게 정리했습니다.':'왜 이 구성에 이 가격인지, 그대로 적었습니다.')+'</p><ul>');
-  C.reasons.forEach(function(r){ h.push('    <li>'+esc(r)+'</li>'); });
-  h.push('  </ul></section>');
-  h.push('  <section class="kts-info"><span class="k">INFO</span><dl>');
-  C.info.forEach(function(r){ h.push('    <dt>'+esc(r.k)+'</dt><dd>'+esc(r.v)+'</dd>'); });
-  h.push('  </dl></section>');
-  h.push('  <section class="kts-cta"><h2>'+esc(C.cta.title)+'</h2><p>'+esc(C.cta.sub)+'</p>');
-  h.push('    <div class="kts-pill">'+esc(C.contact?('문의 '+C.contact):'문의 남겨주시면 답 드립니다')+'</div></section>');
-  h.push('  <footer class="kts-foot">'+(C.mark?'<b>'+esc(C.brand||'KTS 더상세')+'</b><span>사진 '+photos.length+'장 → 상세페이지 1초 · KTS 더상세</span>':'<b>'+esc(C.brand||' ')+'</b>')+'</footer>');
-  h.push('</div>');
+  h.push('  </section>');
+  /* 가격 */
+  h.push('  <section class="kp-price"><span class="kp-k">PRICE</span><h2>가격의 안전마진</h2>');
+  if(C.M&&C.M.diff>0){
+    h.push('  <div class="kp-kpi">');
+    h.push('    <div><b>감정가</b><span>'+esc(C.appraise||'—')+'</span></div>');
+    h.push('    <div><b>매매가</b><span>'+esc(C.trade)+'</span></div>');
+    h.push('    <div><b>감정가 대비</b><span>-'+pctText(C.M.diff,C.M.appraise)+'%</span></div>');
+    h.push('  </div>');
+  }
+  h.push(hList(C.priceParas));
+  h.push('  </section>');
+  /* 수익 */
+  h.push('  <section class="kp-income"><span class="kp-k">INCOME</span><h2>수익 구조</h2>');
+  if(C.incomeRows.length){
+    h.push('  <table>');
+    C.incomeRows.forEach(function(r){ h.push('    <tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'); });
+    h.push('  </table>');
+  }
+  h.push(hList(C.incomeParas));
+  h.push('  </section>');
+  /* 권리 */
+  h.push('  <section class="kp-rights"><span class="kp-k">RIGHTS</span><h2>권리분석</h2>');
+  C.rightItems.forEach(function(it,i){
+    h.push('  <article><b>'+('0'+(i+1)).slice(-2)+' '+esc(it.title)+'</b><span>'+esc(it.body)+'</span></article>');
+  });
+  h.push(hList(C.rightsDeep));
+  h.push('  <ol class="kp-check">');
+  C.checklist.forEach(function(t){ h.push('    <li>'+esc(t)+'</li>'); });
+  h.push('  </ol></section>');
+  /* 입지 */
+  h.push('  <section class="kp-loc"><span class="kp-k">LOCATION</span><h2>입지</h2>');
+  C.loc.forEach(function(b){ h.push('    <h3>'+esc(b.h)+'</h3><p>'+esc(b.t)+'</p>'); });
+  if(C.spots.length){
+    h.push('    <ul>');
+    C.spots.forEach(function(sp){ h.push('      <li><b>'+esc(sp.name)+'</b>'+(sp.desc?(' — '+esc(sp.desc)):'')+'</li>'); });
+    h.push('    </ul>');
+  }
+  h.push('  </section>');
+  /* 시장조사 */
+  h.push('  <section class="kp-market"><span class="kp-k">MARKET</span><h2>시장조사</h2>');
+  h.push(hList(C.market));
+  h.push('  </section>');
+  /* 사진 */
+  if(C.photos.length>1){
+    h.push('  <section class="kp-site">');
+    C.photos.slice(1).forEach(function(p){
+      h.push('    <figure><img src="'+p.img.src+'" alt="'+esc(C.name+' '+p.role)	+'"><figcaption><b>'+esc(p.role)+'</b>'+esc(p.caption)+'</figcaption></figure>');
+    });
+    h.push('  </section>');
+  }
+  /* 지도 */
+  h.push('  <section class="kp-map"><span class="kp-k">MAP · ROADVIEW</span><h2>지도 · 로드뷰 · 위성</h2>');
+  h.push('    <a href="'+C.links.naver+'" target="_blank" rel="noopener">네이버 지도에서 보기</a>');
+  h.push('    <a href="'+C.links.kakao+'" target="_blank" rel="noopener">카카오맵 · 로드뷰에서 보기</a>');
+  h.push('    <a href="'+C.links.sky+'" target="_blank" rel="noopener">구글 위성지도에서 보기</a>');
+  h.push('    <p>'+esc(C.addr)+'</p>');
+  h.push('  </section>');
+  /* CTA */
+  h.push('  <section class="kp-cta"><p>현장 확인 · 권리관계 확인 후 진행합니다</p>');
+  if(tel) h.push('    <a class="kp-tel" href="tel:'+tel+'">전화 문의 '+esc(C.phone)+'</a>');
+  if(C.contact) h.push('    <p>'+esc(C.contact)+'</p>');
+  h.push('  </section>');
+  h.push('  <footer class="kp-foot">'+(C.mark?('<b>'+esc(C.brand)+'</b><span>부동산 매물 브리핑 · 사진 '+C.photos.length+'장 · KTS 더상세</span>'):('<b>'+esc(C.brand)+'</b>'))+'</footer>');
+  h.push('</article>');
   h.push('<style>');
-  h.push('.kts-detail{max-width:780px;margin:0 auto;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#0A1128;line-height:1.6;word-break:keep-all}');
-  h.push('.kts-detail img{width:100%;display:block}');
-  h.push('.kts-hero{background:#0A1128;color:#fff}');
-  h.push('.kts-hb{padding:36px 24px 40px}');
-  h.push('.kts-hb span{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800}');
-  h.push('.kts-hb h1{font-size:30px;line-height:1.34;margin:14px 0 10px;font-weight:800;letter-spacing:-.02em}');
-  h.push('.kts-hb p{margin:0;font-size:15px;color:#BFCEE6}');
-  h.push('.kts-detail section,.kts-detail figure{margin:0;padding:44px 24px}');
-  h.push('.kts-detail .k{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800;display:block}');
-  h.push('.kts-detail h2{font-size:24px;margin:10px 0 18px;font-weight:800;letter-spacing:-.02em}');
-  h.push('.kts-why p{margin:0 0 8px;font-size:15px;color:#3D4A63}');
-  h.push('.kts-why blockquote{margin:18px 0 0;padding:18px 20px;background:#FFF3EA;border-left:6px solid #FF6B00;border-radius:12px;font-size:17px;font-weight:800;color:#0A1128}');
-  h.push('.kts-points{background:#F3F5FA}');
-  h.push('.kts-points ol{list-style:none;margin:0;padding:0}');
-  h.push('.kts-points li{display:flex;gap:14px;align-items:center;background:#fff;border-radius:14px;padding:18px;margin-bottom:12px}');
-  h.push('.kts-points li b{color:#FF6B00;font-size:15px;background:#FFF0E4;border-radius:9px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}');
-  h.push('.kts-points li span{font-size:17px;font-weight:800;color:#101B33}');
-  h.push('.kts-fig{padding:0}');
-  h.push('.kts-fig figcaption{font-size:13px;color:#5B6883;padding:14px 24px 0}');
-  h.push('.kts-spec table{width:100%;border-collapse:collapse}');
-  h.push('.kts-spec th{background:#0A1128;color:#A9BAD6;font-size:13px;font-weight:700;text-align:left;padding:16px 18px;width:34%}');
-  h.push('.kts-spec td{background:#F6F8FC;color:#0A1128;font-size:14px;font-weight:600;padding:16px 18px;border-bottom:1px solid #E3E8F1}');
-  h.push('.kts-duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0}');
-  h.push('.kts-price{background:#0A1128;color:#fff}');
-  h.push('.kts-price strong{display:block;font-size:34px;color:#FF6B00;margin:12px 0 6px}');
-  h.push('.kts-price .lead{font-size:14px;color:#A9BAD6;margin:0 0 16px}');
-  h.push('.kts-price ul{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.13)}');
-  h.push('.kts-price li{position:relative;padding:12px 0 0 16px;font-size:15px;color:#E4EBF7}');
-  h.push('.kts-price li:before{content:"";position:absolute;left:0;top:19px;width:7px;height:7px;border-radius:50%;background:#FF6B00}');
-  h.push('.kts-info dl{margin:14px 0 0;display:grid;grid-template-columns:96px 1fr;row-gap:14px;column-gap:12px}');
-  h.push('.kts-info dt{color:#67758F;font-weight:800;font-size:13px}');
-  h.push('.kts-info dd{margin:0;font-size:15px;font-weight:600;color:#16223C}');
-  h.push('.kts-cta{background:#111B36;color:#fff;text-align:center}');
-  h.push('.kts-cta h2{color:#fff;font-size:23px}');
-  h.push('.kts-cta p{color:#A9BAD6;font-size:14px;margin:0 0 18px}');
-  h.push('.kts-pill{display:inline-block;border:1px solid rgba(255,107,0,.55);background:rgba(255,107,0,.14);color:#FF6B00;font-weight:700;font-size:14px;padding:15px 28px;border-radius:999px}');
-  h.push('.kts-foot{background:#070D1E;color:#6E80A3;text-align:center;padding:28px 24px 34px;font-size:12px}');
-  h.push('.kts-foot b{display:block;color:#fff;font-size:14px;margin-bottom:6px}');
-  h.push('.kts-foot span{display:block}');
-  h.push('@media(max-width:480px){.kts-detail h2{font-size:20px}.kts-hb h1{font-size:23px}.kts-detail section,.kts-detail figure{padding:32px 18px}.kts-fig{padding:0}}');
+  h.push(ESTATE_CSS);
   h.push('</style>');
   return h.join('\n');
 }
 
-/* ---------------- UI ---------------- */
+var PRODUCT_CSS=[
+'.kts-detail{max-width:780px;margin:0 auto;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#0A1128;line-height:1.7;word-break:keep-all}',
+'.kts-detail img{width:100%;display:block}',
+'.kts-hero{background:#0A1128;color:#fff}',
+'.kts-hb{padding:34px 24px 38px}',
+'.kts-hb span{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800}',
+'.kts-hb h1{font-size:29px;line-height:1.34;margin:14px 0 10px;font-weight:800;letter-spacing:-.02em}',
+'.kts-hb p{margin:0;font-size:16px;color:#FFC79B;font-weight:700}',
+'.kts-detail section{margin:0;padding:36px 24px 40px}',
+'.kts-detail .k{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800;display:block;margin-bottom:10px}',
+'.kts-detail h2{font-size:23px;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}',
+'.kts-detail h3{font-size:16px;margin:18px 0 6px;font-weight:800;color:#FF6B00}',
+'.kts-detail p{margin:0 0 10px;font-size:15px;color:#3D4A63}',
+'.kts-points{background:#F4F6FA}',
+'.kts-points ol{list-style:none;margin:0;padding:0}',
+'.kts-points li{display:flex;gap:14px;align-items:center;background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:10px;font-size:16px;font-weight:800}',
+'.kts-points li b{color:#FF6B00;font-size:13px;background:#FFF0E4;border-radius:9px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}',
+'.kts-compare table{width:100%;border-collapse:collapse;font-size:14px}',
+'.kts-compare th{background:#0A1128;color:#fff;font-weight:800;padding:10px;font-size:12px}',
+'.kts-compare td{padding:12px;border-bottom:1px solid #E3E8F1;color:#3D4A63;vertical-align:top}',
+'.kts-compare td.now{background:#FFF3EA;font-weight:700;color:#0A1128}',
+'.kts-story{background:#fff}',
+'.kts-fig{margin:0;padding:0!important}',
+'.kts-fig figcaption{padding:12px 24px 20px;font-size:14px;color:#5B6883}',
+'.kts-fig figcaption b{display:block;color:#FF6B00;font-size:12px;margin-bottom:4px}',
+'.kts-spec table{width:100%;border-collapse:collapse}',
+'.kts-spec th{background:#0A1128;color:#A9BAD6;font-size:13px;font-weight:700;text-align:left;padding:14px 16px;width:32%}',
+'.kts-spec td{background:#F6F8FC;color:#0A1128;font-size:14px;font-weight:600;padding:14px 16px;border-bottom:1px solid #E3E8F1}',
+'.kts-price{background:#F4F6FA}',
+'.kts-price strong{display:block;font-size:32px;color:#FF6B00;margin:0 0 12px;font-weight:900}',
+'.kts-price ul{margin:0;padding-left:18px;color:#33415C;font-size:15px}',
+'.kts-trust{background:#F4F6FA}',
+'.kts-trust ul{margin:0 0 16px;padding-left:18px;color:#33415C;font-size:15px}',
+'.kts-trust dl{display:grid;grid-template-columns:110px 1fr;row-gap:10px;margin:0;font-size:14px}',
+'.kts-trust dt{color:#67758F;font-weight:800}',
+'.kts-trust dd{margin:0;font-weight:600;color:#16223C}',
+'.kts-tags{background:#fff}',
+'.kts-tags span{display:inline-block;background:#EEF2F8;color:#4A5872;font-size:13px;font-weight:700;border-radius:999px;padding:7px 13px;margin:0 6px 8px 0}',
+'.kts-cta{background:#111B36;color:#fff;text-align:center}',
+'.kts-cta h2{color:#fff}',
+'.kts-cta p{color:#A9BAD6}',
+'.kts-pill{display:inline-block;border:1px solid rgba(255,107,0,.55);background:rgba(255,107,0,.14);color:#FF6B00;font-weight:700;font-size:14px;padding:14px 26px;border-radius:999px}',
+'.kts-foot{background:#070D1E;color:#6E80A3;text-align:center;padding:24px;font-size:12px}',
+'.kts-foot b{display:block;color:#fff;font-size:13px;margin-bottom:5px}',
+'@media(max-width:480px){.kts-detail section{padding:28px 18px 32px}.kts-hb{padding:26px 18px 30px}.kts-hb h1{font-size:23px}.kts-fig{padding:0!important}}'
+].join('\n');
+
+function buildProductHTML(C){
+  var h=[];
+  h.push('<!-- KTS 더상세 v2.0 · 상품 상세(SEO) · '+new Date().toLocaleString('ko-KR')+' -->');
+  h.push('<!-- 키워드: '+esc(C.kws.join(', '))+' -->');
+  h.push('<article class="kts-detail">');
+  h.push('  <header class="kts-hero">');
+  if(C.photos[0]) h.push('    <img src="'+C.photos[0].img.src+'" alt="'+esc(C.name+' '+(C.mainKw||''))+'">');
+  h.push('    <div class="kts-hb"><span>PRODUCT DETAIL</span><h1>'+esc(C.title)+'</h1><p>'+esc(C.hook)+'</p></div>');
+  h.push('  </header>');
+  h.push('  <section class="kts-why"><span class="k">WHY</span><h2>'+esc(C.mainKw?(C.mainKw+' — 왜 이 상품인가'):'왜 이 상품인가')+'</h2>');
+  h.push(hList(C.empathy));
+  h.push('  </section>');
+  h.push('  <section class="kts-points"><span class="k">POINT</span><h2>이 세 가지면 충분합니다</h2><ol>');
+  C.points.forEach(function(p){ h.push('    <li><b>'+esc(p.no)+'</b><span>'+esc(p.text)+'</span></li>'); });
+  h.push('  </ol></section>');
+  if(C.compare.length){
+    h.push('  <section class="kts-compare"><span class="k">COMPARE</span><h2>무엇이 다른가</h2>');
+    if(C.compareNote) h.push('    <p>'+esc(C.compareNote)+'</p>');
+    h.push('    <table><thead><tr><th>흔한 방식</th><th>이 상품</th></tr></thead><tbody>');
+    C.compare.forEach(function(c){ h.push('      <tr><td>'+esc(c.before||'—')+'</td><td class="now">'+esc(c.after||'—')+'</td></tr>'); });
+    h.push('    </tbody></table>');
+    h.push('  </section>');
+  }
+  if(C.storyLines.length){
+    h.push('  <section class="kts-story"><span class="k">STORY</span><h2>써 본 사람의 하루</h2>');
+    h.push(hList(C.storyLines));
+    h.push('  </section>');
+  }
+  C.photos.slice(1).forEach(function(p){
+    h.push('  <figure class="kts-fig"><img src="'+p.img.src+'" alt="'+esc(C.name+' '+p.role+' '+(C.mainKw||''))+'"><figcaption><b>'+esc(p.role)+'</b>'+esc(p.caption)+(p.story?(' '+esc(p.story)):'')+'</figcaption></figure>');
+  });
+  h.push('  <section class="kts-spec"><span class="k">SPEC</span><h2>제원</h2><table>');
+  ['크기','재질','구성','가격'].forEach(function(l,i){
+    h.push('    <tr><th>'+l+'</th><td>'+esc((C.specs[i]||'').trim()||'—')+'</td></tr>');
+  });
+  h.push('  </table></section>');
+  h.push('  <section class="kts-price"><span class="k">PRICE</span><h2>가격과 구성</h2>');
+  h.push('    <strong>'+esc(C.price||'가격 문의')+'</strong><ul>');
+  C.reasons.forEach(function(r){ h.push('      <li>'+esc(r)+'</li>'); });
+  h.push('    </ul></section>');
+  h.push('  <section class="kts-trust"><span class="k">TRUST</span><h2>받고 나서도 안심</h2><ul>');
+  C.trust.forEach(function(t){ h.push('    <li>'+esc(t)+'</li>'); });
+  h.push('  </ul><dl>');
+  C.info.forEach(function(r){ h.push('    <dt>'+esc(r.k)+'</dt><dd>'+esc(r.v)+'</dd>'); });
+  h.push('  </dl></section>');
+  if(C.tags.length){
+    h.push('  <section class="kts-tags"><span class="k">TAG</span><h2>태그</h2>');
+    C.tags.forEach(function(t){ h.push('    <span>#'+esc(t.replace(/\s+/g,''))+'</span>'); });
+    h.push('  </section>');
+  }
+  h.push('  <section class="kts-cta"><h2>'+esc(C.cta.title)+'</h2><p>'+esc(C.cta.sub)+'</p>');
+  h.push('    <div class="kts-pill">'+esc(C.contact?('문의 '+C.contact):'문의 남겨주시면 답 드립니다')+'</div></section>');
+  h.push('  <footer class="kts-foot">'+(C.mark?('<b>'+esc(C.brand)+'</b><span>사진 '+C.photos.length+'장 → 상세페이지 1초 · KTS 더상세</span>'):('<b>'+esc(C.brand)+'</b>'))+'</footer>');
+  h.push('</article>');
+  h.push('<style>');
+  h.push(PRODUCT_CSS);
+  h.push('</style>');
+  return h.join('\n');
+}
+function buildHTML(){ return S.mode==='estate'?buildEstateHTML(LAST?LAST.C:estateCopy()):buildProductHTML(LAST?LAST.C:productCopy()); }
+
+/* =========================================================================
+   토스트
+   ========================================================================= */
+var TOAST_T=null;
 function toast(msg,warn){
-  var el=$('toast'); el.textContent=msg;
+  var el=$('toast'); if(!el) return;
+  el.textContent=msg;
   el.className='toast on'+(warn?' warn':'');
-  clearTimeout(el._t);
-  el._t=setTimeout(function(){ el.className='toast'+(warn?' warn':''); },2300);
+  clearTimeout(TOAST_T);
+  TOAST_T=setTimeout(function(){ el.className='toast'+(warn?' warn':''); },2600);
 }
 
+/* =========================================================================
+   폼 읽기 / 쓰기
+   ========================================================================= */
+function readForm(){
+  if(S.mode==='estate'){
+    var e=S.e;
+    e.name=$('eName').value; e.hook=$('eHook').value; S.addr=$('eAddr').value;
+    e.zone=$('eZone').value; e.land=$('eLand').value; e.area=$('eArea').value;
+    e.struct=$('eStruct').value; e.scale=$('eScale').value; e.facility=$('eFacility').value;
+    e.trade=$('eTrade').value; e.appraise=$('eAppraise').value; e.official=$('eOfficial').value;
+    e.invest=$('eInvest').value; e.debt=$('eDebt').value; e.rate=$('eRate').value;
+    e.deposit=$('eDeposit').value; e.rent=$('eRent').value; e.mgmt=$('eMgmt').value;
+    e.lease=$('eLease').value; S.rights=[$('fR0').value,$('fR1').value,$('fR2').value,$('fR3').value];
+    e.rightsNote=$('eRightsNote').value;
+    e.locBack=$('eLocBack').value; e.traffic=$('eTraffic').value;
+    e.market2=$('eMarket2').value; e.dev=$('eDev').value;
+    e.spots=$('eSpots').value; e.marketNote=$('eMarketNote').value;
+    e.phone=$('ePhone').value; e.contact=$('eContact').value;
+    S.brand=$('eBrand').value; e.priceNote=$('ePriceNote').value;
+    S.mark=$('eMark').checked; S.width=parseInt($('eWidth').value,10)||780;
+  }else{
+    S.name=$('fName').value; S.hook=$('fHook').value;
+    S.points=[$('fP0').value,$('fP1').value,$('fP2').value];
+    S.specs=[$('fS0').value,$('fS1').value,$('fS2').value,$('fS3').value];
+    S.gomin=$('fGomin').value; S.reason=$('fReason').value; S.notice=$('fNotice').value;
+    S.story=$('fStory').value; S.trust=$('fTrust').value; S.tags=$('fTags').value;
+    S.kwMain=$('fKwMain').value; S.kwSub=$('fKwSub').value;
+    S.target=$('fTarget').value; S.compare=$('fCompare').value;
+    S.brand=$('fBrand').value; S.contact=$('fContact').value;
+    S.mark=$('fMark').checked; S.width=parseInt($('fWidth').value,10)||780;
+  }
+  updateCalcEcho();
+}
+function writeForm(){
+  var e=S.e;
+  $('eName').value=e.name||''; $('eHook').value=e.hook||''; $('eAddr').value=S.addr||'';
+  $('eZone').value=e.zone||''; $('eLand').value=e.land||''; $('eArea').value=e.area||'';
+  $('eStruct').value=e.struct||''; $('eScale').value=e.scale||''; $('eFacility').value=e.facility||'';
+  $('eTrade').value=e.trade||''; $('eAppraise').value=e.appraise||''; $('eOfficial').value=e.official||'';
+  $('eInvest').value=e.invest||''; $('eDebt').value=e.debt||''; $('eRate').value=e.rate||'';
+  $('eDeposit').value=e.deposit||''; $('eRent').value=e.rent||''; $('eMgmt').value=e.mgmt||'';
+  $('eLease').value=e.lease||'';
+  var R=S.rights||['','','',''];
+  $('fR0').value=R[0]||''; $('fR1').value=R[1]||''; $('fR2').value=R[2]||''; $('fR3').value=R[3]||'';
+  $('eRightsNote').value=e.rightsNote||'';
+  $('eLocBack').value=e.locBack||''; $('eTraffic').value=e.traffic||'';
+  $('eMarket2').value=e.market2||''; $('eDev').value=e.dev||'';
+  $('eSpots').value=e.spots||''; $('eMarketNote').value=e.marketNote||'';
+  $('ePhone').value=e.phone||''; $('eContact').value=e.contact||'';
+  $('eBrand').value=S.brand||''; $('ePriceNote').value=e.priceNote||'';
+  $('eMark').checked=S.mark; $('eWidth').value=String(S.width);
+
+  $('fName').value=S.name||''; $('fHook').value=S.hook||'';
+  $('fP0').value=S.points[0]||''; $('fP1').value=S.points[1]||''; $('fP2').value=S.points[2]||'';
+  $('fS0').value=S.specs[0]||''; $('fS1').value=S.specs[1]||''; $('fS2').value=S.specs[2]||''; $('fS3').value=S.specs[3]||'';
+  $('fGomin').value=S.gomin||''; $('fReason').value=S.reason||''; $('fNotice').value=S.notice||'';
+  $('fStory').value=S.story||''; $('fTrust').value=S.trust||''; $('fTags').value=S.tags||'';
+  $('fKwMain').value=S.kwMain||''; $('fKwSub').value=S.kwSub||'';
+  $('fTarget').value=S.target||''; $('fCompare').value=S.compare||'';
+  $('fBrand').value=S.brand||''; $('fContact').value=S.contact||'';
+  $('fMark').checked=S.mark; $('fWidth').value=String(S.width);
+  updateCalcEcho();
+}
+
+function updateCalcEcho(){
+  var box=$('calcEcho'); if(!box) return;
+  if(S.mode!=='estate') return;
+  var M=estateMetrics();
+  var parts=[];
+  if(M.diff>0) parts.push('감정가 대비 <b>-'+pctText(M.diff,M.appraise)+'%</b>');
+  if(M.perArea) parts.push('연면적 평당 <b>'+wonText(M.perArea)+' 원</b>');
+  if(M.perLand) parts.push('대지 평당 <b>'+wonText(M.perLand)+' 원</b>');
+  if(M.interest) parts.push('월 이자 <b>'+wonText(M.interest)+' 원</b>');
+  if(M.net>0) parts.push('순월세 <b>'+wonText(M.net)+' 원</b>');
+  if(M.invest&&M.net>0) parts.push('실투자 대비 <b>'+Math.round(M.netYield*10)/10+'%</b>');
+  box.innerHTML = parts.length? ('자동 계산 — '+parts.join(' · ')) : '숫자를 넣으면 <b>감정가 대비 · 평당 단가 · 순월세 · 수익률</b>을 자동으로 계산해 본문에 넣습니다.';
+}
+
+/* =========================================================================
+   사진 슬롯
+   ========================================================================= */
 function renderThumbs(){
   var estate=S.mode==='estate';
-  var box=$('thumbs'); box.innerHTML='';
+  var box=$(estate?'thumbsE':'thumbsP');
+  var other=$(estate?'thumbsP':'thumbsE');
+  if(other) other.innerHTML='';
+  if(!box) return;
+  box.innerHTML='';
+  var roles=estate?ROLES_E:ROLES_P;
   S.photos.forEach(function(p,i){
-    if(estate && !p.role) p.role=ESTATE_ROLES[i]||'기타';
+    if(!p.role) p.role=roles[Math.min(i,roles.length-1)];
     var d=document.createElement('div');
     d.className='th'+(i===0?' main':'');
     d.innerHTML='<div class="im"><img src="'+p.url+'" alt=""></div>'+
       (i===0?'<span class="badge">대표</span>':'')+
-      '<button class="del" type="button" aria-label="사진 삭제">×</button>'+
-      (estate?'':'<div class="cap">'+(i===0?'대표':'사진 '+(i+1))+'</div>');
-    d.querySelector('.del').addEventListener('click',function(e){ e.stopPropagation(); S.photos.splice(i,1); renderThumbs(); });
+      '<button class="del" type="button" aria-label="사진 삭제">×</button>';
+    d.querySelector('.del').addEventListener('click',function(ev){
+      ev.stopPropagation(); S.photos.splice(i,1); renderThumbs(); saveDraft();
+    });
     d.querySelector('.im').addEventListener('click',function(){
       if(i===0){ toast('이미 대표 사진입니다.'); return; }
-      var t=S.photos.splice(i,1)[0]; S.photos.unshift(t); renderThumbs(); toast('대표 사진을 바꿨습니다.');
+      var t=S.photos.splice(i,1)[0]; S.photos.unshift(t);
+      renderThumbs(); saveDraft(); toast('대표 사진을 바꿨습니다.');
     });
-    /* 부동산 모드 — 사진마다 역할(외경·도로·내부·지적도·입지)을 고른다 */
-    if(estate){
-      var sel=document.createElement('select');
-      sel.className='role';
-      sel.setAttribute('aria-label','사진 역할');
-      ESTATE_ROLES.concat(['기타']).forEach(function(r){
-        var o=document.createElement('option'); o.value=r; o.textContent=r; o.selected=(p.role===r); sel.appendChild(o);
-      });
-      sel.addEventListener('click',function(e){ e.stopPropagation(); });
-      sel.addEventListener('change',function(e){ p.role=e.target.value; saveDraft(); });
-      d.appendChild(sel);
-    }
+    var sel=document.createElement('select');
+    sel.className='role'; sel.setAttribute('aria-label','사진 역할');
+    roles.forEach(function(r){
+      var o=document.createElement('option'); o.value=r; o.textContent=r; o.selected=(p.role===r); sel.appendChild(o);
+    });
+    sel.addEventListener('click',function(ev){ ev.stopPropagation(); });
+    sel.addEventListener('change',function(ev){
+      p.role=ev.target.value;
+      if(!p.cap) p.cap='';
+      renderThumbs(); saveDraft();
+    });
+    d.appendChild(sel);
+    var cap=document.createElement('textarea');
+    cap.className='cap'; cap.value=p.cap||'';
+    cap.setAttribute('placeholder', p.role==='항공(위성)'?'항공사진 설명':(ROLE_CAP[p.role]||'현장 설명').slice(0,30));
+    cap.addEventListener('input',function(){ p.cap=cap.value; saveDraft(); });
+    d.appendChild(cap);
     box.appendChild(d);
   });
-  $('photoHint').textContent = S.photos.length
-    ? (estate
-        ? (S.photos.length+'장 · 사진을 누르면 대표(외경)로 · 아래 칸에서 역할을 고릅니다.')
-        : (S.photos.length+'장 · 사진을 누르면 대표로 올라갑니다.'))
-    : (estate ? '외경 · 도로 · 내부 · 지적도 · 입지 — 5장이면 충분합니다.'
-              : '사진을 누르면 대표 사진으로 바뀝니다.');
-  $('btnClearPhotos').hidden = !S.photos.length;
+  var hint=$(estate?'photoHintE':'photoHint');
+  var limit=estate?LIMIT_E:LIMIT_P;
+  if(hint){
+    hint.textContent = S.photos.length
+      ? (S.photos.length+'장 · 사진을 누르면 대표로 · 칸에서 역할과 설명을 고칩니다 ('+limit+'장까지)')
+      : (estate? '외경 · 도로 · 내부 · 지적도 · 항공(위성) · 로드뷰 · 주변명소 — 역할을 고르면 현장 설명이 자동으로 붙습니다.'
+                : '사진을 누르면 대표 사진으로 바뀝니다. 장면마다 설명을 붙이면 글이 됩니다.');
+  }
+  var clr=$(estate?'btnClearPhotosE':'btnClearPhotos');
+  if(clr) clr.hidden=!S.photos.length;
+  var opt=$(estate?'optEPhotos':'optPPhotos');
+  if(opt) opt.textContent=S.photos.length+'/'+limit+'장';
 }
 
 function shrinkImage(file){
@@ -1377,7 +2750,7 @@ function shrinkImage(file){
         var c=document.createElement('canvas'); c.width=w; c.height=h;
         var x=c.getContext('2d'); x.imageSmoothingQuality='high';
         x.drawImage(im,0,0,w,h);
-        var url=c.toDataURL('image/jpeg',0.92);
+        var url=c.toDataURL('image/jpeg',0.9);
         var im2=new Image();
         im2.onload=function(){ res({url:url,img:im2,ar:w/h,name:file.name}); };
         im2.onerror=rej; im2.src=url;
@@ -1391,125 +2764,108 @@ function shrinkImage(file){
 async function addFiles(files){
   var list=Array.prototype.slice.call(files||[]).filter(function(f){return /^image\//.test(f.type);});
   if(!list.length) return;
-  var room=5-S.photos.length;
-  if(room<=0){ toast('사진은 5장까지 들어갑니다.',true); return; }
-  if(list.length>room){ toast('5장까지만 담았습니다.',true); list=list.slice(0,room); }
+  var limit=S.mode==='estate'?LIMIT_E:LIMIT_P;
+  var room=limit-S.photos.length;
+  if(room<=0){ toast('사진은 '+limit+'장까지 들어갑니다.',true); return; }
+  if(list.length>room){ toast(limit+'장까지만 담았습니다.',true); list=list.slice(0,room); }
+  var roles=S.mode==='estate'?ROLES_E:ROLES_P;
   for(var i=0;i<list.length;i++){
-    try{ S.photos.push(await shrinkImage(list[i])); }catch(e){}
+    try{
+      var p=await shrinkImage(list[i]);
+      p.role=roles[Math.min(S.photos.length,roles.length-1)];
+      S.photos.push(p);
+    }catch(e){}
   }
-  renderThumbs();
+  renderThumbs(); saveDraft();
   if(S.photos.length) toast(S.photos.length+'장 담았습니다.');
 }
 
-function readForm(){
-  S.name=$('fName').value;
-  S.hook=$('fHook').value;
-  S.points=[$('fP0').value,$('fP1').value,$('fP2').value];
-  S.specs=[$('fS0').value,$('fS1').value,$('fS2').value,$('fS3').value];
-  S.gomin=$('fGomin').value; S.reason=$('fReason').value; S.notice=$('fNotice').value;
-  S.brand=$('fBrand').value; S.contact=$('fContact').value;
-  S.addr=$('fAddr').value; S.trade=$('fTrade').value; S.invest=$('fInvest').value;
-  S.phone=$('fPhone').value; S.rights=[$('fR0').value,$('fR1').value,$('fR2').value];
-  S.mark=$('fMark').checked; S.width=parseInt($('fWidth').value,10)||780;
-}
-function writeForm(){
-  $('fName').value=S.name; $('fHook').value=S.hook;
-  $('fP0').value=S.points[0]; $('fP1').value=S.points[1]; $('fP2').value=S.points[2];
-  $('fS0').value=S.specs[0]; $('fS1').value=S.specs[1]; $('fS2').value=S.specs[2]; $('fS3').value=S.specs[3];
-  $('fGomin').value=S.gomin; $('fReason').value=S.reason; $('fNotice').value=S.notice;
-  $('fBrand').value=S.brand; $('fContact').value=S.contact;
-  var R=S.rights||['','',''];
-  $('fAddr').value=S.addr||''; $('fTrade').value=S.trade||''; $('fInvest').value=S.invest||'';
-  $('fPhone').value=S.phone||''; $('fR0').value=R[0]||''; $('fR1').value=R[1]||''; $('fR2').value=R[2]||'';
-  $('fMark').checked=S.mark; $('fWidth').value=String(S.width);
-}
-
-function setMode(mode){
-  S.mode=mode;
-  var isE=mode==='estate';
-  $('swP').classList.toggle('on',!isE); $('swE').classList.toggle('on',isE);
-  $('swP').setAttribute('aria-selected',String(!isE));
-  $('swE').setAttribute('aria-selected',String(isE));
-  var L=LABELS[mode];
-  $('lbBasic').textContent=L.basic; $('lbName').textContent=L.name;
-  $('lbHook').innerHTML=L.hook+' <span style="color:#5E6F91;font-weight:600">(선택)</span>';
-  $('fName').placeholder=L.namePh;
-  $('lbPoints').textContent=L.points;
-  $('sk0').textContent=L.specs[0]; $('sk1').textContent=L.specs[1];
-  $('sk2').textContent=L.specs[2]; $('sk3').textContent=L.specs[3];
-  $('lbGomin').innerHTML=L.gomin+' <span style="color:#5E6F91;font-weight:600">(선택)</span>';
-  $('lbNotice').innerHTML=L.notice+' <span style="color:#5E6F91;font-weight:600">(선택)</span>';
-  $('fGomin').placeholder = isE?'예) 3억 이하, 월 수익 200만 원 이상':'비워두시면 자동 문장으로 채웁니다';
-  $('fS0').placeholder = isE?'예) 대지 330㎡ · 건평 132㎡':'예) 120g · 15×5cm';
-  $('fS1').placeholder = isE?'예) 근린생활시설':'예) 젤 타입';
-  $('fS2').placeholder = isE?'예) 3층 전층 · 주차 2대':'예) 본품 + 도포기 1개';
-  $('fS3').placeholder = isE?'예) 4억 2천만 원':'예) 9,900원';
-  /* ── 부동산 모드 전용 입력칸 ── */
-  $('stepEstate').hidden = !isE;
-  $('stepRights').hidden = !isE;
-  $('stepPoints').hidden = isE;
-  $('noSpecs').textContent = isE?'04':'03';
-  $('noPhotos').textContent = isE?'05':'04';
-  $('ttSpecs').textContent = isE?'매물 제원 4줄':'제원 4줄';
-  $('optSpecs').textContent = isE?'면적·용도·구조':'표로 들어갑니다';
-  $('ttPhotos').textContent = isE?'5대 사진':'제품 사진';
-  $('optPhotos').textContent = isE?'외경·도로·내부·지적도·입지':'1~5장';
-  document.body.classList.toggle('eMode',isE);
-  try{
-    var go=document.querySelector('.bar .go');
-    if(go) go.innerHTML='<i></i>'+(isE?'1초 만에 매물 브리핑 만들기':'1초 만에 상세페이지 만들기');
-  }catch(e){}
-  document.querySelector('.intro h1').innerHTML = isE
-    ? '매물 사진 넣고 <em>1초</em>,<br>중개사 브리핑이 나옵니다'
-    : '사진 넣고 <em>1초</em>,<br>쿠팡형 상세페이지가 나옵니다';
-  document.querySelector('.intro p').textContent = isE
-    ? '매물명과 현장 사진 1~5장이면 됩니다. 위치·제원·거래 조건을 한 장에 정리해 드립니다.'
-    : '상품명과 사진 1~5장만 있으면 됩니다. 나머지는 카피 4원칙으로 자동으로 채워 드립니다.';
-  renderThumbs();
-  saveDraft();
-}
-
-/* ---------------- 초안 저장 ---------------- */
+/* =========================================================================
+   초안 저장
+   ========================================================================= */
 function saveDraft(){
   try{
-    var d={mode:S.mode,name:S.name,hook:S.hook,points:S.points,specs:S.specs,gomin:S.gomin,
-      reason:S.reason,notice:S.notice,brand:S.brand,contact:S.contact,mark:S.mark,width:S.width,
-      addr:S.addr,trade:S.trade,invest:S.invest,phone:S.phone,rights:S.rights};
-    localStorage.setItem('kts.thedetail.draft',JSON.stringify(d));
+    var d={mode:S.mode,out:S.out,brand:S.brand,mark:S.mark,width:S.width,addr:S.addr,
+      rights:S.rights,
+      p:{name:S.name,hook:S.hook,points:S.points,specs:S.specs,gomin:S.gomin,reason:S.reason,
+         notice:S.notice,story:S.story,trust:S.trust,tags:S.tags,kwMain:S.kwMain,kwSub:S.kwSub,
+         target:S.target,compare:S.compare,contact:S.contact},
+      e:S.e};
+    localStorage.setItem('kts.thedetail.draft2',JSON.stringify(d));
   }catch(e){}
 }
 function loadDraft(){
   try{
-    var raw=localStorage.getItem('kts.thedetail.draft'); if(!raw) return;
+    var raw=localStorage.getItem('kts.thedetail.draft2'); if(!raw) return;
     var d=JSON.parse(raw);
-    ['name','hook','gomin','reason','notice','brand','contact','addr','trade','invest','phone'].forEach(function(k){ if(d[k]) S[k]=d[k]; });
-    if(Array.isArray(d.points)) S.points=d.points; if(Array.isArray(d.specs)) S.specs=d.specs;
-    if(Array.isArray(d.rights)) S.rights=d.rights;
-    if(typeof d.mark==='boolean') S.mark=d.mark; if(d.width) S.width=d.width;
     if(d.mode) S.mode=d.mode;
+    if(d.out) S.out=d.out;
+    if(d.brand) S.brand=d.brand;
+    if(typeof d.mark==='boolean') S.mark=d.mark;
+    if(d.width) S.width=d.width;
+    if(d.addr) S.addr=d.addr;
+    if(Array.isArray(d.rights)) S.rights=d.rights;
+    if(d.p) Object.keys(d.p).forEach(function(k){ if(d.p[k]!=null) S[k]=d.p[k]; });
+    if(d.e) Object.keys(d.e).forEach(function(k){ if(d.e[k]!=null) S.e[k]=d.e[k]; });
     writeForm();
   }catch(e){}
 }
 
-/* ---------------- 화면 전환 ---------------- */
+/* =========================================================================
+   화면 전환
+   ========================================================================= */
+function updateModeSwitch(){
+  Array.prototype.forEach.call(document.querySelectorAll('#modesw button'),function(b){
+    var on=b.getAttribute('data-out')===S.out;
+    b.classList.toggle('on',on);
+    b.setAttribute('aria-selected',String(on));
+  });
+}
+function tipsHTML(){
+  if(S.mode==='estate'){
+    return '<b>쓰는 곳별 안내</b><ul>'+
+      '<li>블로그 · <b style="display:inline;color:#C8D4E8">전체 3p+</b>를 PDF로 받아 글로 옮기면 한 편이 됩니다.</li>'+
+      '<li>중개사·상담 · <b style="display:inline;color:#C8D4E8">브리핑용</b>을 문자·카톡 이미지로.</li>'+
+      '<li>포스터·전단 · <b style="display:inline;color:#C8D4E8">한 장 요약</b>을 A4로 인쇄합니다.</li></ul>';
+  }
+  return '<b>올리는 곳별 3초 안내</b><ul>'+
+    '<li>쿠팡 · 상세설명 이미지 항목에 <b style="display:inline;color:#C8D4E8">PNG</b>를 그대로 올립니다.</li>'+
+    '<li>스마트스토어 · 상세 HTML 편집기에 <b style="display:inline;color:#C8D4E8">HTML 코드</b>를 붙여넣습니다.</li>'+
+    '<li>블로그 · <b style="display:inline;color:#C8D4E8">전체 3p+</b>를 PDF로 받아 글로 옮기면 한 편이 됩니다.</li></ul>';
+}
+function renderMeta(info){
+  var pages=info.pages||0;
+  $('meta').innerHTML='<span>'+info.W+' × '+info.H.toLocaleString()+' px</span>'+
+    '<span class="'+(pages>=2.95?'hot':'')+'">약 '+pages.toFixed(1)+'쪽 (A4)</span>'+
+    '<span>사진 '+S.photos.length+'장</span>'+
+    '<span>'+OUT_LABEL[S.out]+'</span>';
+  $('pvSize').textContent=info.W+' × '+info.H.toLocaleString()+' · '+pages.toFixed(1)+'쪽';
+  $('pvTitle').textContent=(S.mode==='estate'?'부동산 매물 브리핑':'상품 상세')+' · '+OUT_LABEL[S.out];
+  $('doneTitle').textContent=S.mode==='estate'?'매물 브리핑 완성':'상세페이지 완성';
+  $('tipsBox').innerHTML=tipsHTML();
+}
 function showResult(info){
   document.body.classList.add('result');
   $('screenResult').classList.add('on');
-  $('elapsed').textContent=(info.ms/1000).toFixed(2)+'초';
-  $('meta').innerHTML='<span>'+info.W+' × '+info.H.toLocaleString()+' px</span>'+
-    '<span>사진 '+S.photos.length+'장</span>'+
-    '<span>'+(S.mode==='estate'?'부동산 브리핑':'상품 상세')+'</span>';
-  $('pvSize').textContent=info.W+' × '+info.H.toLocaleString();
+  $('elapsed').textContent=((info&&info.ms)||0)/1000>0?(((info.ms)/1000).toFixed(2)+'초'):'';
   $('copybox').style.display='none';
-  // 금기어 점검
-  var all=[S.name,S.hook,S.points.join(' '),S.gomin,S.reason,S.notice].join(' ');
+  updateModeSwitch();
+  renderMeta(info||{W:0,H:0,pages:0});
+  /* 금기어 점검 */
+  var all;
+  if(S.mode==='estate'){
+    all=[S.e.name,S.e.hook,S.e.lease,S.e.rightsNote,S.e.marketNote,S.e.locBack,S.e.spots,
+         S.rights.join(' ')].join(' ');
+  }else{
+    all=[S.name,S.hook,S.points.join(' '),S.gomin,S.reason,S.notice,S.story,S.compare].join(' ');
+  }
   var neg=findNegatives(all);
   var nb=$('negBox');
   if(neg.length){
     nb.innerHTML='<div class="neg"><b>부정어 '+neg.length+'곳을 찾았습니다</b> — 아래 표현을 바꾸시면 더 부드럽게 읽힙니다.'+
       '<ul>'+neg.slice(0,6).map(function(n){return '<li>“'+n.word+'” → “'+n.alt+'”</li>';}).join('')+'</ul></div>';
-  } else {
-    nb.innerHTML='<div class="neg ok"><b>부정어 0개</b> — 전제 → 긍정 유도 → 명분 순서로 읽힙니다.</div>';
+  }else{
+    nb.innerHTML='<div class="neg ok"><b>부정어 0개</b> — '+(S.mode==='estate'?'숫자 → 권리 → 입지 순서로 읽힙니다.':'후킹 → 공감 → 특장점 → 실사용 → 안심 순서로 읽힙니다.')+'</div>';
   }
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -1519,53 +2875,121 @@ function backToEdit(){
   window.scrollTo({top:0,behavior:'instant'});
 }
 
-/* ---------------- 이벤트 ---------------- */
+/* =========================================================================
+   모드
+   ========================================================================= */
+function setMode(mode){
+  S.mode=mode;
+  var isE=mode==='estate';
+  $('swP').classList.toggle('on',!isE); $('swE').classList.toggle('on',isE);
+  $('swP').setAttribute('aria-selected',String(!isE));
+  $('swE').setAttribute('aria-selected',String(isE));
+  $('formProduct').hidden=isE;
+  $('formEstate').hidden=!isE;
+  $('introH1').innerHTML=isE
+    ? '매물 사진 넣고 <em>1초</em>,<br>블로그 3p+ 브리핑이 나옵니다'
+    : '사진 넣고 <em>1초</em>,<br>상품 상세페이지가 나옵니다';
+  $('introP').textContent=isE
+    ? '물건 내용·가격·권리·입지를 넣으면 공시지가·평당 단가·수익률까지 계산해 심층 분석을 자동으로 씁니다.'
+    : '상품명과 키워드, 사진만 있으면 됩니다. 쿠팡·네이버가 좋아하는 구조로 카피를 자동으로 채워 드립니다.';
+  var go=document.querySelector('.bar .go');
+  if(go) go.innerHTML='<i></i>'+(isE?'1초 만에 매물 브리핑 만들기':'1초 만에 상세페이지 만들기');
+  renderThumbs();
+  updateCalcEcho();
+  saveDraft();
+}
+
+/* =========================================================================
+   예시 채우기
+   ========================================================================= */
+function demoProduct(){
+  $('fName').value='욕실 실리콘 곰팡이 제거젤 120g + 도포기';
+  $('fHook').value='바르고 8시간, 문지르지 않아도 줄눈이 돌아옵니다.';
+  $('fKwMain').value='실리콘 곰팡이 제거';
+  $('fKwSub').value='욕실 곰팡이, 줄눈 청소, 창틀 곰팡이, 세탁기 패킹';
+  $('fTarget').value='원룸·오피스텔 1인 가구, 이사 전후 청소하는 분';
+  $('fP0').value='짜서 바르고 8시간 뒤 물로 헹구면 끝';
+  $('fP1').value='실리콘·줄눈·창틀·세탁기 패킹까지 한 번에';
+  $('fP2').value='도포기 포함, 손에 묻지 않습니다';
+  $('fCompare').value='일반 젤은 흘러내려 두 번 바릅니다 → 점도가 높아 한 번에 붙습니다\n도포기가 따로 없어 손에 묻습니다 → 도포기 동봉\n성분이 강해 냄새가 오래 남습니다 → 헹굼 후 냄새가 남지 않습니다';
+  $('fS0').value='120g · 15×5cm'; $('fS1').value='젤 타입(도포용)';
+  $('fS2').value='본품 120g + 도포기 1개'; $('fS3').value='9,900원';
+  $('fGomin').value='줄눈이 검게 변할 때마다 새로 실리콘을 바르는 게 지겹습니다.';
+  $('fStory').value='퇴근하고 욕실에 들어가면 늘 그 자리부터 눈이 갑니다.\n바르고 하루 지나 물로 헹궜더니, 손으로 만져도 미끌거림이 없었습니다.\n일주일 뒤 같은 자리를 다시 봤을 때 검은 점이 올라오지 않은 게 가장 반가웠습니다.';
+  $('fTrust').value='수령일부터 7일 이내 청약철회 안내에 따릅니다.\n파손·오배송은 사진 1장으로 접수하고, 확인 후 바로 교환합니다.\n문의는 영업일 기준 24시간 안에 답 드립니다.';
+  $('fReason').value='본품 120g + 도포기 포함, 배송비 포함';
+  $('fTags').value='욕실청소, 곰팡이제거, 줄눈청소, 실리콘곰팡이, 창틀청소';
+  $('fBrand').value='KTS'; $('fContact').value='카카오톡 @kts';
+  toast('예시를 채웠습니다. 사진만 넣어보세요.');
+  readForm(); saveDraft();
+}
+function demoEstate(){
+  var v={
+    eName:'서산 대산읍 세아빌딩 (근생통건물)',
+    eHook:'대산항 배후 만실 임대 건물 · 감정 52억 대비 45억',
+    eAddr:'충남 서산시 대산읍 대산리 148-8, 148-86 (2필지)',
+    eZone:'일반상업지역', eLand:'271평', eArea:'775평',
+    eStruct:'철골조 · 제1,2종 근린생활시설',
+    eScale:'지하1~지상5층 · 층별 140평 · 2017.09 준공',
+    eFacility:'승강기 2대 · 주차 27대',
+    eTrade:'45억 원', eAppraise:'52억 원', eOfficial:'12억 5,892만 원', eInvest:'14억 원',
+    eDebt:'27억 원 (수협)', eRate:'4.2%',
+    eDeposit:'4억 3,000만 원', eRent:'1,933만 원', eMgmt:'240만 원',
+    eLease:'1층 101호 양꼬치집 7,000 / 350 (관 30)\n1층 102호 맘스터치 3,000 / 190 (관 20)\n1층 103호 고기원칙 2,000 / 165 (관 15)\n2층 201호 공실 4,000 / 200 (관 25)\n2층 202호 더존PC방 4,000 / 170 (관 25)\n3층 301호 OB베어 5,000 / 190 (관 30)\n3층 302호 스터디카페 3,000 / 150 (관 20)\n4층 401호 스크린골프 10,000 / 300 (관 50)\n5층 501호 입시학원 3,000 / 110 (관 15)\n5층 502호 사무실 2,000 / 80 (관 10)\n옥상 중계기 27.5',
+    fR0:'갑구 근저당 30억 — 잔금일에 매도인 말소 조건',
+    fR1:'을구 해당 없음 · 국세·지방세 체납 0원',
+    fR2:'임대차 10호실 · 보증금 4억 3,000만 승계',
+    fR3:'201호 공실 · 인도 즉시 가능',
+    eSpots:'대산항 — 인접, 배후 물동량과 상주 인구의 원천\n현대오일뱅크 · 코오롱 · KCC 대산공단 — 배후 근로 인구\n대산읍 중심 상권 — 1층 먹거리·은행·편의시설 밀집',
+    ePhone:'010-2002-2899', eBrand:'KTS 부동산 교환',
+    ePriceNote:'감정 52억 대비 7억 낮은 급매 조건'
+  };
+  Object.keys(v).forEach(function(id){ if($(id)) $(id).value=v[id]; });
+  toast('세아빌딩 실사 데이터를 채웠습니다.');
+  readForm(); saveDraft();
+}
+
+/* =========================================================================
+   이벤트
+   ========================================================================= */
 $('swP').addEventListener('click',function(){ setMode('product'); });
 $('swE').addEventListener('click',function(){ setMode('estate'); });
+
 $('fPhoto').addEventListener('change',function(e){ addFiles(e.target.files); e.target.value=''; });
-$('btnClearPhotos').addEventListener('click',function(){ S.photos=[]; renderThumbs(); toast('사진을 모두 지웠습니다.'); });
-['dragover','dragenter'].forEach(function(ev){
-  $('drop').addEventListener(ev,function(e){ e.preventDefault(); $('drop').classList.add('hot'); });
+$('fPhotoE').addEventListener('change',function(e){ addFiles(e.target.files); e.target.value=''; });
+$('btnClearPhotos').addEventListener('click',function(){ S.photos=[]; renderThumbs(); saveDraft(); toast('사진을 모두 지웠습니다.'); });
+$('btnClearPhotosE').addEventListener('click',function(){ S.photos=[]; renderThumbs(); saveDraft(); toast('사진을 모두 지웠습니다.'); });
+['drop'].forEach(function(){});
+Array.prototype.forEach.call(document.querySelectorAll('.drop'),function(drop){
+  ['dragover','dragenter'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('hot'); }); });
+  ['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('hot'); }); });
+  drop.addEventListener('drop',function(e){ if(e.dataTransfer&&e.dataTransfer.files) addFiles(e.dataTransfer.files); });
 });
-['dragleave','drop'].forEach(function(ev){
-  $('drop').addEventListener(ev,function(e){ e.preventDefault(); $('drop').classList.remove('hot'); });
-});
-$('drop').addEventListener('drop',function(e){ if(e.dataTransfer&&e.dataTransfer.files) addFiles(e.dataTransfer.files); });
 
-document.querySelectorAll('input[type=text],input[type=tel]').forEach(function(el){
+Array.prototype.forEach.call(document.querySelectorAll('input[type=text],input[type=tel],textarea'),function(el){
   el.addEventListener('input',function(){ saveDraft(); });
+  el.addEventListener('change',function(){ saveDraft(); });
 });
 
-$('btnDemo').addEventListener('click',function(){
-  if(S.mode==='estate'){
-    $('fName').value='의정부 민락동 근린상가 3층 132㎡';
-    $('fHook').value='역 도보 6분 · 유동인구 하루 1만 2천';
-    $('fAddr').value='경기 의정부시 민락동 123-4, 3층';
-    $('fTrade').value='4억 2천만 원 (교환 가능)';
-    $('fInvest').value='1억 1천만 원';
-    $('fPhone').value='010-2002-2899';
-    $('fR0').value='갑구 근저당 3억 — 매도 시 말소';
-    $('fR1').value='을구 해당 없음 · 세금 체납 0원';
-    $('fR2').value='임차인 없음 · 즉시 인도 가능';
-    $('fS0').value='대지 330㎡ · 건평 132㎡'; $('fS1').value='제2종 근린생활시설';
-    $('fS2').value='3층 전층 · 주차 2대'; $('fS3').value='4억 2천만 원';
-    $('fContact').value=''; $('fBrand').value='KTS 부동산 교환';
-  }else{
-    $('fName').value='욕실 실리콘 곰팡이 제거젤 120g + 도포기';
-    $('fHook').value=''; $('fP0').value='짜서 바르고, 8시간 뒤 물로 헹구면 끝';
-    $('fP1').value='실리콘·줄눈·창틀·세탁기 패킹까지';
-    $('fP2').value='도포기 포함, 손에 묻지 않습니다';
-    $('fS0').value='120g · 15×5cm'; $('fS1').value='젤 타입(도포용)';
-    $('fS2').value='본품 120g + 도포기 1개'; $('fS3').value='9,900원';
-    $('fContact').value='카카오톡 @kts';
+$('btnDemo').addEventListener('click',demoProduct);
+$('btnDemoE').addEventListener('click',demoEstate);
+$('btnAutoEstate').addEventListener('click',function(){
+  readForm();
+  var M=estateMetrics();
+  if(!$('eLocBack').value) $('eLocBack').value = '배후 산업 단지와 주거지의 상주 인구가 매일 이 블록을 지나갑니다.';
+  if(!$('eTraffic').value) $('eTraffic').value = '간선도로에서 블록 안으로 한 번에 진입합니다. 주차 동선이 건물 앞에서 해결됩니다.';
+  if(!$('eMarket2').value) $('eMarket2').value = '1층은 먹거리, 위층은 학원·PC·스포츠 — 시간대가 겹치지 않는 업종 구성입니다.';
+  if(!$('eDev').value) $('eDev').value = '배후 단지와 주거 확장은 곧 상주 인구의 증가로 이어집니다.';
+  if(!$('eMarketNote').value && M.perArea){
+    $('eMarketNote').value='시세의 기준은 평당 단가입니다. 이 물건은 연면적 기준 평당 '+wonText(M.perArea)+' 원, 대지 기준 평당 '+wonText(M.perLand)+' 원입니다. 같은 블록·비슷한 준공 연도의 건물과 나란히 놓으면 가격의 위치가 드러납니다.'+(M.rentWon?(' 실제로 지불되는 월세 '+manText(M.rentAll)+'만 원은 이 지역 임대료의 표본입니다.'):'');
   }
-  toast('예시를 채웠습니다. 사진만 넣어보세요.');
-  try{ readForm(); }catch(e){}
-  saveDraft();
+  readForm(); saveDraft();
+  toast('추천 문장을 채웠습니다. 그대로 쓰거나 고쳐 쓰세요.');
 });
 
 $('btnPng').addEventListener('click',function(){ save('png'); });
 $('btnJpg').addEventListener('click',function(){ save('jpg'); });
+$('btnPdf').addEventListener('click',function(){ save('pdf'); });
 $('btnBack').addEventListener('click',backToEdit);
 $('btnHtml').addEventListener('click',function(){
   var code=buildHTML();
@@ -1580,16 +3004,31 @@ $('btnHtml').addEventListener('click',function(){
   }
 });
 
+Array.prototype.forEach.call(document.querySelectorAll('#modesw button'),function(b){
+  b.addEventListener('click',function(){
+    var out=b.getAttribute('data-out');
+    if(S.out===out) return;
+    S.out=out; saveDraft(); updateModeSwitch();
+    var info;
+    try{ info=generate(); }catch(e){ toast('생성 중 문제가 생겼습니다: '+e.message,true); return; }
+    renderMeta(info);
+    try{ $('out').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+  });
+});
+
 function attemptGenerate(){
   readForm();
-  if(!S.name.trim()){
+  var name=S.mode==='estate'?nz(S.e.name):nz(S.name);
+  if(!name){
     toast(S.mode==='estate'?'매물명을 먼저 넣어주세요.':'상품명을 먼저 넣어주세요.',true);
-    $('fName').focus(); $('fName').scrollIntoView({behavior:'smooth',block:'center'});
+    var f=$(S.mode==='estate'?'eName':'fName');
+    f.focus(); f.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   if(!S.photos.length){
     toast(S.mode==='estate'?'매물 사진 1장(외경)만 넣어주세요.':'사진 1장만 넣어주세요.',true);
-    $('drop').scrollIntoView({behavior:'smooth',block:'center'});
+    var drop=document.querySelector('.drop');
+    if(drop) drop.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   var btn=document.querySelector('.go');
@@ -1607,12 +3046,21 @@ document.querySelector('.go').addEventListener('click',attemptGenerate);
 loadDraft();
 if(S.mode==='estate') setMode('estate'); else setMode('product');
 renderThumbs();
+updateCalcEcho();
 
 /* 테스트·검수용 */
 window.KTS_THE_DETAIL={
   state:S, generate:generate, buildCopy:buildCopy, buildHTML:buildHTML,
-  setMode:setMode, addFiles:addFiles, setState:function(p){ Object.assign(S,p); writeForm(); renderThumbs(); },
-  LABELS:LABELS
+  buildPDF:buildPDF, setMode:setMode, setOut:function(o){S.out=o;updateModeSwitch();},
+  addFiles:addFiles, renderThumbs:renderThumbs,
+  setState:function(p){
+    Object.keys(p||{}).forEach(function(k){
+      if(k==='e'&&p.e){ Object.keys(p.e).forEach(function(k2){ S.e[k2]=p.e[k2]; }); }
+      else S[k]=p[k];
+    });
+    writeForm(); renderThumbs(); updateCalcEcho();
+  },
+  metrics:estateMetrics, parseLease:parseLease, labels:{rolesE:ROLES_E,rolesP:ROLES_P}
 };
 })();
 </script>
