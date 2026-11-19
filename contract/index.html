@@ -109,7 +109,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
  <div class="prog"><div class="track"><div class="fill" id="pfill"></div></div>
   <div class="lbls" id="plbls"></div></div>
 </header>
-<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">기준가 500,000원 → 지금 <b style="color:#FF6B00;font-weight:900">0원</b> · 업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
+<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
 <main>
 <!-- 1 당사자 -->
@@ -430,7 +430,12 @@ async function composite(maxW){
     g.font = fw + ' ' + fs + 'px ' + FONT;
     while (fs > 6 && g.measureText(t).width > w - pad * 2 && (f.fit || h < fs * 2.6) && !f.top && !f.multi){ fs -= .5; g.font = fw + ' ' + fs + 'px ' + FONT; }
     if (f.top || f.multi || (!f.fit && g.measureText(t).width > w - pad * 2 && h >= fs * 2.6)){
-      const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.32;
+      let lines = wrapText(g, t, w - pad * 2), lh = fs * 1.32;
+      if (f.shrink){
+        const fmin = 11 * (cv.width / 1489);
+        while (lines.length * lh + pad > h && fs > fmin){ fs = Math.max(fmin, fs - .5 * (cv.width / 1489)); g.font = fw + ' ' + fs + 'px ' + FONT; lines = wrapText(g, t, w - pad * 2); lh = fs * 1.32; }
+        if (lines.length * lh + pad > h) toast('특약이 너무 깁니다 — 줄이거나 글자를 줄여 주세요');
+      }
       let yy = y + pad + fs * 0.55;
       g.textAlign = 'left';
       lines.forEach(l => {
