@@ -2490,6 +2490,7 @@ var PRODUCT_CSS=[
 '.kts-hb span{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800}',
 '.kts-hb h1{font-size:29px;line-height:1.34;margin:14px 0 10px;font-weight:800;letter-spacing:-.02em}',
 '.kts-hb p{margin:0;font-size:16px;color:#FFC79B;font-weight:700}',
+'.kts-kws{margin:10px 0 0;font-size:13px;color:#8FA1C0;font-weight:600}',
 '.kts-detail section{margin:0;padding:36px 24px 40px}',
 '.kts-detail .k{color:#FF6B00;font-size:12px;letter-spacing:.24em;font-weight:800;display:block;margin-bottom:10px}',
 '.kts-detail h2{font-size:23px;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}',
@@ -2536,7 +2537,9 @@ function buildProductHTML(C){
   h.push('<article class="kts-detail">');
   h.push('  <header class="kts-hero">');
   if(C.photos[0]) h.push('    <img src="'+C.photos[0].img.src+'" alt="'+esc(C.name+' '+(C.mainKw||''))+'">');
-  h.push('    <div class="kts-hb"><span>PRODUCT DETAIL</span><h1>'+esc(C.title)+'</h1><p>'+esc(C.hook)+'</p></div>');
+  h.push('    <div class="kts-hb"><span>PRODUCT DETAIL</span><h1>'+esc(C.title)+'</h1><p>'+esc(C.hook)+'</p>');
+  if(C.kws.length) h.push('      <p class="kts-kws">'+esc(C.kws.slice(0,6).join(' · '))+'</p>');
+  h.push('    </div>');
   h.push('  </header>');
   h.push('  <section class="kts-why"><span class="k">WHY</span><h2>'+esc(C.mainKw?(C.mainKw+' — 왜 이 상품인가'):'왜 이 상품인가')+'</h2>');
   h.push(hList(C.empathy));
@@ -2564,7 +2567,9 @@ function buildProductHTML(C){
   ['크기','재질','구성','가격'].forEach(function(l,i){
     h.push('    <tr><th>'+l+'</th><td>'+esc((C.specs[i]||'').trim()||'—')+'</td></tr>');
   });
-  h.push('  </table></section>');
+  h.push('  </table>');
+  if(C.subKws.length) h.push('  <p class="kts-kws">함께 찾는 말 — '+esc(C.subKws.slice(0,6).join(' · '))+'</p>');
+  h.push('  </section>');
   h.push('  <section class="kts-price"><span class="k">PRICE</span><h2>가격과 구성</h2>');
   h.push('    <strong>'+esc(C.price||'가격 문의')+'</strong><ul>');
   C.reasons.forEach(function(r){ h.push('      <li>'+esc(r)+'</li>'); });
