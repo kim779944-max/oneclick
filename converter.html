@@ -1397,8 +1397,8 @@ function charUnits(ch){
   const c = ch.charCodeAt(0);
   if(c === 32) return 600;                       /* 공백 — 한글 글꼴에서 한 칸 폭에 가깝다 */
   if(c < 128) return 600;                        /* 영문·숫자·기호 */
-  if(c >= 0x3130 && c <= 0x318F) return 900;      /* 한글 호환 자모 */
-  return 900;                                    /* 한글·한자·확장 */
+  if(c >= 0x3130 && c <= 0x318F) return 960;      /* 한글 호환 자모 */
+  return 960;                                    /* 한글·한자·확장 — 9pt 글꼴에서 실제로 먹는 폭 */
 }
 function textUnits(s){
   let n = 0;
@@ -1414,14 +1414,9 @@ function shrinkH(text, w){
   return h;
 }
 /* 열 너비(%): 원본 비율 유지하면서 ‘글자가 꾼기는 최소 폭’을 보장하고, 남는 폭에서 나눔 */
-function fitColWidths(st, totalW){
-  const n = st.nCols;
-  let pct = (st.colWidths || []).slice(0, n).map(x => Math.max(1, +x || 0));
-  while (pct.length < n) pct.push(100 / n);
-  const sum0 = pct.reduce((a, b) => a + b, 0) || 100;
-  pct = pct.map(x => x / sum0 * 100);
-  /* 열별 ‘절대 넓히면 안 꾼기는’ 최소 HWPUNIT */
-  const need = new Array(n).fill(0);
+/* 열마다 ‘글자가 꺾이지 않는 최소 폭(HWPUNIT)’ */
+function colNeeds(st){
+  const need = new Array(st.nCols).fill(0);
   st.cells.forEach(c => {
     if (c.cs > 1) return;                            /* 병합 칸은 기준에서 제외 */
     const lines = String(c.text == null ? '' : c.text).split('\n');
@@ -1430,7 +1425,17 @@ function fitColWidths(st, totalW){
     if (c.bold) mx = Math.round(mx * 1.18);          /* 머리글 굵은 글씨는 실제로 더 넓다 */
     if (mx > need[c.c]) need[c.c] = mx;
   });
-  const minPct = need.map(u => Math.min(60, (u + CELL_MARGIN) / totalW * 100));
+  return need;
+}
+function fitColWidths(st, totalW){
+  const n = st.nCols;
+  let pct = (st.colWidths || []).slice(0, n).map(x => Math.max(1, +x || 0));
+  while (pct.length < n) pct.push(100 / n);
+  const sum0 = pct.reduce((a, b) => a + b, 0) || 100;
+  pct = pct.map(x => x / sum0 * 100);
+  /* 열별 ‘절대 넓히면 안 꾼기는’ 최소 HWPUNIT */
+  const need = colNeeds(st);
+  const minPct = need.map(u => Math.min(68, (u + CELL_MARGIN) / totalW * 100));
   /* 공백이 있으면 먼저 분배, 모자라면 넓은 열에서 가져온다 */
   for (let pass = 0; pass < 4; pass++){
     let deficit = 0;
@@ -1638,7 +1643,12 @@ async function buildHwpxDoc(st){
       return;
     }
     const tst = it.tst;
-    const tw = Math.max(3000, Math.round(PW * (it.w || 100) / 100));
+    let tw = Math.max(3000, Math.round(PW * (it.w || 100) / 100));
+    /* 열마다 필요한 최소 폭을 다 합치면 표 폭보다 클 때 — 표 자체를 본문 폭까지 넓혀 글자가 꺾이지 않게 */
+    if (!tst.lockWidths){
+      const needW = colNeeds(tst).reduce((a, u) => a + u + CELL_MARGIN, 0);
+      if (needW > tw) tw = Math.min(PW, Math.round(needW));
+    }
     if (!tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);   /* 작은 표도 빈칸 없이 글자가 꺾이지 않는 폭으로 */
     const widths = tst.colWidths.map(w => Math.max(600, Math.round(tw * w / 100)));
     widths[widths.length - 1] += tw - widths.reduce((a, b) => a + b, 0);
@@ -1660,12 +1670,14 @@ async function buildHwpxDoc(st){
       tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hMax = Math.max(hMax, c._h || 900); });
       let h = n <= 1 ? 1150 : (n * 1100 + 300);
       if (hMax > 900) h = Math.max(h, n * Math.round(hMax * 1.35) + (tst._banner ? 900 : 400));
-      const p = propRowH(tst, r, 84188); if (p) h = Math.max(h, Math.min(p, (tst.nRows <= 2 && !it.main) ? 2400 : h * 4));   /* 작은 머리 표는 세로로 늘어지지 않게 */
+      const p = propRowH(tst, r, 84188);
+      /* 사진에서 읽은 행 높이는 참고만 — 한 줄짜리 행이 화면을 넘게 늘어지지 않도록 상한을 둔다 */
+      if (p) h = Math.max(h, Math.min(p, (tst.nRows <= 2 && !it.main) ? 2400 : Math.max(3300, n * 1400 + 1100)));
       it.rowH.push(h);
     }
   });
   /* A4 한 장에 들어가게 행 높이를 맞춘다(본문 여백 20+15mm 뺀 높이 73,000) */
-  fitRowsOnePage(items, 73000);
+  fitRowsOnePage(items, 69000);   /* 한 장 본문 높이(약 74,000)에서 문단 위아래 여백까지 빼고 잡는다 */
   const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
   const H = hwHeader(hwFont(t.text['Contents__header.xml'], face), {
     bgs:[...new Set(need.bgs)], nbBgs:[...new Set(need.nbBgs)], chars:need.chars, aligns:[...new Set(need.aligns)]});
