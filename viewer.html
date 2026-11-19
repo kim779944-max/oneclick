@@ -201,9 +201,17 @@ table.xl td.b{font-weight:900}
 .kipupg .t b i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber2);margin-right:5px;vertical-align:middle;box-shadow:0 0 7px var(--amber2)}
 .kipupg .t span{display:block;font-size:11px;color:#AFBDD0;line-height:1.45;margin-top:2px}
 .kipupg em{font-style:normal;font-size:12px;font-weight:900;color:var(--amber2);white-space:nowrap}
+/* ---------- (추가 2026-11-20) 첫 화면의 '다른 도구 더보기' 쇼룸 버튼 ---------- */
+.shopmore{display:block;margin:14px auto 0;max-width:330px;text-decoration:none;text-align:center;
+ border:1px solid rgba(255,107,0,.55);border-radius:13px;padding:12px 14px;line-height:1.3;
+ background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,255,255,.02));
+ color:#FFA24D;font-size:13px;font-weight:900;letter-spacing:-.3px}
+.shopmore span{display:block;font-size:10.5px;font-weight:700;color:#9FB0C8;margin-top:3px;letter-spacing:0}
+.shopmore:active{transform:translateY(1px)}
+.drop.mini .shopmore{display:none}
 </style></head><body>
 <div id="app">
-<header><span class="brand">KTS <i>더뷰</i></span><span class="sp"></span><a href="https://autooneclick.com/" id="homeA">← 원클릭</a></header>
+<header><span class="brand">KTS <i>더뷰</i></span><span class="sp"></span><a href="https://autooneclick.com/" id="homeA" style="display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,107,0,.55);background:rgba(255,107,0,.14);color:#FFA24D;font-size:12px;font-weight:900;text-decoration:none;letter-spacing:-.2px;white-space:nowrap">← 원클릭 쇼룸</a></header>
 <div id="vtool">
   <div class="r1">
     <button type="button" class="bk" id="vtBack">← 뒤로가기</button>
@@ -226,7 +234,7 @@ table.xl td.b{font-weight:900}
   <button type="button" id="pgEdit">더편집</button>
   <button type="button" id="vtSaveImg">이미지로 저장</button>
 </div></div>
-<a class="ktsRsv" href="https://autooneclick.com/#reserve" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">기준가 500,000원 → 지금 <b style="color:#FF6B00;font-weight:900">0원</b> · 업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
+<a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
 
 <div class="drop" id="drop">
@@ -240,6 +248,7 @@ table.xl td.b{font-weight:900}
   <button class="big" onclick="document.getElementById('f').click()">파일 열기</button>
   <input type="file" id="f" hidden accept=".hwp,.hwpx,.xlsx,.xlsm,.docx,.csv,.txt,.pdf,image/*">
   <div class="hint">파일을 고르면 표·문서가 화면 전체로 바로 펼쳐집니다</div>
+  <a class="shopmore" href="https://autooneclick.com/">원클릭 다른 도구 더보기 · 쇼룸 가기 →<span>더양식 · 더계약서 · 더상세 · 더스캔 · 더싸인 한자리</span></a>
 </div>
 
 <div id="loader">
@@ -1143,10 +1152,34 @@ function vOpen(){
   try{ if (!(history.state && history.state.v === 'doc')) history.pushState({v: 'doc'}, '', location.pathname + location.search); }catch(e){}
   applyZoom(PP.zoom);
 }
+/* 외부 링크로 직통 진입한 사용자가 초기 화면에서 '뒤로가기'를 누를 때
+   빈 페이지로 이탈하지 않고 쇼룸으로 착지하게 하는 안전장치 (2026-11-20)
+   — 파일 열람·확대·페이지 이동(pushState {v:'doc'})과 충돌하지 않게 초기 화면에서만 동작합니다. */
+const SHOP_HOME = 'https://autooneclick.com/?from=viewer-back';
+const SHOP_GUARD = (function(){
+  try{
+    if (window.KTSApp) return false;
+    if (/KTS[\s\S]*더뷰/.test(navigator.userAgent)) return false;
+    if (/(^|\.)autooneclick\.com$/.test(location.hostname)) return false;
+    if (/autooneclick\.com/.test(document.referrer || '')) return false;
+    return true;
+  }catch(e){ return false; }
+})();
+var shopLanded = false;
+function shopFallback(){
+  if (!SHOP_GUARD || shopLanded) return;
+  shopLanded = true;
+  try{ location.replace(SHOP_HOME); }catch(e){ location.href = SHOP_HOME; }
+}
+if (SHOP_GUARD){
+  try{ if (!(history.state && history.state.v)) history.pushState({v:'shopguard'}, '', location.pathname + location.search); }catch(e){}
+}
 window.addEventListener('popstate', e => {
   const st = e.state || {};
   if (st.v === 'doc') return;                       /* 앞으로 가기 — 화면 유지 */
-  if (docEl && docEl.style.display !== 'none'){ resetView(); showToast('직전 화면으로 돌아왔습니다'); }
+  if (docEl && docEl.style.display !== 'none'){ resetView(); showToast('직전 화면으로 돌아왔습니다'); return; }
+  if (st.v === 'shopguard') return;                 /* 같은 자리로 다시 들어온 경우 */
+  shopFallback();                                   /* 초기 화면 뒤로가기 → 쇼룸 착지 */
 });
 (function bindVTool(){
   const q = id => document.getElementById(id);

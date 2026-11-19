@@ -382,6 +382,7 @@ h1 em{font-style:normal;color:var(--amber)}
 
   <div class="tabs" id="tabs">
     <button class="on" data-c="all">전체</button>
+    <button data-c="fav">★ 내 단축바</button>
     <button data-c="convert">변환·문서</button>
     <button data-c="money">자금·세무</button>
     <button data-c="talk">대화</button>
@@ -391,11 +392,6 @@ h1 em{font-style:normal;color:var(--amber)}
   </div>
   <div class="count" id="count"></div>
   <div class="slegend" id="slegend"></div>
-
-  <section class="fav" id="fav" aria-label="자주 쓰는 바로가기">
-    <div class="favH"><b>★ 자주 쓰는 바로가기</b><span>카드의 ☆를 누르면 이 줄에 고정됩니다</span></div>
-    <div class="favRow" id="favRow"></div>
-  </section>
 
   <div class="plist" id="plist"></div>
 
@@ -465,8 +461,10 @@ function toggleFav(k){
   if (i >= 0) f.splice(i, 1); else { f.unshift(k); if (f.length > 8) f = f.slice(0, 8); }
   lsPut(FAV_KEY, f);
   render();
-  toastMsg(i >= 0 ? '바로가기에서 뺐습니다' : '위 ★ 자주 쓰는 바로가기에 고정했습니다');
+  toastMsg(i >= 0 ? '★ 내 단축바에서 뺐습니다' : '★ 내 단축바에 담았습니다');
 }
+/* ★ 내 단축바 탭에 담을 도구 = 카드의 ☆를 누른 것만 */
+function favList(){ return (window.PRODUCTS || []).filter(p => isFav(p.k)); }
 function markRecent(k){
   if (!k) return;
   var r = lsArr(REC_KEY).filter(x => x !== k);
@@ -502,9 +500,15 @@ document.addEventListener('click', e => {
 }, true);
 
 function render(){
-  const list = window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
-  $('#count').textContent = list.length + '개';
+  const favMode = cur === 'fav';
+  const list = favMode ? favList()
+    : window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
+  $('#count').textContent = favMode ? (list.length ? list.length + '개 담김' : '') : list.length + '개';
   renderLegend();
+  if (favMode && !list.length){
+    $('#plist').innerHTML = '<div class="favEmpty">카드 아래 ☆를 누르면 자주 쓰는 도구가 여기에 담깁니다</div>';
+    renderFav(); return;
+  }
   $('#plist').innerHTML = list.map(p => {
     const m = stMeta(p);
     const fv = isFav(p.k);
