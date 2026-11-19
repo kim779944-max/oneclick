@@ -1160,8 +1160,7 @@ const SHOP_GUARD = (function(){
   try{
     if (window.KTSApp) return false;
     if (/KTS[\s\S]*더뷰/.test(navigator.userAgent)) return false;
-    if (/(^|\.)autooneclick\.com$/.test(location.hostname)) return false;
-    if (/autooneclick\.com/.test(document.referrer || '')) return false;
+    if (/autooneclick\.com/.test(document.referrer || '')) return false;   /* 쇼룸에서 눌러 들어온 경우는 브라우저 기본 뒤로가기에 맡깁니다 */
     return true;
   }catch(e){ return false; }
 })();
