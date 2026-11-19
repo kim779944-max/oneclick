@@ -139,6 +139,14 @@ h1 em{font-style:normal;color:var(--or)}
   opacity:0;transition:.25s;z-index:120;pointer-events:none;max-width:88vw;text-align:center}
 .toast.on{opacity:1}
 </style>
+<style>
+  /* ---------- (추가 2026-11-20) 특가 → 원클릭 쇼룸 유입 깔때기 ---------- */
+  .ktsShop{display:block;margin:12px 14px 2px;text-align:center;text-decoration:none;border:1px solid rgba(255,107,0,.6);
+    border-radius:14px;padding:12px 14px;line-height:1.3;background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,255,255,.02));
+    color:#FFA24D;font-size:13.5px;font-weight:900;letter-spacing:-.3px}
+  .ktsShop span{display:block;font-size:10.5px;font-weight:700;color:#9FB0C8;margin-top:3px;letter-spacing:0}
+  .ktsShop:active{transform:translateY(1px)}
+</style>
 </head>
 <body>
 <div id="app">
@@ -158,6 +166,8 @@ h1 em{font-style:normal;color:var(--or)}
     <h1>오늘 <em>특가만</em> 모아서,<br>체크하면 <em>발주서 1초</em>.</h1>
     <p class="lead">편의점 1+1·2+1, 제과점·카페 쿠폰, 마트 전단, <b>사장님용 업소 식자재</b>까지 마트별로 값 비교.</p>
   </div>
+
+  <a class="ktsShop" href="https://autooneclick.com/?from=sale" id="shopMore">더보기 · 원클릭 쇼룸 가기 →<span>더양식 · 더계약서 · 더뷰 · 더상세 한자리</span></a>
 
   <div class="tabs" id="tabs"></div>
   <div class="filters" id="filters">
@@ -496,6 +506,30 @@ h1 em{font-style:normal;color:var(--or)}
   });
 
   render();
+})();
+</script>
+<script>
+/* ---------- (추가 2026-11-20) 외부 직통 진입 → 뒤로가기 = 원클릭 쇼룸 착지 ----------
+   메인에 처음 들어올 때 1회만 history를 쌓고, 뒤로가기가 오면
+   · 발주서 시트가 열려 있으면 시트만 닫고
+   · 이미 목록 화면이면 쇼룸으로 착지합니다.  쇼룸에서 눌러 들어온 경우·앱 안에서는 끕니다. */
+(function(){
+  var SHOP_HOME = 'https://autooneclick.com/?from=sale-back';
+  var on = false;
+  try{
+    on = !window.KTSApp && !/KTS\s*(앱|App)/i.test(navigator.userAgent || '')
+       && !/autooneclick\.com/.test(document.referrer || '');
+  }catch(e){ on = false; }
+  if (!on) return;
+  try{ if (!(history.state && history.state.v)) history.pushState({v:'shopguard'}, '', location.pathname + location.search); }catch(e){}
+  var landed = false;
+  window.addEventListener('popstate', function(){
+    if (landed) return;
+    var sh = document.getElementById('sheet');
+    if (sh && sh.classList.contains('on')){ sh.classList.remove('on'); return; }
+    landed = true;
+    try{ location.replace(SHOP_HOME); }catch(e){ location.href = SHOP_HOME; }
+  });
 })();
 </script>
 </body>

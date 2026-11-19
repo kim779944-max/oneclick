@@ -86,6 +86,13 @@ input,textarea{font-family:inherit}
 #home .home-btn.primary .ico{stroke:#0A1224;stroke-width:2}
 #home .home-foot{color:#7D8AA0}
  (max-height:640px){#home .home-logo{width:96px;height:96px}#home .home-steps{margin-bottom:20px}}
+/* ---------- (추가 2026-11-20) 무료 도구 → 원클릭 쇼룸 유입 깔때기 ---------- */
+.home-shop{display:block;width:100%;max-width:330px;margin:14px 0 46px;text-align:center;text-decoration:none;
+  border:1px solid rgba(255,107,0,.6);border-radius:14px;padding:12px 14px;line-height:1.3;
+  background:linear-gradient(180deg,rgba(255,107,0,.18),rgba(18,32,60,.55));color:#FFA24D;
+  font-size:13.5px;font-weight:900;letter-spacing:-.3px}
+.home-shop span{display:block;font-size:10.5px;font-weight:700;color:#9FB0C8;margin-top:3px;letter-spacing:0}
+.home-shop:active{transform:translateY(1px)}
 
 /* ---------- 2. 카메라 ---------- */
 #camera{background:#000}
@@ -556,6 +563,7 @@ body.stt-on #btnMic{background:rgba(255,107,0,.92);animation:pulse 1.1s infinite
       <span>갤러리보기</span>
     </button>
   </div>
+  <a class="home-shop" href="https://autooneclick.com/?from=saycap" id="shopMore">더보기 · 원클릭 쇼룸 가기 →<span>더양식 · 더계약서 · 더뷰 · 더상세 한자리</span></a>
   <div class="home-foot">
     사진 원본은 <b>100% 그대로</b> · 한 번 톡 = 자막 꺼짐 · 말하면 자막<br>
     <span style="opacity:.8">촬영 · 갤러리 · 검색 · 확대 · 내보내기</span>
@@ -2784,6 +2792,29 @@ window.addEventListener('beforeunload', ()=>{ urlCache.forEach(u=>URL.revokeObje
 document.addEventListener('visibilitychange', ()=>{
   if(document.hidden){ stopSTT(); stopRec(); }
 });
+</script>
+<script>
+/* ---------- (추가 2026-11-20) 외부 직통 진입 → 뒤로가기 = 원클릭 쇼룸 착지 ----------
+   메인(홈)에 처음 들어올 때 1회만 history를 쌓고, 뒤로가기가 오면
+   · 단계(카메라·편집·갤러리·뷰어) 중이면 홈으로만 돌아가고
+   · 이미 홈이면 쇼룸으로 착지합니다.  쇼룸에서 눌러 들어온 경우·앱 안에서는 끕니다. */
+(function(){
+  var SHOP_HOME = 'https://autooneclick.com/?from=saycap-back';
+  var on = false;
+  try{
+    on = !window.KTSApp && !/KTS\s*(앱|App)/i.test(navigator.userAgent || '')
+       && !/autooneclick\.com/.test(document.referrer || '') && !location.hash;
+  }catch(e){ on = false; }
+  if (!on) return;
+  try{ if (!(history.state && history.state.v)) history.pushState({v:'shopguard'}, '', location.pathname + location.search); }catch(e){}
+  var landed = false;
+  window.addEventListener('popstate', function(){
+    if (landed) return;
+    if (typeof currentScreen === 'string' && currentScreen !== 'home'){ show('home'); return; }
+    landed = true;
+    try{ location.replace(SHOP_HOME); }catch(e){ location.href = SHOP_HOME; }
+  });
+})();
 </script>
 </body>
 </html>

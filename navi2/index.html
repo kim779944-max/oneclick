@@ -191,6 +191,15 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 .expl{font-size:11.5px;color:#93A4BC;line-height:1.65;margin:9px 2px 0;word-break:keep-all}
 .expl b{color:#E7EDF6}
 </style>
+<style>
+/* ---------- (추가 2026-11-20) 무료 진단 → 원클릭 쇼룸 유입 깔때기 ---------- */
+.ktsShop{display:block;margin:8px 12px 0;text-align:center;text-decoration:none;
+  border:1px solid rgba(255,107,0,.6);border-radius:14px;padding:12px 14px;line-height:1.3;
+  background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,255,255,.02));
+  color:#FFA24D;font-size:13.5px;font-weight:900;letter-spacing:-.3px}
+.ktsShop span{display:block;font-size:10.5px;font-weight:700;color:#9FB0C8;margin-top:3px;letter-spacing:0}
+.ktsShop:active{transform:translateY(1px)}
+</style>
 </head>
 <body>
 <div id="app">
@@ -203,6 +212,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   </header>
 <a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
+  <a class="ktsShop" href="https://autooneclick.com/?from=navi2" id="shopMore">더보기 · 원클릭 쇼룸 가기 →<span>더양식 · 더계약서 · 더뷰 · 더상세 한자리</span></a>
 
   <!-- ① 표지 -->
   <section class="scr on" id="sIntro">
@@ -830,6 +840,35 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
   window.__APP = APP;
   window.__ST = ST;
+})();
+</script>
+<script>
+/* ---------- (추가 2026-11-20) 외부 직통 진입 → 뒤로가기 = 원클릭 쇼룸 착지 ----------
+   메인(표지)에 처음 들어올 때 1회만 history를 쌓고, 뒤로가기가 오면
+   · 단계(모드·질문·결과) 중이면 표지로만 돌아가고
+   · 이미 표지면 쇼룸으로 착지합니다.  쇼룸에서 눌러 들어온 경우·공유 링크·앱 안에서는 끕니다. */
+(function(){
+  var SHOP_HOME = 'https://autooneclick.com/?from=navi2-back';
+  var on = false;
+  try{
+    on = !window.KTSApp && !/KTS\s*(앱|App)/i.test(navigator.userAgent || '')
+       && !/autooneclick\.com/.test(document.referrer || '') && !location.hash;
+  }catch(e){ on = false; }
+  if (!on) return;
+  try{ if (!(history.state && history.state.v)) history.pushState({v:'shopguard'}, '', location.pathname + location.search); }catch(e){}
+  var landed = false;
+  window.addEventListener('popstate', function(){
+    if (landed) return;
+    var intro = document.getElementById('sIntro');
+    if (intro && !intro.classList.contains('on')){
+      var all = document.querySelectorAll('.scr');
+      for (var i = 0; i < all.length; i++) all[i].classList.toggle('on', all[i] === intro);
+      window.scrollTo(0, 0);
+      return;
+    }
+    landed = true;
+    try{ location.replace(SHOP_HOME); }catch(e){ location.href = SHOP_HOME; }
+  });
 })();
 </script>
 </body>
