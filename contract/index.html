@@ -933,7 +933,11 @@ async function buildHwpx(st){
     body += '</hp:tr>';
   }
   body += '</hp:tbl></hp:run></hp:p>';
-  const section = t.prefix + body + '</hs:sec>';
+  let pre = t.prefix;
+  const tiny = H.chId[chKey(false, '', 100)] || 0;
+  if (tiny) pre = pre.replace(/<hp:p id="0" paraPrIDRef="1"([^>]*)><hp:run charPrIDRef="1">/,
+    `<hp:p id="0" paraPrIDRef="${H.paId['TH'] || 1}"$1><hp:run charPrIDRef="${tiny}">`);
+  const section = pre + body + '</hs:sec>';
   return [
     {name:'mimetype', data:'application/hwp+zip', store:true},
     {name:'version.xml', data:t.text['version.xml']},
@@ -1084,7 +1088,11 @@ async function buildHwpxDoc(st){
     }
     body += '</hp:tbl></hp:run></hp:p>';
   }
-  const section = t.prefix + body + '</hs:sec>';
+  let pre = t.prefix;
+  const tiny = H.chId[chKey(false, '', 100)] || 0;
+  if (tiny) pre = pre.replace(/<hp:p id="0" paraPrIDRef="1"([^>]*)><hp:run charPrIDRef="1">/,
+    `<hp:p id="0" paraPrIDRef="${H.paId['TH'] || 1}"$1><hp:run charPrIDRef="${tiny}">`);
+  const section = pre + body + '</hs:sec>';
   return [
     {name:'mimetype', data:'application/hwp+zip', store:true},
     {name:'version.xml', data:t.text['version.xml']},
@@ -1097,6 +1105,282 @@ async function buildHwpxDoc(st){
     {name:'Contents/section0.xml', data:section}
   ];
 }
+/* ===== 더계약서 전용 — A4 세로 1장 고정 조판 ===== */
+/* 위 물건 표·대금 표·아래 인적사항/날인 표는 폭(50,000)과 칸을 고정(treatAsChar=1)하고,
+   그 사이의 본문 조항·특약사항만 줄간격·문단간격·글자 크기를 조절해 A4 한 장에 딱 맞춘다. */
+const KC_PW = 59528, KC_PH = 84188;
+const KC_ML = 3402, KC_MR = 3402, KC_MT = 2400, KC_MB = 2400, KC_HF = 500;
+const KC_BODY_W = KC_PW - KC_ML - KC_MR;      /* 52724 */
+const KC_TBL_W = KC_BODY_W;                   /* 표 폭 = 본문 가용 폭 (오른쪽 끝 일치) */
+const KC_BODY_H = KC_PH - (KC_MT + KC_HF) - (KC_MB + KC_HF);   /* 78388 — 머리/꼬리 띠까지 뺀 실제 본문 높이 */
+const KCF = {top:260, tblPad:566, tblX:60, safe:0};        /* 페이지 설정 문단·표 바깥여백·측정 오차 */
+window.KCF = KCF;
+const KC_LIMIT = KC_BODY_H - 1500;                             /* 채울 수 있는 최대 높이(줄 하나 분의 여유 포함) */
+const KC_BASE = 9.5;                          /* buildDoc 기본 본문 글자 크기(pt) */
+let KCTPL = null;
+function kcTpl(t){
+  if (KCTPL) return KCTPL;
+  /* 머리/꼬리 500, 위아래 2400(8.5mm), 좌우 3402(12mm) — 세로(WIDELY) 유지 */
+  const prefix = t.prefix
+    .replace(/<hp:margin header="\d+" footer="\d+" gutter="0" left="\d+" right="\d+" top="\d+" bottom="\d+"\/>/,
+      `<hp:margin header="${KC_HF}" footer="${KC_HF}" gutter="0" left="${KC_ML}" right="${KC_MR}" top="${KC_MT}" bottom="${KC_MB}"/>`)
+    .replace(/horzsize="\d+"/g, `horzsize="${KC_BODY_W}"`)
+    /* 페이지 설정을 담은 빈 문단이 위쪽 11mm를 먹지 않도록 높이를 0에 가깝게 */
+    .replace(/vertsize="1000" textheight="1000" baseline="850" spacing="600"/g, 'vertsize="10" textheight="10" baseline="8" spacing="0"');
+  KCTPL = {prefix, pos: '<hp:pos treatAsChar="1" affectLSpacing="1" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>',
+    outm: t.parts.outm, inm: t.parts.inm, text: t.text};
+  return KCTPL;
+}
+function kcItems(st){
+  const items = [];
+  (st.doc || []).forEach(b => {
+    if (b.t === 'table'){
+      if (b.main){ if (!st._noMain) items.push({kind:'tbl', tst:st, main:true}); }
+      else items.push({kind:'tbl', tst:b.tbl});
+    } else if (b.t === 'text'){
+      if (b.bg && b.runs.length) items.push({kind:'tbl', tst:bannerTable(b)});
+      else items.push({kind:'txt', b});
+    }
+  });
+  return items;
+}
+const kcSize = (pt, sc) => Math.max(700, Math.round(pt * 100 * (sc || 1) / 50) * 50);
+function kcCellLines(c, w, h){
+  const avail = Math.max(600, w - CELL_MARGIN);
+  const lines = String(c.text == null ? '' : c.text).split('\n');
+  let n = 0;
+  lines.forEach(l => { n += Math.max(1, Math.ceil(textUnits(l) * (h / 900) / avail)); });
+  return Math.max(1, n);
+}
+function kcRowLines(tst, r, widths){
+  let mx = 1;
+  tst.cells.forEach(c => {
+    if (c.r > r || c.r + c.rs <= r) return;
+    let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+    const n = kcCellLines(c, w, c._h || 900);
+    if (n > mx) mx = n;
+  });
+  return mx;
+}
+function kcPrep(items){
+  items.forEach(it => {
+    if (it.kind === 'txt') return;
+    const tst = it.tst, tw = KC_TBL_W;
+    if (it.main && !tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);
+    const widths = (tst.colWidths || []).map(w => Math.max(600, Math.round(tw * w / 100)));
+    while (widths.length < tst.nCols) widths.push(Math.round(tw / tst.nCols));
+    widths[widths.length - 1] += tw - widths.reduce((a, b) => a + b, 0);
+    it.widths = widths;
+    if (!tst._banner) tst.cells.forEach(c => { c.nb = false; c.bg = ''; });   /* 라벨 칸도 실선 테두리(2)로 표 바깥까지 닫는다 */
+    tst.cells.forEach(c => {
+      let cw = 0; for (let k = 0; k < c.cs; k++) cw += widths[c.c + k] || 0;
+      if (!c._fixH) c._h = tst.lockWidths ? shrinkH(c.text, cw) : 900;
+    });
+    it.rows = []; let tot = 0;
+    for (let r = 0; r < tst.nRows; r++){
+      const n = kcRowLines(tst, r, widths);
+      let hm = 900;
+      tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hm = Math.max(hm, c._h || 900); });
+      const rh = Math.max(1150, n * Math.round(hm * 1.25) + 190);
+      it.rows.push(rh); tot += rh;
+    }
+    it.h = tot + KCF.tblPad + KCF.tblX;    /* 표 높이 + 바깥 여백 */
+  });
+}
+function kcTextLines(b, h){
+  let n = 0;
+  runLines(b.runs).forEach(ln => {
+    const txt = ln.map(r => r.text).join('');
+    n += Math.max(1, Math.ceil(textUnits(txt) * (h / 900) / KC_BODY_W));
+  });
+  return Math.max(1, n);
+}
+function kcMeasure(items, sc, pct, next){
+  let tot = KCF.top + KCF.safe;
+  items.forEach(it => {
+    if (it.kind === 'tbl'){ tot += it.h; return; }
+    const h = kcSize(it.b.size, sc);
+    tot += kcTextLines(it.b, h) * Math.round(h * pct / 100) + next;
+  });
+  return tot;
+}
+function kcFit(items){
+  const SIZES = [9.6, 9.4, 9.2, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0];
+  let pick = null;
+  for (const size of SIZES){
+    const sc = size / KC_BASE;
+    for (let pct = 138; pct >= 128 && !pick; pct -= 2){
+      for (const next of [500, 400, 300, 200, 100, 0]){
+        if (kcMeasure(items, sc, pct, next) <= KC_LIMIT){ pick = {size, sc, pct, next}; break; }
+      }
+    }
+    if (pick) break;
+  }
+  if (!pick) pick = {size: 8.0, sc: 8.0 / KC_BASE, pct: 128, next: 0};
+  /* 채우기 — 같은 글자 크기에서 줄간격·문단간격을 늘려 바닥까지 */
+  let best = null, bestTot = -1;
+  for (let pct = pick.pct; pct <= 170; pct += 2)
+    for (let next = pick.next; next <= 1200; next += 50){
+      const tot = kcMeasure(items, pick.sc, pct, next);
+      if (tot <= KC_LIMIT && tot > bestTot){ bestTot = tot; best = {pct, next}; }
+    }
+  if (best){ pick.pct = best.pct; pick.next = best.next; }
+  /* 그래도 비면 표의 행 높이를 조금씩 늘려 바닥까지 고르게 채운다 */
+  let tot = kcMeasure(items, pick.sc, pick.pct, pick.next);
+  const tls = items.filter(it => it.kind === 'tbl');
+  if (tot < KC_LIMIT - 400 && tls.length){
+    const rowsAll = tls.reduce((a, t) => a + t.rows.length, 0);
+    const per = Math.min(1200, Math.floor((KC_LIMIT - tot - 200) / Math.max(1, rowsAll)));
+    if (per > 0){
+      tls.forEach(t => { t.rows = t.rows.map(h => h + per); t.h += per * t.rows.length; });
+      tot = kcMeasure(items, pick.sc, pick.pct, pick.next);
+    }
+  }
+  pick.total = tot; pick.limit = KC_LIMIT;
+  return pick;
+}
+function kcHeader(base, need){
+  let borderFills = '', chars = '', paras = '';
+  let bfCnt = 2, chCnt = 3, paCnt = 10;
+  const bfId = {}, chId = {}, paId = {};
+  const bfXml = (id, bg, line) => {
+    const side = s => `<hh:${s}Border type="${line ? 'SOLID' : 'NONE'}" width="${line ? '0.12 mm' : '0.1 mm'}" color="#000000"/>`;
+    return `<hh:borderFill id="${id}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">`
+      + '<hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>'
+      + side('left') + side('right') + side('top') + side('bottom')
+      + '<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>'
+      + (bg ? `<hc:fillBrush><hc:winBrush faceColor="${bg}" hatchColor="#999999" alpha="0"/></hc:fillBrush>` : '')
+      + '</hh:borderFill>';
+  };
+  need.bgs.forEach(bg => {
+    if (!bg){ bfId[''] = 2; return; }
+    if (bfId[bg]) return;
+    bfCnt++; bfId[bg] = 99 + bfCnt; borderFills += bfXml(bfId[bg], bg, true);
+  });
+  (need.nbBgs || []).forEach(bg => {
+    const k = 'nb|' + (bg || '');
+    if (bfId[k]) return;
+    if (!bg){ bfId[k] = 1; return; }
+    bfCnt++; bfId[k] = 99 + bfCnt; borderFills += bfXml(bfId[k], bg, false);
+  });
+  need.chars.forEach(c => {
+    const key = chKey(c.b, c.color, c.h, c.hl, c.ul);
+    if (chId[key]) return;
+    chCnt++; const id = 99 + chCnt; chId[key] = id;
+    chars += `<hh:charPr id="${id}" height="${c.h || 900}" textColor="${c.color || '#000000'}" shadeColor="${c.hl || 'none'}" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">`
+      + '<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + '<hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
+      + '<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
+      + (c.b ? '<hh:bold/>' : '')
+      + `<hh:underline type="${c.ul ? 'BOTTOM' : 'NONE'}" shape="SOLID" color="${c.ul || '#000000'}"/><hh:strikeout shape="NONE" color="#000000"/>`
+      + '<hh:outline type="NONE"/><hh:shadow type="NONE" color="#000000" offsetX="0" offsetY="0"/></hh:charPr>';
+  });
+  const paBase = /<hh:paraPr id="0".*?<\/hh:paraPr>/s.exec(base)[0];
+  need.paras.forEach(spec => {
+    const p = spec.split('|'), key = p[0];
+    if (paId[key]) return;
+    paCnt++; const id = 99 + paCnt; paId[key] = id;
+    const horiz = key === 'L' || key === 'TL' ? 'JUSTIFY' : (key === 'R' || key === 'TR' ? 'RIGHT' : 'CENTER');
+    paras += paBase.replace(/<hh:paraPr id="0"/, `<hh:paraPr id="${id}"`)
+      .replace(/<hh:align horizontal="[A-Z]+"/, `<hh:align horizontal="${horiz}"`)
+      .replace(/<hh:lineSpacing type="PERCENT" value="\d+"/g, `<hh:lineSpacing type="PERCENT" value="${p[1]}"`)
+      .replace(/<hc:next value="\d+" unit="HWPUNIT"\/>/g, `<hc:next value="${p[2]}" unit="HWPUNIT"/>`)
+      .replace(/<hc:prev value="\d+" unit="HWPUNIT"\/>/g, `<hc:prev value="${p[3] || 0}" unit="HWPUNIT"/>`);
+  });
+  let xml = base;
+  xml = xml.replace('<hh:borderFills itemCnt="2">', `<hh:borderFills itemCnt="${bfCnt}">`);
+  xml = xml.replace('</hh:borderFills>', borderFills + '</hh:borderFills>');
+  xml = xml.replace(/<hh:charProperties itemCnt="3">/, `<hh:charProperties itemCnt="${chCnt}">`);
+  xml = xml.replace('</hh:charProperties>', chars + '</hh:charProperties>');
+  xml = xml.replace(/<hh:paraProperties itemCnt="10">/, `<hh:paraProperties itemCnt="${paCnt}">`);
+  xml = xml.replace('</hh:paraProperties>', paras + '</hh:paraProperties>');
+  return {xml, bfId, chId, paId};
+}
+async function buildHwpxContract(st){
+  const t = kcTpl(await loadTpl());
+  const items = kcItems(st);
+  kcPrep(items);
+  const fit = kcFit(items);
+  const need = {bgs:[''], nbBgs:[''], chars:[],
+    paras:['C|125|0|0', 'L|125|0|0', 'R|125|0|0', 'TH|100|0|0',
+      `TL|${fit.pct}|${fit.next}|0`, `TC|${fit.pct}|${fit.next}|0`, `TR|${fit.pct}|${fit.next}|0`]};
+  const addChar = (b, color, h, hl, ul) => need.chars.push({b:!!b, color:color || '', h:h || 900, hl:hl || '', ul:ul || ''});
+  items.forEach(it => {
+    if (it.kind === 'txt'){
+      const h = kcSize(it.b.size, fit.sc);
+      addChar(false, '', h);
+      (it.b.runs || []).forEach(r => addChar(r.b, r.color, h, r.hl, r.ul));
+      return;
+    }
+    it.tst.cells.forEach(c => {
+      if (c.nb) need.nbBgs.push(c.bg || ''); else need.bgs.push(c.bg || '');
+      const base = {b:!!c.bold, color:c.color || '', h:c._h || 900};
+      addChar(base.b, base.color, base.h);
+      (c.runs || []).forEach(r => addChar(base.b || r.b, r.color || base.color, base.h, r.hl, r.ul));
+    });
+  });
+  need.chars.push({b:false, color:'', h:100});            /* 페이지 설정 문단을 0 높이로 눌러 위쪽 여백을 살린다 */
+  const face = FONT_ALIAS[CUR_FONT] || CUR_FONT || '';
+  const H = kcHeader(hwFont(t.text['Contents__header.xml'], face), need);
+  let body = '', pid = 200, seq = 5000, tblId = 1;
+  for (const it of items){
+    if (it.kind === 'txt'){
+      const b = it.b, h = kcSize(b.size, fit.sc);
+      const pa = H.paId['T' + b.align] || 0;
+      body += b.runs.length ? hwRunParas(b.runs, {b:false, color:'', h}, pa, H, pid * 10)
+        : `<hp:p id="${pid * 10}" paraPrIDRef="${pa}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${H.chId[chKey(false, '', h)] || 0}"><hp:t/></hp:run></hp:p>`;
+      pid++;
+      continue;
+    }
+    const tst = it.tst, widths = it.widths, rowH = r => it.rows[r];
+    let totalH = 0; for (let r = 0; r < tst.nRows; r++) totalH += rowH(r);
+    body += `<hp:p id="${pid * 10}" paraPrIDRef="${H.paId['TH'] || 0}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0">`;
+    pid++;
+    body += `<hp:tbl id="${tblId++}" zOrder="0" numberingType="NONE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${tst.nRows}" colCnt="${tst.nCols}" cellSpacing="0" borderFillIDRef="${tst._banner ? 1 : 2}" noAdjust="0">`;
+    body += `<hp:sz width="${KC_TBL_W}" widthRelTo="ABSOLUTE" height="${totalH}" heightRelTo="ABSOLUTE" protect="0"/>`;
+    body += t.pos + t.outm + t.inm;
+    const byRow = {}; tst.cells.forEach(c => (byRow[c.r] = byRow[c.r] || []).push(c));
+    const covered = Array.from({length: tst.nRows}, () => new Array(tst.nCols).fill(false));
+    tst.cells.forEach(c => { for (let y = c.r; y < c.r + c.rs; y++) for (let x = c.c; x < c.c + c.cs; x++) if (covered[y]) covered[y][x] = true; });
+    const blank = {bold:false, color:'', bg:'', align:'C'};
+    for (let r = 0; r < tst.nRows; r++){
+      const list = (byRow[r] || []).sort((a, b) => a.c - b.c);
+      let acc = 0;
+      body += '<hp:tr>';
+      for (const c of list){
+        let w = 0; for (let k = 0; k < c.cs; k++) w += widths[c.c + k] || 0;
+        let h = 0; for (let k = 0; k < c.rs; k++) h += rowH(r + k) || rowH(r);
+        for (let k = acc; k < c.c; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+        body += hwCell(c, r, c.c, c.cs, c.rs, c.text, w, h, H, seq++);
+        acc = c.c + c.cs;
+      }
+      for (let k = acc; k < tst.nCols; k++) if (!covered[r][k]) body += hwCell(blank, r, k, 1, 1, '', widths[k], rowH(r), H, seq++);
+      body += '</hp:tr>';
+    }
+    body += '</hp:tbl></hp:run></hp:p>';
+  }
+  try { window.__kcLayout = {size:fit.size, pct:fit.pct, next:fit.next, total:fit.total, limit:fit.limit,
+    body:KC_BODY_H, tables:items.filter(i => i.kind === 'tbl').map(i => i.h)}; } catch(e){}
+  let pre = t.prefix;
+  const tiny = H.chId[chKey(false, '', 100)] || 0;
+  if (tiny) pre = pre.replace(/<hp:p id="0" paraPrIDRef="1"([^>]*)><hp:run charPrIDRef="1">/,
+    `<hp:p id="0" paraPrIDRef="${H.paId['TH'] || 1}"$1><hp:run charPrIDRef="${tiny}">`);
+  const section = pre + body + '</hs:sec>';
+  return [
+    {name:'mimetype', data:'application/hwp+zip', store:true},
+    {name:'version.xml', data:t.text['version.xml']},
+    {name:'settings.xml', data:t.text['settings.xml']},
+    {name:'META-INF/manifest.xml', data:t.text['META-INF__manifest.xml']},
+    {name:'META-INF/container.xml', data:t.text['META-INF__container.xml']},
+    {name:'META-INF/container.rdf', data:t.text['META-INF__container.rdf']},
+    {name:'Contents/content.hpf', data:t.text['Contents__content.hpf']},
+    {name:'Contents/header.xml', data:H.xml},
+    {name:'Contents/section0.xml', data:section}
+  ];
+}
+
 /* ===== converter.html 엔진 복사본 끝 ===== */
 
 /* ===================== 계약서 1초 생성기 ===================== */
@@ -1565,7 +1849,7 @@ function doPrint(){
 function fileBase(){ const [ra] = ROLE[S.type]; return `${TITLE[S.type].replace(/\s/g, '')}_${(S.a.name || ra).replace(/[\\/:*?"<>|\s]/g, '')}_${(S.money.contractDate || '').replace(/-/g, '')}`; }
 async function hwpxBlob(){
   const st = docFromRaw(buildDoc(), ''); if (!st) throw new Error('문서를 만들지 못했습니다');
-  const z = await makeZip(await buildHwpx(st));
+  const z = await makeZip(await buildHwpxContract(st));
   return new Blob([z], {type:'application/hwp+zip'});
 }
 async function doHwpx(){
