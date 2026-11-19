@@ -601,6 +601,37 @@ function normalize(raw, preview){
     if (!occ[r][c]) out.push({r, c, rs:1, cs:1, text:'', bold:false, align:'C', bg:'', color:'', num:false});
   }
   out.sort((a, b) => a.r - b.r || a.c - b.c);
+  // ② 글자가 하나도 없는 빈 열·빈 행은 없앤다 — 공고번호/게시기간 표의 빈 칸·세로 늘어짐 제거
+  const rowHas = new Array(nRows).fill(false), colHas = new Array(nCols).fill(false);
+  out.forEach(c => {
+    if (String(c.text == null ? '' : c.text).trim() === '') return;
+    for (let r = c.r; r < c.r + c.rs; r++) rowHas[r] = true;
+    for (let k = c.c; k < c.c + c.cs; k++) colHas[k] = true;
+  });
+  const keepR = [], keepC = [];
+  rowHas.forEach((v, i) => { if (v) keepR.push(i); });
+  colHas.forEach((v, i) => { if (v) keepC.push(i); });
+  if (keepR.length && keepC.length && (keepR.length < nRows || keepC.length < nCols)){
+    const rMap = {}, cMap = {};
+    keepR.forEach((r, i) => rMap[r] = i);
+    keepC.forEach((c, i) => cMap[c] = i);
+    const kept = out.filter(c => rMap[c.r] != null && cMap[c.c] != null);
+    const w0 = cw.slice(), r0 = (raw.rowHeights || []).slice();
+    /* 지운 열·행의 비율만큼 남은 칸에 다시 나눠 준다(원본 비율 유지) */
+    const nC = keepC.length, nR = keepR.length;
+    const cw2 = keepC.map(c => (w0[c] || (1000 / nCols)) || 1);
+    const sC = cw2.reduce((a, b) => a + b, 0) || 1;
+    cw = cw2.map(w => Math.round(w / sC * 1000) / 10);
+    nRows = nR; nCols = nC;
+    kept.forEach(c => { c.r = rMap[c.r]; c.c = cMap[c.c]; });
+    out.length = 0; out.push(...kept);
+    if (r0.length >= nRows && isFinite(+raw.h)){
+      /* 행 높이는 아래 rowHeights 계산에서 다시 매긴다 */
+      raw = Object.assign({}, raw, { rowHeights: keepR.map(r => r0[r] || 0) });
+      const sR = raw.rowHeights.reduce((a, b) => a + (+b || 0), 0) || 1;
+      raw.rowHeights = raw.rowHeights.map(x => (+x || 0) / sR * 1000 / 10);
+    }
+  }
   // 열이 너무 좁아 '5/13' 같은 값이 두 줄로 쪼개지는 것 방지: 가장 긴 토큰 기준으로 최소 폭 확보
   const minW = new Array(nCols).fill(0);
   out.forEach(c => {
@@ -634,10 +665,12 @@ function normHex(v){ const s = String(v || '').trim(); return /^#[0-9a-f]{6}$/i.
 function normRuns(a){
   if (!Array.isArray(a)) return null;
   const ulOf = v => normHex(v) || ((v === 1 || v === '1' || v === true) ? '#000000' : '');
+  const HL_AUTO = false;   /* 형광펜 자동 칠하기 끔 — 사진 그림자·종이 빛깔까지 노란 형광펜으로 칠해지던 문제(적립 72-④) */
+  const hlOf = v => HL_AUTO ? normHex(v) : '';
   const out = [];
   a.forEach(x => {
-    if (Array.isArray(x)) out.push({text:String(x[0] == null ? '' : x[0]), b:!!+x[1], color:normHex(x[2]), hl:normHex(x[3]), ul:ulOf(x[4])});
-    else if (x && typeof x === 'object') out.push({text:String(x.text == null ? '' : x.text), b:!!(x.b || x.bold), color:normHex(x.color), hl:normHex(x.hl || x.highlight), ul:ulOf(x.ul || x.underline)});
+    if (Array.isArray(x)) out.push({text:String(x[0] == null ? '' : x[0]), b:!!+x[1], color:normHex(x[2]), hl:hlOf(x[3]), ul:ulOf(x[4])});
+    else if (x && typeof x === 'object') out.push({text:String(x.text == null ? '' : x.text), b:!!(x.b || x.bold), color:normHex(x.color), hl:hlOf(x.hl || x.highlight), ul:ulOf(x.ul || x.underline)});
     else if (typeof x === 'string') out.push({text:x, b:false, color:'', hl:'', ul:''});
   });
   const m = [];
@@ -672,7 +705,7 @@ function docFromRaw(raw, preview){
       if (!isTbl(b)) continue;
       const p = placeXW(b);
       if (b === main){ st = normalize(b, preview); doc.push({t:'table', main:true, x:p.x, w:p.w, y:st.y, h:st.h}); }
-      else doc.push({t:'table', x:p.x, w:p.w, y:(isFinite(+b.y) ? +b.y : undefined), h:(isFinite(+b.h) ? +b.h : undefined), tbl:normalize(Object.assign({}, b, {lockWidths:true}), '')});
+      else doc.push({t:'table', x:p.x, w:p.w, y:(isFinite(+b.y) ? +b.y : undefined), h:(isFinite(+b.h) ? +b.h : undefined), tbl:normalize(b, '')});
     } else if (t === 'blank'){
       /* 직인·도장·QR 자리 — 글자 대신 빈 자리만 원래 높이대로 남긴다 */
       const hh = Math.max(2, Math.min(40, +b.h || 6));
@@ -1303,21 +1336,22 @@ function hwHeader(base, need){
       + (bg ? `<hc:fillBrush><hc:winBrush faceColor="${bg}" hatchColor="#999999" alpha="0"/></hc:fillBrush>` : '')
       + '</hh:borderFill>';
   };
+  /* 한글·리더 모두 테두리채우기를 '1부터 빈틈없는 번호'로 읽는다 — 102번 같은 빈 번호는 배경색이 통째로 빠진다 */
   need.bgs.forEach(bg => {
     if (!bg){ bfId[''] = 2; return; }
     if (bfId[bg]) return;
-    bfCnt++; bfId[bg] = 99 + bfCnt; borderFills += bfXml(bfId[bg], bg, true);
+    bfCnt++; bfId[bg] = bfCnt; borderFills += bfXml(bfId[bg], bg, true);
   });
   (need.nbBgs || []).forEach(bg => {          /* 테두리 없는 칸(좌우 작은 표 사이 빈 열·제목 배너) */
     const k = 'nb|' + (bg || '');
     if (bfId[k]) return;
     if (!bg){ bfId[k] = 1; return; }
-    bfCnt++; bfId[k] = 99 + bfCnt; borderFills += bfXml(bfId[k], bg, false);
+    bfCnt++; bfId[k] = bfCnt; borderFills += bfXml(bfId[k], bg, false);
   });
   need.chars.forEach(c => {
     const key = chKey(c.b, c.color, c.h, c.hl, c.ul);
     if (chId[key]) return;
-    chCnt++; const id = 99 + chCnt; chId[key] = id;
+    const id = chCnt; chCnt++; chId[key] = id;
     chars += `<hh:charPr id="${id}" height="${c.h || 900}" textColor="${c.color || '#000000'}" shadeColor="${c.hl || 'none'}" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">`
       + '<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>'
       + '<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>'
@@ -1331,7 +1365,7 @@ function hwHeader(base, need){
   const paBase = /<hh:paraPr id="0".*?<\/hh:paraPr>/s.exec(base)[0];
   need.aligns.forEach(al => {
     if (paId[al]) return;
-    paCnt++; const id = 99 + paCnt; paId[al] = id;
+    const id = paCnt; paCnt++; paId[al] = id;
     /* 'L'/'C'/'R' = 표 칸(줄간격 125%) · 'TL'/'TC'/'TR' = 본문 문단(줄간격 160%, 문단 아래 여백) */
     const a = al.charAt(al.length - 1), text = al.length > 1;
     const horiz = a === 'L' ? 'JUSTIFY' : (a === 'R' ? 'RIGHT' : 'CENTER');
@@ -1352,12 +1386,12 @@ function hwHeader(base, need){
 }
 /* ================= 열 너무·행 높이: 원본 1:1 보장 ================= */
 const HWPU_PER_PT = 100;           /* 1pt = 100 HWPUNIT */
-const CELL_MARGIN = 360;           /* 좌우 여백 합 170+170 + 여유 */
+const CELL_MARGIN = 700;           /* 좌우 여백 170+170 + 글꼴이 실제로 더 먹는 폭 여유 */
 function charUnits(ch){
   const c = ch.charCodeAt(0);
-  if(c === 32) return 260;                       /* 공백 */
-  if(c < 128) return 470;                        /* 영문·숫자·기호 */
-  if(c >= 0x3130 && c <= 0x318F) return 480;      /* 한글 호환 자모 */
+  if(c === 32) return 600;                       /* 공백 — 한글 글꼴에서 한 칸 폭에 가깝다 */
+  if(c < 128) return 600;                        /* 영문·숫자·기호 */
+  if(c >= 0x3130 && c <= 0x318F) return 900;      /* 한글 호환 자모 */
   return 900;                                    /* 한글·한자·확장 */
 }
 function textUnits(s){
@@ -1387,6 +1421,7 @@ function fitColWidths(st, totalW){
     const lines = String(c.text == null ? '' : c.text).split('\n');
     let mx = 0;
     lines.forEach(l => { const u = textUnits(l); if (u > mx) mx = u; });
+    if (c.bold) mx = Math.round(mx * 1.18);          /* 머리글 굵은 글씨는 실제로 더 넓다 */
     if (mx > need[c.c]) need[c.c] = mx;
   });
   const minPct = need.map(u => Math.min(60, (u + CELL_MARGIN) / totalW * 100));
@@ -1598,7 +1633,7 @@ async function buildHwpxDoc(st){
     }
     const tst = it.tst;
     const tw = Math.max(3000, Math.round(PW * (it.w || 100) / 100));
-    if (it.main && !tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);
+    if (!tst.lockWidths) tst.colWidths = fitColWidths(tst, tw);   /* 작은 표도 빈칸 없이 글자가 꺾이지 않는 폭으로 */
     const widths = tst.colWidths.map(w => Math.max(600, Math.round(tw * w / 100)));
     widths[widths.length - 1] += tw - widths.reduce((a, b) => a + b, 0);
     it.tw = tw; it.widths = widths;
@@ -1619,7 +1654,7 @@ async function buildHwpxDoc(st){
       tst.cells.forEach(c => { if (c.r === r && c.rs === 1) hMax = Math.max(hMax, c._h || 900); });
       let h = n <= 1 ? 1150 : (n * 1100 + 300);
       if (hMax > 900) h = Math.max(h, n * Math.round(hMax * 1.35) + (tst._banner ? 900 : 400));
-      const p = propRowH(tst, r, 84188); if (p) h = Math.max(h, Math.min(p, h * 4));
+      const p = propRowH(tst, r, 84188); if (p) h = Math.max(h, Math.min(p, (tst.nRows <= 2 && !it.main) ? 2400 : h * 4));   /* 작은 머리 표는 세로로 늘어지지 않게 */
       it.rowH.push(h);
     }
   });

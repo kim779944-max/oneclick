@@ -411,6 +411,7 @@ function stMeta(p){
   const S = window.KTS_STATUS; if (!S) return null;
   if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) return null;
   const it = (S.items || {})[p.k] || {};
+  if (it.hide) return null;                       /* 표시 안 함(시연 합격·확정 상품) */
   const key = it.st || 'before';
   const def = (S.states || {})[key] || { label:'수정전', color:'#94A3B8', ink:'#0B1726' };
   return { key:key, def:def, it:it };
@@ -419,9 +420,9 @@ function renderLegend(){
   const box = $('#slegend'); if (!box) return;
   const S = window.KTS_STATUS; if (!S) { box.innerHTML = ''; return; }
   if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) { box.innerHTML = ''; return; }
-  const cnt = {done:0, after:0, fix:0, before:0};
-  window.PRODUCTS.forEach(p => { cnt[((S.items || {})[p.k] || {}).st || 'before']++; });
-  box.innerHTML = ['done','after','fix','before'].map(k => {
+  const cnt = {after:0, fix:0, before:0};
+  window.PRODUCTS.forEach(p => { const it = (S.items || {})[p.k] || {}; if (it.hide) return; const k = it.st || 'before'; if (cnt[k] != null) cnt[k]++; });
+  box.innerHTML = ['after','fix','before'].filter(k => S.states[k]).map(k => {
     const d = S.states[k];
     return `<i><u style="background:${d.color}"></u>${d.label} ${cnt[k]}</i>`;
   }).join('') + '<i style="color:#6F819C">· 배지를 누르면 수정 내역</i>';

@@ -161,7 +161,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
    <label class="lb">이름표<em>예: 성명 · 금액 · 날짜</em></label>
    <input id="fLabel" maxlength="30">
    <label class="lb">성격</label>
-   <div class="seg" id="fType"><button data-v="text">글자</button><button data-v="number">숫자</button><button data-v="date">날짜</button><button data-v="sign">서명</button></div>
+   <div class="seg" id="fType"><button data-v="text">일반 글자</button><button data-v="sign">서명</button></div>
   </div>
   <p class="kv" id="fCount"></p>
  </div>
@@ -181,7 +181,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  <div class="card">
   <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
   <p class="sub">칸을 누르고 <b style="color:#FFC08A">마이크</b>에 대고 말하면 그 칸에 그대로 들어갑니다. 명함·사업자등록증·신분증·메모지 사진으로 한 번에 채울 수도 있습니다.</p>
-  <div class="microw"><button class="btn sec sm" id="voiceBtn">🎤 말해서 넣기</button><button class="btn sec sm" id="photoFill">사진으로 자동 채우기</button></div>
+  <div class="microw"><button class="btn sec sm" id="voiceBtn">🎤 말해서 넣기</button><button class="btn sec sm" id="photoFill">📷 신분증·명함 읽어오기</button></div>
   <div class="microw"><button class="btn sec sm" id="handBtn">손글씨 사진 읽기</button></div>
   <input type="file" id="handIn" accept="image/*" hidden>
   <input type="file" id="photoIn2" accept="image/*" hidden>
@@ -1558,14 +1558,14 @@ function drawEditor(){
   }
   const f = CUR.fields[SEL];
   $('#fEdit').style.display = f ? 'block' : 'none';
-  if (f){ $('#fLabel').value = f.label; $$('#fType button').forEach(b => b.classList.toggle('on', b.dataset.v === f.type)); $('#fLabel').disabled = ro(); }
+  if (f){ $('#fLabel').value = f.label; $$('#fType button').forEach(b => b.classList.toggle('on', b.dataset.v === (f.type === 'sign' ? 'sign' : 'text'))); $('#fLabel').disabled = ro(); }
   $('#fCount').textContent = `빈칸 ${CUR.fields.length}개 · 되돌리기 ${UNDO.length}단계 저장됨` + (ro() ? ' · 기본 양식은 보기 전용' : '');
   $('#s2tip').textContent = ro() ? '기본 양식입니다. 칸 위치를 바꾸려면 목록에서 [복제]한 뒤 고치세요. 그대로 [다음]을 누르면 값 입력으로 갑니다.'
     : '미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.';
   $('#formName').value = CUR.name || '';
   $('#formName').disabled = ro();
 }
-const TYPE_NM = {text:'글자', number:'숫자', date:'날짜', sign:'서명'};
+const TYPE_NM = {text:'일반 글자', sign:'서명', number:'일반 글자', date:'일반 글자'};   /* 숫자·날짜 구분은 없앴다(적립 73번) — 칸은 '일반 글자'와 '서명' 둘뿐 */
 (function bindStage(){
   const st = $('#edStage'); let drag = null;
   const pct = e => { const r = st.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
