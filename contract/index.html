@@ -45,6 +45,11 @@ main{padding:12px 14px 120px}
 .picks button{font-size:12px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 6px;line-height:1.3}
 .picks button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
 .mini{font-size:10.5px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:4px 9px;margin-left:auto}
+.thm{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.thm button{flex:1;min-width:68px;font-size:12px;font-weight:900;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 6px;display:flex;align-items:center;gap:6px;justify-content:center}
+.thm button.on{color:var(--on-amber);border-color:var(--amber);background:linear-gradient(135deg,var(--amber),var(--amber2))}
+.thm i{width:11px;height:11px;border-radius:3px;border:1px solid #9FB0C8;display:inline-block;flex:0 0 auto}
+.thmnote{font-size:10.5px;color:#7C8DA6;margin-top:6px;line-height:1.5}
 .fillrow{display:flex;gap:7px;margin-top:10px}
 .fillrow button{flex:1;font-family:inherit;font-size:12px;font-weight:900;color:#E6EDF7;background:#12203C;border:1px solid var(--line2);border-radius:11px;padding:11px 6px}
 .fillrow button.listening{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
@@ -113,12 +118,27 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
 <main>
+<!-- 0 양식 고르기 · A4 원본 미리보기 -->
+<section class="scr" id="s0">
+ <div class="card">
+  <h2><span class="n">★</span>표준계약서 고르기</h2>
+  <p class="sub">서식을 고르면 A4 원본 양식이 크게 뜹니다. [이 양식으로 작성하기]를 누르면 1단계 입력이 시작됩니다.</p>
+  <div class="picks" id="pickGrid"></div>
+ </div>
+ <div class="card">
+  <h2><span class="n">A4</span><span id="pvTitle">원본 양식 미리보기</span></h2>
+  <p class="sub" id="pvSub">원본 그대로의 빈 양식입니다. 빈칸만 채워 인쇄·PDF로 뽑습니다.</p>
+  <canvas class="pv" id="pv0"></canvas>
+  <div id="thmBox"></div>
+  <div class="row"><button class="btn pri" id="startBtn">이 양식으로 작성하기</button></div>
+  <p class="kv" id="pvInfo"></p>
+ </div>
+</section>
 <!-- 1 당사자 -->
 <section class="scr" id="s1">
  <div class="card">
-  <h2><span class="n">1</span>표준계약서 고르기</h2>
-  <p class="sub">원본 양식 그대로 띄우고 빈칸만 채웁니다. 양식을 바꿔도 넣은 값은 그대로 남습니다.</p>
-  <div class="picks" id="pickGrid"></div>
+  <h2><span class="n">1</span><span id="s1t">당사자 정보</span><button type="button" class="newb" id="otherForm">다른 양식</button></h2>
+  <p class="sub">카드 위 [📷 신분증]을 누르면 그 사람 칸(성명·주민번호·주소·전화)만 채웁니다. 물건 소재지는 건드리지 않습니다.</p>
  </div>
  <div id="partyWrap"></div>
  <div class="fillrow"><button type="button" id="vFill">🎤 말로 채우기</button></div>
@@ -150,6 +170,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
  </div>
  <div class="card"><h2><span class="n">보</span>미리보기 · 출력</h2>
   <canvas class="pv" id="pvCv"></canvas>
+  <div id="thmBox2"></div>
   <div class="missbox" id="missBox"></div>
   <label class="lb">인쇄 부수</label>
   <div class="seg" id="cpSeg"><button data-cp="1">1부</button><button data-cp="2">2부</button><button data-cp="3">3부</button></div>
@@ -177,6 +198,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <div id="toast"></div>
 <div id="printArea"></div>
 <script src="forms.js"></script>
+<script src="forms_consult.js"></script>
 <script>
 /* ===================== 더계약서 (표준계약서 원본 사진식) ===================== */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -206,7 +228,7 @@ const num = v => +String(v == null ? '' : v).replace(/[^\d]/g, '') || 0;
 /* ---------- 상태 ---------- */
 const FORMS = window.KC_FORMS || [];
 const LS = 'kc_std_v2', LS_Q = 'kc_inquiry_queue';
-const fresh = () => ({form:'sale', step:1, v:{}, sp:[], free:'', cp:1});
+const fresh = () => ({form:'sale', step:0, v:{}, sp:[], free:'', cp:1, theme:''});
 let S; try{ S = Object.assign(fresh(), JSON.parse(localStorage.getItem(LS) || 'null') || {}); }catch(e){ S = fresh(); }
 if (!Array.isArray(S.sp)) S.sp = [];
 let saveT; const flush = () => { clearTimeout(saveT); saveT = null; try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} };
@@ -221,12 +243,34 @@ const getV = fid => { const v = S.v[VK(fid)]; return v == null ? '' : v; };
 const setV = (fid, v) => { S.v[VK(fid)] = v; save(); };
 
 /* ---------- 단계 ---------- */
-const STEP_NM = {1:'당사자', 2:'내용', 3:'특약', 4:'서명'};
+const STEP_NM = {0:'양식', 1:'당사자', 2:'내용', 3:'특약', 4:'서명'};
 function hasSpecial(){ const f = curForm(); return f.fields.some(x => x.grp === 's'); }
-function stepList(){ return hasSpecial() ? [1, 2, 3, 4] : [1, 2, 4]; }
+function stepList(){ return hasSpecial() ? [0, 1, 2, 3, 4] : [0, 1, 2, 4]; }
+
+/* ---------- 색감 테마 (흑백 · 하늘색 · 연두색 · 회색) ---------- */
+const THEMES = [{id:'mono', nm:'흑백', c:'#FFFFFF'}, {id:'sky', nm:'하늘색', c:'#DCEAF7'}, {id:'green', nm:'연두색', c:'#DFF0D8'}, {id:'gray', nm:'회색', c:'#E5E7EA'}];
+function formThemes(){ const f = curForm(); return Array.isArray(f.themes) && f.themes.length ? f.themes : null; }
+function themeId(){ const th = formThemes(); if (!th) return ''; return (S.theme && th.indexOf(S.theme) >= 0) ? S.theme : (th.indexOf(curForm().theme) >= 0 ? curForm().theme : th[0]); }
+function renderThemeChips(){
+  const th = formThemes();
+  [$('#thmBox'), $('#thmBox2')].forEach(box => {
+    if (!box) return;
+    if (!th){ box.innerHTML = ''; return; }
+    const cur = themeId();
+    box.innerHTML = '<div class="tlabel">서식 색감 <i>(구분 제목줄·항목 칸·당사자 라벨에 그대로 반영)</i></div><div class="thm">'
+      + THEMES.filter(t => th.indexOf(t.id) >= 0).map(t => `<button type="button" data-thm="${t.id}" class="${cur === t.id ? 'on' : ''}"><i style="background:${t.c}"></i>${t.nm}</button>`).join('') + '</div>';
+  });
+}
+function setTheme(id){
+  if (formThemes() && formThemes().indexOf(id) < 0) return;
+  S.theme = id; save();
+  renderThemeChips();
+  if (S.step === 0) renderSheet(); else if (S.step === 4) renderPreview();
+  toast('색감을 ' + (THEMES.find(t => t.id === id) || {}).nm + '으로 바꿨습니다');
+}
 function renderSteps(){
   const list = stepList();
-  $('#plbls').innerHTML = list.map((n, i) => `<button data-s="${n}" class="${S.step === n ? 'on' : ''}${n < S.step ? ' done' : ''}">${i + 1} ${STEP_NM[n]}</button>`).join('');
+  $('#plbls').innerHTML = list.map(n => `<button data-s="${n}" class="${S.step === n ? 'on' : ''}${n < S.step ? ' done' : ''}">${n === 0 ? '양식' : n + ' ' + STEP_NM[n]}</button>`).join('');
   const idx = Math.max(0, list.indexOf(S.step));
   $('#pfill').style.width = ((idx + 1) / list.length * 100) + '%';
   $('#plbls').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.s); };
@@ -243,12 +287,24 @@ function loadUrlImg(src){
 let BG = null, BG_SRC = null;
 const bgW = () => BG ? (BG.naturalWidth || BG.width) : 1489;
 const bgH = () => BG ? (BG.naturalHeight || BG.height) : 2105;
+/* 양식의 쪽 수 — 약정서처럼 2쪽짜리 양식은 pages 배열을 쓴다 */
+const pageCount = () => { const f = curForm(); return (f.pages && f.pages.length) ? f.pages.length : 1; };
+function pageBase(pg){ const f = curForm(); return (f.pages && f.pages[pg - 1]) ? f.pages[pg - 1].bg : f.bg; }
+/* 고른 색감에 맞는 종이 그림 — 하늘색은 기본 바탕, 나머지는 _mono/_green/_gray */
+function bgSrcFor(pg){
+  const base = pageBase(pg || 1);
+  const th = formThemes(); if (!th) return base;
+  const t = themeId(); if (t === 'sky') return base;
+  return String(base).replace(/\.png$/, '_' + t + '.png');
+}
 /* 화면의 종이 사진이 지금 고른 양식과 반드시 같도록 — 바뀌었으면 먼저 불러온다 */
-async function ensureBg(){
-  const src = curForm().bg;
+async function ensureBg(pg){
+  const src = bgSrcFor(pg || 1);
   if (BG && BG_SRC === src) return;
   BG = await loadUrlImg(src); BG_SRC = src;
 }
+async function imgFor(pg){ return await loadUrlImg(bgSrcFor(pg || 1)); }
+function themeColorOf(){ return ''; }
 
 /* ---------- 입력 칸 그리기 ---------- */
 function inputHtml(f){
@@ -404,17 +460,19 @@ function wrapText(g, text, maxW){
   });
   return out;
 }
-async function composite(maxW){
-  await ensureBg();
-  const W = bgW(), H = bgH();
+async function composite(maxW, pg){
+  pg = pg || 1;
+  const IM = await imgFor(pg);
+  const W = IM ? (IM.naturalWidth || IM.width) : 1489, H = IM ? (IM.naturalHeight || IM.height) : 2105;
   const s = maxW ? Math.min(2, maxW / W) : Math.max(1.6, 297 / 25.4 * 96 / W);
   const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
   const g = cv.getContext('2d');
   g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
-  if (BG) g.drawImage(BG, 0, 0, cv.width, cv.height);
-  const fs0 = curForm().fields.filter(f => f.type !== 'sign').map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
+  if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
+  const fs0 = curForm().fields.filter(f => f.type !== 'sign' && (!f.page || f.page === pg)).map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
   const FS0 = Math.min((fs0[fs0.length >> 1] || 40) * 0.55, cv.width * 0.035);
   for (const f of curForm().fields){
+    if (f.page && f.page !== pg) continue;
     const v = getV(f.id); if (v == null || v === '') continue;
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     if (f.type === 'sign'){
@@ -452,14 +510,45 @@ async function composite(maxW){
   return cv;
 }
 let PVT = null;
+async function compositeAll(maxW){
+  const n = pageCount(), out = [];
+  for (let p = 1; p <= n; p++) out.push(await composite(maxW, p));
+  return out;
+}
+function stackCanvases(list, bg){ /* 쪽 그림을 세로로 붙여 한 장으로 */
+  const gap = list.length > 1 ? 16 : 0;
+  const w = Math.max.apply(null, list.map(c => c.width));
+  const h = list.reduce((a, c) => a + c.height, 0) + gap * (list.length - 1);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const g = cv.getContext('2d'); g.fillStyle = bg || '#fff'; g.fillRect(0, 0, w, h);
+  let y = 0; list.forEach(c => { g.drawImage(c, 0, y); y += c.height + gap; });
+  return cv;
+}
 async function renderPreview(){
   clearTimeout(PVT);
   PVT = setTimeout(async () => {
-    const c = await composite(1200);
+    const all = await compositeAll(1200);
+    const c = stackCanvases(all, '#0B1729');
     const pv = $('#pvCv'); pv.width = c.width; pv.height = c.height;
     pv.getContext('2d').drawImage(c, 0, 0);
-    renderMiss();
+    renderMiss(); renderThemeChips();
   }, 60);
+}
+/* 0단계 — A4 원본 양식 미리보기 (작성 전 서식 확인) */
+let PVT0 = null;
+async function renderSheet(){
+  const f = curForm(); if (!f) return;
+  $('#pvTitle').textContent = f.name || '원본 양식 미리보기';
+  renderThemeChips();
+  clearTimeout(PVT0);
+  PVT0 = setTimeout(async () => {
+    const all = await compositeAll(1200);
+    const c = stackCanvases(all, '#0B1729');
+    const cv = $('#pv0'); cv.width = c.width; cv.height = c.height;
+    cv.getContext('2d').drawImage(c, 0, 0);
+    const n = pageCount();
+    $('#pvInfo').innerHTML = '<span class="dot"></span>A4 ' + n + '쪽 · 빈칸 ' + f.fields.filter(x => x.type !== 'sign').length + '곳 · 넣은 값은 이 기기에만 저장됩니다';
+  }, 50);
 }
 function empties(){
   const out = [];
@@ -481,23 +570,30 @@ async function doPrint(){
   const n = +S.cp || 1;
   busyOn('인쇄할 종이를 만드는 중…');
   try{
-    const c = await composite();
-    const url = c.toDataURL('image/jpeg', 0.94);
-    $('#printArea').innerHTML = Array.from({length:n}, () => '<img src="' + url + '" alt="">').join('');
+    const pages = await compositeAll();
+    const urls = pages.map(c => c.toDataURL('image/jpeg', 0.94));
+    let html = '';
+    for (let k = 0; k < n; k++) urls.forEach(u => { html += '<img src="' + u + '" alt="">'; });
+    $('#printArea').innerHTML = html;
     busyOff();
     setTimeout(() => window.print(), 260);
-    $('#outInfo').innerHTML = `<span class="dot"></span>A4 ${n}부 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
+    $('#outInfo').innerHTML = `<span class="dot"></span>A4 ${pages.length}쪽 × ${n}부 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
   }catch(e){ busyOff(); toast('출력을 만들지 못했습니다'); }
 }
 async function doPng(){
   busyOn('사진으로 만드는 중…');
   try{
-    const c = await composite();
-    const nm = (curForm().name || '계약서').replace(/\s/g, '') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.png';
-    const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = nm;
-    document.body.appendChild(a); a.click(); setTimeout(() => { a.remove(); }, 1200);
-    busyOff(); toast('사진으로 저장했습니다');
-    $('#outInfo').innerHTML = `<span class="dot"></span>${escH(nm)} 저장 — 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`;
+    const pages = await compositeAll();
+    const base = (curForm().name || '계약서').replace(/\s/g, '') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const names = [];
+    for (let i = 0; i < pages.length; i++){
+      const nm = pages.length > 1 ? base + '_' + (i + 1) + 'p.png' : base + '.png';
+      const a = document.createElement('a'); a.href = pages[i].toDataURL('image/png'); a.download = nm;
+      document.body.appendChild(a); a.click(); a.remove(); names.push(nm);
+      await new Promise(r => setTimeout(r, 380));
+    }
+    busyOff(); toast(pages.length > 1 ? pages.length + '장을 사진으로 저장했습니다' : '사진으로 저장했습니다');
+    $('#outInfo').innerHTML = `<span class="dot"></span>${escH(names.join(', '))} 저장 — 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`;
   }catch(e){ busyOff(); toast('저장하지 못했습니다'); }
 }
 
@@ -511,8 +607,9 @@ function go(n, noPush){
   renderSteps();
   const i = list.indexOf(n);
   $('#backBtn').style.display = (i === 0) ? 'none' : '';
-  $('#nextBtn').textContent = (i === list.length - 1) ? '인쇄 · PDF' : ('다음: ' + STEP_NM[list[i + 1]]);
-  if (n === 1){ renderPick(); renderParty(); }
+  $('#nextBtn').textContent = (n === 0) ? '이 양식으로 작성하기' : ((i === list.length - 1) ? '인쇄 · PDF' : ('다음: ' + STEP_NM[list[i + 1]]));
+  if (n === 1){ renderParty(); }
+  if (n === 0){ renderPick(); renderSheet(); }
   if (n === 2) renderContent();
   if (n === 3) renderSpecial();
   if (n === 4){ renderSigns(); renderPreview(); renderCp(); }
@@ -523,7 +620,7 @@ function go(n, noPush){
 window.addEventListener('popstate', e => {
   const st = e.state && e.state.kc;
   const list = stepList();
-  go((st >= 1 && st <= 4) ? st : list[0], true);
+  go((st >= 0 && st <= 4) ? st : list[0], true);
 });
 function renderCp(){
   $$('#cpSeg button').forEach(b => b.classList.toggle('on', (+b.dataset.cp) === (+S.cp || 1)));
@@ -575,7 +672,11 @@ document.addEventListener('click', e => {
   if (fm){ setForm(fm.dataset.form); return; }
   const ph = e.target.closest('[data-photo]');
   if (ph){ PHOTO_G = ph.dataset.photo; $('#pIn').click(); return; }
+  const th = e.target.closest('[data-thm]');
+  if (th){ setTheme(th.dataset.thm); return; }
 });
+$('#startBtn').onclick = () => go(1);
+$('#otherForm').onclick = () => go(0);
 $('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 4) renderPreview(); });
 $('#cpSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.cp = +b.dataset.cp; save(); renderCp(); };
 $('#printBtn').onclick = doPrint;
@@ -585,15 +686,14 @@ $('#backBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step
   if (i <= 0) return;
   if (history.state && history.state.kc && history.state.kc > list[0]){ try{ history.back(); return; }catch(e){} }
   go(list[i - 1]); };
-$('#newBtn').onclick = () => { const fm = S.form; S = fresh(); S.form = fm; try{ localStorage.removeItem(LS); }catch(e){} go(1); toast('새 계약서를 시작합니다'); };
+$('#newBtn').onclick = () => { const fm = S.form; S = fresh(); S.form = fm; try{ localStorage.removeItem(LS); }catch(e){} go(0); toast('새 계약서를 시작합니다'); };
 
 function setForm(id){
   if (!id || id === S.form) return;
-  S.form = id; S.sp = []; S.free = ''; save();
-  if (!stepList().includes(S.step)) S.step = stepList()[0];
+  S.form = id; S.sp = []; S.free = ''; S.theme = ''; save();
+  if (!stepList().includes(S.step)) S.step = 0;
   const f = curForm(); BG = null; BG_SRC = null;
-  ensureBg().then(() => { if (S.step === 4) renderPreview(); });
-  go(S.step, true); toast(f.name + ' 양식입니다');
+  go(0, true); toast(f.name + ' 양식입니다');
 }
 
 /* ---------- 말로 채우기 ---------- */
@@ -750,7 +850,7 @@ function qDraft(){
   let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).classList.toggle('miss', !v); if (!v) bad = true; });
   if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
   return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더계약서',
-    draft:`${n}님, 안녕하세요. KTS 원클릭 더계약서입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 서식·특약을 확인해 다음 판에 넣고, ${t} 으로 하루 안에 연락드리겠습니다.\n지금 있는 표준계약서 9종(매매·교환·주택·상가 임대차·등기위임장·근로·차용·용역·동업)은 바로 무료로 쓰실 수 있습니다.`};
+    draft:`${n}님, 안녕하세요. KTS 원클릭 더계약서입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 서식·특약을 확인해 다음 판에 넣고, ${t} 으로 하루 안에 연락드리겠습니다.\n지금 있는 표준계약서 12종(매매·교환 당사자용·교환 중개사용·주택·상가 임대차·부동산 임대차·등기위임장·근로·차용·용역·동업·컨설팅 약정서)은 바로 무료로 쓰실 수 있습니다.`};
 }
 $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; try{ a = JSON.parse(localStorage.getItem(LS_Q) || '[]'); }catch(e){} a.push(q); try{ localStorage.setItem(LS_Q, JSON.stringify(a)); }catch(e){}
@@ -758,14 +858,14 @@ $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; tr
 
 /* ---------- 시작 ---------- */
 window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, set BG(v){ BG = v; },
-  curForm, getV, setV, composeSpecial, syncSpecial, composite, go, mapPhoto, parseCText, kindOf, empties, renderPreview, stepList, setForm, FORMS};
+  curForm, getV, setV, composeSpecial, syncSpecial, composite, compositeAll, pageCount, renderSheet, setTheme, themeId, go, mapPhoto, parseCText, kindOf, empties, renderPreview, stepList, setForm, FORMS};
 (async function start(){
   if (!FORMS.length){ toast('표준 양식 데이터를 읽지 못했습니다'); return; }
   if (!FORMS.some(f => f.id === S.form)) S.form = FORMS[0].id;
-  await ensureBg();
-  S.step = stepList().includes(S.step || 1) ? S.step : 1;
-  try{ history.replaceState({kc:S.step || 1}, ''); GO_INIT = true; }catch(e){}
-  go(S.step || 1, true);
+  S.step = stepList().includes(S.step || 0) ? (S.step || 0) : 0;
+  await ensureBg(S.step === 0 ? 1 : 1);
+  try{ history.replaceState({kc:S.step || 0}, ''); GO_INIT = true; }catch(e){}
+  go(S.step || 0, true);
 })();
 </script>
 </body></html>

@@ -102,6 +102,12 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 .modal{position:fixed;inset:0;background:rgba(3,7,18,.72);z-index:80;display:none;align-items:flex-end;justify-content:center}
 .modal.on{display:flex}
 .modal .sheet{width:100%;max-width:460px;background:#0F1B33;border-top:2px solid var(--amber);border-radius:18px 18px 0 0;padding:16px 14px 22px}
+#pvImgs img{width:100%;display:block;border-radius:8px;margin-top:8px;background:#fff;border:1px solid var(--line2)}
+.thm{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.thm button{flex:1;min-width:64px;font-size:12px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 5px;display:flex;align-items:center;gap:6px;justify-content:center}
+.thm button.on{color:var(--on-amber);border-color:var(--amber);background:linear-gradient(135deg,var(--amber),var(--amber2))}
+.thm i{width:11px;height:11px;border-radius:3px;border:1px solid #9FB0C8;display:inline-block;flex:0 0 auto}
+.thm .tl{font-size:11px;font-weight:800;color:var(--gray);margin-top:8px}
 #busy{position:fixed;inset:0;background:rgba(3,7,18,.7);z-index:85;display:none;align-items:center;justify-content:center}
 #busy.on{display:flex}
 #busy div{background:#12203C;border:1px solid var(--amber);border-radius:14px;padding:16px 18px;font-weight:900;font-size:13.5px}
@@ -139,11 +145,14 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  </div>
  <div class="card">
   <h2><span class="n">★</span>표준 양식 바로 쓰기 <small style="font-size:10.5px;color:var(--gray);font-weight:700">빈칸 지정 끝 · 열쇠 필요 없음</small></h2>
-  <p class="sub">부동산 매매계약서·등기 위임장·교환계약서는 원본 양식 그대로 빈칸 자리가 다 지정돼 있습니다. 버튼을 누르면 바로 값 입력 화면으로 갑니다.</p>
-  <div class="row"><button class="btn pri" id="psSale">📄 매매계약서 바로쓰기</button></div>
-  <div class="row"><button class="btn pri" id="psPower">📄 등기위임장 바로쓰기</button></div>
-  <div class="row"><button class="btn pri" id="psExchange">📄 교환계약서 바로쓰기</button></div>
-  <p class="kv">매매계약서 62칸(서명 6곳) · 등기위임장 12칸(서명 1곳) · 교환계약서 32칸(서명 2곳) — 비워 둔 칸은 원본 그대로 빈칸으로 나옵니다.</p>
+  <p class="sub">버튼을 누르면 A4 원본 양식이 먼저 크게 뜹니다. [이 양식으로 작성하기]를 누르면 값 입력이 시작되고, 비워 둔 칸은 원본 그대로 빈칸으로 나옵니다.</p>
+  <div class="row"><button class="btn pri" id="psSale">📄 매매계약서</button></div>
+  <div class="row"><button class="btn pri" id="psPower">📄 등기위임장</button></div>
+  <div class="row"><button class="btn pri" id="psExchange">📄 교환계약서(당사자용)</button></div>
+  <div class="row"><button class="btn pri" id="psExbroker">📄 교환계약서(중개사용)</button></div>
+  <div class="row"><button class="btn pri" id="psLease">📄 부동산 임대차계약서</button></div>
+  <div class="row"><button class="btn pri" id="psConsult">📄 컨설팅 전속거래 약정서</button></div>
+  <p class="kv">매매 62칸(서명 6) · 위임장 12칸(서명 1) · 교환 당사자용 32칸(서명 2) · 교환 중개사용 35칸(서명 3) · 임대차 43칸(서명 3) · 약정서 41칸(서명 2·A4 2쪽) — 색감은 흑백·하늘색·연두색·회색 중에 고릅니다.</p>
  </div>
  <div class="card">
   <h2><span class="n">1</span>새 양식 사진 등록</h2>
@@ -215,6 +224,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
   <h2><span class="n">4</span>미리보기</h2>
   <p class="sub">종이 위에 값이 얹힌 모습 그대로 인쇄·PDF로 나갑니다. 값을 넣지 않은 칸은 아무 표시도 남기지 않고 원본 빈칸 그대로 나옵니다.</p>
   <canvas class="pv" id="pvCv"></canvas>
+  <div id="tfThm"></div>
  </div>
 </section>
 
@@ -262,6 +272,13 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  <label class="lb">열쇠(AIza…)</label><input id="keyIn" autocomplete="off" spellcheck="false">
  <div class="row"><button class="btn sec sm" id="keyDel">지우기</button><button class="btn pri sm" id="keySave">이 기기에 저장</button></div>
  <div class="row"><button class="btn sec sm" id="keyClose">닫기</button></div>
+</div></div>
+<div class="modal" id="pvModal"><div class="sheet" style="max-height:92vh;overflow:auto">
+ <h2 style="font-size:15px;font-weight:900" id="pvName">양식</h2>
+ <p class="kv">A4 원본 양식입니다. [이 양식으로 작성하기]를 누르면 값 입력이 시작됩니다.</p>
+ <div id="pvImgs"></div>
+ <div id="pvThm"></div>
+ <div class="row"><button class="btn sec sm" id="pvClose">닫기</button><button class="btn pri" id="pvStart">이 양식으로 작성하기</button></div>
 </div></div>
 <div id="busy"><div id="busyT">처리 중…</div></div>
 <div id="toast"></div>
@@ -1419,10 +1436,138 @@ const PRESET_EXCHANGE_FIELDS = [
     {id:'p30', label:'을 성명', type:'text', x:74.755, y:81.627, w:11.927, h:2.423},
     {id:'p31', label:'을 자필서명', type:'sign', x:87.018, y:81.603, w:7.795, h:2.471}
 ];
+const PRESET_EXBROKER_FIELDS = [
+    {"id":"pa_thing","label":"갑 물건 표시","type":"text","x":27.938,"y":15.451,"w":64.271,"h":3.515},
+    {"id":"pb_thing","label":"을 물건 표시","type":"text","x":27.938,"y":19.014,"w":64.271,"h":3.515},
+    {"id":"diff","label":"교환차액","type":"number","x":28.475,"y":25,"w":55.136,"h":1.425},
+    {"id":"earnest","label":"계약금","type":"number","x":28.543,"y":26.606,"w":12.76,"h":1.283},
+    {"id":"e_y","label":"계약금 년","type":"text","x":45.467,"y":26.606,"w":3.761,"h":1.283},
+    {"id":"e_m","label":"계약금 월","type":"text","x":51.108,"y":26.606,"w":2.821,"h":1.283},
+    {"id":"e_d","label":"계약금 일","type":"text","x":55.809,"y":26.606,"w":2.821,"h":1.283},
+    {"id":"middle","label":"중도금","type":"number","x":28.543,"y":28.078,"w":12.76,"h":1.283},
+    {"id":"m_y","label":"중도금 년","type":"text","x":45.467,"y":28.078,"w":3.761,"h":1.283},
+    {"id":"m_m","label":"중도금 월","type":"text","x":51.108,"y":28.078,"w":2.821,"h":1.283},
+    {"id":"m_d","label":"중도금 일","type":"text","x":55.809,"y":28.078,"w":2.821,"h":1.283},
+    {"id":"balance","label":"잔금","type":"number","x":28.543,"y":29.551,"w":12.76,"h":1.283},
+    {"id":"b_y","label":"잔금 년","type":"text","x":45.467,"y":29.551,"w":3.761,"h":1.283},
+    {"id":"b_m","label":"잔금 월","type":"text","x":51.108,"y":29.551,"w":2.821,"h":1.283},
+    {"id":"b_d","label":"잔금 일","type":"text","x":55.809,"y":29.551,"w":2.821,"h":1.283},
+    {"id":"special","label":"특약사항","type":"text","x":7.723,"y":48.652,"w":84.553,"h":13.872},
+    {"id":"date_y","label":"작성일 년","type":"text","x":71.592,"y":82.372,"w":5.776,"h":1.283},
+    {"id":"date_m","label":"작성일 월","type":"text","x":80.054,"y":82.372,"w":3.761,"h":1.283},
+    {"id":"date_d","label":"작성일 일","type":"text","x":86.501,"y":82.372,"w":3.761,"h":1.283},
+    {"id":"a_addr","label":"갑 주소","type":"text","x":23.774,"y":84.296,"w":63.067,"h":1.425},
+    {"id":"a_sign","label":"갑 (인)","type":"sign","x":86.908,"y":85.033,"w":5.44,"h":1.425},
+    {"id":"a_rrn","label":"갑 주민등록번호","type":"text","x":23.774,"y":85.769,"w":25.453,"h":1.425},
+    {"id":"a_tel","label":"갑 전화","type":"text","x":57.354,"y":85.769,"w":12.021,"h":1.425},
+    {"id":"a_name","label":"갑 성명","type":"text","x":76.83,"y":85.769,"w":10.011,"h":1.425},
+    {"id":"b_addr","label":"을 주소","type":"text","x":23.774,"y":87.242,"w":63.067,"h":1.425},
+    {"id":"b_sign","label":"을 (인)","type":"sign","x":86.908,"y":87.978,"w":5.44,"h":1.425},
+    {"id":"b_rrn","label":"을 주민등록번호","type":"text","x":23.774,"y":88.714,"w":25.453,"h":1.425},
+    {"id":"b_tel","label":"을 전화","type":"text","x":57.354,"y":88.714,"w":12.021,"h":1.425},
+    {"id":"b_name","label":"을 성명","type":"text","x":76.83,"y":88.714,"w":10.011,"h":1.425},
+    {"id":"c_office_addr","label":"중개 중개사무소 소재지","type":"text","x":23.774,"y":90.468,"w":63.067,"h":1.425},
+    {"id":"c_sign","label":"중개 중개업자 (인)","type":"sign","x":86.908,"y":90.187,"w":5.44,"h":6.06},
+    {"id":"c_permit","label":"중개 허가번호","type":"text","x":23.774,"y":92.504,"w":25.453,"h":1.425},
+    {"id":"c_tel","label":"중개 전화","type":"text","x":57.354,"y":92.504,"w":12.021,"h":1.425},
+    {"id":"c_rep","label":"중개 대표","type":"text","x":76.83,"y":92.504,"w":10.011,"h":1.425},
+    {"id":"c_office","label":"중개 상호","type":"text","x":23.774,"y":94.54,"w":63.067,"h":1.425}
+];
+const PRESET_LEASE_FIELDS = [
+    {"id":"prop_addr","label":"소재지","type":"text","x":17.864,"y":16.56,"w":74.345,"h":2.09},
+    {"id":"land_kind","label":"토지 지목","type":"text","x":27.938,"y":18.698,"w":36.734,"h":2.09},
+    {"id":"land_area","label":"토지 면적","type":"text","x":71.187,"y":18.698,"w":16.723,"h":2.09},
+    {"id":"bldg_kind","label":"건물 구조·용도","type":"text","x":27.938,"y":20.836,"w":36.734,"h":2.09},
+    {"id":"bldg_area","label":"건물 면적","type":"text","x":71.187,"y":20.836,"w":16.723,"h":2.09},
+    {"id":"part","label":"임대할 부분","type":"text","x":17.864,"y":22.974,"w":46.808,"h":2.09},
+    {"id":"part_area","label":"임대할 부분 면적","type":"text","x":71.187,"y":22.974,"w":16.723,"h":2.09},
+    {"id":"deposit","label":"보증금","type":"number","x":28.475,"y":27.914,"w":35.659,"h":2.09},
+    {"id":"earnest","label":"계약금","type":"number","x":28.475,"y":30.052,"w":35.659,"h":2.09},
+    {"id":"middle","label":"중도금","type":"number","x":28.543,"y":32.655,"w":12.76,"h":1.283},
+    {"id":"m_y","label":"중도금 년","type":"text","x":45.467,"y":32.655,"w":2.821,"h":1.283},
+    {"id":"m_m","label":"중도금 월","type":"text","x":50.168,"y":32.655,"w":2.821,"h":1.283},
+    {"id":"m_d","label":"중도금 일","type":"text","x":54.869,"y":32.655,"w":2.821,"h":1.283},
+    {"id":"balance","label":"잔금","type":"number","x":28.543,"y":34.793,"w":12.76,"h":1.283},
+    {"id":"b_y","label":"잔금 년","type":"text","x":45.467,"y":34.793,"w":3.761,"h":1.283},
+    {"id":"b_m","label":"잔금 월","type":"text","x":51.108,"y":34.793,"w":2.821,"h":1.283},
+    {"id":"b_d","label":"잔금 일","type":"text","x":55.809,"y":34.793,"w":2.821,"h":1.283},
+    {"id":"rent","label":"월 차임","type":"number","x":28.543,"y":36.931,"w":12.76,"h":1.283},
+    {"id":"r_y","label":"차임 시작 년","type":"text","x":45.467,"y":36.931,"w":3.761,"h":1.283},
+    {"id":"r_m","label":"차임 시작 월","type":"text","x":51.108,"y":36.931,"w":2.821,"h":1.283},
+    {"id":"r_d","label":"차임 시작 일","type":"text","x":55.809,"y":36.931,"w":2.821,"h":1.283},
+    {"id":"t_to_y","label":"기간 끝 년","type":"text","x":83.009,"y":39.094,"w":8.059,"h":1.283},
+    {"id":"t_to_m","label":"기간 끝 월","type":"text","x":7.723,"y":40.583,"w":4.298,"h":1.283},
+    {"id":"t_to_d","label":"기간 끝 일","type":"text","x":13.566,"y":40.583,"w":4.298,"h":1.283},
+    {"id":"special","label":"특약사항","type":"text","x":7.723,"y":67.812,"w":84.553,"h":4.418},
+    {"id":"date_y","label":"작성일 년","type":"text","x":73.271,"y":79.857,"w":5.373,"h":1.188},
+    {"id":"date_m","label":"작성일 월","type":"text","x":81.061,"y":79.857,"w":3.492,"h":1.188},
+    {"id":"date_d","label":"작성일 일","type":"text","x":86.971,"y":79.857,"w":3.492,"h":1.188},
+    {"id":"a_addr","label":"갑 주소","type":"text","x":24.332,"y":81.473,"w":62.114,"h":2.221},
+    {"id":"a_sign","label":"갑 (인)","type":"sign","x":86.513,"y":81.473,"w":5.697,"h":4.489},
+    {"id":"a_rrn","label":"갑 주민등록번호","type":"text","x":24.332,"y":83.741,"w":24.302,"h":2.221},
+    {"id":"a_tel","label":"갑 전화","type":"text","x":55.789,"y":83.741,"w":12.486,"h":2.221},
+    {"id":"a_name","label":"갑 성명","type":"text","x":75.431,"y":83.741,"w":11.014,"h":2.221},
+    {"id":"b_addr","label":"을 주소","type":"text","x":24.332,"y":86.01,"w":62.114,"h":2.221},
+    {"id":"b_sign","label":"을 (인)","type":"sign","x":86.513,"y":86.01,"w":5.697,"h":4.489},
+    {"id":"b_rrn","label":"을 주민등록번호","type":"text","x":24.332,"y":88.278,"w":24.302,"h":2.221},
+    {"id":"b_tel","label":"을 전화","type":"text","x":55.789,"y":88.278,"w":12.486,"h":2.221},
+    {"id":"b_name","label":"을 성명","type":"text","x":75.431,"y":88.278,"w":11.014,"h":2.221},
+    {"id":"c_office_addr","label":"중개 중개사무소 소재지","type":"text","x":24.332,"y":90.546,"w":62.114,"h":2.09},
+    {"id":"c_sign","label":"중개 (인)","type":"sign","x":86.513,"y":90.546,"w":5.697,"h":6.366},
+    {"id":"c_office","label":"중개 상호","type":"text","x":24.332,"y":92.684,"w":62.114,"h":2.09},
+    {"id":"c_bizno","label":"중개 등록번호","type":"text","x":24.332,"y":94.822,"w":24.302,"h":2.09},
+    {"id":"c_tel","label":"중개 전화","type":"text","x":55.789,"y":94.822,"w":30.656,"h":2.09}
+];
+const PRESET_CONSULT_FIELDS = [
+    {"id":"a_name","label":"갑 성명(상호)","type":"text","x":22.644,"y":21.972,"w":26.421,"h":1.989,"page":1},
+    {"id":"a_rrn","label":"갑 주민(법인)등록번호","type":"text","x":66.291,"y":21.972,"w":23.998,"h":1.989,"page":1},
+    {"id":"a_addr","label":"갑 주소","type":"text","x":22.644,"y":24.139,"w":67.645,"h":1.989,"page":1},
+    {"id":"a_tel","label":"갑 연락처","type":"text","x":22.644,"y":26.305,"w":26.421,"h":1.989,"page":1},
+    {"id":"a_sign","label":"갑 서명 또는 인","type":"text","x":66.291,"y":26.305,"w":23.998,"h":1.989,"page":1},
+    {"id":"b_name","label":"을 성명(상호)","type":"text","x":22.644,"y":30.639,"w":26.421,"h":1.989,"page":1},
+    {"id":"b_rrn","label":"을 주민(법인)등록번호","type":"text","x":66.291,"y":30.639,"w":23.998,"h":1.989,"page":1},
+    {"id":"b_addr","label":"을 주소","type":"text","x":22.644,"y":32.806,"w":67.645,"h":1.989,"page":1},
+    {"id":"b_tel","label":"을 연락처","type":"text","x":22.644,"y":34.973,"w":26.421,"h":1.989,"page":1},
+    {"id":"b_sign","label":"을 서명 또는 인","type":"text","x":66.291,"y":34.973,"w":23.998,"h":1.989,"page":1},
+    {"id":"o_target","label":"대상물의 표시","type":"text","x":33.959,"y":54.931,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_term","label":"계약(의뢰) 기간","type":"text","x":33.959,"y":57.098,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_deposit","label":"보증금(매매가)","type":"number","x":33.959,"y":59.264,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_rent","label":"월 차임","type":"number","x":33.959,"y":61.431,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_scope","label":"목적물의 범위 및 주요 조건","type":"text","x":33.959,"y":63.598,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_note","label":"비고(기타 조건)","type":"text","x":33.959,"y":65.765,"w":56.329,"h":1.989,"page":1},
+    {"id":"o_lease_note","label":"제4조 ① 내용","type":"text","x":17.23,"y":73.865,"w":49.882,"h":1.782,"page":1},
+    {"id":"o_months","label":"전속 약정기간(개월)","type":"text","x":48.427,"y":76.295,"w":7.76,"h":2.288,"page":1},
+    {"id":"t_from_y","label":"기간 시작 년","type":"text","x":16.58,"y":81.192,"w":6.652,"h":2.288,"page":1},
+    {"id":"t_from_m","label":"기간 시작 월","type":"text","x":25.081,"y":81.192,"w":5.195,"h":2.288,"page":1},
+    {"id":"t_from_d","label":"기간 시작 일","type":"text","x":32.125,"y":81.192,"w":5.195,"h":2.288,"page":1},
+    {"id":"t_to_y","label":"기간 끝 년","type":"text","x":44.161,"y":81.192,"w":6.652,"h":2.288,"page":1},
+    {"id":"t_to_m","label":"기간 끝 월","type":"text","x":52.662,"y":81.192,"w":5.195,"h":2.288,"page":1},
+    {"id":"t_to_d","label":"기간 끝 일","type":"text","x":59.705,"y":81.192,"w":5.195,"h":2.288,"page":1},
+    {"id":"f_total","label":"총 컨설팅 용역비용","type":"number","x":33.19,"y":27.006,"w":21.167,"h":1.721,"page":2},
+    {"id":"f_r1","label":"① 약정 시 비율","type":"text","x":40.046,"y":32.072,"w":4.233,"h":1.721,"page":2},
+    {"id":"f_m1","label":"① 약정 시 금액","type":"number","x":59.054,"y":32.072,"w":16.757,"h":1.721,"page":2},
+    {"id":"f_r2","label":"② 권리계약 시 비율","type":"text","x":40.046,"y":34.632,"w":4.233,"h":1.721,"page":2},
+    {"id":"f_m2","label":"② 권리계약 시 금액","type":"number","x":59.054,"y":34.632,"w":16.757,"h":1.721,"page":2},
+    {"id":"f_r3","label":"③ 본계약 시 비율","type":"text","x":40.046,"y":37.191,"w":4.233,"h":1.721,"page":2},
+    {"id":"f_m3","label":"③ 본계약 시 금액","type":"number","x":59.054,"y":37.191,"w":16.757,"h":1.721,"page":2},
+    {"id":"f_r4","label":"④ 잔금 시 비율","type":"text","x":40.046,"y":39.751,"w":4.233,"h":1.721,"page":2},
+    {"id":"f_m4","label":"④ 잔금 시 금액","type":"number","x":59.054,"y":39.751,"w":16.757,"h":1.721,"page":2},
+    {"id":"f_etc","label":"기타 특약사항","type":"text","x":29.109,"y":41.927,"w":61.18,"h":18.684,"page":2},
+    {"id":"date_y","label":"작성일 년","type":"text","x":38.785,"y":73.935,"w":6.182,"h":2.39,"page":2},
+    {"id":"date_m","label":"작성일 월","type":"text","x":47,"y":73.935,"w":6.239,"h":2.39,"page":2},
+    {"id":"date_d","label":"작성일 일","type":"text","x":55.272,"y":73.935,"w":6.239,"h":2.39,"page":2},
+    {"id":"s_a_name","label":"갑 성 명","type":"text","x":18.415,"y":82.496,"w":28.602,"h":1.961,"page":2},
+    {"id":"s_a_in","label":"갑 (인)","type":"sign","x":38.852,"y":88.323,"w":10.476,"h":4.042,"page":2},
+    {"id":"s_b_name","label":"을 상호･성명","type":"text","x":62.619,"y":82.496,"w":24.812,"h":1.961,"page":2},
+    {"id":"s_b_in","label":"을 (인)","type":"sign","x":79.267,"y":88.323,"w":10.476,"h":4.042,"page":2}
+];
 const PRESETS = [
   {id:'p_sale',  name:'부동산 매매계약서', builtin:true, bgUrl:'tpl_sale.png',  fields:PRESET_SALE_FIELDS},
   {id:'p_power', name:'등기 위임장',       builtin:true, bgUrl:'tpl_power.png', fields:PRESET_POWER_FIELDS},
-  {id:'p_exchange', name:'부동산 교환계약서', builtin:true, bgUrl:'tpl_exchange.png', fields:PRESET_EXCHANGE_FIELDS}
+  {id:'p_exchange', name:'부동산 교환계약서(당사자용)', builtin:true, bgUrl:'tpl_exchange.png', fields:PRESET_EXCHANGE_FIELDS},
+  {id:'p_exbroker', name:'부동산 교환계약서(중개사용)', builtin:true, bgUrl:'tpl_exbroker.png', themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_EXBROKER_FIELDS},
+  {id:'p_lease', name:'부동산 임대차계약서', builtin:true, bgUrl:'tpl_lease.png', themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_LEASE_FIELDS},
+  {id:'p_consult', name:'부동산 컨설팅 전속 거래 약정서', builtin:true, bgUrls:['tpl_consult_p1.png','tpl_consult_p2.png'], themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_CONSULT_FIELDS}
 ];
 
 /* ---------- 문서 블록 → A4 캔버스(빈 양식 배경) ---------- */
@@ -1523,7 +1668,12 @@ function loadUrlImg(src){                    /* 표준 양식 배경(같은 사�
 function blankSheet(){ const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
   const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, PW, PH); return cv; }
 async function loadBg(form){
-  if (form.bgUrl){ const im = await loadUrlImg(form.bgUrl); if (im) return im; return blankSheet(); }
+  const base = (form.bgUrls && form.bgUrls.length) ? form.bgUrls[0] : form.bgUrl;
+  if (base){
+    const th = form._theme || form.theme || '';
+    const im = await loadUrlImg((form.themes && th && th !== 'sky') ? base.replace(/\.png$/, '_' + th + '.png') : base);
+    if (im) return im; return blankSheet();
+  }
   if (form.builtin || form.fromBuiltin) return renderBlank(form);
   const d = await imgGet(form.id);
   if (!d) return renderBlank(form);
@@ -1531,6 +1681,15 @@ async function loadBg(form){
 }
 const bgW = () => BG ? (BG.naturalWidth || BG.width) : PW;
 const bgH = () => BG ? (BG.naturalHeight || BG.height) : PH;
+
+/* ---------- 색감 테마 · 쪽(pages) ---------- */
+const THEMES = [{id:'mono', nm:'흑백', c:'#FFFFFF'}, {id:'sky', nm:'하늘색', c:'#DCEAF7'}, {id:'green', nm:'연두색', c:'#DFF0D8'}, {id:'gray', nm:'회색', c:'#E6E8EB'}];
+function curTheme(){ const f = CUR || {}; if (!f.themes) return ''; return (f._theme && f.themes.indexOf(f._theme) >= 0) ? f._theme : (f.themes.indexOf(f.theme) >= 0 ? f.theme : (f.themes[1] || f.themes[0])); }
+function themed(base, th){ return (!base || !th || th === 'sky') ? base : base.replace(/\.png$/, '_' + th + '.png'); }
+function tfPageCount(){ return (CUR && CUR.bgUrls && CUR.bgUrls.length) ? CUR.bgUrls.length : 1; }
+function tfBgBase(pg){ return (CUR.bgUrls && CUR.bgUrls[(pg || 1) - 1]) ? CUR.bgUrls[(pg || 1) - 1] : CUR.bgUrl; }
+async function tfBgImg(pg){ const base = tfBgBase(pg); if (!base) return BG; const im = await loadUrlImg(themed(base, curTheme())); return im || BG; }
+let PENDING_THEME = '';
 
 /* ---------- ① 등록: 사진 → 자동 기울기·테두리 보정 ---------- */
 function loadImageFile(file){
@@ -1647,7 +1806,7 @@ function renderList(){
 const escH = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 async function openForm(id, step){
   const f = findForm(id); if (!f) return;
-  CUR = clone(f); BG = await loadBg(CUR); VALS = lsGet(LS_VALS + CUR.id, {}); SEL = -1; UNDO = []; REDO = []; $("#outName").value = "";
+  CUR = clone(f); if (PENDING_THEME){ CUR._theme = PENDING_THEME; PENDING_THEME = ''; } BG = await loadBg(CUR); VALS = lsGet(LS_VALS + CUR.id, {}); SEL = -1; UNDO = []; REDO = []; $("#outName").value = "";
   /* 내가 지운 자리·추가한 칸은 기본 양식에서도 따로 보관한다 */
   try{ const a = JSON.parse(localStorage.getItem('tf_addf_' + CUR.id) || 'null'); if (Array.isArray(a) && a.length) CUR.fields = CUR.fields.concat(a); }catch(e){}
   go(step || 3);
@@ -1666,12 +1825,54 @@ async function delForm(id){
   try{ localStorage.removeItem(LS_VALS + id); }catch(e){}
   renderList(); toast('삭제했습니다');
 }
-$('#psSale').onclick  = async () => { busyOn('매매계약서 양식을 여는 중…'); try{ await openForm('p_sale', 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
-$('#psPower').onclick = async () => { busyOn('등기위임장 양식을 여는 중…'); try{ await openForm('p_power', 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
-$('#psExchange').onclick = async () => { busyOn('교환계약서 양식을 여는 중…'); try{ await openForm('p_exchange', 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
+/* ---------- 원본 양식 미리보기 → [이 양식으로 작성하기] ---------- */
+let PVF = null;
+function pvThemeOf(){ const f = PVF || {}; if (!f.themes) return ''; return (f._theme && f.themes.indexOf(f._theme) >= 0) ? f._theme : (f.themes.indexOf(f.theme) >= 0 ? f.theme : (f.themes[1] || f.themes[0])); }
+function showPreview(id){
+  const f = findForm(id); if (!f) return;
+  PVF = clone(f); PVF._theme = f.theme || (f.themes ? (f.themes[1] || f.themes[0]) : '');
+  renderPreviewModal(); $('#pvModal').classList.add('on');
+}
+function renderPreviewModal(){
+  const f = PVF; if (!f) return;
+  $('#pvName').textContent = f.name;
+  const n = (f.bgUrls && f.bgUrls.length) ? f.bgUrls.length : 1, th = pvThemeOf();
+  let h = '';
+  for (let p = 1; p <= n; p++){
+    const base = (f.bgUrls && f.bgUrls[p - 1]) ? f.bgUrls[p - 1] : f.bgUrl;
+    h += `<img src="${themed(base, th)}" alt="A4 ${p}쪽 원본 양식">`;
+  }
+  $('#pvImgs').innerHTML = h;
+  $('#pvThm').innerHTML = f.themes ? ('<div class="tl">서식 색감 · 구분 제목줄·항목 칸·당사자 라벨에 그대로 반영</div><div class="thm">'
+    + THEMES.filter(t => f.themes.indexOf(t.id) >= 0).map(t => `<button type="button" data-pvthm="${t.id}" class="${th === t.id ? 'on' : ''}"><i style="background:${t.c}"></i>${t.nm}</button>`).join('') + '</div>') : '';
+}
+function renderTfTheme(){
+  const box = $('#tfThm'); if (!box) return;
+  const f = CUR; if (!f || !f.themes){ box.innerHTML = ''; return; }
+  const th = curTheme();
+  box.innerHTML = '<div class="tl">서식 색감</div><div class="thm">'
+    + THEMES.filter(t => f.themes.indexOf(t.id) >= 0).map(t => `<button type="button" data-tfthm="${t.id}" class="${th === t.id ? 'on' : ''}"><i style="background:${t.c}"></i>${t.nm}</button>`).join('') + '</div>';
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-pvthm]');
+  if (a && PVF){ PVF._theme = a.dataset.pvthm; renderPreviewModal(); return; }
+  const b = e.target.closest('[data-tfthm]');
+  if (b && CUR){ CUR._theme = b.dataset.tfthm; renderTfTheme(); if (STEP === 4) renderPreview(); return; }
+});
+$('#pvClose').onclick = () => $('#pvModal').classList.remove('on');
+$('#pvStart').onclick = async () => { const f = PVF; if (!f) return; $('#pvModal').classList.remove('on');
+  PENDING_THEME = f._theme || '';
+  busyOn('양식을 여는 중…'); try{ await openForm(f.id, 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
+
+$('#psSale').onclick  = () => showPreview('p_sale');
+$('#psPower').onclick = () => showPreview('p_power');
+$('#psExchange').onclick = () => showPreview('p_exchange');
+$('#psExbroker').onclick = () => showPreview('p_exbroker');
+$('#psLease').onclick = () => showPreview('p_lease');
+$('#psConsult').onclick = () => showPreview('p_consult');
 $('#formList').onclick = async e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.open) openForm(b.dataset.open, 3);
+  if (b.dataset.open){ const f = findForm(b.dataset.open); if (f && f.builtin) showPreview(b.dataset.open); else openForm(b.dataset.open, 3); }
   else if (b.dataset.dup) dupForm(b.dataset.dup);
   else if (b.dataset.del) delForm(b.dataset.del);
 };
@@ -2157,12 +2358,15 @@ $('#keySave').onclick = () => { const k = $('#keyIn').value.trim(); if (!/^AIza[
 $('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catch(e){} $('#keyIn').value = ''; updKey(); toast('열쇠를 지웠습니다'); };
 
 /* ---------- ④ 미리보기(배경 + 값 얹기) ---------- */
-async function composite(maxW){
-  const W = bgW(), H = bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
+async function composite(maxW, pg){
+  pg = pg || 1;
+  const IM = (CUR.bgUrls || CUR.themes || CUR._theme) ? await tfBgImg(pg) : BG;
+  const W = IM ? (IM.naturalWidth || IM.width) : bgW(), H = IM ? (IM.naturalHeight || IM.height) : bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
   const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
-  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(BG, 0, 0, cv.width, cv.height);
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
   /* 그림·로고·도장 지운 자리 — 종이 배경부터 깨끗하게 지우고 그 위에 값을 올린다 */
   for (const f of CUR.fields){
+    if (f.page && f.page !== pg) continue;
     if (f.type !== 'erase' && !f.erase) continue;
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     g.fillStyle = '#fff'; g.fillRect(x, y, w, h);
@@ -2172,6 +2376,7 @@ async function composite(maxW){
   const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.55, cv.width * 0.035);
   for (const f of CUR.fields){
     if (f.type === 'erase') continue;
+    if (f.page && f.page !== pg) continue;
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     const v = VALS[f.label]; if (v == null || v === '') continue;
     if (f.type === 'sign'){
@@ -2195,7 +2400,16 @@ async function composite(maxW){
   }
   return cv;
 }
-async function renderPreview(){ const c = await composite(), pv = $('#pvCv'); pv.width = c.width; pv.height = c.height; pv.getContext('2d').drawImage(c, 0, 0); }
+async function renderPreview(){
+  const n = tfPageCount(), imgs = [];
+  for (let p = 1; p <= n; p++) imgs.push(await composite(1200, p));
+  const gap = n > 1 ? 16 : 0;
+  const w = Math.max.apply(null, imgs.map(c => c.width)), h = imgs.reduce((a, c) => a + c.height, 0) + gap * (n - 1);
+  const pv = $('#pvCv'); pv.width = w; pv.height = h;
+  const g = pv.getContext('2d'); g.fillStyle = '#0B1729'; g.fillRect(0, 0, w, h);
+  let y = 0; imgs.forEach(c => { g.drawImage(c, 0, y); y += c.height + gap; });
+  renderTfTheme();
+}
 
 /* ---------- ⑤ 내보내기: converter 엔진(docFromRaw → buildHwpx / buildXlsx) 그대로 ---------- */
 function normLabel(s){ return String(s || '').replace(/[\s·:：()\[\]]/g, ''); }
@@ -2240,7 +2454,13 @@ async function doExport(kind){
 }
 $('#exHwpx').onclick = () => doExport('hwpx');
 $('#exXlsx').onclick = () => doExport('xlsx');
-$('#exPrint').onclick = async () => { const c = await composite(); $('#printArea').innerHTML = `<img src="${c.toDataURL('image/png')}" alt="">`; setTimeout(() => window.print(), 120); };
+$('#exPrint').onclick = async () => { busyOn('인쇄할 종이를 만드는 중…');
+  try{ const n = tfPageCount(), urls = [];
+    for (let p = 1; p <= n; p++){ const c = await composite(0, p); urls.push(c.toDataURL('image/png')); }
+    $('#printArea').innerHTML = urls.map(u => `<img src="${u}" alt="">`).join('');
+    busyOff(); setTimeout(() => window.print(), 140);
+    $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
+  }catch(e){ busyOff(); toast('인쇄 화면을 만들지 못했습니다'); } };
 
 /* ---------- 화면 이동 (폰 하단 뒤로가기 = 이전 단계) ---------- */
 let GO_INIT = false;
