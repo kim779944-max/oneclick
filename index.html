@@ -478,16 +478,18 @@ function renderFav(){
   var box = $('#favRow'); if (!box) return;
   var by = {}; (window.PRODUCTS || []).forEach(p => { by[p.k] = p; });
   var pinned = lsArr(FAV_KEY).filter(k => by[k]);
+  var rec = lsArr(REC_KEY);
   var out = pinned.slice();
   var add = k => { if (by[k] && out.indexOf(k) < 0 && out.length < 6) out.push(k); };
-  lsArr(REC_KEY).forEach(add);
+  rec.forEach(add);
   FAV_DEFAULT.forEach(add);
   if (!out.length){ box.innerHTML = '<span class="favEmpty">☆ 누르면 이 줄에 고정됩니다</span>'; return; }
   box.innerHTML = out.map(k => {
     var p = by[k], pin = pinned.indexOf(k) >= 0;
     var href = p.link || ('detail.html?k=' + k);
     var nm = String(p.nm).split(' — ')[0];
-    return `<a class="fchip" href="${href}"><img src="${p.icon}" alt=""><span class="fnm"><span class="fn">${nm}</span><span class="fk">${pin ? '★ 고정' : '최근'}</span></span></a>`;
+    var tag = pin ? '★ 고정' : (rec.indexOf(k) >= 0 ? '최근' : '추천');
+    return `<a class="fchip" href="${href}"><img src="${p.icon}" alt=""><span class="fnm"><span class="fn">${nm}</span><span class="fk">${tag}</span></span></a>`;
   }).join('');
 }
 /* 별표·열기 버튼은 카드가 다시 그려져도 한 곳에서 받습니다 */
