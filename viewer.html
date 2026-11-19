@@ -932,7 +932,7 @@ async function paintDoc(r, file, nm){
   PP.zoom = 1;
   if (r.kind === 'pdf') await buildPdf(r.buf);
   else if (r.kind === 'img') await buildImage(r.url);
-  else if (r.kind === 'html') buildSheet(r);
+  else if (r.kind === 'html' || r.kind === 'table') buildSheet(r);   /* openXlsx/openText 는 'table' */
   else if (r.kind === 'frame') buildFrame(r.url);
   else buildNotice();
   applyZoom(fitZoom());
