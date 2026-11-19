@@ -528,7 +528,7 @@ async function visionStruct(file, onStep){
     for (let attempt = 0; attempt < 2; attempt++){
     try{
       const body = {contents:[{parts:[{text:PROMPT},{inline_data:{mime_type:'image/jpeg', data:img.data}}]}],
-        generationConfig:{responseMimeType:'application/json', temperature:0, maxOutputTokens:65535}};
+        generationConfig:{responseMimeType:'application/json', temperature:0, maxOutputTokens:32768}};
       const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
       const r = await fetch(cfg.endpoint + model + ':generateContent?key=' + encodeURIComponent(key),
         {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctl.signal});
