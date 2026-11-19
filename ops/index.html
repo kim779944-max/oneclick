@@ -362,13 +362,24 @@
 
   /* ── PIN 게이트 ── */
   function isMaster(){ return !!(window.KTS && window.KTS.isMaster && window.KTS.isMaster()); }
+  var SS = 'kts_ops';
+  function sess(v){
+    try{ if (v === undefined) return sessionStorage.getItem(SS); sessionStorage.setItem(SS, v); }catch(e){}
+    return null;
+  }
+  function allowed(){
+    var s = sess();
+    if (s === '0') return false;             /* 판에서 '잠그기'를 누른 경우 */
+    return isMaster();                        /* 쇼룸 마스터 1회 인증이면 바로 열림 */
+  }
   function gate(){
-    if (isMaster()){ $('#gate').classList.add('off'); return; }
+    if (allowed()){ $('#gate').classList.add('off'); return; }
     $('#gate').classList.remove('off');
   }
   $('#pinGo').onclick = function(){
     var v = ($('#pin').value || '').replace(/\D/g,'');
     if (window.KTS && window.KTS.setMaster && window.KTS.setMaster(v)){
+      sess('1');
       $('#gate').classList.add('off');
       load();
     } else {
@@ -379,7 +390,8 @@
   $('#pin').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); $('#pinGo').click(); } });
   $('#lock').onclick = function(e){
     e.preventDefault();
-    if (window.KTS && window.KTS.clearMaster) window.KTS.clearMaster();
+    /* 판만 잠근다 — 쇼룸의 마스터 모드(무제한 열기)는 그대로 둔다 */
+    sess('0');
     gate();
   };
 
@@ -395,7 +407,7 @@
     });
   }
   $('#btnReload').onclick = function(){ load(); };
-  gate(); if (isMaster()) load();
+  gate(); if (allowed()) load();
 })();
 </script>
 </body>
