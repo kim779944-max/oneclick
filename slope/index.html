@@ -270,7 +270,7 @@ details.adv .keyrow{margin-top:7px}
 
   <p class="foot">KTS 원클릭 · 지번·경사도 지도<br>
   지형 <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">공개 DEM(SRTM 계열)</a> ·
-  지도 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> ·
+  지도 <a id="mapSrc" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> ·
   지적 <a href="https://www.vworld.kr/" target="_blank" rel="noopener">© Vworld</a><br>
   참고용 그림입니다. 경계·지목·인허가의 법적 판단은 공부(公簿)와 담당 관청 확인이 기준입니다.</p>
 </main>
@@ -1186,6 +1186,8 @@ $('#copyTxt').addEventListener('click',function(){
 /* ---------------- 시작 ---------------- */
 fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key);
 if(S.key){ $('#vk').value=S.key }
+/* 바탕 지도 출처 표기 — 키가 있으면 Vworld WMTS 바탕을 쓴다 */
+if(S.key){ var ms=$('#mapSrc'); if(ms){ ms.href='https://www.vworld.kr/'; ms.textContent='© Vworld' } }
 /* 키가 있으면 필지 경계(Vworld 연속지적도)를 처음부터 켜 둔다 */
 if(S.key){
   S.lay.parcel=1;
