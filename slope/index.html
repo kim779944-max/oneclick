@@ -1705,7 +1705,7 @@ function v3open(my){
   try{
     V3.P=v3prog(gl,V3_VS,V3_FS); V3.LP=v3prog(gl,V3_LVS,V3_LFS); V3.PP=v3prog(gl,V3_PVS,V3_PFS);
     if(!V3.P||!V3.LP||!V3.PP) throw new Error('shader');
-    V3.G=v3geom(); V3.TX=v3texPlan(V3.G.vw);
+    V3.G=v3geom(); V3.TX=v3texPlan(V3.G.vw); V3.from={lat:S.lat,lon:S.lon};
     V3.tex=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,V3.tex);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
@@ -1829,7 +1829,8 @@ function archEnter(){
 /* 지번(필지)이 바뀌면 이어서 다시 조회 — 2D에서 지번을 바꿔도 이 탭이 같이 갱신된다 */
 function archOnPlace(){
   /* 3D는 켜 둔 채로 메쉬를 다시 만들지 않는다 — 지번이 바뀌면 2D로 돌아와 새 필지로 다시 열게 한다(옛 지형이 남는 것 방지) */
-  if(V3.on||V3.want){ v3exit(); toast('지번이 바뀌었습니다 · 3D 지형을 다시 누르면 새 필지로 그립니다') }
+  var same=V3.from&&Math.abs(V3.from.lat-S.lat)<1e-7&&Math.abs(V3.from.lon-S.lon)<1e-7;
+  if((V3.on||V3.want)&&!same){ v3exit(); toast('지번이 바뀌었습니다 · 3D 지형을 다시 누르면 새 필지로 그립니다') }
   if(!ARCH.on) return;
   clearTimeout(ARCH.t);
   ARCH.t=setTimeout(function(){ if(ARCH.on) archLoad(false) },160);
