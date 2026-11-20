@@ -280,8 +280,6 @@ function setSig(c){
   if(!c){ pv.innerHTML='<span class="em">사인을 만들면 여기에 투명 PNG로 보입니다</span>'; $('#pngDl').disabled=true; renderStage(); return; }
   pv.innerHTML='<img alt="사인 미리보기" src="'+c.toDataURL('image/png')+'">';
   $('#pngDl').disabled=false;
-  /* 문서를 먼저 열어 둔 상태면 표준 도장 크기로 바로 얹어 둔다(끌어서 옮길 수 있음) */
-  if(docs.length && docs[cur] && !docs[cur].place) docs[cur].place={x:.74,y:.85,w:(+$('#sz').value/100)};
   renderStage(); paintThumbs();
 }
 
