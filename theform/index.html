@@ -2469,7 +2469,7 @@ $('#goSign').onclick = async () => {
   busyOn('계약서를 더싸인으로 넘기는 중…');
   try{
     const n = tfPageCount(), pages = [];
-    for (let p = 1; p <= n; p++){ const c = await composite(1200, p); pages.push(c.toDataURL('image/jpeg', 0.92)); }
+    for (let p = 1; p <= n; p++){ const c = await composite(1600, p); pages.push(c.toDataURL('image/jpeg', 0.9)); }
     try{ sessionStorage.setItem('kts_sign_seed', JSON.stringify({name: outBase(), pages, at: Date.now()})); }
     catch(err){ busyOff(); return toast('계약서가 커서 넘기지 못했습니다 · [인쇄·PDF 저장]으로 PDF를 만든 뒤 더싸인에 올려 주세요'); }
     busyOff();
