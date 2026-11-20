@@ -391,7 +391,9 @@ h1 em{font-style:normal;color:var(--amber)}
     <button data-c="etc">생활</button>
     <button data-c="soon">준비 중</button>
   </div>
+  <div id="refNote"></div>
   <div class="count" id="count"></div>
+  <div id="favSlots" style="display:none"></div>
   <div class="slegend" id="slegend"></div>
 
   <div class="plist" id="plist"></div>
@@ -419,6 +421,7 @@ h1 em{font-style:normal;color:var(--amber)}
 <button class="totop" id="toTop" type="button" aria-label="원클릭 맨 위로">↑ 원클릭</button>
 
 <script src="master.js"></script>
+<script src="slots.js"></script>
 <script src="products.js"></script>
 <script src="status.js"></script>
 <script>
@@ -456,8 +459,20 @@ var FAV_KEY = 'kts_favs', REC_KEY = 'kts_recent';
 var FAV_DEFAULT = ['viewer','photo2doc','thedetail','contract','navi','sign'];
 function lsArr(k){ try { var v = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
 function lsPut(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-function isFav(k){ return lsArr(FAV_KEY).indexOf(k) >= 0; }
+/* 무료 4칸 고정 · 월 1회 초기화 · 5칸째 칸 추가 (적립메모 120번, slots.js)
+   손님이 ☆로 직접 담는 칸에만 적용 — FAV_DEFAULT(추천)는 내 칸이 아니므로 그대로.
+   옛 kts_favs 는 지우지 않고 처음 한 번 그대로 옮긴다(4개 넘게 담아 둔 분은 유예). */
+var FAVSL = window.KTSSlots ? window.KTSSlots({ key:'fav', free:4, label:'내 단축바', el:'#favSlots',
+  migrate: function(){ return lsArr(FAV_KEY).map(function(k){ return { id:k, kind:'tool' }; }); }, migrateKey:'kts_favs',
+  onChange: function(){ try { render(); } catch(e){} } }) : null;
+function favIds(){ return FAVSL ? FAVSL.items().map(function(i){ return i.id; }) : lsArr(FAV_KEY); }
+function isFav(k){ return favIds().indexOf(k) >= 0; }
 function toggleFav(k){
+  if (FAVSL){
+    if (isFav(k)){ if (FAVSL.remove(k)) toastMsg('★ 내 단축바에서 뺐습니다'); return; }
+    FAVSL.add({ id:k, kind:'tool' });
+    return;
+  }
   var f = lsArr(FAV_KEY), i = f.indexOf(k);
   if (i >= 0) f.splice(i, 1); else { f.unshift(k); if (f.length > 8) f = f.slice(0, 8); }
   lsPut(FAV_KEY, f);
@@ -502,6 +517,7 @@ document.addEventListener('click', e => {
 
 function render(){
   const favMode = cur === 'fav';
+  const fsl = $('#favSlots'); if (fsl){ fsl.style.display = favMode ? '' : 'none'; if (favMode && FAVSL) FAVSL.paint(); }
   const list = favMode ? favList()
     : window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
   $('#count').textContent = favMode ? (list.length ? list.length + '개 담김' : '') : list.length + '개';
@@ -540,6 +556,8 @@ $$('#tabs button').forEach(b => b.onclick = () => {
   render();
 });
 render();
+/* 카톡 초대 링크로 들어온 기기 — 안내 1줄만(자동 해금 없음) */
+try { if (window.KTSSlots) window.KTSSlots.ref.notice($('#refNote')); } catch(e){}
 /* 마스터 모드(PIN 2899)를 켜고 끌 때 배지 표시 기준(status.js show)이 바로 반영되게 */
 document.addEventListener('kts:master', () => { try { render(); } catch(e){} });
 
