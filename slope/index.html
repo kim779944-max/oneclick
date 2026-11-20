@@ -175,7 +175,7 @@ details.adv .keyrow{margin-top:7px}
       <div class="mapbadge"><span id="bPos">—</span><span id="bEl">—</span><span class="warn" id="bSl">—</span></div>
       <div class="zoomctl"><button type="button" id="zIn" aria-label="확대">+</button><button type="button" id="zOut" aria-label="축소">−</button></div>
       <div class="hint" id="hint">밀어서 필지에 맞추세요</div>
-      <span class="attr">© OpenStreetMap · DEM</span>
+      <span class="attr" id="mapAttr">© OpenStreetMap · DEM</span>
       <div class="legend">
         <div class="tt">경사도(°) · 칸 하나 3.8m(5m 격자)</div>
         <div class="bar"></div>
@@ -1187,7 +1187,8 @@ $('#copyTxt').addEventListener('click',function(){
 fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key);
 if(S.key){ $('#vk').value=S.key }
 /* 바탕 지도 출처 표기 — 키가 있으면 Vworld WMTS 바탕을 쓴다 */
-if(S.key){ var ms=$('#mapSrc'); if(ms){ ms.href='https://www.vworld.kr/'; ms.textContent='© Vworld' } }
+if(S.key){ var ms=$('#mapSrc'); if(ms){ ms.href='https://www.vworld.kr/'; ms.textContent='© Vworld' } 
+  var ma=$('#mapAttr'); if(ma) ma.textContent='© Vworld · DEM' }
 /* 키가 있으면 필지 경계(Vworld 연속지적도)를 처음부터 켜 둔다 */
 if(S.key){
   S.lay.parcel=1;
