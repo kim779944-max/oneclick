@@ -270,7 +270,10 @@ function buildChips(){
     arr.push(['stop','준공·청산 제외']);
     ['재건축','재개발','주거환경개선'].forEach(function(v){arr.push([v,v]);});
   }else{
-    ['재개발(주택정비)','재건축(공동주택)','재개발(도시정비)','주거환경개선'].forEach(function(v){arr.push([v,v.replace(/\(.*\)/,'')]);});
+    arr.push(['재개발(주택정비)','재개발(주택)']);
+    arr.push(['재건축(공동주택)','재건축']);
+    arr.push(['재개발(도시정비)','재개발(도시)']);
+    arr.push(['주거환경개선','주거환경개선']);
   }
   c.innerHTML=arr.map(function(a){return '<button data-f="'+esc(a[0])+'"'+(FILT===a[0]?' class="on"':'')+'>'+esc(a[1])+'</button>';}).join('');
 }
@@ -316,7 +319,7 @@ function itemHTML(r){
   var mb=r.l? '<span class="mb">매물 '+r.l+'</span>':'';
   return '<button class="item" data-i="'+esc(r.__i)+'">'+
     '<div class="nm">'+esc(r.n)+'</div>'+
-    '<div class="lo"><em>'+esc(where)+'</em><span>'+esc(TAB==='nation'?'세대수 '+(r.hn?won(r.hn)+'세대':'미기재'):r.j)+'</span></div>'+
+    '<div class="lo"><em>'+esc(where)+'</em><span>'+esc(TAB==='nation'?'세대수 '+(r.hn?won(r.hn)+'세대':'미기재'):(r.j||'위치 미기재'))+'</span></div>'+
     barHTML(s)+
     '<div class="bot"><span class="stp '+cls+'">'+esc(stageLabel(r))+'</span>'+
       (r.o==='일시중단'?'<span class="stop">일시중단</span>':'')+ mb +'</div>'+
@@ -373,9 +376,12 @@ function ladderHTML(r){
   return h+'</div>';
 }
 function addrOf(r){
-  if(TAB==='seoul') return '서울특별시 '+r.g+' '+r.j;
-  if(TAB==='gyeonggi') return r.j.indexOf('경기')===0? r.j : '경기도 '+r.j;
-  return r.sd+' '+r.g+' '+r.n;
+  if(TAB==='seoul') return ('서울특별시 '+r.g+' '+(r.j||'')).trim();
+  if(TAB==='gyeonggi'){
+    if(!r.j) return '경기도 '+r.g+' (위치 미기재)';
+    return r.j.indexOf('경기')===0? r.j : '경기도 '+r.j;
+  }
+  return (r.sd+' '+r.g+' '+r.n).trim();
 }
 function navHTML(r){
   var a=addrOf(r), q=encodeURIComponent(a), nm=encodeURIComponent(r.n);
