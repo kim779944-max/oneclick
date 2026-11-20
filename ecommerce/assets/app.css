@@ -1,0 +1,109 @@
+/* KTS 이커머스 원클릭 — 공통 틀 (색·390·카드·버튼·시트). 외부 폰트·CDN 0 */
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;
+  --ok:#4ADE80;--red:#FF5C6C;--warn:#FCD34D}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);overflow-x:hidden}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:15px;line-height:1.55;padding-bottom:64px;-webkit-text-size-adjust:100%}
+a{color:var(--amber2)}
+.wrap{max-width:560px;margin:0 auto;padding:0 14px}
+/* 헤더 */
+.hd{position:sticky;top:0;z-index:20;background:var(--bg2);border-bottom:1px solid var(--line)}
+.hd .wrap{display:flex;align-items:center;gap:8px;height:52px}
+.hd .back{color:var(--ink2);text-decoration:none;font-size:14px;white-space:nowrap;padding:8px 2px}
+.hd h1{flex:1;min-width:0;font-size:16px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd h1 small{display:block;font-size:11px;color:var(--gray);font-weight:400}
+.keybtn{height:36px;border-radius:18px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:inherit;font-size:12px;padding:0 10px;white-space:nowrap;cursor:pointer}
+.keybtn b{color:var(--amber2);font-weight:700}
+/* 카드·입력 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:6px}
+.card h2 .n{display:inline-flex;width:22px;height:22px;border-radius:11px;background:var(--amber);color:var(--on);font-size:12px;align-items:center;justify-content:center}
+.f{display:block;margin:0 0 10px}
+.f>span{display:block;font-size:13px;color:var(--ink2);margin-bottom:4px}
+.f>span em{color:var(--amber2);font-style:normal}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+input,select,textarea{width:100%;min-height:42px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--ink);font:inherit;font-size:15px;padding:8px 10px}
+textarea{min-height:84px;resize:vertical}
+input[type=file]{padding:8px;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--amber);outline-offset:0}
+.hint{font-size:12px;color:var(--gray);margin:4px 0 0}
+.lim{font-size:12px;color:var(--warn);margin:6px 0 0}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line2)}
+/* 버튼 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:42px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--amber);border-color:var(--amber);color:var(--on);font-weight:700}
+.btn:disabled,.btn.lock{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:36px;font-size:13px;padding:0 10px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.go{position:sticky;top:52px;z-index:15;background:var(--bg);padding:10px 0 8px}
+.go .btn.pri{width:100%;min-height:50px;font-size:17px}
+.need{font-size:13px;color:var(--warn);margin:6px 2px 0;min-height:18px}
+/* 탭 */
+.tabs{display:flex;flex-wrap:wrap;gap:2px 4px;overflow:visible;white-space:nowrap;border-bottom:1px solid var(--line);margin:14px 0 0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;color:var(--ink2);font:inherit;font-size:13.5px;padding:9px 7px 7px;cursor:pointer;min-height:40px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--amber);font-weight:700}
+.panel{display:none;padding:12px 0}
+.panel.on{display:block}
+.empty{color:var(--gray);font-size:14px;padding:20px 4px;text-align:center}
+/* 결과 블록 */
+.opt{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+.opt .lab{font-size:12px;color:var(--amber2);font-weight:700;margin-bottom:4px}
+.opt .txt{font-size:15px;word-break:keep-all;overflow-wrap:anywhere}
+.chk{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-block;font-size:12px;border-radius:999px;padding:3px 9px;background:var(--bg2);border:1px solid var(--line2);color:var(--ink2)}
+.chip.ok{color:var(--ok);border-color:#2d6b45}
+.chip.bad{color:var(--red);border-color:#7a2f3a}
+.tagbox{display:flex;flex-wrap:wrap;gap:6px}
+.tagbox .chip{font-size:13px;color:var(--ink)}
+.tagbox .chip i{font-style:normal;color:var(--gray);font-size:11px;margin-left:4px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 5px;text-align:right;word-break:keep-all;overflow-wrap:anywhere}
+table.t th{background:var(--card2);color:var(--ink2);font-weight:600;text-align:center}
+table.t td.l{text-align:left}
+table.t tr.loss td{background:#3a1520;color:#FFC2C9}
+table.t tr.sel td{outline:0;background:#2a1a08}
+.scroll{overflow-x:auto}
+.note{font-size:12px;color:var(--gray);margin:8px 0}
+.warnline{font-size:13px;color:var(--warn);margin:8px 0}
+.redline{font-size:13px;color:#fff;background:#5a1420;border:1px solid var(--red);border-radius:8px;padding:8px 10px;margin:8px 0}
+.okline{font-size:13px;color:var(--ok);margin:8px 0}
+pre.code{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;line-height:1.45;white-space:pre-wrap;word-break:break-all;max-height:280px;overflow:auto;color:var(--ink2)}
+.preview{background:#fff;color:#1b2333;border-radius:10px;overflow:hidden;margin:8px 0}
+.preview img{max-width:100%;display:block}
+.prevscale{width:100%;overflow:hidden;border-radius:10px;background:#fff}
+.prevscale .pgwrap{transform-origin:0 0}
+/* 원고 미리보기(블로그·인스타) */
+.ms{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:15px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere}
+.ms h3{font-size:16px;margin:16px 0 6px;color:var(--amber2)}
+.ms p{margin:0 0 10px}
+.ms .ph{display:block;border:1px dashed var(--line2);border-radius:8px;padding:8px 10px;color:var(--ink2);font-size:13px;margin:8px 0}
+.ms .ph img{max-width:100%;border-radius:6px;display:block;margin-bottom:4px}
+/* 시트(열쇠) */
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(5,8,20,.72);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .box{width:100%;max-width:560px;background:var(--card);border:1px solid var(--line2);border-radius:16px 16px 0 0;padding:16px 14px 20px}
+.sheet .box h3{margin:0 0 8px;font-size:16px}
+/* 하단 고정 배너 */
+.banner{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bg2);border-top:1px solid var(--line)}
+.banner .wrap{display:flex;justify-content:center;gap:4px;height:48px;align-items:center;font-size:13px;white-space:nowrap}
+.banner a{color:var(--ink2);text-decoration:none;padding:12px 6px}
+.banner a.all{color:var(--amber2);font-weight:700}
+.banner span{color:var(--line2)}
+#toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:60;background:#1d2c4f;color:var(--ink);border:1px solid var(--amber);border-radius:999px;padding:10px 16px;font-size:14px;max-width:92vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+.owner-badge{display:inline-block;font-size:11px;color:var(--on);background:var(--amber2);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 0;min-height:42px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--ink2);font:inherit;font-size:14px;cursor:pointer;padding:0 6px}
+.seg button.on{border-color:var(--amber);color:var(--ink);background:#2a1a08;font-weight:700}
+.two{display:grid;grid-template-columns:1fr;gap:10px}
+.track{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.track .btn{width:100%}
+.track p{margin:8px 0 0;font-size:13px;color:var(--ink2)}
+.track.rec{border-color:var(--amber)}
+.track.rec p{color:var(--amber2)}
+.score{font-size:30px;font-weight:800;color:var(--amber2)}
+@media (min-width:600px){.two{grid-template-columns:1fr 1fr}}
+@media print{.hd,.banner,.go,.tabs,.btns{display:none}}

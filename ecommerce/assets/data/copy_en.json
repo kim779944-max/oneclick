@@ -1,0 +1,33 @@
+{
+  "_note": "Amazon / Shopee English templates. {noun}=product noun, {cat}=category noun, {attr}=feature. No brand names, no superlatives, no emoji. Made in Korea is always stated.",
+  "banned": ["best", "#1", "no.1", "number one", "perfect", "guaranteed", "guarantee", "cheapest", "100%", "top rated", "amazing"],
+  "title": "{noun} - {f1}, {f2}, {use} - Made in Korea{spec}",
+  "shopeeTitle": "{noun} {f1} {use} Made in Korea{spec}",
+  "bullets": [
+    "{F1}: {feat1} so you can {ben1} during {sit1}.",
+    "{F2}: {feat2}, which helps you {ben2} at home or on the go.",
+    "EASY TO USE: Ready to use right out of the box, so even first-time users can {ben3} without extra tools.",
+    "MADE IN KOREA: Checked before shipping from Korea, so the {noun} arrives clean and ready for {sit2}.",
+    "WHAT YOU GET: {spec2}. Simple packaging that is easy to store or give as a gift."
+  ],
+  "description": [
+    "This {noun} is designed for everyday use. It focuses on {feat1} and {feat2}, so it fits naturally into {sit1} and {sit2}.",
+    "It is lightweight and simple to handle. Open the package, follow the short guide, and start using it right away. No special tools or setup are needed.",
+    "Made in Korea and inspected before shipping. Please check the size and specifications below before ordering, and contact the seller with any questions."
+  ],
+  "searchTerms": ["{noun}", "{cat}", "korean", "made in korea", "{f1}", "{f2}", "{use}", "gift", "home", "daily use", "portable", "easy"],
+  "feat": {
+    "생활용품": [["STRONG HOLD", "a firm, durable build", "fix small problems quickly"], ["SIMPLE SETUP", "a press-and-use design", "save time"], ["HOME", "home repair", "keep things tidy"]],
+    "주방용품": [["HYGIENIC", "an easy-to-wash surface", "keep your kitchen clean"], ["HEAT SAFE", "heat-resistant material", "cook with confidence"], ["KITCHEN", "home cooking", "prepare meals easily"]],
+    "가전디지털": [["RECHARGEABLE", "a USB-C rechargeable battery", "skip disposable products"], ["COMPACT", "a pocket-size body", "carry it every day"], ["TRAVEL", "commuting", "stay comfortable"]],
+    "패션잡화": [["LIGHTWEIGHT", "a light, durable material", "wear it all day"], ["EVERYDAY STYLE", "a simple design", "match any outfit"], ["DAILY", "daily outings", "look neat"]],
+    "뷰티": [["GENTLE", "a gentle formula", "care for your skin daily"], ["TRAVEL SIZE", "a compact size", "carry it anywhere"], ["DAILY CARE", "morning routines", "feel refreshed"]],
+    "식품": [["INDIVIDUALLY PACKED", "individual packs", "enjoy a portion at a time"], ["EASY PREP", "quick preparation", "snack without fuss"], ["SNACK", "office breaks", "share with family"]],
+    "완구·취미": [["SAFE MATERIAL", "child-friendly material", "play with peace of mind"], ["CREATIVE PLAY", "an open-ended design", "spark imagination"], ["PLAY", "indoor play", "enjoy family time"]],
+    "스포츠·레저": [["OUTDOOR READY", "a weather-resistant build", "enjoy the outdoors"], ["FOLDABLE", "a compact folding design", "pack it easily"], ["OUTDOOR", "camping trips", "stay prepared"]],
+    "반려동물": [["PET SAFE", "pet-friendly material", "care for your pet"], ["EASY CLEAN", "a washable surface", "keep it hygienic"], ["PET CARE", "daily walks", "keep pets comfortable"]],
+    "자동차용품": [["CAR READY", "a non-slip design", "keep your car organized"], ["PORTABLE", "a compact body", "carry it on road trips"], ["DRIVING", "long drives", "drive comfortably"]]
+  },
+  "sits": ["winter commutes", "home repairs", "weekend cleaning", "camping trips", "daily routines", "travel"],
+  "shopeeTags": ["#madeinkorea", "#koreanproduct", "#{nounTag}", "#{catTag}", "#dailyuse", "#homeessentials", "#giftidea", "#kshopping"]
+}

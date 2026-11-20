@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더그램 · 인스타 원클릭</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>더그램 · 인스타 원클릭<small>작성은 여기서 · 올리는 버튼만 사장님이</small></h1>
+  <button class="keybtn" id="btnKey" type="button">AI 열쇠 <b id="aiLeft">없음</b></button>
+</div></header>
+
+<main class="wrap">
+  <section class="card">
+    <h2><span class="n">1</span>무엇을 올릴까요</h2>
+    <label class="f"><span>한 줄 주제 <em>필수</em></span><input id="inTopic" type="text" maxlength="30" placeholder="예: 겨울 손난로 고르는 법"></label>
+    <div class="grid2">
+      <label class="f"><span>업종</span><select id="inBiz"></select></label>
+      <label class="f"><span>지역 (선택)</span><input id="inRegion" type="text" maxlength="10" placeholder="예: 수원"></label>
+    </div>
+    <label class="f"><span>톤</span><select id="tone"><option>감성</option><option selected>정보</option><option>유머</option></select></label>
+    <label class="f"><span>사진/영상 1개 (선택 · 미리보기용, 어디에도 올리지 않음)</span><input id="inPhoto" type="file" accept="image/*,video/*"></label>
+    <div class="thumbs" id="thumbs"></div>
+    <p class="okline" id="humanLine">자동 로그인·자동 업로드 없음 — 업로드 버튼만 사람이 누릅니다</p>
+  </section>
+
+  <div class="go">
+    <button class="btn pri" id="btnGo" type="button">1방 생성</button>
+    <div class="need" id="need"></div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="tabHook">① 첫 줄 3안</button>
+    <button type="button" data-tab="tabBody">② 본문</button>
+    <button type="button" data-tab="tabTag">③ 해시태그 25</button>
+    <button type="button" data-tab="tabComment">④ 첫 댓글</button>
+  </nav>
+  <div class="btns">
+    <button class="btn sm pri" id="btnCopy" type="button">전체 복사</button>
+    <button class="btn sm" id="btnBodyOnly" type="button">본문만</button>
+    <button class="btn sm" id="btnDl" type="button">원고 받기(.txt)</button>
+    <a class="btn sm" id="btnInsta" href="instagram://app">인스타 열기</a>
+  </div>
+  <p class="note">[인스타 열기]는 휴대폰에 인스타 앱이 있을 때만 열립니다. 앱이 없으면 아무 일도 일어나지 않으니, 앱을 직접 열고 붙여넣어 주세요.</p>
+
+  <div id="out">
+    <section class="panel" id="tabHook"><div class="empty">[1방 생성]을 누르면 첫 줄 3안(질문형·수치형·공감형)이 나옵니다.</div></section>
+    <section class="panel" id="tabBody"><div class="empty">본문(3~5문단)이 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabTag"><div class="empty">해시태그 25개가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabComment"><div class="empty">첫 댓글이 여기에 나옵니다.</div></section>
+  </div>
+</main>
+
+<div class="sheet" id="keySheet" role="dialog" aria-label="AI 열쇠">
+  <div class="box">
+    <h3>AI 열쇠 (선택)</h3>
+    <p class="hint">열쇠가 없어도 규칙 엔진으로 끝까지 만듭니다. 열쇠를 넣으면 문장을 더 자연스럽게 다듬습니다. 이 기기에만 저장, 하루 12회까지.</p>
+    <input id="keyIn" type="password" autocomplete="off" placeholder="내 제미나이 무료 열쇠 붙여넣기">
+    <div class="btns">
+      <button class="btn pri" id="keySave" type="button">이 기기에 저장</button>
+      <button class="btn" id="keyDel" type="button">지우기</button>
+      <button class="btn" data-close type="button">닫기</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/data/bundle.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+var K = KTS, $ = K.$;
+var S = { res: null, photo: null, hook: 0 };
+window.__res = null; window.__done = false;
+var EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu;
+var BAN = K.BAN.concat(['정품보장']);
+
+/* 결정론 고르기 */
+function pk(arr, s, i){ return arr[(s + i * 5) % arr.length]; }
+function emojiN(t){ return (String(t).match(EMOJI) || []).length; }
+
+/* ① 첫 줄 3안 — 40자 이내, 주제를 맨 앞(첫 12자 안 핵심) */
+function makeHooks(o){
+  var H = K.D.insta_copy.hooks, s = K.seed(o.topic + o.tone), out = [];
+  ['질문형', '수치형', '공감형'].forEach(function(k, i){
+    var cand = H[k].map(function(t){ return K.fill(t, { topic: o.topic }); });
+    var t = pk(cand, s, i);
+    if (t.length > 40) t = cand.reduce(function(a, b){ return b.length < a.length ? b : a; });
+    if (t.length > 40) t = o.topic.slice(0, 34) + (k === '질문형' ? ' 어때요?' : k === '수치형' ? ' 3가지' : ' 공감');
+    out.push({ k: k, t: t });
+  });
+  return out;
+}
+/* ② 본문 — 3~5문단, 350~700자 */
+var EXTRA = {
+  '감성': ['사진은 꾸미지 않고 있는 그대로 담았어요.', '{region} 골목의 공기까지 전해지면 좋겠어요.', '천천히 보고 마음에 남는 것 하나만 가져가세요.', '{topic}, 오늘은 조금 느긋하게 생각해 봐요.', '계절이 바뀔 때마다 이런 기록을 남겨 두고 싶어요.', '오늘 이 글을 본 분들의 하루도 편안하길 바라요.'],
+  '정보': ['{topic}에서 가장 많이 놓치는 건 기준을 정하지 않는 거예요.', '처음이라면 한 가지만 바꿔 보고 결과를 확인하는 게 좋아요.', '궁금한 점은 댓글로 남겨 주시면 다음 게시물에서 정리할게요.', '{region}에서 직접 확인한 내용만 담았어요.', '가격보다 내 생활에 맞는지를 먼저 따져 보세요.', '같은 고민을 하는 분이 많아서 순서대로 묶어 봤어요.'],
+  '유머': ['참고로 이 글을 쓰는 동안 커피를 두 잔 마셨어요.', '{region} 사장님들 다 같이 힘내 보자고요.', '중간에 포기해도 괜찮아요, 저장해 두면 되니까요.', '{topic}, 오늘은 진짜 해 봅니다.', '내일의 나에게 미루는 것도 일종의 기술이긴 하죠.', '그래도 오늘 한 줄이라도 했다면 그걸로 충분해요.']
+};
+function makeBody(o){
+  var B = K.D.insta_copy.body[o.tone] || K.D.insta_copy.body['정보'], s = K.seed(o.topic + o.biz + o.tone);
+  var map = { topic: o.topic, region: o.region || '우리 동네', biz: o.biz === '기타' ? '저희 가게' : '저희 ' + o.biz };
+  var paras = [];
+  paras.push([K.fill(pk(B.open, s, 0), map)]);
+  B.mid.forEach(function(m){ paras.push([K.fill(m, map)]); });
+  var ex = (EXTRA[o.tone] || EXTRA['정보']).map(function(x){ return K.fill(x, map); }), ei = 0;
+  function len(){ return paras.map(function(p){ return p.join(' '); }).join('\n\n').length + 2 + closeLine.length; }
+  var closeLine = K.fill(B.close[0], map);
+  while (len() < 420 && ei < ex.length){ paras[1 + (ei % 3)].push(ex[ei]); ei++; }
+  paras.push([closeLine]);
+  if (paras.length > 5){ var last = paras.pop(); paras[paras.length - 1] = paras[paras.length - 1].concat(last); }
+  return paras.map(function(p){ return p.join(' '); });
+}
+/* ③ 해시태그 25 = 대형 5 + 중형 10 + 소형/지역 10 */
+function makeTags(o){
+  var T = K.D.insta_copy.tags, s = K.seed(o.topic + o.biz + o.region), used = {}, out = [];
+  function add(w, g){ w = String(w || '').replace(/[^가-힣A-Za-z0-9_]/g, ''); if (!w || w.length > 19 || used[w] || K.banFind(w, BAN).length || K.customerCheck(w).ban.length) return false; used[w] = 1; out.push({ t: '#' + w, g: g }); return true; }
+  function fill(pool, n, g){ var c = 0; for (var i = 0; i < pool.length && c < n; i++){ if (add(pool[(s + i) % pool.length], g)) c++; } return c; }
+  fill(T.big, 5, '대형');
+  var biz = T.biz[o.biz] || T.biz['기타'];
+  var m = fill(biz, 10, '중형');
+  if (m < 10) fill(T.biz['기타'], 10 - m, '중형');
+  var tw = K.words(o.topic).filter(function(w){ return w.length >= 2; });
+  var small = [];
+  if (o.region) T.local.forEach(function(x){ small.push(K.fill(x, { region: o.region })); });
+  small = small.concat([o.topic.replace(/\s+/g, '')], tw, tw.map(function(w){ return w + '추천'; }), tw.map(function(w){ return w + '정보'; }), tw.map(function(w){ return w + '꿀팁'; }));
+  var c = 0; small.forEach(function(w){ if (c < 10 && add(w, o.region && w.indexOf(o.region) === 0 ? '지역' : '소형')) c++; });
+  var k = 1; while (c < 10){ if (add((tw[0] || '오늘') + '기록' + k, '소형')) c++; k++; }
+  return out;
+}
+/* ④ 첫 댓글 */
+function makeComment(o){
+  var C = K.D.insta_copy.comment, s = K.seed(o.topic);
+  return [K.fill(pk(C.question, s, 0), { topic: o.topic }), C.guide];
+}
+
+function readOpts(){ return { topic: $('#inTopic').value.trim(), biz: $('#inBiz').value, region: $('#inRegion').value.trim().replace(/\s+/g, ''), tone: $('#tone').value }; }
+function fullText(r){ return [r.hooks[S.hook].t, '', r.body.join('\n\n'), '', r.tags.map(function(x){ return x.t; }).join(' ')].join('\n'); }
+
+function draw(r){
+  var e = K.esc;
+  $('#tabHook').innerHTML = r.hooks.map(function(h, i){
+    return '<div class="opt"><div class="lab">' + (i + 1) + '안 · ' + h.k + (S.hook === i ? ' · 선택됨' : '') + '</div><div class="txt">' + e(h.t) + '</div><div class="chk"><span class="chip ' + (h.t.length <= 40 ? 'ok' : 'bad') + '">' + h.t.length + '/40자</span><span class="chip ok">첫 12자: ' + e(h.t.slice(0, 12)) + '</span><span class="chip ' + (emojiN(h.t) <= 1 ? 'ok' : 'bad') + '">이모지 ' + emojiN(h.t) + '</span>' +
+      '<button class="btn sm" type="button" data-hook="' + i + '">이 안 쓰기</button></div></div>';
+  }).join('') + '<div class="btns"><button class="btn" id="btnAi" type="button" data-ai>AI로 다듬기</button></div><p class="note" id="aiMsg"></p>';
+  K.$$('[data-hook]').forEach(function(b){ b.onclick = function(){ S.hook = Number(b.getAttribute('data-hook')); draw(S.res); K.toast((S.hook + 1) + '안을 [전체 복사]에 씁니다'); }; });
+  $('#btnAi').onclick = aiPolish;
+  var bl = r.body.join('\n\n').length;
+  $('#tabBody').innerHTML = '<p class="okline">' + r.body.length + '문단 · ' + bl + '자 (기준 350~700) · 금지어 ' + K.banFind(r.body.join(' '), BAN).length + '</p>' +
+    (S.photo ? '<div class="preview" style="max-width:240px">' + (S.photo.video ? '<p style="padding:8px">영상: ' + e(S.photo.name) + '</p>' : '<img src="' + S.photo.url + '" alt="게시 사진">') + '</div>' : '') +
+    '<div class="ms" id="bodyBox">' + r.body.map(function(p){ return '<p>' + e(p) + '</p>'; }).join('') + '</div>';
+  var cnt = { '대형': 0, '중형': 0, '소형': 0, '지역': 0 }; r.tags.forEach(function(x){ cnt[x.g]++; });
+  $('#tabTag').innerHTML = '<p class="okline">' + r.tags.length + '개 (인스타 한도 30 이내) · 중복 0 · 대형 ' + cnt['대형'] + ' · 중형 ' + cnt['중형'] + ' · 소형/지역 ' + (cnt['소형'] + cnt['지역']) + '</p>' +
+    '<div class="tagbox" id="tagBox">' + r.tags.map(function(x){ return '<span class="chip">' + e(x.t) + '<i>' + x.g + '</i></span>'; }).join('') + '</div>' +
+    '<div class="btns"><button class="btn" id="btnTagCopy" type="button">해시태그만 복사</button></div>';
+  $('#btnTagCopy').onclick = function(){ K.copy(r.tags.map(function(x){ return x.t; }).join(' ')); };
+  $('#tabComment').innerHTML = '<div class="ms" id="cmtBox"><p>' + e(r.comment[0]) + '</p><p>' + e(r.comment[1]) + '</p></div>' +
+    '<p class="note">게시 직후 댓글창에 그대로 붙여넣으세요.</p><div class="btns"><button class="btn" id="btnCmt" type="button">첫 댓글 복사</button></div>';
+  $('#btnCmt').onclick = function(){ K.copy(r.comment.join('\n')); };
+  K.aiBadge();
+}
+
+function go(){
+  if ($('#btnGo').disabled) return;
+  var o = readOpts(); S.hook = 0;
+  var r = { o: o, hooks: makeHooks(o), body: makeBody(o), tags: makeTags(o), comment: makeComment(o) };
+  S.res = r; draw(r);
+  var all = fullText(r), cust = K.customerCheck(all + '\n' + r.comment.join('\n'));
+  window.__res = { hooks: r.hooks.map(function(h){ return { k: h.k, t: h.t, len: h.t.length, emoji: emojiN(h.t), head12: h.t.slice(0, 12).indexOf(o.topic.slice(0, 4)) >= 0 }; }),
+    bodyLen: r.body.join('\n\n').length, paras: r.body.length, bodyBan: K.banFind(r.body.join(' '), BAN).length,
+    tags: r.tags.map(function(x){ return x.t; }), groups: r.tags.map(function(x){ return x.g; }), comment: r.comment, cust: cust, fullLen: all.length };
+  window.__done = true; K.goTab('tabHook'); K.toast('4블록을 모두 만들었습니다');
+}
+async function aiPolish(){
+  try {
+    var o = await aiJson('인스타 게시물 첫 줄 3개를 더 자연스럽게 다듬어 JSON {"hooks":["..","..",".."]} 로만 답하세요. 규칙: 각 40자 이내, 주제 "' + S.res.o.topic + '"를 첫 12자 안에, 순서대로 질문형·수치형·공감형, 이모지 1개 이하, 과장어(최고·1위·100%) 금지.\n' + S.res.hooks.map(function(h){ return h.t; }).join('\n'));
+    var n = 0;
+    (o.hooks || []).slice(0, 3).forEach(function(t, i){ t = String(t || '').trim(); if (t && t.length <= 40 && emojiN(t) <= 1 && !K.banFind(t, BAN).length){ S.res.hooks[i].t = t; n++; } });
+    draw(S.res); $('#aiMsg').textContent = 'AI 다듬기: ' + n + '안 채택 · ' + (window.__aiModel || '');
+  } catch(e){ $('#aiMsg').textContent = aiErr(e); K.toast(aiErr(e)); }
+}
+function need(){ if (!S.res){ K.toast('먼저 [1방 생성]을 눌러 주세요'); return false; } return true; }
+
+async function boot(){
+  await K.loadData(['insta_copy', 'sample_products']);
+  $('#inBiz').innerHTML = Object.keys(K.D.insta_copy.tags.biz).map(function(b){ return '<option>' + b + '</option>'; }).join('');
+  K.shell(); K.tabs('#tabs');
+  K.gate('#btnGo', '#need', function(){ return $('#inTopic').value.trim() ? '' : '한 줄 주제를 넣어 주세요'; });
+  $('#inPhoto').addEventListener('change', async function(){
+    var f = this.files && this.files[0]; if (!f){ S.photo = null; $('#thumbs').innerHTML = ''; return; }
+    if (/^video\//.test(f.type)){ S.photo = { name: f.name, video: true }; $('#thumbs').innerHTML = '<span class="chip">영상 ' + K.esc(f.name) + '</span>'; }
+    else { var p = await K.readPhotos([f], 1); S.photo = p[0] || null; $('#thumbs').innerHTML = S.photo ? '<img src="' + S.photo.url + '" alt="게시 사진">' : ''; }
+  });
+  $('#btnGo').addEventListener('click', go);
+  $('#btnCopy').addEventListener('click', function(){ if (need()){ var t = fullText(S.res); window.__full = { len: t.length, text: t }; K.copy(t); } });
+  $('#btnBodyOnly').addEventListener('click', function(){ if (need()) K.copy(S.res.body.join('\n\n')); });
+  $('#btnDl').addEventListener('click', function(){ if (need()) K.download(new Blob(['﻿' + fullText(S.res) + '\r\n\r\n[첫 댓글]\r\n' + S.res.comment.join('\r\n')], { type: 'text/plain;charset=utf-8' }), '인스타원고_' + K.safeName(S.res.o.topic) + '.txt'); });
+  if (K.qs('sample') === '1'){
+    var s = K.D.sample_products.insta;
+    $('#inTopic').value = s.topic; $('#inBiz').value = s.biz; $('#inRegion').value = s.region; $('#tone').value = K.qs('tone') || s.tone;
+    if (K.qs('nophoto') !== '1'){ S.photo = K.samplePhoto('손난로', 210); $('#thumbs').innerHTML = '<img src="' + S.photo.url + '" alt="샘플 사진">'; }
+    K.regate(); if (K.qs('auto') === '1') go();
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>

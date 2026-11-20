@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>이커머스 원클릭 5종 — 더셀 · 더글 · 더그램</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+.hub{display:grid;gap:10px;margin:12px 0}
+.hub a{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.hub a b{display:block;font-size:16px;margin-bottom:4px}
+.hub a span{display:block;font-size:13px;color:var(--ink2)}
+.hub a i{font-style:normal;font-size:11px;color:var(--on);background:var(--amber);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+ol.how{margin:0;padding-left:20px}
+ol.how li{margin:0 0 6px;font-size:14px}
+</style>
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>이커머스 원클릭 5종<small>사장님 도구 모음 · 작성·계산·파일까지</small></h1>
+  <button class="keybtn" id="btnKey" type="button">AI 열쇠 <b id="aiLeft">없음</b></button>
+</div></header>
+
+<main class="wrap">
+  <div class="hub" id="cards">
+    <a href="coupang.html"><b>더셀 · 쿠팡 원클릭 <i>1순위</i></b><span>상품명 3안 · 태그 20 · 상세페이지(HTML·PNG) · 가격표 · Wing 엑셀 / 오픈 API 서명</span></a>
+    <a href="naver.html"><b>더셀 · 네이버 스토어 원클릭</b><span>SEO 상품명 · 키워드 13 · 속성·태그 10 · 상세 스토리 · 대량등록 엑셀</span></a>
+    <a href="global.html"><b>더셀 · 역직구 원클릭</b><span>아마존·라쿠텐/큐텐·쇼피 현지어 문구 · 관세·환율 역산 · 3국 엑셀</span></a>
+    <a href="blog.html"><b>더글 · 블로그 원클릭</b><span>상위 글 뼈대만 추출 · 완전 자동 / 직접 넣기(추천) 투트랙 · 서식 그대로 복사</span></a>
+    <a href="insta.html"><b>더그램 · 인스타 원클릭</b><span>첫 줄 3안 · 본문 · 해시태그 25 · 첫 댓글 · 업로드만 사람이</span></a>
+  </div>
+
+  <section class="card">
+    <h2>3분 사용법</h2>
+    <ol class="how">
+      <li>위에서 도구를 고릅니다.</li>
+      <li>상품명(또는 키워드)과 꼭 필요한 칸 1~2개만 넣습니다. 사진은 직접 찍은 것이 가장 좋습니다.</li>
+      <li>주황색 <b>[1방 생성]</b>을 누르면 결과가 탭으로 나뉘어 한 번에 채워집니다.</li>
+      <li>탭마다 <b>[복사]</b>·<b>[받기]</b>로 가져가 쿠팡 Wing·스마트스토어센터·블로그·인스타에 <b>직접</b> 붙여넣거나 올립니다.</li>
+      <li>AI 열쇠는 선택입니다. 없어도 끝까지 만들어지고, 있으면 문장이 더 자연스러워집니다(이 기기에만 저장).</li>
+    </ol>
+    <p class="note">이 도구들은 자동 로그인·자동 발행·자동 수집을 하지 않습니다. 작성·계산·파일 만들기까지만 하고, 올리는 버튼은 사장님이 누릅니다.</p>
+  </section>
+
+  <section class="card" id="more">
+    <h2>다른 원클릭</h2>
+    <div class="hub">
+      <a href="../viewer.html"><b>더뷰 — 만능 뷰어</b><span>열리지 않던 .hwp·PDF·오피스 첨부까지 폰에서 바로</span></a>
+      <a href="../theform/"><b>더양식 — 내 양식 1초</b><span>종이 양식 사진 → 값만 채워 한글·엑셀·PDF</span></a>
+      <a href="../thedetail/"><b>더상세 — 상세페이지 1초</b><span>상품 사진으로 상세페이지 1장</span></a>
+      <a href="../sign/"><b>더싸인 — 폰 전자서명</b><span>사인·도장·간인을 폰에서</span></a>
+    </div>
+  </section>
+</main>
+
+<div class="sheet" id="keySheet" role="dialog" aria-label="AI 열쇠">
+  <div class="box">
+    <h3>AI 열쇠 (선택)</h3>
+    <p class="hint">열쇠는 이 기기에만 저장되고 어디에도 보내거나 기록하지 않습니다. 하루 12회까지. 없어도 모든 도구가 동작합니다.</p>
+    <input id="keyIn" type="password" autocomplete="off" placeholder="내 제미나이 무료 열쇠 붙여넣기">
+    <div class="btns">
+      <button class="btn pri" id="keySave" type="button">이 기기에 저장</button>
+      <button class="btn" id="keyDel" type="button">지우기</button>
+      <button class="btn" data-close type="button">닫기</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/app.js"></script>
+<script>KTS.shell(); window.__done = true;</script>
+</body>
+</html>

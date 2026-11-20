@@ -1,0 +1,125 @@
+{
+ "_note": "역직구 관세·부가세·면세 기준입니다. 숫자마다 source(근거)·checked(확인일) 필드가 있고, 제도는 바뀌므로 실제 발송 전에 다시 확인하세요.",
+ "checked": "2026-11-20",
+ "us": {
+  "label": "미국(아마존)",
+  "currency": "USD",
+  "fx": {
+   "value": 1450,
+   "source": "기본값(수정 가능) — 발송일 환율로 바꾸세요",
+   "checked": "2026-11-20",
+   "verified": false
+  },
+  "deMinimis": {
+   "value": 0,
+   "suspended": true,
+   "text": "$800 소액면세(디미니미스) 무기한 중지. 2025-08-29 발효, 2026-06-24 연방규정으로 규정화. $2,500 이하 모든 화물에 관세 적용, 우편물도 예외 아님(정식·약식 통관). → 미국은 면세 구간이 없다고 계산합니다.",
+   "source": "CBP 보도자료 2026-06-24 · Federal Register 2026-12670",
+   "url": "https://www.cbp.gov/newsroom",
+   "checked": "2026-11-20"
+  },
+  "why": [
+   "예전 계산기는 '$800 이하 면세'로 계산했지만, 2025-08-29부터 이 면세가 중지되었습니다.",
+   "그래서 이 계산기는 미국행 모든 가격에 관세·세금을 넣어 계산합니다(면세 적용 0건)."
+  ],
+  "dutyRate": {
+   "value": 0.15,
+   "source": "기본 가정값(한국산 상호관세 15% 가정) — 품목 HTS 코드별 실제 세율로 바꾸세요",
+   "checked": "2026-11-20",
+   "verified": false
+  },
+  "vatRate": {
+   "value": 0,
+   "source": "미국은 연방 부가세 없음(주 판매세는 마켓플레이스가 손님에게 별도 징수) — 0으로 계산",
+   "checked": "2026-11-20",
+   "verified": false
+  },
+  "taxableRule": "과세가격 = 원화매출 (면세 없음)"
+ },
+ "jp": {
+  "label": "일본(라쿠텐·큐텐)",
+  "currency": "JPY",
+  "fx": {
+   "value": 9.4,
+   "source": "기본값(1엔 = 9.4원, 수정 가능)",
+   "checked": "2026-11-20",
+   "verified": false
+  },
+  "deMinimis": {
+   "value": 10000,
+   "factor": 0.6,
+   "itemLimit": 16666,
+   "text": "과세가격 1만 엔 이하 관세·소비세 면세 유지. 단 개인사용 과세가격 = 해외소매가 ×0.6 특례 → 상품가 약 16,666엔까지 면세(운임 별도 표기 시). 이 특례는 2028-04-01 폐지. 2028-04-01부터 1만 엔 이하 통신판매에도 소비세 10%(판매자·지정 플랫폼 납부). 가죽제품·니트의류 등 면세 제외 품목 있음.",
+   "source": "관세청 카스타무스 앤서 · 재무성 2026 세제개정 · 한국관세무역개발원 2026-10-06",
+   "url": "https://www.customs.go.jp/tsukan/kojinyunyu.htm",
+   "checked": "2026-11-20",
+   "abolish": "2028-04-01"
+  },
+  "dutyRate": {
+   "value": 0.05,
+   "source": "기본 가정값(간이세율 근사) — 품목별 실제 세율로 바꾸세요",
+   "checked": "2026-11-20",
+   "verified": false
+  },
+  "vatRate": {
+   "value": 0.1,
+   "source": "일본 소비세 10%",
+   "checked": "2026-11-20",
+   "verified": true
+  },
+  "taxableRule": "과세가격 = (원화매출 − 국제배송) × 0.6 · 상품가(엔) × 0.6 ≤ 10,000엔이면 관세·소비세 0"
+ },
+ "sea": {
+  "label": "동남아·대만(쇼피)",
+  "source": "쇼피 판매자센터 안내(값 미확인 표시)",
+  "url": "https://seller.shopee.com",
+  "checked": "2026-11-20",
+  "defaultCountry": "TW",
+  "text": "국가별 상이(대만 저가면세·싱가포르 GST 9% 등). 기본값은 '면세 없음'으로 두고, 국가를 고르면 값이 바뀝니다. 현지 규정을 꼭 확인하세요.",
+  "countries": {
+   "TW": {
+    "label": "대만",
+    "currency": "TWD",
+    "fx": 45,
+    "dutyRate": 0.05,
+    "vatRate": 0.05,
+    "exemptLimit": 0,
+    "verified": false,
+    "note": "면세 없음 기본(저가면세 기준 변동 — 현지 규정 확인)"
+   },
+   "SG": {
+    "label": "싱가포르",
+    "currency": "SGD",
+    "fx": 1100,
+    "dutyRate": 0,
+    "vatRate": 0.09,
+    "exemptLimit": 0,
+    "verified": false,
+    "note": "GST 9% (저가 수입품에도 부과)"
+   },
+   "MY": {
+    "label": "말레이시아",
+    "currency": "MYR",
+    "fx": 330,
+    "dutyRate": 0.05,
+    "vatRate": 0.1,
+    "exemptLimit": 0,
+    "verified": false,
+    "note": "저가품 판매세 10% 근사(현지 규정 확인)"
+   },
+   "PH": {
+    "label": "필리핀",
+    "currency": "PHP",
+    "fx": 25,
+    "dutyRate": 0.05,
+    "vatRate": 0.12,
+    "exemptLimit": 0,
+    "verified": false,
+    "note": "VAT 12% 근사(현지 규정 확인)"
+   }
+  },
+  "taxableRule": "과세가격 = 원화매출 · 국가별 면세 없음 기본 + 입력값으로 조정"
+ },
+ "notice": "제도는 바뀝니다 — 실제 발송 전 관세청·현지 세관·플랫폼 공지를 꼭 확인하세요.",
+ "invoiceTip": "운임은 인보이스에 상품가와 따로 적어야 일본 면세 판정(상품가 ×0.6)에서 빠집니다."
+}

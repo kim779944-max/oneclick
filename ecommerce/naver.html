@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더셀 · 네이버 스토어 원클릭</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>더셀 · 네이버 스토어 원클릭<small>사장님 전용 · SEO 1초 세팅</small></h1>
+  <button class="keybtn" id="btnKey" type="button">AI 열쇠 <b id="aiLeft">없음</b></button>
+</div></header>
+
+<main class="wrap">
+  <section class="card">
+    <h2><span class="n">1</span>상품</h2>
+    <label class="f"><span>상품명(또는 키워드) <em>필수</em></span><input id="inName" type="text" placeholder="예: 충전식 손난로"></label>
+    <div class="grid2">
+      <label class="f"><span>매입가(원) <em>필수</em></span><input id="inCost" type="text" inputmode="numeric"></label>
+      <label class="f"><span>카테고리</span><select id="inCat"></select></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>희망 판매가(원, 선택)</span><input id="inPrice" type="text" inputmode="numeric" placeholder="비우면 자동 제안"></label>
+      <label class="f"><span>배송비(원)</span><input id="inShip" type="text" inputmode="numeric" value="0"></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>브랜드(선택)</span><input id="inBrand" type="text"></label>
+      <label class="f"><span>원산지(선택)</span><input id="inOrigin" type="text" placeholder="국산"></label>
+    </div>
+    <label class="f"><span>사진 (선택 · 여러 장, 상세 스토리 3장면에 사용)</span><input id="inPhoto" type="file" accept="image/*" multiple></label>
+    <div class="thumbs" id="thumbs"></div>
+  </section>
+
+  <div class="go">
+    <button class="btn pri" id="btnGo" type="button">1방 생성</button>
+    <div class="need" id="need"></div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="tabSeo">① SEO 세팅</button>
+    <button type="button" data-tab="tabAttr">② 속성·태그</button>
+    <button type="button" data-tab="tabStory">③ 상세 스토리</button>
+    <button type="button" data-tab="tabExcel">④ 등록 파일</button>
+  </nav>
+  <div class="btns">
+    <button class="btn sm" id="btnCopy" type="button">이 탭 복사</button>
+    <button class="btn sm" id="btnDl" type="button">이 탭 받기</button>
+  </div>
+  <div id="out">
+    <section class="panel" id="tabSeo"><div class="empty">상품명 3안 · 메인 키워드 3 · 세부 키워드 10 · SEO 점수가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabAttr"><div class="empty">속성 10행 · 태그 10개가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabStory"><div class="empty">상세 스토리 7블록이 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabExcel"><div class="empty">대량등록용 엑셀·CSV가 여기에 나옵니다.</div></section>
+  </div>
+</main>
+
+<div class="sheet" id="keySheet" role="dialog" aria-label="AI 열쇠">
+  <div class="box">
+    <h3>AI 열쇠 (선택)</h3>
+    <p class="hint">열쇠가 없어도 모든 기능이 규칙 엔진으로 동작합니다. 열쇠는 이 기기에만 저장되고 어디에도 보내거나 기록하지 않습니다. 하루 12회까지.</p>
+    <input id="keyIn" type="password" autocomplete="off" placeholder="내 제미나이 무료 열쇠 붙여넣기">
+    <div class="btns">
+      <button class="btn pri" id="keySave" type="button">이 기기에 저장</button>
+      <button class="btn" id="keyDel" type="button">지우기</button>
+      <button class="btn" data-close type="button">닫기</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/data/bundle.js"></script>
+<script src="assets/xlsx.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+var K = KTS, $ = K.$;
+var S = { photos: [], res: null };
+window.__res = null; window.__done = false;
+var REF = '상세페이지 참조';
+
+function lookup(name, cat){
+  var T = K.D.tags_ko, hit = null, key = '';
+  Object.keys(T.products).forEach(function(k){ if (!hit && name.indexOf(k) >= 0){ hit = T.products[k]; key = k; } });
+  var c = T.categories[cat] || T.categories['생활용품'], g = T.generic;
+  function grp(n){ return K.uniq([].concat(hit ? hit[n] || [] : [], c[n] || [], g[n] || [])); }
+  var kw = key;
+  if (!kw){ var w = K.words(name.replace(/[^\w가-힣\s]/g, ' ')); kw = w.length ? w.reduce(function(a, b){ return b.length > a.length ? b : a; }) : name; }
+  return { hit: hit, kw: kw, grp: grp };
+}
+function clean(s){ return String(s || '').replace(/[!@#$%^&*()\[\]{}<>~=+|\\/;:"'`]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function fit(words, max){
+  var out = [], seen = {};
+  words.forEach(function(w){ K.words(clean(w)).forEach(function(x){ if (!seen[x] && !K.banFind(x).length){ var t = out.concat([x]).join(' '); if (t.length <= max){ seen[x] = 1; out.push(x); } } }); });
+  return out.join(' ');
+}
+function tcheck(t, kw){ return { len: t.length, kw: t.indexOf(kw) >= 0 ? 1 : 0, ban: K.banFind(t).length, dup: K.dupWords(t).length, sp: /[!@#$%^&*()]/.test(t) ? 1 : 0 }; }
+
+function makeSeo(inp, L){
+  var g = L.grp, a = g('attr'), t = g('target'), s = g('situation'), std = g('std').filter(function(x){ return x !== L.kw; }), sp = g('spec');
+  var nt = K.words(clean(inp.name)).filter(function(w){ return w !== L.kw && w.indexOf(L.kw) < 0; });
+  var titles = [
+    { label: 'A 메인 앞배치', t: fit([L.kw].concat(nt, [a[0], a[1], t[0], sp[0], s[0], a[2]]), 50) },
+    { label: 'B 검색어 확장', t: fit([L.kw].concat(nt, [std[0], a[2], s[1], t[1], sp[1], a[3]]), 50) },
+    { label: 'C 상황·대상', t: fit([L.kw].concat(nt, [s[2], s[3], t[2], a[3], a[4]]), 50) }
+  ];
+  if (inp.brand && !/자체브랜드/.test(inp.brand)) titles[1].t = fit([L.kw, inp.brand].concat(K.words(titles[1].t).slice(1)), 50);
+  var mains = K.uniq([L.kw, std[0], std[1], std[2]]).slice(0, 3);
+  var I = K.D.tags_ko.intent, details = [];
+  [['정보', I['정보']], ['구매', I['구매']], ['비교', I['비교']], ['지역', I['지역']]].forEach(function(p){ details.push({ g: p[0], t: L.kw + ' ' + p[1][0] }, { g: p[0], t: L.kw + ' ' + p[1][1] }); });
+  details.push({ g: '상황', t: s[0] + ' ' + L.kw }, { g: '상황', t: t[0] + ' ' + L.kw });
+  var used = {}; mains.concat(details.map(function(d){ return d.t; })).forEach(function(x){ used[x.replace(/\s/g, '')] = 1; });
+  var tags = [];
+  a.concat(s, t, std.slice(3), g('syn')).forEach(function(w){ var k = String(w).replace(/\s/g, ''); if (tags.length < 10 && k.length >= 2 && k.length <= 20 && !used[k] && !K.banFind(k).length){ used[k] = 1; tags.push(k); } });
+  return { titles: titles, mains: mains, details: details, tags: tags };
+}
+function makeAttr(inp, L){
+  var rows = {}; (L.hit ? L.hit.specRows : []).forEach(function(r){ rows[r[0]] = r[1]; });
+  var wt = (inp.spec.match(/\d+(?:\.\d+)?\s*(?:g|kg)/i) || [])[0];
+  return [
+    ['브랜드', inp.brand || REF], ['제조사', REF], ['원산지', inp.origin || REF], ['KC 인증번호', REF],
+    ['중량', wt || REF], ['규격', rows['폭'] ? rows['폭'] + (rows['길이'] ? ' × ' + rows['길이'] : '') : (rows['길이'] || rows['구성'] || REF)],
+    ['색상', rows['색상'] || REF], ['재질', rows['재질'] || rows['모'] || REF], ['사용연령', REF], ['유효기간', REF]
+  ];
+}
+function makeStory(inp, L){
+  var C = K.D.copy_ko.story, g = L.grp, s = K.seed(inp.name);
+  var map = { kw: L.kw, target: g('target')[0], situation: g('situation')[0], attr: g('attr')[0] };
+  var scenes = C.scenes.map(function(x, i){ return { h: K.fill(x[0], map), p: K.fill(x[1], map), img: S.photos[i] ? S.photos[i].url : (S.photos.length === 1 ? S.photos[0].url : '') }; });
+  if (L.hit) scenes.forEach(function(sc, i){ sc.p = L.hit.points[i][1] + '. ' + L.hit.points[i][2] + '.'; });
+  return [
+    { t: 'promise', h: '', p: [K.fill(K.pick(C.promise, s), map)] },
+    { t: 'why', h: '왜 이 상품인가요', p: [K.fill(C.why, map)] },
+    { t: 'scenes', h: '이렇게 씁니다', scenes: scenes },
+    { t: 'spec', h: '상품 정보', rows: makeAttr(inp, L).filter(function(r){ return r[1] !== REF; }).concat([['상품명', inp.name]]) },
+    { t: 'ship', h: '배송 · 교환', p: K.D.copy_ko.ship.slice() },
+    { t: 'faq', h: '자주 묻는 질문', faq: C.faq },
+    { t: 'closing', h: '', p: [K.fill(C.closing, map)] }
+  ];
+}
+function storyHtml(blocks, withImg){
+  var e = K.esc;
+  return blocks.map(function(b){
+    var h = b.h ? '<h3>' + e(b.h) + '</h3>' : '';
+    if (b.t === 'promise') return '<h2>' + e(b.p[0]) + '</h2>';
+    if (b.t === 'scenes') return h + b.scenes.map(function(x, i){ return '<p><b>' + (i + 1) + '. ' + e(x.h) + '</b></p>' + (withImg && x.img ? '<p><img src="' + x.img + '" alt="' + e(x.h) + '" style="max-width:100%"></p>' : '') + '<p>' + e(x.p) + '</p>'; }).join('');
+    if (b.t === 'spec') return h + '<table border="1" cellpadding="6" style="border-collapse:collapse">' + b.rows.map(function(r){ return '<tr><th>' + e(r[0]) + '</th><td>' + e(r[1]) + '</td></tr>'; }).join('') + '</table>';
+    if (b.t === 'faq') return h + b.faq.map(function(q){ return '<p><b>Q. ' + e(q[0]) + '</b></p><p>A. ' + e(q[1]) + '</p>'; }).join('');
+    return h + b.p.map(function(x){ return '<p>' + e(x) + '</p>'; }).join('');
+  }).join('\n');
+}
+function storyText(blocks){
+  return blocks.map(function(b){
+    if (b.t === 'scenes') return b.h + '\n' + b.scenes.map(function(x, i){ return (i + 1) + '. ' + x.h + '\n' + x.p; }).join('\n');
+    if (b.t === 'spec') return b.h + '\n' + b.rows.map(function(r){ return r[0] + ': ' + r[1]; }).join('\n');
+    if (b.t === 'faq') return b.h + '\n' + b.faq.map(function(q){ return 'Q. ' + q[0] + '\nA. ' + q[1]; }).join('\n');
+    return (b.h ? b.h + '\n' : '') + b.p.join('\n');
+  }).join('\n\n');
+}
+function score(r){
+  var kw = r.kw, t = r.seo.titles[0].t, all = r.seo.mains.concat(r.seo.details.map(function(d){ return d.t; }), r.seo.tags);
+  var norm = all.map(function(x){ return x.replace(/\s/g, ''); }), dup = norm.length - K.uniq(norm).length;
+  var filled = r.attr.filter(function(x){ return x[1] !== REF; }).length;
+  var first = r.story[0].p[0];
+  var banN = K.banFind(r.seo.titles.map(function(x){ return x.t; }).join(' ') + ' ' + all.join(' ') + ' ' + storyText(r.story)).length;
+  var items = [
+    ['상품명 키워드 포함', 30, t.indexOf(kw) >= 0 ? 30 : 0, '대표 상품명에 메인 키워드 "' + kw + '" 없음'],
+    ['태그 중복 0', 15, dup ? 0 : 15, '키워드·태그 중복 ' + dup + '건'],
+    ['속성 채움', 15, Math.round(15 * filled / 10), '속성 ' + (10 - filled) + '칸 "상세페이지 참조"'],
+    ['상세 첫 문단 키워드', 20, first.indexOf(kw) >= 0 ? 20 : 0, '상세 첫 문단에 키워드 없음'],
+    ['글자수 적정', 10, t.length <= 50 ? 10 : (t.length <= 100 ? 5 : 0), '상품명 ' + t.length + '자(권장 50자 이내)'],
+    ['금지어 0', 10, banN ? 0 : 10, '금지어 ' + banN + '건']
+  ];
+  return { total: items.reduce(function(s, x){ return s + x[2]; }, 0), items: items, filled: filled, dup: dup, banN: banN };
+}
+var HEAD = ['상품명', '판매가', '재고수량', '카테고리', '대표이미지', '상세설명', '배송비', '원산지', '상품코드', '상품상태', '태그'];
+function exRow(r){ return [r.seo.titles[0].t, r.price, 100, r.inp.cat, S.photos[0] ? S.photos[0].name : '', storyHtml(r.story, false), r.inp.ship, r.inp.origin || REF, r.code, '신상품', r.seo.tags.join(',')]; }
+
+function draw(r){
+  var sc = r.score;
+  $('#tabSeo').innerHTML = r.seo.titles.map(function(o){ var c = tcheck(o.t, r.kw);
+    return '<div class="opt"><div class="lab">' + o.label + '</div><div class="txt">' + K.esc(o.t) + '</div><div class="chk"><span class="chip ' + (c.len <= 100 ? 'ok' : 'bad') + '">글자수 ' + c.len + (c.len <= 50 ? ' · 권장 50 이내' : ' · 50자 초과') + '</span><span class="chip ' + (c.kw ? 'ok' : 'bad') + '">메인키워드 ' + (c.kw ? '포함' : '없음') + '</span><span class="chip ' + (c.ban ? 'bad' : 'ok') + '">금지어 ' + c.ban + '</span><span class="chip ' + (c.dup ? 'bad' : 'ok') + '">중복 ' + c.dup + '</span></div></div>'; }).join('') +
+    '<div class="opt"><div class="lab">메인 키워드 3</div><div class="tagbox">' + r.seo.mains.map(function(x){ return '<span class="chip">' + K.esc(x) + '</span>'; }).join('') + '</div></div>' +
+    '<div class="opt"><div class="lab">세부 키워드 10 (검색 의도별)</div><div class="tagbox">' + r.seo.details.map(function(x){ return '<span class="chip">' + K.esc(x.t) + '<i>' + x.g + '</i></span>'; }).join('') + '</div></div>' +
+    '<div class="opt"><div class="lab">SEO 점수</div><div class="score" id="seoScore">' + sc.total + '<small style="font-size:14px;color:var(--gray)"> / 100</small></div>' +
+    '<table class="t"><colgroup><col style="width:46%"><col><col></colgroup><tr><th>항목</th><th>배점</th><th>점수</th></tr>' + sc.items.map(function(x){ return '<tr><td class="l">' + x[0] + '</td><td>' + x[1] + '</td><td>' + x[2] + '</td></tr>'; }).join('') + '</table>' +
+    '<p class="note" id="seoWhy">감점 사유: ' + (sc.items.filter(function(x){ return x[2] < x[1]; }).map(function(x){ return x[3] + '(−' + (x[1] - x[2]) + ')'; }).join(' · ') || '없음') + '</p></div>' +
+    '<div class="btns"><button class="btn" id="btnAi" type="button" data-ai>AI로 상품명 다듬기</button></div><p class="note" id="aiMsg"></p>';
+  $('#btnAi').onclick = aiPolish;
+  $('#tabAttr').innerHTML = '<table class="t"><colgroup><col style="width:36%"><col></colgroup><tr><th>속성</th><th>값</th></tr>' + r.attr.map(function(x){ return '<tr><td class="l">' + x[0] + '</td><td class="l">' + K.esc(x[1]) + '</td></tr>'; }).join('') + '</table>' +
+    '<p class="note">모르는 값은 "상세페이지 참조"로 자동 입력 — 아는 값은 센터에서 바로 고쳐 주세요(속성을 채울수록 SEO 점수가 오릅니다).</p>' +
+    '<div class="opt" style="margin-top:10px"><div class="lab">태그 10개 (각 20자 이내 · 중복 0)</div><div class="tagbox">' + r.seo.tags.map(function(x){ return '<span class="chip">' + K.esc(x) + '</span>'; }).join('') + '</div></div>' +
+    '<div class="btns"><button class="btn pri" id="btnTag" type="button">태그 10개 복사</button></div>';
+  $('#btnTag').onclick = function(){ K.copy(r.seo.tags.join(',')); };
+  $('#tabStory').innerHTML = '<p class="okline">7블록 · 원가·마진·연락처가 들어가지 않습니다 (원가·마진 단어 ' + r.cust.ban.length + '건 · 전화번호 ' + r.cust.phone + '건)</p>' +
+    '<div class="btns"><button class="btn pri" id="btnHtml" type="button">HTML 받기</button><button class="btn pri" id="btnBody" type="button">본문 복사</button></div>' +
+    '<div class="ms" id="storyPrev">' + storyHtml(r.story, true) + '</div>';
+  $('#btnHtml').onclick = dlHtml; $('#btnBody').onclick = function(){ K.copy(storyText(r.story), storyHtml(r.story, false)); };
+  $('#tabExcel').innerHTML = '<p class="note">11열 × 1행 · 판매가 ' + K.won(r.price) + (r.inp.price ? ' (희망 판매가)' : ' (자동 제안: 마진 22% · 요율 ' + K.pct(r.rate) + ')') + '</p>' +
+    '<div class="btns"><button class="btn pri" id="btnXlsx" type="button">엑셀 받기</button><button class="btn" id="btnCsv" type="button">CSV 받기</button></div>' +
+    '<p class="warnline">스마트스토어 공식 대량등록 양식은 스마트스토어센터에서 내려받아야 합니다. 이 표는 그 양식에 <b>붙여넣기용</b>이고, 열 대응표는 <a href="열매핑.html#naver" target="_blank" rel="noopener" style="color:#FFA24D">스마트스토어 열 매핑</a>에 있습니다.</p>' +
+    '<div class="btns"><button class="btn" type="button" disabled id="btnApi">API 업로드 — 준비 중(서버 필요)</button></div>' +
+    '<p class="note">네이버 커머스 API는 인증에 bcrypt 서명이 필요해 브라우저 단독으로는 안전하게 할 수 없습니다 — 서버가 필요한 별건입니다.</p>';
+  $('#btnXlsx').onclick = dlXlsx; $('#btnCsv').onclick = dlCsv;
+  K.aiBadge();
+}
+function base(){ return K.safeName(S.res.inp.name); }
+function dlHtml(){ K.download(new Blob(['<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>' + K.esc(S.res.inp.name) + ' 상세</title></head><body style="max-width:860px;margin:0 auto;font-family:\'Malgun Gothic\',sans-serif;line-height:1.7">' + storyHtml(S.res.story, true) + '</body></html>'], { type: 'text/html;charset=utf-8' }), '스토어상세_' + base() + '.html'); }
+function dlXlsx(){ K.download(KTS_XLSX.xlsxBlob('스마트스토어', HEAD, [exRow(S.res)]), '스마트스토어_등록_' + base() + '.xlsx'); }
+function dlCsv(){ K.download(K.csvBlob(HEAD, [exRow(S.res)]), '스마트스토어_등록_' + base() + '.csv'); }
+
+async function aiPolish(){
+  try {
+    var o = await aiJson('네이버 스마트스토어 상품명 3개를 자연스럽게 다듬어 JSON {"titles":["..","..",".."]}로만 답하세요. 메인 키워드 "' + S.res.kw + '" 맨 앞, 50자 이내, 특수문자·중복 단어·과장어 금지.\n' + S.res.seo.titles.map(function(t){ return t.t; }).join('\n'));
+    var n = 0; (o.titles || []).slice(0, 3).forEach(function(t, i){ t = clean(t); var c = tcheck(t, S.res.kw); if (c.len <= 50 && c.kw && !c.ban && !c.dup && t.indexOf(S.res.kw) === 0){ S.res.seo.titles[i].t = t; n++; } });
+    S.res.score = score(S.res); draw(S.res); $('#aiMsg').textContent = 'AI 다듬기: ' + n + '안 채택 · ' + (window.__aiModel || '');
+  } catch(e){ $('#aiMsg').textContent = aiErr(e); K.toast(aiErr(e)); }
+}
+
+async function go(){
+  if ($('#btnGo').disabled) return;
+  var inp = { name: $('#inName').value.trim(), cat: $('#inCat').value, cost: K.num($('#inCost').value), price: K.num($('#inPrice').value), ship: K.num($('#inShip').value), brand: $('#inBrand').value.trim(), origin: $('#inOrigin').value.trim(), spec: S.spec || '' };
+  var L = lookup(inp.name, inp.cat), F = K.D.fees.naver;
+  var r = { inp: inp, kw: L.kw, rate: F.defaultRate };
+  r.seo = makeSeo(inp, L); r.attr = makeAttr(inp, L); r.story = makeStory(inp, L);
+  r.price = inp.price || Math.ceil((inp.cost + inp.ship) / (1 - F.defaultRate - 1 / 11 - 0.03 - 0.22) / 100) * 100;
+  r.code = 'KTS-N-' + K.stamp() + '-' + (K.seed(inp.name) % 100000);
+  r.score = score(r);
+  r.cust = K.customerCheck(storyText(r.story));
+  S.res = r; draw(r);
+  var all = r.seo.mains.concat(r.seo.details.map(function(d){ return d.t; }), r.seo.tags);
+  window.__res = {
+    kw: r.kw, titles: r.seo.titles.map(function(t){ var c = tcheck(t.t, r.kw); return { t: t.t, len: c.len, kw: c.kw, ban: c.ban, dup: c.dup }; }),
+    mains: r.seo.mains, details: r.seo.details.map(function(d){ return d.t; }), tags: r.seo.tags, all23: all.length,
+    uniq23: K.uniq(all.map(function(x){ return x.replace(/\s/g, ''); })).length, tagMaxLen: Math.max.apply(null, r.seo.tags.map(function(x){ return x.length; })),
+    score: { total: r.score.total, items: r.score.items.map(function(x){ return x[2]; }), filled: r.score.filled, dup: r.score.dup, banN: r.score.banN, titleLen: r.seo.titles[0].t.length,
+      titleHasKw: r.seo.titles[0].t.indexOf(r.kw) >= 0, firstHasKw: r.story[0].p[0].indexOf(r.kw) >= 0 },
+    story: r.story.map(function(b){ return b.t; }), storyEmpty: r.story.filter(function(b){ return !storyText([b]).trim(); }).length, cust: r.cust,
+    exCols: HEAD.length, exRow: exRow(r).map(function(v){ return typeof v === 'string' ? v.slice(0, 60) : v; }), photos: S.photos.length
+  };
+  window.__done = true; K.goTab('tabSeo'); K.toast('4탭을 모두 만들었습니다');
+}
+function curCopy(){
+  if (!S.res){ K.toast('먼저 [1방 생성]을 눌러 주세요'); return; }
+  var t = K.activeTab, r = S.res;
+  if (t === 'tabSeo') K.copy(r.seo.titles.map(function(x){ return x.t; }).concat(['', '메인: ' + r.seo.mains.join(', '), '세부: ' + r.seo.details.map(function(d){ return d.t; }).join(', ')]).join('\n'));
+  else if (t === 'tabAttr') K.copy(r.attr.map(function(x){ return x[0] + '\t' + x[1]; }).join('\n') + '\n\n태그: ' + r.seo.tags.join(','));
+  else if (t === 'tabStory') K.copy(storyText(r.story), storyHtml(r.story, false));
+  else K.copy([HEAD.join('\t'), exRow(r).join('\t')].join('\n'));
+}
+function curDl(){
+  if (!S.res){ K.toast('먼저 [1방 생성]을 눌러 주세요'); return; }
+  var t = K.activeTab;
+  if (t === 'tabStory') dlHtml(); else if (t === 'tabExcel') dlXlsx();
+  else K.download(new Blob(['﻿' + (t === 'tabSeo' ? S.res.seo.titles.map(function(x){ return x.t; }).join('\r\n') : S.res.attr.map(function(x){ return x.join('\t'); }).join('\r\n'))], { type: 'text/plain' }), '스토어_' + (t === 'tabSeo' ? 'SEO' : '속성') + '_' + base() + '.txt');
+}
+async function boot(){
+  await K.loadData(['fees', 'tags_ko', 'copy_ko', 'sample_products']);
+  $('#inCat').innerHTML = Object.keys(K.D.tags_ko.categories).map(function(c){ return '<option>' + c + '</option>'; }).join('');
+  K.shell(); K.tabs('#tabs');
+  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); return m.length ? m.join('·') + '을(를) 넣어 주세요' : ''; });
+  $('#inPhoto').addEventListener('change', async function(){ S.photos = await K.readPhotos(this.files, 6); $('#thumbs').innerHTML = S.photos.map(function(p){ return '<img src="' + p.url + '" alt="">'; }).join(''); });
+  $('#btnGo').addEventListener('click', go); $('#btnCopy').addEventListener('click', curCopy); $('#btnDl').addEventListener('click', curDl);
+  if (K.qs('sample') === '1'){
+    var idx = Math.min(2, Math.max(0, parseInt(K.qs('s') || '1', 10) || 0)), p = K.D.sample_products.products[idx];
+    $('#inName').value = p.name; $('#inCost').value = p.cost; $('#inCat').value = p.cat; $('#inShip').value = p.ship; $('#inBrand').value = p.brand; $('#inOrigin').value = p.origin; S.spec = p.spec;
+    if (K.qs('nophoto') !== '1'){ S.photos = [K.samplePhoto(p.name, [28, 210, 140][idx])]; $('#thumbs').innerHTML = '<img src="' + S.photos[0].url + '" alt="샘플 사진">'; }
+    K.regate(); if (K.qs('auto') === '1') await go();
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>

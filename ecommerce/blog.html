@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더글 · 블로그 원클릭</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+details.top{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+details.top summary{cursor:pointer;color:var(--ink2);font-size:14px;min-height:28px}
+details.top textarea{margin-top:8px;min-height:70px;font-size:13px}
+</style>
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>더글 · 블로그 원클릭<small>상위 글은 구조만 · 문장은 새로 씁니다</small></h1>
+  <button class="keybtn" id="btnKey" type="button">AI 열쇠 <b id="aiLeft">없음</b></button>
+</div></header>
+
+<main class="wrap">
+  <section class="card">
+    <h2><span class="n">1</span>무엇을 쓸까요</h2>
+    <label class="f"><span>목표 키워드 <em>필수</em></span><input id="inKeyword" type="text" placeholder="예: 방수테이프"></label>
+    <label class="f"><span>지역 (선택)</span><input id="inRegion" type="text" placeholder="예: 수원"></label>
+    <label class="f"><span>현장 메모 3줄 (선택 · 한 줄에 하나)</span><textarea id="inMemo" placeholder="무엇을 봤는지 / 어떻게 했는지 / 결과가 어땠는지"></textarea></label>
+    <label class="f"><span>톤</span><select id="tone"><option value="t1">① 사용기 후기 (제가 직접 써 보니)</option><option value="t2">② 알아본 경험담 (알아보다가·문의해 보니)</option></select></label>
+    <label class="f"><span>직접 찍은 사진 (여러 장 · 고른 순서대로 글에 들어갑니다)</span><input id="inPhoto" type="file" accept="image/*" multiple></label>
+    <div class="thumbs" id="thumbs"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">2</span>요즘 잘 쓴 글 5개 (선택)</h2>
+    <p class="hint">본문을 붙여넣으면 <b>문장은 가져오지 않고 구조만</b> 뽑습니다(소제목 수·문단·호흡·사진 간격·첫 문단·마무리). 비워 두면 기본 뼈대 8종 중 맞는 것을 씁니다.</p>
+    <details class="top"><summary>상위 글 1</summary><textarea id="top1"></textarea></details>
+    <details class="top"><summary>상위 글 2</summary><textarea id="top2"></textarea></details>
+    <details class="top"><summary>상위 글 3</summary><textarea id="top3"></textarea></details>
+    <details class="top"><summary>상위 글 4</summary><textarea id="top4"></textarea></details>
+    <details class="top"><summary>상위 글 5</summary><textarea id="top5"></textarea></details>
+  </section>
+
+  <div class="go">
+    <button class="btn pri" id="btnGo" type="button">1방 생성</button>
+    <div class="need" id="need"></div>
+  </div>
+
+  <section class="two" id="tracks">
+    <div class="track">
+      <button class="btn" id="btnAuto" type="button">[ 완전 자동 ]</button>
+      <p id="autoTxt">사진 없이도 글 완성 (사진 자리는 표시만)</p>
+    </div>
+    <div class="track rec">
+      <button class="btn pri" id="btnDirect" type="button">[ 직접 넣기 (추천) ]</button>
+      <p id="directTxt">검색 노출에 유리합니다 · 자동 발행 없이 사진과 글을 함께 올리는 방식</p>
+      <p class="lim" id="directLock">직접 찍은 사진을 1장 이상 골라 주세요(남의 사진·AI 그림 사용 금지)</p>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="tabBone">① 뼈대</button>
+    <button type="button" data-tab="tabDraft">② 원고</button>
+    <button type="button" data-tab="tabCheck">③ 검사</button>
+  </nav>
+  <div class="btns">
+    <button class="btn sm" id="btnCopy" type="button">서식 그대로 복사</button>
+    <button class="btn sm" id="btnDl" type="button">원고 받기</button>
+  </div>
+  <div id="out">
+    <section class="panel" id="tabBone"><div class="empty">뼈대 표가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabDraft"><div class="empty">원고가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabCheck"><div class="empty">글자수·키워드·금지어·표절 검사 결과가 여기에 나옵니다.</div></section>
+  </div>
+</main>
+
+<div class="sheet" id="keySheet" role="dialog" aria-label="AI 열쇠">
+  <div class="box">
+    <h3>AI 열쇠 (선택)</h3>
+    <p class="hint">열쇠가 없어도 규칙 엔진으로 원고가 끝까지 만들어집니다. 열쇠는 이 기기에만 저장되고 어디에도 보내거나 기록하지 않습니다. 하루 12회까지.</p>
+    <input id="keyIn" type="password" autocomplete="off" placeholder="내 제미나이 무료 열쇠 붙여넣기">
+    <div class="btns">
+      <button class="btn pri" id="keySave" type="button">이 기기에 저장</button>
+      <button class="btn" id="keyDel" type="button">지우기</button>
+      <button class="btn" data-close type="button">닫기</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/data/bundle.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+var K = KTS, $ = K.$;
+var S = { photos: [], res: null };
+window.__res = null; window.__done = false;
+var BAN = ['최고', '1위', '완벽', '무조건', '100%'];
+
+/* ---------- 뼈대 추출 (구조만, 문장 0) ---------- */
+function isSub(line){ var l = line.trim(); return /^(#{1,4}\s|■|▶|●|\[.+\]$|\d+[.)]\s)/.test(l) || (l.length <= 22 && !/[.?!요다]$/.test(l) && l.length >= 2); }
+function firstType(p){ if (/^결론|결론부터/.test(p)) return '결론선행형'; if (/\?/.test(p)) return '질문형'; if (/(여러분|다들|저도|고민|걱정)/.test(p)) return '공감형'; return '정보형'; }
+function closeType(p){ if (/(공감|구독|댓글|이웃)/.test(p)) return '참여유도형'; if (/(정리하면|요약|세 가지|정리)/.test(p)) return '요약형'; if (/(권합니다|추천|확인하세요|바랍니다)/.test(p)) return '추천형'; return '마무리 인사형'; }
+function subKind(s){ if (/(비교|차이|가격|대비)/.test(s)) return '비교'; if (/(순서|방법|붙이|사용|결정|셀프|피해)/.test(s)) return '사용'; if (/(뒤|후기|결과|숙제)/.test(s)) return '후기'; return '정보'; }
+function analyze(text, kw){
+  var lines = text.replace(/\r/g, '').split('\n'), subs = [], paras = [], cur = [];
+  lines.forEach(function(l){
+    var t = l.trim();
+    if (!t){ if (cur.length){ paras.push(cur.join(' ')); cur = []; } return; }
+    if (isSub(t)){ if (cur.length){ paras.push(cur.join(' ')); cur = []; } subs.push(t.replace(/^#+\s*/, '')); return; }
+    cur.push(t);
+  });
+  if (cur.length) paras.push(cur.join(' '));
+  var marks = (text.match(/(사진|\[이미지\]|\(사진\))/g) || []).length;
+  return { subs: subs.length, order: subs.map(subKind), paras: paras.length, avg: paras.length ? Math.round(paras.reduce(function(s, p){ return s + p.length; }, 0) / paras.length) : 0,
+    photos: marks || Math.round(paras.length / 2), first: paras[0] ? firstType(paras[0]) : '정보형', close: paras.length ? closeType(paras[paras.length - 1]) : '요약형',
+    kw: kw ? text.split(kw).length - 1 : 0 };
+}
+function mode(a){ var c = {}, best = a[0]; a.forEach(function(x){ c[x] = (c[x] || 0) + 1; if (c[x] > c[best]) best = x; }); return best; }
+function extract(tops, kw){
+  var rows = tops.map(function(t){ return analyze(t, kw); });
+  var avg = function(f){ return Math.round(rows.reduce(function(s, r){ return s + r[f]; }, 0) / rows.length * 10) / 10; };
+  return { n: rows.length, rows: rows, subs: avg('subs'), paras: avg('paras'), avgLen: Math.round(avg('avg')), photos: avg('photos'), first: mode(rows.map(function(r){ return r.first; })),
+    close: mode(rows.map(function(r){ return r.close; })), kw: avg('kw'), order: rows[0].order.slice(0, 5).join('→') };
+}
+function pickBone(kw){
+  var B = K.D.blog_bones.bones, b = null;
+  B.forEach(function(x){ if (!b && x.match.some(function(m){ return kw.indexOf(m) >= 0; })) b = x; });
+  return b || B[B.length - 1];
+}
+
+/* ---------- 원고 만들기 ---------- */
+function sentences(s){ return String(s).split(/(?<=[.?!])\s+/).map(function(x){ return x.trim(); }).filter(Boolean); }
+function compose(o){
+  var BB = K.D.blog_bones, bank = BB[o.tone], subs = BB.subtitles[o.tone], bone = o.bone;
+  var memos = o.memo.split('\n').map(function(x){ return x.trim().replace(/[.。]+$/, ''); }).filter(Boolean).slice(0, 3);
+  var vars = { kw: o.kw, it: bone.it, region: o.region };
+  function memoLine(i){ var m = memos[i]; if (!m) return ''; return o.tone === 't1' ? '그날 제 메모에는 "' + m + '"라고 적혀 있어요.' : '확인하면서 적어 둔 메모는 "' + m + '"였습니다.'; }
+  function use(list){
+    return list.map(function(s){
+      var mm = s.match(/^\{m(\d)\}$/); if (mm) return memoLine(Number(mm[1]) - 1);
+      if (/\{region\}/.test(s) && !o.region) return '';
+      return K.fill(s, vars);
+    }).filter(Boolean);
+  }
+  var nSec = Math.max(3, Math.min(5, Math.round(o.subs || bone.roles.length)));
+  var roles = bone.roles.slice();
+  ['compare', 'tip', 'caution', 'point', 'use', 'background'].forEach(function(r){ if (roles.indexOf(r) < 0) roles.push(r); });
+  var secs = roles.slice(0, nSec).map(function(r){
+    var ss = use(bank[r]), half = ss.length > 4 ? Math.ceil(ss.length / 2) : ss.length;
+    var paras = ss.length > 4 ? [ss.slice(0, half), ss.slice(half)] : [ss];
+    return { role: r, h: K.fill(subs[r], vars), paras: paras };
+  });
+  var doc = { intro: [use(bank.intro)], secs: secs, close: [use(bank.close)] };
+  var extras = use(bank.extra), ei = 0;
+  function all(){ var a = [].concat(doc.intro); doc.secs.forEach(function(s){ a = a.concat(s.paras); }); return a.concat(doc.close); }
+  function len(){ return doc.secs.reduce(function(n, s){ return n + s.h.length; }, 0) + all().reduce(function(n, p){ return n + p.join(' ').length; }, 0); }
+  // 길이 맞추기: 짧으면 덧붙임 문장 → 소제목 추가, 길면 긴 문단에서 문장 덜기
+  while (len() < 1250 && (ei < extras.length || doc.secs.length < 5)){
+    if (ei < extras.length){ var p = doc.secs[ei % doc.secs.length].paras; var tgt = p.filter(function(x){ return x.length < 4; })[0]; if (tgt) tgt.push(extras[ei]); ei++; if (!tgt) continue; }
+    else { var r = roles[doc.secs.length], ss = use(bank[r]); doc.secs.push({ role: r, h: K.fill(subs[r], vars), paras: ss.length > 4 ? [ss.slice(0, Math.ceil(ss.length / 2)), ss.slice(Math.ceil(ss.length / 2))] : [ss] }); }
+  }
+  var guard = 0;
+  while (len() > 1780 && guard++ < 40){ var big = all().filter(function(x){ return x.length > 2; }).sort(function(a, b){ return b.length - a.length; })[0]; if (!big) break; big.pop(); }
+  // 키워드 3~5회 (첫 문단 1회 포함)
+  var kwSent = o.tone === 't1' ? ['{kw}를 쓰고 나서 주말 아침이 한결 여유로워졌어요.', '그래서 저는 {kw}를 현관 수납장에 하나 더 넣어 두었습니다.'] : ['{kw}를 비교하던 시간이 결국 아깝지 않았습니다.', '그래서 {kw}를 고를 때는 조건표부터 만들기를 권해요.'];
+  function count(){ return all().map(function(p){ return p.join(' '); }).concat(doc.secs.map(function(s){ return s.h; })).join(' ').split(o.kw).length - 1; }
+  var ki = 0;
+  while (count() < 4 && ki < kwSent.length){ var sec = doc.secs[(ki * 2 + 1) % doc.secs.length]; sec.paras[sec.paras.length - 1].push(K.fill(kwSent[ki], vars)); ki++; }
+  if (doc.intro[0].join(' ').indexOf(o.kw) < 0) doc.intro[0][0] = o.kw + ' 이야기입니다. ' + doc.intro[0][0];
+  var n = 0;
+  doc.secs.forEach(function(s){ s.paras.forEach(function(p){ p.forEach(function(x, i){ var c = x.split(o.kw).length - 1; n += c; }); }); });
+  var seen = 0;
+  function trimKw(p){ return p.map(function(x){ return x.split(o.kw).map(function(part, i, arr){ if (i === arr.length - 1) return part; seen++; return part + (seen > 5 ? bone.it : o.kw); }).join(''); }); }
+  doc.intro = doc.intro.map(trimKw); doc.secs.forEach(function(s){ s.h = trimKw([s.h])[0]; s.paras = s.paras.map(trimKw); }); doc.close = doc.close.map(trimKw);
+  // 사진 자리
+  var every = Math.max(1, Math.round(o.every || bone.photoEvery || 2)), slots = [], pi = 0;
+  var cap = o.direct ? o.photos.map(function(p, i){ var nm = p.name.replace(/\.[a-z0-9]+$/i, '').replace(/^sample_/, '').replace(/[_-]+/g, ' ').trim(); return (/^(img|dsc|pxl|kakaotalk|photo|\d)/i.test(nm) || !nm) ? (memos[i] || '사진 ' + (i + 1)) : nm; })
+    : ['대표컷', '사용 장면', '디테일', '전후 비교', '구성품', '마무리 컷'];
+  var maxPh = o.direct ? o.photos.length : Math.max(3, Math.min(6, Math.round(o.photos || 4)));
+  function slot(){ if (pi >= maxPh) return null; var s = { n: pi + 1, cap: cap[pi] || ('사진 ' + (pi + 1)), url: o.direct && o.photos[pi] ? o.photos[pi].url : '' }; pi++; return s; }
+  var items = [], pc = 0;
+  items.push({ t: 'p', s: doc.intro[0] });
+  var s0 = slot(); if (s0) items.push({ t: 'ph', s: s0 });
+  doc.secs.forEach(function(sec){
+    items.push({ t: 'h', s: sec.h });
+    sec.paras.forEach(function(p){ items.push({ t: 'p', s: p }); pc++; if (pc % every === 0){ var sl = slot(); if (sl) items.push({ t: 'ph', s: sl }); } });
+  });
+  while (pi < maxPh){ items.push({ t: 'ph', s: slot() }); }
+  items.push({ t: 'p', s: doc.close[0] });
+  return { items: items, tone: o.tone, direct: o.direct };
+}
+function draftText(d){ return d.items.map(function(it){ return it.t === 'h' ? it.s : it.t === 'p' ? it.s.join(' ') : '[사진 ' + it.s.n + ' — ' + it.s.cap + ']'; }).join('\n\n'); }
+function bodyText(d){ return d.items.filter(function(it){ return it.t !== 'ph'; }).map(function(it){ return it.t === 'h' ? it.s : it.s.join(' '); }).join('\n'); }
+function draftHtml(d, withImg){
+  var e = K.esc;
+  return d.items.map(function(it){
+    if (it.t === 'h') return '<h3>' + e(it.s) + '</h3>';
+    if (it.t === 'p') return '<p>' + e(it.s.join(' ')) + '</p>';
+    return withImg ? '<span class="ph">' + (it.s.url ? '<img src="' + it.s.url + '" alt="' + e(it.s.cap) + '">' : '') + '[사진 ' + it.s.n + ' — ' + e(it.s.cap) + ']</span>' : '<p>[사진 ' + it.s.n + ' — ' + e(it.s.cap) + ']</p>';
+  }).join('');
+}
+function sentList(d){ var a = []; d.items.forEach(function(it){ if (it.t === 'h') a.push(it.s); if (it.t === 'p') a = a.concat(it.s); }); return a; }
+function norm(s){ return String(s).replace(/[^가-힣A-Za-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function plagiarism(text, tops){
+  var set = {}, N = 6;
+  tops.forEach(function(t){ var w = norm(t).split(' '); for (var i = 0; i + N <= w.length; i++) set[w.slice(i, i + N).join(' ')] = 1; });
+  var w = norm(text).split(' '), hit = 0, grams = 0;
+  for (var i = 0; i + N <= w.length; i++){ grams++; if (set[w.slice(i, i + N).join(' ')]) hit++; }
+  return { hit: hit, grams: grams, refGrams: Object.keys(set).length };
+}
+function stats(d, kw){
+  var body = bodyText(d), heads = d.items.filter(function(it){ return it.t === 'h'; }).length;
+  var paras = d.items.filter(function(it){ return it.t === 'p'; });
+  return { chars: body.replace(/\n/g, '').length, kw: body.split(kw).length - 1, ban: K.banFind(body, BAN).length, heads: heads, paras: paras.length,
+    paraMin: Math.min.apply(null, paras.map(function(p){ return p.s.length; })), paraMax: Math.max.apply(null, paras.map(function(p){ return p.s.length; })),
+    firstKw: paras[0].s.join(' ').indexOf(kw) >= 0, photos: d.items.filter(function(it){ return it.t === 'ph'; }).length, cust: K.customerCheck(body) };
+}
+
+/* ---------- 화면 ---------- */
+function drawAll(r){
+  var x = r.bone, e = K.esc;
+  $('#tabBone').innerHTML = '<p class="note">' + (r.ext ? '상위 글 ' + r.ext.n + '편에서 구조만 뽑았습니다(문장 0 복사).' : '상위 글이 없어 기본 뼈대 "' + e(r.boneDef.name) + '"을 씁니다(자동 모드).') + '</p>' +
+    '<table class="t" id="boneTable"><colgroup><col style="width:38%"><col></colgroup><tr><th>항목</th><th>값</th></tr>' +
+    '<tr><td class="l">1) 도입</td><td class="l">' + e(x.first) + '</td></tr>' +
+    '<tr><td class="l">2) 소제목</td><td class="l">' + x.subs + '개' + (x.order ? ' [' + e(x.order) + ']' : '') + '</td></tr>' +
+    '<tr><td class="l">3) 문단</td><td class="l">' + x.paras + '개</td></tr>' +
+    '<tr><td class="l">4) 호흡</td><td class="l">문단당 평균 ' + x.avgLen + '자</td></tr>' +
+    '<tr><td class="l">5) 사진</td><td class="l">' + x.photos + '장 (문단 ' + x.every + '개마다)</td></tr>' +
+    '<tr><td class="l">6) 키워드</td><td class="l">' + x.kw + '회</td></tr>' +
+    '<tr><td class="l">7) 마무리</td><td class="l">' + e(x.close) + '</td></tr></table>' +
+    (r.ext ? '<p class="note">글별: ' + r.ext.rows.map(function(q, i){ return (i + 1) + '편 소제목' + q.subs + '·문단' + q.paras + '·' + q.avg + '자·사진' + q.photos + '·키워드' + q.kw; }).join(' / ') + '</p>' : '');
+  var st = r.stats;
+  $('#tabDraft').innerHTML = '<p class="okline">' + (r.draft.direct ? '[직접 넣기] 사진 ' + st.photos + '장 반영' : '[완전 자동] 사진 자리 ' + st.photos + '곳 표시') + ' · ' + (r.draft.tone === 't1' ? '사용기 후기' : '알아본 경험담') + ' · ' + st.chars + '자</p>' +
+    '<div class="ms" id="draft">' + draftHtml(r.draft, true) + '</div>' + (r.draft.direct ? '' : '<p class="warnline" id="photoHint">' + e(K.D.blog_bones.photoHint) + '</p>') +
+    '<div class="btns"><button class="btn pri" id="btnFmt" type="button">서식 그대로 복사</button><button class="btn" id="btnAi" type="button" data-ai>AI로 문장 다듬기</button></div><p class="warnline">올리기 전에 제가 직접 겪은 내용으로 고쳐 주세요 — 실제와 다른 경험담·수치는 표시·광고에 문제가 될 수 있습니다.</p><p class="note" id="aiMsg"></p>';
+  $('#btnFmt').onclick = copyFmt; $('#btnAi').onclick = aiPolish;
+  $('#tabCheck').innerHTML = '<table class="t" id="checkTable"><colgroup><col style="width:52%"><col></colgroup><tr><th>검사</th><th>결과</th></tr>' +
+    '<tr><td class="l">글자수 (1,200~1,800)</td><td>' + st.chars + '</td></tr><tr><td class="l">키워드 "' + e(r.kw) + '" (3~5회)</td><td>' + st.kw + '</td></tr>' +
+    '<tr><td class="l">첫 문단 키워드</td><td>' + (st.firstKw ? '있음' : '없음') + '</td></tr><tr><td class="l">소제목 (3~5)</td><td>' + st.heads + '</td></tr>' +
+    '<tr><td class="l">문단 문장 수 (2~4)</td><td>' + st.paraMin + '~' + st.paraMax + '</td></tr><tr><td class="l">금지어</td><td>' + st.ban + '</td></tr>' +
+    '<tr><td class="l">6어절 연속 일치 (상위 글)</td><td id="plagHit">' + r.plag.hit + '건 / ' + r.plag.grams + '묶음 검사</td></tr>' +
+    '<tr><td class="l">두 톤 같은 문장</td><td id="toneSame">' + r.toneSame + '건</td></tr>' +
+    '<tr><td class="l">원가·마진·전화번호</td><td>' + (st.cust.ban.length + st.cust.phone) + '건</td></tr></table>';
+  K.aiBadge();
+}
+function readOpts(direct){
+  var kw = $('#inKeyword').value.trim(), tops = ['#top1', '#top2', '#top3', '#top4', '#top5'].map(function(s){ return $(s).value.trim(); }).filter(Boolean);
+  var def = pickBone(kw), ext = tops.length ? extract(tops, kw) : null;
+  var bone = ext ? { first: ext.first, subs: Math.max(3, Math.min(5, Math.round(ext.subs))), order: ext.order, paras: Math.round(ext.paras), avgLen: ext.avgLen, photos: Math.round(ext.photos), kw: ext.kw, close: ext.close, every: Math.max(1, Math.round(ext.paras / Math.max(1, ext.photos))) }
+    : { first: def.open, subs: def.roles.length, order: '', paras: def.roles.length * 2 + 2, avgLen: 110, photos: 4, kw: 4, close: def.close, every: def.photoEvery };
+  return { kw: kw, region: $('#inRegion').value.trim(), memo: $('#inMemo').value, tone: $('#tone').value, direct: direct, photos: direct ? S.photos : bone.photos, every: bone.every, subs: bone.subs, bone: def, boneView: bone, ext: ext, tops: tops };
+}
+function run(direct){
+  var o = readOpts(direct);
+  var d = compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone, direct: direct, photos: o.photos, every: o.every, subs: o.subs, bone: o.bone });
+  var other = compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone === 't1' ? 't2' : 't1', direct: direct, photos: o.photos, every: o.every, subs: o.subs, bone: o.bone });
+  var a = sentList(d), b = {}; sentList(other).forEach(function(x){ b[x] = 1; });
+  var r = { kw: o.kw, bone: o.boneView, boneDef: o.bone, ext: o.ext, draft: d, other: other, stats: stats(d, o.kw), otherStats: stats(other, o.kw),
+    plag: plagiarism(bodyText(d), o.tops), plagOther: plagiarism(bodyText(other), o.tops), toneSame: a.filter(function(x){ return b[x]; }).length };
+  S.res = r; drawAll(r);
+  window.__res = { kw: o.kw, direct: direct, tone: d.tone, bone: { first: r.bone.first, subs: r.bone.subs, paras: r.bone.paras, avgLen: r.bone.avgLen, photos: r.bone.photos, kw: r.bone.kw, close: r.bone.close }, extN: o.ext ? o.ext.n : 0,
+    stats: r.stats, otherStats: r.otherStats, plag: r.plag, plagOther: r.plagOther, toneSame: r.toneSame, sentences: a.length };
+  window.__done = true; K.goTab('tabDraft'); K.toast((direct ? '[직접 넣기]' : '[완전 자동]') + ' 원고를 만들었습니다 (' + r.stats.chars + '자)');
+}
+window.blogRun = run;
+function copyFmt(){ if (!S.res){ K.toast('먼저 원고를 만들어 주세요'); return; } var h = draftHtml(S.res.draft, false); window.__fmt = { h3: (h.match(/<h3>/g) || []).length, lines: draftText(S.res.draft).split('\n').length }; K.copy(draftText(S.res.draft), h); }
+async function aiPolish(){
+  try {
+    var o = await aiJson('다음 블로그 원고의 문장을 사람 구어체 존댓말로 자연스럽게 다듬되 소제목·문단·사진 자리 순서는 그대로 두고 JSON {"paras":["문단1","문단2",...]} (사진 자리·소제목 제외 문단만, 같은 개수)로만 답하세요. 금지: 최고·1위·완벽·무조건·100%, 실명·연락처.\n' + S.res.draft.items.filter(function(i){ return i.t === 'p'; }).map(function(i){ return i.s.join(' '); }).join('\n'));
+    var ps = S.res.draft.items.filter(function(i){ return i.t === 'p'; }), n = 0;
+    if ((o.paras || []).length === ps.length){ ps.forEach(function(p, i){ var t = String(o.paras[i] || ''); if (t && !K.banFind(t, BAN).length){ p.s = sentences(t); n++; } }); }
+    var st = stats(S.res.draft, S.res.kw);
+    if (st.chars < 1200 || st.chars > 1800 || st.kw < 3 || st.kw > 5){ K.toast('AI 결과가 규격(글자수·키워드)을 벗어나 원래 원고를 유지합니다'); run(S.res.draft.direct); return; }
+    S.res.stats = st; drawAll(S.res); $('#aiMsg').textContent = 'AI 다듬기: 문단 ' + n + '개 반영 · ' + (window.__aiModel || '');
+  } catch(e){ $('#aiMsg').textContent = aiErr(e); K.toast(aiErr(e)); }
+}
+function updLock(){
+  var lock = !S.photos.length; $('#btnDirect').disabled = lock; $('#directLock').style.display = lock ? '' : 'none';
+  var ok = !!$('#inKeyword').value.trim(); $('#btnAuto').disabled = !ok; if (!ok) $('#btnDirect').disabled = true;
+}
+async function boot(){
+  await K.loadData(['blog_bones', 'sample_products']);
+  K.shell(); K.tabs('#tabs');
+  K.gate('#btnGo', '#need', function(){ return $('#inKeyword').value.trim() ? '' : '목표 키워드를 넣어 주세요'; });
+  document.addEventListener('input', updLock); updLock();
+  $('#inPhoto').addEventListener('change', async function(){ S.photos = await K.readPhotos(this.files, 12); $('#thumbs').innerHTML = S.photos.map(function(p, i){ return '<img src="' + p.url + '" alt="사진 ' + (i + 1) + '">'; }).join(''); updLock(); K.toast('사진 ' + S.photos.length + '장 — 고른 순서대로 글에 들어갑니다'); });
+  $('#btnGo').addEventListener('click', function(){ if (!$('#btnGo').disabled) run(S.photos.length > 0); });
+  $('#btnAuto').addEventListener('click', function(){ if (!$('#btnAuto').disabled) run(false); });
+  $('#btnDirect').addEventListener('click', function(){ if (!$('#btnDirect').disabled) run(true); });
+  $('#btnCopy').addEventListener('click', copyFmt);
+  $('#btnDl').addEventListener('click', function(){ if (!S.res){ K.toast('먼저 원고를 만들어 주세요'); return; } K.download(new Blob(['﻿' + draftText(S.res.draft)], { type: 'text/plain' }), '블로그원고_' + K.safeName(S.res.kw) + '.txt'); });
+  if (K.qs('sample') === '1'){
+    var b = K.D.sample_products.blog;
+    $('#inKeyword').value = b.keyword; $('#inRegion').value = b.region; $('#inMemo').value = b.memo; $('#tone').value = K.qs('tone') || b.tone;
+    if (K.qs('notop') !== '1') K.D.sample_products.blogTop.forEach(function(t, i){ $('#top' + (i + 1)).value = t; });
+    if (K.qs('nophoto') !== '1'){ S.photos = [K.samplePhoto('창틀 방수 작업', 28)]; $('#thumbs').innerHTML = '<img src="' + S.photos[0].url + '" alt="샘플 사진">'; }
+    K.regate(); updLock();
+    if (K.qs('auto') === '1') $('#btnGo').click();
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>

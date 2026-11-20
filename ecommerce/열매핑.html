@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>열 이름 대응표 — 쿠팡·스마트스토어·역직구</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 2px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top;word-break:keep-all;overflow-wrap:anywhere;line-height:1.5}
+.tbl th{background:var(--card2);color:var(--ink2);font-weight:600;font-size:12px}
+.tbl td:first-child{color:var(--ink2);width:27%}
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 2px}
+.jump a{font-size:12.5px;text-decoration:none;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:6px 11px;background:var(--card2)}
+</style>
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>열 이름 대응표<small>우리 파일 → 각 판매자센터 양식</small></h1>
+</div></header>
+
+<main class="wrap">
+  <div class="jump">
+    <a href="#coupang">쿠팡 Wing</a><a href="#naver">스마트스토어</a><a href="#global">아마존·라쿠텐·쇼피</a>
+  </div>
+
+  <section class="card" id="coupang">
+    <h2>쿠팡 Wing — 15열</h2>
+    <p class="note">Wing 공식 일괄등록 양식은 <b>판매자센터(Wing) → 상품관리 → 상품 일괄등록</b>에서 카테고리별로 내려받습니다. 쿠팡 도구가 만드는 <b>쿠팡_Wing등록_*.xlsx / .csv</b>는 그 양식에 붙여넣기 좋은 평면 표(15열 × 1행)입니다. Wing 양식의 실제 열 이름·순서는 카테고리·양식 버전마다 다르므로 아래 "Wing 쪽 이름"은 대표 명칭입니다 — 내려받은 양식의 머리줄과 맞춰 주세요.</p>
+    <table class="tbl">
+      <tr><th>우리 열</th><th>Wing 쪽 이름(대표)</th><th>채우는 값</th></tr>
+      <tr><td>노출상품명</td><td>노출상품명</td><td>상품명 A안(핵심앞배치형) · 100자 이내</td></tr>
+      <tr><td>등록상품명</td><td>등록상품명(판매자 관리용)</td><td>입력한 상품명 · 손님에게 안 보임</td></tr>
+      <tr><td>브랜드</td><td>브랜드</td><td><code>브랜드없음</code> · 자체 브랜드가 있으면 바꾸기</td></tr>
+      <tr><td>카테고리코드</td><td>카테고리(코드)</td><td>비움 — Wing 카테고리 검색으로 선택</td></tr>
+      <tr><td>판매가</td><td>판매가격</td><td>④ 마진표 권장가(또는 고른 가격)</td></tr>
+      <tr><td>재고수량</td><td>재고수량</td><td>100</td></tr>
+      <tr><td>배송방법</td><td>배송방법</td><td><code>택배</code></td></tr>
+      <tr><td>배송비</td><td>배송비 / 배송비 종류</td><td>입력한 판매자 배송비 · 0이면 무료배송</td></tr>
+      <tr><td>상품상태</td><td>상품상태</td><td><code>새상품</code></td></tr>
+      <tr><td>대표이미지</td><td>대표이미지</td><td>첫 사진 파일 이름 · Wing에는 이미지 파일·URL로 등록</td></tr>
+      <tr><td>상세설명</td><td>상세설명(이미지/HTML)</td><td>③ 탭의 PNG를 올리기</td></tr>
+      <tr><td>원산지</td><td>원산지</td><td><code>상세페이지 참조</code> · 실제 원산지로 바꾸기 권장</td></tr>
+      <tr><td>상품코드</td><td>판매자상품코드</td><td><code>KTS-yyyymmdd-번호</code></td></tr>
+      <tr><td>옵션명</td><td>옵션명</td><td><code>단일상품</code></td></tr>
+      <tr><td>중량</td><td>중량(g)</td><td>규격에서 뽑은 g 숫자</td></tr>
+    </table>
+    <p class="note">오픈 API(사업자용): 요청 본문은 ⑤ 탭 (나)에서 <code>coupang_body.json</code>으로 받습니다. <code>sellerProductName</code>=노출상품명, <code>items[0].salePrice/originalPrice</code>=판매가, <code>items[0].searchTags</code>=태그 20개, <code>deliveryCharge</code>=배송비. <code>displayCategoryCode</code>·<code>returnCenterCode</code>·<code>outboundShippingPlaceCode</code>는 Wing에서 확인한 값으로 바꿔야 실제 등록이 됩니다(지금은 자리표시자).</p>
+  </section>
+
+  <section class="card" id="naver">
+    <h2>스마트스토어 — 11열</h2>
+    <p class="note">공식 대량등록 양식은 <b>스마트스토어센터 → 상품관리 → 상품 일괄등록</b>에서 내려받습니다. 네이버 도구가 만드는 <b>스마트스토어_등록_*.xlsx / .csv</b>는 그 양식에 붙여넣기용 평면 표(11열 × 1행)입니다. 양식 열 이름은 버전마다 다르므로 아래는 대표 명칭입니다.</p>
+    <table class="tbl">
+      <tr><th>우리 열</th><th>센터 양식 쪽 이름(대표)</th><th>채우는 값</th></tr>
+      <tr><td>상품명</td><td>상품명</td><td>SEO 상품명 A안(50자 권장, 100자 이내)</td></tr>
+      <tr><td>판매가</td><td>판매가</td><td>희망 판매가 · 비우면 자동 제안가</td></tr>
+      <tr><td>재고수량</td><td>재고수량</td><td>100</td></tr>
+      <tr><td>카테고리</td><td>카테고리코드</td><td>고른 카테고리 이름 → 센터에서 코드 선택</td></tr>
+      <tr><td>대표이미지</td><td>대표이미지 파일명</td><td>첫 사진 파일 이름</td></tr>
+      <tr><td>상세설명</td><td>상세설명</td><td>③ 상세 스토리 HTML(사진 제외)</td></tr>
+      <tr><td>배송비</td><td>기본배송비</td><td>입력한 배송비</td></tr>
+      <tr><td>원산지</td><td>원산지코드/원산지</td><td>입력한 원산지 또는 <code>상세페이지 참조</code></td></tr>
+      <tr><td>상품코드</td><td>판매자상품코드</td><td><code>KTS-N-yyyymmdd-번호</code></td></tr>
+      <tr><td>상품상태</td><td>상품상태</td><td><code>신상품</code></td></tr>
+      <tr><td>태그</td><td>태그</td><td>② 태그 10개(쉼표 구분)</td></tr>
+    </table>
+    <p class="note">네이버 커머스 API 직통 업로드는 브라우저 단독으로 할 수 없습니다(토큰 발급에 bcrypt 서명이 필요해 서버가 있어야 합니다). 화면의 API 버튼은 이유와 함께 잠겨 있습니다.</p>
+  </section>
+
+  <section class="card" id="global">
+    <h2>역직구 — 아마존 14열 · 라쿠텐/큐텐 7열 · 쇼피 8열</h2>
+    <p class="note">각 마켓 공식 양식(아마존 flat-file 카테고리 템플릿 · 라쿠텐 RMS CSV · 큐텐 QSM 엑셀 · 쇼피 Mass Upload)은 각 판매자센터에서 내려받습니다. 역직구 도구의 ④ 탭 파일은 그 양식에 붙여넣기용 근사 열입니다.</p>
+    <table class="tbl">
+      <tr><th>우리 열</th><th>flat-file 필드</th><th>값</th></tr>
+      <tr><td>sku</td><td>item_sku / sku</td><td><code>KTS-G-…-US</code></td></tr>
+      <tr><td>item_name</td><td>item_name</td><td>미국 제목(200자 이내)</td></tr>
+      <tr><td>brand_name</td><td>brand_name</td><td><code>Generic</code> (브랜드 임의 사용 0)</td></tr>
+      <tr><td>price</td><td>standard_price</td><td>② 마진표 권장가(USD)</td></tr>
+      <tr><td>quantity</td><td>quantity</td><td>50</td></tr>
+      <tr><td>product_description</td><td>product_description</td><td>설명 3문단</td></tr>
+      <tr><td>bullet_point1~5</td><td>bullet_point1~5</td><td>불릿 5 (각 200자 이내)</td></tr>
+      <tr><td>main_image_url</td><td>main_image_url</td><td>이미지 호스팅 주소로 교체</td></tr>
+      <tr><td>country_of_origin</td><td>country_of_origin</td><td>원산지 한국이면 <code>South Korea</code>, 아니면 입력값</td></tr>
+      <tr><td>item_weight</td><td>item_weight + unit</td><td><code>120 g</code></td></tr>
+    </table>
+    <p class="note">검색어(generic_keywords)는 ① 탭의 "검색어(백엔드)"를 따로 붙여넣습니다(250바이트 이내).</p>
+    <table class="tbl">
+      <tr><th>우리 열</th><th>라쿠텐 RMS / 큐텐 QSM</th><th>값</th></tr>
+      <tr><td>상품번호</td><td>商品管理番号 / 판매자상품코드</td><td><code>…-JP</code></td></tr>
+      <tr><td>상품명</td><td>商品名</td><td>일본 제목(60자 권장)</td></tr>
+      <tr><td>판매가</td><td>販売価格</td><td>권장가(JPY)</td></tr>
+      <tr><td>재고</td><td>在庫数</td><td>50</td></tr>
+      <tr><td>상품설명</td><td>商品説明文</td><td>상품설명</td></tr>
+      <tr><td>이미지URL</td><td>商品画像URL</td><td>호스팅 주소</td></tr>
+      <tr><td>배송비</td><td>送料</td><td>0 · 운임은 인보이스에 상품가와 따로 적기(일본 면세 판정)</td></tr>
+    </table>
+    <table class="tbl">
+      <tr><th>우리 열</th><th>쇼피 Mass Upload 필드</th><th>값</th></tr>
+      <tr><td>SKU</td><td>Parent SKU</td><td><code>…-SEA</code></td></tr>
+      <tr><td>상품명</td><td>Product Name</td><td>쇼피 제목(120자 이내)</td></tr>
+      <tr><td>가격</td><td>Price</td><td>권장가(현지통화)</td></tr>
+      <tr><td>재고</td><td>Stock</td><td>50</td></tr>
+      <tr><td>설명</td><td>Product Description</td><td>설명 3문단 + 해시태그 8</td></tr>
+      <tr><td>이미지</td><td>Cover image</td><td>호스팅 주소</td></tr>
+      <tr><td>중량</td><td>Weight (kg)</td><td>g ÷ 1000</td></tr>
+      <tr><td>차원</td><td>Length/Width/Height</td><td>크기 입력값</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>같이 보기</h2>
+    <div class="btns">
+      <a class="btn sm" href="coupang.html">쿠팡 원클릭</a>
+      <a class="btn sm" href="naver.html">네이버 스토어 원클릭</a>
+      <a class="btn sm" href="global.html">역직구 원클릭</a>
+      <a class="btn sm" href="index.html">이커머스 5종 처음으로</a>
+    </div>
+  </section>
+</main>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+</div>
+</body>
+</html>

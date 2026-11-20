@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더셀 · 역직구 원클릭</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+.cset{display:none}.cset.on{display:block}
+.mt td,.mt th{font-size:12px;padding:5px 3px}
+.mt td.l .btn{margin-top:4px;width:100%;min-height:34px;font-size:12px;padding:0 4px}
+h3.cty{font-size:15px;margin:18px 0 6px;color:var(--amber2)}
+.lst{margin:4px 0 0;padding-left:18px}.lst li{margin:0 0 6px;font-size:14px;word-break:keep-all;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="../index.html">← 쇼룸</a>
+  <h1>더셀 · 역직구 원클릭<small>아마존 · 라쿠텐/큐텐 · 쇼피 · 사장님 전용</small></h1>
+  <button class="keybtn" id="btnKey" type="button">AI 열쇠 <b id="aiLeft">없음</b></button>
+</div></header>
+
+<main class="wrap">
+  <section class="card">
+    <h2><span class="n">1</span>상품 (공통)</h2>
+    <label class="f"><span>상품명(한국어) <em>필수</em></span><input id="inName" type="text" placeholder="예: 방수테이프"></label>
+    <div class="grid2">
+      <label class="f"><span>영어 이름 (선택)</span><input id="inEn" type="text" placeholder="Waterproof Repair Tape"></label>
+      <label class="f"><span>일본어 이름 (선택)</span><input id="inJa" type="text" placeholder="防水補修テープ"></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>매입가(원) <em>필수</em></span><input id="inCost" type="text" inputmode="numeric" placeholder="3200"></label>
+      <label class="f"><span>카테고리</span><select id="inCat"></select></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>중량(g) <em>필수</em></span><input id="inWeight" type="text" inputmode="numeric" placeholder="120"></label>
+      <label class="f"><span>크기 (선택)</span><input id="inSize" type="text" placeholder="10×10×5cm"></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>원산지</span><input id="inOrigin" type="text" value="국산"></label>
+      <label class="f"><span>목표 마진율(%)</span><input id="inMargin" type="text" inputmode="decimal" value="22"></label>
+    </div>
+    <label class="f"><span>사진 (선택 · 파일 이름이 등록 파일의 이미지 칸에 들어갑니다)</span><input id="inPhoto" type="file" accept="image/*" multiple></label>
+    <div class="thumbs" id="thumbs"></div>
+    <p class="hint" id="originHint"></p>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">2</span>국가별 조건</h2>
+    <div class="seg" id="ctry">
+      <button type="button" data-c="us" class="on">미국(아마존)</button>
+      <button type="button" data-c="jp">일본(라쿠텐·큐텐)</button>
+      <button type="button" data-c="sea">동남아·대만(쇼피)</button>
+    </div>
+    <div id="csets"></div>
+    <div class="grid2" style="margin-top:6px">
+      <label class="f"><span>결제·환수수료(%)</span><input id="inPay" type="text" inputmode="decimal" value="3"></label>
+      <label class="f"><span>반품충당(%)</span><input id="inRet" type="text" inputmode="decimal" value="3"></label>
+    </div>
+    <p class="note">기본값은 참고용입니다 — '확인 필요' 표시가 붙은 숫자는 사장님 실제 값으로 바꿔 주세요.</p>
+  </section>
+
+  <div class="go">
+    <button class="btn pri" id="btnGo" type="button">1방 생성</button>
+    <div class="need" id="need"></div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="tabCopy">① 현지어 문구</button>
+    <button type="button" data-tab="tabMargin">② 마진표</button>
+    <button type="button" data-tab="tabRules">③ 제도 안내</button>
+    <button type="button" data-tab="tabExcel">④ 등록 파일</button>
+  </nav>
+  <div class="btns">
+    <button class="btn sm" id="btnCopy" type="button">이 탭 복사</button>
+    <button class="btn sm" id="btnDl" type="button">이 탭 받기</button>
+  </div>
+
+  <div id="out">
+    <section class="panel" id="tabCopy"><div class="empty">[1방 생성]을 누르면 미국·일본·쇼피 현지어 문구가 나옵니다(AI 열쇠 없이도 완성).</div></section>
+    <section class="panel" id="tabMargin"><div class="empty">관세·환율 역산 마진표(3개국 × 3가격)가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabRules"><div class="empty">국가별 면세·관세 제도 안내가 여기에 나옵니다.</div></section>
+    <section class="panel" id="tabExcel"><div class="empty">아마존·라쿠텐/큐텐·쇼피 등록용 엑셀·CSV가 여기에 나옵니다.</div></section>
+  </div>
+</main>
+
+<div class="sheet" id="keySheet" role="dialog" aria-label="AI 열쇠">
+  <div class="box">
+    <h3>AI 열쇠 (선택)</h3>
+    <p class="hint">열쇠가 없어도 기본 문구 템플릿으로 3개국 문구가 끝까지 만들어집니다. 열쇠를 넣으면 더 자연스러운 현지어로 다듬습니다. 이 기기에만 저장, 하루 12회까지.</p>
+    <input id="keyIn" type="password" autocomplete="off" placeholder="내 제미나이 무료 열쇠 붙여넣기">
+    <div class="btns">
+      <button class="btn pri" id="keySave" type="button">이 기기에 저장</button>
+      <button class="btn" id="keyDel" type="button">지우기</button>
+      <button class="btn" data-close type="button">닫기</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav class="banner"><div class="wrap">
+  <a href="../viewer.html">더 뷰</a><span>·</span><a href="../theform/">더양식</a><span>·</span><a href="../thedetail/">더상세</a><span>·</span><a class="all" href="../index.html">전체 보기</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/data/bundle.js"></script>
+<script src="assets/xlsx.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+var K = KTS, $ = K.$, e = K.esc;
+var S = { photos: [], res: null, mode: 'tpl', sel: { us: null, jp: null, sea: null } };
+window.__res = null; window.__done = false;
+var CS = ['us', 'jp', 'sea'];
+var STEP = { USD: 0.1, JPY: 10, TWD: 1, SGD: 0.1, MYR: 0.1, PHP: 1 };
+var CAT_EN = { '생활용품': 'household', '주방용품': 'kitchen', '가전디지털': 'electronics', '패션잡화': 'fashion accessory', '뷰티': 'beauty', '식품': 'food', '완구·취미': 'toy', '스포츠·레저': 'outdoor', '반려동물': 'pet supply', '자동차용품': 'car accessory' };
+var NOUN_EN = { '생활용품': 'Home Repair Item', '주방용품': 'Kitchen Tool', '가전디지털': 'Portable Device', '패션잡화': 'Daily Accessory', '뷰티': 'Beauty Care Item', '식품': 'Korean Snack', '완구·취미': 'Kids Toy', '스포츠·레저': 'Outdoor Gear', '반려동물': 'Pet Care Item', '자동차용품': 'Car Accessory' };
+var CAT_JA = { '생활용품': '日用品', '주방용품': 'キッチン用品', '가전디지털': '家電', '패션잡화': 'ファッション小物', '뷰티': 'コスメ', '식품': '食品', '완구·취미': 'おもちゃ', '스포츠·레저': 'アウトドア用品', '반려동물': 'ペット用品', '자동차용품': 'カー用品' };
+var EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u;
+
+/* ---------- 국가별 조건 화면 ---------- */
+function cfg(c){
+  var D = K.D.duties, G = K.D.fees.global;
+  if (c === 'sea'){ var sc = (S.seaC || D.sea.defaultCountry), x = D.sea.countries[sc]; return { cur: x.currency, fx: x.fx, duty: x.dutyRate, vat: x.vatRate, exempt: x.exemptLimit, rate: G.platforms.sea.rate, label: D.sea.label + ' · ' + x.label }; }
+  return { cur: D[c].currency, fx: D[c].fx.value, duty: D[c].dutyRate.value, vat: D[c].vatRate.value, exempt: c === 'jp' ? D.jp.deMinimis.value : 0, rate: G.platforms[c].rate, label: D[c].label };
+}
+function shipSuggest(c, g, method){
+  var B = K.D.fees.global.shipBands, band = B.bands[B.bands.length - 1];
+  for (var i = 0; i < B.bands.length; i++){ if (g <= B.bands[i].maxG){ band = B.bands[i]; break; } }
+  return Math.round(band[c] * (B.methods[method] || 1) / 10) * 10;
+}
+function drawSets(){
+  var D = K.D.duties, h = '';
+  CS.forEach(function(c){
+    var x = cfg(c);
+    h += '<div class="cset' + (c === 'us' ? ' on' : '') + '" id="set_' + c + '">' +
+      '<p class="note">' + e(x.label) + ' · 통화 ' + x.cur + '</p>' +
+      (c === 'sea' ? '<label class="f"><span>국가</span><select id="seaCountry">' + Object.keys(D.sea.countries).map(function(k){ return '<option value="' + k + '"' + (k === (S.seaC || D.sea.defaultCountry) ? ' selected' : '') + '>' + D.sea.countries[k].label + ' (' + D.sea.countries[k].currency + ')</option>'; }).join('') + '</select></label>' : '') +
+      '<div class="grid2"><label class="f"><span>판매가(' + x.cur + ', 선택)</span><input id="pr_' + c + '" type="text" inputmode="decimal" placeholder="비우면 권장가"></label>' +
+      '<label class="f"><span>환율(1 ' + x.cur + ' = 원)</span><input id="fx_' + c + '" type="text" inputmode="decimal" value="' + x.fx + '"></label></div>' +
+      '<div class="grid2"><label class="f"><span>배송 방식</span><select id="me_' + c + '"><option>소포</option><option>특송</option><option>풀필먼트</option></select></label>' +
+      '<label class="f"><span>국제배송비(원)</span><input id="sh_' + c + '" type="text" inputmode="numeric" placeholder="무게로 자동"></label></div>' +
+      '<div class="grid2"><label class="f"><span>플랫폼 요율(%)</span><input id="ra_' + c + '" type="text" inputmode="decimal" value="' + +(x.rate * 100).toFixed(2) + '"></label>' +
+      '<label class="f"><span>관세율(%)</span><input id="du_' + c + '" type="text" inputmode="decimal" value="' + +(x.duty * 100).toFixed(2) + '"></label></div>' +
+      '<div class="grid2"><label class="f"><span>부가세·소비세율(%)</span><input id="va_' + c + '" type="text" inputmode="decimal" value="' + +(x.vat * 100).toFixed(2) + '"></label>' +
+      '<label class="f"><span>면세 한도(' + (c === 'jp' ? '과세가격 엔' : x.cur) + ')</span><input id="ex_' + c + '" type="text" inputmode="decimal" value="' + x.exempt + '"' + (c === 'us' ? ' disabled' : '') + '></label></div>' +
+      (c === 'us' ? '<p class="warnline">미국은 면세 구간이 없습니다($800 소액면세 2025-08-29부터 중지) — 한도 칸은 0으로 고정</p>' : '') +
+      (c === 'jp' ? '<p class="note">' + e(D.invoiceTip) + '</p>' : '') +
+      (c === 'sea' ? '<p class="note">' + e(D.sea.countries[S.seaC || D.sea.defaultCountry].note) + ' · 면세 없음 기본</p>' : '') +
+      '<p class="hint" id="shHint_' + c + '"></p></div>';
+  });
+  $('#csets').innerHTML = h;
+  var sc = $('#seaCountry');
+  if (sc) sc.onchange = function(){ S.seaC = sc.value; var keep = {}; CS.forEach(function(c){ keep[c] = $('#pr_' + c).value; }); drawSets(); CS.forEach(function(c){ $('#pr_' + c).value = c === 'sea' ? '' : keep[c]; }); showSet('sea'); shipHints(); };
+  CS.forEach(function(c){ $('#me_' + c).onchange = shipHints; });
+}
+function showSet(c){ K.$$('#ctry button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-c') === c); }); K.$$('.cset').forEach(function(s){ s.classList.toggle('on', s.id === 'set_' + c); }); }
+function shipHints(){ var g = K.num($('#inWeight').value); CS.forEach(function(c){ var el = $('#shHint_' + c); if (el) el.textContent = g ? '무게 ' + g + 'g · ' + $('#me_' + c).value + ' 기준 제안 ' + K.won(shipSuggest(c, g, $('#me_' + c).value)) + ' (근사치 — 실제 요금 입력 권장)' : ''; }); }
+
+/* ---------- 계산 (지시서 5장 순서 그대로) ---------- */
+function readC(c){
+  var x = cfg(c), g = K.num($('#inWeight').value), me = $('#me_' + c).value, shv = $('#sh_' + c).value.trim();
+  return { c: c, cur: x.cur, fx: K.num($('#fx_' + c).value) || x.fx, rate: K.num($('#ra_' + c).value) / 100, duty: K.num($('#du_' + c).value) / 100, vat: K.num($('#va_' + c).value) / 100,
+    exempt: c === 'us' ? 0 : K.num($('#ex_' + c).value), ship: shv ? Math.round(K.num(shv)) : shipSuggest(c, g, me), shipAuto: !shv, method: me, price: K.num($('#pr_' + c).value),
+    pay: K.num($('#inPay').value) / 100, ret: K.num($('#inRet').value) / 100, cost: K.num($('#inCost').value), label: x.label };
+}
+function isExempt(p, price){
+  if (p.c === 'us') return false;                                  // 미국: 면세 없음
+  if (p.c === 'jp') return p.exempt > 0 && price * 0.6 <= p.exempt;  // 일본: 상품가(엔) × 0.6 ≤ 10,000
+  return p.exempt > 0 && price <= p.exempt;                        // 쇼피: 기본 0 = 면세 없음
+}
+function row(p, label, price){
+  var won = Math.round(price * p.fx), fee = Math.round(won * p.rate), pay = Math.round(won * p.pay), ex = isExempt(p, price), taxable;
+  if (p.c === 'jp') taxable = ex ? 0 : Math.round(Math.max(0, won - p.ship) * 0.6);
+  else taxable = ex ? 0 : won;
+  var duty = Math.round(taxable * p.duty), vat = Math.round((taxable + duty) * p.vat), rv = Math.round(won * p.ret);
+  var profit = won - p.cost - p.ship - fee - pay - duty - vat - rv;
+  return { label: label, price: price, won: won, fee: fee, pay: pay, ship: p.ship, cost: p.cost, taxable: taxable, duty: duty, vat: vat, ret: rv, profit: profit, mr: won ? profit / won : 0, exempt: ex,
+    breaks: p.c === 'jp' && p.exempt > 0 && !ex };
+}
+function solve(p, m){   // 순익 = m × 원화매출 이 되는 현지 판매가(올림 전)
+  var kb = 1 - p.rate - p.pay - p.ret, base = p.cost + p.ship;
+  function taxed(){
+    if (p.c === 'jp'){ var t = 0.6 * (p.duty + (1 + p.duty) * p.vat); return (base - p.ship * t) / (kb - t - m); }
+    var t2 = p.duty + (1 + p.duty) * p.vat; return base / (kb - t2 - m);
+  }
+  var w;
+  if (p.c !== 'us' && p.exempt > 0){ w = base / (kb - m); if (w > 0 && isExempt(p, w / p.fx)) return w / p.fx; }
+  w = taxed(); return w > 0 ? w / p.fx : 0;
+}
+function ceilStep(v, cur){ var s = STEP[cur] || 1; return +(Math.ceil(v / s - 1e-9) * s).toFixed(s < 1 ? 1 : 0); }
+function margin(c, target){
+  var p = readC(c), be = solve(p, 0);
+  var tiers = [['최저(10%)', 0.10], ['권장(' + target + '%)', target / 100], ['프리미엄(35%)', 0.35]];
+  var rows = tiers.map(function(t){ var r = row(p, t[0], ceilStep(solve(p, t[1]), p.cur)); r.lock = r.profit < 0 || r.price < be; return r; });
+  if (p.price){ var u = row(p, '입력 가격', p.price); u.lock = u.profit < 0 || u.price < be; u.user = true; rows.push(u); }
+  return { p: p, be: be, beShow: ceilStep(be, p.cur), rows: rows };
+}
+
+/* ---------- 현지어 문구 (기본 문구 템플릿 — 키 0) ---------- */
+function tc(s){ return String(s).toLowerCase().replace(/\b[a-z]/g, function(ch){ return ch.toUpperCase(); }); }
+function madeIn(){ return /(국산|한국|국내|korea)/i.test($('#inOrigin').value); }
+function originFix(s, lang){
+  if (madeIn()) return s;
+  return lang === 'ja' ? s.replace(/韓国製/g, '韓国発送') : s.replace(/MADE IN KOREA/g, 'SHIPPED FROM KOREA').replace(/Made in Korea/g, 'Shipped from Korea').replace(/made in korea/g, 'shipped from korea');
+}
+function fitLen(s, n){ if (s.length <= n) return s; var cut = s.slice(0, n), sp = cut.lastIndexOf(' '); return (sp > n * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,\-]+$/, ''); }
+function fitBytes(words, n){ var out = []; words.forEach(function(w){ var t = out.concat([w]).join(' '); if (K.bytes(t) <= n) out.push(w); }); return out.join(' '); }
+function makeCopy(inp){
+  var EN = K.D.copy_en, JA = K.D.copy_ja, s = K.seed(inp.name), cat = inp.cat;
+  var f = EN.feat[cat] || EN.feat['생활용품'], fj = JA.feat[cat] || JA.feat['생활용품'];
+  var noun = inp.en || NOUN_EN[cat] || 'Daily Item', nounJ = inp.ja || (CAT_JA[cat] || '日用品');
+  var sit1 = EN.sits[s % EN.sits.length], sit2 = EN.sits[(s + 1) % EN.sits.length];
+  var size = String(inp.size || '').replace(/×/g, 'x');
+  var specT = inp.weight ? ' (' + inp.weight + 'g)' : '';
+  var spec2 = '1 x ' + noun + (inp.weight ? ', approx. ' + inp.weight + ' g' : '') + (size ? ', ' + size : '');
+  var mp = { noun: noun, cat: CAT_EN[cat] || 'household', f1: tc(f[0][0]), f2: tc(f[1][0]), use: tc(f[2][1]), spec: specT, F1: f[0][0], feat1: f[0][1], ben1: f[0][2],
+    F2: f[1][0], feat2: f[1][1], ben2: f[1][2], ben3: f[2][2], sit1: sit1, sit2: sit2, spec2: spec2 };
+  var us = {
+    title: fitLen(originFix(K.fill(EN.title, mp), 'en'), 200),
+    bullets: EN.bullets.map(function(b){ return fitLen(originFix(K.fill(b, mp), 'en'), 200); }),
+    description: EN.description.map(function(d){ return originFix(K.fill(d, mp), 'en'); }),
+    searchTerms: ''
+  };
+  var titleW = {}; us.title.toLowerCase().split(/[^a-z0-9]+/).forEach(function(w){ titleW[w] = 1; });
+  var terms = K.uniq(EN.searchTerms.map(function(t){ return originFix(K.fill(t, mp), 'en').toLowerCase(); }).join(' ').split(/\s+/)).filter(function(w){ return w && !titleW[w]; });
+  us.searchTerms = fitBytes(terms, 250);
+  var sj = JA.sits[s % JA.sits.length], sj2 = JA.sits[(s + 1) % JA.sits.length];
+  var mj = { noun: nounJ, cat: CAT_JA[cat] || '日用品', f1: fj[0], f2: fj[1], use: fj[2], spec: inp.weight ? ' ' + inp.weight + 'g' : '', sit1: sj, sit2: sj2 };
+  var jp = {
+    title: fitLen(originFix(K.fill(JA.title, mj), 'ja'), 60),
+    catch: JA.catch.map(function(c){ return originFix(K.fill(c, mj), 'ja'); }),
+    description: originFix(K.fill(JA.description, mj), 'ja'),
+    keywords: K.uniq(JA.keywords.map(function(k){ return originFix(K.fill(k, mj), 'ja'); }).concat(['韓国雑貨', '暮らし', 'ギフト', '生活雑貨', '新生活'])).slice(0, 10)
+  };
+  var tagMap = { nounTag: noun.toLowerCase().replace(/[^a-z0-9]/g, ''), catTag: (CAT_EN[cat] || 'household').replace(/[^a-z]/g, '') };
+  var sea = {
+    title: fitLen(originFix(K.fill(EN.shopeeTitle, mp), 'en'), 120),
+    description: us.description.slice(),
+    tags: K.uniq(EN.shopeeTags.map(function(t){ return originFix(K.fill(t, tagMap), 'en').replace(/\s+/g, ''); })).slice(0, 8)
+  };
+  if (!madeIn()) sea.tags = sea.tags.map(function(t){ return t === '#madeinkorea' ? '#shippedfromkorea' : t; });
+  return { us: us, jp: jp, sea: sea, src: '기본 문구 템플릿' };
+}
+function copyChecks(cp){
+  var EN = K.D.copy_en, JA = K.D.copy_ja;
+  var enAll = [cp.us.title].concat(cp.us.bullets, cp.us.description, [cp.us.searchTerms, cp.sea.title], cp.sea.description, cp.sea.tags).join(' ');
+  var jaAll = [cp.jp.title].concat(cp.jp.catch, [cp.jp.description], cp.jp.keywords).join(' ');
+  return {
+    usTitle: cp.us.title.length, usBullets: cp.us.bullets.map(function(b){ return b.length; }), usDesc: cp.us.description.length, usSearchBytes: K.bytes(cp.us.searchTerms),
+    jpTitle: cp.jp.title.length, jpCatch: cp.jp.catch.length, jpKeywords: cp.jp.keywords.length, jpDesc: cp.jp.description.length,
+    seaTitle: cp.sea.title.length, seaDesc: cp.sea.description.length, seaTags: cp.sea.tags.length,
+    banEn: K.banFind(enAll, EN.banned).length, banJa: K.banFind(jaAll, JA.banned).length, emoji: EMOJI.test(enAll + jaAll) ? 1 : 0,
+    origin: madeIn() ? (/Made in Korea/.test(cp.us.title) && /韓国製/.test(cp.jp.title) ? 'Made in Korea 표기' : '누락') : '원산지 한국 아님 → Shipped from Korea'
+  };
+}
+
+/* ---------- 그리기 ---------- */
+function drawCopy(r){
+  var cp = r.copy, ck = copyChecks(cp);
+  function ol(a){ return '<ol class="lst">' + a.map(function(x){ return '<li>' + e(x) + '</li>'; }).join('') + '</ol>'; }
+  $('#tabCopy').innerHTML =
+    '<div class="seg" id="modeSeg"><button type="button" data-m="ai" data-ai' + (S.mode === 'ai' ? ' class="on"' : '') + '>AI 열쇠</button><button type="button" data-m="tpl"' + (S.mode === 'tpl' ? ' class="on"' : '') + '>기본 문구 템플릿</button><button type="button" data-m="paste"' + (S.mode === 'paste' ? ' class="on"' : '') + '>번역 붙여넣기</button></div>' +
+    '<p class="note" id="modeMsg">만든 방법: ' + e(cp.src) + ' · 브랜드명 임의 사용 0 · 과장어 ' + (ck.banEn + ck.banJa) + ' · 이모지 ' + ck.emoji + ' · ' + e(ck.origin) + '</p>' +
+    '<div id="pasteBox" style="display:' + (S.mode === 'paste' ? 'block' : 'none') + '"><label class="f"><span>번역기 결과 붙여넣기</span><textarea id="inPaste" placeholder="번역기에서 옮긴 설명 문단을 붙여넣으세요"></textarea></label>' +
+    '<label class="f"><span>넣을 자리</span><select id="pasteTo"><option value="us">미국 설명</option><option value="jp">일본 상품설명</option><option value="sea">쇼피 설명</option></select></label>' +
+    '<div class="btns"><button class="btn" id="btnPaste" type="button">붙여넣은 글로 바꾸기</button></div></div>' +
+    '<h3 class="cty">미국(아마존)</h3>' +
+    '<div class="opt"><div class="lab">제목 ' + ck.usTitle + '/200자</div><div class="txt">' + e(cp.us.title) + '</div></div>' +
+    '<div class="opt"><div class="lab">불릿 5 (특징 → 이득 → 사용상황, 각 200자 이내: ' + ck.usBullets.join('·') + ')</div>' + ol(cp.us.bullets) + '</div>' +
+    '<div class="opt"><div class="lab">설명 ' + ck.usDesc + '문단</div>' + cp.us.description.map(function(d){ return '<p class="txt" style="margin:0 0 8px">' + e(d) + '</p>'; }).join('') + '</div>' +
+    '<div class="opt"><div class="lab">검색어(백엔드) ' + ck.usSearchBytes + '/250바이트</div><div class="txt">' + e(cp.us.searchTerms) + '</div></div>' +
+    '<h3 class="cty">일본(라쿠텐·큐텐)</h3>' +
+    '<div class="opt"><div class="lab">제목 ' + ck.jpTitle + '/60자 권장</div><div class="txt">' + e(cp.jp.title) + '</div></div>' +
+    '<div class="opt"><div class="lab">캐치 3줄</div>' + ol(cp.jp.catch) + '</div>' +
+    '<div class="opt"><div class="lab">상품설명</div><p class="txt" style="margin:0">' + e(cp.jp.description) + '</p></div>' +
+    '<div class="opt"><div class="lab">검색 키워드 ' + ck.jpKeywords + '</div><div class="tagbox">' + cp.jp.keywords.map(function(k){ return '<span class="chip">' + e(k) + '</span>'; }).join('') + '</div></div>' +
+    '<h3 class="cty">동남아·대만(쇼피)</h3>' +
+    '<div class="opt"><div class="lab">제목 ' + ck.seaTitle + '/120자</div><div class="txt">' + e(cp.sea.title) + '</div></div>' +
+    '<div class="opt"><div class="lab">설명 ' + ck.seaDesc + '문단</div>' + cp.sea.description.map(function(d){ return '<p class="txt" style="margin:0 0 8px">' + e(d) + '</p>'; }).join('') + '</div>' +
+    '<div class="opt"><div class="lab">해시태그형 태그 ' + ck.seaTags + '</div><div class="tagbox">' + cp.sea.tags.map(function(k){ return '<span class="chip">' + e(k) + '</span>'; }).join('') + '</div></div>';
+  K.$$('#modeSeg button').forEach(function(b){ b.onclick = function(){ setMode(b.getAttribute('data-m')); }; });
+  $('#btnPaste').onclick = applyPaste;
+  K.aiBadge();
+}
+function setMode(m){
+  if (m === 'ai' && !myKey()){ K.toast(aiErr(new Error('NO_KEY'))); $('#modeMsg').textContent = '열쇠가 없어 AI는 잠겨 있습니다 — 기본 문구 템플릿 결과를 그대로 쓰셔도 됩니다.'; return; }
+  S.mode = m;
+  if (m === 'tpl'){ S.res.copy = makeCopy(S.res.inp); drawCopy(S.res); return; }
+  if (m === 'paste'){ drawCopy(S.res); return; }
+  aiCopy();
+}
+function applyPaste(){
+  var t = ($('#inPaste').value || '').trim(), to = $('#pasteTo').value, cp = S.res.copy;
+  if (!t){ K.toast('번역 결과를 붙여넣어 주세요'); return; }
+  if (to === 'jp') cp.jp.description = t; else { var ps = t.split(/\n\s*\n|\n/).map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 3); cp[to].description = ps; }
+  cp.src = '번역 붙여넣기(' + to + ') + 기본 문구 템플릿'; drawCopy(S.res); K.toast('붙여넣은 글로 바꿨습니다');
+}
+async function aiCopy(){
+  var cp = S.res.copy, EN = K.D.copy_en, JA = K.D.copy_ja;
+  try {
+    var o = await aiJson('Rewrite these e-commerce listings in natural native language. Return JSON only: {"us":{"title":"","bullets":["","","","",""],"description":["","",""],"searchTerms":""},"jp":{"title":"","catch":["","",""],"description":"","keywords":["x10"]},"sea":{"title":"","description":["","",""],"tags":["#x8"]}}. Rules: no brand names, no superlatives (best, #1, perfect, guaranteed, 最高, 最安, No.1), no emoji, keep the origin statement (' + (madeIn() ? 'Made in Korea / 韓国製' : 'Shipped from Korea / 韓国発送') + '), US title<=200 chars, each bullet<=200 chars, searchTerms<=250 bytes, JP title<=60 chars, Shopee title<=120 chars.\n' + JSON.stringify({ us: cp.us, jp: cp.jp, sea: cp.sea }));
+    var n = 0;
+    function ok(s, lim, ban){ return typeof s === 'string' && s && s.length <= lim && !K.banFind(s, ban).length && !EMOJI.test(s); }
+    if (o.us){ if (ok(o.us.title, 200, EN.banned)){ cp.us.title = o.us.title; n++; }
+      if ((o.us.bullets || []).length === 5 && o.us.bullets.every(function(b){ return ok(b, 200, EN.banned); })){ cp.us.bullets = o.us.bullets; n++; }
+      if ((o.us.description || []).length === 3 && o.us.description.every(function(b){ return ok(b, 1000, EN.banned); })){ cp.us.description = o.us.description; n++; }
+      if (ok(o.us.searchTerms, 250, EN.banned) && K.bytes(o.us.searchTerms) <= 250){ cp.us.searchTerms = o.us.searchTerms; n++; } }
+    if (o.jp){ if (ok(o.jp.title, 60, JA.banned)){ cp.jp.title = o.jp.title; n++; }
+      if ((o.jp.catch || []).length === 3 && o.jp.catch.every(function(b){ return ok(b, 80, JA.banned); })){ cp.jp.catch = o.jp.catch; n++; }
+      if (ok(o.jp.description, 1000, JA.banned)){ cp.jp.description = o.jp.description; n++; }
+      if ((o.jp.keywords || []).length === 10){ cp.jp.keywords = o.jp.keywords; n++; } }
+    if (o.sea){ if (ok(o.sea.title, 120, EN.banned)){ cp.sea.title = o.sea.title; n++; }
+      if ((o.sea.description || []).length === 3){ cp.sea.description = o.sea.description; n++; }
+      if ((o.sea.tags || []).length === 8){ cp.sea.tags = o.sea.tags; n++; } }
+    cp.src = 'AI 열쇠(' + (window.__aiModel || '') + ') · 규칙 통과 ' + n + '항목 채택, 나머지는 템플릿'; drawCopy(S.res);
+  } catch(err){ S.mode = 'tpl'; drawCopy(S.res); $('#modeMsg').textContent = aiErr(err); K.toast(aiErr(err)); }
+}
+function drawMargin(r){
+  var D = K.D.duties, h = '<p class="note">계산 순서: 원화매출 = 판매가 × 환율 → 수수료 → 결제 → 과세가격 → 관세 → 부가세 = (과세가격+관세) × 세율 → 순익 = 원화매출 − 매입가 − 국제배송 − 수수료 − 결제 − 관세 − 부가세 − 반품충당</p>';
+  CS.forEach(function(c){
+    var m = r.margin[c], p = m.p;
+    h += '<h3 class="cty">' + e(p.label) + ' · ' + p.cur + ' (1 = ' + K.fmt(p.fx, 2) + '원)</h3>';
+    if (c === 'us') h += '<p class="redline">' + e(D.us.why[0]) + '<br>' + e(D.us.why[1]) + '</p>';
+    if (c === 'jp') h += '<p class="note">면세 판정: 상품가(엔) × 0.6 ≤ ' + K.fmt(p.exempt) + '엔 → 상품가 약 ' + K.fmt(Math.floor(p.exempt / 0.6)) + '엔까지 면세. ' + e(D.invoiceTip) + '</p>';
+    if (c === 'sea') h += '<p class="note">' + e(p.label) + ' — 면세 한도 ' + (p.exempt ? K.fmt(p.exempt) + ' ' + p.cur : '없음(기본)') + ' · 현지 규정 확인</p>';
+    h += '<p class="warnline">손익분기가 ' + K.fmt(m.beShow, 1) + ' ' + p.cur + ' · 국제배송 ' + K.won(p.ship) + (p.shipAuto ? '(무게 ' + K.num($('#inWeight').value) + 'g·' + p.method + ' 자동 제안)' : '(직접 입력)') + ' · 요율 ' + K.pct(p.rate) + ' · 관세 ' + K.pct(p.duty) + ' · 세금 ' + K.pct(p.vat) + '</p>';
+    h += '<div class="scroll"><table class="t mt" id="mt_' + c + '"><colgroup><col style="width:24%"><col><col><col><col><col><col style="width:12%"></colgroup>' +
+      '<tr><th>구분</th><th>판매가</th><th>원화매출</th><th>수수료+결제</th><th>관세+세금</th><th>순익</th><th>마진</th></tr>' +
+      m.rows.map(function(x, i){
+        return '<tr class="' + (x.lock ? 'loss' : '') + (S.sel[c] === x.price ? ' sel' : '') + '"><td class="l">' + e(x.label) + (x.lock ? '<button class="btn sm" type="button" disabled>이 가격으로 올릴 수 없음</button>' : '<button class="btn sm" type="button" data-c="' + c + '" data-p="' + x.price + '">이 가격 사용</button>') + '</td><td>' + K.fmt(x.price, 2) + '</td><td>' + K.fmt(x.won) + '</td><td>' + K.fmt(x.fee + x.pay) + '</td><td>' + K.fmt(x.duty + x.vat) + (x.exempt ? '<br><small>면세</small>' : '') + '</td><td>' + K.fmt(x.profit) + '</td><td>' + K.pct(x.mr) + '</td></tr>';
+      }).join('') + '</table></div>';
+    m.rows.forEach(function(x){ if (x.breaks) h += '<p class="redline">' + e(x.label) + ' ' + K.fmt(x.price, 2) + '엔: 이 가격은 면세가 깨집니다 — 손님이 관세를 더 냅니다</p>'; });
+  });
+  h += '<div class="btns"><button class="btn pri" id="btnMarginCsv" type="button">마진표 CSV 받기</button></div>';
+  $('#tabMargin').innerHTML = h;
+  K.$$('#tabMargin [data-p]').forEach(function(b){ b.onclick = function(){ S.sel[b.getAttribute('data-c')] = Number(b.getAttribute('data-p')); drawMargin(r); drawExcel(r); K.toast('등록 파일 가격을 바꿨습니다'); }; });
+  $('#btnMarginCsv').onclick = dlMarginCsv;
+}
+function drawRules(){
+  var D = K.D.duties, sc = D.sea.countries[S.seaC || D.sea.defaultCountry];
+  function tr(n, t, src, url, ck){ return '<tr><td class="l"><b>' + e(n) + '</b></td><td class="l">' + e(t) + '<br><small>근거: ' + e(src) + '<br><a href="' + e(url) + '" target="_blank" rel="noopener">' + e(url) + '</a> · 확인 ' + e(ck) + '</small></td></tr>'; }
+  $('#tabRules').innerHTML = '<p class="redline" id="changeNote">' + e(D.notice) + '</p>' +
+    '<table class="t" id="rulesTable"><colgroup><col style="width:24%"><col></colgroup><tr><th>국가</th><th>지금(2026-11) 적용 · 근거 · 확인일</th></tr>' +
+    tr('미국', D.us.deMinimis.text, D.us.deMinimis.source, D.us.deMinimis.url, D.us.deMinimis.checked) +
+    tr('일본', D.jp.deMinimis.text, D.jp.deMinimis.source, D.jp.deMinimis.url, D.jp.deMinimis.checked) +
+    tr('동남아·대만(쇼피)', D.sea.text + ' (지금 선택: ' + sc.label + ' — ' + sc.note + ')', D.sea.source, D.sea.url, D.sea.checked) + '</table>' +
+    '<p class="note">미국이 이 계산기의 핵심 차이입니다: ' + e(D.us.why.join(' ')) + '</p><p class="note">' + e(D.invoiceTip) + '</p>' +
+    '<p class="note">이 표의 값은 2026-11 확인 기준입니다. 제도는 바뀔 수 있으니 실제 발송 전에 각국 관세 원문을 한 번 더 확인하세요.</p>';
+}
+var HEADS = {
+  us: ['sku', 'item_name', 'brand_name', 'price', 'quantity', 'product_description', 'bullet_point1', 'bullet_point2', 'bullet_point3', 'bullet_point4', 'bullet_point5', 'main_image_url', 'country_of_origin', 'item_weight'],
+  jp: ['상품번호', '상품명', '판매가', '재고', '상품설명', '이미지URL', '배송비'],
+  sea: ['SKU', '상품명', '가격', '재고', '설명', '이미지', '중량', '차원']
+};
+var NAMES = { us: '아마존', jp: '라쿠텐큐텐', sea: '쇼피' };
+function listPrice(r, c){ return S.sel[c] || r.margin[c].rows[1].price; }
+function exRow(r, c){
+  var cp = r.copy, inp = r.inp, img = S.photos[0] ? 'https://내-이미지-호스팅/' + S.photos[0].name : '', sku = r.code + '-' + c.toUpperCase();
+  if (c === 'us') return [sku, cp.us.title, 'Generic', listPrice(r, 'us'), 50, cp.us.description.join(' ')].concat(cp.us.bullets, [img, madeIn() ? 'South Korea' : String(inp.origin || ''), inp.weight ? inp.weight + ' g' : '']);
+  if (c === 'jp') return [sku, cp.jp.title, listPrice(r, 'jp'), 50, cp.jp.description, img, 0];
+  return [sku, cp.sea.title, listPrice(r, 'sea'), 50, cp.sea.description.join('\n') + '\n' + cp.sea.tags.join(' '), img, inp.weight ? inp.weight / 1000 : '', String(inp.size || '').replace(/×/g, 'x')];
+}
+function drawExcel(r){
+  var h = '<p class="warnline">각 마켓 공식 일괄등록 양식(아마존 flat-file·라쿠텐 CSV·큐텐 엑셀·쇼피 Mass Upload)은 판매자센터에서 내려받아야 합니다. 이 파일은 그 양식에 <b>붙여넣기 좋은 평면 표</b>이고, 열 이름 대응표는 <a href="열매핑.html#global" target="_blank" rel="noopener" style="color:#FFA24D">역직구 열 매핑</a>에 있습니다.</p>';
+  CS.forEach(function(c){
+    var row = exRow(r, c);
+    h += '<div class="card"><h2>' + e(r.margin[c].p.label) + ' — ' + HEADS[c].length + '열 × 1행</h2><p class="note">판매가 ' + K.fmt(listPrice(r, c), 2) + ' ' + r.margin[c].p.cur + ' (② 마진표 권장가 또는 고른 가격)</p>' +
+      '<div class="btns"><button class="btn pri" type="button" id="xl_' + c + '">엑셀 받기</button><button class="btn" type="button" id="csv_' + c + '">CSV 받기</button></div>' +
+      '<p class="note">' + e(HEADS[c].slice(0, 4).join(', ')) + ' … / ' + e(String(row[1]).slice(0, 50)) + '</p></div>';
+  });
+  $('#tabExcel').innerHTML = h;
+  CS.forEach(function(c){ $('#xl_' + c).onclick = function(){ dlX(c); }; $('#csv_' + c).onclick = function(){ dlC(c); }; });
+}
+function base(){ return K.safeName(S.res.inp.name); }
+function dlX(c){ K.download(KTS_XLSX.xlsxBlob(NAMES[c], HEADS[c], [exRow(S.res, c)]), NAMES[c] + '_등록_' + base() + '.xlsx'); }
+function dlC(c){ K.download(K.csvBlob(HEADS[c], [exRow(S.res, c)]), NAMES[c] + '_등록_' + base() + '.csv'); }
+var M_HEAD = ['국가', '구분', '판매가(현지)', '통화', '환율', '원화매출', '매입가', '국제배송', '수수료', '결제', '과세가격', '관세', '부가세', '반품충당', '순익', '마진율(%)', '면세', '잠금'];
+function mRows(){ var a = []; CS.forEach(function(c){ var m = S.res.margin[c]; m.rows.forEach(function(x){ a.push([m.p.label, x.label, x.price, m.p.cur, m.p.fx, x.won, x.cost, x.ship, x.fee, x.pay, x.taxable, x.duty, x.vat, x.ret, x.profit, Math.round(x.mr * 1000) / 10, x.exempt ? 'Y' : 'N', x.lock ? 'Y' : 'N']); }); }); return a; }
+function dlMarginCsv(){ K.download(K.csvBlob(M_HEAD, mRows()), '역직구_마진표_' + base() + '.csv'); }
+function copyText(cp){
+  return ['[미국 · 아마존]', cp.us.title, '', cp.us.bullets.map(function(b){ return '• ' + b; }).join('\n'), '', cp.us.description.join('\n\n'), '', 'Search terms: ' + cp.us.searchTerms,
+    '', '[일본 · 라쿠텐/큐텐]', cp.jp.title, cp.jp.catch.join('\n'), '', cp.jp.description, '', cp.jp.keywords.join(' '),
+    '', '[쇼피]', cp.sea.title, '', cp.sea.description.join('\n\n'), '', cp.sea.tags.join(' ')].join('\n');
+}
+
+/* ---------- 실행 ---------- */
+function readInp(){ return { name: $('#inName').value.trim(), en: $('#inEn').value.trim(), ja: $('#inJa').value.trim(), cost: K.num($('#inCost').value), cat: $('#inCat').value, weight: K.num($('#inWeight').value), size: $('#inSize').value.trim(), origin: $('#inOrigin').value.trim(), target: K.num($('#inMargin').value) || 22 }; }
+function go(){
+  if ($('#btnGo').disabled) return;
+  var inp = readInp(); S.sel = { us: null, jp: null, sea: null }; S.mode = 'tpl';
+  var r = { inp: inp, code: 'KTS-G-' + K.stamp() + '-' + (K.seed(inp.name) % 100000), margin: {} };
+  r.copy = makeCopy(inp);
+  CS.forEach(function(c){ r.margin[c] = margin(c, inp.target); });
+  S.res = r; drawCopy(r); drawMargin(r); drawRules(); drawExcel(r);
+  var ck = copyChecks(r.copy);
+  window.__res = { copy: ck, copyText: copyText(r.copy).length, madeIn: madeIn(),
+    margin: CS.map(function(c){ var m = r.margin[c]; return { c: c, cur: m.p.cur, fx: m.p.fx, rate: m.p.rate, pay: m.p.pay, ret: m.p.ret, duty: m.p.duty, vat: m.p.vat, exempt: m.p.exempt, ship: m.p.ship, cost: m.p.cost, be: m.be,
+      rows: m.rows.map(function(x){ return { label: x.label, price: x.price, won: x.won, fee: x.fee, pay: x.pay, taxable: x.taxable, duty: x.duty, vat: x.vat, ret: x.ret, profit: x.profit, exempt: x.exempt, lock: x.lock, breaks: x.breaks }; }) }; }),
+    rules: { urls: K.$$('#rulesTable a').length, checked: (($('#rulesTable') || {}).textContent || '').split('확인 2026-11-20').length - 1, notice: !!$('#changeNote') },
+    ex: CS.map(function(c){ return { c: c, cols: HEADS[c].length, row: exRow(r, c).length }; }) };
+  window.__done = true; K.goTab('tabCopy'); K.toast('4탭을 모두 만들었습니다 (3개국)');
+}
+function curCopy(){
+  if (!S.res){ K.toast('먼저 [1방 생성]을 눌러 주세요'); return; }
+  var t = K.activeTab;
+  if (t === 'tabCopy') K.copy(copyText(S.res.copy));
+  else if (t === 'tabMargin') K.copy([M_HEAD.join('\t')].concat(mRows().map(function(x){ return x.join('\t'); })).join('\n'));
+  else if (t === 'tabRules') K.copy(($('#rulesTable') || {}).innerText || '');
+  else K.copy(CS.map(function(c){ return [HEADS[c].join('\t'), exRow(S.res, c).join('\t')].join('\n'); }).join('\n\n'));
+}
+function curDl(){
+  if (!S.res){ K.toast('먼저 [1방 생성]을 눌러 주세요'); return; }
+  var t = K.activeTab;
+  if (t === 'tabCopy') K.download(new Blob(['﻿' + copyText(S.res.copy)], { type: 'text/plain;charset=utf-8' }), '역직구_문구_' + base() + '.txt');
+  else if (t === 'tabMargin' || t === 'tabRules') dlMarginCsv();
+  else dlX('us');
+}
+async function boot(){
+  await K.loadData(['fees', 'duties', 'copy_en', 'copy_ja', 'sample_products']);
+  $('#inCat').innerHTML = Object.keys(K.D.copy_en.feat).map(function(c){ return '<option>' + c + '</option>'; }).join('');
+  drawSets();
+  K.shell(); K.tabs('#tabs');
+  K.$$('#ctry button').forEach(function(b){ b.onclick = function(){ showSet(b.getAttribute('data-c')); }; });
+  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); if (!K.num($('#inWeight').value)) m.push('중량'); return m.length ? m.join('·') + '을(를) 넣어 주세요' : ''; });
+  function oh(){ $('#originHint').textContent = madeIn() ? '원산지가 한국이라 문구에 Made in Korea / 韓国製 를 넣습니다.' : '원산지가 한국이 아니라 Made in Korea 대신 Shipped from Korea / 韓国発送 으로 적습니다(원산지 허위 표기 방지).'; }
+  $('#inOrigin').addEventListener('input', oh); oh();
+  $('#inWeight').addEventListener('input', shipHints);
+  $('#inPhoto').addEventListener('change', async function(){ S.photos = await K.readPhotos(this.files, 6); $('#thumbs').innerHTML = S.photos.map(function(p, i){ return '<img src="' + p.url + '" alt="사진 ' + (i + 1) + '">'; }).join(''); });
+  $('#btnGo').addEventListener('click', go); $('#btnCopy').addEventListener('click', curCopy); $('#btnDl').addEventListener('click', curDl);
+  if (K.qs('sample') === '1'){
+    var idx = Math.min(2, Math.max(0, parseInt(K.qs('s') || '0', 10) || 0)), p = K.D.sample_products.products[idx], g = K.D.sample_products.global;
+    $('#inName').value = p.name; $('#inEn').value = p.en; $('#inJa').value = p.ja; $('#inCost').value = p.cost; $('#inCat').value = p.cat;
+    $('#inWeight').value = p.weight; $('#inSize').value = p.size; $('#inOrigin').value = p.origin; oh();
+    if (K.qs('noprice') !== '1'){ $('#pr_us').value = g.us.price; $('#pr_jp').value = K.qs('jpy') || g.jp.price; $('#pr_sea').value = g.sea.price; }
+    if (K.qs('nophoto') !== '1'){ S.photos = [K.samplePhoto(p.name, [28, 210, 140][idx])]; $('#thumbs').innerHTML = '<img src="' + S.photos[0].url + '" alt="샘플 사진">'; }
+    shipHints(); K.regate(); if (K.qs('auto') === '1') go();
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>
