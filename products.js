@@ -238,7 +238,20 @@ window.PRODUCTS = [
     window.PRODUCTS.length = 0;
     json.products.forEach(function(p){
       var o = {};
-      for (var k in p) if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k];
+      for (var k in p) if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k
+  {k:'slope', nm:'경사도 지도 — 지번 1초', sub:'지번 넣으면 필지·경사도(°·%) 그림',
+   cat:'etc', badge:'NEW', status:'live', icon:'shots/ic_slope.png',
+   price:'3건 무료', price2:'10건권 9,000원 (부가세 별도) · 실결제 9,900원',
+   line:'지번 하나로, 그 땅의 경사도가 그림으로 나옵니다.',
+   blurb:'지번·주소를 넣으면 필지 위치와 주변 경사(°·%)·표고·향·단면을 5m 격자 지도 위에 그립니다. 무료 3건 체험, 10건권 9,000원(부가세 별도).',
+   link:'slope/', shot:'shots/slope_home.png',
+   bullets:[['입력','지번·주소 검색 또는 지도 누르기'],['지형','경사 °·% 색판 · 등고선 · 음영'],
+            ['수치','중심 표고·경사·향 · 반경 평균·최대 · 표고차'],['저장','분석 카드 그림 · 브리핑 문구 복사']],
+   how:['지번이나 주소를 넣고 [찾기]를 누릅니다.','지도를 손가락으로 밀어 필지에 맞춥니다.','결과를 보고 [그림으로 저장]으로 카드를 남깁니다.'],
+   notes:['지형은 공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산한 참고용 그림입니다.',
+          '인허가·설계·매매 판단은 국토정보플랫폼 5m 수치지형도와 공부(公簿)로 확인하세요.',
+          '결제는 이 사이트에서 받지 않습니다. 이용권 코드는 문자로 신청합니다.']}
+];
       /* 최신판으로 열리게 — 목록에서 넘어갈 때 카탈로그 판번호를 붙인다 */
       if (v && o.link && o.link.indexOf('?') < 0 && !/^https?:/.test(o.link)) o.link += '?v=' + v;
       window.PRODUCTS.push(o);
