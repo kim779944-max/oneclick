@@ -2,7 +2,7 @@
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 지번·경사도 지도 — 지번 넣으면 그 자리 경사도가 그림으로 (3건 무료)</title>
-<meta name="description" content="지번·주소를 넣으면 필지 위치와 주변 경사도(°·%)·표고·향·단면을 5m 격자 그림으로 보여 줍니다. 무료 3건, 10건권 9,000원(부가세 별도).">
+<meta name="description" content="지번·주소를 넣으면 필지 위치와 경계, 주변 경사도(°·%)·표고·향·단면을 5m 격자 그림으로 보여 줍니다. 무료 3건, 10건권 9,000원.">
 <meta name="theme-color" content="#0A1128">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="../icon.png">
@@ -282,12 +282,12 @@ details.adv .keyrow{margin-top:7px}
   </section>
 
   <section class="card">
-    <h2><i>7</i>이용 요금<small>부가세 별도</small></h2>
+    <h2><i>7</i>이용 요금<small>문자 신청</small></h2>
     <div class="plans">
       <div class="plan on" id="planFree"><span class="ck"></span><span class="pk">FREE</span><b>체험</b>
         <span class="pr">3건</span><span class="ds">지번 3곳까지 무료</span></div>
       <div class="plan" id="planTen"><span class="ck"></span><span class="pk">10건권</span><b>실무용</b>
-        <span class="pr">9,000원<small> (부가세 별도)</small></span><span class="ds">실결제 9,900원 · 건당 990원</span></div>
+        <span class="pr">9,000원</span><span class="ds">10건 · 건당 900원</span></div>
     </div>
     <div class="meter"><span>남은 체험</span><span class="dots" id="dots"><i></i><i></i><i></i></span><b id="leftN">3곳</b></div>
     <div class="unlock" id="unlock">
@@ -298,7 +298,7 @@ details.adv .keyrow{margin-top:7px}
       </div>
     </div>
     <a class="btn" id="buy" href="sms:01020022899">10건권 신청 (문자)</a>
-    <p class="note">· 결제는 이 사이트에서 받지 않습니다. 문자로 신청하시면 입금 안내와 이용권 코드를 보내 드립니다.<br>· 부가세 별도 규칙에 따라 10건권은 <b>9,000원 + 부가세 900원 = 실결제 9,900원</b>입니다.<br>· 체험 3건이 끝나면 새 지번은 <b>미리보기(워터마크)</b>로 열리고, 저장한 그림에 안내선이 들어갑니다.</p>
+    <p class="note">· 결제는 이 사이트에서 받지 않습니다. 문자로 신청하시면 입금 안내와 이용권 코드를 보내 드립니다.<br>· 체험 3건이 끝나면 새 지번은 <b>미리보기(워터마크)</b>로 열리고, 저장한 그림에 안내선이 들어갑니다.</p>
   </section>
 
   <p class="foot">KTS 원클릭 · 지번·경사도 지도<br>
@@ -1036,7 +1036,7 @@ function paintQuota(){
   if(S.cred>0&&!master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 이용권 '+S.cred+'건 남음</span> — 새 지번도 그대로 분석됩니다.'; }
   else if(master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 마스터 모드</span> — 횟수 제한 없이 열립니다.'; }
   var pv=$('#pv');
-  if(pv){ if(S.preview){ pv.classList.remove('hide'); pv.innerHTML='<b>체험 3건을 모두 쓰셨습니다.</b> 이 지번은 미리보기로 열렸고, 저장한 그림에 안내선이 들어갑니다. 10건권 9,000원(부가세 별도 · 실결제 9,900원)으로 열 수 있습니다.' } else pv.classList.add('hide'); }
+  if(pv){ if(S.preview){ pv.classList.remove('hide'); pv.innerHTML='<b>체험 3건을 모두 쓰셨습니다.</b> 이 지번은 미리보기로 열렸고, 저장한 그림에 안내선이 들어갑니다. 10건권 9,000원으로 열 수 있습니다.' } else pv.classList.add('hide'); }
 }
 function distM(a,b){ var dy=(a.lat-b.lat)*111320, dx=(a.lon-b.lon)*111320*Math.cos(a.lat*Math.PI/180); return Math.sqrt(dx*dx+dy*dy) }
 function commitPlace(){
@@ -1739,7 +1739,7 @@ if(S.key){
   if(pb0) pb0.classList.add('on');
 }
 requestRender(); buildTerrain(); drawProfile(); parcelFetch(S.lat,S.lon);
-$('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원(부가세 별도·실결제 9,900원) 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
+$('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
 setTimeout(function(){ $('#hint').classList.add('off') },6000);
 window.addEventListener('resize',function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain() });
 window.addEventListener('orientationchange',function(){ setTimeout(function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain() },300) });
