@@ -831,8 +831,9 @@ function paintQuota(){
   dots.forEach(function(d,i){ d.classList.toggle('on',i<shown) });
   $('#freeTag').textContent=master()?'마스터':(S.free<3?'무료 '+(3-S.free)+'건 남음':(S.cred>0?'이용권 '+S.cred+'건':'체험 종료'));
   $('#planTag').textContent=master()?'마스터':(S.free<3?'체험 '+(3-S.free)+'건':(S.cred>0?'10건권 '+S.cred+'건':'체험 종료'));
-  $('#planFree').classList.toggle('on',S.cred<=0||S.free<3);
-  $('#planTen').classList.toggle('on',!(S.cred<=0||S.free<3));
+  var freeMode=(S.free<3&&S.cred<=0);
+  $('#planFree').classList.toggle('on',freeMode);
+  $('#planTen').classList.toggle('on',!freeMode);
   var ul=$('#unlock');
   if(S.cred>0&&!master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 이용권 '+S.cred+'건 남음</span> — 새 지번도 그대로 분석됩니다.'; }
   else if(master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 마스터 모드</span> — 횟수 제한 없이 열립니다.'; }
@@ -912,7 +913,7 @@ function renderHits(list,q){
     return '<button type="button" data-i="'+i+'"><b>'+esc(r.name||r.full)+'</b><small>'+(r.coarse?'넓은 단위로 찾음 · 누른 뒤 지도를 눌러 필지를 맞추세요':'이 지점으로 이동')+'</small></button>';
   }).join('');
   h.querySelectorAll('button').forEach(function(b){
-    b.addEventListener('click',function(){ var r=list[+b.getAttribute('data-i')]; applyPlace(r, r.coarse?(q+' ('+r.name+')'):r.name) });
+    b.addEventListener('click',function(){ var r=list[+b.getAttribute('data-i')]; applyPlace(r, r.coarse?(q+' ('+r.name+')'):r.name); toast('지점을 옮겼습니다 · 지도를 밀어 필지를 맞춰 주세요') });
   });
 }
 function applyPlace(p,label){
@@ -944,7 +945,7 @@ function doSearch(){
       toast(S.key?'주소를 찾지 못했습니다 · 지도를 눌러 지점을 맞춰 주세요':'무료 모드에서는 지번 세부가 약합니다 · 지도를 눌러 맞춰 주세요');
       return;
     }
-    if(list.length===1){ applyPlace(list[0],q); return }
+    if(list.length===1){ applyPlace(list[0],q); toast('지점을 찾았습니다 · 지도를 밀어 필지를 맞춰 주세요'); return }
     renderHits(list,q);
   }).catch(function(e){ busy(false); toast('주소 찾기에 실패했습니다 · 지도를 눌러 맞춰 주세요') });
 }
