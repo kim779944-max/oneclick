@@ -190,7 +190,7 @@ details.adv .keyrow{margin-top:7px}
       <button type="button" data-l="zone" class="lk">용도지역<small>Vworld</small></button>
       <button type="button" data-l="sat">위성<small>Vworld</small></button>
     </div>
-    <div class="rng"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="80" aria-label="경사 색 진하기"><b id="opv">80%</b></div>
+    <div class="rng"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
     <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
   </section>
 
@@ -291,7 +291,7 @@ var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}c
 var S={
   lat:37.8319, lon:127.3668, zoom:16.2,
   lay:{slope:1,cont:1,grid:0,parcel:0,zone:0,sat:0},
-  op:0.80, radius:100, addr:'가평 · 신하리 일대(예시 지점)', profile:'ew',
+  op:0.38, radius:100, addr:'가평 · 신하리 일대(예시 지점)', profile:'ew',
   key:LS.get('kts_slope_vk',''), demTpl:LS.get('kts_slope_dem',''),
   free:parseInt(LS.get('kts_slope_free','0'),10)||0,
   cred:parseInt(LS.get('kts_slope_cred','0'),10)||0,
@@ -452,37 +452,99 @@ function buildTerrain(){
     ic.putImageData(id,0,0);
     var range=mx-mn, steps=[1,2,5,10,20,50], step=steps[steps.length-1];
     for(var s2=0;s2<steps.length;s2++){ if(range/steps[s2]<=14){step=steps[s2];break} }
-    var cont=buildContours(elev,cols,rows,1); /* 1m 눈금으로 만들어 두고 그릴 때 간격을 고른다 */
+    var cbase=range>150?5:(range>70?2:1);
+    var cont=buildContours(elev,cols,rows,cbase); /* 기본 간격으로 만들어 두고 그릴 때 더 촘촘하게는 쓰지 않는다 */
     T={z:z,n:n,cols:cols,rows:rows,elev:elev,slope:slope,asp:asp,mpp:mpp,img:img,
-       mn:mn,mx:mx,step:step,cont:cont,wx0:tg.tx0/n,wy0:tg.ty0/n,cellW:1/(n*256),cellH:1/(n*256)};
+       mn:mn,mx:mx,step:step,cont:cont,cbase:cbase,wx0:tg.tx0/n,wy0:tg.ty0/n,cellW:1/(n*256),cellH:1/(n*256)};
     Tbusy=false; setLoad(false); requestRender(); analyze(); drawProfile();
     if(Tpending){Tpending=false;buildTerrain()}
   });
 }
 
-/* 등고선 — 격자 한 번 훑어 레벨별 Path2D 로 모은다 */
-function buildContours(elev,cols,rows,step){
-  var map=new Map();
+/* 표고를 1-2-1 로 한 번만 눌러 준다 — DEM 격자에서 생기는 잔톱니를 줄이는 용도(표시용 사본) */
+function smoothElev(src,cols,rows){
+  var a=new Float32Array(cols*rows), o=new Float32Array(cols*rows), x, y, r, up, dn;
+  for(y=0;y<rows;y++){
+    r=y*cols;
+    for(x=0;x<cols;x++){ a[r+x]=(src[r+(x>0?x-1:0)]+src[r+x]*2+src[r+(x<cols-1?x+1:cols-1)])*0.25 }
+  }
+  for(y=0;y<rows;y++){
+    r=y*cols; up=(y>0?y-1:0)*cols; dn=(y<rows-1?y+1:rows-1)*cols;
+    for(x=0;x<cols;x++){ o[r+x]=(a[up+x]+a[r+x]*2+a[dn+x])*0.25 }
+  }
+  return o;
+}
+/* 등고선 한 줄을 2차 곡선으로 이어 그린다(격자 꼭짓점 대신 중간점을 지나므로 톱니가 사라진다) */
+function appendChain(P,pts){
+  var n=pts.length; if(n<2) return;
+  P.moveTo(pts[0][0],pts[0][1]);
+  if(n===2){ P.lineTo(pts[1][0],pts[1][1]); return }
+  for(var i=1;i<n-1;i++){
+    P.quadraticCurveTo(pts[i][0],pts[i][1],(pts[i][0]+pts[i+1][0])*0.5,(pts[i][1]+pts[i+1][1])*0.5);
+  }
+  P.lineTo(pts[n-1][0],pts[n-1][1]);
+}
+function findEdgeId(code,id,cc){
+  for(var q=0;q<code.length;q++){ if(code[q]===cc) return id[q] }
+  return -1;
+}
+/* 등고선 — 변끼리 이어 붙여 끊기지 않는 한 줄(polyline)로 만든 뒤 부드러운 곡선 경로로 */
+function buildContours(elev0,cols,rows,step){
+  var elev=smoothElev(elev0,cols,rows), bands=new Map();
   for(var y=0;y<rows-1;y++){
     for(var x=0;x<cols-1;x++){
-      var a=elev[y*cols+x], b=elev[y*cols+x+1], c=elev[(y+1)*cols+x+1], d=elev[(y+1)*cols+x];
-      var lo=Math.min(a,b,c,d), hi=Math.max(a,b,c,d);
+      var i=y*cols+x;
+      var a=elev[i], b=elev[i+1], c=elev[i+cols+1], d=elev[i+cols];
+      var lo=a<b?a:b, hi=a>b?a:b;
+      if(c<lo)lo=c; if(d<lo)lo=d; if(c>hi)hi=c; if(d>hi)hi=d;
       if(hi-lo<0.02) continue;
+      var hid=i*2, vid=i*2+1, hbd=(i+cols)*2, vrg=(i+1)*2+1;
       for(var lv=Math.ceil(lo/step)*step; lv<hi; lv+=step){
-        var pts=[];
-        if((a<lv&&b>=lv)||(b<lv&&a>=lv)) pts.push([x+(lv-a)/(b-a), y]);
-        if((b<lv&&c>=lv)||(c<lv&&b>=lv)) pts.push([x+1, y+(lv-b)/(c-b)]);
-        if((c<lv&&d>=lv)||(d<lv&&c>=lv)) pts.push([x+(lv-c)/(d-c), y+1]);
-        if((d<lv&&a>=lv)||(a<lv&&d>=lv)) pts.push([x, y+(lv-d)/(a-d)]);
-        if(pts.length<2) continue;
-        var P=map.get(lv);
-        if(!P){P=new Path2D();map.set(lv,P)}
-        P.moveTo(pts[0][0],pts[0][1]);
-        for(var q=1;q<pts.length;q+=2){ P.lineTo(pts[q][0],pts[q][1]); if(pts[q+1])P.moveTo(pts[q+1][0],pts[q+1][1]); }
+        var bd=bands.get(lv); if(!bd){ bd={p:new Map(),s:[]}; bands.set(lv,bd) }
+        var P=bd.p, code=[], id=[], n1, n2;
+        if((a<lv)!==(b<lv)){ code.push(1); id.push(hid); P.set(hid,[x+(lv-a)/(b-a),y]) }
+        if((b<lv)!==(c<lv)){ code.push(2); id.push(vrg); P.set(vrg,[x+1,y+(lv-b)/(c-b)]) }
+        if((d<lv)!==(c<lv)){ code.push(4); id.push(hbd); P.set(hbd,[x+(lv-d)/(c-d),y+1]) }
+        if((a<lv)!==(d<lv)){ code.push(8); id.push(vid); P.set(vid,[x,y+(lv-a)/(d-a)]) }
+        if(code.length===2){ bd.s.push(id[0],id[1]); continue }
+        if(code.length!==4) continue;
+        /* 네 변이 모두 걸리는 안장(saddle) 칸 — 가운데 값으로 위·아래를 갈라 겹침을 막는다 */
+        var upCenter=((a+b+c+d)*0.25>=lv), aHi=a>=lv, bHi=b>=lv, cHi=c>=lv, dHi=d>=lv;
+        if(upCenter){ aHi=!aHi; bHi=!bHi; cHi=!cHi; dHi=!dHi }
+        if(aHi){ n1=findEdgeId(code,id,1); n2=findEdgeId(code,id,8); if(n1>=0&&n2>=0) bd.s.push(n1,n2) }
+        if(bHi){ n1=findEdgeId(code,id,1); n2=findEdgeId(code,id,2); if(n1>=0&&n2>=0) bd.s.push(n1,n2) }
+        if(cHi){ n1=findEdgeId(code,id,2); n2=findEdgeId(code,id,4); if(n1>=0&&n2>=0) bd.s.push(n1,n2) }
+        if(dHi){ n1=findEdgeId(code,id,4); n2=findEdgeId(code,id,8); if(n1>=0&&n2>=0) bd.s.push(n1,n2) }
       }
     }
   }
-  var out=[]; map.forEach(function(P,lv){ out.push({lv:lv,p:P,bold:(Math.round(lv/step)%5===0)}) });
+  var out=[];
+  bands.forEach(function(bd,lv){
+    var segs=bd.s, n=segs.length/2, used=new Uint8Array(n), i, e1, e2, m1=new Map(), m2=new Map(), o;
+    for(i=0;i<n;i++){
+      e1=segs[i*2]; e2=segs[i*2+1];
+      if(!m1.has(e1)) m1.set(e1,i); else m2.set(e1,i);
+      if(!m1.has(e2)) m1.set(e2,i); else m2.set(e2,i);
+    }
+    function nextSeg(idv,cur){
+      var a=m1.get(idv); if(a===undefined) return -1;
+      o=m2.get(idv); if(o===undefined) return -1;
+      return a===cur?o:a;
+    }
+    var path=new Path2D();
+    for(i=0;i<n;i++){
+      if(used[i]) continue;
+      used[i]=1;
+      var chain=[segs[i*2],segs[i*2+1]], cur=i, k, nx, s0, s1;
+      while(true){ k=nextSeg(chain[chain.length-1],cur); if(k<0||used[k]) break; used[k]=1; s0=segs[k*2]; s1=segs[k*2+1]; nx=(s0===chain[chain.length-1]?s1:s0); cur=k; chain.push(nx) }
+      cur=i;
+      while(true){ k=nextSeg(chain[0],cur); if(k<0||used[k]) break; used[k]=1; s0=segs[k*2]; s1=segs[k*2+1]; nx=(s0===chain[0]?s1:s0); cur=k; chain.unshift(nx) }
+      var pts=new Array(chain.length);
+      for(var q2=0;q2<chain.length;q2++){ pts[q2]=bd.p.get(chain[q2]) }
+      appendChain(path,pts);
+    }
+    out.push({lv:lv,p:path,bold:(Math.round(lv/step)%5===0)});
+  });
   out.sort(function(a,b){return a.lv-b.lv});
   return out;
 }
@@ -532,7 +594,7 @@ function drawBase(g,x0,y0,w,h){
   var ty0=Math.max(0,Math.floor(y0/s)), ty1=Math.min(n-1,Math.floor((y0+h)/s));
   if((tx1-tx0+1)*(ty1-ty0+1)>120) return;
   var hasF=(typeof g.filter==='string');
-  if(hasF) g.filter='grayscale(.75) brightness(1.12) contrast(1.04)';
+  if(hasF) g.filter='grayscale(.52) brightness(1.2) contrast(1.05)';
   for(var ty=ty0;ty<=ty1;ty++){
     for(var tx=tx0;tx<=tx1;tx++){
       var t=getTile(z,((tx%n)+n)%n,ty,S.lay.sat?'sat':'map');
@@ -566,32 +628,35 @@ function drawContours(g,x0,y0,w,h,sc){
   var rng=vmx-vmn, ST=[1,2,5,10,20,50,100], cstep=ST[ST.length-1];
   for(var si=0;si<ST.length;si++){ if(rng/ST[si]<=10){cstep=ST[si];break} }
   if(S.zoom>16.6&&cstep<2) cstep=2;
+  if(cstep<T.cbase) cstep=T.cbase;
   g.save(); g.setTransform(sc*px,0,0,sc*px,sc*ox,sc*oy);
   g.lineJoin='round'; g.lineCap='round';
   for(var i=0;i<T.cont.length;i++){
     var L=T.cont[i];
     if(Math.round(L.lv/cstep)!==L.lv/cstep) continue;
     var bld=(Math.round(L.lv/(cstep*5))===L.lv/(cstep*5));
-    g.lineWidth=(bld?2.0:1.2)/px;
-    g.strokeStyle=bld?'rgba(6,12,26,.55)':'rgba(6,12,26,.34)';
+    g.lineWidth=(bld?1.7:0.9)/px;
+    g.strokeStyle=bld?'rgba(8,14,28,.42)':'rgba(8,14,28,.22)';
     g.stroke(L.p);
-    g.lineWidth=(bld?1.3:0.75)/px;
-    g.strokeStyle=bld?'rgba(255,255,255,.85)':'rgba(255,255,255,.62)';
+    g.lineWidth=(bld?1.15:0.55)/px;
+    g.strokeStyle=bld?'rgba(255,255,255,.92)':'rgba(255,255,255,.58)';
     g.stroke(L.p);
   }
   g.restore();
 }
 function drawGridLines(g,x0,y0,w,h){
-  var W=worldSize(S.zoom), mpp=mppAt(S.zoom,S.lat), sp=5/mpp;
-  if(sp<3.4) return;
-  var cellW=5/CIRC/Math.cos(S.lat*Math.PI/180);
+  var W=worldSize(S.zoom), mpp=mppAt(S.zoom,S.lat), stepM=5, sp=stepM/mpp;
+  if(sp<3.2){ stepM=10; sp=stepM/mpp }
+  if(sp<3.6) return;
+  var cellW=stepM/CIRC/Math.cos(S.lat*Math.PI/180);
   var u0=x0/W, v0=y0/W, u1=(x0+w)/W, v1=(y0+h)/W;
-  g.save(); g.strokeStyle='rgba(255,255,255,.17)'; g.lineWidth=1;
+  var hw=1/(dpr||1); /* 화면 1px 두께 — 흐릿하게 번지지 않게 */
+  g.save(); g.strokeStyle=stepM===5?'rgba(255,255,255,.20)':'rgba(255,255,255,.24)'; g.lineWidth=hw;
   g.beginPath();
-  var gu=Math.floor(u0/cellW)*cellW, n=0;
-  for(var u=gu;u<=u1&&n<400;u+=cellW,n++){ var X=u*W-x0; g.moveTo(X,0); g.lineTo(X,h) }
+  var gu=Math.floor(u0/cellW)*cellW, n=0, X, Y;
+  for(var u=gu;u<=u1&&n<400;u+=cellW,n++){ X=Math.round((u*W-x0)*dpr)/dpr+hw*0.5; g.moveTo(X,0); g.lineTo(X,h) }
   var gv=Math.floor(v0/cellW)*cellW; n=0;
-  for(var v=gv;v<=v1&&n<400;v+=cellW,n++){ var Y=v*W-y0; g.moveTo(0,Y); g.lineTo(w,Y) }
+  for(var v=gv;v<=v1&&n<400;v+=cellW,n++){ Y=Math.round((v*W-y0)*dpr)/dpr+hw*0.5; g.moveTo(0,Y); g.lineTo(w,Y) }
   g.stroke(); g.restore();
 }
 var vwImgs=new Map();
