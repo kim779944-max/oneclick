@@ -463,6 +463,11 @@ function lsPut(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(
    손님이 ☆로 직접 담는 칸에만 적용 — FAV_DEFAULT(추천)는 내 칸이 아니므로 그대로.
    옛 kts_favs 는 지우지 않고 처음 한 번 그대로 옮긴다(4개 넘게 담아 둔 분은 유예). */
 var FAVSL = window.KTSSlots ? window.KTSSlots({ key:'fav', free:4, label:'내 단축바', el:'#favSlots',
+  cellHtml: function(it){ var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === it.id; })[0];
+    if (!p) return '<span>'+it.id+'</span>';
+    return '<img src="'+p.icon+'" alt=""><span style="font-size:9px;line-height:1.15">'+String(p.nm).split(' — ')[0]+'</span><button type="button" data-use="1">열기</button>'; },
+  onUse: function(it){ var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === it.id; })[0];
+    if (p) location.href = p.link || ('detail.html?k=' + p.k); },
   migrate: function(){ return lsArr(FAV_KEY).map(function(k){ return { id:k, kind:'tool' }; }); }, migrateKey:'kts_favs',
   onChange: function(){ try { render(); } catch(e){} } }) : null;
 function favIds(){ return FAVSL ? FAVSL.items().map(function(i){ return i.id; }) : lsArr(FAV_KEY); }
@@ -491,7 +496,7 @@ function markRecent(k){
 function renderFav(){
   var box = $('#favRow'); if (!box) return;
   var by = {}; (window.PRODUCTS || []).forEach(p => { by[p.k] = p; });
-  var pinned = lsArr(FAV_KEY).filter(k => by[k]);
+  var pinned = favIds().filter(k => by[k]);
   var rec = lsArr(REC_KEY);
   var out = pinned.slice();
   var add = k => { if (by[k] && out.indexOf(k) < 0 && out.length < 6) out.push(k); };

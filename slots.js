@@ -207,7 +207,7 @@
         '<div class="ksl-sec"><b class="t">③ 카톡 친구 초대</b><span class="ln">1칸 추가 = 친구 3명 · 2칸 추가 = 친구 5명 <b style="color:#FFC98F">(확인 후 해금)</b><br>내 초대 링크 <code data-a="link">' + esc(refLink()) + '</code></span>' +
         '<button type="button" class="ksl-b g" style="margin-top:6px;width:100%" data-a="share">초대 링크 보내기</button>' +
         '<span class="ln" style="display:block;margin-top:5px;color:#7C8DA6">친구가 들어온 숫자는 자동으로 세지 않습니다. 대표님이 확인한 뒤 코드로 열어 드립니다.</span></div>' +
-        '<p class="ksl-note">모든 금액은 부가세 별도 · 금액은 문자로 안내드립니다. 이 사이트에서는 결제하지 않습니다.</p>' +
+        '<p class="ksl-note">금액은 문자로 안내드립니다 · 이 사이트에서는 결제하지 않습니다.</p>' +
         '<button type="button" class="ksl-b g" style="width:100%;margin-top:8px" data-a="close">닫기</button>',
         function (el, close) {
           el.querySelector('[data-a="go"]').onclick = function () {
