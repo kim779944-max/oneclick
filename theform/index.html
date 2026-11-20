@@ -239,8 +239,10 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
    <button class="btn pri" id="exHwpx">한글 파일(.hwpx) 저장</button>
    <button class="btn pri" id="exXlsx">엑셀 파일(.xlsx) 저장</button>
    <button class="btn sec" id="exPrint">인쇄 · PDF 저장</button>
+   <button class="btn sec" id="goSign">🖊️ 도장 찍으러 가기 (더싸인)</button>
   </div>
   <p class="kv" id="exInfo">저장한 파일은 더뷰(<a href="../viewer.html">viewer.html</a>)로 바로 열어 확인할 수 있습니다.</p>
+  <p class="kv">[도장 찍으러 가기]를 누르면 방금 작성한 계약서가 더싸인에 그대로 올라갑니다. 사인·도장을 찍어 내려받으세요. (파일은 이 기기 안에서만 넘어갑니다)</p>
  </div>
 </section>
 
@@ -1403,38 +1405,38 @@ const PRESET_POWER_FIELDS = [
     {id:'p11', label:'위임인 서명·날인', type:'sign', x:67.159, y:67.696, w:21.827, h:8.314}
   ];
 const PRESET_EXCHANGE_FIELDS = [
-    {id:'p0', sec:'1. 부동산의 표시', label:'갑 대상물건', type:'text', x:24.526, y:11.902, w:70.303, h:2.352},
-    {id:'p1', label:'갑 평가액', type:'number', x:24.526, y:14.491, w:29.566, h:2.304},
-    {id:'p2', label:'갑 승계채무액', type:'number', x:65.347, y:14.491, w:29.482, h:2.304},
-    {id:'p3', label:'갑 순가액', type:'number', x:24.526, y:17.010, w:70.303, h:2.304},
-    {id:'p4', label:'을 대상물건', type:'text', x:24.526, y:19.551, w:70.303, h:2.304},
-    {id:'p5', label:'을 평가액', type:'number', x:24.526, y:22.093, w:29.566, h:2.304},
-    {id:'p6', label:'을 승계채무액', type:'number', x:65.347, y:22.093, w:29.482, h:2.304},
-    {id:'p7', label:'을 순가액', type:'number', x:24.526, y:24.612, w:70.303, h:2.304},
-    {id:'p8', sec:'2. 교환대금 · 지급', label:'교환대금(한글)', type:'text', x:20.159, y:30.824, w:27.886, h:2.316},
-    {id:'p9', label:'계약금(한글)', type:'text', x:20.159, y:33.378, w:27.886, h:2.304},
-    {id:'p10', label:'중도금(한글)', type:'text', x:20.159, y:35.920, w:27.886, h:2.281},
-    {id:'p11', label:'중도금 년', type:'text', x:53.756, y:35.920, w:8.735, h:2.281},
-    {id:'p12', label:'중도금 월', type:'text', x:64.675, y:35.920, w:5.544, h:2.281},
-    {id:'p13', label:'중도금 일', type:'text', x:72.403, y:35.920, w:5.208, h:2.281},
-    {id:'p14', label:'잔금(한글)', type:'text', x:20.159, y:38.485, w:27.886, h:2.233},
-    {id:'p15', label:'잔금 년', type:'text', x:53.756, y:38.485, w:8.735, h:2.233},
-    {id:'p16', label:'잔금 월', type:'text', x:64.675, y:38.485, w:5.544, h:2.233},
-    {id:'p17', label:'잔금 일', type:'text', x:72.403, y:38.485, w:5.208, h:2.233},
-    {id:'p18', sec:'3. 특약사항', label:'특약사항', type:'text', x:5.208, y:63.311, w:89.538, h:7.958, multi:1, top:1, fs:23},
-    {id:'p19', sec:'4. 작성일', label:'작성일 년', type:'text', x:70.555, y:71.578, w:8.735, h:1.473},
-    {id:'p20', label:'작성일 월', type:'text', x:81.306, y:71.578, w:4.452, h:1.473},
-    {id:'p21', label:'작성일 일', type:'text', x:87.623, y:71.578, w:4.099, h:1.473},
-    {id:'p22', sec:'5. 교환인 (갑)', label:'갑 주소', type:'text', x:27.550, y:74.001, w:67.279, h:2.471},
-    {id:'p23', label:'갑 주민등록번호', type:'text', x:27.550, y:76.567, w:19.487, h:2.399},
-    {id:'p24', label:'갑 전화', type:'text', x:52.748, y:76.567, w:15.791, h:2.399},
-    {id:'p25', label:'갑 성명', type:'text', fit:1, x:74.755, y:76.567, w:4.200, h:2.399},
-    {id:'p26', label:'갑 자필서명', type:'sign', x:79.038, y:76.602, w:15.707, h:2.328},
-    {id:'p27', sec:'6. 교환인 (을)', label:'을 주소', type:'text', x:27.550, y:79.061, w:67.279, h:2.471},
-    {id:'p28', label:'을 주민등록번호', type:'text', x:27.550, y:81.627, w:19.487, h:2.423},
-    {id:'p29', label:'을 전화', type:'text', x:52.748, y:81.627, w:15.791, h:2.423},
-    {id:'p30', label:'을 성명', type:'text', x:74.755, y:81.627, w:11.927, h:2.423},
-    {id:'p31', label:'을 자필서명', type:'sign', x:87.018, y:81.603, w:7.795, h:2.471}
+    {id:'p0', sec:'1. 부동산의 표시', label:'갑 대상물건', type:'text', x:24.513, y:11.829, w:70.181, h:2.375},
+    {id:'p1', label:'갑 평가액', type:'number', x:24.513, y:14.394, w:29.617, h:2.328},
+    {id:'p2', label:'갑 승계채무액', type:'number', x:65.212, y:14.394, w:29.416, h:2.328},
+    {id:'p3', label:'갑 순가액', type:'number', x:24.513, y:16.912, w:70.181, h:2.328},
+    {id:'p4', label:'을 대상물건', type:'text', x:24.513, y:19.477, w:70.181, h:2.328},
+    {id:'p5', label:'을 평가액', type:'number', x:24.513, y:21.995, w:29.617, h:2.328},
+    {id:'p6', label:'을 승계채무액', type:'number', x:65.212, y:21.995, w:29.416, h:2.328},
+    {id:'p7', label:'을 순가액', type:'number', x:24.513, y:24.513, w:70.181, h:2.328},
+    {id:'p8', sec:'2. 교환대금 · 지급', label:'교환대금(한글)', type:'text', x:19.208, y:30.831, w:29.147, h:2.280},
+    {id:'p9', label:'계약금(한글)', type:'text', x:19.208, y:33.302, w:29.147, h:2.328},
+    {id:'p10', label:'중도금(한글)', type:'text', x:19.208, y:35.819, w:29.147, h:2.328},
+    {id:'p11', label:'중도금 년', type:'text', x:53.727, y:35.819, w:8.731, h:2.328},
+    {id:'p12', label:'중도금 월', type:'text', x:64.674, y:35.819, w:5.373, h:2.328},
+    {id:'p13', label:'중도금 일', type:'text', x:72.398, y:35.819, w:5.238, h:2.328},
+    {id:'p14', label:'잔금(한글)', type:'text', x:19.208, y:38.385, w:29.147, h:2.280},
+    {id:'p15', label:'잔금 년', type:'text', x:53.727, y:38.385, w:8.731, h:2.280},
+    {id:'p16', label:'잔금 월', type:'text', x:64.674, y:38.385, w:5.373, h:2.280},
+    {id:'p17', label:'잔금 일', type:'text', x:72.398, y:38.385, w:5.238, h:2.280},
+    {id:'p18', sec:'3. 특약사항', label:'특약사항', type:'text', x:15.581, y:57.672, w:79.113, h:23.753, multi:1, top:1, fs:23},
+    {id:'p19', sec:'4. 작성일', label:'작성일 년', type:'text', x:70.517, y:81.710, w:8.731, h:2.090},
+    {id:'p20', label:'작성일 월', type:'text', x:81.263, y:81.710, w:4.433, h:2.090},
+    {id:'p21', label:'작성일 일', type:'text', x:87.576, y:81.710, w:4.164, h:2.090},
+    {id:'p22', sec:'5. 교환인 (갑)', label:'갑 주소', type:'text', x:27.670, y:84.513, w:66.958, h:2.280},
+    {id:'p23', label:'갑 주민등록번호', type:'text', x:27.670, y:87.078, w:19.275, h:2.233},
+    {id:'p24', label:'갑 전화', type:'text', x:52.787, y:87.078, w:15.715, h:2.233},
+    {id:'p25', label:'갑 성명', type:'text', fit:1, x:74.815, y:87.078, w:5.641, h:2.233},
+    {id:'p26', label:'갑 자필서명', type:'sign', x:81.061, y:86.936, w:7.790, h:2.565},
+    {id:'p27', sec:'6. 교환인 (을)', label:'을 주소', type:'text', x:27.670, y:89.596, w:66.958, h:2.233},
+    {id:'p28', label:'을 주민등록번호', type:'text', x:27.670, y:92.114, w:19.275, h:2.138},
+    {id:'p29', label:'을 전화', type:'text', x:52.787, y:92.114, w:15.715, h:2.138},
+    {id:'p30', label:'을 성명', type:'text', x:74.815, y:92.114, w:5.641, h:2.138},
+    {id:'p31', label:'을 자필서명', type:'sign', x:81.061, y:91.924, w:7.790, h:2.565}
 ];
 const PRESET_EXBROKER_FIELDS = [
     {"id":"pa_thing","label":"갑 물건 표시","type":"text","x":27.938,"y":15.451,"w":64.271,"h":3.515},
@@ -2461,6 +2463,19 @@ $('#exPrint').onclick = async () => { busyOn('인쇄할 종이를 만드는 중�
     busyOff(); setTimeout(() => window.print(), 140);
     $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
   }catch(e){ busyOff(); toast('인쇄 화면을 만들지 못했습니다'); } };
+/* ⑤-2 더싸인으로 이어 찍기 — 방금 적은 계약서(값이 얹힌 그대로)를 넘긴다 */
+$('#goSign').onclick = async () => {
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  busyOn('계약서를 더싸인으로 넘기는 중…');
+  try{
+    const n = tfPageCount(), pages = [];
+    for (let p = 1; p <= n; p++){ const c = await composite(1200, p); pages.push(c.toDataURL('image/jpeg', 0.92)); }
+    try{ sessionStorage.setItem('kts_sign_seed', JSON.stringify({name: outBase(), pages, at: Date.now()})); }
+    catch(err){ busyOff(); return toast('계약서가 커서 넘기지 못했습니다 · [인쇄·PDF 저장]으로 PDF를 만든 뒤 더싸인에 올려 주세요'); }
+    busyOff();
+    location.href = '../sign/?from=theform';
+  }catch(err){ busyOff(); toast('더싸인으로 넘기지 못했습니다'); }
+};
 
 /* ---------- 화면 이동 (폰 하단 뒤로가기 = 이전 단계) ---------- */
 let GO_INIT = false;

@@ -197,7 +197,8 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
     <div class="hide" id="docArea">
       <div class="pages" id="pages"></div>
       <div class="stage" id="stage"><img class="pg" id="pgImg" alt=""><div class="hint" id="stHint">찍을 자리를 누르세요 · 끌어서 옮기기</div></div>
-      <div class="rng"><span>크기</span><input type="range" id="sz" min="8" max="60" value="24"><span id="szV">24%</span></div>
+      <div class="rng"><span>크기</span><input type="range" id="sz" min="3" max="60" value="8"><span id="szV">8%</span></div>
+      <div class="row" id="szPre"><button class="mini on" type="button" data-mm="15">① 15mm 막도장</button><button class="mini" type="button" data-mm="18">② 18mm 인감</button><button class="mini" type="button" data-mm="21">③ 21mm 직인</button></div>
       <div class="row"><button class="mini" type="button" id="sigDel">이 쪽 사인 빼기</button><button class="mini" type="button" id="sigAll">모든 쪽 같은 자리</button></div>
       <div class="tog" id="ganin"><span class="sw"></span><span class="tt">간인 (사이간자) 자동<small>쪽과 쪽 사이 경계에 도장을 반씩 걸쳐 찍습니다</small></span><span class="lk" id="ganinLk">PRO</span></div>
       <div class="two">
@@ -262,13 +263,14 @@ $$('#mk button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m;
   if(mode==='photo') buildFromPhoto();
 });
 
-/* 투명 캔버스에서 그려진 부분만 잘라내기 */
-function cropAlpha(c, pad){
+/* 투명 캔버스에서 그려진 부분만 잘라내기 — 상하좌우 여백 자동 trim */
+function cropAlpha(c, pad, thr){
   const x=c.getContext('2d',{willReadFrequently:true}); const {width:W,height:H}=c; const d=x.getImageData(0,0,W,H).data;
+  const A = thr || 16;
   let x0=W,y0=H,x1=-1,y1=-1;
-  for(let y=0;y<H;y++) for(let i=0;i<W;i++){ if(d[(y*W+i)*4+3]>16){ if(i<x0)x0=i; if(i>x1)x1=i; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  for(let y=0;y<H;y++) for(let i=0;i<W;i++){ if(d[(y*W+i)*4+3] > A){ if(i<x0)x0=i; if(i>x1)x1=i; if(y<y0)y0=y; if(y>y1)y1=y; } }
   if(x1<0) return null;
-  pad=pad||6; x0=Math.max(0,x0-pad); y0=Math.max(0,y0-pad); x1=Math.min(W-1,x1+pad); y1=Math.min(H-1,y1+pad);
+  pad = pad==null ? 6 : pad; x0=Math.max(0,x0-pad); y0=Math.max(0,y0-pad); x1=Math.min(W-1,x1+pad); y1=Math.min(H-1,y1+pad);
   const o=document.createElement('canvas'); o.width=x1-x0+1; o.height=y1-y0+1;
   o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height); return o;
 }
@@ -278,6 +280,8 @@ function setSig(c){
   if(!c){ pv.innerHTML='<span class="em">사인을 만들면 여기에 투명 PNG로 보입니다</span>'; $('#pngDl').disabled=true; renderStage(); return; }
   pv.innerHTML='<img alt="사인 미리보기" src="'+c.toDataURL('image/png')+'">';
   $('#pngDl').disabled=false;
+  /* 문서를 먼저 열어 둔 상태면 표준 도장 크기로 바로 얹어 둔다(끌어서 옮길 수 있음) */
+  if(docs.length && docs[cur] && !docs[cur].place) docs[cur].place={x:.74,y:.85,w:(+$('#sz').value/100)};
   renderStage(); paintThumbs();
 }
 
@@ -347,7 +351,7 @@ function buildSeal(){
   const rnd=()=>{ seed=(Math.imul(seed,1103515245)+12345)>>>0; return seed/4294967296; };
   for(let i=3;i<d.length;i+=4){ if(d[i] && rnd()<0.035) d[i]=Math.round(d[i]*0.35); else if(d[i]) d[i]=Math.round(d[i]*(0.86+rnd()*0.14)); }
   x.putImageData(id,0,0);
-  setSig(cropAlpha(c,4));
+  setSig(cropAlpha(c,2,48));
 }
 $('#sealName').addEventListener('input',buildSeal);
 $$('#pSeal [data-s]').forEach(b=>b.onclick=()=>{ sealShape=b.dataset.s; $$('#pSeal [data-s]').forEach(x=>x.classList.toggle('on',x===b)); buildSeal(); });
@@ -386,7 +390,7 @@ function buildFromPhoto(){
     d[i+3]=Math.round(a*255);
   }
   x.putImageData(id,0,0);
-  const out=cropAlpha(c,6);
+  const out=cropAlpha(c,2,48);
   if(!out){ toast('도장을 찾지 못했습니다 · 강도를 낮춰 보세요'); setSig(null); return; }
   setSig(out);
 }
@@ -402,6 +406,14 @@ $('#pngDl').onclick=()=>{ if(!sig) return; sig.toBlob(b=>saveBlob(b,'KTS더싸�
 
 /* ---------- 3. 문서에 찍기 ---------- */
 let docs=[], cur=0, ganin=false;            // docs: {c:canvas, thumb, place:{x,y,w}|null}  (x,y,w = 쪽 너비 대비 비율)
+/* 크기 프리셋 — A4 폭 210mm 기준. 15mm≈7%, 18mm≈9%, 21mm≈10% */
+const MM_PAGE=210;
+function szW(){ const p=docs.length&&docs[cur]&&docs[cur].place; return p? p.w : (+$('#sz').value/100); }
+function szPaint(){
+  const w=szW(), mm=w*MM_PAGE;
+  const vl=$('#szV'); if(vl) vl.textContent=Math.round(w*100)+'% · '+mm.toFixed(1)+'mm';
+  $$('#szPre [data-mm]').forEach(b=>b.classList.toggle('on', Math.abs(+b.dataset.mm-mm)<0.5));
+}
 $('#docDrop').onclick=()=>$('#docFile').click();
 $('#docFile').onchange=async e=>{
   const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
@@ -455,7 +467,7 @@ function renderStage(){
     const el=document.createElement('div'); el.className='sig';
     el.style.left=(p.place.x*100)+'%'; el.style.top=(p.place.y*100)+'%'; el.style.width=(p.place.w*100)+'%';
     el.innerHTML='<img alt="" src="'+sig.toDataURL('image/png')+'">'; st.appendChild(el); dragSig(el);
-    $('#sz').value=Math.round(p.place.w*100); $('#szV').textContent=$('#sz').value+'%';
+    $('#sz').value=Math.round(p.place.w*100); szPaint();
   }
   if(ganin && sig && docs.length>1){
     const ar=docs[cur].c.height/docs[cur].c.width;
@@ -479,7 +491,13 @@ function dragSig(el){
     el.style.left=(p.x*100)+'%'; el.style.top=(p.y*100)+'%'; });
   const end=()=>{ on=false; }; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
 }
-$('#sz').oninput=()=>{ $('#szV').textContent=$('#sz').value+'%'; const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } };
+$('#sz').oninput=()=>{ const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } szPaint(); };
+$$('#szPre [data-mm]').forEach(b=>b.onclick=()=>{
+  const mm=+b.dataset.mm, w=mm/MM_PAGE, p=docs.length&&docs[cur]&&docs[cur].place;
+  $('#sz').value=Math.round(w*100);
+  if(p){ p.w=w; const el=$('#stage .sig'); if(el) el.style.width=(w*100)+'%'; }
+  szPaint(); toast('실제 '+mm+'mm — A4 계약서 폭 기준으로 찍힙니다');
+});
 $('#sigDel').onclick=()=>{ if(docs[cur]){ docs[cur].place=null; renderStage(); paintThumbs(); } };
 $('#sigAll').onclick=()=>{ const p=docs[cur]&&docs[cur].place; if(!p){ toast('먼저 이 쪽에 찍을 자리를 누르세요'); return; }
   docs.forEach(d=>d.place={...p}); paintThumbs(); toast(docs.length+'쪽 모두 같은 자리에 찍었습니다'); };
@@ -555,8 +573,31 @@ function buildPDF(pages){
   const out=new Uint8Array(off); let o=0; chunks.forEach(c=>{ out.set(c,o); o+=c.length; }); return out;
 }
 
+/* ---------- 더양식에서 넘어온 계약서 자동 열기 (④에서 [도장 찍으러 가기]) ---------- */
+function seedFromForm(){
+  let raw=null; try{ raw=sessionStorage.getItem('kts_sign_seed'); }catch(e){}
+  if(!raw) return;
+  try{ sessionStorage.removeItem('kts_sign_seed'); }catch(e){}
+  let d=null; try{ d=JSON.parse(raw); }catch(e){ return; }
+  const urls=(d && d.pages) || []; if(!urls.length) return;
+  const cap = isPro() ? 20 : 1;
+  Promise.all(urls.slice(0,cap).map(u=>new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>{ const r=Math.min(1,2000/Math.max(im.naturalWidth,im.naturalHeight));
+      const c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*r); c.height=Math.round(im.naturalHeight*r);
+      const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(im,0,0,c.width,c.height); res(c); };
+    im.onerror=()=>res(null); im.src=u;
+  }))).then(list=>{
+    list=list.filter(Boolean); if(!list.length) return;
+    docs=list.map(c=>({c, thumb:thumbOf(c), place:null})); cur=0;
+    $('#docArea').classList.remove('hide'); renderDoc(); szPaint();
+    toast(urls.length>cap ? '무료는 1쪽만 열었습니다 · 여러 쪽은 월 4,900원' : ((d.name? d.name+' — ':'')+'더양식에서 넘어온 계약서를 열었습니다'));
+    try{ $('#docArea').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+  });
+}
+
 /* ---------- 시작 ---------- */
-sizePad(); paintPlan();
+sizePad(); paintPlan(); seedFromForm();
 if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
 </script>
 </body></html>
