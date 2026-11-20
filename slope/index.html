@@ -756,7 +756,10 @@ function drawParcelHL(g,x0,y0,w,h){
   g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=7.5; g.stroke(p); /* 흰 테두리(바깥) */
   g.strokeStyle='#FF6B00'; g.lineWidth=4.5; g.stroke(p);              /* 굵은 오렌지 */
   g.strokeStyle='rgba(255,255,255,.92)'; g.lineWidth=1.4; g.stroke(p);/* 안쪽 흰 선 — 이중 테두리 */
-  /* 지번 이름표 */
+  g.restore();
+  /* 지번 이름표 — 필지 위쪽 변이 화면에 들어와 있을 때만 붙인다(확대해 필지가 화면을 덮으면 붙이지 않는다) */
+  if(by<6||by>h-6) return;
+  g.save();
   var txt=PC.jibun||'내 필지';
   g.font='900 11px -apple-system,"Noto Sans KR",sans-serif';
   var tw=g.measureText(txt).width, pw=tw+16, ph=18;
