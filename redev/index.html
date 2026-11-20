@@ -45,12 +45,12 @@ main{padding:12px 14px 0}
 .tabs{display:flex;gap:5px;margin-top:8px}
 .tabs button{flex:1;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:10px;padding:8px 4px;font-size:12px;font-weight:900;cursor:pointer;line-height:1.25}
 .tabs button small{display:block;font-size:9px;font-weight:800;color:#7186A2}
-.tabs button.on{border-color:var(--amber);color:#FFC98F;background:rgba(255,107,0,.14)}
-.tabs button.on small{color:#C79A6D}
+.tabs button.on{border-color:var(--amber);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2));box-shadow:0 6px 14px rgba(255,107,0,.22)}
+.tabs button.on small{color:#4A2600}
 .chips{display:flex;gap:5px;overflow-x:auto;margin-top:8px;padding-bottom:3px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chips button{flex:0 0 auto;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer}
-.chips button.on{border-color:var(--amber);color:#FFC98F;background:rgba(255,107,0,.14)}
+.chips button.on{border-color:var(--amber2);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2))}
 .chips button b{color:#FFC98F}
 .countline{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:11px;color:var(--ink2);font-weight:800}
 .countline b{color:#fff;font-size:12.5px}
@@ -93,10 +93,11 @@ main{padding:12px 14px 0}
 /* 사다리 */
 .lad{margin-top:12px}
 .lad .row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.lad .row div{text-align:center;font-size:8.5px;font-weight:800;color:#6E82A1;line-height:1.25;word-break:keep-all}
+.lad .row div{text-align:center;font-size:8px;font-weight:800;color:#6E82A1;line-height:1.2;letter-spacing:-.4px;word-break:keep-all;overflow-wrap:anywhere;padding:0 1px}
 .lad .row div b{display:block;font-size:9px;color:#8FA1B8;font-weight:900}
 .lad .row div.on b{color:#FFC98F}.lad .row div.on{color:#FFC98F}
-.lad .row div.now b{color:#0A1224;background:var(--amber2);border-radius:5px;padding:1px 0}
+.lad .row div.now b{display:inline-block;min-width:13px;color:#0A1224;background:var(--amber2);border-radius:5px;padding:0 5px}
+.lad .row div.now{color:#FFD9A6}
 .lad .row div.end b{color:#8DE7B8}
 .track{display:flex;gap:3px;margin-top:7px}
 .track i{flex:1;height:6px;border-radius:3px;background:#1E2C4A;font-style:normal;position:relative}
@@ -119,6 +120,8 @@ main{padding:12px 14px 0}
 .three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}
 .three a{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line2);background:#0E1A33;color:#DCE6F2;border-radius:11px;padding:9px 3px;font-size:11.5px;font-weight:900}
 .three a i{font-style:normal;font-size:15px}
+.nvi{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:900;font-style:normal;letter-spacing:0}
+.nvi.nv{background:#03C75A;color:#fff}.nvi.kk{background:#FEE500;color:#3C1E1E}.nvi.tm{background:#1A6DFF;color:#fff}
 .three a small{font-size:9px;font-weight:800;color:#7E90AA}
 .lnklist a{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#0E1A33;border-radius:11px;padding:9px 10px;margin-bottom:6px;font-size:12px;font-weight:900;color:#DCE6F2}
 .lnklist a i{font-style:normal;color:var(--amber2);font-size:13px}
@@ -231,6 +234,7 @@ var D=null, TAB='seoul', FILT='all', Q='', SHOWN=40, CUR=null;
 var ALERT_KEY='kts_redev_alerts_v1', MEM_KEY='kts_redev_member_v1';
 var TEL='01020022899';
 var STEPS=['정비구역 지정','추진위원회','조합설립','사업시행인가','관리처분인가','이주·철거','착공'];
+var STEPS_S=['구역지정','추진위','조합설립','사업시행','관리처분','이주·철거','착공'];
 var DATE_KEYS=['a','b','c','e','f','g','h'];
 var DATE_LABELS=['구역지정','추진위','조합설립','사업시행','관리처분','이주시작','착공'];
 var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
@@ -363,7 +367,7 @@ function ladderHTML(r){
   var s=r.s==null?-1:r.s, h='<div class="lad"><div class="row">';
   for(var i=0;i<7;i++){
     var c=(s===7)?'end':(i<s?'on':(i===s?'now':''));
-    h+='<div class="'+c+'"><b>'+(i+1)+'</b>'+STEPS[i].replace(' ','<br>')+'</div>';
+    h+='<div class="'+c+'"><b>'+(i+1)+'</b>'+STEPS_S[i]+'</div>';
   }
   h+='</div><div class="track">';
   for(var j=0;j<7;j++){
@@ -387,11 +391,11 @@ function navHTML(r){
   var a=addrOf(r), q=encodeURIComponent(a), nm=encodeURIComponent(r.n);
   var coords=(r.x&&r.y)? ' data-x="'+esc(r.x)+'" data-y="'+esc(r.y)+'"':'';
   var tm=r.x&&r.y
-    ? '<a href="tmap://route?goalname='+nm+'&amp;goalx='+esc(r.x)+'&amp;goaly='+esc(r.y)+'"><i>🚕</i>티맵<small>내비 열기</small></a>'
-    : '<button data-copy="'+esc(a)+'" style="border:1px solid var(--line2);background:#0E1A33;color:#DCE6F2;border-radius:11px;padding:9px 3px;font-size:11.5px;font-weight:900"><i style="font-style:normal;font-size:15px">🚕</i>티맵<small style="display:block;font-size:9px;color:#7E90AA">주소 복사</small></button>';
+    ? '<a href="tmap://route?goalname='+nm+'&amp;goalx='+esc(r.x)+'&amp;goaly='+esc(r.y)+'"><i class="nvi tm">T</i>티맵<small>내비 열기</small></a>'
+    : '<button data-copy="'+esc(a)+'" style="border:1px solid var(--line2);background:#0E1A33;color:#DCE6F2;border-radius:11px;padding:9px 3px;font-size:11.5px;font-weight:900"><i class="nvi tm">T</i>티맵<small style="display:block;font-size:9px;color:#7E90AA">주소 복사</small></button>';
   return '<div class="three"'+coords+'>'+
-    '<a href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener"><i>🟢</i>네이버지도<small>길찾기</small></a>'+
-    '<a href="https://map.kakao.com/?q='+q+'" target="_blank" rel="noopener"><i>🟡</i>카카오맵<small>길찾기</small></a>'+
+    '<a href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener"><i class="nvi nv">N</i>네이버지도<small>길찾기</small></a>'+
+    '<a href="https://map.kakao.com/?q='+q+'" target="_blank" rel="noopener"><i class="nvi kk">K</i>카카오맵<small>길찾기</small></a>'+
     tm+'</div>';
 }
 function dealHTML(r){
