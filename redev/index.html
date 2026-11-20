@@ -261,7 +261,11 @@ function buildChips(){
   var arr=[['all','전체']];
   if(t==='seoul'){
     arr.push(['stop','일시중단']);
-    ['재건축','재개발(주택정비형)','재개발(도시정비형)','가로주택정비','소규모재건축'].forEach(function(v){arr.push([v,v.replace('(주택정비형)','').replace('(도시정비형)','')]);});
+    arr.push(['재건축','재건축']);
+    arr.push(['재개발(주택정비형)','재개발(주택)']);
+    arr.push(['재개발(도시정비형)','재개발(도시)']);
+    arr.push(['가로주택정비','가로주택']);
+    arr.push(['소규모재건축','소규모재건축']);
   }else if(t==='gyeonggi'){
     arr.push(['stop','준공·청산 제외']);
     ['재건축','재개발','주거환경개선'].forEach(function(v){arr.push([v,v]);});
@@ -344,7 +348,13 @@ function datesHTML(r){
     out+='<div><span>'+lab+'</span><b>'+esc(dt[k])+'</b></div>';
   });
   if(TAB==='gyeonggi'&&dt.z) out+='<div><span>준공</span><b>'+esc(dt.z)+'</b></div>';
-  return out?'<div class="dates">'+out+'</div>':'<div class="dates"><div><span>인가일</span><b>공개 자료에 없음</b></div></div>';
+  if(!out){
+    return '<div class="dates"><div><span>인가일</span><b>공개 자료에 없음</b></div></div>'+
+      '<div class="note">'+(TAB==='seoul'
+        ? '이 구역은 서울시 추진현황(495건)에 없어 인가일·세대수가 비어 있습니다. 정보몽땅 원문 사업개요에서 확인하세요.'
+        : '이 구역은 공개 자료에 일자가 비어 있습니다. 원문에서 확인하세요.')+'</div>';
+  }
+  return '<div class="dates">'+out+'</div>';
 }
 function ladderHTML(r){
   var s=r.s==null?-1:r.s, h='<div class="lad"><div class="row">';
@@ -445,10 +455,11 @@ function sheetHTML(r){
       '<div class="note">티맵은 앱이 설치된 폰에서 바로 열립니다. 앱이 없으면 주소를 복사해 쓰세요.</div></div>'+
     '<div class="card"><h2><i>₩</i>참고 시세·공시지가 <small>참고용</small></h2>'+
       '<div class="lnklist">'+
-        '<a href="https://new.land.naver.com/search?query='+priceQ+'" target="_blank" rel="noopener"><i>🏠</i>네이버부동산 시세<em>참고</em></a>'+
-        '<a href="https://rt.molit.go.kr/'+'" target="_blank" rel="noopener"><i>📊</i>국토부 실거래가 공개<em>실거래</em></a>'+
-        '<a href="https://www.realtyprice.kr:447/teigh/teighForm.do" target="_blank" rel="noopener"><i>📋</i>부동산공시가격 알리미<em>공시지가</em></a>'+
+        '<a href="https://map.naver.com/p/search/'+priceQ+'" target="_blank" rel="noopener"><i>🏠</i>네이버 지도로 이 자리 보기<em>주변</em></a>'+
+        '<a href="https://rt.molit.go.kr/" target="_blank" rel="noopener"><i>📊</i>국토부 실거래가 공개시스템<em>실거래</em></a>'+
+        '<a href="https://www.realtyprice.kr/" target="_blank" rel="noopener"><i>📋</i>부동산공시가격 알리미<em>공시지가</em></a>'+
       '</div>'+
+      '<div class="note">위 세 곳은 주소를 직접 넣어 확인하는 곳입니다(이 화면은 금액을 계산·표시하지 않습니다).</div>'+
       '<div class="warn"><b>감정평가액·비례율은 관리처분 전 비공개입니다.</b> 공식 감정평가액·비례율·분담금은 관리처분계획 인가 때 공개됩니다. 위 링크의 시세·공시지가는 <b>참고 값</b>이고, 이 화면은 어떤 금액도 계산해 드리지 않습니다.</div>'+
     '</div>'+
     dealHTML(r)+
