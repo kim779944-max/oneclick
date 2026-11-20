@@ -193,7 +193,7 @@ details.adv .keyrow{margin-top:7px}
 .aox b{display:block;font-size:9px;color:#8FA1B8;font-weight:800}
 .aox p{margin:1px 0 0;font-size:10.5px;color:#DCE6F2;font-weight:900;line-height:1.35;word-break:keep-all}
 .aox p s{display:block;text-decoration:none;font-size:8.5px;color:#7C8DA6;font-weight:700;margin-top:1px}
-#aSec{display:block;width:100%;height:180px;border-radius:9px;background:#0A1526;border:1px solid #1D2C49;margin-top:6px}
+#aSec{display:block;width:100%;height:190px;border-radius:9px;background:#0A1526;border:1px solid #1D2C49;margin-top:6px}
 .alnk a{display:flex;align-items:center;gap:7px;text-decoration:none;color:#DCE6F2;border:1px solid #1D2C49;background:#0E1A33;border-radius:9px;padding:7px 9px;margin-top:5px;font-size:11px;font-weight:900}
 .alnk a i{font-style:normal;color:#FFA24D;font-size:12px}
 .alnk a em{margin-left:auto;font-style:normal;color:#6D7E97;font-size:9px;font-weight:800}
@@ -1954,7 +1954,7 @@ function archRender(){
       :'용도지역을 확인하지 못해 일조 사선을 그리지 못했습니다.');
   secNote+='<br>대지안의 공지 — 건축선 1~6m · 인접대지경계선 0.5~6m 범위에서 조례가 정함(건축법 §58·시행령 §80의2 별표 2).';
   h+='<div class="acard"><div class="atit">정북 일조 사선 단면 <em>건축법 §61 · 2026.11.12 시행</em></div>'
-    +'<canvas id="aSec" width="360" height="180" aria-label="정북 일조 사선 단면"></canvas>'
+    +'<canvas id="aSec" width="360" height="190" aria-label="정북 일조 사선 단면"></canvas>'
     +'<div class="asub" id="aSecNote">'+secNote+'</div></div>';
   /* 5 도로·농지·산지 */
   var jimok=L.lndcgrCodeNm||'';
@@ -1990,7 +1990,7 @@ function archRender(){
 /* 정북 일조 사선 단면 미니 그림 */
 function archDrawSec(){
   var c=$('#aSec'); if(!c) return;
-  var g=c.getContext('2d'), w=c.clientWidth||340, h=180, dp=Math.min(2,window.devicePixelRatio||1);
+  var g=c.getContext('2d'), w=c.clientWidth||340, h=190, dp=Math.min(2,window.devicePixelRatio||1);
   c.width=Math.round(w*dp); c.height=Math.round(h*dp);
   g.setTransform(dp,0,0,dp,0,0);
   g.clearRect(0,0,w,h); g.fillStyle='#0A1526'; g.fillRect(0,0,w,h);
@@ -2001,7 +2001,7 @@ function archDrawSec(){
   var C=zi?zi.c:0, F=zi?zi.f:0;
   var fl=(C&&F)?Math.max(1,Math.floor(F/C)):2;
   var H=+(fl*3.3).toFixed(1);
-  var mL=42, mR=8, mT=22, mB=34, gw=w-mL-mR, gh=h-mT-mB;
+  var mL=42, mR=8, mT=22, mB=40, gw=w-mL-mR, gh=h-mT-mB;
   var HMAX=Math.max(isRes?18:10, Math.ceil((H*1.3)/2)*2);
   var SW=Math.max(15,Math.min(34,H*1.3));
   function X(m){ return mL+gw*m/SW }
@@ -2041,14 +2041,14 @@ function archDrawSec(){
   for(i=1;i<fl;i++){ var fy=Y(i*3.3); g.beginPath(); g.moveTo(bx,fy); g.lineTo(bxx,fy); g.stroke() }
   g.fillStyle='#fff'; g.font='900 10px -apple-system,"Noto Sans KR",sans-serif';
   g.fillText(fl+'층 · '+H+'m', Math.min(bx+4,mL+gw-56), Math.max(mT+10,by-4));
-  var ay=Y(0)+11;
+  var ay=Y(0)+12;
   g.strokeStyle='#FFD9A6'; g.lineWidth=1;
   g.beginPath(); g.moveTo(X(0),ay); g.lineTo(X(off),ay); g.stroke();
   g.beginPath(); g.moveTo(X(0),ay-2); g.lineTo(X(0),ay+2); g.moveTo(X(off),ay-2); g.lineTo(X(off),ay+2); g.stroke();
   g.fillStyle='#FFD9A6'; g.font='800 8.5px -apple-system,"Noto Sans KR",sans-serif';
   g.fillText(off.toFixed(1)+'m', Math.min(X(off)+3,mL+gw-24), ay-3);
   g.fillStyle='#6D7E97'; g.font='700 8.5px -apple-system,"Noto Sans KR",sans-serif';
-  g.fillText(isRes?'정북 사선 · 10m↓ 1.5m / 10~17m 5m / 17m↑ 높이의 1/2':'주거지역 아님 — 일조 사선 미적용', mL, h-7);
+  g.fillText(isRes?'정북 사선 · 10m↓ 1.5m / 10~17m 5m / 17m↑ 높이의 1/2':'주거지역 아님 — 일조 사선 미적용', mL, h-8);
 }
 function archCopy(){
   var d=ARCH.data;
