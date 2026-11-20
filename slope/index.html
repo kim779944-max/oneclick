@@ -450,9 +450,9 @@ function buildTerrain(){
       dd[p]=c[0]*k;dd[p+1]=c[1]*k;dd[p+2]=c[2]*k;dd[p+3]=255;
     }
     ic.putImageData(id,0,0);
-    var step=1; var range=mx-mn; var steps=[1,2,5,10,20,50];
-    for(var s2=0;s2<steps.length;s2++){ if(range/steps[s2]<=13){step=steps[s2];break} step=50 }
-    var cont=buildContours(elev,cols,rows,step);
+    var range=mx-mn, steps=[1,2,5,10,20,50], step=steps[steps.length-1];
+    for(var s2=0;s2<steps.length;s2++){ if(range/steps[s2]<=14){step=steps[s2];break} }
+    var cont=buildContours(elev,cols,rows,1); /* 1m 눈금으로 만들어 두고 그릴 때 간격을 고른다 */
     T={z:z,n:n,cols:cols,rows:rows,elev:elev,slope:slope,asp:asp,mpp:mpp,img:img,
        mn:mn,mx:mx,step:step,cont:cont,wx0:tg.tx0/n,wy0:tg.ty0/n,cellW:1/(n*256),cellH:1/(n*256)};
     Tbusy=false; setLoad(false); requestRender(); analyze(); drawProfile();
@@ -545,7 +545,7 @@ function drawSlopeImg(g,x0,y0,w,h){
   if(!T) return;
   var W=worldSize(S.zoom);
   var X=T.wx0*W-x0, Y=T.wy0*W-y0, ww=T.cols*T.cellW*W, hh=T.rows*T.cellH*W;
-  var smooth=(ww/T.cols)>2.3;
+  var smooth=(ww/T.cols)>2.3; /* 칸이 2px보다 커지면 부드럽게 */
   g.save(); g.globalAlpha=S.op; g.imageSmoothingEnabled=smooth;
   g.globalCompositeOperation='multiply';
   g.drawImage(T.img,X,Y,ww,hh); g.restore();
@@ -554,19 +554,36 @@ function drawContours(g,x0,y0,w,h,sc){
   if(!T) return;
   sc=sc||(g===ctx?dpr:1);
   var W=worldSize(S.zoom), px=W*T.cellW, ox=T.wx0*W-x0, oy=T.wy0*W-y0;
+  var fx0=((x0/W)-T.wx0)/T.cellW, fy0=((y0/W)-T.wy0)/T.cellH;
+  var fx1=(((x0+w)/W)-T.wx0)/T.cellW, fy1=(((y0+h)/W)-T.wy0)/T.cellH;
+  var stp=Math.max(1,Math.floor((fx1-fx0)/36)), vmn=1e9, vmx=-1e9;
+  for(var sy=Math.max(0,Math.floor(fy0));sy<Math.min(T.rows,fy1);sy+=stp){
+    for(var sx=Math.max(0,Math.floor(fx0));sx<Math.min(T.cols,fx1);sx+=stp){
+      var ev=T.elev[sy*T.cols+sx]; if(ev<vmn)vmn=ev; if(ev>vmx)vmx=ev;
+    }
+  }
+  if(vmn>1e8){vmn=T.mn;vmx=T.mx}
+  var rng=vmx-vmn, ST=[1,2,5,10,20,50,100], cstep=ST[ST.length-1];
+  for(var si=0;si<ST.length;si++){ if(rng/ST[si]<=10){cstep=ST[si];break} }
+  if(S.zoom>16.6&&cstep<2) cstep=2;
   g.save(); g.setTransform(sc*px,0,0,sc*px,sc*ox,sc*oy);
   g.lineJoin='round'; g.lineCap='round';
   for(var i=0;i<T.cont.length;i++){
     var L=T.cont[i];
-    g.lineWidth=(L.bold?1.5:0.85)/px;
-    g.strokeStyle=L.bold?'rgba(255,255,255,.60)':'rgba(255,255,255,.33)';
+    if(Math.round(L.lv/cstep)!==L.lv/cstep) continue;
+    var bld=(Math.round(L.lv/(cstep*5))===L.lv/(cstep*5));
+    g.lineWidth=(bld?2.0:1.2)/px;
+    g.strokeStyle=bld?'rgba(6,12,26,.55)':'rgba(6,12,26,.34)';
+    g.stroke(L.p);
+    g.lineWidth=(bld?1.3:0.75)/px;
+    g.strokeStyle=bld?'rgba(255,255,255,.85)':'rgba(255,255,255,.62)';
     g.stroke(L.p);
   }
   g.restore();
 }
 function drawGridLines(g,x0,y0,w,h){
   var W=worldSize(S.zoom), mpp=mppAt(S.zoom,S.lat), sp=5/mpp;
-  if(sp<4.5) return;
+  if(sp<3.4) return;
   var cellW=5/CIRC/Math.cos(S.lat*Math.PI/180);
   var u0=x0/W, v0=y0/W, u1=(x0+w)/W, v1=(y0+h)/W;
   g.save(); g.strokeStyle='rgba(255,255,255,.17)'; g.lineWidth=1;
@@ -649,7 +666,7 @@ cv.addEventListener('pointermove',function(e){
   if(ptrs.size>=2){
     var a=[];ptrs.forEach(function(v){a.push(v)});
     var d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
-    if(lastDist>0&&d>0){ var f=d/lastDist; S.zoom=clamp(S.zoom+Math.log2(f),13,18); requestRender(); }
+    if(lastDist>0&&d>0){ var f=d/lastDist; S.zoom=clamp(S.zoom+Math.log2(f),13,17.2); requestRender(); }
     lastDist=d; moved+=99; return;
   }
   moved+=Math.hypot(dx,dy);
@@ -670,9 +687,9 @@ function endPtr(e){
 }
 cv.addEventListener('pointerup',endPtr);
 cv.addEventListener('pointercancel',endPtr);
-cv.addEventListener('wheel',function(e){ e.preventDefault(); var p=localPt(e); var f=Math.pow(1.0016,-e.deltaY); S.zoom=clamp(S.zoom+Math.log2(f),13,18); requestRender(); nudgeTerrain(); },{passive:false});
-$('#zIn').addEventListener('click',function(){S.zoom=clamp(S.zoom+0.7,13,18);requestRender();nudgeTerrain()});
-$('#zOut').addEventListener('click',function(){S.zoom=clamp(S.zoom-0.7,13,18);requestRender();nudgeTerrain()});
+cv.addEventListener('wheel',function(e){ e.preventDefault(); var p=localPt(e); var f=Math.pow(1.0016,-e.deltaY); S.zoom=clamp(S.zoom+Math.log2(f),13,17.2); requestRender(); nudgeTerrain(); },{passive:false});
+$('#zIn').addEventListener('click',function(){S.zoom=clamp(S.zoom+0.7,13,17.2);requestRender();nudgeTerrain()});
+$('#zOut').addEventListener('click',function(){S.zoom=clamp(S.zoom-0.7,13,17.2);requestRender();nudgeTerrain()});
 
 /* ---------------- 지형값 읽기 ---------------- */
 function sampleGrid(arr,u,v){
@@ -900,18 +917,19 @@ function renderHits(list,q){
 }
 function applyPlace(p,label){
   S.lat=clamp(p.lat,-85,85); S.lon=((p.lon+540)%360)-180; S.addr=label||p.name||'선택한 지점';
-  S.zoom=Math.max(16,S.zoom);
+  S.zoom=Math.max(16.6,S.zoom);
   $('#hits').classList.add('hide');
   $('#hint').classList.add('off');
   commitPlace(); requestRender(); buildTerrain();
   setTimeout(function(){buildTerrain()},1400);
 }
+function busy(on){ var b=$('#qGo'); b.textContent=on?'찾는 중':'찾기'; b.disabled=!!on }
 function doSearch(){
   var q=($('#q').value||'').trim();
   if(!q){ toast('지번이나 주소를 한 줄 넣어 주세요'); return }
   var m=q.match(/^(\d{2,3}\.\d{3,8})\s*[, ]\s*(\d{2,3}\.\d{3,8})$/);
   if(m){ applyPlace({lat:+m[1],lon:+m[2],name:'좌표 지점'},'좌표 '+m[1]+', '+m[2]); return }
-  toast('주소를 찾는 중…');
+  busy(true); toast('주소를 찾는 중…');
   var chain=S.key
     ? vwGeocode(q,'parcel').then(function(a){ return a||vwGeocode(q,'road') })
     : Promise.resolve(null);
@@ -919,6 +937,7 @@ function doSearch(){
     if(a){ applyPlace(a,q); return null }
     return nomiSearch(q);
   }).then(function(list){
+    busy(false);
     if(list==null) return;
     if(!list.length){
       $('#hits').classList.add('hide');
@@ -927,7 +946,7 @@ function doSearch(){
     }
     if(list.length===1){ applyPlace(list[0],q); return }
     renderHits(list,q);
-  }).catch(function(e){ toast('주소 찾기에 실패했습니다 · 지도를 눌러 맞춰 주세요') });
+  }).catch(function(e){ busy(false); toast('주소 찾기에 실패했습니다 · 지도를 눌러 맞춰 주세요') });
 }
 $('#sf').addEventListener('submit',function(e){ e.preventDefault(); doSearch() });
 
