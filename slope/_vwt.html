@@ -1,21 +1,23 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>vworld wms test</title>
-<style>body{font:14px/1.5 monospace;padding:12px;white-space:pre-wrap}</style></head>
+<html lang="ko"><head><meta charset="utf-8"><title>vworld wms domain test</title>
+<style>body{font:13px/1.5 monospace;padding:12px;white-space:pre-wrap}</style></head>
 <body><div id="out">running…</div>
 <script>
 var K='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
-function wms(v,crsParam,bbox,layers){
-  return 'https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version='+v+'&'+crsParam+'&bbox='+bbox
-    +'&width=400&height=400&layers='+layers+'&styles=&format=image/png&transparent=TRUE&key='+K;
+function wms(domain,bbox,layers){
+  return 'https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.3.0&crs=EPSG:4326'
+   +'&bbox='+bbox+'&width=400&height=400&layers='+layers+'&styles=&format=image/png&transparent=TRUE'
+   +(domain?'&domain='+encodeURIComponent(domain):'')+'&key='+K;
 }
 var LL='127.3633,37.8280,127.3705,37.8357', LATLON='37.8280,127.3633,37.8357,127.3705';
 var PARCEL='lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun', ZONE='lt_c_uq111,lt_c_uq112,lt_c_uq113,lt_c_uq114';
 var tests=[
- ['wms 1.3.0 lat,lon parcel', wms('1.3.0','crs=EPSG:4326',LATLON,PARCEL)],
- ['wms 1.3.0 lon,lat parcel', wms('1.3.0','crs=EPSG:4326',LL,PARCEL)],
- ['wms 1.3.0 lat,lon zone',   wms('1.3.0','crs=EPSG:4326',LATLON,ZONE)],
- ['wms 1.1.1 lon,lat parcel', wms('1.1.1','srs=EPSG:4326',LL,PARCEL)],
- ['wms 1.3.0 lat,lon bonbun only', wms('1.3.0','crs=EPSG:4326',LATLON,'lp_pa_cbnd_bonbun')]
+ ['domain=host, lat,lon, parcel',   wms('autooneclick.com',LATLON,PARCEL)],
+ ['domain=host, lon,lat, parcel',   wms('autooneclick.com',LL,PARCEL)],
+ ['domain=url,  lat,lon, parcel',   wms('https://autooneclick.com',LATLON,PARCEL)],
+ ['domain=url,  lon,lat, parcel',   wms('https://autooneclick.com',LL,PARCEL)],
+ ['domain=host, lat,lon, zone',     wms('autooneclick.com',LATLON,ZONE)],
+ ['no domain,   lat,lon, parcel',   wms('',LATLON,PARCEL)]
 ];
 var out=document.getElementById('out'), L=[];
 function say(s){L.push(s);out.textContent=L.join('\n')}
