@@ -141,6 +141,29 @@ details.adv .keyrow{margin-top:7px}
 .loadbar{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);background-size:50% 100%;background-repeat:no-repeat;animation:ld 1s linear infinite;opacity:0;transition:.2s}
 .loadbar.on{opacity:.95}
 @keyframes ld{0%{background-position:-50% 0}100%{background-position:150% 0}}
+/* 3D 지형 보기(121번) — 2D 틀은 그대로, 아래는 추가만 */
+.vmode{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;background:#0B1729;border:1px solid var(--line);border-radius:11px;padding:3px}
+.vmode button{border:0;background:none;color:#9FB0C8;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:900;cursor:pointer}
+.vmode button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.mapwrap.m3d #mapcv{visibility:hidden}
+.mapwrap.m3d .legend,.mapwrap.m3d .zoomctl,.mapwrap.m3d .hint{display:none}
+#cv3d{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;
+ background:linear-gradient(180deg,#0A1128 0%,#1A2D55 55%,#2B4374 100%)}
+.ui3d{display:none}
+.mapwrap.m3d .ui3d{display:block}
+.c3d{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.c3d .cmp{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,107,0,.85);background:rgba(10,17,40,.88);position:relative}
+.c3d .cmp i{position:absolute;inset:0;font-style:normal;display:block}
+.c3d .cmp i::before{content:"";position:absolute;left:50%;top:4px;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #FF6B00}
+.c3d .cmp i::after{content:"N";position:absolute;left:0;right:0;top:13px;text-align:center;font-size:10px;font-weight:900;color:#fff;line-height:1}
+.c3d button{border:1px solid rgba(255,255,255,.18);background:rgba(10,17,40,.88);color:#fff;border-radius:8px;padding:5px 7px;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap}
+.ex3d{position:absolute;right:8px;bottom:8px;display:flex;gap:3px;background:rgba(10,17,40,.86);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:3px}
+.ex3d button{border:0;background:none;color:#9FB0C8;border-radius:6px;padding:4px 7px;font-size:10.5px;font-weight:900;cursor:pointer}
+.ex3d button.on{background:var(--amber);color:var(--on)}
+.inf3d{position:absolute;left:8px;bottom:8px;font-size:10px;font-weight:900;color:#E7EEF7;background:rgba(10,17,40,.86);border:1px solid rgba(255,107,0,.55);border-radius:7px;padding:4px 7px;white-space:nowrap}
+.tip3d{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);font-size:10px;font-weight:800;color:#FFD9A6;background:rgba(10,17,40,.88);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:3px 9px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+.tip3d.off{opacity:0}
+.lbl3d{position:absolute;left:0;top:0;transform:translate(-50%,-100%);font-size:11px;font-weight:900;color:#FFD9A6;background:rgba(10,17,40,.9);border:1.2px solid rgba(255,107,0,.95);border-radius:7px;padding:1px 8px;white-space:nowrap;pointer-events:none}
 </style></head>
 <body>
 <div id="app">
@@ -169,8 +192,17 @@ details.adv .keyrow{margin-top:7px}
 
   <section class="card">
     <h2><i>2</i>필지 경사도 지도<small id="demTag">5m 격자</small></h2>
+    <div class="vmode" id="vmode"><button type="button" data-v="2d" class="on">2D 지도</button><button type="button" data-v="3d">3D 지형</button></div>
     <div class="mapwrap">
       <canvas id="mapcv" width="360" height="392" aria-label="경사도 지도"></canvas>
+      <canvas id="cv3d" class="hide" aria-label="3D 지형"></canvas>
+      <div class="ui3d" id="ui3d">
+        <div class="lbl3d hide" id="lbl3d"></div>
+        <div class="c3d"><span class="cmp" id="cmp3d" aria-label="북쪽"><i></i></span><button type="button" id="rst3d">↺ 초기</button></div>
+        <span class="inf3d" id="inf3d">위성 · 고도 과장 1x</span>
+        <div class="ex3d" id="ex3d"><button type="button" data-x="1" class="on">1x</button><button type="button" data-x="1.5">1.5x</button><button type="button" data-x="2">2x</button></div>
+        <div class="tip3d" id="tip3d">한 손가락: 회전·기울기 · 두 손가락: 확대</div>
+      </div>
       <div class="loadbar" id="ld"></div>
       <div class="mapbadge"><span id="bPos">—</span><span id="bEl">—</span><span class="warn" id="bSl">—</span></div>
       <div class="zoomctl"><button type="button" id="zIn" aria-label="확대">+</button><button type="button" id="zOut" aria-label="축소">−</button></div>
@@ -1276,6 +1308,423 @@ $('#copyTxt').addEventListener('click',function(){
     navigator.clipboard.writeText(t).then(function(){toast('문구를 복사했습니다 · 카톡에 붙여 넣으세요')},fallback);
   } else fallback();
 });
+
+/* ---------------- 3D 지형 보기(121번) ----------------
+   WebGL1 직접 · 라이브러리/CDN 없음. 2D 상태(S·T·PC)는 읽기만 하고 바꾸지 않는다.
+   메쉬 = 지금 2D 화면 구역의 표고(T.elev, 3×3 평균) · 텍스처 = 같은 구역 Vworld 위성 타일 · 선 = 필지 테두리 */
+var V3={on:false,want:false,gen:0,gl:null,cv:null,raf:0,dirty:true,spin:0,
+  yaw:0,pitch:38,dist:800,ex:1,home:null,G:null,P:null,LP:null,B:null,tex:null,TX:null,lines:null,lab:null,
+  warned:{},lastT:0,iv:[],st:{ctx:0,live:0,verts:0,tris:0,texW:0,texH:0,tz:0,tilesOk:0,tilesFail:0,tilesTotal:0,firstMs:-1,drawMs:0,draws:0,lineSegs:0,parcel:'',center:''}};
+function v3toast(k,msg){ if(V3.warned[k]) return; V3.warned[k]=1; toast(msg) }
+function v3view(){
+  var W=worldSize(S.zoom), cx=lng2w(S.lon), cy=lat2w(S.lat), hw=VW()/2/W, hh=VH()/2/W;
+  return {u0:cx-hw,u1:cx+hw,v0:cy-hh,v1:cy+hh};
+}
+function v3bil(fx,fy){
+  fx=clamp(fx,0,T.cols-1.001); fy=clamp(fy,0,T.rows-1.001);
+  var x=fx|0, y=fy|0, tx=fx-x, ty=fy-y, i=y*T.cols+x, e=T.elev;
+  return (e[i]*(1-tx)+e[i+1]*tx)*(1-ty)+(e[i+T.cols]*(1-tx)+e[i+T.cols+1]*tx)*ty;
+}
+/* 3×3 평균 표고 — 정점 하나가 덮는 칸 안을 아홉 점으로 고르게 눌러 잔톱니를 없앤다 */
+function v3avg(u,v,d){
+  var fx=(u-T.wx0)/T.cellW, fy=(v-T.wy0)/T.cellH, s=0;
+  for(var j=-1;j<=1;j++) for(var i=-1;i<=1;i++) s+=v3bil(fx+i*d,fy+j*d);
+  return s/9;
+}
+/* 행렬(열 우선) */
+function m4mul(a,b){ var o=new Float32Array(16); for(var c=0;c<4;c++) for(var r=0;r<4;r++){ o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3] } return o }
+function m4persp(fy,asp,n,f){ var t=1/Math.tan(fy/2), o=new Float32Array(16); o[0]=t/asp; o[5]=t; o[10]=(f+n)/(n-f); o[11]=-1; o[14]=2*f*n/(n-f); return o }
+function m4look(e,c,u){
+  var zx=e[0]-c[0], zy=e[1]-c[1], zz=e[2]-c[2], l=Math.hypot(zx,zy,zz); zx/=l; zy/=l; zz/=l;
+  var xx=u[1]*zz-u[2]*zy, xy=u[2]*zx-u[0]*zz, xz=u[0]*zy-u[1]*zx; l=Math.hypot(xx,xy,xz); xx/=l; xy/=l; xz/=l;
+  var yx=zy*xz-zz*xy, yy=zz*xx-zx*xz, yz=zx*xy-zy*xx;
+  return new Float32Array([xx,yx,zx,0, xy,yy,zy,0, xz,yz,zz,0, -(xx*e[0]+xy*e[1]+xz*e[2]),-(yx*e[0]+yy*e[1]+yz*e[2]),-(zx*e[0]+zy*e[1]+zz*e[2]),1]);
+}
+var V3_VS='attribute vec3 p;attribute vec3 n;attribute vec2 t;uniform mat4 m;uniform vec3 L;varying vec2 vt;varying float vl;'
+  +'void main(){vt=t;vl=0.62+0.48*max(dot(normalize(n),L),0.0);gl_Position=m*vec4(p,1.0);}';
+var V3_FS='precision mediump float;uniform sampler2D tx;uniform float k;varying vec2 vt;varying float vl;'
+  +'void main(){gl_FragColor=vec4(texture2D(tx,vt).rgb*vl*k,1.0);}';
+/* 굵은 선 = 화면 픽셀 폭의 삼각 띠(꼭짓점 셰이더에서 화면 방향으로 벌린다) */
+var V3_LVS='attribute vec3 p;attribute vec3 o;attribute float s;uniform mat4 m;uniform vec2 vp;uniform float w;'
+  +'void main(){vec4 a=m*vec4(p,1.0);vec4 b=m*vec4(o,1.0);if(a.w<=0.0||b.w<=0.0){gl_Position=vec4(2.0,2.0,2.0,1.0);return;}'
+  +'vec2 sa=a.xy/a.w*vp;vec2 sb=b.xy/b.w*vp;vec2 d=sb-sa;float l=length(d);d=l>0.0001?d/l:vec2(1.0,0.0);'
+  +'vec2 nn=vec2(-d.y,d.x);vec2 off=nn*s*w*0.5;a.xy+=off/vp*a.w;a.z-=0.0004*a.w;gl_Position=a;}';
+var V3_LFS='precision mediump float;uniform vec4 c;void main(){gl_FragColor=c;}';
+/* 꺾이는 곳은 둥근 점으로 메워 톱니가 없게 */
+var V3_PVS='attribute vec3 p;uniform mat4 m;uniform float w;void main(){vec4 a=m*vec4(p,1.0);a.z-=0.0004*a.w;gl_Position=a;gl_PointSize=w;}';
+var V3_PFS='precision mediump float;uniform vec4 c;void main(){if(length(gl_PointCoord-vec2(0.5))>0.5)discard;gl_FragColor=c;}';
+function v3prog(gl,vs,fs){
+  function sh(t,src){ var s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s); if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ gl.deleteShader(s); return null } return s }
+  var a=sh(gl.VERTEX_SHADER,vs), b=sh(gl.FRAGMENT_SHADER,fs); if(!a||!b) return null;
+  var p=gl.createProgram(); gl.attachShader(p,a); gl.attachShader(p,b); gl.linkProgram(p);
+  gl.deleteShader(a); gl.deleteShader(b);
+  if(!gl.getProgramParameter(p,gl.LINK_STATUS)){ gl.deleteProgram(p); return null }
+  return p;
+}
+/* 이전 3D 컨텍스트를 깨끗이 지운다(누적 금지) — 캔버스도 새 것으로 바꾼다 */
+function v3destroy(){
+  if(V3.raf){ cancelAnimationFrame(V3.raf); V3.raf=0 }
+  var gl=V3.gl;
+  if(gl){
+    try{
+      if(V3.B){ for(var k in V3.B){ if(V3.B[k]) gl.deleteBuffer(V3.B[k]) } }
+      if(V3.tex) gl.deleteTexture(V3.tex);
+      if(V3.P) gl.deleteProgram(V3.P);
+      if(V3.LP) gl.deleteProgram(V3.LP);
+      if(V3.PP) gl.deleteProgram(V3.PP);
+      var lc=gl.getExtension('WEBGL_lose_context'); if(lc) lc.loseContext();
+    }catch(e){}
+    V3.st.live=Math.max(0,V3.st.live-1);
+  }
+  V3.gl=null; V3.B=null; V3.tex=null; V3.P=null; V3.LP=null; V3.PP=null; V3.G=null; V3.TX=null; V3.lines=null;
+  var old=$('#cv3d');
+  if(old&&V3.cv){ var nc=document.createElement('canvas'); nc.id='cv3d'; nc.className='hide'; nc.setAttribute('aria-label','3D 지형'); old.parentNode.replaceChild(nc,old) }
+  V3.cv=null;
+}
+/* 지형 메쉬 — 정점 ≤128×128, 높이 = (표고 − 메쉬 최저표고) × 과장 */
+function v3geom(){
+  var vw=v3view(), cX=(vw.u1-vw.u0)/T.cellW, cY=(vw.v1-vw.v0)/T.cellH;
+  var nx=clamp(Math.round(cX),48,128), ny=clamp(Math.round(nx*cY/cX),48,128);
+  var stepC=cX/(nx-1), d=Math.max(0.34,stepC/3);
+  /* 중심 = 필지 중심(화면 안일 때) · 아니면 지도 중심 */
+  var lat0=S.lat, lon0=S.lon, pIn=false, pb=null;
+  if(PC&&PC.rings){
+    var bx=1e9,by=1e9,bX=-1e9,bY=-1e9;
+    PC.rings.forEach(function(r){ r.forEach(function(pt){ if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) return; if(pt[0]<bx)bx=pt[0]; if(pt[0]>bX)bX=pt[0]; if(pt[1]<by)by=pt[1]; if(pt[1]>bY)bY=pt[1] }) });
+    if(bx<1e8){
+      pb={lon:(bx+bX)/2,lat:(by+bY)/2};
+      var pu=lng2w(pb.lon), pv=lat2w(pb.lat);
+      pIn=(pu>vw.u0&&pu<vw.u1&&pv>vw.v0&&pv<vw.v1);
+      if(pIn){ lat0=pb.lat; lon0=pb.lon }
+    }
+  }
+  var kx=111320*Math.cos(lat0*Math.PI/180), ky=110540;
+  var raw=new Float32Array(nx*ny), mn=1e9, mx=-1e9, U=new Float64Array(nx), Vv=new Float64Array(ny);
+  for(var i=0;i<nx;i++) U[i]=vw.u0+(vw.u1-vw.u0)*i/(nx-1);
+  for(var j=0;j<ny;j++) Vv[j]=vw.v0+(vw.v1-vw.v0)*j/(ny-1);
+  for(j=0;j<ny;j++) for(i=0;i<nx;i++){ var e=v3avg(U[i],Vv[j],d); raw[j*nx+i]=e; if(e<mn)mn=e; if(e>mx)mx=e }
+  var X=new Float32Array(nx), Z=new Float32Array(ny);
+  for(i=0;i<nx;i++) X[i]=(w2lng(U[i])-lon0)*kx;
+  for(j=0;j<ny;j++) Z[j]=-(w2lat(Vv[j])-lat0)*ky;
+  return {vw:vw,nx:nx,ny:ny,raw:raw,mn:mn,mx:mx,X:X,Z:Z,U:U,V:Vv,lat0:lat0,lon0:lon0,kx:kx,ky:ky,pIn:pIn,pb:pb,
+    ext:Math.max(X[nx-1]-X[0],Z[ny-1]-Z[0])};
+}
+function v3h(G,u,v){ /* 메쉬 높이(과장 반영) — 선·이름표용 */
+  var gi=clamp((u-G.vw.u0)/(G.vw.u1-G.vw.u0)*(G.nx-1),0,G.nx-1.001), gj=clamp((v-G.vw.v0)/(G.vw.v1-G.vw.v0)*(G.ny-1),0,G.ny-1.001);
+  var x=gi|0, y=gj|0, tx=gi-x, ty=gj-y, i=y*G.nx+x, r=G.raw;
+  return ((r[i]*(1-tx)+r[i+1]*tx)*(1-ty)+(r[i+G.nx]*(1-tx)+r[i+G.nx+1]*tx)*ty-G.mn)*V3.ex;
+}
+function v3xz(G,lon,lat){ return [(lon-G.lon0)*G.kx, -(lat-G.lat0)*G.ky] }
+function v3upload(){
+  var gl=V3.gl, G=V3.G, TX=V3.TX, nx=G.nx, ny=G.ny, ex=V3.ex, nV=nx*ny;
+  var P=new Float32Array(nV*3);
+  for(var j=0;j<ny;j++) for(var i=0;i<nx;i++){ var q=(j*nx+i)*3; P[q]=G.X[i]; P[q+1]=(G.raw[j*nx+i]-G.mn)*ex; P[q+2]=G.Z[j] }
+  var base=-Math.max(6,G.ext*0.035);
+  /* 옆면(스커트) 정점 수: 둘레 × 2 */
+  var per=[]; for(i=0;i<nx;i++) per.push([i,0]); for(j=1;j<ny;j++) per.push([nx-1,j]); for(i=nx-2;i>=0;i--) per.push([i,ny-1]); for(j=ny-2;j>0;j--) per.push([0,j]);
+  var nS=per.length*2, buf=new Float32Array((nV+nS)*8);
+  function put(k,x,y,z,a,b,c,u,v){ var o=k*8; buf[o]=x;buf[o+1]=y;buf[o+2]=z;buf[o+3]=a;buf[o+4]=b;buf[o+5]=c;buf[o+6]=u;buf[o+7]=v }
+  function uv(i,j){ return [(G.U[i]-TX.u0)/(TX.u1-TX.u0),(G.V[j]-TX.v0)/(TX.v1-TX.v0)] }
+  for(j=0;j<ny;j++) for(i=0;i<nx;i++){
+    var a=(j*nx+Math.max(0,i-1))*3, b=(j*nx+Math.min(nx-1,i+1))*3, c=(Math.max(0,j-1)*nx+i)*3, d=(Math.min(ny-1,j+1)*nx+i)*3;
+    var dx0=P[b]-P[a], dy0=P[b+1]-P[a+1], dz1=P[d+2]-P[c+2], dy1=P[d+1]-P[c+1];
+    /* n = (d−c) × (b−a) 의 근사: 높이 기울기로 */
+    var nxv=-dy0/dx0, nzv=-dy1/dz1, l=Math.hypot(nxv,1,nzv), t=uv(i,j), q2=(j*nx+i)*3;
+    put(j*nx+i,P[q2],P[q2+1],P[q2+2],nxv/l,1/l,nzv/l,t[0],t[1]);
+  }
+  var cxm=(G.X[0]+G.X[nx-1])/2, czm=(G.Z[0]+G.Z[ny-1])/2;
+  per.forEach(function(pp,k){
+    var i=pp[0], j=pp[1], q=(j*nx+i)*3, t=uv(i,j), ox=P[q]-cxm, oz=P[q+2]-czm, l=Math.hypot(ox,oz)||1;
+    put(nV+k*2,P[q],P[q+1],P[q+2],ox/l,0,oz/l,t[0],t[1]);
+    put(nV+k*2+1,P[q],base,P[q+2],ox/l,0,oz/l,t[0],t[1]);
+  });
+  var idx=new Uint16Array((nx-1)*(ny-1)*6), m=0;
+  for(j=0;j<ny-1;j++) for(i=0;i<nx-1;i++){ var v0=j*nx+i, v1=v0+1, v2=v0+nx, v3=v2+1; idx[m++]=v0;idx[m++]=v2;idx[m++]=v1;idx[m++]=v1;idx[m++]=v2;idx[m++]=v3 }
+  var sidx=new Uint16Array(per.length*6), s=0;
+  for(var k=0;k<per.length;k++){ var a0=nV+k*2, a1=a0+1, b0=nV+((k+1)%per.length)*2, b1=b0+1; sidx[s++]=a0;sidx[s++]=a1;sidx[s++]=b0;sidx[s++]=b0;sidx[s++]=a1;sidx[s++]=b1 }
+  var B=V3.B||(V3.B={});
+  if(!B.v) B.v=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,B.v); gl.bufferData(gl.ARRAY_BUFFER,buf,gl.STATIC_DRAW);
+  if(!B.i) B.i=gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,B.i); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,idx,gl.STATIC_DRAW);
+  if(!B.s) B.s=gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,B.s); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,sidx,gl.STATIC_DRAW);
+  B.nI=idx.length; B.nS=sidx.length;
+  V3.st.verts=nV; V3.st.tris=idx.length/3;
+  v3lines();
+}
+/* 필지 테두리 — 꼭짓점 표고를 메쉬에서 읽어 +1.5m 띄운다(지형을 따라가도록 칸 크기로 잘게 나눈다) */
+function v3lines(){
+  var gl=V3.gl, G=V3.G, B=V3.B; V3.lines=null; V3.lab=null;
+  if(!PC||!PC.rings||!G.pIn) return;
+  var segLen=(G.vw.u1-G.vw.u0)/(G.nx-1), pts=[], all=[], top=-1e9;
+  PC.rings.forEach(function(r){
+    var ring=[];
+    for(var j=0;j<r.length;j++){ var pt=r[j]; if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) continue; ring.push([lng2w(pt[0]),lat2w(pt[1])]) }
+    if(ring.length<2) return;
+    var line=[];
+    for(var q=0;q<ring.length;q++){
+      var a=ring[q], b=ring[(q+1)%ring.length], n=Math.min(64,Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/segLen)));
+      for(var s=0;s<n;s++){ var u=a[0]+(b[0]-a[0])*s/n, v=a[1]+(b[1]-a[1])*s/n, xz=v3xz(G,w2lng(u),w2lat(v)), y=v3h(G,u,v)+1.5; line.push([xz[0],y,xz[1]]); if(y>top) top=y }
+    }
+    line.push(line[0]); pts.push(line);
+  });
+  var nseg=0; pts.forEach(function(l){ nseg+=l.length-1 }); nseg=Math.min(nseg,16000);
+  if(!nseg) return;
+  var vb=new Float32Array(nseg*4*7), ib=new Uint16Array(nseg*6), k=0, o=0, m=0;
+  pts.forEach(function(l){
+    for(var q=0;q<l.length-1&&k<nseg;q++,k++){
+      var A=l[q], Bp=l[q+1], base=k*4;
+      [[A,Bp,1],[A,Bp,-1],[Bp,A,1],[Bp,A,-1]].forEach(function(r){ vb[o++]=r[0][0];vb[o++]=r[0][1];vb[o++]=r[0][2];vb[o++]=r[1][0];vb[o++]=r[1][1];vb[o++]=r[1][2];vb[o++]=r[2] });
+      ib[m++]=base;ib[m++]=base+1;ib[m++]=base+2;ib[m++]=base;ib[m++]=base+2;ib[m++]=base+3;
+    }
+  });
+  if(!B.lv) B.lv=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,B.lv); gl.bufferData(gl.ARRAY_BUFFER,vb,gl.STATIC_DRAW);
+  if(!B.li) B.li=gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,B.li); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,ib,gl.STATIC_DRAW);
+  var pp=new Float32Array(nseg*3); for(var z=0;z<nseg;z++){ pp[z*3]=vb[z*28];pp[z*3+1]=vb[z*28+1];pp[z*3+2]=vb[z*28+2] }
+  if(!B.pv) B.pv=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,B.pv); gl.bufferData(gl.ARRAY_BUFFER,pp,gl.STATIC_DRAW);
+  V3.lines={n:ib.length,np:nseg}; V3.st.lineSegs=nseg;
+  var c=v3xz(G,G.pb.lon,G.pb.lat); V3.lab=[c[0],top+Math.max(4,G.ext*0.02),c[1]];
+}
+/* 위성 텍스처 — 같은 구역의 Vworld Satellite 타일을 이어 붙인 1장(≤2048²) · 못 받은 칸은 회색 */
+function v3texPlan(vw){
+  var tz=clamp(Math.round(S.zoom),14,19), n, tx0, tx1, ty0, ty1;
+  for(;;){
+    n=Math.pow(2,tz); tx0=Math.floor(vw.u0*n); tx1=Math.floor(vw.u1*n); ty0=Math.max(0,Math.floor(vw.v0*n)); ty1=Math.min(n-1,Math.floor(vw.v1*n));
+    if(((tx1-tx0+1)*256<=2048&&(ty1-ty0+1)*256<=2048)||tz<=3) break; tz--;
+  }
+  var c=document.createElement('canvas'); c.width=(tx1-tx0+1)*256; c.height=(ty1-ty0+1)*256;
+  return {tz:tz,n:n,tx0:tx0,tx1:tx1,ty0:ty0,ty1:ty1,c:c,u0:tx0/n,u1:(tx1+1)/n,v0:ty0/n,v1:(ty1+1)/n,done:false,t0:Date.now()};
+}
+/* Vworld Satellite 는 .jpeg 로만 내려온다(.png 요청은 XML 오류) — 3D 전용 위성 타일 받기.
+   2D의 getTile()/tileUrl()은 건드리지 않는다. 실패하면 오픈 지도로 바꾸지 않고 회색으로 둔다. */
+var v3sat=new Map();
+function v3satTile(z,x,y){
+  var k=S.key+'/'+z+'/'+x+'/'+y, t=v3sat.get(k); if(t) return t;
+  t={img:new Image(),ok:false,fail:false};
+  t.img.crossOrigin='anonymous'; t.img.decoding='async';
+  t.img.onload=function(){ t.ok=true; if(V3.TX) V3.TX.next=0 };
+  t.img.onerror=function(){ t.fail=true; if(V3.TX) V3.TX.next=0 };
+  t.img.src='https://api.vworld.kr/req/wmts/1.0.0/'+encodeURIComponent(S.key)+'/Satellite/'+z+'/'+y+'/'+x+'.jpeg';
+  v3sat.set(k,t); return t;
+}
+function v3texPaint(){
+  var TX=V3.TX, gl=V3.gl; if(!TX||!gl) return;
+  var g=TX.c.getContext('2d'), ok=0, fail=0, pend=0, tot=0;
+  g.fillStyle='rgb(115,115,115)'; g.fillRect(0,0,TX.c.width,TX.c.height);
+  for(var ty=TX.ty0;ty<=TX.ty1;ty++) for(var tx=TX.tx0;tx<=TX.tx1;tx++){
+    tot++;
+    if(!S.key){ fail++; continue }
+    var t=v3satTile(TX.tz,((tx%TX.n)+TX.n)%TX.n,ty);
+    if(t.ok){ try{ g.drawImage(t.img,(tx-TX.tx0)*256,(ty-TX.ty0)*256,256,256); ok++ }catch(e){ fail++ } }
+    else if(t.fail) fail++;
+    else pend++;
+  }
+  var up=true;
+  gl.bindTexture(gl.TEXTURE_2D,V3.tex);
+  try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,TX.c) }
+  catch(e){ up=false; g.fillStyle='rgb(115,115,115)'; g.fillRect(0,0,TX.c.width,TX.c.height); ok=0; fail=tot; pend=0; try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,TX.c) }catch(e2){} }
+  V3.st.tilesOk=ok; V3.st.tilesFail=fail; V3.st.tilesTotal=tot; V3.st.texW=TX.c.width; V3.st.texH=TX.c.height; V3.st.tz=TX.tz;
+  V3.dirty=true;
+  var timeUp=Date.now()-TX.t0>12000;
+  if(pend&&!timeUp) return false;
+  TX.done=true;
+  var sat=ok>0;
+  $('#inf3d').textContent=(sat?(fail?'위성(일부 회색)':'위성'):'회색 지형')+' · 고도 과장 '+V3.ex+'x';
+  if(!sat) v3toast('sat',S.key?'위성사진을 받지 못했습니다 · 회색 지형으로 보여 드립니다':'Vworld 키가 없어 위성사진 없이 회색 지형으로 보여 드립니다');
+  return true;
+}
+function v3reset(){ V3.yaw=0; V3.pitch=38; V3.dist=V3.G?V3.G.ext*1.05:800; V3.dirty=true }
+function v3draw(){
+  var gl=V3.gl, G=V3.G; if(!gl||!G) return;
+  var t0=performance.now(), cv3=V3.cv, d=Math.min(2,window.devicePixelRatio||1);
+  var w=cv3.clientWidth||360, h=cv3.clientHeight||392;
+  if(cv3.width!==Math.round(w*d)||cv3.height!==Math.round(h*d)){ cv3.width=Math.round(w*d); cv3.height=Math.round(h*d) }
+  gl.viewport(0,0,cv3.width,cv3.height);
+  gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  var yr=V3.yaw*Math.PI/180, pr=V3.pitch*Math.PI/180;
+  var tg=[0,v3h(G,lng2w(G.lon0),lat2w(G.lat0)),0];
+  var eye=[tg[0]+V3.dist*Math.cos(pr)*Math.sin(yr), tg[1]+V3.dist*Math.sin(pr), tg[2]+V3.dist*Math.cos(pr)*Math.cos(yr)];
+  var proj=m4persp(45*Math.PI/180,w/h,Math.max(0.5,V3.dist*0.01),V3.dist*6+G.ext*4);
+  var M=m4mul(proj,m4look(eye,tg,[0,1,0]));
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.depthMask(true); gl.disable(gl.BLEND);
+  gl.disable(gl.CULL_FACE);
+  var P=V3.P; gl.useProgram(P);
+  gl.bindBuffer(gl.ARRAY_BUFFER,V3.B.v);
+  var ap=gl.getAttribLocation(P,'p'), an=gl.getAttribLocation(P,'n'), at=gl.getAttribLocation(P,'t');
+  gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap,3,gl.FLOAT,false,32,0);
+  gl.enableVertexAttribArray(an); gl.vertexAttribPointer(an,3,gl.FLOAT,false,32,12);
+  gl.enableVertexAttribArray(at); gl.vertexAttribPointer(at,2,gl.FLOAT,false,32,24);
+  gl.uniformMatrix4fv(gl.getUniformLocation(P,'m'),false,M);
+  gl.uniform3f(gl.getUniformLocation(P,'L'),-0.5,0.7071,-0.5);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,V3.tex); gl.uniform1i(gl.getUniformLocation(P,'tx'),0);
+  gl.uniform1f(gl.getUniformLocation(P,'k'),1);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,V3.B.i); gl.drawElements(gl.TRIANGLES,V3.B.nI,gl.UNSIGNED_SHORT,0);
+  gl.uniform1f(gl.getUniformLocation(P,'k'),0.5);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,V3.B.s); gl.drawElements(gl.TRIANGLES,V3.B.nS,gl.UNSIGNED_SHORT,0);
+  gl.disableVertexAttribArray(an); gl.disableVertexAttribArray(at);
+  if(V3.lines){
+    var LP=V3.LP; gl.useProgram(LP);
+    gl.bindBuffer(gl.ARRAY_BUFFER,V3.B.lv);
+    var lp=gl.getAttribLocation(LP,'p'), lo=gl.getAttribLocation(LP,'o'), ls=gl.getAttribLocation(LP,'s');
+    gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp,3,gl.FLOAT,false,28,0);
+    gl.enableVertexAttribArray(lo); gl.vertexAttribPointer(lo,3,gl.FLOAT,false,28,12);
+    gl.enableVertexAttribArray(ls); gl.vertexAttribPointer(ls,1,gl.FLOAT,false,28,24);
+    gl.uniformMatrix4fv(gl.getUniformLocation(LP,'m'),false,M);
+    gl.uniform2f(gl.getUniformLocation(LP,'vp'),cv3.width/2,cv3.height/2);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,V3.B.li);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+    /* 2D와 같은 이중 테두리: 흰 7.5 / 오렌지 4.5 / 흰 1.4 */
+    var PP=V3.PP, pa=gl.getAttribLocation(PP,'p');
+    [[7.5,1,1,1,.95],[4.5,1,107/255,0,1],[1.4,1,1,1,.92]].forEach(function(L){
+      gl.useProgram(LP); gl.bindBuffer(gl.ARRAY_BUFFER,V3.B.lv);
+      gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp,3,gl.FLOAT,false,28,0);
+      gl.enableVertexAttribArray(lo); gl.vertexAttribPointer(lo,3,gl.FLOAT,false,28,12);
+      gl.enableVertexAttribArray(ls); gl.vertexAttribPointer(ls,1,gl.FLOAT,false,28,24);
+      gl.uniform1f(gl.getUniformLocation(LP,'w'),L[0]*d);
+      gl.uniform4f(gl.getUniformLocation(LP,'c'),L[1],L[2],L[3],L[4]);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,V3.B.li);
+      gl.drawElements(gl.TRIANGLES,V3.lines.n,gl.UNSIGNED_SHORT,0);
+      gl.disableVertexAttribArray(lo); gl.disableVertexAttribArray(ls);
+      gl.useProgram(PP); gl.bindBuffer(gl.ARRAY_BUFFER,V3.B.pv);
+      gl.enableVertexAttribArray(pa); gl.vertexAttribPointer(pa,3,gl.FLOAT,false,12,0);
+      gl.uniformMatrix4fv(gl.getUniformLocation(PP,'m'),false,M);
+      gl.uniform1f(gl.getUniformLocation(PP,'w'),L[0]*d);
+      gl.uniform4f(gl.getUniformLocation(PP,'c'),L[1],L[2],L[3],L[4]);
+      gl.drawArrays(gl.POINTS,0,V3.lines.np);
+    });
+    gl.depthMask(true); gl.disable(gl.BLEND);
+  }
+  /* 나침반·지번 이름표(HTML) */
+  $('#cmp3d').style.transform='rotate('+(V3.yaw)+'deg)';
+  var lb=$('#lbl3d');
+  if(V3.lab&&PC&&PC.jibun!==undefined){
+    var p=V3.lab, cx=M[0]*p[0]+M[4]*p[1]+M[8]*p[2]+M[12], cy=M[1]*p[0]+M[5]*p[1]+M[9]*p[2]+M[13], cw=M[3]*p[0]+M[7]*p[1]+M[11]*p[2]+M[15];
+    var sx=(cx/cw*0.5+0.5)*w, sy=(1-(cy/cw*0.5+0.5))*h;
+    if(cw>0&&sx>20&&sx<w-20&&sy>22&&sy<h-4){ lb.textContent=PC.jibun||'내 필지'; lb.style.left=sx+'px'; lb.style.top=sy+'px'; lb.classList.remove('hide') }
+    else lb.classList.add('hide');
+  } else lb.classList.add('hide');
+  V3.st.drawMs=performance.now()-t0; V3.st.draws++;
+  if(V3.st.firstMs<0&&V3.t0){ V3.st.firstMs=Math.round(performance.now()-V3.t0); V3.st.firstAt=performance.now() }
+}
+function v3loop(ts){
+  V3.raf=0;
+  if(!V3.on||document.hidden) return; /* 3D가 아니거나 탭이 가려지면 멈춘다 */
+  V3.raf=requestAnimationFrame(v3loop);
+  if(V3.spin){ if(V3.lastT){ V3.iv.push(ts-V3.lastT); if(V3.iv.length>240) V3.iv.shift() } V3.lastT=ts; V3.yaw=(V3.yaw+1.5)%360; V3.dirty=true; if(ts>V3.spin){ V3.spin=0; V3.lastT=0 } }
+  if(V3.TX&&!V3.TX.done&&(!V3.TX.next||ts>V3.TX.next)){ V3.TX.next=ts+300; v3texPaint() }
+  if(V3.dirty){ V3.dirty=false; v3draw() }
+}
+function v3start(){ if(V3.on&&!V3.raf&&!document.hidden) V3.raf=requestAnimationFrame(v3loop) }
+function v3paintMode(m){
+  document.querySelectorAll('#vmode button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===m) });
+  $('.mapwrap').classList.toggle('m3d',m==='3d');
+}
+function v3exit(){
+  V3.want=false; V3.gen++; V3.on=false;
+  v3destroy(); v3paintMode('2d');
+  requestRender(); /* 2D는 S를 그대로 다시 그린다 — 중심·줌·층 그대로 */
+}
+function v3fail(msg){ v3exit(); toast(msg) }
+function v3enter(){
+  if(V3.on) return;
+  V3.want=true; var my=++V3.gen; V3.warned={};
+  v3paintMode('3d');
+  if(!T){
+    setLoad(true); if(!Tbusy) buildTerrain();
+    var t0=Date.now();
+    (function wait(){
+      if(my!==V3.gen) return;
+      if(T){ setLoad(false); v3open(my); return }
+      if(Date.now()-t0>9000){ setLoad(false); v3fail('지형을 아직 못 받았습니다 · 2D에서 잠시 뒤 다시'); return }
+      setTimeout(wait,200);
+    })();
+    return;
+  }
+  v3open(my);
+}
+function v3open(my){
+  if(my!==V3.gen) return;
+  v3destroy(); /* 중복 진입 대비 — 이전 컨텍스트를 먼저 지운다 */
+  V3.t0=performance.now(); V3.st.firstMs=-1;
+  var c=$('#cv3d'), gl=null;
+  c.classList.remove('hide');
+  try{ gl=c.getContext('webgl',{antialias:true,alpha:true,premultipliedAlpha:true})||c.getContext('experimental-webgl',{alpha:true}) }catch(e){ gl=null }
+  V3.cv=c;
+  if(!gl){ v3fail('이 기기에서는 3D를 켤 수 없습니다 — 2D로 계속 봅니다'); return }
+  V3.gl=gl; V3.st.ctx++; V3.st.live++;
+  c.addEventListener('webglcontextlost',function(e){ e.preventDefault(); if(V3.gl===gl&&V3.on) v3fail('3D 화면이 멈췄습니다 — 2D로 계속 봅니다') });
+  try{
+    V3.P=v3prog(gl,V3_VS,V3_FS); V3.LP=v3prog(gl,V3_LVS,V3_LFS); V3.PP=v3prog(gl,V3_PVS,V3_PFS);
+    if(!V3.P||!V3.LP||!V3.PP) throw new Error('shader');
+    V3.G=v3geom(); V3.TX=v3texPlan(V3.G.vw);
+    V3.tex=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,V3.tex);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    v3upload(); v3texPaint();
+  }catch(e){ v3fail('이 기기에서는 3D를 켤 수 없습니다 — 2D로 계속 봅니다'); return }
+  V3.st.parcel=V3.lines?(PC&&PC.jibun||'필지'):''; V3.st.center=V3.G.pIn?'parcel':'map';
+  if(PC&&PC.rings&&!V3.G.pIn) v3toast('pout','필지가 화면 밖입니다 · 2D에서 필지를 가운데로 옮긴 뒤 3D로 보세요');
+  V3.on=true; v3reset(); v3draw(); v3start();
+  var tip=$('#tip3d'); tip.classList.remove('off'); setTimeout(function(){ tip.classList.add('off') },3500);
+  v3bind(c);
+}
+function v3bind(c){
+  var ptr=new Map(), lastD=0, moved=0, lastTap=0, lastTapP=null;
+  function lp(e){ var r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top} }
+  function lim(){ var G=V3.G; if(G) V3.dist=clamp(V3.dist,G.ext*0.12,G.ext*3.2) }
+  c.addEventListener('pointerdown',function(e){
+    try{c.setPointerCapture(e.pointerId)}catch(x){}
+    ptr.set(e.pointerId,lp(e)); if(ptr.size===1) moved=0;
+    if(ptr.size===2){ var a=[];ptr.forEach(function(v){a.push(v)}); lastD=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y) }
+    $('#tip3d').classList.add('off');
+  });
+  c.addEventListener('pointermove',function(e){
+    var p=ptr.get(e.pointerId); if(!p) return;
+    var q=lp(e), dx=q.x-p.x, dy=q.y-p.y; p.x=q.x; p.y=q.y;
+    if(ptr.size>=2){
+      var a=[];ptr.forEach(function(v){a.push(v)}); var dd=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+      if(lastD>0&&dd>0){ V3.dist*=lastD/dd; lim(); V3.dirty=true }
+      lastD=dd; moved+=99; return;
+    }
+    moved+=Math.hypot(dx,dy);
+    V3.yaw=((V3.yaw-dx*0.45)%360+360)%360; V3.pitch=clamp(V3.pitch+dy*0.3,8,85); V3.dirty=true;
+  });
+  function up(e){
+    ptr.delete(e.pointerId); if(ptr.size<2) lastD=0;
+    if(ptr.size===0&&moved<8){
+      var now=Date.now(), q=lp(e);
+      if(now-lastTap<330&&lastTapP&&Math.hypot(q.x-lastTapP.x,q.y-lastTapP.y)<30){ v3reset(); lastTap=0 } else { lastTap=now; lastTapP=q }
+    }
+  }
+  c.addEventListener('pointerup',up); c.addEventListener('pointercancel',up);
+  c.addEventListener('wheel',function(e){ e.preventDefault(); V3.dist*=Math.pow(1.0015,e.deltaY); lim(); V3.dirty=true },{passive:false});
+}
+document.querySelectorAll('#vmode button').forEach(function(b){
+  b.addEventListener('click',function(){ if(b.getAttribute('data-v')==='3d') v3enter(); else if(V3.on||V3.want) v3exit() });
+});
+$('#rst3d').addEventListener('click',function(){ v3reset() });
+document.querySelectorAll('#ex3d button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#ex3d button').forEach(function(x){ x.classList.toggle('on',x===b) });
+    V3.ex=+b.getAttribute('data-x');
+    if(V3.on&&V3.gl){ v3upload(); var inf=$('#inf3d'); inf.textContent=inf.textContent.replace(/고도 과장 [\d.]+x/,'고도 과장 '+V3.ex+'x'); V3.dirty=true }
+  });
+});
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(V3.raf){ cancelAnimationFrame(V3.raf); V3.raf=0 } } else v3start() });
+window.addEventListener('resize',function(){ if(V3.on) V3.dirty=true });
+/* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) */
+window.__KTS_3D=function(){
+  var med=0; if(V3.iv.length){ var a=V3.iv.slice().sort(function(x,y){return x-y}); med=a[a.length>>1] }
+  return {on:V3.on,yaw:V3.yaw,pitch:V3.pitch,dist:V3.dist,ex:V3.ex,frameMedianMs:med,frames:V3.iv.length,raf:!!V3.raf,
+    st:JSON.parse(JSON.stringify(V3.st)),grid:V3.G?[V3.G.nx,V3.G.ny]:null,extM:V3.G?Math.round(V3.G.ext):0,reliefM:V3.G?Math.round(V3.G.mx-V3.G.mn):0,
+    S:{lat:S.lat,lon:S.lon,zoom:S.zoom}};
+};
+window.__KTS_3D_SET=function(o){ o=o||{}; if(o.yaw!=null) V3.yaw=o.yaw; if(o.pitch!=null) V3.pitch=clamp(o.pitch,8,85); if(o.dist!=null) V3.dist=o.dist; if(o.spinMs){ V3.iv=[]; V3.lastT=0; V3.spin=performance.now()+o.spinMs } V3.dirty=true; v3draw(); return true };
+/* 하늘(투명) 비율 · 픽셀 해시 — 그린 직후 읽는다 */
+window.__KTS_3D_PIX=function(){
+  var gl=V3.gl; if(!gl) return null; v3draw();
+  var W=gl.drawingBufferWidth, H=gl.drawingBufferHeight, px=new Uint8Array(W*H*4); gl.readPixels(0,0,W,H,gl.RGBA,gl.UNSIGNED_BYTE,px);
+  var sky=0, h=2166136261>>>0; for(var i=0;i<px.length;i+=4){ if(px[i+3]===0) sky++; h^=px[i]^(px[i+1]<<8)^(px[i+2]<<16); h=Math.imul(h,16777619)>>>0 }
+  return {w:W,h:H,sky:+(sky/(W*H)).toFixed(4),hash:h.toString(16)};
+};
 
 /* ---------------- 시작 ---------------- */
 fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key);
