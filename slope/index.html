@@ -665,15 +665,20 @@ function drawGridLines(g,x0,y0,w,h){
 var vwImgs=new Map();
 function drawVWImg(g,x0,y0,w,h,kind){
   if(!S.key) return;
+  /* Vworld WMS는 CORS 헤더를 주지 않는다 — 그림 저장용 캔버스를 오염시키므로 화면에만 겹친다 */
+  if(g!==ctx) return;
   var W=worldSize(S.zoom);
   var lon0=w2lng(x0/W), lon1=w2lng((x0+w)/W), lat1=w2lat(y0/W), lat0=w2lat((y0+h)/W);
   var layers=kind==='parcel'?'lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun':'lt_c_uq111,lt_c_uq112,lt_c_uq113,lt_c_uq114';
-  var url='https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.1.1&srs=EPSG:4326'
-    +'&bbox='+[lon0,lat0,lon1,lat1].join(',')+'&width='+Math.round(w)+'&height='+Math.round(h)
-    +'&layers='+layers+'&styles=&format=image/png&transparent=TRUE&key='+encodeURIComponent(S.key);
+  /* Vworld WMS는 1.3.0만 받고, 기본키는 인증 도메인(domain)을 함께 보내야 통과한다 */
+  var dom=''; try{ dom=location.hostname||'' }catch(e){}
+  var url='https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.3.0&crs=EPSG:4326'
+    +'&bbox='+[lat0,lon0,lat1,lon1].join(',')+'&width='+Math.round(w)+'&height='+Math.round(h)
+    +'&layers='+layers+'&styles=&format=image/png&transparent=TRUE'
+    +(dom?'&domain='+encodeURIComponent(dom):'')+'&key='+encodeURIComponent(S.key);
   var im=vwImgs.get(url);
   if(!im){
-    im={img:new Image(),ok:false}; im.img.crossOrigin='anonymous';
+    im={img:new Image(),ok:false};
     im.img.onload=function(){im.ok=true;requestRender()};
     im.img.onerror=function(){ if(!im.warned){im.warned=true;toast('Vworld '+(kind==='parcel'?'필지 경계':'용도지역')+' 층을 불러오지 못했습니다')} };
     im.img.src=url; vwImgs.set(url,im);
