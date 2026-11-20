@@ -1,36 +1,32 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>vworld wms domain test</title>
+<html lang="ko"><head><meta charset="utf-8"><title>vworld wms cors test</title>
 <style>body{font:13px/1.5 monospace;padding:12px;white-space:pre-wrap}</style></head>
 <body><div id="out">running…</div>
 <script>
 var K='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
-function wms(domain,bbox,layers){
-  return 'https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.3.0&crs=EPSG:4326'
-   +'&bbox='+bbox+'&width=400&height=400&layers='+layers+'&styles=&format=image/png&transparent=TRUE'
-   +(domain?'&domain='+encodeURIComponent(domain):'')+'&key='+K;
-}
-var LL='127.3633,37.8280,127.3705,37.8357', LATLON='37.8280,127.3633,37.8357,127.3705';
-var PARCEL='lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun', ZONE='lt_c_uq111,lt_c_uq112,lt_c_uq113,lt_c_uq114';
-var tests=[
- ['domain=host, lat,lon, parcel',   wms('autooneclick.com',LATLON,PARCEL)],
- ['domain=host, lon,lat, parcel',   wms('autooneclick.com',LL,PARCEL)],
- ['domain=url,  lat,lon, parcel',   wms('https://autooneclick.com',LATLON,PARCEL)],
- ['domain=url,  lon,lat, parcel',   wms('https://autooneclick.com',LL,PARCEL)],
- ['domain=host, lat,lon, zone',     wms('autooneclick.com',LATLON,ZONE)],
- ['no domain,   lat,lon, parcel',   wms('',LATLON,PARCEL)]
-];
+var U='https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.3.0&crs=EPSG:4326'
+  +'&bbox=37.8280,127.3633,37.8357,127.3705&width=400&height=400'
+  +'&layers=lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun&styles=&format=image/png&transparent=TRUE'
+  +'&domain=autooneclick.com&key='+K;
+var TILE='https://api.vworld.kr/req/wmts/1.0.0/'+K+'/Base/16/25317/55953.png';
 var out=document.getElementById('out'), L=[];
 function say(s){L.push(s);out.textContent=L.join('\n')}
-function imgTest(url){return new Promise(function(res){
-  var im=new Image(); im.crossOrigin='anonymous'; var done=false;
-  im.onload=function(){ if(done)return; done=true; res('OK '+im.naturalWidth+'x'+im.naturalHeight) };
-  im.onerror=function(){ if(done)return; done=true; res('FAIL') };
-  setTimeout(function(){ if(!done){done=true;res('timeout')} },9000);
+function load(url,cross){return new Promise(function(res){
+  var im=new Image(); if(cross) im.crossOrigin='anonymous'; var done=false;
+  im.onload=function(){ if(done)return; done=true; res({ok:true,im:im}) };
+  im.onerror=function(){ if(done)return; done=true; res({ok:false}) };
+  setTimeout(function(){ if(!done){done=true;res({ok:'timeout'})} },9000);
   im.src=url;
 })}
+async function taint(im){ try{ var c=document.createElement('canvas'); c.width=50;c.height=50;
+   c.getContext('2d').drawImage(im,0,0,50,50); c.toDataURL(); return 'readable' }catch(e){ return 'tainted('+e.name+')' } }
 (async function(){
   say('origin: '+location.origin);
-  for(var i=0;i<tests.length;i++){ say(tests[i][0]+': '+await imgTest(tests[i][1])) }
+  var a=await load(U,true);   say('WMS crossOrigin: '+(a.ok?'OK '+a.im.naturalWidth+'x'+a.im.naturalHeight:'FAIL'));
+  var b=await load(U,false);  say('WMS plain:       '+(b.ok?'OK '+b.im.naturalWidth+'x'+b.im.naturalHeight:'FAIL'));
+  if(b.ok) say('WMS plain canvas: '+await taint(b.im));
+  var c=await load(TILE,true); say('WMTS crossOrigin: '+(c.ok?'OK':'FAIL'));
+  if(a.ok) say('WMS crossOrigin canvas: '+await taint(a.im));
   say('done');
 })();
 </script></body></html>
