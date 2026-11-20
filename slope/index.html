@@ -1929,6 +1929,9 @@ function archRender(){
     +'<div class="asub">'+(zi?('법정 <b>건폐율 '+C+'%</b> · <b>용적률 '+F+'%</b> 이하 — 국토계획법 시행령 §84①·§85① (조례가 더 낮게 정할 수 있음)')
       :'표준 용도지역 명칭이 아니어서 법정 수치를 붙이지 못했습니다 — 토지이음 확인')+'</div>'
     +(zn.length>1?'<div class="asub">겹친 용도지역: <b>'+esc(zn.slice(1).join(' · '))+'</b></div>':'')
+    +((L.prposArea2Nm&&L.prposArea2Nm!=='지정되지않음'&&L.prposArea2Nm!==main)?('<div class="asub">공부상 2차 용도지역: <b>'+esc(L.prposArea2Nm)+'</b>'
+      +(zInfo(L.prposArea2Nm)?(' (법정 건폐율 '+zInfo(L.prposArea2Nm).c+'% · 용적률 '+zInfo(L.prposArea2Nm).f+'%)'):'')
+      +' — 필지가 두 용도지역에 걸치면 구역별 면적 비율로 허용량이 나뉩니다.</div>'):'')
     +'</div>';
   /* 2 용도지구·구역 */
   h+='<div class="acard"><div class="atit">용도지구 · 용도구역 <em>Vworld</em></div><div class="achips">';
