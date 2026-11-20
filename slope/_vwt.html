@@ -1,38 +1,34 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>vworld test</title>
+<html lang="ko"><head><meta charset="utf-8"><title>vworld wms test</title>
 <style>body{font:14px/1.5 monospace;padding:12px;white-space:pre-wrap}</style></head>
 <body><div id="out">running…</div>
 <script>
 var K='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
-var TILE='https://api.vworld.kr/req/wmts/1.0.0/'+K+'/Base/16/25317/55953.png';
-var WMS='https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version=1.1.1&srs=EPSG:4326&bbox=127.3633,37.8280,127.3705,37.8357&width=400&height=400&layers=lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun&styles=&format=image/png&transparent=TRUE&key='+K;
-var out=document.getElementById('out'); var L=[];
+function wms(v,crsParam,bbox,layers){
+  return 'https://api.vworld.kr/req/wms?service=WMS&request=GetMap&version='+v+'&'+crsParam+'&bbox='+bbox
+    +'&width=400&height=400&layers='+layers+'&styles=&format=image/png&transparent=TRUE&key='+K;
+}
+var LL='127.3633,37.8280,127.3705,37.8357', LATLON='37.8280,127.3633,37.8357,127.3705';
+var PARCEL='lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun', ZONE='lt_c_uq111,lt_c_uq112,lt_c_uq113,lt_c_uq114';
+var tests=[
+ ['wms 1.3.0 lat,lon parcel', wms('1.3.0','crs=EPSG:4326',LATLON,PARCEL)],
+ ['wms 1.3.0 lon,lat parcel', wms('1.3.0','crs=EPSG:4326',LL,PARCEL)],
+ ['wms 1.3.0 lat,lon zone',   wms('1.3.0','crs=EPSG:4326',LATLON,ZONE)],
+ ['wms 1.1.1 lon,lat parcel', wms('1.1.1','srs=EPSG:4326',LL,PARCEL)],
+ ['wms 1.3.0 lat,lon bonbun only', wms('1.3.0','crs=EPSG:4326',LATLON,'lp_pa_cbnd_bonbun')]
+];
+var out=document.getElementById('out'), L=[];
 function say(s){L.push(s);out.textContent=L.join('\n')}
-function imgTest(name,url,cross){return new Promise(function(res){
-  var im=new Image(); if(cross) im.crossOrigin='anonymous';
-  var done=false;
-  im.onload=function(){ if(done)return;done=true; res({ok:true,w:im.naturalWidth,h:im.naturalHeight}) };
-  im.onerror=function(){ if(done)return;done=true; res({ok:false}) };
-  setTimeout(function(){ if(!done){done=true;res({ok:'timeout'})} },9000);
+function imgTest(url){return new Promise(function(res){
+  var im=new Image(); im.crossOrigin='anonymous'; var done=false;
+  im.onload=function(){ if(done)return; done=true; res('OK '+im.naturalWidth+'x'+im.naturalHeight) };
+  im.onerror=function(){ if(done)return; done=true; res('FAIL') };
+  setTimeout(function(){ if(!done){done=true;res('timeout')} },9000);
   im.src=url;
 })}
 (async function(){
   say('origin: '+location.origin);
-  try{ var r=await fetch(TILE,{mode:'cors',cache:'no-store'});
-       say('fetch cors: status='+r.status+' acao='+r.headers.get('access-control-allow-origin')+' ct='+r.headers.get('content-type')+' size='+(await r.blob()).size);
-  }catch(e){ say('fetch cors ERR: '+e.message) }
-  say('img crossOrigin tile: '+JSON.stringify(await imgTest('t',TILE,true)));
-  say('img plain tile: '+JSON.stringify(await imgTest('t',TILE,false)));
-  try{ var r2=await fetch(WMS,{mode:'cors',cache:'no-store'});
-       say('fetch wms: status='+r2.status+' acao='+r2.headers.get('access-control-allow-origin')+' ct='+r2.headers.get('content-type')+' size='+(await r2.blob()).size);
-  }catch(e){ say('fetch wms ERR: '+e.message) }
-  say('img crossOrigin wms: '+JSON.stringify(await imgTest('w',WMS,true)));
-  say('img plain wms: '+JSON.stringify(await imgTest('w',WMS,false)));
-  // canvas taint test with plain image
-  var im=await new Promise(function(res){var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=TILE});
-  if(im){ try{ var c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;
-      c.getContext('2d').drawImage(im,0,0); c.toDataURL(); say('plain tile canvas: NOT tainted (readable)');
-    }catch(e){ say('plain tile canvas: tainted — '+e.name) } }
+  for(var i=0;i<tests.length;i++){ say(tests[i][0]+': '+await imgTest(tests[i][1])) }
   say('done');
 })();
 </script></body></html>
