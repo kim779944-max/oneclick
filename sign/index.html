@@ -406,7 +406,8 @@ $('#pngDl').onclick=()=>{ if(!sig) return; sig.toBlob(b=>saveBlob(b,'KTS더싸�
 let docs=[], cur=0, ganin=false;            // docs: {c:canvas, thumb, place:{x,y,w}|null}  (x,y,w = 쪽 너비 대비 비율)
 /* 크기 프리셋 — A4 폭 210mm 기준. 15mm≈7%, 18mm≈9%, 21mm≈10% */
 const MM_PAGE=210;
-function szW(){ const p=docs.length&&docs[cur]&&docs[cur].place; return p? p.w : (+$('#sz').value/100); }
+let pendingW=null;   /* 찍기 전에 골라 둔 정확한 폭(비율) — 슬라이더는 1% 단위라 따로 보관 */
+function szW(){ const p=docs.length&&docs[cur]&&docs[cur].place; return p? p.w : (pendingW!=null? pendingW : (+$('#sz').value/100)); }
 function szPaint(){
   const w=szW(), mm=w*MM_PAGE;
   const vl=$('#szV'); if(vl) vl.textContent=Math.round(w*100)+'% · '+mm.toFixed(1)+'mm';
@@ -477,7 +478,7 @@ $('#stage').addEventListener('pointerdown',e=>{
   if(e.target.closest('.sig')) return;
   if(!sig){ toast('먼저 ② 사인을 만들어 주세요'); return; }
   const r=$('#stage').getBoundingClientRect();
-  const w = docs[cur].place ? docs[cur].place.w : (+$('#sz').value/100);
+  const w = szW();
   docs[cur].place={x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height, w};
   renderStage(); paintThumbs();
 });
@@ -489,10 +490,11 @@ function dragSig(el){
     el.style.left=(p.x*100)+'%'; el.style.top=(p.y*100)+'%'; });
   const end=()=>{ on=false; }; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
 }
-$('#sz').oninput=()=>{ const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } szPaint(); };
+$('#sz').oninput=()=>{ pendingW=null; const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } szPaint(); };
 $$('#szPre [data-mm]').forEach(b=>b.onclick=()=>{
   const mm=+b.dataset.mm, w=mm/MM_PAGE, p=docs.length&&docs[cur]&&docs[cur].place;
   $('#sz').value=Math.round(w*100);
+  pendingW=w;
   if(p){ p.w=w; const el=$('#stage .sig'); if(el) el.style.width=(w*100)+'%'; }
   szPaint(); toast('실제 '+mm+'mm — A4 계약서 폭 기준으로 찍힙니다');
 });
