@@ -1,8 +1,8 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 지번·경사도 지도 — 지번 넣으면 그 자리 경사도가 그림으로 (3건 무료)</title>
-<meta name="description" content="지번·주소를 넣으면 필지 위치와 경계, 주변 경사도(°·%)·표고·향·단면을 5m 격자 그림으로 보여 줍니다. 무료 3건, 10건권 9,000원.">
+<title>KTS 지번·경사도 지도 — 지번 넣으면 그 자리 경사도가 그림으로 (하루 3건 무료)</title>
+<meta name="description" content="지번·주소를 넣으면 필지 위치와 경계, 주변 경사도(°·%)·표고·향·단면을 5m 격자 그림으로 보여 줍니다. 하루 3건 무료(자정 초기화), 10건권 9,000원.">
 <meta name="theme-color" content="#0A1128">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="../icon.png">
@@ -171,7 +171,7 @@ details.adv .keyrow{margin-top:7px}
   <a class="back" href="https://autooneclick.com/">← 원클릭</a>
   <span class="brand">KTS <i>경사도 지도</i></span>
   <span class="sp"></span>
-  <span class="st" id="planTag">체험 3건</span>
+  <span class="st" id="planTag">하루 3건 무료</span>
 </header>
 <main>
   <div class="hero">
@@ -180,7 +180,7 @@ details.adv .keyrow{margin-top:7px}
   </div>
 
   <section class="card">
-    <h2><i>1</i>지번·주소로 찾기<small id="freeTag">무료 3건</small></h2>
+    <h2><i>1</i>지번·주소로 찾기<small id="freeTag">하루 3건 무료</small></h2>
     <form class="srch" id="sf" novalidate>
       <input id="q" type="search" inputmode="search" placeholder="예) 가평군 조종면 신하리" aria-label="지번 또는 주소" autocomplete="off">
       <button type="submit" id="qGo">찾기</button>
@@ -284,12 +284,12 @@ details.adv .keyrow{margin-top:7px}
   <section class="card">
     <h2><i>7</i>이용 요금<small>문자 신청</small></h2>
     <div class="plans">
-      <div class="plan on" id="planFree"><span class="ck"></span><span class="pk">FREE</span><b>체험</b>
-        <span class="pr">3건</span><span class="ds">지번 3곳까지 무료</span></div>
+      <div class="plan on" id="planFree"><span class="ck"></span><span class="pk">FREE</span><b>무료</b>
+        <span class="pr">하루 3건</span><span class="ds">매일 자정에 다시 채워짐</span></div>
       <div class="plan" id="planTen"><span class="ck"></span><span class="pk">10건권</span><b>실무용</b>
         <span class="pr">9,000원</span><span class="ds">10건 · 건당 900원</span></div>
     </div>
-    <div class="meter"><span>남은 체험</span><span class="dots" id="dots"><i></i><i></i><i></i></span><b id="leftN">3곳</b></div>
+    <div class="meter"><span>오늘 남은 무료</span><span class="dots" id="dots"><i></i><i></i><i></i></span><b id="leftN">3곳</b></div>
     <div class="unlock" id="unlock">
       <span id="ulMsg">이용권 코드를 넣으면 10건이 열립니다. 코드는 문자로 신청하면 보내 드립니다.</span>
       <div class="r" id="ulRow">
@@ -298,7 +298,7 @@ details.adv .keyrow{margin-top:7px}
       </div>
     </div>
     <a class="btn" id="buy" href="sms:01020022899">10건권 신청 (문자)</a>
-    <p class="note">· 결제는 이 사이트에서 받지 않습니다. 문자로 신청하시면 입금 안내와 이용권 코드를 보내 드립니다.<br>· 체험 3건이 끝나면 새 지번은 <b>미리보기(워터마크)</b>로 열리고, 저장한 그림에 안내선이 들어갑니다.</p>
+    <p class="note">· 결제는 이 사이트에서 받지 않습니다. 문자로 신청하시면 입금 안내와 이용권 코드를 보내 드립니다.<br>· 하루 3건 무료를 다 쓰면 새 지번은 <b>미리보기(워터마크)</b>로 열리고, 저장한 그림에 안내선이 들어갑니다. 자정(한국시간 0시)에 다시 3건이 채워집니다.</p>
   </section>
 
   <p class="foot">KTS 원클릭 · 지번·경사도 지도<br>
@@ -324,18 +324,22 @@ var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}c
 /* 기본 Vworld 오픈키 — 대표님 발급(서비스 URL https://autooneclick.com 전용).
    6번 카드에 아무 키도 넣지 않아도 이 키로 연결된다. 6번 카드에서 직접 비우면 그때부터는 쓰지 않는다. */
 var DEFAULT_VW_KEY='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
+/* 오늘 날짜(한국시간 YYYY-MM-DD) — 하루 3건 무료를 자정에 다시 채우는 기준 */
+function todayKey(){var t=new Date().getTime()+9*3600*1000, d=new Date(t);return d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2)}
 var S={
   lat:37.8319, lon:127.3668, zoom:16.2,
   lay:{slope:1,cont:1,grid:0,parcel:0,zone:0,sat:0},
   op:0.38, radius:100, addr:'가평 · 신하리 일대(예시 지점)', profile:'ew',
   key:(function(){var v=LS.get('kts_slope_vk',null); return v==null?DEFAULT_VW_KEY:v})(), demTpl:LS.get('kts_slope_dem',''),
-  free:parseInt(LS.get('kts_slope_free','0'),10)||0,
+  free:(function(){var d=todayKey();if(LS.get('kts_slope_day','')!==d){LS.set('kts_slope_day',d);LS.set('kts_slope_free','0');return 0}return parseInt(LS.get('kts_slope_free','0'),10)||0})(),
   cred:parseInt(LS.get('kts_slope_cred','0'),10)||0,
   seen:(function(){try{var a=JSON.parse(LS.get('kts_slope_seen','[]'));return Array.isArray(a)?a:[]}catch(e){return []}})(),
   preview:false, counted:null, hits:[]
 };
 function master(){return window.KTS_MASTER===true||(window.KTS&&window.KTS.isMaster&&window.KTS.isMaster())}
-function saveQ(){LS.set('kts_slope_free',String(S.free));LS.set('kts_slope_cred',String(S.cred));LS.set('kts_slope_seen',JSON.stringify(S.seen.slice(-40)))}
+function saveQ(){LS.set('kts_slope_day',todayKey());LS.set('kts_slope_free',String(S.free));LS.set('kts_slope_cred',String(S.cred));LS.set('kts_slope_seen',JSON.stringify(S.seen.slice(-40)))}
+/* 날짜가 바뀌었으면 무료 3건을 다시 채운다(페이지를 켜 둔 채로 자정이 지나도 적용) */
+function rollDay(){var d=todayKey();if(LS.get('kts_slope_day','')===d)return false;LS.set('kts_slope_day',d);LS.set('kts_slope_free','0');S.free=0;S.preview=false;S.counted=null;return true}
 /* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) — 줌·필지 확인 */
 window.__KTS_ST=function(){ return {zoom:S.zoom, tileZ:clamp(Math.round(S.zoom),3,TZMAX), maxZoom:ZMAX,jibun:(PC&&PC.jibun)||'', pnu:(PC&&PC.pnu)||'', pcLoaded:!!PC, bb:(PC&&PC.bb)||null} };
 
@@ -1022,13 +1026,14 @@ document.querySelectorAll('.prof button').forEach(function(b){
 /* ---------------- 검수/이용권 ---------------- */
 function quotaLeft(){ return master()?999:(S.free<3?3-S.free:S.cred) }
 function paintQuota(){
+  if(rollDay()) S.preview=false;
   var left=master()?'전체':(S.free<3?(3-S.free)+'곳':(S.cred>0?S.cred+'건':'0'));
   $('#leftN').textContent=left;
   var dots=document.querySelectorAll('#dots i');
   var shown=master()?3:(S.free<3?3-S.free:Math.min(3,S.cred));
   dots.forEach(function(d,i){ d.classList.toggle('on',i<shown) });
-  $('#freeTag').textContent=master()?'마스터':(S.free<3?'무료 '+(3-S.free)+'건 남음':(S.cred>0?'이용권 '+S.cred+'건':'체험 종료'));
-  $('#planTag').textContent=master()?'마스터':(S.free<3?'체험 '+(3-S.free)+'건':(S.cred>0?'10건권 '+S.cred+'건':'체험 종료'));
+  $('#freeTag').textContent=master()?'마스터':(S.free<3?(S.free===0?'하루 3건 무료':'오늘 무료 '+(3-S.free)+'/3건'):(S.cred>0?'이용권 '+S.cred+'건':'오늘 무료 소진'));
+  $('#planTag').textContent=master()?'마스터':(S.free<3?(S.free===0?'하루 3건 무료':'오늘 무료 '+(3-S.free)+'/3건'):(S.cred>0?'이용권 '+S.cred+'건':'오늘 무료 소진'));
   var freeMode=(S.free<3&&S.cred<=0);
   $('#planFree').classList.toggle('on',freeMode);
   $('#planTen').classList.toggle('on',!freeMode);
@@ -1036,15 +1041,16 @@ function paintQuota(){
   if(S.cred>0&&!master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 이용권 '+S.cred+'건 남음</span> — 새 지번도 그대로 분석됩니다.'; }
   else if(master()){ $('#ulMsg').innerHTML='<span class="okmsg">✓ 마스터 모드</span> — 횟수 제한 없이 열립니다.'; }
   var pv=$('#pv');
-  if(pv){ if(S.preview){ pv.classList.remove('hide'); pv.innerHTML='<b>체험 3건을 모두 쓰셨습니다.</b> 이 지번은 미리보기로 열렸고, 저장한 그림에 안내선이 들어갑니다. 10건권 9,000원으로 열 수 있습니다.' } else pv.classList.add('hide'); }
+  if(pv){ if(S.preview){ pv.classList.remove('hide'); pv.innerHTML='<b>오늘 무료 3건을 모두 쓰셨습니다.</b> 이 지번은 미리보기로 열렸고, 저장한 그림에 안내선이 들어갑니다. 내일 자정에 다시 3건이 채워지고, 10건권 9,000원으로 지금 바로 열 수도 있습니다.' } else pv.classList.add('hide'); }
 }
 function distM(a,b){ var dy=(a.lat-b.lat)*111320, dx=(a.lon-b.lon)*111320*Math.cos(a.lat*Math.PI/180); return Math.sqrt(dx*dx+dy*dy) }
 function commitPlace(){
+  rollDay();
   if(S.counted&&distM(S,S.counted)<80) return;
   if(master()){ S.counted={lat:S.lat,lon:S.lon}; S.preview=false; paintQuota(); return }
   if(S.free<3){ S.free++; S.counted={lat:S.lat,lon:S.lon}; S.seen.push(S.lat.toFixed(4)+','+S.lon.toFixed(4)); saveQ(); S.preview=false; paintQuota(); return }
   if(S.cred>0){ S.cred--; S.counted={lat:S.lat,lon:S.lon}; saveQ(); S.preview=false; paintQuota(); toast('이용권 1건 사용 · 남은 '+S.cred+'건'); return }
-  S.preview=true; paintQuota(); toast('체험 3건을 다 쓰셨습니다 · 미리보기로 열립니다');
+  S.preview=true; paintQuota(); toast('오늘 무료 3건을 다 쓰셨습니다 · 미리보기로 열립니다 (자정에 다시 3건)');
 }
 function codeOK(c){
   c=String(c||'').toUpperCase().replace(/\s/g,'');
