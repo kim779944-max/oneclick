@@ -82,6 +82,7 @@ img.pic{display:block;max-width:100%;margin:0 auto;border-radius:10px}
 .ppnotice b{color:#111}
 .ppnotice button{margin-top:15px;border:0;border-radius:11px;padding:12px 18px;font-family:inherit;font-size:13px;font-weight:900;
  background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber)}
+.ppnotice .pppriv{margin-top:9px;font-size:11px;color:#6B7280}.ppnotice .ppretry{display:block;margin:9px auto 0;padding:8px 13px;font-size:11.5px;background:#F3F4F6;color:#374151;border:1px solid #D1D5DB}
 /* ---------- 고정 보기 바 — 뒤로·확대/축소·원본크기·페이지·이미지 저장 (스크롤해도 항상 보임) ---------- */
 #vtool{display:none;position:fixed;left:0;right:0;top:0;z-index:38;background:rgba(10,17,40,.97);
  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
@@ -940,13 +941,34 @@ function buildNotice(){
     + '<h3>원본 1:1 표시를 위해<br>PDF 또는 사진으로 저장해 열어 주세요</h3>'
     + '<p>구형 <b>.hwp</b>는 폰 브라우저에서 종이 그대로 그릴 수 없습니다.</p>'
     + '<p>한글에서 <b>[인쇄 → PDF로 저장]</b>을 하거나, 종이를 <b>사진으로 찍어</b> 올리면 원본 비율 그대로 1:1로 보입니다.</p>'
-    + '<button type="button" id="ppPick">PDF·사진으로 열기</button>';
+    + '<p class="pppriv">구형 .hwp는 사무실 PC에서 PDF로 바꿉니다. 파일은 그 PC를 거쳐 이 기기로 돌아오고 저장되지 않습니다.</p>'
+    + '<button type="button" id="ppPick">PDF·사진으로 열기</button>'
+    + '<button type="button" class="ppretry" id="ppRetry">사무실 PC로 변환 다시 시도</button>';
   PP.scale.appendChild(card);
   PP.notice = true;
   PP.w = 340; PP.h = Math.max(card.offsetHeight, 260);
   PP.tops = [0]; PP.pages = [{el: card, w: 340, h: PP.h}];
   const b = card.querySelector('#ppPick');
   if (b) b.onclick = () => document.getElementById('f').click();
+  const rt = card.querySelector('#ppRetry'), rf = PP.file;
+  if (rt) rt.onclick = () => { if (rf) showFile(rf); };
+}
+/* 구형 .hwp → 사무실 PC(한컴오피스) 변환 서버 → PDF 바이트. 실패하면 null(→ 안내 카드) */
+async function hwpViaPc(file){
+  const wait = (ms) => { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
+  try{
+    const hj = await (await fetch('../hwp-host.json?t=' + Date.now(), {cache: 'no-store', signal: wait(10000)})).json();
+    const url = String(hj && hj.url || '').replace(/\/+$/, '');
+    if (!/^https:\/\//.test(url)) return null;
+    const hc = await fetch(url + '/health', {cache: 'no-store', signal: wait(10000)});
+    if (!hc.ok) return null;
+    const res = await fetch(url + '/convert', {method: 'POST', body: file, signal: wait(50000),
+      headers: {'Content-Type': 'application/octet-stream', 'X-KTS-Name': encodeURIComponent(file.name || 'doc.hwp')}});
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    const h = new Uint8Array(buf, 0, Math.min(5, buf.byteLength));
+    return (h.length === 5 && String.fromCharCode.apply(null, h) === '%PDF-') ? buf : null;
+  }catch(e){ return null; }
 }
 
 /* ---------- 조립 ---------- */
@@ -1091,7 +1113,11 @@ async function showFile(file){
     } else if (/\.(csv|txt)$/.test(name)){
       r = openText(await file.text(), name);
     } else if (/\.hwp$/.test(name)){
-      r = {kind: 'notice', note: '구형 한글'};          /* 1:1 인화 불가 — 깨뜨리지 않고 안내만 */
+      loader(true, nm, '구형 한글 → PDF로 바꾸는 중… (사무실 PC)', 40);
+      const pb = await hwpViaPc(file);                  /* 사무실 PC가 꺼져 있으면 null → 지금의 안내 카드 */
+      r = !pb ? {kind: 'notice', note: '구형 한글'}
+        : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
+        : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
     } else {
       r = {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''}
     }
