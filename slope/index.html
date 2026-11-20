@@ -305,7 +305,7 @@ var S={
 function master(){return window.KTS_MASTER===true||(window.KTS&&window.KTS.isMaster&&window.KTS.isMaster())}
 function saveQ(){LS.set('kts_slope_free',String(S.free));LS.set('kts_slope_cred',String(S.cred));LS.set('kts_slope_seen',JSON.stringify(S.seen.slice(-40)))}
 /* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) — 줌·필지 확인 */
-window.__KTS_ST=function(){ return {zoom:S.zoom, tileZ:clamp(Math.round(S.zoom),3,TZMAX), maxZoom:ZMAX,jibun:(PC&&PC.jibun)||'', pnu:(PC&&PC.pnu)||'', pcLoaded:!!PC} };
+window.__KTS_ST=function(){ return {zoom:S.zoom, tileZ:clamp(Math.round(S.zoom),3,TZMAX), maxZoom:ZMAX,jibun:(PC&&PC.jibun)||'', pnu:(PC&&PC.pnu)||'', pcLoaded:!!PC, bb:(PC&&PC.bb)||null} };
 
 /* ---------------- 작은 도구 ---------------- */
 var toastT=0;
@@ -741,15 +741,19 @@ function drawParcelHL(g,x0,y0,w,h){
   if(!PC||!PC.rings) return;
   var W=worldSize(S.zoom), p=new Path2D(), bx=1e9, by=1e9, bX=-1e9, bY=-1e9;
   for(var i=0;i<PC.rings.length;i++){
-    var r=PC.rings[i];
+    var r=PC.rings[i], started=false;
     for(var j=0;j<r.length;j++){
-      var X=lng2w(r[j][0])*W-x0, Y=lat2w(r[j][1])*W-y0;
-      if(j===0) p.moveTo(X,Y); else p.lineTo(X,Y);
+      var pt=r[j];
+      if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) continue; /* 비정상 꼭짓점은 건너뛴다 */
+      var X=lng2w(pt[0])*W-x0, Y=lat2w(pt[1])*W-y0;
+      if(!started){ p.moveTo(X,Y); started=true } else p.lineTo(X,Y);
       if(X<bx)bx=X; if(X>bX)bX=X; if(Y<by)by=Y; if(Y>bY)bY=Y;
     }
-    p.closePath();
+    if(started) p.closePath();
   }
+  if(!isFinite(bx)||!isFinite(by)) return;
   if(bX<0||bx>w||bY<0||by>h) return; /* 화면 밖 */
+  PC.bb={bx:Math.round(bx),by:Math.round(by),bX:Math.round(bX),bY:Math.round(bY),w:w,h:h};
   g.save();
   g.fillStyle='rgba(255,107,0,.17)'; g.fill(p,'evenodd');          /* 은은한 반투명 채우기 */
   g.lineJoin='round'; g.lineCap='round';
