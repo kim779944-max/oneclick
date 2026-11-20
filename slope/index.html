@@ -745,7 +745,7 @@ function drawParcelHL(g,x0,y0,w,h){
     for(var j=0;j<r.length;j++){
       var X=lng2w(r[j][0])*W-x0, Y=lat2w(r[j][1])*W-y0;
       if(j===0) p.moveTo(X,Y); else p.lineTo(X,Y);
-      if(i===0){ if(X<bx)bx=X; if(X>bX)bX=X; if(Y<by)by=Y; if(Y>bY)bY=Y }
+      if(X<bx)bx=X; if(X>bX)bX=X; if(Y<by)by=Y; if(Y>bY)bY=Y;
     }
     p.closePath();
   }
