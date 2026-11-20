@@ -1828,6 +1828,8 @@ function archEnter(){
 }
 /* 지번(필지)이 바뀌면 이어서 다시 조회 — 2D에서 지번을 바꿔도 이 탭이 같이 갱신된다 */
 function archOnPlace(){
+  /* 3D는 켜 둔 채로 메쉬를 다시 만들지 않는다 — 지번이 바뀌면 2D로 돌아와 새 필지로 다시 열게 한다(옛 지형이 남는 것 방지) */
+  if(V3.on||V3.want){ v3exit(); toast('지번이 바뀌었습니다 · 3D 지형을 다시 누르면 새 필지로 그립니다') }
   if(!ARCH.on) return;
   clearTimeout(ARCH.t);
   ARCH.t=setTimeout(function(){ if(ARCH.on) archLoad(false) },160);
