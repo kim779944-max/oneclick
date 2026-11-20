@@ -142,7 +142,7 @@ details.adv .keyrow{margin-top:7px}
 .loadbar.on{opacity:.95}
 @keyframes ld{0%{background-position:-50% 0}100%{background-position:150% 0}}
 /* 3D 지형 보기(121번) — 2D 틀은 그대로, 아래는 추가만 */
-.vmode{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;background:#0B1729;border:1px solid var(--line);border-radius:11px;padding:3px}
+.vmode{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px;background:#0B1729;border:1px solid var(--line);border-radius:11px;padding:3px}
 .vmode button{border:0;background:none;color:#9FB0C8;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:900;cursor:pointer}
 .vmode button.on{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
 .mapwrap.m3d #mapcv{visibility:hidden}
@@ -164,11 +164,49 @@ details.adv .keyrow{margin-top:7px}
 .tip3d{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);font-size:10px;font-weight:800;color:#FFD9A6;background:rgba(10,17,40,.88);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:3px 9px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
 .tip3d.off{opacity:0}
 .lbl3d{position:absolute;left:0;top:0;transform:translate(-50%,-100%);font-size:11px;font-weight:900;color:#FFD9A6;background:rgba(10,17,40,.9);border:1.2px solid rgba(255,107,0,.95);border-radius:7px;padding:1px 8px;white-space:nowrap;pointer-events:none}
+/* 건축·규제 탭(123번) — 2D·3D 틀은 그대로, 아래는 추가만 */
+.ahide{display:none!important}
+.card.mArch .togs,.card.mArch .rng{display:none}
+.arch{padding-top:2px}
+.ahead{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.aaddr{font-size:11.5px;font-weight:900;color:#DCE6F2;line-height:1.4;word-break:keep-all}
+.aaddr small{display:block;font-size:9.5px;color:#7C8DA6;font-weight:700;margin-top:2px}
+.acard{border:1px solid #1D2C49;background:#0B1729;border-radius:11px;padding:8px 9px;margin-bottom:7px}
+.atit{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:900;color:#8FA1B8;letter-spacing:.02em}
+.atit em{margin-left:auto;font-style:normal;font-size:9px;color:#6D7E97;font-weight:800}
+.abadge{display:block;font-size:16px;font-weight:900;letter-spacing:-.5px;color:#fff;margin-top:3px;line-height:1.25}
+.abadge s{text-decoration:none;color:#FFA24D}
+.asub{font-size:9.5px;color:#8FA1B8;margin-top:3px;line-height:1.55;word-break:keep-all}
+.asub b{color:#DCE6F2}
+.achips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.achips span{font-size:9.5px;font-weight:900;border-radius:999px;padding:3px 8px;border:1px solid rgba(255,107,0,.45);color:#FFD9A6;background:rgba(255,107,0,.1)}
+.achips span.no{border-color:#2A3A5C;color:#7C8DA6;background:#0E1A33}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.agrid div{background:#0E1A33;border:1px solid #1D2C49;border-radius:9px;padding:6px 8px}
+.agrid span{display:block;font-size:9px;font-weight:800;color:#8FA1B8}
+.agrid b{font-size:14px;font-weight:900;color:#F3F6FA;letter-spacing:-.3px;font-style:normal}
+.agrid b small{font-size:9.5px;color:#AFBDD0;font-weight:800;margin-left:1px}
+.aox{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.aox div{display:flex;align-items:flex-start;gap:6px;background:#0E1A33;border:1px solid #1D2C49;border-radius:9px;padding:6px 7px}
+.aox i{flex:0 0 auto;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:900;color:#0A1224;background:#5A6B84;margin-top:1px}
+.aox i.o{background:#2ED47A}.aox i.x{background:#E23A2E;color:#fff}.aox i.q{background:#FFA24D}
+.aox b{display:block;font-size:9px;color:#8FA1B8;font-weight:800}
+.aox p{margin:1px 0 0;font-size:10.5px;color:#DCE6F2;font-weight:900;line-height:1.35;word-break:keep-all}
+.aox p s{display:block;text-decoration:none;font-size:8.5px;color:#7C8DA6;font-weight:700;margin-top:1px}
+#aSec{display:block;width:100%;height:180px;border-radius:9px;background:#0A1526;border:1px solid #1D2C49;margin-top:6px}
+.alnk a{display:flex;align-items:center;gap:7px;text-decoration:none;color:#DCE6F2;border:1px solid #1D2C49;background:#0E1A33;border-radius:9px;padding:7px 9px;margin-top:5px;font-size:11px;font-weight:900}
+.alnk a i{font-style:normal;color:#FFA24D;font-size:12px}
+.alnk a em{margin-left:auto;font-style:normal;color:#6D7E97;font-size:9px;font-weight:800}
+.afoot{display:flex;gap:5px;margin-top:7px}
+.afoot button{flex:1;border:1px solid #2E4370;background:#12203C;color:#DCE6F2;border-radius:9px;padding:8px;font-size:11px;font-weight:900;cursor:pointer}
+.anote2{font-size:9.5px;color:#6D7E97;line-height:1.6;margin:8px 2px 2px}
+.anote2 b{color:#B9C8DA}
+.aload{font-size:10.5px;color:#FFD9A6;font-weight:800;padding:10px 2px;line-height:1.6}
 </style></head>
 <body>
 <div id="app">
 <header>
-  <a class="back" href="https://autooneclick.com/">← 원클릭</a>
+  <a class="back" href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭</a>
   <span class="brand">KTS <i>경사도 지도</i></span>
   <span class="sp"></span>
   <span class="st" id="planTag">하루 3건 무료</span>
@@ -190,9 +228,9 @@ details.adv .keyrow{margin-top:7px}
     <p class="note" id="qNote">지도를 손가락으로 밀어 필지에 맞추면 그 자리를 바로 분석합니다. 지도를 한 번 누르면 그 지점으로 중심이 옮겨집니다.</p>
   </section>
 
-  <section class="card">
+  <section class="card" id="mapCard">
     <h2><i>2</i>필지 경사도 지도<small id="demTag">5m 격자</small></h2>
-    <div class="vmode" id="vmode"><button type="button" data-v="2d" class="on">2D 지도</button><button type="button" data-v="3d">3D 지형</button></div>
+    <div class="vmode" id="vmode"><button type="button" data-v="2d" class="on">2D 지도</button><button type="button" data-v="3d">3D 지형</button><button type="button" data-v="arch">건축·규제</button></div>
     <div class="mapwrap">
       <canvas id="mapcv" width="360" height="392" aria-label="경사도 지도"></canvas>
       <canvas id="cv3d" class="hide" aria-label="3D 지형"></canvas>
@@ -213,6 +251,13 @@ details.adv .keyrow{margin-top:7px}
         <div class="bar"></div>
         <div class="lb"><span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30+</span></div>
       </div>
+    </div>
+    <div class="arch hide" id="arch">
+      <div class="ahead">
+        <div class="aaddr" id="aAddr">—</div>
+      </div>
+      <div id="aBody"></div>
+      <p class="anote2">1차 <b>법정 기준</b> 참고용입니다. 법정 상한은 조례로 더 낮아질 수 있으니 최종은 <b>지자체 조례·고시</b>와 토지이음 확인이 기준입니다.</p>
     </div>
     <div class="togs" id="togs">
       <button type="button" data-l="slope" class="on">경사도<small>색</small></button>
@@ -771,7 +816,7 @@ function parcelFetch(lat,lon){
     var pr=ft.properties||{};
     PC={rings:rings,jibun:pr.jibun||pr.bonbun||'',addr:pr.addr||'',pnu:pr.pnu||'',area:parcelArea(rings,lat)};
     paintParcelInfo(); requestRender();
-  }).catch(function(){ /* 필지 조회가 막혀도 경사도 지도는 그대로 */ });
+  }).catch(function(){ /* 필지 조회가 막혀도 경사도 지도는 그대로 */ }).then(function(){ archOnPlace() });
 }
 function drawParcelHL(g,x0,y0,w,h){
   if(!PC||!PC.rings) return;
@@ -1704,7 +1749,7 @@ function v3bind(c){
   c.addEventListener('wheel',function(e){ e.preventDefault(); V3.dist*=Math.pow(1.0015,e.deltaY); lim(); V3.dirty=true },{passive:false});
 }
 document.querySelectorAll('#vmode button').forEach(function(b){
-  b.addEventListener('click',function(){ if(b.getAttribute('data-v')==='3d') v3enter(); else if(V3.on||V3.want) v3exit() });
+  b.addEventListener('click',function(){ setView(b.getAttribute('data-v')) });
 });
 $('#rst3d').addEventListener('click',function(){ v3reset() });
 document.querySelectorAll('#ex3d button').forEach(function(b){
@@ -1730,6 +1775,316 @@ window.__KTS_3D_PIX=function(){
   var W=gl.drawingBufferWidth, H=gl.drawingBufferHeight, px=new Uint8Array(W*H*4); gl.readPixels(0,0,W,H,gl.RGBA,gl.UNSIGNED_BYTE,px);
   var sky=0, h=2166136261>>>0; for(var i=0;i<px.length;i+=4){ if(px[i+3]===0) sky++; h^=px[i]^(px[i+1]<<8)^(px[i+2]<<16); h=Math.imul(h,16777619)>>>0 }
   return {w:W,h:H,sky:+(sky/(W*H)).toFixed(4),hash:h.toString(16)};
+};
+
+/* ---------------- 건축·규제 탭(123번) ----------------
+   지번 1회 입력(S·PC)으로 이어서 조회한다 —
+   용도지역·용도지구·용도구역·지구단위계획(Vworld 2D Data API) + 지목·도로접면·공시지가(NED 토지특성).
+   법정 건폐율·용적률(국토계획법 시행령 §84·§85)과 정북 일조 사선(건축법 §61, 2026.11.12 시행)으로
+   건축 가능 규모·층수를 단면 그림으로 보여 준다. 2D·3D 상태(S·T·PC·V3)는 읽기만 한다. */
+var ARCH={on:false,seq:0,key:'',loading:false,data:null,err:'',cache:{},t:0};
+var ZL=[['LT_C_UQ111','도시지역'],['LT_C_UQ112','관리지역'],['LT_C_UQ113','농림지역'],['LT_C_UQ114','자연환경보전지역']];
+var DL=[['LT_C_UQ121','경관지구'],['LT_C_UQ123','고도지구'],['LT_C_UQ124','방화지구'],['LT_C_UQ125','방재지구'],
+        ['LT_C_UQ126','보호지구'],['LT_C_UQ128','취락지구'],['LT_C_UQ129','개발진흥지구'],['LT_C_UQ130','특정용도제한지구']];
+var AL=[['LT_C_UD801','개발제한구역'],['LT_C_UQ162','도시자연공원구역']];
+var PL=[['LT_C_UPISUQ161','지구단위계획구역'],['LT_C_UPISUQ171','개발행위허가제한']];
+/* 국토계획법 시행령 §84①(건폐율)·§85①(용적률) — 조례가 정하는 상한의 최대치 */
+var ZT={
+  '제1종전용주거':{c:50,f:100},'제2종전용주거':{c:50,f:150},
+  '제1종일반주거':{c:60,f:200},'제2종일반주거':{c:60,f:250},'제3종일반주거':{c:50,f:300},
+  '준주거':{c:70,f:500},
+  '중심상업':{c:90,f:1500},'일반상업':{c:80,f:1300},'근린상업':{c:70,f:900},'유통상업':{c:80,f:1100},
+  '전용공업':{c:70,f:300},'일반공업':{c:70,f:350},'준공업':{c:70,f:400},
+  '보전녹지':{c:20,f:80},'생산녹지':{c:20,f:100},'자연녹지':{c:20,f:100},
+  '보전관리':{c:20,f:80},'생산관리':{c:20,f:80},'계획관리':{c:40,f:100},
+  '농림':{c:20,f:80},'자연환경보전':{c:20,f:80}
+};
+function zBase(n){ return String(n||'').replace(/\s*지역$/,'') }
+function zInfo(n){ return ZT[zBase(n)]||null }
+function archKey(){ return (PC&&PC.pnu)?('p'+PC.pnu):('c'+S.lat.toFixed(5)+','+S.lon.toFixed(5)) }
+function paintTabs(m){ document.querySelectorAll('#vmode button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===m) }) }
+/* 탭 하나로 2D·3D·건축규제를 오간다 — 2D/3D 쪽은 기존 함수(v3enter·v3exit)를 그대로 쓴다 */
+function setView(m){
+  if(m==='arch'){
+    if(V3.on||V3.want) v3exit();
+    $('.mapwrap').classList.add('ahide');
+    $('#arch').classList.remove('hide');
+    $('#mapCard').classList.add('mArch');
+    paintTabs('arch'); archEnter();
+    return;
+  }
+  ARCH.on=false;
+  $('#arch').classList.add('hide');
+  $('#mapCard').classList.remove('mArch');
+  $('.mapwrap').classList.remove('ahide');
+  if(m==='3d'){ v3enter(); return }
+  if(V3.on||V3.want) v3exit();
+  else { paintTabs('2d'); requestRender() }
+}
+function archEnter(){
+  ARCH.on=true;
+  if(!ARCH.data||ARCH.key!==archKey()) archLoad(false);
+  else { archRender() }
+}
+/* 지번(필지)이 바뀌면 이어서 다시 조회 — 2D에서 지번을 바꿔도 이 탭이 같이 갱신된다 */
+function archOnPlace(){
+  if(!ARCH.on) return;
+  clearTimeout(ARCH.t);
+  ARCH.t=setTimeout(function(){ if(ARCH.on) archLoad(false) },160);
+}
+/* Vworld 2D Data — 한 레이어를 점으로 찍어 uname 목록을 받는다 */
+function vwNames(L,lat,lon){
+  var url='https://api.vworld.kr/req/data?service=data&request=GetFeature&version=2.0&data='+L
+    +'&key='+encodeURIComponent(S.key)+'&domain=autooneclick.com&format=json&size=5&page=1'
+    +'&geometry=false&attribute=true&crs=EPSG:4326'
+    +'&geomFilter='+encodeURIComponent('POINT('+lon.toFixed(7)+' '+lat.toFixed(7)+')');
+  return jsonp(url).then(function(j){
+    var r=j&&j.response;
+    if(!r||r.status!=='OK') return [];
+    var fs=(r.result&&r.result.featureCollection&&r.result.featureCollection.features)||[];
+    var out=[];
+    for(var i=0;i<fs.length;i++){
+      var u=(fs[i].properties||{}).uname;
+      if(u&&u!=='지정되지않음'&&out.indexOf(u)<0) out.push(u);
+    }
+    return out;
+  }).catch(function(){ return [] });
+}
+/* NED 토지특성 — 지목·산여부·도로접면·공시지가. 같은 PNU의 연도별 행이 오므로 최신 연도를 고른다 */
+function nedLand(pnu){
+  if(!pnu) return Promise.resolve(null);
+  var url='https://api.vworld.kr/ned/data/getLandCharacteristics?key='+encodeURIComponent(S.key)
+    +'&domain=autooneclick.com&pnu='+encodeURIComponent(pnu)+'&format=json&numOfRows=30&pageNo=1';
+  return jsonp(url).then(function(j){
+    var f=j&&j.landCharacteristicss&&j.landCharacteristicss.field;
+    if(!f) return null;
+    if(!f.length) f=[f];
+    var best=null;
+    for(var i=0;i<f.length;i++){
+      var r=f[i]; if(String(r.pnu)!==String(pnu)) continue;
+      if(!best||(+r.stdrYear||0)>(+best.stdrYear||0)) best=r;
+    }
+    return best||f[0];
+  }).catch(function(){ return null });
+}
+function archLoad(force){
+  if(!ARCH.on) return;
+  var k=archKey();
+  if(!force&&ARCH.cache[k]){ ARCH.key=k; ARCH.data=ARCH.cache[k]; ARCH.loading=false; ARCH.err=''; archRender(); return }
+  if(!S.key){ ARCH.key=k; ARCH.data=null; ARCH.loading=false; ARCH.err='key'; archRender(); return }
+  var my=++ARCH.seq, lat=S.lat, lon=S.lon, pnu=(PC&&PC.pnu)||'';
+  ARCH.key=k; ARCH.loading=true; ARCH.err=''; ARCH.data=null; archRender();
+  function grp(list){
+    return Promise.all(list.map(function(L){ return vwNames(L[0],lat,lon) })).then(function(res){
+      return list.map(function(L,i){ return {label:L[1],names:res[i]} }).filter(function(o){ return o.names.length });
+    });
+  }
+  Promise.all([grp(ZL),grp(DL),grp(AL),grp(PL),nedLand(pnu)]).then(function(r){
+    if(my!==ARCH.seq) return;
+    var d={zone:r[0],dist:r[1],area:r[2],plan:r[3],land:r[4],pnu:pnu,at:Date.now()};
+    ARCH.data=d; ARCH.cache[k]=d; ARCH.loading=false; archRender();
+  }).catch(function(){ if(my!==ARCH.seq) return; ARCH.loading=false; ARCH.err='fail'; archRender() });
+}
+function archZones(d){ var a=[]; (d.zone||[]).forEach(function(g){ g.names.forEach(function(n){ if(a.indexOf(n)<0) a.push(n) }) }); return a }
+function sigName(){
+  var d=ARCH.data&&ARCH.data.land;
+  if(!d||!d.ldCodeNm) return '';
+  var t=String(d.ldCodeNm).split(' ');
+  return t.slice(0,2).join(' ');
+}
+function acell(label,val){ return '<div><span>'+label+'</span><b>'+val+'</b></div>' }
+function aox(k,label,txt,sub){
+  return '<div><i class="'+k+'">'+(k==='o'?'✓':(k==='x'?'✕':'?'))+'</i><div><b>'+label+'</b><p>'+txt+'<s>'+sub+'</s></p></div></div>';
+}
+function archRender(){
+  var body=$('#aBody'), ad=$('#aAddr');
+  if(!body) return;
+  var d=ARCH.data, L=(d&&d.land)||{};
+  var pnu=(PC&&PC.pnu)||(d&&d.pnu)||'';
+  ad.innerHTML=esc(S.addr||'—')+'<small>'+(PC&&PC.jibun?('필지 '+esc(PC.jibun)+' · '):'')
+    +(PC&&PC.area?(Math.round(PC.area).toLocaleString()+'㎡ · '):'')
+    +'좌표 '+S.lat.toFixed(4)+', '+S.lon.toFixed(4)+(pnu?' · PNU '+esc(pnu):'')+'</small>';
+  if(!d){
+    body.innerHTML='<div class="aload">'+(ARCH.err==='key'
+      ?'Vworld 키가 없어 조회할 수 없습니다. 6번 카드에서 키를 넣어 주세요.'
+      :(ARCH.loading?'용도지역·용도지구·지목·도로를 조회하는 중…'
+      :(ARCH.err==='fail'?'조회에 실패했습니다 · 다시 조회를 눌러 주세요.':'지번을 넣어 주세요.')))+'</div>';
+    return;
+  }
+  var zn=archZones(d), dn=[], an=[], pn=[];
+  (d.dist||[]).forEach(function(g){ g.names.forEach(function(n){ if(dn.indexOf(n)<0) dn.push(n) }) });
+  (d.area||[]).forEach(function(g){ g.names.forEach(function(n){ if(an.indexOf(n)<0) an.push(n) }) });
+  (d.plan||[]).forEach(function(g){ g.names.forEach(function(n){ if(pn.indexOf(n)<0) pn.push(n) }) });
+  var main=zn[0]||'', zi=main?zInfo(main):null;
+  var A=(PC&&PC.area)||(+L.lndpclAr)||0;
+  var C=zi?zi.c:null, F=zi?zi.f:null;
+  var foot=(C&&A)?A*C/100:null, far=(F&&A)?A*F/100:null;
+  var fl=(C&&F)?Math.max(1,Math.floor(F/C)):null;
+  var isRes=/(전용주거|일반주거)지역$/.test(main);
+  var h='';
+  /* 1 용도지역 */
+  h+='<div class="acard"><div class="atit">용도지역 <em>Vworld 2D 데이터</em></div>'
+    +'<span class="abadge">'+(main?esc(main):'<s>조회 안 됨</s>')+'</span>'
+    +'<div class="asub">'+(zi?('법정 <b>건폐율 '+C+'%</b> · <b>용적률 '+F+'%</b> 이하 — 국토계획법 시행령 §84①·§85① (조례가 더 낮게 정할 수 있음)')
+      :'표준 용도지역 명칭이 아니어서 법정 수치를 붙이지 못했습니다 — 토지이음 확인')+'</div>'
+    +(zn.length>1?'<div class="asub">겹친 용도지역: <b>'+esc(zn.slice(1).join(' · '))+'</b></div>':'')
+    +'</div>';
+  /* 2 용도지구·구역 */
+  h+='<div class="acard"><div class="atit">용도지구 · 용도구역 <em>Vworld</em></div><div class="achips">';
+  var chips=[];
+  dn.forEach(function(n){ chips.push('<span>'+esc(n)+'</span>') });
+  an.forEach(function(n){ chips.push('<span>'+esc(n)+'</span>') });
+  pn.forEach(function(n){ chips.push('<span>'+esc(n)+'</span>') });
+  h+=(chips.length?chips.join(''):'<span class="no">해당 없음</span>')+'</div>';
+  h+='<div class="asub">경관·고도·방화·방재·보호·취락·개발진흥·특정용도제한 지구 + 개발제한구역·도시자연공원구역·지구단위계획을 이 지점 기준으로 조회합니다.</div></div>';
+  /* 3 규모 */
+  h+='<div class="acard"><div class="atit">건축 가능 규모 <em>법정 상한 기준</em></div><div class="agrid">'
+    +acell('건폐율',C?C+'<small>%</small>':'—')
+    +acell('용적률',F?F+'<small>%</small>':'—')
+    +acell('대지면적',A?Math.round(A).toLocaleString()+'<small>㎡</small>':'—')
+    +acell('건축면적',foot?Math.round(foot).toLocaleString()+'<small>㎡</small>':'—')
+    +acell('연면적',far?Math.round(far).toLocaleString()+'<small>㎡</small>':'—')
+    +acell('예상 층수',fl?('약 '+fl+'<small>층</small>'):'—')
+    +'</div><div class="asub">건축면적 = 대지면적 × 건폐율 · 연면적 = 대지면적 × 용적률 · 층수 = 용적률 ÷ 건폐율. 실제는 조례 상한·도로 후퇴·주차·일조로 줄어듭니다.</div></div>';
+  /* 4 일조 사선 단면 */
+  var secNote=isRes
+    ? '이 필지는 주거지역 — 정북 경계에서 <b>10m 이하 1.5m</b>, <b>10m 초과~17m 5m</b>, <b>17m 초과 높이의 1/2</b> 이상 띄워야 합니다(조례 범위). '
+    : (main?('이 필지는 <b>'+esc(main)+'</b> — 일조 사선(§61)은 전용·일반주거지역 건축물에 적용됩니다. 정북 인접 대지가 주거지역이 아니어도 적용 제외됩니다.')
+      :'용도지역을 확인하지 못해 일조 사선을 그리지 못했습니다.');
+  secNote+='<br>대지안의 공지 — 건축선 1~6m · 인접대지경계선 0.5~6m 범위에서 조례가 정함(건축법 §58·시행령 §80의2 별표 2).';
+  h+='<div class="acard"><div class="atit">정북 일조 사선 단면 <em>건축법 §61 · 2026.11.12 시행</em></div>'
+    +'<canvas id="aSec" width="360" height="180" aria-label="정북 일조 사선 단면"></canvas>'
+    +'<div class="asub" id="aSecNote">'+secNote+'</div></div>';
+  /* 5 도로·농지·산지 */
+  var jimok=L.lndcgrCodeNm||'';
+  var sanSet=(L.regstrSeCodeNm==='산')||jimok==='임야';
+  var farm=/^(전|답|과수원)$/.test(jimok);
+  var roadNm=L.roadSideCodeNm||'', meng=/맹지/.test(roadNm), roadQ=!roadNm||roadNm==='지정되지않음';
+  var dr=an.indexOf('개발제한구역')>=0, dp=pn.length>0;
+  h+='<div class="acard"><div class="atit">도로 · 농지 · 산지 <em>NED 토지특성'+(L.stdrYear?' '+esc(L.stdrYear):'')+'</em></div><div class="aox">'
+    +aox(meng?'x':(roadQ?'q':'o'),'도로 접면',roadQ?'확인 필요':(meng?'맹지 — 접면 없음':esc(roadNm)),meng?'맹지 주의 · 건축법 §44 접도요건':'건축법 §44 접도요건')
+    +aox(farm?'o':'x','농지',farm?'농지 해당':(jimok?'농지 아님':'확인 필요'),'지목 '+(jimok?esc(jimok):'—'))
+    +aox(sanSet?'o':'x','산지',sanSet?'산지 해당':'산지 아님','지목 '+(jimok?esc(jimok):'—')+(L.regstrSeCodeNm?' · '+esc(L.regstrSeCodeNm):''))
+    +aox(dr?'x':'o','개발제한구역',dr?'해당':'해당 없음','용도구역(Vworld)')
+    +aox(dp?'q':'o','지구단위계획',dp?esc(pn.join(' · ')):'미지정','Vworld')
+    +aox(L.pblntfPclnd?'o':'q','공시지가',L.pblntfPclnd?(Math.round(+L.pblntfPclnd).toLocaleString()+'원/㎡'):'—','NED '+(L.stdrYear||''))
+    +'</div><div class="asub">지목·도로접면은 공부 기반 토지특성이라 현황과 다를 수 있습니다. <b>맹지</b>는 4m 이상 도로에 접하지 않아 건축허가가 막히는 땅입니다.</div></div>';
+  /* 6 공식 확인 */
+  var eum=pnu?('https://www.eum.go.kr/web/ar/lu/luLandDet.jsp?pnu='+encodeURIComponent(pnu)):'https://www.eum.go.kr/web/am/amMain.jsp';
+  var sg=sigName();
+  h+='<div class="acard"><div class="atit">공식 확인 바로가기 <em>최종 판단</em></div><div class="alnk">'
+    +'<a href="'+esc(eum)+'" target="_blank" rel="noopener"><i>◈</i>토지이음 토지이용계획'+(pnu?' (이 필지)':'')+'<em>행위제한·건폐율</em></a>'
+    +'<a href="https://www.elis.go.kr/" target="_blank" rel="noopener"><i>▤</i>자치법규정보시스템'+(sg?' · '+esc(sg):'')+'<em>건축·도시계획 조례</em></a>'
+    +'<a href="https://www.ilsa.go.kr/" target="_blank" rel="noopener"><i>◎</i>일사편리 부동산공부 열람<em>토지대장·지적도</em></a>'
+    +'<a href="https://www.vworld.kr/" target="_blank" rel="noopener"><i>◉</i>브이월드 용도지역 지도<em>Vworld</em></a>'
+    +'</div></div>';
+  h+='<div class="afoot"><button type="button" id="aRetry">다시 조회</button><button type="button" id="aCopy">진단 문구 복사</button></div>';
+  body.innerHTML=h;
+  var rb=$('#aRetry');
+  if(rb) rb.addEventListener('click',function(){ archLoad(true); toast('용도지역·규제를 다시 조회합니다') });
+  var cb=$('#aCopy');
+  if(cb) cb.addEventListener('click',function(){ archCopy() });
+  archDrawSec();
+}
+/* 정북 일조 사선 단면 미니 그림 */
+function archDrawSec(){
+  var c=$('#aSec'); if(!c) return;
+  var g=c.getContext('2d'), w=c.clientWidth||340, h=180, dp=Math.min(2,window.devicePixelRatio||1);
+  c.width=Math.round(w*dp); c.height=Math.round(h*dp);
+  g.setTransform(dp,0,0,dp,0,0);
+  g.clearRect(0,0,w,h); g.fillStyle='#0A1526'; g.fillRect(0,0,w,h);
+  var d=ARCH.data; if(!d) return;
+  var zn=archZones(d), main=zn[0]||'', zi=main?zInfo(main):null;
+  var isRes=/(전용주거|일반주거)지역$/.test(main);
+  var A=(PC&&PC.area)||+((d.land||{}).lndpclAr)||0;
+  var C=zi?zi.c:0, F=zi?zi.f:0;
+  var fl=(C&&F)?Math.max(1,Math.floor(F/C)):2;
+  var H=+(fl*3.3).toFixed(1);
+  var mL=42, mR=8, mT=22, mB=34, gw=w-mL-mR, gh=h-mT-mB;
+  var HMAX=Math.max(isRes?18:10, Math.ceil((H*1.3)/2)*2);
+  var SW=Math.max(15,Math.min(34,H*1.3));
+  function X(m){ return mL+gw*m/SW }
+  function Y(m){ return mT+gh*(1-m/HMAX) }
+  var i;
+  g.strokeStyle='#16233D'; g.lineWidth=1;
+  for(i=0;i<=HMAX;i+=5){ g.beginPath(); g.moveTo(mL,Y(i)); g.lineTo(mL+gw,Y(i)); g.stroke() }
+  g.font='800 8.5px -apple-system,"Noto Sans KR",sans-serif'; g.fillStyle='#6D7E97'; g.textAlign='right';
+  g.fillText(HMAX+'m',mL-4,Y(HMAX)+3); g.fillText('0',mL-4,Y(0)+3);
+  if(HMAX>=10) g.fillText('10m',mL-4,Y(10)+3);
+  if(HMAX>=17) g.fillText('17m',mL-4,Y(17)+3);
+  g.textAlign='left';
+  g.strokeStyle='#4A5E80'; g.lineWidth=1.4; g.beginPath(); g.moveTo(mL,Y(0)); g.lineTo(mL+gw,Y(0)); g.stroke();
+  g.setLineDash([4,3]); g.strokeStyle='rgba(226,58,46,.9)'; g.lineWidth=1.2;
+  g.beginPath(); g.moveTo(X(0),Y(0)); g.lineTo(X(0),Y(HMAX)); g.stroke(); g.setLineDash([]);
+  g.fillStyle='#FF8A7A'; g.font='900 9px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText('정북 경계',X(0)+3,mT-6);
+  function dset(m){ if(!isRes) return 1; if(m<=10) return 1.5; if(m<=17) return 5; return m/2 }
+  var topM=Math.max(H+1,isRes?18:8);
+  if(isRes){
+    g.beginPath(); g.moveTo(X(0),Y(0));
+    for(i=0;i<=topM;i+=0.5) g.lineTo(X(dset(i)),Y(i));
+    g.lineTo(X(0),Y(topM)); g.closePath();
+    g.fillStyle='rgba(226,58,46,.14)'; g.fill();
+    g.beginPath();
+    for(i=0;i<=topM;i+=0.5){ var xx=X(dset(i)),yy=Y(i); if(i) g.lineTo(xx,yy); else g.moveTo(xx,yy) }
+    g.strokeStyle='rgba(226,58,46,.9)'; g.lineWidth=1.5; g.stroke();
+  }
+  var off=dset(H), bw=Math.min(SW-off-1.5, Math.max(4,SW*0.5));
+  if(bw<2.2) bw=Math.max(2.2,SW*0.3);
+  var bx=X(off), bxx=X(off+bw), by=Y(H), byy=Y(0);
+  var gr=g.createLinearGradient(0,by,0,byy);
+  gr.addColorStop(0,'rgba(255,162,77,.9)'); gr.addColorStop(1,'rgba(255,107,0,.28)');
+  g.fillStyle=gr; g.fillRect(bx,by,bxx-bx,byy-by);
+  g.strokeStyle='#FFA24D'; g.lineWidth=1.2; g.strokeRect(bx+0.5,by,bxx-bx-1,byy-by);
+  g.strokeStyle='rgba(255,255,255,.22)';
+  for(i=1;i<fl;i++){ var fy=Y(i*3.3); g.beginPath(); g.moveTo(bx,fy); g.lineTo(bxx,fy); g.stroke() }
+  g.fillStyle='#fff'; g.font='900 10px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText(fl+'층 · '+H+'m', Math.min(bx+4,mL+gw-56), Math.max(mT+10,by-4));
+  var ay=Y(0)+11;
+  g.strokeStyle='#FFD9A6'; g.lineWidth=1;
+  g.beginPath(); g.moveTo(X(0),ay); g.lineTo(X(off),ay); g.stroke();
+  g.beginPath(); g.moveTo(X(0),ay-2); g.lineTo(X(0),ay+2); g.moveTo(X(off),ay-2); g.lineTo(X(off),ay+2); g.stroke();
+  g.fillStyle='#FFD9A6'; g.font='800 8.5px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText(off.toFixed(1)+'m', Math.min(X(off)+3,mL+gw-24), ay-3);
+  g.fillStyle='#6D7E97'; g.font='700 8.5px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText(isRes?'정북 사선 · 10m↓ 1.5m / 10~17m 5m / 17m↑ 높이의 1/2':'주거지역 아님 — 일조 사선 미적용', mL, h-7);
+}
+function archCopy(){
+  var d=ARCH.data;
+  if(!d){ toast('아직 조회 중입니다'); return }
+  var L=d.land||{}, zn=archZones(d), main=zn[0]||'', zi=main?zInfo(main):null;
+  var A=(PC&&PC.area)||(+L.lndpclAr)||0, C=zi?zi.c:null, F=zi?zi.f:null;
+  var fl=(C&&F)?Math.max(1,Math.floor(F/C)):null;
+  var dn=[]; (d.dist||[]).forEach(function(g){ g.names.forEach(function(n){ if(dn.indexOf(n)<0) dn.push(n) }) });
+  var an=[]; (d.area||[]).forEach(function(g){ g.names.forEach(function(n){ if(an.indexOf(n)<0) an.push(n) }) });
+  var pn=[]; (d.plan||[]).forEach(function(g){ g.names.forEach(function(n){ if(pn.indexOf(n)<0) pn.push(n) }) });
+  var t=['[건축·규제 1차 진단] '+stamp(),
+    '지번: '+(S.addr||'—')+((PC&&PC.pnu)?' (PNU '+PC.pnu+')':''),
+    '용도지역: '+(main||'—')+(C?('  ·  법정 건폐율 '+C+'% / 용적률 '+F+'%'):''),
+    '용도지구·구역: '+(dn.concat(an,pn).join(', ')||'해당 없음'),
+    '대지면적 '+(A?Math.round(A).toLocaleString()+'㎡':'—')+(C?('  ·  건축면적 약 '+Math.round(A*C/100).toLocaleString()+'㎡ · 연면적 약 '+Math.round(A*F/100).toLocaleString()+'㎡ · 약 '+fl+'층'):''),
+    '지목 '+(L.lndcgrCodeNm||'—')+' · 도로접면 '+(L.roadSideCodeNm||'—')+(L.pblntfPclnd?('  ·  공시지가 '+Math.round(+L.pblntfPclnd).toLocaleString()+'원/㎡'):''),
+    '일조: '+(/(전용주거|일반주거)지역$/.test(main)?'정북 10m↓1.5m · 10~17m 5m · 17m↑ 높이의 1/2 (건축법 §61)':'주거지역 아님 — 적용 대상 아님'),
+    '출처: KTS 원클릭 지번·경사도 지도 (autooneclick.com/slope/)',
+    '※ 1차 법정 기준 참고용 — 최종은 지자체 조례·고시와 토지이음 확인'].join('\n');
+  function fb(){
+    var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('진단 문구를 복사했습니다') }catch(e){ toast('복사가 막혔습니다 · 화면 캡처를 써 주세요') }
+    ta.remove();
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ toast('진단 문구를 복사했습니다 · 카톡에 붙여 넣으세요') },fb);
+  } else fb();
+}
+window.addEventListener('resize',function(){ if(ARCH.on) archDrawSec() });
+/* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) */
+window.__KTS_ARCH=function(){
+  var d=ARCH.data||{}, L=d.land||{};
+  return {on:ARCH.on,loading:ARCH.loading,err:ARCH.err,key:ARCH.key,
+    zone:archZones(d),dist:(d.dist||[]),area:(d.area||[]),plan:(d.plan||[]),
+    land:{jimok:L.lndcgrCodeNm||'',san:L.regstrSeCodeNm||'',road:L.roadSideCodeNm||'',jiga:L.pblntfPclnd||'',year:L.stdrYear||''},
+    pnu:(PC&&PC.pnu)||'',areaM2:(PC&&PC.area)||0};
 };
 
 /* ---------------- 시작 ---------------- */
