@@ -206,6 +206,7 @@ details.adv .keyrow{margin-top:7px}
       <div><span>사면 방향(향)</span><b id="kAsp">—</b></div>
     </div>
     <p class="addrline" id="addr">주소 <b>—</b> · 위도 —, 경도 —</p>
+    <p class="addrline hide" id="pcInfo" style="color:#FFC98F"></p>
     <p class="addrline hide" id="pv" style="color:#FFC98F"></p>
     <p class="addrline" id="dist">15° 넘는 땅 <b>—</b> · 25° 넘는 땅 <b>—</b></p>
     <div class="two">
@@ -303,6 +304,8 @@ var S={
 };
 function master(){return window.KTS_MASTER===true||(window.KTS&&window.KTS.isMaster&&window.KTS.isMaster())}
 function saveQ(){LS.set('kts_slope_free',String(S.free));LS.set('kts_slope_cred',String(S.cred));LS.set('kts_slope_seen',JSON.stringify(S.seen.slice(-40)))}
+/* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) — 줌·필지 확인 */
+window.__KTS_ST=function(){ return {zoom:S.zoom, tileZ:clamp(Math.round(S.zoom),3,TZMAX), maxZoom:ZMAX,jibun:(PC&&PC.jibun)||'', pnu:(PC&&PC.pnu)||'', pcLoaded:!!PC} };
 
 /* ---------------- 작은 도구 ---------------- */
 var toastT=0;
@@ -312,6 +315,7 @@ function fmt(n,d){if(n==null||!isFinite(n))return '—';return (d?n.toFixed(d):S
 
 /* ---------------- 지도 좌표(웹 메르카토르) ---------------- */
 var TILE=256, R2=6378137, CIRC=40075016.686;
+var ZMIN=13, ZMAX=20, TZMAX=19; /* Vworld WMTS 타일은 19까지만 — 20은 z19 타일을 늘려 그리는 오버줌 */
 function lng2w(lon){return (lon+180)/360}
 function lat2w(lat){var s=Math.sin(clamp(lat,-85,85)*Math.PI/180);return 0.5-Math.log((1+s)/(1-s))/(4*Math.PI)}
 function w2lng(x){return x*360-180}
@@ -586,12 +590,13 @@ function scene(g,w,h,o){
   if(S.lay.grid) drawGridLines(g,x0,y0,w,h);
   if(S.lay.parcel) drawVWImg(g,x0,y0,w,h,'parcel');
   if(S.lay.zone) drawVWImg(g,x0,y0,w,h,'zone');
+  if(PC) drawParcelHL(g,x0,y0,w,h);
   drawMarker(g,x0,y0,w,h,o);
   g.restore();
 }
 
 function drawBase(g,x0,y0,w,h){
-  var z=clamp(Math.round(S.zoom),3,19), n=Math.pow(2,z);
+  var z=clamp(Math.round(S.zoom),3,TZMAX), n=Math.pow(2,z); /* 줌이 19를 넘으면 z19 타일을 크게 늘려 그린다(오버줌) */
   var s=256*worldSize(S.zoom)/worldSize(z); /* 화면에서 타일 한 장의 크기(px) */
   var tx0=Math.floor(x0/s), tx1=Math.floor((x0+w)/s);
   var ty0=Math.max(0,Math.floor(y0/s)), ty1=Math.min(n-1,Math.floor((y0+h)/s));
@@ -685,6 +690,86 @@ function drawVWImg(g,x0,y0,w,h,kind){
   }
   if(im.ok){ g.save(); g.globalAlpha=kind==='parcel'?0.9:0.45; g.drawImage(im.img,0,0,w,h); g.restore() }
 }
+/* ---------------- 찾은 필지 경계 강조(Vworld 연속지적도 Data API) ---------------- */
+var PC=null, PCseq=0;
+function ringAreaSigned(ring,latC){
+  var mPerLat=111132, mPerLon=111320*Math.cos(latC*Math.PI/180), s=0, n=ring.length;
+  if(n<3) return 0;
+  for(var i=0;i<n;i++){
+    var a=ring[i], b=ring[(i+1)%n];
+    s+=(a[0]*mPerLon)*(b[1]*mPerLat)-(b[0]*mPerLon)*(a[1]*mPerLat);
+  }
+  return s/2;
+}
+function parcelArea(rings,latC){
+  var s=0; for(var i=0;i<rings.length;i++) s+=ringAreaSigned(rings[i],latC);
+  return Math.abs(s);
+}
+function paintParcelInfo(){
+  var el=$('#pcInfo'); if(!el) return;
+  if(!PC||!PC.jibun){ el.classList.add('hide'); el.innerHTML=''; return }
+  var m2=PC.area||0, py=Math.round(m2/3.3058);
+  el.classList.remove('hide');
+  el.innerHTML='필지 경계 <b>'+esc(PC.jibun)+'</b> · '+Math.round(m2).toLocaleString()+'㎡('+py.toLocaleString()+'평)'
+    +(PC.pnu?' · PNU '+esc(PC.pnu):'')+' <span style="color:#8FA1B8">Vworld 연속지적도 · 참고용</span>';
+}
+function parcelFetch(lat,lon){
+  if(!S.key){ PC=null; paintParcelInfo(); requestRender(); return }
+  var seq=++PCseq;
+  var url='https://api.vworld.kr/req/data?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
+    +'&key='+encodeURIComponent(S.key)+'&domain=autooneclick.com'
+    +'&format=json&size=1&page=1&geometry=true&attribute=true&crs=EPSG:4326'
+    +'&geomFilter='+encodeURIComponent('POINT('+lon.toFixed(7)+' '+lat.toFixed(7)+')');
+  jsonp(url).then(function(j){
+    if(seq!==PCseq) return; /* 그 사이 다른 지점을 골랐으면 버린다 */
+    var fc=j&&j.response&&j.response.result&&j.response.result.featureCollection;
+    var ft=fc&&fc.features&&fc.features[0];
+    if(!ft||!ft.geometry){ PC=null; paintParcelInfo(); requestRender(); return }
+    var gm=ft.geometry, rings=[];
+    if(gm.type==='Polygon') rings=gm.coordinates.slice();
+    else if(gm.type==='MultiPolygon'){
+      for(var i=0;i<gm.coordinates.length;i++){ for(var q=0;q<gm.coordinates[i].length;q++) rings.push(gm.coordinates[i][q]) }
+    }
+    rings=rings.filter(function(r){return r&&r.length>2});
+    if(!rings.length){ PC=null; paintParcelInfo(); requestRender(); return }
+    var pr=ft.properties||{};
+    PC={rings:rings,jibun:pr.jibun||pr.bonbun||'',addr:pr.addr||'',pnu:pr.pnu||'',area:parcelArea(rings,lat)};
+    paintParcelInfo(); requestRender();
+  }).catch(function(){ /* 필지 조회가 막혀도 경사도 지도는 그대로 */ });
+}
+function drawParcelHL(g,x0,y0,w,h){
+  if(!PC||!PC.rings) return;
+  var W=worldSize(S.zoom), p=new Path2D(), bx=1e9, by=1e9, bX=-1e9, bY=-1e9;
+  for(var i=0;i<PC.rings.length;i++){
+    var r=PC.rings[i];
+    for(var j=0;j<r.length;j++){
+      var X=lng2w(r[j][0])*W-x0, Y=lat2w(r[j][1])*W-y0;
+      if(j===0) p.moveTo(X,Y); else p.lineTo(X,Y);
+      if(i===0){ if(X<bx)bx=X; if(X>bX)bX=X; if(Y<by)by=Y; if(Y>bY)bY=Y }
+    }
+    p.closePath();
+  }
+  if(bX<0||bx>w||bY<0||by>h) return; /* 화면 밖 */
+  g.save();
+  g.fillStyle='rgba(255,107,0,.17)'; g.fill(p,'evenodd');          /* 은은한 반투명 채우기 */
+  g.lineJoin='round'; g.lineCap='round';
+  g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=7.5; g.stroke(p); /* 흰 테두리(바깥) */
+  g.strokeStyle='#FF6B00'; g.lineWidth=4.5; g.stroke(p);              /* 굵은 오렌지 */
+  g.strokeStyle='rgba(255,255,255,.92)'; g.lineWidth=1.4; g.stroke(p);/* 안쪽 흰 선 — 이중 테두리 */
+  /* 지번 이름표 */
+  var txt=PC.jibun||'내 필지';
+  g.font='900 11px -apple-system,"Noto Sans KR",sans-serif';
+  var tw=g.measureText(txt).width, pw=tw+16, ph=18;
+  var lx=clamp((bx+bX)/2,pw/2+5,w-pw/2-5), ly=(by-11);
+  ly=clamp(ly<ph/2+4?(by+ph/2+8):ly,ph/2+4,h-ph/2-4);
+  g.beginPath();
+  if(g.roundRect) g.roundRect(lx-pw/2,ly-ph/2,pw,ph,7); else g.rect(lx-pw/2,ly-ph/2,pw,ph);
+  g.fillStyle='rgba(10,17,40,.9)'; g.fill();
+  g.strokeStyle='rgba(255,107,0,.95)'; g.lineWidth=1.2; g.stroke();
+  g.fillStyle='#FFD9A6'; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(txt,lx,ly+0.5); g.textAlign='left'; g.textBaseline='alphabetic';
+  g.restore();
+}
 function drawMarker(g,x0,y0,w,h,o){
   var W=worldSize(S.zoom);
   var cx=lng2w(S.lon)*W-x0, cy=lat2w(S.lat)*W-y0;
@@ -739,7 +824,7 @@ cv.addEventListener('pointermove',function(e){
   if(ptrs.size>=2){
     var a=[];ptrs.forEach(function(v){a.push(v)});
     var d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
-    if(lastDist>0&&d>0){ var f=d/lastDist; S.zoom=clamp(S.zoom+Math.log2(f),13,17.2); requestRender(); }
+    if(lastDist>0&&d>0){ var f=d/lastDist; S.zoom=clamp(S.zoom+Math.log2(f),ZMIN,ZMAX); requestRender(); }
     lastDist=d; moved+=99; return;
   }
   moved+=Math.hypot(dx,dy);
@@ -753,16 +838,17 @@ function endPtr(e){
     var near=Math.sqrt(Math.pow(downPos.x-VW()/2,2)+Math.pow(downPos.y-VH()/2,2))<14;
     if(!near){
       S.lat=pt.lat; S.lon=pt.lon; S.addr='지도에서 고른 지점';
-      requestRender(); commitPlace(); buildTerrain();
+      PC=null; paintParcelInfo();
+      requestRender(); commitPlace(); buildTerrain(); parcelFetch(S.lat,S.lon);
     }
   }
   if(ptrs.size===0){ moved=0; downPos=null; }
 }
 cv.addEventListener('pointerup',endPtr);
 cv.addEventListener('pointercancel',endPtr);
-cv.addEventListener('wheel',function(e){ e.preventDefault(); var p=localPt(e); var f=Math.pow(1.0016,-e.deltaY); S.zoom=clamp(S.zoom+Math.log2(f),13,17.2); requestRender(); nudgeTerrain(); },{passive:false});
-$('#zIn').addEventListener('click',function(){S.zoom=clamp(S.zoom+0.7,13,17.2);requestRender();nudgeTerrain()});
-$('#zOut').addEventListener('click',function(){S.zoom=clamp(S.zoom-0.7,13,17.2);requestRender();nudgeTerrain()});
+cv.addEventListener('wheel',function(e){ e.preventDefault(); var p=localPt(e); var f=Math.pow(1.0016,-e.deltaY); S.zoom=clamp(S.zoom+Math.log2(f),ZMIN,ZMAX); requestRender(); nudgeTerrain(); },{passive:false});
+$('#zIn').addEventListener('click',function(){S.zoom=clamp(S.zoom+(S.zoom>=17?0.5:0.7),ZMIN,ZMAX);requestRender();nudgeTerrain()});
+$('#zOut').addEventListener('click',function(){S.zoom=clamp(S.zoom-(S.zoom>17?0.5:0.7),ZMIN,ZMAX);requestRender();nudgeTerrain()});
 
 /* ---------------- 지형값 읽기 ---------------- */
 function sampleGrid(arr,u,v){
@@ -995,6 +1081,7 @@ function applyPlace(p,label){
   $('#hits').classList.add('hide');
   $('#hint').classList.add('off');
   commitPlace(); requestRender(); buildTerrain();
+  PC=null; paintParcelInfo(); parcelFetch(S.lat,S.lon);
   setTimeout(function(){buildTerrain()},1400);
 }
 function busy(on){ var b=$('#qGo'); b.textContent=on?'찾는 중':'찾기'; b.disabled=!!on }
@@ -1061,8 +1148,8 @@ function paintKey(ok,msg){
 }
 $('#vkSave').addEventListener('click',function(){
   var v=($('#vk').value||'').trim();
-  if(!v){ S.key=''; LS.set('kts_slope_vk',''); paintKey(false); tiles.clear(); vwImgs.clear(); requestRender(); toast('키를 지웠습니다'); return }
-  S.key=v; LS.set('kts_slope_vk',v); tiles.clear(); vwImgs.clear(); requestRender();
+  if(!v){ S.key=''; LS.set('kts_slope_vk',''); paintKey(false); tiles.clear(); vwImgs.clear(); PC=null; paintParcelInfo(); requestRender(); toast('키를 지웠습니다'); return }
+  S.key=v; LS.set('kts_slope_vk',v); tiles.clear(); vwImgs.clear(); requestRender(); parcelFetch(S.lat,S.lon);
   toast('키 확인 중…');
   vwGeocode('서울특별시 중구 세종대로 110','road').then(function(a){
     if(a){ paintKey(true); toast('Vworld 연결됨 — 필지 경계를 켜 보세요') }
@@ -1195,7 +1282,7 @@ if(S.key){
   var pb0=document.querySelector('#togs button[data-l="parcel"]');
   if(pb0) pb0.classList.add('on');
 }
-requestRender(); buildTerrain(); drawProfile();
+requestRender(); buildTerrain(); drawProfile(); parcelFetch(S.lat,S.lon);
 $('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원(부가세 별도·실결제 9,900원) 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
 setTimeout(function(){ $('#hint').classList.add('off') },6000);
 window.addEventListener('resize',function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain() });
