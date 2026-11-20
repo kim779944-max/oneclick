@@ -288,11 +288,14 @@ var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}c
         set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
 /* ---------------- 상태 ---------------- */
+/* 기본 Vworld 오픈키 — 대표님 발급(서비스 URL https://autooneclick.com 전용).
+   6번 카드에 아무 키도 넣지 않아도 이 키로 연결된다. 6번 카드에서 직접 비우면 그때부터는 쓰지 않는다. */
+var DEFAULT_VW_KEY='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
 var S={
   lat:37.8319, lon:127.3668, zoom:16.2,
   lay:{slope:1,cont:1,grid:0,parcel:0,zone:0,sat:0},
   op:0.38, radius:100, addr:'가평 · 신하리 일대(예시 지점)', profile:'ew',
-  key:LS.get('kts_slope_vk',''), demTpl:LS.get('kts_slope_dem',''),
+  key:(function(){var v=LS.get('kts_slope_vk',null); return v==null?DEFAULT_VW_KEY:v})(), demTpl:LS.get('kts_slope_dem',''),
   free:parseInt(LS.get('kts_slope_free','0'),10)||0,
   cred:parseInt(LS.get('kts_slope_cred','0'),10)||0,
   seen:(function(){try{var a=JSON.parse(LS.get('kts_slope_seen','[]'));return Array.isArray(a)?a:[]}catch(e){return []}})(),
@@ -1178,6 +1181,12 @@ $('#copyTxt').addEventListener('click',function(){
 /* ---------------- 시작 ---------------- */
 fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key);
 if(S.key){ $('#vk').value=S.key }
+/* 키가 있으면 필지 경계(Vworld 연속지적도)를 처음부터 켜 둔다 */
+if(S.key){
+  S.lay.parcel=1;
+  var pb0=document.querySelector('#togs button[data-l="parcel"]');
+  if(pb0) pb0.classList.add('on');
+}
 requestRender(); buildTerrain(); drawProfile();
 $('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원(부가세 별도·실결제 9,900원) 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
 setTimeout(function(){ $('#hint').classList.add('off') },6000);
