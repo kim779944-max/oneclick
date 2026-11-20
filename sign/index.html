@@ -109,6 +109,14 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
  font-size:12px;font-weight:800;padding:10px 15px;border-radius:999px;opacity:0;transition:.25s;z-index:90;max-width:90%;text-align:center;pointer-events:none}
 .toast.on{opacity:1}
 .hide{display:none!important}
+/* 한 화면 다중 날인(119번) — 확정한 도장은 선택할 때만 점선 */
+.stage .sig.uns{outline-color:transparent}
+.stage .sig.uns:hover{outline-color:rgba(255,107,0,.45)}
+.mini.fix{border-color:var(--amber);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2))}
+.boxask{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;border:1px dashed rgba(255,107,0,.5);border-radius:10px;padding:8px 9px;font-size:11.5px;font-weight:800;color:var(--ink2);background:rgba(255,107,0,.06)}
+.boxask .sp{flex:1}
+.stcount{font-size:10.5px;color:var(--gray);font-weight:800;margin-top:6px}
+.stcount b{color:var(--amber2)}
 </style></head><body>
 <div id="app">
 <header><a class="back" href="https://autooneclick.com/">← 원클릭</a><span class="brand">KTS <i>더싸인</i></span><span class="sp"></span><span class="st" id="planTag">한 장 무료</span></header>
@@ -187,6 +195,7 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
 
     <div class="prev" id="prev"><span class="em">사인을 만들면 여기에 투명 PNG로 보입니다</span></div>
     <button class="btn ghost" type="button" id="pngDl" disabled>투명 PNG 저장</button>
+    <div id="stampBox"></div>
   </section>
 
   <!-- 3. 문서에 찍기 -->
@@ -199,7 +208,10 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
       <div class="stage" id="stage"><img class="pg" id="pgImg" alt=""><div class="hint" id="stHint">찍을 자리를 누르세요 · 끌어서 옮기기</div></div>
       <div class="rng"><span>크기</span><input type="range" id="sz" min="3" max="60" value="8"><span id="szV">8%</span></div>
       <div class="row" id="szPre"><button class="mini on" type="button" data-mm="15">① 15mm 막도장</button><button class="mini" type="button" data-mm="18">② 18mm 인감</button><button class="mini" type="button" data-mm="21">③ 21mm 직인</button></div>
-      <div class="row"><button class="mini" type="button" id="sigDel">이 쪽 사인 빼기</button><button class="mini" type="button" id="sigAll">모든 쪽 같은 자리</button></div>
+      <div class="row"><button class="mini" type="button" id="sigDel">이 도장 빼기</button><button class="mini" type="button" id="sigAll">모든 쪽 같은 자리</button></div>
+      <div class="row"><button class="mini fix" type="button" id="sigFix">+ 이 도장 확정하고 다른 도장 추가</button></div>
+      <div class="stcount" id="stCount"></div>
+      <div class="boxask hide" id="boxAsk"><span>방금 확정한 도장을 <b style="color:#FFA24D">도장함</b>에 담아 둘까요?</span><span class="sp"></span><button class="mini" type="button" id="boxYes">도장함에 담기</button><button class="mini" type="button" id="boxNo">괜찮아요</button></div>
       <div class="tog" id="ganin"><span class="sw"></span><span class="tt">간인 (사이간자) 자동<small>쪽과 쪽 사이 경계에 도장을 반씩 걸쳐 찍습니다</small></span><span class="lk" id="ganinLk">PRO</span></div>
       <div class="two">
         <button class="btn" type="button" id="outImg">날인본 이미지 저장</button>
@@ -214,6 +226,7 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
 <div class="toast" id="toast"></div>
 </div>
 
+<script src="../slots.js"></script>
 <script>
 /* =====================================================================
    KTS 더싸인 v1.0 — 사인 3택(직접·사인도장·도장사진) → 투명 PNG → 문서 날인 / 간인
@@ -407,7 +420,19 @@ let docs=[], cur=0, ganin=false;            // docs: {c:canvas, thumb, place:{x,
 /* 크기 프리셋 — A4 폭 210mm 기준. 15mm≈7%, 18mm≈9%, 21mm≈10% */
 const MM_PAGE=210;
 let pendingW=null;   /* 찍기 전에 골라 둔 정확한 폭(비율) — 슬라이더는 1% 단위라 따로 보관 */
-function szW(){ const p=docs.length&&docs[cur]&&docs[cur].place; return p? p.w : (pendingW!=null? pendingW : (+$('#sz').value/100)); }
+/* 한 화면 다중 날인(119번): docs[i].stamps=[{sid,cv,x,y,w,grp}] — 확정한 도장들. place 는 지금 만지는 도장(레거시 그대로).
+   sel = -1 이면 place 선택, 0 이상이면 stamps[sel] 선택. 크기·끌기·빼기·모든 쪽은 선택한 도장에만. */
+let sel=-1, sidN=0;
+const stampsOf=p=>p? (p.stamps||(p.stamps=[])) : [];
+function selObj(){ const p=docs.length&&docs[cur]; if(!p) return null; if(sel>=0) return stampsOf(p)[sel]||null; return p.place||null; }
+function selEl(){ return sel>=0 ? $('#stage .sig[data-s="'+sel+'"]') : $('#stage .sig[data-s="p"]'); }
+function szW(){ const p=selObj(); return p? p.w : (pendingW!=null? pendingW : (+$('#sz').value/100)); }
+/* 도장 누르기 = 선택(다시 그리지 않고 점선만 옮긴다 — 끌기가 끊기지 않게) */
+function pickSel(i){
+  if(sel===i) return; sel=i;
+  $$('#stage .sig').forEach(n=>n.classList.toggle('uns', n.dataset.s!==(i>=0?String(i):'p')));
+  const so=selObj(); if(so){ pendingW=null; $('#sz').value=Math.round(so.w*100); szPaint(); }
+}
 function szPaint(){
   const w=szW(), mm=w*MM_PAGE;
   const vl=$('#szV'); if(vl) vl.textContent=Math.round(w*100)+'% · '+mm.toFixed(1)+'mm';
@@ -452,8 +477,8 @@ async function pdfToCanvases(f){
 }
 function thumbOf(c){ const t=document.createElement('canvas'); const r=120/c.width; t.width=120; t.height=Math.round(c.height*r); t.getContext('2d').drawImage(c,0,0,t.width,t.height); return t.toDataURL('image/jpeg',0.7); }
 function paintThumbs(){
-  $('#pages').innerHTML=docs.map((p,i)=>'<button type="button" class="'+(i===cur?'on':'')+'" data-i="'+i+'"><img src="'+p.thumb+'" alt=""><i>'+(i+1)+'</i>'+(p.place&&sig?'<em>사인</em>':'')+'</button>').join('');
-  $$('#pages button').forEach(b=>b.onclick=()=>{ cur=+b.dataset.i; renderDoc(); });
+  $('#pages').innerHTML=docs.map((p,i)=>'<button type="button" class="'+(i===cur?'on':'')+'" data-i="'+i+'"><img src="'+p.thumb+'" alt=""><i>'+(i+1)+'</i>'+((p.place&&sig)||stampsOf(p).length?'<em>사인</em>':'')+'</button>').join('');
+  $$('#pages button').forEach(b=>b.onclick=()=>{ cur=+b.dataset.i; sel=-1; renderDoc(); });
   $('#pages').classList.toggle('hide', docs.length<2);
   $('#docInfo').textContent = docs.length ? docs.length+'쪽' : '사진·PDF';
 }
@@ -461,13 +486,20 @@ function renderDoc(){ if(!docs.length) return; $('#pgImg').src=docs[cur].c.toDat
 function renderStage(){
   const st=$('#stage'); if(!st || !docs.length) return;
   st.querySelectorAll('.sig,.seam').forEach(n=>n.remove());
-  const p=docs[cur]; $('#stHint').classList.toggle('hide', !!(p.place&&sig));
+  const p=docs[cur], sts=stampsOf(p); $('#stHint').classList.toggle('hide', !!(p.place&&sig) || sts.length>0);
+  if(sel>=sts.length) sel=-1;
+  sts.forEach((s,i)=>{
+    const el=document.createElement('div'); el.className='sig stamp'+(i===sel?'':' uns'); el.dataset.s=String(i);
+    el.style.left=(s.x*100)+'%'; el.style.top=(s.y*100)+'%'; el.style.width=(s.w*100)+'%';
+    el.innerHTML='<img alt="" src="'+(s.url||(s.url=s.cv.toDataURL('image/png')))+'">'; st.appendChild(el); dragSig(el,()=>stampsOf(docs[cur])[i],()=>pickSel(i));
+  });
   if(p.place && sig){
-    const el=document.createElement('div'); el.className='sig';
+    const el=document.createElement('div'); el.className='sig'+(sel===-1?'':' uns'); el.dataset.s='p';
     el.style.left=(p.place.x*100)+'%'; el.style.top=(p.place.y*100)+'%'; el.style.width=(p.place.w*100)+'%';
-    el.innerHTML='<img alt="" src="'+sig.toDataURL('image/png')+'">'; st.appendChild(el); dragSig(el);
-    $('#sz').value=Math.round(p.place.w*100); szPaint();
+    el.innerHTML='<img alt="" src="'+sig.toDataURL('image/png')+'">'; st.appendChild(el); dragSig(el,()=>docs[cur].place,()=>pickSel(-1));
   }
+  const so=selObj(); if(so){ $('#sz').value=Math.round(so.w*100); szPaint(); }
+  const sc=$('#stCount'); if(sc) sc.innerHTML = sts.length ? '이 쪽 확정 도장 <b>'+sts.length+'개</b>'+(p.place&&sig?' + 지금 만지는 도장 1개':'')+' · 도장을 누르면 선택(점선) — 크기·빼기·모든 쪽은 선택한 도장에만' : '';
   if(ganin && sig && docs.length>1){
     const ar=docs[cur].c.height/docs[cur].c.width;
     seamsFor(cur).forEach(s=>{ const im=document.createElement('img'); im.className='seam'; im.src=s.url;
@@ -478,29 +510,58 @@ $('#stage').addEventListener('pointerdown',e=>{
   if(e.target.closest('.sig')) return;
   if(!sig){ toast('먼저 ② 사인을 만들어 주세요'); return; }
   const r=$('#stage').getBoundingClientRect();
-  const w = szW();
+  const w = (sel===-1? szW() : (pendingW!=null? pendingW : (+$('#sz').value/100)));
+  sel=-1;
   docs[cur].place={x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height, w};
   renderStage(); paintThumbs();
 });
-function dragSig(el){
+function dragSig(el,get,pick){
+  get=get||(()=>docs[cur].place);
   let sx,sy,ox,oy,on=false;
-  el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); el.setPointerCapture(e.pointerId); on=true; sx=e.clientX; sy=e.clientY; ox=docs[cur].place.x; oy=docs[cur].place.y; });
+  el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); el.setPointerCapture(e.pointerId); on=true; sx=e.clientX; sy=e.clientY; const o=get(); ox=o.x; oy=o.y;
+    if(pick) pick(); });
   el.addEventListener('pointermove',e=>{ if(!on) return; const r=$('#stage').getBoundingClientRect();
-    const p=docs[cur].place; p.x=Math.min(1,Math.max(0,ox+(e.clientX-sx)/r.width)); p.y=Math.min(1,Math.max(0,oy+(e.clientY-sy)/r.height));
+    const p=get(); if(!p) return; p.x=Math.min(1,Math.max(0,ox+(e.clientX-sx)/r.width)); p.y=Math.min(1,Math.max(0,oy+(e.clientY-sy)/r.height));
     el.style.left=(p.x*100)+'%'; el.style.top=(p.y*100)+'%'; });
   const end=()=>{ on=false; }; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
 }
-$('#sz').oninput=()=>{ pendingW=null; const p=docs[cur]&&docs[cur].place; if(p){ p.w=+$('#sz').value/100; const el=$('#stage .sig'); if(el) el.style.width=(p.w*100)+'%'; } szPaint(); };
+$('#sz').oninput=()=>{ pendingW=null; const p=selObj(); if(p){ p.w=+$('#sz').value/100; const el=selEl(); if(el) el.style.width=(p.w*100)+'%'; } szPaint(); };
 $$('#szPre [data-mm]').forEach(b=>b.onclick=()=>{
-  const mm=+b.dataset.mm, w=mm/MM_PAGE, p=docs.length&&docs[cur]&&docs[cur].place;
+  const mm=+b.dataset.mm, w=mm/MM_PAGE, p=selObj();
   $('#sz').value=Math.round(w*100);
   pendingW=w;
-  if(p){ p.w=w; const el=$('#stage .sig'); if(el) el.style.width=(w*100)+'%'; }
+  if(p){ p.w=w; const el=selEl(); if(el) el.style.width=(w*100)+'%'; }
   szPaint(); toast('실제 '+mm+'mm — A4 계약서 폭 기준으로 찍힙니다');
 });
-$('#sigDel').onclick=()=>{ if(docs[cur]){ docs[cur].place=null; renderStage(); paintThumbs(); } };
-$('#sigAll').onclick=()=>{ const p=docs[cur]&&docs[cur].place; if(!p){ toast('먼저 이 쪽에 찍을 자리를 누르세요'); return; }
+$('#sigDel').onclick=()=>{ if(!docs[cur]) return;
+  if(sel>=0){ stampsOf(docs[cur]).splice(sel,1); sel=-1; toast('선택한 도장을 뺐습니다'); }
+  else docs[cur].place=null;
+  renderStage(); paintThumbs(); };
+$('#sigAll').onclick=()=>{
+  if(sel>=0){ const s=stampsOf(docs[cur])[sel]; if(!s) return; const g=s.grp||(s.grp='g'+(++sidN));
+    docs.forEach((d,i)=>{ if(i===cur) return; const a=stampsOf(d).filter(t=>t.grp!==g); a.push({sid:'s'+(++sidN),cv:s.cv,url:s.url,x:s.x,y:s.y,w:s.w,grp:g}); d.stamps=a; });
+    paintThumbs(); toast(docs.length+'쪽 모두 같은 자리에 이 도장을 찍었습니다'); return; }
+  const p=docs[cur]&&docs[cur].place; if(!p){ toast('먼저 이 쪽에 찍을 자리를 누르세요'); return; }
   docs.forEach(d=>d.place={...p}); paintThumbs(); toast(docs.length+'쪽 모두 같은 자리에 찍었습니다'); };
+/* [+ 이 도장 확정하고 다른 도장 추가] — 지금 도장을 이 쪽에 고정하고 ②로 안내(저장·재업로드 없이) */
+let lastFixed=null;
+$('#sigFix').onclick=()=>{
+  const p=docs[cur];
+  if(!p){ toast('문서를 먼저 올려 주세요'); return; }
+  if(!sig || !p.place){ toast(sig?'먼저 문서에서 찍을 자리를 누르세요':'먼저 ② 사인을 만들어 주세요'); return; }
+  const cv=document.createElement('canvas'); cv.width=sig.width; cv.height=sig.height; cv.getContext('2d').drawImage(sig,0,0);
+  const s={sid:'s'+(++sidN),cv,x:p.place.x,y:p.place.y,w:p.place.w};
+  stampsOf(p).push(s); p.place=null; sel=stampsOf(p).length-1; lastFixed=s;
+  renderStage(); paintThumbs();
+  $('#boxAsk').classList.toggle('hide', !stampBox);
+  toast('도장 '+stampsOf(p).length+'개 확정 · ②에서 다음 도장을 만들거나 도장함에서 고르세요');
+};
+$('#boxNo').onclick=()=>{ $('#boxAsk').classList.add('hide'); try{ document.querySelector('#mk').scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} };
+$('#boxYes').onclick=()=>{
+  if(!stampBox||!lastFixed) return;
+  const url=lastFixed.url||(lastFixed.url=lastFixed.cv.toDataURL('image/png'));
+  stampBox.add({id:'st'+fnv(url).toString(16), kind:'stamp', data:url}).then(r=>{ if(r!=='cancel') $('#boxAsk').classList.add('hide'); });
+};
 $('#ganin').onclick=()=>{
   if(!isPro()){ toast('간인(사이간자)은 월 4,900원 PRO — 위 ①에서 고르면 미리보기로 써 볼 수 있습니다'); return; }
   if(docs.length<2){ toast('간인은 2쪽 이상일 때 찍힙니다'); }
@@ -524,6 +585,7 @@ function seamsFor(i){
 function composePage(i){
   const p=docs[i], src=p.c, c=document.createElement('canvas'); c.width=src.width; c.height=src.height;
   const x=c.getContext('2d'); x.drawImage(src,0,0);
+  stampsOf(p).forEach(s=>{ const w=s.w*c.width, h=w*s.cv.height/s.cv.width; x.drawImage(s.cv, s.x*c.width-w/2, s.y*c.height-h/2, w, h); });  /* 확정한 도장 전부 한 번에 */
   if(p.place && sig){ const w=p.place.w*c.width, h=w*sig.height/sig.width; x.drawImage(sig, p.place.x*c.width-w/2, p.place.y*c.height-h/2, w, h); }
   if(ganin && sig && docs.length>1) seamsFor(i).forEach(s=>{ const w=s.w*c.width, h=w*s.c.height/s.c.width; x.drawImage(s.c, s.x*c.width, s.y*c.width, w, h); });
   if(isPro() && !unlocked() && (docs.length>1 || ganin)){       // PRO 미리보기 워터마크
@@ -536,8 +598,9 @@ function composePage(i){
 }
 function checkReady(){
   if(!docs.length){ toast('문서를 먼저 올려 주세요'); return false; }
-  if(!sig){ toast('먼저 ② 사인을 만들어 주세요'); return false; }
-  if(!docs.some(d=>d.place) && !ganin){ toast('문서에서 찍을 자리를 눌러 주세요'); return false; }
+  const anyStamp=docs.some(d=>stampsOf(d).length);
+  if(!sig && !anyStamp){ toast('먼저 ② 사인을 만들어 주세요'); return false; }
+  if(!docs.some(d=>d.place) && !anyStamp && !ganin){ toast('문서에서 찍을 자리를 눌러 주세요'); return false; }
   return true;
 }
 $('#outImg').onclick=async ()=>{
@@ -595,6 +658,27 @@ function seedFromForm(){
     try{ $('#docArea').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
   });
 }
+
+/* ---------- 도장함(120번) — 투명 PNG 를 이 기기에 4칸 무료 · 담은 칸은 이번 달 고정 ---------- */
+let stampBox=null;
+function useStamp(it){
+  const im=new Image();
+  im.onload=()=>{ const c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; c.getContext('2d').drawImage(im,0,0);
+    setSig(c); toast(docs.length?'도장함 도장을 꺼냈습니다 · 문서에서 찍을 자리를 누르세요':'도장함 도장을 꺼냈습니다 · ③에서 문서를 올려 주세요'); };
+  im.onerror=()=>toast('도장을 열지 못했습니다');
+  im.src=it.data;
+}
+if(window.KTSSlots){
+  stampBox=window.KTSSlots({key:'stamp', free:4, label:'도장함', el:'#stampBox',
+    cellHtml:it=>'<img alt="" src="'+String(it.data||'').replace(/"/g,'')+'"><button type="button" data-use="1">이 도장으로 찍기</button>',
+    onUse:useStamp});
+}
+/* ② 에서 만든 사인을 바로 담는 길 — 확정 전에도 담을 수 있게 */
+(function(){ const b=document.createElement('button'); b.type='button'; b.className='btn ghost'; b.id='boxPut'; b.textContent='지금 사인을 도장함에 담기'; b.disabled=true;
+  $('#pngDl').insertAdjacentElement('afterend',b);
+  b.onclick=()=>{ if(!sig||!stampBox) return; const url=sig.toDataURL('image/png'); stampBox.add({id:'st'+fnv(url).toString(16),kind:'stamp',data:url}); };
+  new MutationObserver(()=>{ b.disabled=$('#pngDl').disabled; }).observe($('#pngDl'),{attributes:true,attributeFilter:['disabled']});
+})();
 
 /* ---------- 시작 ---------- */
 sizePad(); paintPlan(); seedFromForm();
