@@ -635,11 +635,11 @@ function drawContours(g,x0,y0,w,h,sc){
     var L=T.cont[i];
     if(Math.round(L.lv/cstep)!==L.lv/cstep) continue;
     var bld=(Math.round(L.lv/(cstep*5))===L.lv/(cstep*5));
-    g.lineWidth=(bld?1.6:0.85)/px;
-    g.strokeStyle=bld?'rgba(8,14,28,.5)':'rgba(8,14,28,.28)';
+    g.lineWidth=(bld?2.2:1.5)/px;
+    g.strokeStyle='rgba(255,255,255,.5)';
     g.stroke(L.p);
-    g.lineWidth=(bld?1.1:0.55)/px;
-    g.strokeStyle=bld?'rgba(255,255,255,.95)':'rgba(255,255,255,.72)';
+    g.lineWidth=(bld?1.25:0.8)/px;
+    g.strokeStyle=bld?'rgba(18,32,56,.66)':'rgba(18,32,56,.42)';
     g.stroke(L.p);
   }
   g.restore();
