@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더셀 100점 — 상세 설계 · 고단가 거름망 · 3채널 등록</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:430px){.f3{grid-template-columns:1fr 1fr}}
+label.fl{display:block;font-size:12.5px;color:var(--ink2);margin:10px 0 4px}
+input.fi,select.fi,textarea.fi{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid var(--line2);border-radius:10px;font-size:15px;background:var(--card);color:var(--ink)}
+textarea.fi{min-height:64px;resize:vertical}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+.tbl th,.tbl td{border:1px solid var(--line);padding:7px 8px;text-align:left;word-break:keep-all;line-height:1.5}
+.tbl th{background:var(--card2);color:var(--ink2);font-size:12px}
+.ok{color:#12805c;font-weight:700}
+.ng{color:#C2410C;font-weight:700}
+.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:7px;padding:3px 9px;color:#fff;background:var(--amber)}
+.blk{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin:8px 0;background:var(--card)}
+.blk b{display:block;font-size:14px;margin-bottom:5px;color:var(--ink)}
+.blk p{margin:0 0 4px;font-size:13.5px;color:var(--ink2);line-height:1.6;word-break:keep-all}
+.head3{font-size:15px;margin:14px 0 4px;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row .btn{flex:1;min-width:150px}
+</style>
+</head>
+<body>
+<div id="ownerApp" class="owner">
+<header class="hd"><div class="wrap">
+  <a class="back" href="index.html">← 이커머스</a>
+  <h1>더셀 100점<small>상세 설계 · 고단가 거름망 · 3채널 등록 파일</small></h1>
+</div></header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>1. 상품 넣기 <span class="badge" id="gateBadge">판정 전</span></h2>
+    <p class="note">도매처 상품 페이지에서 본 숫자만 넣으세요. 숫자를 넣으면 4원칙 판정과 계산 영수증이 같이 나옵니다.</p>
+
+    <label class="fl">상품명 (도매처 표기)</label>
+    <input class="fi" id="name" placeholder="예: 부틸 방수테이프 5cm x 10m">
+    <div class="f2">
+      <div><label class="fl">노출 상품명 (손님에게 보일 이름)</label><input class="fi" id="title" placeholder="비우면 상품명 그대로"></div>
+      <div><label class="fl">분류 (장면 3곳 자동)</label>
+        <select class="fi" id="cat"></select></div>
+    </div>
+    <div class="f3">
+      <div><label class="fl">도매가 (원)</label><input class="fi" id="cost" inputmode="numeric" placeholder="36900"></div>
+      <div><label class="fl">공급사 배송비</label><input class="fi" id="ship" inputmode="numeric" placeholder="3000"></div>
+      <div><label class="fl">판매가 (원)</label><input class="fi" id="price" inputmode="numeric" placeholder="자동"></div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnSuggest" type="button">권장가 계산 (원가×1.62 · 900원 끝수)</button>
+    </div>
+    <div class="f3">
+      <div><label class="fl">옵션 수</label><input class="fi" id="opts" inputmode="numeric" value="1"></div>
+      <div><label class="fl">최소주문수량</label>
+        <select class="fi" id="moq"><option value="1">1개</option><option value="n">2개 이상</option></select></div>
+      <div><label class="fl">KC 인증</label>
+        <select class="fi" id="kc"><option value="none">비대상</option><option value="target">대상(전기·어린이 등)</option></select></div>
+    </div>
+    <div class="f2">
+      <div><label class="fl">규격·구성 (한 줄)</label><input class="fi" id="unit" placeholder="예: 10m 1롤 · 두께 3가지"></div>
+      <div><label class="fl">원산지</label><input class="fi" id="origin" placeholder="예: 중국"></div>
+    </div>
+    <div class="f2">
+      <div><label class="fl">출고지 (실제)</label><input class="fi" id="from" placeholder="경기 하남시 …"></div>
+      <div><label class="fl">반품지 (실제)</label><input class="fi" id="back" placeholder="경기 하남시 …"></div>
+    </div>
+    <div class="row">
+      <button class="btn pri" id="btnGo" type="button">판정 · 상세 설계 만들기</button>
+    </div>
+  </section>
+
+  <section class="card" id="secGate" hidden>
+    <h2>2. 하드 거름망 4원칙</h2>
+    <div id="gateOut"></div>
+  </section>
+
+  <section class="card" id="secPlan" hidden>
+    <h2>3. 100점 상세 설계 (섹션별 문구)</h2>
+    <div id="planOut"></div>
+  </section>
+
+  <section class="card" id="secFile" hidden>
+    <h2>4. 등록 파일 3채널</h2>
+    <p class="note">파일만 만듭니다. 올리는 버튼은 사장님이 각 판매자센터에서 누릅니다. Wing 공식 양식의 열 이름이 다르면 값만 옮겨 붙이면 됩니다.</p>
+    <div class="row">
+      <button class="btn pri" id="btnXlsm" type="button">쿠팡 Wing (.xlsm)</button>
+      <button class="btn" id="btnCoupangCsv" type="button">쿠팡 (.csv)</button>
+      <button class="btn" id="btnNaver" type="button">스마트스토어 (.xlsm + .csv)</button>
+      <button class="btn" id="btnGlobal" type="button">역직구 3사 (.csv)</button>
+    </div>
+    <div id="banOut"></div>
+  </section>
+
+  <section class="card">
+    <h2>기준 (2026-11-20 확정)</h2>
+    <ul class="note" style="padding-left:18px;line-height:1.75">
+      <li>상세는 ① 사용 장면별 설명 ② 1·2·3 순서·팁 ③ Before/After + 작업량 가이드 ④ 후기 칭찬·불만 보완까지 채워야 등록합니다.</li>
+      <li>포장지 스펙 복붙·주황 도형 나열은 폐기. 손님이 수정 0번으로 올릴 수준이 아니면 출시하지 않습니다.</li>
+      <li>고단가 4원칙: ① 최소주문 1개 ② 4~8만 단품·건당 순익 8,000원 이상·마진 30% 이상 ③ 옵션 3개 이하·KC 비대상 ④ 계산 영수증 공개.</li>
+      <li>로켓그로스는 쓰지 않습니다(사입·입고 자금 묶임). 일반 판매자배송 위탁만.</li>
+    </ul>
+  </section>
+</main>
+
+<nav class="banner"><div class="wrap">
+  <a href="coupang.html">쿠팡</a><span>·</span><a href="naver.html">네이버</a><span>·</span><a href="global.html">역직구</a><span>·</span><a class="all" href="index.html">이커머스 전체</a>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/freekey.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/xlsx.js"></script>
+<script src="assets/detail100.js"></script>
+<script>
+(function(){
+  var K = window.KTS, D = K.D100;
+  var $ = function(s){ return document.querySelector(s); };
+  var S = { o: null, r: null };
+
+  /* 카테고리 채우기 */
+  var sel = $('#cat');
+  D.CATS.forEach(function(c){
+    var op = document.createElement('option'); op.value = c; op.textContent = c; sel.appendChild(op);
+  });
+
+  function read(){
+    var o = {
+      name: $('#name').value.trim() || '상품명',
+      title: $('#title').value.trim(),
+      cat: $('#cat').value,
+      cost: K.num($('#cost').value), ship: K.num($('#ship').value), price: K.num($('#price').value),
+      opts: K.num($('#opts').value) || 1,
+      moq: $('#moq').value, kc: $('#kc').value,
+      unit: $('#unit').value.trim(), origin: $('#origin').value.trim(),
+      from: $('#from').value.trim(), back: $('#back').value.trim(),
+      stock: 100, weight: '', tax: 'tax', kw: $('#title').value.trim() || $('#name').value.trim()
+    };
+    if (!o.price) o.price = D.suggest(o.cost, o.ship);
+    if (!o.title) o.title = o.name;
+    return o;
+  }
+
+  function gateHtml(g){
+    var h = '<p class="' + (g.pass ? 'ok' : 'ng') + '" style="font-size:15px;margin:2px 0 8px">'
+      + (g.pass ? 'PASS — 4원칙 전부 통과' : 'FAIL — 아래 항목을 고쳐야 등록 대상입니다') + '</p>';
+    h += '<table class="tbl"><tr><th>원칙</th><th>값</th><th>판정</th></tr>';
+    g.checks.forEach(function(c){
+      h += '<tr><td>' + c.k + '</td><td>' + c.v + '</td><td class="' + (c.ok ? 'ok' : 'ng') + '">' + (c.ok ? 'PASS' : '미달') + '</td></tr>';
+    });
+    h += '</table>';
+    var r = g.r;
+    h += '<h3 class="head3">계산 영수증 (1개 판매 기준)</h3>'
+      + '<table class="tbl"><tr><th>항목</th><th>금액</th></tr>'
+      + '<tr><td>판매가 (A)</td><td>' + K.won(r.P) + '</td></tr>'
+      + '<tr><td>쿠팡 수수료 11% (B)</td><td>- ' + K.won(r.fee) + '</td></tr>'
+      + '<tr><td>도매가 (C)</td><td>- ' + K.won(r.D) + '</td></tr>'
+      + '<tr><td>공급사 배송비 (D)</td><td>- ' + K.won(r.S) + '</td></tr>'
+      + '<tr><td>부가세 (E) = (A-C-D)/11</td><td>- ' + K.won(r.vat) + '</td></tr>'
+      + '<tr><th>실수령 순익 (F)</th><th>' + K.won(r.profit) + '</th></tr>'
+      + '<tr><td>총원가 (G) = C+D+B+E</td><td>' + K.won(r.total) + '</td></tr>'
+      + '<tr><td>마진율 F/G</td><td>' + K.pct(r.margin) + '</td></tr></table>';
+    return h;
+  }
+
+  function planHtml(p){
+    var h = '<h3 class="head3">후킹 헤드라인 3안</h3>';
+    p.heads.forEach(function(t, i){ h += '<div class="blk"><p>' + (i + 1) + '. ' + t + '</p></div>'; });
+    p.blocks.forEach(function(b){
+      h += '<div class="blk"><b>' + b.h + '</b>';
+      b.body.forEach(function(l){ h += '<p>· ' + l + '</p>'; });
+      h += '</div>';
+    });
+    return h;
+  }
+
+  function banHtml(text){
+    var hit = K.banFind(text, K.BAN);
+    var c = K.customerCheck(text);
+    var h = '<h3 class="head3">금지어·노출 검사</h3><table class="tbl"><tr><th>검사</th><th>결과</th></tr>'
+      + '<tr><td>과장·금지어</td><td class="' + (hit.length ? 'ng' : 'ok') + '">' + (hit.length ? hit.join(', ') : '없음') + '</td></tr>'
+      + '<tr><td>손님 화면 내부 용어(원가·마진 등)</td><td class="' + (c.ban.length ? 'ng' : 'ok') + '">' + (c.ban.length ? c.ban.join(', ') : '없음') + '</td></tr>'
+      + '<tr><td>전화번호 노출</td><td class="' + (c.phone ? 'ng' : 'ok') + '">' + (c.phone ? '있음' : '없음') + '</td></tr></table>';
+    return h;
+  }
+
+  function go(){
+    var o = read();
+    var g = D.gate(o);
+    var p = D.plan(o);
+    S.o = o; S.r = g.r; S.p = p;
+    $('#gateOut').innerHTML = gateHtml(g);
+    $('#planOut').innerHTML = planHtml(p);
+    $('#banOut').innerHTML = banHtml([p.heads.join(' '), o.title].join(' '));
+    $('#secGate').hidden = false; $('#secPlan').hidden = false; $('#secFile').hidden = false;
+    var b = $('#gateBadge');
+    b.textContent = g.pass ? 'PASS' : 'FAIL';
+    b.style.background = g.pass ? '#12805c' : '#C2410C';
+    $('#secGate').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  $('#btnSuggest').onclick = function(){
+    var v = D.suggest(K.num($('#cost').value), K.num($('#ship').value));
+    if (!v) return K.toast('도매가를 먼저 넣어 주세요');
+    $('#price').value = v; K.toast('권장가 ' + K.won(v) + ' (30% 이상 마진)');
+  };
+  $('#btnGo').onclick = go;
+
+  function base(){ return String(S.o.title || '상품').replace(/[\\\/:*?"<>|]/g, '').slice(0, 24) + '_' + K.stamp(); }
+
+  $('#btnXlsm').onclick = function(){
+    if (!S.r) return K.toast('먼저 판정을 만들어 주세요');
+    var row = D.rowsWing(S.o, S.r);
+    K.download(KTS_XLSX.xlsmBlob('쿠팡Wing', D.WING_HEAD, [row]), '쿠팡_Wing등록_' + base() + '.xlsm');
+  };
+  $('#btnCoupangCsv').onclick = function(){
+    if (!S.r) return K.toast('먼저 판정을 만들어 주세요');
+    K.download(K.csvBlob(D.WING_HEAD, [D.rowsWing(S.o, S.r)]), '쿠팡_Wing등록_' + base() + '.csv');
+  };
+  $('#btnNaver').onclick = function(){
+    if (!S.r) return K.toast('먼저 판정을 만들어 주세요');
+    var row = D.rowsNaver(S.o, S.r);
+    K.download(KTS_XLSX.xlsmBlob('스마트스토어', D.NAVER_HEAD, [row]), '스마트스토어_등록_' + base() + '.xlsm');
+    K.download(K.csvBlob(D.NAVER_HEAD, [row]), '스마트스토어_등록_' + base() + '.csv');
+  };
+  $('#btnGlobal').onclick = function(){
+    if (!S.r) return K.toast('먼저 판정을 만들어 주세요');
+    K.download(K.csvBlob(D.GLOBAL_HEAD, D.rowsGlobal(S.o, S.r)), '역직구_3사_' + base() + '.csv');
+  };
+  window.__done = true;
+})();
+</script>
+</body>
+</html>

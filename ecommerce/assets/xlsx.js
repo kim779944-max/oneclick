@@ -45,12 +45,12 @@
       '<dimension ref="A1:' + colName(head.length - 1) + (rows.length + 1) + '"/>' + widths + x +
       '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/></worksheet>';
   }
-  function xlsxBlob(sheetName, head, rows){
+  function xlsxBlob(sheetName, head, rows, macro){
     var X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
     var ct = X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
       '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
       '<Default Extension="xml" ContentType="application/xml"/>' +
-      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      (macro ? '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.ms-excel.sheet.macroEnabled.main+xml"/>' : '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>') +
       '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
       '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
     var rels = X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -77,7 +77,13 @@
       { name: 'xl/_rels/workbook.xml.rels', data: wbrels },
       { name: 'xl/styles.xml', data: styles },
       { name: 'xl/worksheets/sheet1.xml', data: sheetXml(head, rows) }
-    ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    ], macro ? 'application/vnd.ms-excel.sheet.macroEnabled.12' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   }
-  window.KTS_XLSX = { crc32: crc32, zipStore: zipStore, sheetXml: sheetXml, xlsxBlob: xlsxBlob, colName: colName };
+
+  /* 매크로 사용 통합문서(.xlsm) — 쿠팡 Wing 일괄등록 양식이 xlsm 계열이라 같은 틀을 xlsm으로 낸다.
+     매크로(vbaProject)는 넣지 않는다: 양식 틀·값만 옮겨 붙이는 용도. */
+  function xlsmBlob(sheetName, head, rows){
+    return xlsxBlob(sheetName, head, rows, true);
+  }
+  window.KTS_XLSX = { crc32: crc32, zipStore: zipStore, sheetXml: sheetXml, xlsxBlob: xlsxBlob, xlsmBlob: xlsmBlob, colName: colName };
 })();

@@ -48,6 +48,7 @@
       <tr><td>옵션명</td><td>옵션명</td><td><code>단일상품</code></td></tr>
       <tr><td>중량</td><td>중량(g)</td><td>규격에서 뽑은 g 숫자</td></tr>
     </table>
+    <p class="note"><b>더셀 100점 도구의 쿠팡 파일은 .xlsm</b>(매크로 사용 통합문서 형식)으로 나옵니다. Wing 일괄등록 양식이 xlsm 계열이라 같은 틀을 그대로 열어 값만 옮겨 붙이기 쉽게 맞춘 것입니다. 매크로는 넣지 않았고, 공식 양식의 열 이름·순서가 다르면 <b>값만 복사해 붙여넣으면</b> 됩니다.</p>
     <p class="note">오픈 API(사업자용): 요청 본문은 ⑤ 탭 (나)에서 <code>coupang_body.json</code>으로 받습니다. <code>sellerProductName</code>=노출상품명, <code>items[0].salePrice/originalPrice</code>=판매가, <code>items[0].searchTags</code>=태그 20개, <code>deliveryCharge</code>=배송비. <code>displayCategoryCode</code>·<code>returnCenterCode</code>·<code>outboundShippingPlaceCode</code>는 Wing에서 확인한 값으로 바꿔야 실제 등록이 됩니다(지금은 자리표시자).</p>
   </section>
 
