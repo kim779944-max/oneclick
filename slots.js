@@ -27,7 +27,6 @@
     if (!m || m[1] !== yymm()) return false;
     return fnv('kts-sign-' + m[1]).toString(16).toUpperCase().padStart(8, '0').slice(0, 4) === m[2];
   }
-  var LIMIT_UNIT = { photo2doc: '장', ad_magnet: '건' };
   function master() { return w.KTS_MASTER === true; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function lsGet(k) { try { return w.localStorage.getItem(k); } catch (e) { return null; } }
@@ -290,6 +289,7 @@
   var FREE = { sign: '한 장 무료', theform: '기본 양식 5종 무료', contract: '서식 3종 무료',
                viewer: '평생 무료', sale: '평생 무료', saycap: '무료', organizer: '무료',
                tongyeok: '번역 무료', realty: '무료', exchange: '열람 무료' };
+  var LIMIT_UNIT = { photo2doc: '장', ad_magnet: '건' };
   /* products.js(catalog.json)에 없는 도구 — 쇼룸·박스에서 같이 씁니다 */
   var EXTRA = {
     thescan:   { nm: '더스캔',     ico: '▣', link: 'thescan/' },
