@@ -306,7 +306,7 @@ details.adv .keyrow{margin-top:7px}
       <button type="button" data-l="zone" class="lk">용도지역<small>Vworld</small></button>
       <button type="button" data-l="sat">위성<small>Vworld</small></button>
     </div>
-    <div class="rng"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
+    <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
     <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
     <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 길고 붉을수록 급하고, 숫자는 그 칸의 경사(°)입니다. 도면처럼 얇게 그려 색판이 번지지 않습니다.</p>
     <button class="btn chk" type="button" id="chkGo"><b>확인하기</b><small>이 자리 그대로 결과 전체뷰를 엽니다</small></button>
@@ -1378,9 +1378,10 @@ document.querySelectorAll('#togs button').forEach(function(b){
 });
 /* 범례 — 색판을 꺼 두면 화살표 범례만 남긴다(도면처럼) */
 function paintLegend(){
-  var cb=$('#cbw'), al=$('#aleg');
+  var cb=$('#cbw'), al=$('#aleg'), op=$('#opRow');
   if(cb) cb.style.display=S.lay.slope?'block':'none';
   if(al) al.style.display=S.lay.arrow?'flex':'none';
+  if(op) op.style.display=S.lay.slope?'flex':'none';
 }
 $('#op').addEventListener('input',function(){ S.op=(+this.value)/100; $('#opv').textContent=this.value+'%'; requestRender() });
 $('#rad').addEventListener('input',function(){ S.radius=+this.value; $('#radv').textContent=this.value+'m'; requestRender(); analyze() });
