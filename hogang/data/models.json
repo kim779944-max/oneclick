@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-21",
-  "note": "출고가는 출시 당시 국내 발표가(기본 용량) 기준 예시값입니다. 현재 판매가·공시지원금은 통신사·시점마다 다릅니다. 배터리 용량을 공개하지 않는 제조사는 '비공개'로 둡니다.",
+  "asOf": "2026-11-22",
+  "note": "2026-11-22 기준. 출고가는 국내 발표가(기본 용량) 기준 예시값이며, 2026년 신형 9종은 2026-11-22 현재 출고가(256GB)입니다. 현재 판매가·공시지원금은 통신사·시점마다 다릅니다. 배터리 용량을 공개하지 않는 제조사는 '비공개'로 둡니다.",
   "photos": {
     "s25":"S25 시리즈 3종을 함께 찍은 사진 · 可恩Ke En · CC BY 3.0 (위키미디어 공용)",
     "s25p":"Jakub CA · CC BY 4.0 (위키미디어 공용)",
@@ -21,6 +21,15 @@
     "ip15":"ThePhotoGraphIc · CC BY-SA 4.0 (위키미디어 공용)"
   },
   "models": [
+    {"id":"s26u","name":"갤럭시 S26 울트라","maker":"삼성","launchPrice":1947000,"display":"6.9형 QHD+ 1~120Hz","chip":"스냅드래곤 8 Elite Gen 5 for Galaxy","cam":"200MP+50MP 초광각+50MP 5배+10MP 3배","batt":"5,000mAh","weight":"214g","launch":"2026-03","img":"img/s26u.webp","source":"삼성전자 뉴스룸 국내 사양(2026-02-25) · 출고가(256GB) 2026-10-01 인상 반영(출시 1,797,400원 → 1,947,000원, SBS Biz·아이뉴스24 2026-10-01)","asOf":"2026-11-22"},
+    {"id":"s26p","name":"갤럭시 S26+","maker":"삼성","launchPrice":1601600,"display":"6.7형 QHD+ 1~120Hz","chip":"엑시노스 2600","cam":"50MP+12MP 초광각+10MP 3배","batt":"4,900mAh","weight":"190g","launch":"2026-03","img":"img/s26p.webp","source":"삼성전자 뉴스룸 국내 사양(2026-02-25) · 출고가(256GB) 2026-10-01 인상 반영(출시 1,452,000원 → 1,601,600원, SBS Biz 2026-10-01)","asOf":"2026-11-22"},
+    {"id":"s26","name":"갤럭시 S26","maker":"삼성","launchPrice":1403600,"display":"6.3형 FHD+ 1~120Hz","chip":"엑시노스 2600","cam":"50MP+12MP 초광각+10MP 3배","batt":"4,300mAh","weight":"167g","launch":"2026-03","img":"img/s26.webp","source":"삼성전자 뉴스룸 국내 사양(2026-02-25) · 출고가(256GB) 2026-10-01 인상 반영(출시 1,254,000원 → 1,403,600원, SBS Biz·아이뉴스24 2026-10-01)","asOf":"2026-11-22"},
+    {"id":"fold8u","name":"갤럭시 Z 폴드8 울트라","maker":"삼성","launchPrice":2577300,"display":"8.0형 메인 · 6.5형 커버","chip":"스냅드래곤 8 Elite Gen 5 for Galaxy","cam":"200MP+50MP 초광각+10MP 3배","batt":"5,000mAh","weight":"215g","launch":"2026-08","img":"img/fold8u.webp","source":"삼성전자 뉴스룸 국내 사양(2026-07-22) · 국내 출고가(256GB) 발표 보도(2026-07-22)","asOf":"2026-11-22"},
+    {"id":"fold8","name":"갤럭시 Z 폴드8","maker":"삼성","launchPrice":2278100,"display":"7.6형(4:3) 메인 · 5.5형 커버","chip":"스냅드래곤 8 Elite Gen 5 for Galaxy","cam":"50MP+50MP 초광각","batt":"4,800mAh","weight":"201g","launch":"2026-08","img":"img/fold8.webp","source":"삼성전자 뉴스룸 국내 사양(2026-07-22) · 국내 출고가(256GB) 발표 보도(2026-07-22)","asOf":"2026-11-22"},
+    {"id":"flip8","name":"갤럭시 Z 플립8","maker":"삼성","launchPrice":1683000,"display":"6.9형 메인 · 4.1형 커버","chip":"엑시노스 2600","cam":"50MP+12MP 초광각","batt":"4,300mAh","weight":"180g","launch":"2026-08","img":"img/flip8.webp","source":"삼성전자 뉴스룸 국내 사양(2026-07-22) · 국내 출고가(256GB) 발표 보도(2026-07-22)","asOf":"2026-11-22"},
+    {"id":"ip18pm","name":"아이폰 18 프로 맥스","maker":"애플","launchPrice":2190000,"display":"6.9형(17.4cm) 120Hz","chip":"A20 Pro","cam":"48MP 가변조리개+48MP 초광각+48MP 4배","batt":"비공개(동영상 최대 43시간)","weight":"249g","launch":"2026-09","img":"img/ip18pm.webp","source":"Apple 지원 기술 사양(support.apple.com/ko-kr/148591) · Apple 코리아 스토어 출고가(256GB, 2026-11-22 확인)","asOf":"2026-11-22"},
+    {"id":"ip18p","name":"아이폰 18 프로","maker":"애플","launchPrice":1990000,"display":"6.3형(15.9cm) 120Hz","chip":"A20 Pro","cam":"48MP 가변조리개+48MP 초광각+48MP 4배","batt":"비공개(동영상 최대 34시간)","weight":"211g","launch":"2026-09","img":"img/ip18p.webp","source":"Apple 지원 기술 사양(support.apple.com/ko-kr/148590) · Apple 코리아 스토어 출고가(256GB, 2026-11-22 확인)","asOf":"2026-11-22"},
+    {"id":"ipduo","name":"아이폰 듀오","maker":"애플","launchPrice":3290000,"display":"7.6형(19.3cm) 메인 · 5.4형(13.6cm) 커버 120Hz","chip":"A20 Pro","cam":"48MP+48MP 초광각","batt":"비공개(동영상 최대 44시간·커버 화면)","weight":"254g","launch":"2026-10","img":"img/ipduo.webp","source":"Apple 지원 기술 사양(support.apple.com/ko-kr/148588) · Apple 코리아 스토어 출고가(256GB, 2026-11-22 확인)","asOf":"2026-11-22"},
     {"id":"s25","name":"갤럭시 S25","maker":"삼성","launchPrice":1155000,"display":"6.2형 FHD+ 120Hz","chip":"스냅드래곤 8 Elite for Galaxy","cam":"50MP+12MP 초광각+10MP 3배","batt":"4,000mAh","weight":"162g","launch":"2025-02","img":"img/s25.webp","source":"제조사 국내 발표(2025-01) 출고가·제원","asOf":"2026-11-21"},
     {"id":"s25p","name":"갤럭시 S25+","maker":"삼성","launchPrice":1353000,"display":"6.7형 QHD+ 120Hz","chip":"스냅드래곤 8 Elite for Galaxy","cam":"50MP+12MP 초광각+10MP 3배","batt":"4,900mAh","weight":"190g","launch":"2025-02","img":"img/s25p.webp","source":"제조사 국내 발표(2025-01) 출고가·제원","asOf":"2026-11-21"},
     {"id":"s25u","name":"갤럭시 S25 울트라","maker":"삼성","launchPrice":1698400,"display":"6.9형 QHD+ 120Hz","chip":"스냅드래곤 8 Elite for Galaxy","cam":"200MP+50MP 초광각+50MP 5배+10MP 3배","batt":"5,000mAh","weight":"218g","launch":"2025-02","img":"img/s25u.webp","source":"제조사 국내 발표(2025-01) 출고가·제원","asOf":"2026-11-21"},

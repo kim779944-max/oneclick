@@ -503,7 +503,7 @@ function buildModelGrid(){
   [].forEach.call(document.querySelectorAll('.mg[data-i]'),function(b){
     b.addEventListener('click',function(){ $('#iModel').value=b.dataset.i; recalc(); $('#top1').scrollIntoView({behavior:'smooth',block:'start'}); });
   });
-  $('#mdlCnt').textContent=MODELS.length+'종 · 기준일 2026-11-21';
+  $('#mdlCnt').textContent=MODELS.length+'종 · 기준일 2026-11-22';
 }
 
 function init(data){
@@ -514,6 +514,7 @@ function init(data){
   $('#iPlan').innerHTML=PLANS.map(function(p,i){return '<option value="'+i+'"'+(i===2?' selected':'')+'>'+esc(p.nm)+' · '+fmt(p.m)+'원</option>';}).join('');
   var lo=''; for(var i=0;i<=24;i++) lo+='<option value="'+i+'">'+(i===0?'없음(0개월)':i+'개월')+'</option>'; $('#iLeft').innerHTML=lo;
   buildModelGrid();
+  var d0=MODELS.map(function(m){return m.id;}).indexOf('s26'); if(d0>=0) $('#iModel').value=String(d0);  /* 첫 화면 기준점 = 갤럭시 S26 기본형 */
   ['#iModel','#iPlan','#iLeft','#iCombo','#iWay','#iData'].forEach(function(s){
     $(s).addEventListener('change',recalc); $(s).addEventListener('input',recalc);
   });
