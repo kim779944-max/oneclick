@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A1128">
-<title>호갱 탈출 내비 — 2년 실부담 총액 판독</title>
-<meta name="description" content="지금 요금제·남은 약정·기기 형태를 넣으면 2년 실부담 총액으로 자급제+알뜰폰·통신사 기변과 비교해 드립니다. 인터넷·TV는 이동 시 순이익까지 계산합니다.">
+<title>호갱 탈출 내비 — 기종·요금제·약정 넣으면 최저가 한 줄</title>
+<meta name="description" content="기종·요금제·약정 잔여·결합·구매방식·데이터를 바꾸면 바로 다시 계산해, 맨 위에 최종 휴대폰값·월요금 1등과 사는 법 1·2·3을 보여 줍니다. 약정이 남았으면 위약금과 이득을 판정하고 번호이동·기기변경·자급제+알뜰폰·인터넷 결합 4경로를 비교합니다. 2026-11-21 기준 예시값.">
 <link rel="icon" href="../icon.png">
 <style>
 :root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
@@ -84,84 +84,150 @@ input:focus,select:focus{outline:2px solid var(--or)}
 #toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:60;background:#1d2c4f;border:1px solid var(--or);border-radius:999px;padding:9px 15px;font-size:13.5px;max-width:92vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
 @media print{.sitebar,.acts,.cta,.opbtn{display:none}body{padding-bottom:0}}
+/* ── 2026-11-21 개편: 결론 먼저 · 실시간 재계산 ── */
+.top1{margin:10px 0 0;padding:13px 14px 12px;border-radius:16px;border:1.5px solid var(--or);background:linear-gradient(140deg,rgba(255,107,0,.20),rgba(15,27,51,.96) 62%)}
+.top1 .rk{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--or2);font-weight:800}
+.top1 .rk i{font-style:normal;background:var(--or);color:var(--on);border-radius:6px;padding:1px 7px;font-weight:900}
+.top1 .big{font-size:21px;font-weight:900;letter-spacing:-.7px;line-height:1.35;margin:6px 0 0;word-break:keep-all}
+.top1 .big b{color:var(--or2)}
+.top1 .save{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+.top1 .save span{font-size:13.5px;font-weight:900;color:#CFF5E1;background:#0f2a20;border:1px solid #2d6b45;border-radius:999px;padding:4px 10px}
+.top1 .save em{font-style:normal;font-size:15px;font-weight:900;color:#fff}
+.top1 ol{margin:9px 0 0;padding:0;list-style:none;counter-reset:hw}
+.top1 ol li{position:relative;padding:4px 0 4px 26px;font-size:13px;line-height:1.5;word-break:keep-all}
+.top1 ol li::before{counter-increment:hw;content:counter(hw);position:absolute;left:0;top:4px;width:19px;height:19px;border-radius:10px;background:var(--or);color:var(--on);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.top1 .fn,.fn{font-size:10.5px;color:var(--gray);line-height:1.5;margin:7px 0 0}
+.top1 .warnb,.warnb{display:inline-block;font-size:11px;font-weight:800;color:#3a2a00;background:var(--warn);border-radius:6px;padding:1px 7px;margin-left:2px}
+.inp{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.inp .f{margin:0}
+.inp select{min-height:40px;font-size:14px;padding:6px 8px}
+.cands{display:grid;gap:7px}
+.cand{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:9px 10px}
+.cand .no{width:22px;height:22px;border-radius:11px;background:var(--bg2);border:1px solid var(--line2);color:var(--or2);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.cand b{display:block;font-size:13.5px;word-break:keep-all}
+.cand small{display:block;font-size:11.5px;color:var(--gray);word-break:keep-all}
+.cand .amt{text-align:right;font-size:13.5px;font-weight:900;white-space:nowrap}
+.cand .amt small{font-weight:600}
+.cmp{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp th,.cmp td{border:1px solid var(--line);padding:7px 6px;text-align:right;word-break:keep-all}
+.cmp th{background:var(--card2);color:var(--ink2);font-size:11.5px;text-align:center}
+.cmp td.l{text-align:left}
+.cmp tr.best td{background:rgba(255,107,0,.16);color:#FFE3CC;font-weight:800}
+.cmp tr.best td.l{color:var(--or2)}
+@media (max-width:520px){
+  .cmp thead{display:none}
+  .cmp,.cmp tbody,.cmp tr,.cmp td{display:block;width:100%}
+  .cmp tr{border:1px solid var(--line);border-radius:12px;margin:0 0 8px;overflow:hidden;background:var(--card2)}
+  .cmp tr.best{border-color:var(--or)}
+  .cmp td{border:0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;padding:6px 10px;text-align:right}
+  .cmp td:first-child{border-top:0}
+  .cmp td::before{content:attr(data-h);color:var(--gray);font-weight:600;text-align:left;flex:0 0 auto}
+  .cmp td.l::before{content:none}
+  .cmp td.l{font-size:14px}
+}
+.why1{margin:8px 0 0;font-size:13px;line-height:1.6;color:#FFE3CC;background:rgba(255,107,0,.10);border:1px solid rgba(255,107,0,.45);border-radius:10px;padding:8px 10px;word-break:keep-all}
+.pen3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 8px}
+.pen3 div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 7px;min-width:0}
+.pen3 b{display:block;font-size:10.5px;color:var(--gray);font-weight:600;word-break:keep-all}
+.pen3 span{display:block;font-size:14px;font-weight:900;margin-top:2px;word-break:break-all}
+details.calc{margin:8px 0 0}
+details.calc summary{cursor:pointer;font-size:12.5px;color:var(--or2);font-weight:800}
+details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;font-size:11.5px;line-height:1.65;color:var(--ink2);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px;margin:7px 0 0}
+.mdl{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
+.mdl img{width:120px;height:120px;object-fit:cover;border-radius:12px;background:#fff;border:1px solid var(--line)}
+.mdl .nm{font-size:16px;font-weight:900;word-break:keep-all}
+.spec{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.spec th{width:62px;text-align:left;color:var(--gray);font-weight:600;padding:3px 0;vertical-align:top}
+.spec td{padding:3px 0;word-break:keep-all}
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px}
+.mg{border:1px solid var(--line);border-radius:10px;background:var(--card2);padding:6px;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left;min-width:0}
+.mg.on{border-color:var(--or);box-shadow:0 0 0 2px rgba(255,107,0,.25)}
+.mg img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;background:#fff;display:block}
+.mg .ph0{width:100%;aspect-ratio:1/1;border-radius:7px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--gray);text-align:center;padding:4px}
+.mg b{display:block;font-size:11.5px;margin-top:4px;word-break:keep-all;line-height:1.35}
+.mg small{display:block;font-size:10.5px;color:var(--gray)}
 </style>
 </head>
 <body>
 <header class="hd"><div class="wrap">
   <a class="back" href="https://autooneclick.com/">← 쇼룸</a>
-  <h1>호갱 탈출 내비<small>2년 실부담 총액으로 판독</small></h1>
+  <h1>호갱 탈출 내비<small>기종·요금제·약정 넣으면 최저가 한 줄</small></h1>
   <button class="opbtn" id="btnOp" type="button">운영자</button>
 </div></header>
 
 <main class="wrap">
-  <div id="formBox">
-    <div class="hero">
-      <b>“월 8만원”이 아니라 2년 총액으로 봅니다</b>
-      <span>요금제·남은 약정·기기 형태를 넣으면 <b style="display:inline;color:var(--or2)">지금 유지 / 자급제+알뜰폰 / 통신사 기변</b>의 2년 실부담을 나란히 놓고, 인터넷·TV는 이동했을 때 순이익까지 계산합니다.</span>
+  <!-- ① 결론 먼저: 1등 최솟값 + 절약액 + 사는 법 1·2·3 -->
+  <section class="top1" id="top1" aria-live="polite">
+    <div class="rk"><i>1등</i><span id="t1Route">—</span></div>
+    <div class="big" id="t1Big">최종 휴대폰값 <b>—</b> · 월 <b>—</b></div>
+    <div class="save"><span id="t1Save">—</span><em>어, 이렇게 싸?!</em></div>
+    <ol id="t1How"><li>—</li><li>—</li><li>—</li></ol>
+    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+  </section>
+
+  <!-- ② 입력 6종 — 바꾸는 즉시 다시 계산 -->
+  <section class="card" id="inBox">
+    <h2><span class="n">✎</span>내 조건 <em>바꾸면 바로 다시 계산</em></h2>
+    <div class="inp">
+      <label class="f"><span>기종</span><select id="iModel"></select></label>
+      <label class="f"><span>요금제(통신사)</span><select id="iPlan"></select></label>
+      <label class="f"><span>약정 남은 개월</span><select id="iLeft"></select></label>
+      <label class="f"><span>결합</span><select id="iCombo">
+        <option value="none">없음</option><option value="net">인터넷 결합</option><option value="fam">가족 결합</option></select></label>
+      <label class="f"><span>구매방식(생각한 방법)</span><select id="iWay">
+        <option value="mnp">번호이동</option><option value="chg" selected>기기변경</option><option value="self">자급제+알뜰폰</option><option value="net">인터넷 결합</option></select></label>
+      <label class="f"><span>데이터 사용량(월)</span><select id="iData">
+        <option value="5">5GB 이하</option><option value="15">15GB 이하</option><option value="100" selected>100GB 이하</option><option value="9999">무제한 필요</option></select></label>
     </div>
+    <p class="fn" id="planWarn"></p>
+  </section>
 
-    <section class="card">
-      <h2><span class="n">1</span>지금 내 조건 <em>휴대폰</em></h2>
-      <div class="grid2">
-        <label class="f"><span>통신사</span>
-          <select id="carrier"><option>SKT</option><option>KT</option><option>LG U+</option><option>알뜰폰</option><option>모름</option></select></label>
-        <label class="f"><span>현재 월 요금 (원)</span><input id="nowPay" inputmode="numeric" value="89000"></label>
-      </div>
-      <div class="grid2">
-        <label class="f"><span>남은 약정 (개월)</span><input id="leftMon" inputmode="numeric" value="12"></label>
-        <label class="f"><span>위약금·반환금 (원)</span><input id="penalty" inputmode="numeric" value="0"></label>
-      </div>
-      <label class="f"><span>기기 형태</span>
-        <select id="devType">
-          <option value="sub">공시지원금 (기기 0원으로 받음)</option>
-          <option value="sel">선택약정 (요금 25% 할인)</option>
-          <option value="free">자급제 (기기 직접 삼)</option>
-          <option value="unknown" selected>모름</option>
-        </select></label>
-      <div class="grid2">
-        <label class="f"><span>기기 할부 잔액 (원)</span><input id="devLeft" inputmode="numeric" value="0"></label>
-        <label class="f"><span>부가서비스 월액 (원)</span><input id="addon" inputmode="numeric" value="0"></label>
-      </div>
-      <p class="hint">위약금은 통신사 앱 → 요금 조회 → 해지 예상 금액에서 확인할 수 있습니다. 모르면 0으로 두고 ‘보수적’으로 보세요.</p>
-    </section>
+  <!-- ③ 나머지 후보 — 최종액 오름차순 -->
+  <section class="card">
+    <h2><span class="n">2</span>나머지 후보 <em>2년 총액 낮은 순</em></h2>
+    <div class="cands" id="cands"></div>
+    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+  </section>
 
-    <section class="card">
-      <h2><span class="n">2</span>비교 조건 <em>예시값 · 수정하세요</em></h2>
-      <div class="grid2">
-        <label class="f"><span>자급제 기기값 (원)</span><input id="devPrice" inputmode="numeric" value="1000000"></label>
-        <label class="f"><span>알뜰폰 월 요금 (원)</span><input id="mvnoPay" inputmode="numeric" value="33000"></label>
-      </div>
-      <div class="grid2">
-        <label class="f"><span>기변 시 기기 지원금 (원)</span><input id="subsidy" inputmode="numeric" value="450000"></label>
-        <label class="f"><span>기변 시 기기 추가금 (원)</span><input id="devExtra" inputmode="numeric" value="0"></label>
-      </div>
-      <div class="grid2">
-        <label class="f"><span>고가 요금제 월액 (원)</span><input id="highPay" inputmode="numeric" value="109000"></label>
-        <label class="f"><span>고가 유지 (개월)</span><input id="highMon" inputmode="numeric" value="6"></label>
-      </div>
-      <label class="f"><span>이후 표준 요금제 (원)</span><input id="stdPay" inputmode="numeric" value="45000"></label>
-      <p class="warn">위 숫자는 계산 방법을 보여 주기 위한 <b>예시</b>입니다. 지금 사는 곳의 실제 기기값·요금제를 넣어야 판독이 맞습니다.</p>
-    </section>
+  <!-- ④ 약정이 남았을 때: 위약금 vs 이득 -->
+  <section class="card" id="penBox">
+    <h2><span class="n">3</span>약정이 남았다면 — 지금 바꿀까, 기다릴까</h2>
+    <div id="penBody"></div>
+  </section>
 
-    <section class="card">
-      <h2><span class="n">3</span>인터넷 · TV <em>약정 만료 전후</em></h2>
-      <div class="grid2">
-        <label class="f"><span>현재 인터넷 월요금 (원)</span><input id="netPay" inputmode="numeric" value="33000"></label>
-        <label class="f"><span>남은 약정 (개월)</span><input id="netLeft" inputmode="numeric" value="0"></label>
-      </div>
-      <div class="grid2">
-        <label class="f"><span>TV 결합</span><select id="netTv"><option value="1">포함</option><option value="0" selected>인터넷만</option></select></label>
-        <label class="f"><span>이동 시 사은품 (원)</span><input id="gift" inputmode="numeric" value="480000"></label>
-      </div>
-      <label class="f"><span>이동 후 예상 월요금 (원)</span><input id="netNew" inputmode="numeric" value="33000"></label>
-      <p class="hint">사은품은 업체 광고 기준 <b>최대 48만 원</b>을 예시로 넣었습니다. 실제 지급액은 신청 화면에서 확인해야 합니다.</p>
-    </section>
+  <!-- ⑤ 4경로 최저가 비교표 -->
+  <section class="card">
+    <h2><span class="n">4</span>네 가지 길 비교 <em>2년(24개월) 기준</em></h2>
+    <table class="cmp" id="cmp">
+      <thead><tr><th>경로</th><th>최종 휴대폰값</th><th>월요금</th><th>2년 총액</th><th>약정</th><th>위약금 위험</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="why1" id="why1">—</div>
+    <a class="btn sm" id="btnAjd" href="https://www.ajd.co.kr/" target="_blank" rel="noopener" style="margin-top:9px">인터넷 결합 조건 확인</a>
+    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+  </section>
 
-    <button class="cta" id="btnGo" type="button">확인하기</button>
-    <p class="note">입력값은 이 기기 안에서만 계산합니다. 저장·전송하지 않습니다.</p>
-  </div>
+  <!-- ⑥ 기종 카드 -->
+  <section class="card" id="mdlBox">
+    <h2><span class="n">5</span>기종 자세히 <em id="mdlCnt"></em></h2>
+    <div class="mdl" id="mdl"></div>
+    <div class="mgrid" id="mgrid"></div>
+    <p class="fn" id="mdlNote"></p>
+    <p class="fn"><a href="img/CREDITS.html" target="_blank" rel="noopener">사진 출처</a> · 위키미디어 공용 CC0·CC BY·CC BY-SA 사진 · 제조사 마케팅 이미지는 쓰지 않습니다</p>
+  </section>
 
-  <div id="viewBox" hidden></div>
+  <!-- ⑦ 계산식 (검산용) -->
+  <section class="card">
+    <h2><span class="n">6</span>계산식 그대로 <em>직접 검산하세요</em></h2>
+    <details class="calc" id="calcBox"><summary>펼쳐서 계산 과정 보기</summary><pre id="calcPre"></pre></details>
+    <div class="graybox" style="margin-top:10px">
+      · 금액은 <b>2026-11-21 기준 예시값</b>입니다. 통신사 공시지원금·요금제·추가지원금은 통신사·대리점·시점마다 달라집니다.<br>
+      · 이 화면은 통신사 시스템을 조회하지 않습니다. 넣은 조건으로 이 기기 안에서 계산만 합니다.<br>
+      · 위약금(할인반환금)은 통신사 실제 산식과 다를 수 있으니, 바꾸기 전 고객센터·앱에서 정확한 금액을 확인하세요.<br>
+      · 가입·개통을 대행하지 않습니다.
+    </div>
+  </section>
+  <p class="note">입력값은 이 기기 안에서만 계산합니다. 저장·전송하지 않습니다.</p>
 </main>
 
 <footer class="sitebar"><a href="https://autooneclick.com/">autooneclick.com <i>원클릭 도구</i></a></footer>
@@ -190,213 +256,254 @@ input:focus,select:focus{outline:2px solid var(--or)}
   </div>
 </div>
 
+
 <script>
 (function(){
 'use strict';
-var $=function(s){return document.querySelector(s);},$$=function(s){return [].slice.call(document.querySelectorAll(s));};
+var $=function(s){return document.querySelector(s);};
 function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},2400);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function num(v){var s=String(v==null?'':v).replace(/[^0-9.\-]/g,'');var n=parseFloat(s);return isFinite(n)?n:0;}
 function fmt(n){return Math.round(Number(n)||0).toLocaleString('ko-KR');}
 function won(n){return fmt(n)+'원';}
-function eok(n){var a=Math.abs(n);if(a>=100000000)return (n/100000000).toFixed(2)+'억';if(a>=10000)return Math.round(n/10000).toLocaleString('ko-KR')+'만';return fmt(n);}
-function stamp(){var d=new Date(),p=function(n){return (n<10?'0':'')+n;};return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
 
-function read(){
-  return {
-    carrier:$('#carrier').value, nowPay:num($('#nowPay').value), leftMon:num($('#leftMon').value),
-    penalty:num($('#penalty').value), devType:$('#devType').value, devLeft:num($('#devLeft').value),
-    addon:num($('#addon').value),
-    devPrice:num($('#devPrice').value), mvnoPay:num($('#mvnoPay').value), subsidy:num($('#subsidy').value),
-    devExtra:num($('#devExtra').value), highPay:num($('#highPay').value), highMon:num($('#highMon').value),
-    stdPay:num($('#stdPay').value),
-    netPay:num($('#netPay').value), netLeft:num($('#netLeft').value), netTv:$('#netTv').value,
-    gift:num($('#gift').value), netNew:num($('#netNew').value)
-  };
-}
-function calc(c){
-  var keep=c.nowPay*24 + c.addon*24 + c.devLeft;
-  var mvno=c.devPrice + c.mvnoPay*24 + c.penalty;
-  var chan=c.devExtra + c.highPay*Math.min(24,c.highMon) + c.stdPay*(24-Math.min(24,c.highMon)) + c.penalty;
-  var rows=[
-    {k:'keep',n:'지금 그대로 유지',v:keep,sub:fmt(c.nowPay)+'×24 + 부가서비스 + 기기잔액'},
-    {k:'mvno',n:'자급제 + 알뜰폰',v:mvno,sub:'기기값 + '+fmt(c.mvnoPay)+'×24 + 위약금'},
-    {k:'chan',n:'통신사 기변(지원금)',v:chan,sub:'고가 '+c.highMon+'개월 + 표준 '+(24-Math.min(24,c.highMon))+'개월 + 위약금'}
-  ];
-  var best=rows.slice().sort(function(a,b){return a.v-b.v;})[0];
-  var worst=rows.slice().sort(function(a,b){return b.v-a.v;})[0];
-  // 인터넷
-  var nLeft=Math.min(24,Math.max(0,c.netLeft));
-  var netStay=c.netPay*24;
-  var netMove=c.netLeft>0?(c.netPay*nLeft+c.netNew*(24-nLeft)):(c.netNew*24);
-  var netMoveNet=netMove-c.gift;
-  var netGain=netStay-netMoveNet;
-  return {keep:keep,mvno:mvno,chan:chan,rows:rows,best:best,worst:worst,
-    netStay:netStay,netMove:netMove,netGain:netGain,nLeft:nLeft};
+/* ── 예시 기준값 (2026-11-21) — 실제 통신사 값이 아니라 계산 틀을 보여 주는 예시 ── */
+var PLANS=[
+  {id:'p55', nm:'5G 슬림 12GB', m:55000, gb:12},
+  {id:'p69', nm:'5G 베이직 24GB', m:69000, gb:24},
+  {id:'p85', nm:'5G 스탠다드 110GB', m:85000, gb:110},
+  {id:'p95', nm:'5G 무제한', m:95000, gb:9999},
+  {id:'p115',nm:'5G 무제한 프리미엄', m:115000, gb:9999}
+];
+var MVNO={5:{nm:'알뜰폰 7GB',m:9900},15:{nm:'알뜰폰 15GB',m:16500},100:{nm:'알뜰폰 100GB',m:29700},9999:{nm:'알뜰폰 11GB+일2GB(이후 속도제한)',m:33000}};
+var COMBO={none:{nm:'결합 없음',d:0},net:{nm:'인터넷 결합',d:5500},fam:{nm:'가족 결합',d:11000}};
+var SEL=0.25;             /* 선택약정 할인율 25% */
+var EXTRA=0.15;           /* 유통점 추가지원금: 공시지원금의 15%(예시) */
+var MNP_BONUS=100000;     /* 번호이동 우대지원(예시) — 조건: 85,000원 이상 요금제 6개월 유지 */
+var MNP_MIN=85000, KEEP=6, MONTHS=24;
+var WAYNM={mnp:'번호이동',chg:'기기변경',self:'자급제+알뜰폰',net:'인터넷 결합'};
+
+function subsidyOf(model,m){
+  var s = m<60000?200000 : m<80000?330000 : m<90000?420000 : m<110000?500000 : 600000;
+  return Math.min(s, Math.round(model.launchPrice*0.6/1000)*1000);
 }
 
-function render(c,r){
-  var h='';
-  h+='<div class="card"><h2><span class="n">✓</span>판독 결과 <em>2년 기준</em></h2>';
-  h+='<div class="badges"><span class="b live">실제 계산 · 입력값 기준</span><span class="b info">요금·지원금은 직접 확인 필요</span></div>';
-  h+='<div class="kpis">';
-  h+='<div class="kpi"><b>가장 싼 2년 총액</b><span class="ok">'+won(r.best.v)+'</span><i>'+esc(r.best.n)+'</i></div>';
-  h+='<div class="kpi"><b>가장 비싼 쪽과 차이</b><span class="or">'+won(r.worst.v-r.best.v)+'</span><i>'+esc(r.worst.n)+' 기준</i></div>';
-  h+='</div>';
-  h+='<div class="judge '+(r.worst.v-r.best.v>0?'bad':'mid')+'">';
-  if(r.worst.k==='keep'){
-    h+='<b>지금 그대로 두면 2년에 '+won(r.worst.v-r.best.v)+' 더 냅니다.</b><br>같은 기간 <b>'+esc(r.best.n)+'</b> 쪽이 '+won(r.best.v)+'으로 가장 쌉니다.';
-  }else{
-    h+='<b>지금 조건이 이미 가장 쌉니다.</b><br>바꾸면 2년에 '+won(r.worst.v-r.best.v)+' 더 나갑니다 — 지금은 유지가 맞습니다.';
-  }
-  h+='</div>';
-  h+='<table class="tbl3"><colgroup><col style="width:34%"><col style="width:66%"></colgroup>';
-  h+='<tr><th>선택</th><th>2년 실부담</th></tr>';
-  r.rows.forEach(function(x){
-    h+='<tr'+(x.k===r.best.k?' class="best"':'')+'><td class="l">'+esc(x.n)+'<br><span style="font-size:10.5px;color:#8FA0B8">'+esc(x.sub)+'</span></td><td>'+won(x.v)+'</td></tr>';
-  });
-  h+='</table>';
-  h+='<p class="note">유지안은 지금 요금제를 24개월 더 쓴다고 가정했습니다. 알뜰폰은 약정이 없어 중간에 바꿀 수 있고, 기변안은 고가 요금제 유지 기간과 부가서비스를 조건대로 지켜야 지원금이 유지됩니다.</p></div>';
-
-  /* 인터넷 */
-  h+='<div class="card"><h2><span class="n">1</span>인터넷 · TV 2년 순이익</h2>';
-  h+='<table class="tbl3"><colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>';
-  h+='<tr><th>선택</th><th>2년 지출</th><th>사은품 반영</th></tr>';
-  h+='<tr><td class="l">그대로 유지</td><td>'+fmt(r.netStay)+'</td><td>'+fmt(r.netStay)+'</td></tr>';
-  h+='<tr'+(r.netGain>0?' class="best"':'')+'><td class="l">이동·신규 가입</td><td>'+fmt(r.netMove)+'</td><td>'+fmt(r.netMove-c.gift)+'</td></tr>';
-  h+='</table>';
-  if(r.netGain>0){
-    h+='<div class="judge good" style="margin-top:10px"><b>이동하면 2년에 '+won(r.netGain)+' 이득입니다.</b><br>사은품 '+won(c.gift)+'을 빼고 계산한 값입니다. 사은품은 개통 후 지급되므로 <b>지급 조건·시점</b>을 신청 화면에서 확인하세요.</div>';
-  }else{
-    h+='<div class="judge mid" style="margin-top:10px"><b>지금은 이동 이득이 없습니다 (2년 '+won(-r.netGain)+' 손해).</b><br>약정이 남아 있거나 사은품이 위약금을 못 넘는 경우입니다. 만료 시점에 다시 계산하세요.</div>';
-  }
-  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">';
-  h+='<a class="btn pri" id="btnAjd" href="https://www.ajd.co.kr/" target="_blank" rel="noopener">인터넷 최저가·사은품 확인</a>';
-  h+='</div>';
-  h+='<p class="note">이동은 <b>SKT·KT·LG U+ 본사 상품</b>을 온라인 대리점을 통해 가입하는 것입니다. 별정통신(알뜰폰)으로 바뀌는 게 아니고, 설치 기사도 통신사 본사 기사가 옵니다. 온라인 대리점이 받는 모집 수수료 일부가 사은품으로 돌아오는 구조입니다.</p></div>';
-
-  /* 실행 순서 */
-  h+='<div class="card"><h2><span class="n">2</span>오늘 할 일 1·2·3</h2><ol class="steps">';
-  h+='<li><b>내 위약금부터 확인</b> — 통신사 앱의 해지 예상 금액. 0원이면 지금이 바꿀 때입니다.</li>';
-  h+='<li><b>데이터 사용량 확인</b> — 최근 3개월 평균 사용량(GB)을 보고 알뜰폰 요금제를 고릅니다. 집·회사 와이파이가 많으면 3~5GB면 충분합니다.</li>';
-  h+='<li><b>인터넷 약정 만료일 확인</b> — 만료 1개월 전부터 이동이 유리합니다. 만료 후 재약정하면 사은품이 거의 없습니다.</li>';
-  h+='</ol>';
-  h+='<div class="graybox" style="margin-top:10px"><b>휴대폰으로 수수료를 받으려면</b><br>인터넷·가전렌탈은 온라인 대리점 제휴 링크로 연결하면 되지만, <b>휴대폰 개통은 사전승낙서가 필요</b>해 개인이 바로 링크를 받기 어렵습니다. 현실적인 길은 ① 자급제+알뜰폰 조합으로 비교·연결(오픈마켓 파트너스·알뜰폰 제휴) ② 사전승낙서를 가진 무점포 위탁 파트너에 접수만 넘기는 방식입니다.</div>';
-  h+='</div>';
-
-  h+='<div class="card"><h2><span class="n">3</span>이 계산의 한계</h2><div class="graybox">';
-  h+='· 통신사 요금제·지원금은 수시로 바뀝니다. 이 계산은 <b>내가 넣은 숫자</b> 기준입니다.<br>';
-  h+='· 선택약정 25% 할인, 가족결합, 결합할인은 자동 반영되지 않습니다. 해당되면 현재 월 요금에 이미 반영된 값을 넣으세요.<br>';
-  h+='· 사은품은 지급 시점·조건이 붙습니다. 상품권·현금 지급일과 회수 조건을 꼭 확인하세요.<br>';
-  h+='· 이 화면은 가입을 대신하지 않습니다. 신청 버튼은 제휴사 화면으로 넘어갑니다.';
-  h+='</div></div>';
-
-  h+='<div class="acts"><button class="btn pri" id="btnSave" type="button">저장 (그림·텍스트)</button>'+
-     '<button class="btn" id="btnShare" type="button">공유</button>'+
-     '<button class="btn wide" id="btnAgain" type="button">조건 바꿔 다시 계산</button></div>';
-
-  var box=$('#viewBox');box.innerHTML=h;box.hidden=false;$('#formBox').hidden=true;
-  window.scrollTo({top:0,behavior:'smooth'});
-  LAST={c:c,r:r};
-  var link='';try{link=localStorage.getItem('kts_ajd_link')||'';}catch(e){}
-  if(link){var a=$('#btnAjd');if(a)a.href=link;}
-  $('#btnAgain').addEventListener('click',function(){box.hidden=true;$('#formBox').hidden=false;window.scrollTo({top:0,behavior:'smooth'});});
-  $('#btnSave').addEventListener('click',saveAll);
-  $('#btnShare').addEventListener('click',shareIt);
+var MODELS=[], NOTE='';
+var IN={};
+function readIn(){
+  IN={ model:MODELS[+$('#iModel').value]||MODELS[0], plan:PLANS[+$('#iPlan').value]||PLANS[2],
+       left:+$('#iLeft').value||0, combo:$('#iCombo').value, way:$('#iWay').value, data:+$('#iData').value };
 }
 
-/* ---------- 저장/공유 ---------- */
-var LAST=null;
-function linesOf(){
-  var c=LAST.c,r=LAST.r,o=[];
-  o.push('■ 2년 실부담 총액');
-  r.rows.forEach(function(x){o.push((x.k===r.best.k?'▶ ':'· ')+x.n+': '+won(x.v));});
-  o.push('');
-  o.push('가장 싼 쪽: '+r.best.n+' / 가장 비싼 쪽과 차이 '+won(r.worst.v-r.best.v));
-  o.push('');
-  o.push('■ 인터넷·TV 2년');
-  o.push('유지 '+won(r.netStay)+' / 이동(사은품 반영) '+won(r.netMove-c.gift));
-  o.push(r.netGain>0?('이동 시 이득 '+won(r.netGain)):('이동 시 손해 '+won(-r.netGain)));
-  o.push('');
-  o.push('내 조건: '+c.carrier+' 월 '+fmt(c.nowPay)+'원 · 남은 약속 '+c.leftMon+'개월 · 위약금 '+fmt(c.penalty)+'원');
-  o.push('계산: autooneclick.com/hogang/');
-  return o;
-}
-function drawCard(){
-  var W=900,H=1240,cv=document.createElement('canvas');cv.width=W;cv.height=H;
-  var g=cv.getContext('2d');
-  g.fillStyle='#0A1128';g.fillRect(0,0,W,H);
-  g.fillStyle='#0F1B33';g.fillRect(0,0,W,170);
-  g.fillStyle='#FF6B00';g.fillRect(0,0,14,H);
-  g.fillStyle='#FF6B00';g.font='bold 26px "Malgun Gothic",sans-serif';g.fillText('호갱 탈출 내비',64,58);
-  g.fillStyle='#F3F6FA';g.font='bold 40px "Malgun Gothic",sans-serif';g.fillText('2년 실부담 총액 판독',64,116);
-  g.fillStyle='#8FA0B8';g.font='22px "Malgun Gothic",sans-serif';g.fillText('휴대폰 · 인터넷 · TV',64,150);
-  var y=220;
-  function out(s,color,bold,size){
-    g.fillStyle=color||'#DCE6F6';g.font=(bold?'bold ':'')+(size||23)+'px "Malgun Gothic",sans-serif';
-    var t='',ws=String(s).split(' ');
-    for(var i=0;i<ws.length;i++){
-      var tt=t?t+' '+ws[i]:ws[i];
-      if(g.measureText(tt).width>780&&t){g.fillText(t,64,y);y+=34;t=ws[i];}
-      else t=tt;
+/* 통신사 경로 하나: 공시지원금 vs 선택약정 중 싼 쪽 */
+function carrier(way, model, plan, comboD){
+  var P=model.launchPrice, m=plan.m, S=subsidyOf(model,m);
+  var out=[], cond='';
+  /* (가) 선택약정 25% */
+  var mon=Math.max(0, m*(1-SEL)-comboD);
+  out.push({kind:'sel', dev:P, mon:mon, total:P+mon*MONTHS, warn:'', S:0, X:0, keepCost:0,
+    f:'기기값 '+won(P)+' + (요금 '+won(m)+' × 0.75 − 결합 '+won(comboD)+') × 24'});
+  /* (나) 공시지원금 + 추가지원금(15%) */
+  var sub=S+Math.round(S*EXTRA/10)*10, dev=Math.max(0,P-sub), mon2=Math.max(0,m-comboD), X=0, keepCost=0, warn='';
+  if(way==='mnp'){
+    if(m>=MNP_MIN){ X=MNP_BONUS; }
+    else { /* 조건 미충족: 85,000원 요금제 6개월 유지하면 받음 → 싼 쪽 */
+      var up=(MNP_MIN-m)*KEEP;
+      if(up<MNP_BONUS){ X=MNP_BONUS; keepCost=up; warn='번호이동 우대지원은 '+fmt(MNP_MIN)+'원 이상 요금제 '+KEEP+'개월 유지 조건 — 지금 요금제는 미충족이라 6개월만 올려 쓰는 것으로 계산'; }
+      cond='번호이동 우대지원 조건('+fmt(MNP_MIN)+'원 이상 요금제 '+KEEP+'개월 유지) 미충족'+(X?' — 6개월 올려 쓰는 비용 '+won(up)+' 포함':' — 우대지원 빼고 계산');
     }
-    if(t)g.fillText(t,64,y);
-    y+=38;
+    dev=Math.max(0,dev-X);
   }
-  linesOf().forEach(function(L){
-    if(y>H-130)return;
-    if(/^■/.test(L)){y+=6;out(L,'#FFA24D',true,25);}
-    else if(/^▶/.test(L))out(L,'#8BF0B4',true,24);
-    else out(L);
-  });
-  g.fillStyle='#1D4ED8';g.fillRect(0,H-84,W,84);
-  g.fillStyle='#fff';g.font='bold 30px "Malgun Gothic",sans-serif';g.textAlign='center';
-  g.fillText('autooneclick.com',W/2,H-32);g.textAlign='left';
-  return cv;
-}
-function dl(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},3000);}
-function saveAll(){
-  try{
-    drawCard().toBlob(function(b){if(b)dl(b,'호갱탈출_'+stamp()+'.png');});
-    dl(new Blob([linesOf().join('\n')],{type:'text/plain;charset=utf-8'}),'호갱탈출_'+stamp()+'.txt');
-    toast('그림과 텍스트를 저장했습니다');
-  }catch(e){toast('저장이 막혔습니다 — 공유로 시도해 주세요');}
-}
-function shareIt(){
-  var txt=linesOf().join('\n');
-  try{
-    if(navigator.share){
-      drawCard().toBlob(function(b){
-        if(b&&navigator.canShare&&navigator.canShare({files:[new File([b],'호갱탈출.png',{type:'image/png'})]})){
-          navigator.share({title:'호갱 탈출 내비',text:txt,files:[new File([b],'호갱탈출.png',{type:'image/png'})]}).catch(function(){});
-        }else navigator.share({title:'호갱 탈출 내비',text:txt}).catch(function(){});
-      });
-    }else copy(txt);
-  }catch(e){copy(txt);}
-}
-function copy(t){
-  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast('복사했습니다');},function(){toast('복사가 막혔습니다');});return;}
-  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');toast('복사했습니다');}catch(e){toast('복사가 막혔습니다');}ta.remove();
+  out.push({kind:'sub', dev:dev, mon:mon2, total:dev+mon2*MONTHS+keepCost, warn:warn, S:S, X:X, keepCost:keepCost,
+    f:'기기값 '+won(P)+' − 공시 '+won(S)+' − 추가 '+won(sub-S)+(X?' − 번호이동 우대 '+won(X):'')+' = '+won(dev)+' + (요금 '+won(m)+' − 결합 '+won(comboD)+') × 24'+(keepCost?' + 6개월 상향분 '+won(keepCost):'')});
+  out.sort(function(a,b){return a.total-b.total;});
+  out[0].cond=cond;
+  return out[0];
 }
 
-/* ---------- 이벤트 ---------- */
-$('#btnGo').addEventListener('click',function(){
-  var c=read();
-  if(!c.nowPay&&!c.mvnoPay){toast('현재 월 요금을 넣어 주세요');$('#nowPay').focus();return;}
-  render(c,calc(c));
+function routes(){
+  var md=IN.model, pl=IN.plan, cd=COMBO[IN.combo].d;
+  var r=[];
+  var a=carrier('mnp',md,pl,cd); a.way='mnp'; a.plan=pl.nm; r.push(a);
+  var b=carrier('chg',md,pl,cd); b.way='chg'; b.plan=pl.nm; r.push(b);
+  var mv=MVNO[IN.data]; var c={way:'self', kind:'self', dev:md.launchPrice, mon:mv.m, total:md.launchPrice+mv.m*MONTHS, warn:'', plan:mv.nm,
+    f:'자급제 기기값 '+won(md.launchPrice)+' + 알뜰폰 '+won(mv.m)+' × 24'}; r.push(c);
+  var nd=Math.max(cd, IN.combo==='fam'? cd+COMBO.net.d : COMBO.net.d);
+  var d=carrier('chg',md,pl,nd); d.way='net'; d.plan=pl.nm+' + 인터넷'; r.push(d);
+  return r;
+}
+
+function howTo(best){
+  var md=IN.model.name, k=best.kind;
+  if(best.way==='self') return [
+    '자급제 '+md+'를 일시불(또는 무이자 할부)로 따로 삽니다',
+    best.plan+' 요금제(월 '+won(best.mon)+')로 유심·eSIM 개통합니다',
+    IN.left>0?'지금 통신사는 번호이동으로 옮기며 해지 — 위약금은 아래 3번에서 먼저 확인':'지금 통신사에서 번호이동으로 옮기면 끝 — 약정이 없어 위약금 없음'];
+  var step2 = k==='sel' ? '공시지원금 대신 선택약정 25% 할인을 고릅니다(월 '+won(best.mon)+')' : '공시지원금 + 추가지원금으로 기기값을 '+won(best.dev)+'까지 낮춥니다';
+  var first = best.way==='mnp' ? '다른 통신사로 번호이동하며 '+best.plan+' 요금제로 가입합니다'
+            : best.way==='net' ? '지금 통신사에서 기기변경하고 인터넷도 같은 통신사로 묶습니다'
+            : '지금 통신사 그대로 기기변경, '+best.plan+' 요금제로 갑니다';
+  var third = best.warn ? '조건: '+fmt(MNP_MIN)+'원 이상 요금제를 '+KEEP+'개월 유지한 뒤 낮춥니다'
+            : (COMBO[IN.combo].d||best.way==='net') ? '결합 할인을 개통 날 함께 신청합니다(자동 적용 아님)'
+            : k==='sub' ? '지원금은 요금제 '+KEEP+'개월 유지 조건이 붙는지 계약서에서 확인합니다' : '약정 24개월 동안 요금제를 바꾸면 할인율이 달라질 수 있으니 확인합니다';
+  return [first, step2, third];
+}
+
+/* 할인반환금(위약금) 예시 산식: 받은 할인 × 반환율(경과 12개월까지 100%, 이후 남은개월/12) */
+function penaltyOf(left){
+  if(left<=0) return {p:0,e:MONTHS,D:0,rate:0};
+  var e=MONTHS-left, D=IN.plan.m*SEL*e, rate=e<=12?1:left/12;
+  return {p:Math.round(D*rate/10)*10, e:e, D:D, rate:rate};
+}
+
+function penaltyView(best){
+  var L=IN.left, box=$('#penBody');
+  var cur=Math.round(IN.plan.m*(1-SEL)), nw=best.mon, diff=cur-nw;
+  if(L<=0){
+    box.innerHTML='<div class="judge good">약정이 남지 않았습니다. <b>위약금 없이 지금 바로 바꾸면 됩니다.</b></div>'+
+      '<p class="fn">약정 남은 개월을 고르면 위약금과 이득을 나란히 계산합니다.</p>';
+    return {txt:'약정 없음', L:0};
+  }
+  var pn=penaltyOf(L);
+  var stay=cur*L, move=nw*L+pn.p;
+  var bestW=0, bestG=-Infinity, g0=0, gl=[];
+  for(var w=0; w<=L; w++){
+    var g=diff*(L-w)-penaltyOf(L-w).p; gl.push(g); if(w===0) g0=g;
+    if(g>bestG+0.5){bestG=g; bestW=w;}
+  }
+  var be = diff>0 ? Math.ceil(pn.p/diff) : null;
+  var txt, cls;
+  if(bestW===0 && g0>0){ txt='지금 바꾸면 '+fmt(g0)+'원 이득입니다'; cls='good'; }
+  else if(bestW===L){ txt=L+'개월 뒤(약정 끝)에 바꾸는 게 '+fmt(-g0)+'원 유리합니다'; cls='bad'; }
+  else { txt=bestW+'개월 뒤에 바꾸는 게 '+fmt(bestG-g0)+'원 유리합니다'; cls='mid'; }
+  box.innerHTML=
+    '<div class="pen3"><div><b>잔여 위약금(할인반환금)</b><span>'+won(pn.p)+'</span></div>'+
+    '<div><b>그대로 '+L+'개월 낼 돈</b><span>'+won(stay)+'</span></div>'+
+    '<div><b>지금 바꿔 '+L+'개월 낼 돈</b><span>'+won(move)+'</span></div></div>'+
+    '<div class="judge '+cls+'"><b id="penVerdict">'+esc(txt)+'</b><br>손익분기: '+(be!=null?'바꾼 뒤 <b id="penBE">'+be+'개월</b>이면 위약금을 메웁니다':'<b id="penBE">없음</b> — 새 월요금이 지금보다 싸지 않아 위약금을 메우지 못합니다')+'</div>'+
+    '<details class="calc"><summary>위약금 계산식 펼치기</summary><pre>'+esc(
+      '지금 월 납부 = 요금 '+won(IN.plan.m)+' × (1 − 0.25 선택약정) = '+won(cur)+'\n'+
+      '새 월 납부(1등 '+WAYNM[best.way]+') = '+won(nw)+'\n'+
+      '경과 '+pn.e+'개월 · 받은 할인 = '+won(IN.plan.m)+' × 0.25 × '+pn.e+' = '+won(pn.D)+'\n'+
+      '반환율 = '+(pn.e<=12?'경과 12개월 이하 → 100%':'남은 '+L+'개월 ÷ 12 = '+Math.round(pn.rate*100)+'%')+'\n'+
+      '위약금 = '+won(pn.D)+' × '+Math.round(pn.rate*100)+'% = '+won(pn.p)+'\n'+
+      '그대로 = '+won(cur)+' × '+L+' = '+won(stay)+'\n'+
+      '지금 바꿈 = '+won(nw)+' × '+L+' + 위약금 '+won(pn.p)+' = '+won(move)+'\n'+
+      '이득(w개월 뒤 바꿈) = (지금 월 − 새 월) × (남은 − w) − 위약금(남은 − w)\n'+
+      gl.map(function(g,i){return '  w='+i+' → '+won(g);}).join('\n')+'\n'+
+      '손익분기 = 위약금 ÷ (지금 월 − 새 월) = '+(be!=null?be+'개월':'없음')+'\n'+
+      '※ 예시 산식입니다. 실제 반환금은 통신사 앱·고객센터에서 확인하세요.'
+    )+'</pre></details>';
+  return {txt:txt, L:L, be:be, pen:pn.p};
+}
+
+var T0=0;
+function recalc(){
+  T0=performance.now();
+  readIn();
+  var rs=routes();
+  var sorted=rs.slice().sort(function(a,b){return a.total-b.total;});
+  var best=sorted[0];
+  var mine=rs.filter(function(x){return x.way===IN.way;})[0];
+  var base=IN.model.launchPrice+IN.plan.m*MONTHS;  /* 아무 할인 없이 통신사에서 산 경우 */
+  var save = (mine && mine!==best) ? mine.total-best.total : base-best.total;
+  var saveTx = (mine && mine!==best) ? '생각한 '+WAYNM[IN.way]+'보다 2년 '+won(save)+' 덜 냄' : '할인 없이 살 때보다 2년 '+won(save)+' 덜 냄';
+
+  $('#t1Route').textContent=WAYNM[best.way]+' · '+best.plan+(best.kind==='sel'?' · 선택약정 25%':best.kind==='sub'?' · 공시지원금':'');
+  $('#t1Big').innerHTML='최종 휴대폰값 <b id="t1Dev">'+won(best.dev)+'</b> · 월 <b id="t1Mon">'+won(best.mon)+'</b>'+(best.warn?' <span class="warnb">조건</span>':'');
+  $('#t1Save').textContent=saveTx;
+  $('#t1How').innerHTML=howTo(best).map(function(s){return '<li>'+esc(s)+'</li>';}).join('');
+
+  /* 요금제 조건 경고 */
+  var pw=[];
+  if(IN.plan.gb<IN.data) pw.push('<span class="warnb">데이터 부족</span> 고른 요금제('+IN.plan.gb+'GB)가 쓰는 양보다 적습니다');
+  rs.forEach(function(x){ if(x.cond) pw.push('<span class="warnb">조건 미충족</span> '+esc(WAYNM[x.way])+': '+esc(x.cond)); });
+  if(best.warn) pw.push('<span class="warnb">유지 조건</span> '+esc(best.warn));
+  $('#planWarn').innerHTML=pw.join('<br>');
+
+  /* 나머지 후보 */
+  $('#cands').innerHTML=sorted.slice(1).map(function(x,i){
+    return '<div class="cand"><span class="no">'+(i+2)+'</span><div><b>'+esc(WAYNM[x.way])+' · '+esc(x.plan)+'</b><small>휴대폰값 '+won(x.dev)+' · 월 '+won(x.mon)+(x.warn?' · 유지 조건':'')+'</small></div><div class="amt">'+won(x.total)+'<small>2년 총액</small></div></div>';
+  }).join('');
+
+  /* 4경로 표 */
+  var pn=penaltyOf(IN.left).p;
+  $('#cmp tbody').innerHTML=rs.map(function(x){
+    var risk = x.way==='self' ? (IN.left>0?'지금 약정 '+won(pn)+'만':'없음') : (x.kind==='sub'?'높음(지원금 반환)':'중간(할인 반환)')+(IN.left>0?' + 지금 '+won(pn):'');
+    var yak = x.way==='self' ? '없음(무약정)' : '24개월'+(x.warn?' · 6개월 유지':'')+(x.cond?' · 조건 미충족':'');
+    return '<tr class="'+(x===best?'best':'')+'"><td class="l" data-h="경로">'+esc(WAYNM[x.way])+(x===best?' ★':'')+'</td>'+
+      '<td data-h="최종 휴대폰값">'+won(x.dev)+'</td><td data-h="월요금">'+won(x.mon)+'</td><td data-h="2년 총액">'+won(x.total)+'</td>'+
+      '<td data-h="약정">'+esc(yak)+'</td><td data-h="위약금 위험">'+esc(risk)+'</td></tr>';
+  }).join('');
+  var second=sorted[1];
+  var why = best.way==='self' ? '기기는 제값을 내도, 알뜰폰 월 '+won(best.mon)+'이 24개월 쌓이면 통신사 요금보다 '+won((second.mon-best.mon)*MONTHS)+' 덜 나가서 쌉니다.'
+          : best.kind==='sub' ? '공시지원금·추가지원금으로 기기값이 '+won(IN.model.launchPrice-best.dev)+' 깎여서, 2위보다 '+won(second.total-best.total)+' 쌉니다.'
+          : '선택약정 25%가 24개월 동안 '+won(IN.plan.m*SEL*MONTHS)+'을 깎아 줘서, 공시지원금보다 유리합니다.';
+  $('#why1').innerHTML='<b>왜 '+esc(WAYNM[best.way])+'이 제일 싼가</b> — '+esc(why);
+
+  var pv=penaltyView(best);
+  paintModel();
+
+  $('#calcPre').textContent=rs.map(function(x){return '['+WAYNM[x.way]+'] '+x.f+' = 2년 '+won(x.total);}).join('\n')+
+    '\n\n기준: 요금제 '+IN.plan.nm+' '+won(IN.plan.m)+' · 선택약정 25% · 결합 '+COMBO[IN.combo].nm+' 월 '+won(COMBO[IN.combo].d)+' 할인'+
+    '\n공시지원금(예시) = 요금제 구간별 20만~60만 원, 출고가의 60% 이하 · 추가지원금 = 공시의 15%'+
+    '\n번호이동 우대(예시) '+won(MNP_BONUS)+' — '+fmt(MNP_MIN)+'원 이상 요금제 '+KEEP+'개월 유지 조건'+
+    '\n※ 2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다';
+
+  window.__HOGANG={ms:+(performance.now()-T0).toFixed(2), best:{way:best.way,dev:best.dev,mon:best.mon,total:best.total,kind:best.kind,warn:best.warn},
+    routes:rs.map(function(x){return {way:x.way,dev:x.dev,mon:x.mon,total:x.total,kind:x.kind,warn:x.warn,cond:x.cond||''};}), pen:pv, save:save, input:{model:IN.model.id,plan:IN.plan.id,left:IN.left,combo:IN.combo,way:IN.way,data:IN.data}};
+}
+
+function paintModel(){
+  var md=IN.model;
+  var ph = md._ok ? '<img src="'+esc(md.img)+'" alt="'+esc(md.name)+' 실물 사진">' : '<div class="mg"><div class="ph0" style="width:120px;height:120px">사진 준비 중</div></div>';
+  $('#mdl').innerHTML=ph+'<div><div class="nm">'+esc(md.name)+'</div><table class="spec">'+
+    '<tr><th>출고가</th><td>'+won(md.launchPrice)+'</td></tr><tr><th>화면</th><td>'+esc(md.display)+'</td></tr>'+
+    '<tr><th>칩</th><td>'+esc(md.chip)+'</td></tr><tr><th>카메라</th><td>'+esc(md.cam)+'</td></tr>'+
+    '<tr><th>배터리</th><td>'+esc(md.batt)+'</td></tr><tr><th>무게</th><td>'+esc(md.weight)+'</td></tr>'+
+    '<tr><th>출시</th><td>'+esc(md.launch)+'</td></tr></table></div>';
+  [].forEach.call(document.querySelectorAll('.mg[data-i]'),function(b){b.classList.toggle('on', MODELS[+b.dataset.i]===md);});
+  $('#mdlNote').textContent=(md.photoBy?'사진: '+md.photoBy+' · ':'')+'출고가는 출시 당시 국내 발표가 기준 예시 · '+md.source+' · 기준일 '+md.asOf;
+}
+
+function buildModelGrid(){
+  $('#mgrid').innerHTML=MODELS.map(function(md,i){
+    return '<button type="button" class="mg" data-i="'+i+'">'+(md._ok?'<img loading="lazy" src="'+esc(md.img)+'" alt="'+esc(md.name)+'">':'<span class="ph0">사진 준비 중</span>')+'<b>'+esc(md.name)+'</b><small>'+won(md.launchPrice)+'</small></button>';
+  }).join('');
+  [].forEach.call(document.querySelectorAll('.mg[data-i]'),function(b){
+    b.addEventListener('click',function(){ $('#iModel').value=b.dataset.i; recalc(); $('#top1').scrollIntoView({behavior:'smooth',block:'start'}); });
+  });
+  $('#mdlCnt').textContent=MODELS.length+'종 · 기준일 2026-11-21';
+}
+
+function init(data){
+  MODELS=data.models; NOTE=data.note||'';
+  var photos=data.photos||{};
+  MODELS.forEach(function(m){ m._ok=!!photos[m.id]; m.photoBy=photos[m.id]||''; });
+  $('#iModel').innerHTML=MODELS.map(function(m,i){return '<option value="'+i+'">'+esc(m.name)+'</option>';}).join('');
+  $('#iPlan').innerHTML=PLANS.map(function(p,i){return '<option value="'+i+'"'+(i===2?' selected':'')+'>'+esc(p.nm)+' · '+fmt(p.m)+'원</option>';}).join('');
+  var lo=''; for(var i=0;i<=24;i++) lo+='<option value="'+i+'">'+(i===0?'없음(0개월)':i+'개월')+'</option>'; $('#iLeft').innerHTML=lo;
+  buildModelGrid();
+  ['#iModel','#iPlan','#iLeft','#iCombo','#iWay','#iData'].forEach(function(s){
+    $(s).addEventListener('change',recalc); $(s).addEventListener('input',recalc);
+  });
+  recalc();
+}
+
+fetch('data/models.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(init).catch(function(){
+  $('#t1Route').textContent='기종 목록을 불러오지 못했습니다';
+  toast('기종 목록을 불러오지 못했습니다 — 새로고침해 주세요');
 });
-$('#btnOp').addEventListener('click',function(){
-  try{$('#opLink').value=localStorage.getItem('kts_ajd_link')||'';}catch(e){}
-  $('#opSheet').classList.add('on');
-});
+
+/* 운영자: 인터넷 결합 버튼을 파트너스 링크로 (기존 기능 유지) */
+function applyLink(){ var link='';try{link=localStorage.getItem('kts_ajd_link')||'';}catch(e){} if(link) $('#btnAjd').href=link; }
+applyLink();
+$('#btnOp').addEventListener('click',function(){ $('#opSheet').classList.add('on'); try{$('#opLink').value=localStorage.getItem('kts_ajd_link')||'';}catch(e){} });
 $('#opClose').addEventListener('click',function(){$('#opSheet').classList.remove('on');});
-$('#opSheet').addEventListener('click',function(e){if(e.target===$('#opSheet'))$('#opSheet').classList.remove('on');});
+$('#opSheet').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});
 $('#opSave').addEventListener('click',function(){
   var v=($('#opLink').value||'').trim();
   try{ v?localStorage.setItem('kts_ajd_link',v):localStorage.removeItem('kts_ajd_link'); }catch(e){}
-  $('#opSheet').classList.remove('on');
-  toast(v?'제휴 링크를 저장했습니다':'링크를 지웠습니다');
+  applyLink(); toast(v?'이 기기에 저장했습니다':'지웠습니다'); $('#opSheet').classList.remove('on');
 });
 $('#opClear').addEventListener('click',function(){$('#opLink').value='';try{localStorage.removeItem('kts_ajd_link');}catch(e){}toast('지웠습니다');});
 })();
