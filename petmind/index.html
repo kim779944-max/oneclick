@@ -201,13 +201,14 @@ function catSVG(p){
   var tail=p.tail||'up',ear=p.ear||'fwd',body=p.body||'sit',eyes=p.eyes||'open';
   return S(320,200,function(ar,ag,ared,cl,ln){
     var s=GROUND();
-    var by=body==='crouch'?152:(body==='loaf'?146:128);
-    var bh=body==='crouch'?28:(body==='loaf'?30:38);
-    var hx=224,hy=body==='crouch'?124:100;
-    s+='<rect x="106" y="'+(by+10)+'" width="9" height="34" rx="4.5" fill="'+cl+'"/>';
-    s+='<rect x="122" y="'+(by+12)+'" width="9" height="32" rx="4.5" fill="'+cl+'"/>';
-    s+='<rect x="178" y="'+(by+12)+'" width="9" height="32" rx="4.5" fill="'+cl+'"/>';
-    s+='<rect x="192" y="'+(by+10)+'" width="9" height="34" rx="4.5" fill="'+cl+'"/>';
+    var by=body==='crouch'?156:(body==='loaf'?146:128);
+    var bh=body==='crouch'?24:(body==='loaf'?30:38);
+    var hx=222,hy=body==='crouch'?130:100;
+    var lg=(body==='crouch')?10:34;
+    s+='<rect x="106" y="'+(by+10)+'" width="9" height="'+lg+'" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="122" y="'+(by+12)+'" width="9" height="'+lg+'" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="178" y="'+(by+12)+'" width="9" height="'+lg+'" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="192" y="'+(by+10)+'" width="9" height="'+lg+'" rx="4.5" fill="'+cl+'"/>';
     s+='<rect x="100" y="'+by+'" width="108" height="'+bh+'" rx="'+(bh/2)+'" fill="'+cl+'"/>';
     s+='<path d="M'+(182)+','+(by+10)+' L'+(hx-12)+','+(hy+16)+'" stroke="'+cl+'" stroke-width="15" stroke-linecap="round"/>';
     s+='<circle cx="'+hx+'" cy="'+hy+'" r="21" fill="'+cl+'"/>';
@@ -227,7 +228,10 @@ function catSVG(p){
     s+='<path d="M'+(hx+13)+','+(hy+6)+' l6,0 l-3,4 z" fill="#FF8FA3"/>';
     // tail
     var tx=102,ty=by+16;
-    if(tail==='up'){
+    if(body==='crouch'){
+      s+='<path d="M'+tx+','+ty+' C'+(tx-18)+','+(ty+14)+' '+(tx-10)+','+(ty+26)+' '+(tx+6)+','+(ty+24)+'" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ag,'M'+(tx+18)+','+(ty+12)+' q8,-8 14,-2','#4ADE80',2.2);
+    }else if(tail==='up'){
       s+='<path d="M'+tx+','+ty+' C'+(tx-18)+','+(ty-22)+' '+(tx-18)+','+(ty-52)+' '+(tx-2)+','+(ty-66)+'" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
       s+='<path d="M'+(tx-2)+','+(ty-66)+' q12,-6 16,4" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
       s+=A(ag,'M'+(tx+22)+','+(ty-72)+' q10,10 4,20','#4ADE80',2.2);

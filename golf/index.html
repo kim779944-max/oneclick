@@ -380,10 +380,60 @@ function figGrip(){
     return s;
   });
 }
+
+/* 12. 9시→3시 하프스윙 (페이스 유지) */
+function figHalfSwing(){
+  return S(360,230,function(ar,ag,ared,cl,ln){
+    var s='';
+    s+='<ellipse cx="180" cy="196" rx="92" ry="14" fill="#12203C"/>';
+    // body
+    s+='<circle cx="180" cy="86" r="20" fill="none" stroke="'+cl+'" stroke-width="3.5"/>';
+    s+='<path d="M180,106 L180,152" stroke="'+cl+'" stroke-width="4"/>';
+    s+='<path d="M158,118 L202,118" stroke="'+cl+'" stroke-width="4" stroke-linecap="round"/>';
+    s+='<path d="M180,152 L164,192 M180,152 L196,192" stroke="'+cl+'" stroke-width="4" stroke-linecap="round"/>';
+    // 9 o'clock club (left)
+    s+='<path d="M158,118 L104,132" stroke="#FFA24D" stroke-width="4" stroke-linecap="round"/>';
+    s+='<rect x="92" y="124" width="16" height="20" rx="3" fill="#FFA24D"/>';
+    s+=txt(84,168,'9시',11,'#FFD79A','middle',800);
+    // 3 o'clock club (right)
+    s+='<path d="M202,118 L256,132" stroke="#FFA24D" stroke-width="4" stroke-linecap="round"/>';
+    s+='<rect x="252" y="124" width="16" height="20" rx="3" fill="#FFA24D"/>';
+    s+=txt(278,168,'3시',11,'#FFD79A','middle',800);
+    // arc arrow
+    s+=arrow(ag,'M104,152 C122,186 238,186 246,154','#4ADE80',2.6);
+    s+=txt(180,206,'같은 궤도로 왕복',10.5,'#8BF0B4','middle');
+    s+=txt(180,222,'손목 각을 유지한 채 9시↔3시만',10,'#8FA0B8','middle');
+    return s;
+  });
+}
+/* 13. 테이크어웨이 — 헤드가 목표선을 따라 */
+function figTakeaway(){
+  return S(360,230,function(ar,ag,ared,cl,ln){
+    var s='';
+    s+='<path d="M180,214 L180,26" stroke="#2E4370" stroke-width="2" stroke-dasharray="6 6"/>';
+    s+=txt(184,22,'목표선',10.5,'#8FA0B8');
+    s+='<circle cx="180" cy="190" r="7" fill="#F3F6FA"/>';
+    s+=txt(196,194,'공',10.5,'#DCE6F6');
+    // good path (green) straight back along line
+    s+=arrow(ag,'M180,178 L180,84','#4ADE80',3.4);
+    s+='<rect x="170" y="66" width="20" height="16" rx="3" fill="#4ADE80"/>';
+    s+=txt(206,74,'헤드가 손 앞에서',10.5,'#8BF0B4');
+    s+=txt(206,88,'목표선을 따라',10.5,'#8BF0B4');
+    // bad path (red dashed, drifting inside)
+    s+='<path d="M180,178 C168,150 150,120 136,96" fill="none" stroke="#FF5C6C" stroke-width="2.6" stroke-dasharray="6 5"/>';
+    s+=arrow(ared,'M148,124 L138,112','#FF5C6C',2.2);
+    s+=txt(88,120,'안쪽으로',10.5,'#FFB6C0');
+    s+=txt(88,134,'들어감',10.5,'#FFB6C0');
+    s+=txt(180,226,'처음 50cm~1m만 똑바로 끌고 나가면 경로가 잡힙니다',10,'#8FA0B8','middle');
+    return s;
+  });
+}
+
 var FIG={
   wristHinge:figWristHinge, wristRoll:figWristRoll,
   pathHook:function(){return figPath('hook');}, pathSlice:function(){return figPath('slice');},
   pathLine:function(){return figPath('line');},
+  halfSwing:figHalfSwing, takeaway:figTakeaway,
   headStill:figHeadStill, shoulderTurn:figShoulderTurn, weight:figWeight,
   earlyExt:figEarlyExt, handFirst:figHandFirst, armPit:figArmPit, ballPos:figBallPos, grip:figGrip
 };
@@ -401,7 +451,7 @@ var SYM=[
      feel:'임팩트 뒤 왼손등이 하늘을 보지 않고 목표를 보고 있다는 느낌.',
      mis:'그립을 약하게 잡는다고 손가락을 펴면 클럽이 날아갑니다. 압력만 2/10으로 낮추세요.',
      ok:'10구 중 8구가 목표 왼쪽 5m 안에 떨어지면 통과.'},
-    {img:'wristHinge',t:'9시→3시 하프스윙으로 페이스 고정',
+    {img:'halfSwing',t:'9시→3시 하프스윙으로 페이스 고정',
      how:['왼팔을 9시(수평)까지 올리고, 손목 각을 유지한 채 3시까지 내려옵니다.','공 없이 20회, 그다음 티에 공을 올리고 10회.','공이 왼쪽으로 가지 않는지 확인하며 거리를 30m부터 늘립니다.'],
      feel:'손목이 마지막까지 접힌 채 헤드가 공을 스치고 지나감.',
      mis:'하프스윙에서 힘을 주면 다시 손목이 풀립니다. 30% 힘으로만.',
@@ -419,7 +469,7 @@ var SYM=[
      feel:'가슴이 목표를 정면으로 보고 있다.',
      mis:'오른발만 뒤로 빼고 어깨는 그대로 두면 슬라이스로 바뀝니다. 어깨까지 같이.',
      ok:'가슴에 든 클럽이 목표를 정확히 가리키면 통과.'},
-    {img:'pathLine',t:'백스윙에서 헤드가 손보다 안쪽으로 들어가지 않게',
+    {img:'takeaway',t:'백스윙에서 헤드가 손보다 안쪽으로 들어가지 않게',
      how:['테이크어웨이 첫 50cm에서 헤드가 손 바로 앞에 있게 합니다.','클럽을 목표선과 평행하게 2m 끌고 나갑니다.','그 다음 어깨 회전으로 톱까지 올립니다.'],
      feel:'클럽이 긴 레일 위를 미끄러지듯 뒤로.',
      mis:'손으로 클럽을 들어 올리면 헤드가 안쪽으로 들어갑니다.',
@@ -843,6 +893,8 @@ function renderStep(){
     st.img==='earlyExt'?'엉덩이가 공 쪽으로 나오면 최저점이 밀립니다.':
     st.img==='handFirst'?'그립이 공보다 왼쪽에 있어야 눌러 칩니다.':
     st.img==='armPit'?'오른팔꿈치를 몸에 붙여야 경로가 안정됩니다.':
+    st.img==='halfSwing'?'9시와 3시, 두 지점만 오가며 페이스 각을 유지합니다.':
+    st.img==='takeaway'?'초록 선처럼 헤드가 목표선을 따라 나가야 합니다(빨간 점선은 안쪽으로 새는 경로).':
     st.img==='ballPos'?'볼 위치는 가장 빠른 손잡이입니다.':
     '양손 압력은 2/10(치약 짜듯).')+'</div>';
   h+='<div class="kv"><b>이렇게 하세요</b><ul>';
