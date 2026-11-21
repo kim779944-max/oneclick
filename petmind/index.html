@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A1128">
+<title>강아지·고양이 마음 번역기 — 행동전문가 버전</title>
+<meta name="description" content="비슷해 보이지만 뜻이 다른 꼬리·귀·자세·소리를 그림으로 비교해 고르면, 행동학 근거와 함께 주인이 지금 바로 할 수 있는 1·2·3 교정과 하면 안 되는 행동을 알려 드립니다.">
+<link rel="icon" href="../icon.png">
+<style>
+:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--or:#FF6B00;--or2:#FFA24D;--on:#0A1224;
+--ok:#4ADE80;--red:#FF5C6C;--warn:#FCD34D}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:15px;line-height:1.55;padding-bottom:74px;-webkit-text-size-adjust:100%}
+a{color:var(--or2)}
+.wrap{max-width:560px;margin:0 auto;padding:0 14px}
+.hd{position:sticky;top:0;z-index:20;background:var(--bg2);border-bottom:1px solid var(--line)}
+.hd .wrap{display:flex;align-items:center;gap:8px;height:54px}
+.hd .back{color:var(--ink2);text-decoration:none;font-size:13px;padding:8px 0;white-space:nowrap}
+.hd h1{flex:1;min-width:0;font-size:16px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd h1 small{display:block;font-size:11px;color:var(--gray);font-weight:400}
+.hero{margin:12px 0 0;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(120deg,rgba(255,107,0,.14),rgba(255,255,255,.02) 65%)}
+.hero b{display:block;font-size:15.5px;margin-bottom:4px;letter-spacing:-.3px}
+.hero span{display:block;font-size:12.5px;color:var(--ink2);line-height:1.6}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+.card h2 .n{display:inline-flex;width:22px;height:22px;border-radius:11px;background:var(--or);color:var(--on);font-size:12px;align-items:center;justify-content:center;font-weight:800}
+.species{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 0}
+.species button{min-height:58px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.species button.on{border-color:var(--or);background:#2a1a08;color:var(--or2)}
+.species button span{display:block;font-size:11px;color:var(--gray);font-weight:400;margin-top:1px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);background:var(--card2);color:var(--ink2);border-radius:999px;padding:7px 12px;font-family:inherit;font-size:12.5px;cursor:pointer}
+.chip.on{border-color:var(--or);background:#2a1a08;color:var(--or2);font-weight:800}
+.optgrid{display:grid;gap:10px;margin-top:10px}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line2);border-radius:14px;padding:0;overflow:hidden;color:var(--ink);font-family:inherit;cursor:pointer}
+.opt:active,.opt:hover{border-color:var(--or)}
+.opt svg{display:block;width:100%;height:auto;background:#0B1526}
+.opt .lab{display:block;padding:9px 12px 11px}
+.opt .lab b{display:block;font-size:14px;line-height:1.4;margin-bottom:2px}
+.opt .lab span{display:block;font-size:11.5px;color:var(--gray)}
+.opt.sel{border-color:var(--ok)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair .opt .lab b{font-size:12.5px}
+.pair .opt .lab span{font-size:10.5px}
+.cta{width:100%;min-height:52px;border:0;border-radius:14px;background:var(--or);color:var(--on);font-size:17px;font-weight:900;margin:8px 0 4px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 13px;border-radius:11px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);font-family:inherit;font-size:13.5px;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--or);border-color:var(--or);color:var(--on);font-weight:900}
+.btn.big{min-height:50px;font-size:15px;font-weight:800}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:34px;font-size:12.5px;padding:0 9px}
+.headline{font-size:22px;font-weight:900;letter-spacing:-.5px;margin:0 0 4px;line-height:1.3;word-break:keep-all}
+.sub{font-size:13px;color:var(--ink2);margin:0 0 10px;line-height:1.6}
+.kv{border-top:1px solid var(--line);padding:10px 0 0;margin:10px 0 0}
+.kv b{display:block;font-size:11.5px;color:var(--or2);font-weight:800;margin-bottom:4px;letter-spacing:.2px}
+.kv p{margin:0;font-size:13.5px;line-height:1.7;color:#E4EBF5;word-break:keep-all}
+.kv.no b{color:#FFB6C0}
+.kv.ok b{color:#8BF0B4}
+.kv.vet b{color:#FCD34D}
+.dos{counter-reset:d;margin:0;padding:0;list-style:none}
+.dos li{position:relative;padding:9px 0 9px 30px;font-size:13.5px;line-height:1.68;border-top:1px dashed var(--line)}
+.dos li:first-child{border-top:0}
+.dos li::before{counter-increment:d;content:counter(d);position:absolute;left:0;top:9px;width:20px;height:20px;border-radius:10px;background:var(--card2);border:1px solid var(--line2);color:var(--or2);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ban{background:#3a1520;border:1px solid #7a2f3a;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;color:#FFD7DC;margin:8px 0 0}
+.ban b{color:#fff;display:block;margin-bottom:3px;font-size:11.5px;letter-spacing:.2px}
+.vetbox{background:#2a2008;border:1px solid #7a6120;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;color:#FFE9A8;margin:8px 0 0}
+.vetbox b{color:#FFF3B0;display:block;margin-bottom:3px;font-size:11.5px}
+.note{font-size:11.5px;color:var(--gray);line-height:1.6;margin:8px 0 0}
+.warn{font-size:11.5px;color:var(--warn);line-height:1.6;margin:7px 0 0}
+.graybox{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px;color:var(--ink2);line-height:1.7}
+.graybox b{color:var(--ink)}
+.mic{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mic .dot{width:9px;height:9px;border-radius:50%;background:#4E5B73}
+.mic .dot.on{background:var(--red);box-shadow:0 0 10px rgba(255,92,108,.8)}
+.meter{flex:1 1 100%;height:8px;border-radius:4px;background:var(--bg2);border:1px solid var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#4ADE80,#FFA24D,#FF5C6C);transition:width .08s}
+.readout{font-size:12px;color:var(--ink2);margin-top:6px;min-height:18px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 6px}
+.acts .btn{min-height:48px;font-size:14px;font-weight:800}
+.acts .btn.pri{grid-column:1/-1}
+.acts .wide{grid-column:1/-1}
+.pill{display:inline-block;font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 7px;border:1px solid;margin:0 4px 6px 0}
+.pill.live{color:#8BF0B4;border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.12)}
+.pill.info{color:#FFD79A;border-color:rgba(255,162,77,.45);background:rgba(255,162,77,.12)}
+.sitebar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:linear-gradient(180deg,#1D4ED8,#15379B);border-top:1px solid #3B6BE8}
+.sitebar a{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;color:#fff;text-decoration:none;font-size:14px;font-weight:800}
+.sitebar a i{font-style:normal;font-size:10.5px;font-weight:700;color:#C7D7FF;background:rgba(255,255,255,.14);border-radius:6px;padding:1px 6px}
+#toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:60;background:#1d2c4f;border:1px solid var(--or);border-radius:999px;padding:9px 15px;font-size:13.5px;max-width:92vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media print{.sitebar,.acts,.cta{display:none}body{padding-bottom:0}}
+</style>
+</head>
+<body>
+<header class="hd"><div class="wrap">
+  <a class="back" href="https://autooneclick.com/">← 쇼룸</a>
+  <h1>마음 번역기<small>행동전문가 · 비교해서 고르기</small></h1>
+</div></header>
+
+<main class="wrap"><div id="app"></div></main>
+
+<footer class="sitebar"><a href="https://autooneclick.com/">autooneclick.com <i>원클릭 도구</i></a></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s);},$$=function(s){return [].slice.call(document.querySelectorAll(s));};
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},2400);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function stamp(){var d=new Date(),p=function(n){return (n<10?'0':'')+n;};return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
+
+/* =========================================================
+   그림(SVG) — 같은 동작의 두 얼굴을 나란히 비교
+   (실루엣은 회색, 지금 봐야 할 부위는 주황)
+   ========================================================= */
+var UID=0;
+function S(w,h,build){
+  UID++;
+  var ar='ar'+UID,ag='ag'+UID,ared='rd'+UID,cl='#C9D6E8',ln='#8FA0B8';
+  var defs='<defs>'+
+    '<marker id="'+ar+'" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#FF6B00"/></marker>'+
+    '<marker id="'+ag+'" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#4ADE80"/></marker>'+
+    '<marker id="'+ared+'" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#FF5C6C"/></marker>'+
+    '</defs>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" role="img">'+defs+
+    '<rect width="'+w+'" height="'+h+'" fill="#0B1526"/>'+build(ar,ag,ared,cl,ln)+'</svg>';
+}
+function T(x,y,s,size,color,anchor,weight){
+  return '<text x="'+x+'" y="'+y+'" font-size="'+(size||11)+'" font-family="Malgun Gothic,Noto Sans KR,sans-serif" fill="'+(color||'#8FA0B8')+'" text-anchor="'+(anchor||'start')+'" font-weight="'+(weight||700)+'">'+s+'</text>';
+}
+function A(id,d,color,width){
+  return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+(width||3)+'" stroke-linecap="round" marker-end="url(#'+id+')"/>';
+}
+function GROUND(){return '<ellipse cx="160" cy="180" rx="96" ry="7" fill="#12203C"/>';}
+
+/* 강아지 옆모습 — 실루엣 */
+function dogSVG(p){
+  p=p||{};
+  var tail=p.tail||'wag',ear=p.ear||'fwd',body=p.body||'stand',mouth=p.mouth||'closed';
+  return S(320,200,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    var bx=92,by=110,bw=118,bh=52,hx=238,hy=92;
+    if(body==='bow'){by=98;hx=246;hy=138;}
+    if(body==='crouch'){by=126;hx=232;hy=110;}
+    // legs
+    var ly=body==='crouch'?154:156;
+    s+='<rect x="104" y="'+ly+'" width="12" height="'+(178-ly)+'" rx="6" fill="'+cl+'"/>';
+    s+='<rect x="124" y="'+ly+'" width="12" height="'+(178-ly)+'" rx="6" fill="'+cl+'"/>';
+    s+='<rect x="170" y="'+ly+'" width="12" height="'+(178-ly)+'" rx="6" fill="'+cl+'"/>';
+    s+='<rect x="190" y="'+ly+'" width="12" height="'+(178-ly)+'" rx="6" fill="'+cl+'"/>';
+    // neck + body
+    s+='<path d="M'+(bx+bw-26)+','+(by+24)+' L'+(hx-14)+','+(hy+18)+'" stroke="'+cl+'" stroke-width="18" stroke-linecap="round"/>';
+    s+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="'+(bh/2)+'" fill="'+cl+'"/>';
+    // head
+    s+='<circle cx="'+hx+'" cy="'+hy+'" r="23" fill="'+cl+'"/>';
+    s+='<rect x="'+(hx+13)+'" y="'+(hy-3)+'" width="32" height="18" rx="9" fill="'+cl+'"/>';
+    s+='<circle cx="'+(hx+41)+'" cy="'+(hy+6)+'" r="4.2" fill="#0A1128"/>';
+    s+='<circle cx="'+(hx-7)+'" cy="'+(hy-7)+'" r="3.2" fill="#0A1128"/>';
+    if(mouth==='open'){
+      s+='<path d="M'+(hx+18)+','+(hy+12)+' q9,11 18,0" fill="#7A2230"/>';
+      s+='<path d="M'+(hx+22)+','+(hy+13)+' q6,7 12,0" fill="#FF8FA3"/>';
+    }else if(mouth==='lick'){
+      s+='<path d="M'+(hx+16)+','+(hy+12)+' q10,-1 16,-9" fill="none" stroke="#FF8FA3" stroke-width="5" stroke-linecap="round"/>';
+    }
+    // ear (feature) — 머리 뒤쪽에 붙은 귀
+    var ec='#FF6B00';
+    if(ear==='fwd'){
+      s+='<path d="M'+(hx-24)+','+(hy-6)+' q2,-20 18,-18 q6,12 -2,20 q-9,6 -16,-2 z" fill="'+ec+'"/>';
+      s+='<path d="M'+(hx-22)+','+(hy-2)+' q-2,14 8,16 q4,-10 -2,-16 z" fill="#D9730F"/>';
+    }else if(ear==='up'){
+      s+='<path d="M'+(hx-18)+','+(hy-12)+' q-2,-24 14,-24 q9,12 2,26 z" fill="'+ec+'"/>';
+      s+='<path d="M'+(hx-22)+','+(hy-8)+' q-4,12 6,15 q4,-8 0,-15 z" fill="#D9730F"/>';
+    }else{
+      s+='<path d="M'+(hx-16)+','+(hy-12)+' q-18,-6 -20,8 q10,10 22,4 z" fill="'+ec+'"/>';
+      s+='<path d="M'+(hx-10)+','+(hy-16)+' q-14,-10 -18,2 q10,8 20,4 z" fill="#D9730F"/>';
+    }
+    // tail (feature)
+    var tx=bx+2,ty=by+24;
+    if(tail==='wag'){
+      s+='<path d="M'+tx+','+ty+' C'+(tx-24)+','+(ty-16)+' '+(tx-44)+','+(ty-10)+' '+(tx-54)+','+(ty+12)+'" fill="none" stroke="#FF6B00" stroke-width="10" stroke-linecap="round"/>';
+      s+=A(ar,'M'+(tx-62)+','+(ty+30)+' q-6,-14 4,-22','#FF6B00',2.6);
+      s+=A(ar,'M'+(tx-64)+','+(ty-6)+' q14,-8 24,0','#FF6B00',2.6);
+      s+=A(ar,'M'+(tx-60)+','+(ty+8)+' q12,2 14,12','#FF6B00',2.6);
+    }else if(tail==='high'){
+      s+='<path d="M'+tx+','+ty+' C'+(tx-14)+','+(ty-28)+' '+(tx-8)+','+(ty-58)+' '+(tx+8)+','+(ty-70)+'" fill="none" stroke="#FF6B00" stroke-width="10" stroke-linecap="round"/>';
+      s+=A(ared,'M'+(tx+22)+','+(ty-62)+' q14,-2 16,10','#FF5C6C',2.4);
+      s+=A(ared,'M'+(tx+20)+','+(ty-46)+' q14,-2 16,10','#FF5C6C',2.4);
+      s+=A(ared,'M'+(tx+18)+','+(ty-30)+' q14,-2 16,10','#FF5C6C',2.4);
+    }else{
+      s+='<path d="M'+tx+','+ty+' C'+(tx-14)+','+(ty+24)+' '+(tx-2)+','+(ty+42)+' '+(tx+18)+','+(ty+40)+'" fill="none" stroke="#FF6B00" stroke-width="10" stroke-linecap="round"/>';
+      s+=A(ared,'M'+(tx+30)+','+(ty+24)+' q6,16 -6,20','#FF5C6C',2.4);
+    }
+    return s;
+  });
+}
+/* 고양이 옆모습 */
+function catSVG(p){
+  p=p||{};
+  var tail=p.tail||'up',ear=p.ear||'fwd',body=p.body||'sit',eyes=p.eyes||'open';
+  return S(320,200,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    var by=body==='crouch'?152:(body==='loaf'?146:128);
+    var bh=body==='crouch'?28:(body==='loaf'?30:38);
+    var hx=224,hy=body==='crouch'?124:100;
+    s+='<rect x="106" y="'+(by+10)+'" width="9" height="34" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="122" y="'+(by+12)+'" width="9" height="32" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="178" y="'+(by+12)+'" width="9" height="32" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="192" y="'+(by+10)+'" width="9" height="34" rx="4.5" fill="'+cl+'"/>';
+    s+='<rect x="100" y="'+by+'" width="108" height="'+bh+'" rx="'+(bh/2)+'" fill="'+cl+'"/>';
+    s+='<path d="M'+(182)+','+(by+10)+' L'+(hx-12)+','+(hy+16)+'" stroke="'+cl+'" stroke-width="15" stroke-linecap="round"/>';
+    s+='<circle cx="'+hx+'" cy="'+hy+'" r="21" fill="'+cl+'"/>';
+    // ears
+    var ec=(ear==='fwd'||ear==='flat')?'#FF6B00':'#A9BBD4';
+    if(ear==='fwd'){
+      s+='<path d="M'+(hx-17)+','+(hy-14)+' L'+(hx-14)+','+(hy-34)+' L'+(hx-2)+','+(hy-17)+' z" fill="'+ec+'"/>';
+      s+='<path d="M'+(hx+5)+','+(hy-16)+' L'+(hx+15)+','+(hy-35)+' L'+(hx+18)+','+(hy-13)+' z" fill="'+ec+'"/>';
+    }else{
+      s+='<path d="M'+(hx-16)+','+(hy-8)+' L'+(hx-38)+','+(hy-2)+' L'+(hx-16)+','+(hy-22)+' z" fill="'+ec+'"/>';
+      s+='<path d="M'+(hx+6)+','+(hy-10)+' L'+(hx+28)+','+(hy-2)+' L'+(hx+14)+','+(hy-22)+' z" fill="'+ec+'"/>';
+    }
+    // eyes
+    if(eyes==='closed')s+='<path d="M'+(hx-10)+','+(hy-2)+' q4,4 8,0 M'+(hx+4)+','+(hy-3)+' q4,4 8,0" fill="none" stroke="#0A1128" stroke-width="2.2"/>';
+    else if(eyes==='wide')s+='<circle cx="'+(hx-6)+'" cy="'+(hy-2)+'" r="4" fill="#0A1128"/><circle cx="'+(hx+8)+'" cy="'+(hy-3)+'" r="4" fill="#0A1128"/>';
+    else s+='<circle cx="'+(hx-6)+'" cy="'+(hy-2)+'" r="2.6" fill="#0A1128"/><circle cx="'+(hx+8)+'" cy="'+(hy-3)+'" r="2.6" fill="#0A1128"/>';
+    s+='<path d="M'+(hx+13)+','+(hy+6)+' l6,0 l-3,4 z" fill="#FF8FA3"/>';
+    // tail
+    var tx=102,ty=by+16;
+    if(tail==='up'){
+      s+='<path d="M'+tx+','+ty+' C'+(tx-18)+','+(ty-22)+' '+(tx-18)+','+(ty-52)+' '+(tx-2)+','+(ty-66)+'" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+='<path d="M'+(tx-2)+','+(ty-66)+' q12,-6 16,4" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ag,'M'+(tx+22)+','+(ty-72)+' q10,10 4,20','#4ADE80',2.2);
+    }else if(tail==='tip'){
+      s+='<path d="M'+tx+','+ty+' C'+(tx-18)+','+(ty-10)+' '+(tx-30)+','+(ty-30)+' '+(tx-26)+','+(ty-50)+'" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ar,'M'+(tx-20)+','+(ty-58)+' q10,0 12,10','#FF6B00',2.2);
+      s+=A(ar,'M'+(tx-10)+','+(ty-54)+' q10,0 12,10','#FF6B00',2.2);
+    }else{
+      s+='<path d="M'+tx+','+ty+' C'+(tx-22)+','+(ty+6)+' '+(tx-44)+','+(ty-6)+' '+(tx-56)+','+(ty-30)+'" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ar,'M'+(tx-64)+','+(ty-40)+' q-8,12 0,22','#FF6B00',2.4);
+      s+=A(ar,'M'+(tx-52)+','+(ty+14)+' q-12,4 -16,-6','#FF6B00',2.4);
+    }
+    return s;
+  });
+}
+/* 소리 — 파형 */
+function waveSVG(kind){
+  return S(320,120,function(ar,ag,ared,cl,ln){
+    var s='<path d="M14,60 L306,60" stroke="#1B2E52" stroke-width="1.5"/>';
+    var color=kind==='alert'?'#FF5C6C':(kind==='calm'?'#4ADE80':'#FF6B00');
+    var d={calm:'M20,60 q10,-14 20,0 q10,14 20,0 q10,-8 20,0 q10,8 20,0 q12,-12 24,0',
+      alert:'M22,60 L32,18 L40,102 L52,30 L60,88 L72,40 L82,60',
+      short:'M32,60 L42,28 L52,92 L60,60 L74,60 L84,34 L92,86 L100,60 L290,60',
+      long:'M26,60 q18,-30 36,0 q18,30 36,0 q18,-26 36,0 q18,26 36,0 q18,-22 36,0 q18,22 36,0'}[kind]||'M30,60 q8,-30 16,0 q8,30 16,0 q8,-26 16,0 q8,26 16,0';
+    s+='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="4" stroke-linecap="round"/>';
+    return s;
+  });
+}
+/* 자세 비교 */
+function poseSVG(kind){
+  return S(320,170,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    if(kind==='belly'){
+      s+='<ellipse cx="150" cy="138" rx="58" ry="24" fill="'+cl+'"/>';
+      s+='<path d="M120,120 L112,92 M142,118 L138,90 M166,118 L168,90 M186,122 L194,96" stroke="'+cl+'" stroke-width="10" stroke-linecap="round"/>';
+      s+='<circle cx="232" cy="134" r="20" fill="'+cl+'"/>';
+      s+='<path d="M218,120 L222,100 L232,118 z M240,118 L252,100 L252,120 z" fill="#A9BBD4"/>';
+      s+='<circle cx="226" cy="130" r="2.6" fill="#0A1128"/><circle cx="240" cy="130" r="2.6" fill="#0A1128"/>';
+      s+=A(ag,'M150,112 L150,86','#4ADE80',2.4);
+      s+=T(150,166,'배를 보이는 자세','#8FA0B8','middle',10);
+    }else if(kind==='rubbing'){
+      s+='<rect x="96" y="110" width="110" height="46" rx="23" fill="'+cl+'"/>';
+      s+='<rect x="106" y="150" width="10" height="28" rx="5" fill="'+cl+'"/><rect x="188" y="150" width="10" height="28" rx="5" fill="'+cl+'"/>';
+      s+='<circle cx="220" cy="96" r="20" fill="'+cl+'"/>';
+      s+='<path d="M206,80 L210,60 L218,80 z M228,78 L240,60 L240,82 z" fill="#A9BBD4"/>';
+      s+='<path d="M238,96 L272,96" stroke="#FF6B00" stroke-width="3" stroke-dasharray="5 4"/>';
+      s+='<rect x="268" y="70" width="10" height="52" rx="3" fill="#1B2E52" stroke="#FF6B00" stroke-width="2"/>';
+      s+=A(ar,'M250,84 q10,6 6,16','#FF6B00',2.4);
+      s+=T(250,158,'이마·볼을 문지름','#FFA24D','middle',10);
+    }else if(kind==='knead'){
+      s+='<rect x="92" y="112" width="112" height="46" rx="23" fill="'+cl+'"/>';
+      s+='<circle cx="214" cy="118" r="19" fill="'+cl+'"/>';
+      s+='<path d="M200,104 L204,84 L212,104 z M220,102 L232,84 L232,106 z" fill="#A9BBD4"/>';
+      s+='<rect x="104" y="152" width="10" height="26" rx="5" fill="'+cl+'"/><rect x="180" y="152" width="10" height="26" rx="5" fill="'+cl+'"/>';
+      s+='<path d="M170,158 q6,14 18,10" stroke="#FF6B00" stroke-width="9" stroke-linecap="round" fill="none"/>';
+      s+=A(ag,'M164,150 q-8,-12 2,-20','#4ADE80',2.4);
+      s+=T(186,166,'앞발로 꾹꾹','#8BF0B4','middle',10);
+    }else{
+      s+='<rect x="92" y="106" width="112" height="48" rx="24" fill="'+cl+'"/>';
+      s+='<circle cx="224" cy="92" r="21" fill="'+cl+'"/>';
+      s+='<path d="M208,80 L212,60 L222,78 z M232,78 L244,60 L244,82 z" fill="#A9BBD4"/>';
+      s+='<path d="M204,80 L232,96" stroke="'+cl+'" stroke-width="12" stroke-linecap="round"/>';
+      s+='<rect x="104" y="152" width="10" height="26" rx="5" fill="'+cl+'"/><rect x="122" y="152" width="10" height="26" rx="5" fill="'+cl+'"/><rect x="168" y="152" width="10" height="26" rx="5" fill="'+cl+'"/><rect x="186" y="152" width="10" height="26" rx="5" fill="'+cl+'"/>';
+      s+=T(150,166,'몸이 굳은 자세','#8FA0B8','middle',10);
+    }
+    return s;
+  });
+}
+/* 귀 — 정면 */
+function earSVG(kind){
+  return S(320,160,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    s+='<circle cx="160" cy="92" r="44" fill="'+cl+'"/>';
+    s+='<circle cx="144" cy="86" r="4" fill="#0A1128"/><circle cx="176" cy="86" r="4" fill="#0A1128"/>';
+    s+='<path d="M152,110 q8,6 16,0" fill="none" stroke="#0A1128" stroke-width="2.4"/>';
+    s+='<path d="M160,98 l0,6 l-4,-2" fill="none" stroke="#0A1128" stroke-width="2"/>';
+    if(kind==='fwd'){
+      s+='<path d="M126,62 L136,20 L156,54 z" fill="#FF6B00"/>';
+      s+='<path d="M194,60 L204,18 L216,56 z" fill="#FF6B00"/>';
+      s+=A(ag,'M170,24 L178,10','#4ADE80',2.4);
+      s+=T(252,68,'앞으로 쫑긋','#FFA24D');
+      s+=T(252,84,'= 관심·집중','#8FA0B8');
+    }else if(kind==='back'){
+      s+='<path d="M124,64 L98,46 L132,44 z" fill="#FF6B00"/>';
+      s+='<path d="M196,62 L222,44 L210,74 z" fill="#FF6B00"/>';
+      s+=A(ared,'M140,34 L168,48','#FF5C6C',2.4);
+      s+=T(252,68,'뒤로 붙임','#FFB6C0');
+      s+=T(252,84,'= 불안·복종','#8FA0B8');
+    }else{
+      s+='<path d="M124,66 L96,80 L134,48 z" fill="#FF6B00"/>';
+      s+='<path d="M196,64 L224,78 L204,46 z" fill="#FF6B00"/>';
+      s+=A(ared,'M132,40 L110,58','#FF5C6C',2.4);
+      s+=T(252,68,'옆으로 납작','#FFB6C0');
+      s+=T(252,84,'= 불쾌·경계','#8FA0B8');
+    }
+    return s;
+  });
+}
+/* 입 — 정면 */
+function mouthSVG(kind){
+  return S(320,160,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    s+='<circle cx="156" cy="74" r="44" fill="'+cl+'"/>';
+    s+='<path d="M126,46 L134,18 L150,46 z M182,46 L196,18 L202,48 z" fill="#A9BBD4"/>';
+    s+='<circle cx="140" cy="68" r="3.6" fill="#0A1128"/><circle cx="172" cy="68" r="3.6" fill="#0A1128"/>';
+    s+='<path d="M150,88 l12,0 l-6,8 z" fill="#0A1128"/>';
+    if(kind==='open'){
+      s+='<path d="M136,100 q20,28 40,0 q-20,10 -40,0 z" fill="#7A2230"/>';
+      s+='<path d="M144,102 q12,14 24,0 q-12,6 -24,0 z" fill="#FF8FA3"/>';
+      s+=T(232,70,'입 크게, 혀 내밈','#FFA24D');
+      s+=T(232,86,'= 더움 / 편안한 흥분','#8FA0B8');
+    }else if(kind==='lick'){
+      s+='<path d="M156,108 q10,8 16,-18" fill="none" stroke="#FF8FA3" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ar,'M190,92 q-6,14 -16,18','#FF6B00',2.2);
+      s+=T(232,70,'입술·코 핥기','#FFA24D');
+      s+=T(232,86,'= 긴장 완화 신호','#8FA0B8');
+    }else{
+      s+='<path d="M136,100 q20,18 40,0" fill="none" stroke="#0A1128" stroke-width="3"/>';
+      s+='<path d="M146,106 q10,8 20,0" fill="#FF8FA3"/>';
+      s+=T(232,70,'하품 반복','#FFA24D');
+      s+=T(232,86,'= 스트레스 신호','#8FA0B8');
+    }
+    return s;
+  });
+}
+/* 반복행동 */
+function repSVG(kind){
+  return S(320,180,function(ar,ag,ared,cl,ln){
+    var s=GROUND();
+    s+='<rect x="92" y="112" width="112" height="48" rx="24" fill="'+cl+'"/>';
+    s+='<rect x="104" y="154" width="10" height="24" rx="5" fill="'+cl+'"/><rect x="122" y="154" width="10" height="24" rx="5" fill="'+cl+'"/><rect x="168" y="154" width="10" height="24" rx="5" fill="'+cl+'"/><rect x="186" y="154" width="10" height="24" rx="5" fill="'+cl+'"/>';
+    s+='<circle cx="224" cy="94" r="21" fill="'+cl+'"/>';
+    s+='<path d="M210,80 L214,60 L222,78 z M232,78 L244,60 L244,82 z" fill="#A9BBD4"/>';
+    s+='<circle cx="218" cy="90" r="2.6" fill="#0A1128"/><circle cx="232" cy="90" r="2.6" fill="#0A1128"/>';
+    if(kind==='lick'){
+      s+='<path d="M214,104 L196,132" stroke="'+cl+'" stroke-width="12" stroke-linecap="round"/>';
+      s+='<path d="M198,134 q6,16 0,26" fill="none" stroke="#FF6B00" stroke-width="6" stroke-linecap="round"/>';
+      s+=A(ar,'M216,150 q-8,12 -18,10','#FF6B00',2.2);
+      s+=T(180,172,'바닥·공기 핥기','#FFA24D','middle',10);
+    }else if(kind==='chase'){
+      s+='<path d="M100,130 C82,112 92,84 118,88" fill="none" stroke="#FF6B00" stroke-width="9" stroke-linecap="round"/>';
+      s+=A(ar,'M112,152 A48 48 0 1 1 120,104','#FF6B00',2.6);
+      s+=T(180,172,'제자리에서 빙글빙글','#FFA24D','middle',10);
+    }else if(kind==='groom'){
+      s+='<path d="M212,110 q-16,14 -34,12" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round"/>';
+      s+=A(ar,'M176,136 q-8,8 -2,16','#FF6B00',2.2);
+      s+=T(180,172,'한 곳만 계속 핥음','#FFA24D','middle',10);
+    }else{
+      s+='<path d="M242,100 l14,0" stroke="#FF6B00" stroke-width="3"/>';
+      s+='<path d="M256,94 l10,6 l-10,6" fill="none" stroke="#FF6B00" stroke-width="2.5"/>';
+      s+=T(180,172,'입 오물거림·이갈기','#FFA24D','middle',10);
+    }
+    return s;
+  });
+}
+/* 묶음: 옵션 그림 */
+function figFor(o){
+  if(o.fig==='wave')return waveSVG(o.k);
+  if(o.fig==='ear')return earSVG(o.k);
+  if(o.fig==='mouth')return mouthSVG(o.k);
+  if(o.fig==='pose')return poseSVG(o.k);
+  if(o.fig==='rep')return repSVG(o.k);
+  if(o.fig==='cat')return catSVG({tail:o.tail||'up',ear:o.ear||'fwd',body:o.body||'sit',eyes:o.eyes||'open'});
+  return dogSVG({tail:o.tail||'wag',ear:o.ear||'fwd',body:o.body||'stand',mouth:o.mouth||'closed'});
+}
+
+/* =========================================================
+   행동 데이터 (행동전문가 기준)
+   ========================================================= */
+var DATA={
+dog:{
+  cats:[
+   {id:'tail',name:'꼬리',q:'꼬리가 지금 어떻게 움직입니까?',opts:[
+     {k:'wag',tail:'wag',fig:'dog',label:'엉덩이까지 크게 좌우로 흔든다',sub:'폭이 크고 몸이 함께 흔들림',
+      line:'“반가워! 같이 놀자!”',
+      why:'꼬리 흔들기는 냄새를 넓게 퍼뜨리는 신호입니다. 좌우로 넓게, 엉덩이까지 함께 흔들리면 흥분이 아니라 <b>편안한 인사</b>입니다. 반대로 높이 세우고 잘게 떠는 것과 구분해야 합니다.',
+      dos:['몸을 옆으로 살짝 돌리고 낮은 목소리로 한 번만 부릅니다.','손등을 아래로 향해 내밀고, 코가 닿을 때까지 10초 기다립니다.','스스로 다가오면 목 아래를 3초만 쓰다듬고 손을 거둡니다.'],
+      ban:['머리 위로 손을 뻗어 쓰다듬기 — 정면 위 손은 위협으로 읽힙니다.','꼬리를 잡거나 안아 올리기.','큰 소리로 “왜 이래!” 하며 반응하기.'],
+      vet:''},
+     {k:'high',tail:'high',fig:'dog',label:'높이 세우고 잘게 빠르게 떤다',sub:'몸이 굳고 시선이 고정됨',
+      line:'“낯선데… 아직 판단 중이야.”',
+      why:'꼬리 높이는 <b>각성도</b>를 보여줍니다. 높고 뻣뻣하게 세운 채 끝만 빠르게 떠는 것은 경계·과흥분 상태로, 이때 다가가면 물림 사고가 납니다.',
+      dos:['몸을 비스듬히 돌리고 시선을 피합니다(정면 대치 금지).','3m 거리를 두고 30초 이상 기다립니다 — 30초 안에 결론이 납니다.','하품·입술 핥기·몸 흔들기 같은 진정 신호가 나오면 그때 한 걸음 접근합니다.'],
+      ban:['정면에서 눈을 마주치기.','손을 머리 위로 올리기.','목줄을 당겨 억지로 끌기 — 각성도가 더 올라갑니다.'],
+      vet:''},
+     {k:'tuck',tail:'tuck',fig:'dog',label:'다리 사이로 낮게 내린다',sub:'등이 굽고 귀가 뒤로',
+      line:'“무서워… 조금만 기다려 줘.”',
+      why:'꼬리를 다리 사이로 내리는 것은 <b>자신 없음·복종</b>의 신호입니다. 등이 굽고 몸이 낮아지면 공포 상태이므로 위로를 강요하면 안 됩니다.',
+      dos:['몸을 낮추고 옆으로 서서 시선을 피합니다.','큰 소리·급한 동작을 멈추고 주변 자극을 줄입니다.','익숙한 담요나 이동장 등 스스로 숨을 곳을 만들어 줍니다.'],
+      ban:['억지로 안아 달래기 — 공포가 커집니다.','“괜찮아”라며 계속 다가가기.','그 상황을 반복 노출시키기.'],
+      vet:'2일 이상 식욕 저하·배변 실수·숨는 행동이 이어지면 진료를 받으세요.'}
+   ]},
+   {id:'ear',name:'귀',q:'귀가 어느 쪽을 향합니까?',opts:[
+     {k:'fwd',fig:'ear',label:'앞으로 쫑긋, 머리를 든다',sub:'소리 방향을 향해 집중',
+      line:'“뭐지? 들려!”',
+      why:'귀를 앞으로 세우는 것은 <b>관심·집중</b> 신호입니다. 훈련을 받을 준비가 된 상태라 보상 타이밍을 잡기 좋습니다.',
+      dos:['이름을 한 번만 부르고 반응하면 1초 안에 칭찬·간식을 줍니다.','한 번에 3분, 하루 2회로 짧게 끝냅니다.','집중이 흐려지면(고개 돌림) 바로 마칩니다.'],
+      ban:['이름을 연속으로 여러 번 부르기.','집중이 깨졌는데 계속 훈련하기.'],
+      vet:''},
+     {k:'back',fig:'ear',label:'귀가 뒤로 붙는다',sub:'머리가 낮아지고 몸이 작아짐',
+      line:'“긴장했어, 물러날게.”',
+      why:'귀를 뒤로 붙이는 것은 <b>불안·복종</b>입니다. 사람이 다가오면 스스로 작아지는 신호이므로, 이때 손을 뻗으면 물거나 얼어붙을 수 있습니다.',
+      dos:['한 걸음 물러나 공간을 줍니다.','목소리를 낮추고 짧게 말합니다(문장 길게 하지 않기).','손은 아래로 내린 채 옆에서 기다립니다.'],
+      ban:['머리 쓰다듬기·포옹.','“왜 그래”라며 얼굴을 들여다보기.'],
+      vet:'한쪽 귀만 계속 붙이고 머리를 흔들면 외이도염일 수 있습니다.'},
+     {k:'flat',fig:'ear',label:'옆으로 납작하게 눕는다',sub:'눈을 크게 뜨고 이를 보임',
+      line:'“더 오면 물 거야.”',
+      why:'귀가 옆으로 완전히 눕고 눈 흰자가 보이면 <b>공격 직전 경고</b>입니다. 이 신호를 무시하고 접근하면 물림으로 이어집니다.',
+      dos:['즉시 거리를 2m 이상 벌립니다.','시선을 피하고 옆으로만 움직입니다.','아이·낯선 사람을 그 자리에서 떼어 놓습니다.'],
+      ban:['손을 뻗어 달래기.','소리 지르기·발로 밀기.'],
+      vet:'갑자기 성격이 바뀌면 통증(치아·관절)이 원인일 수 있습니다.'}
+   ]},
+   {id:'pose',name:'자세',q:'몸이 어떤 모양입니까?',opts:[
+     {kind:'bow',fig:'dog',label:'앞발을 뻗고 엉덩이를 들썩',sub:'플레이 보우',
+      line:'“같이 놀자!”',
+      why:'플레이 보우는 <b>놀이 청하기</b>의 대표 신호입니다. 앞발을 뻗어 몸을 낮추고 엉덩이는 올린 채 흔듭니다.',
+      dos:['10초 안에 응답합니다 — 무반응이 반복되면 놀이 요청을 멈춥니다.','공이나 장난감으로 3회 주고받은 뒤 짧게 끝냅니다.','끝낼 때 “그만” 같은 일정한 신호를 씁니다.'],
+      ban:['놀이 중 갑자기 다른 일 하기.','놀이로 흥분이 과해졌는데 계속 이어 가기.'],
+      vet:''},
+     {kind:'stand',fig:'dog',label:'몸을 굳히고 앞으로 무게',sub:'시선 고정, 꼬리 높음',
+      line:'“저건 뭐야… 가만히 있어.”',
+      why:'몸이 굳고 무게가 앞쪽으로 실리면 <b>경계·추적</b> 상태입니다. 이때 목줄을 당기면 반응이 폭발합니다.',
+      dos:['몸을 돌려 시야에서 자극을 가립니다.','목줄을 짧게 잡되 당기지 않고, 보호자 몸 뒤로 유도합니다.','자극이 지나간 뒤 칭찬하고 이동합니다.'],
+      ban:['자극 쪽으로 끌고 가기.','“괜찮아”라며 쓰다듬어 보상하기(경계를 칭찬하는 셈).'],
+      vet:''},
+     {kind:'belly',fig:'pose',label:'배를 보이고 눕는다',sub:'몸을 뒤집어 배를 드러냄',
+      line:'“편해… 근데 배는 만지지 마.”',
+      why:'배를 보이는 것은 <b>신뢰·복종</b>이지만, 만지면 방어 반응이 나올 수 있습니다. 특히 낯선 사람 앞에서는 만지지 않는 것이 안전합니다.',
+      dos:['배는 만지지 않고 옆에 조용히 앉아 있습니다.','원하면 스스로 다가오게 두고, 오면 가슴만 짧게 만집니다.','아이는 손을 등 뒤로 하고 보기만 하게 합니다.'],
+      ban:['배를 문질러 주기 — 물림 사고의 흔한 원인.','얼굴을 배 위에 대기.'],
+      vet:'배를 계속 보이며 일어나지 못하면 복통·디스크일 수 있습니다.'}
+   ]},
+   {id:'mouth',name:'입·얼굴',q:'입과 얼굴은 어떤 상태입니까?',opts:[
+     {k:'open',fig:'mouth',label:'입 크게 벌리고 혀 내밀고 헐떡',sub:'혀가 넓게, 입꼬리 이완',
+      line:'“더워! 또는 신나!”',
+      why:'헐떡임은 체온 조절입니다. 혀가 넓게 나오고 입꼬리가 이완되면 <b>편안한 흥분</b>, 몸이 굳고 혀가 안쪽으로 말리면 <b>스트레스</b>입니다.',
+      dos:['물을 주고 그늘에서 5분 쉽니다.','목 뒤·겨드랑이를 물로 적셔 체온을 낮춥니다.','10분 이상 멈추지 않으면 실내로 데려옵니다.'],
+      ban:['더운 날 산책을 계속하기.','얼음물을 갑자기 많이 먹이기.'],
+      vet:'혀·잇몸이 파랗거나 축 처지면 즉시 병원(열사병).'},
+     {k:'lick',fig:'mouth',label:'입술·코를 자주 핥는다',sub:'하품·몸 흔들기 동반',
+      line:'“좀 부담스러워.”',
+      why:'입술 핥기·하품·몸 털기는 <b>진정 신호</b>입니다. 상대를 달래거나 자기 긴장을 낮추는 행동입니다.',
+      dos:['자극을 주던 행동(꼭 안기, 카메라 들이대기)을 멈춥니다.','한 걸음 물러나 30초 기다립니다.','하품을 따라 하듯 천천히 숨을 내쉽니다.'],
+      ban:['신호를 무시하고 계속 다루기.','“왜 자꾸 하품해”라며 나무라기.'],
+      vet:'식후 1시간 이내 반복되면 위산 역류·메스꺼움일 수 있습니다.'},
+     {k:'yawn',fig:'mouth',label:'하품을 반복한다',sub:'사람 앞에서 자주',
+      line:'“지금 좀 힘들어.”',
+      why:'사람 앞 하품은 졸림보다 <b>스트레스 완화</b> 신호인 경우가 많습니다. 훈련 중 자주 나오면 난이도가 높다는 뜻입니다.',
+      dos:['훈련을 즉시 끝내고 쉽니다.','자극이 적은 조용한 공간으로 옮깁니다.','다음 훈련은 난이도를 낮춰 1분만 합니다.'],
+      ban:['하품을 무시하고 계속 훈련.','큰 소리로 주의 주기.'],
+      vet:'식사·수면 변화와 함께 계속되면 진료.'}
+   ]},
+   {id:'rep',name:'반복행동',q:'같은 동작을 반복합니까?',opts:[
+     {k:'lick',fig:'rep',label:'바닥·공기를 핥고 공기를 씹는다',sub:'식후 또는 사람 없을 때',
+      line:'“속이 불편해 / 긴장돼.”',
+      why:'공기 씹기·바닥 핥기는 <b>위장 불편(메스꺼움)</b>이나 스트레스 신호입니다. 강박으로 굳으면 스스로 멈추기 어려워집니다.',
+      dos:['식후 1시간 동안 관찰해 구역질·침 흘림이 있는지 봅니다.','핥기 시작하면 이름을 부르고 5분 산책이나 노즈워크로 전환합니다.','하루 두 번 10분씩 냄새 맡기 산책을 넣습니다.'],
+      ban:['입을 손으로 막거나 혼내기 — 불안이 커집니다.','핥는 동안 계속 지켜보기.'],
+      vet:'구토·식욕 저하·복부 팽만이 동반되면 위장 질환 검사가 필요합니다.'},
+     {k:'chase',fig:'rep',label:'제자리에서 꼬리를 쫓는다',sub:'빙글빙글 돌며 물려고 함',
+      line:'“심심해! 에너지가 넘쳐.”',
+      why:'대부분 <b>지루함·에너지 과잉</b>입니다. 하루 20분 이상의 냄새 산책과 씹을 거리가 부족할 때 생깁니다.',
+      dos:['산책 시간을 20분 늘리고 코로 냄새 맡는 시간을 충분히 줍니다.','노즈워크 매트나 코 Kong에 사료를 숨겨 20분 일하게 합니다.','돌기 시작하면 “이리 와”로 불러 다른 행동(앉기)을 시키고 보상합니다.'],
+      ban:['꼬리를 잡아 멈추게 하기.','소리 지르며 쫓아가기(놀이로 오해).'],
+      vet:'하루 수십 번 반복하고 멈추지 못하면 강박장애·신경계 검사가 필요합니다.'},
+     {k:'spin',fig:'rep',label:'한 방향으로 계속 돈다',sub:'벽이나 한쪽만 봄',
+      line:'“머리가 이상해…”',
+      why:'한 방향으로만 도는 행동은 <b>전정기관·신경계 문제</b>일 수 있어 훈련으로 해결할 문제가 아닙니다.',
+      dos:['영상으로 30초 촬영해 둡니다(진료에 큰 도움이 됩니다).','주변을 어둡게 하고 미끄러지지 않는 바닥으로 옮깁니다.','24시간 안에 동물병원 진료를 예약합니다.'],
+      ban:['돌 때 손으로 멈추려 하기.','“버릇”이라며 지켜보기.'],
+      vet:'즉시 진료 권장 — 귀·뇌·중독 가능성을 확인해야 합니다.'}
+   ]}
+  ]
+},
+cat:{
+  cats:[
+   {id:'tail',name:'꼬리',q:'꼬리 모양은?',opts:[
+     {k:'up',tail:'up',fig:'cat',label:'곧게 세우고 끝만 살짝 굽힘',sub:'다가오며 세움',
+      line:'“안녕! 반가워.”',
+      why:'꼬리를 곧게 세우는 것은 <b>인사·반가움</b>입니다. 끝이 살짝 굽으면 편안한 상태입니다.',
+      dos:['낮은 목소리로 한 번 인사합니다.','손가락 끝을 코 앞 10cm에 두고 냄새를 맡게 합니다.','스스로 몸을 비비면 손가락으로 이마 한 번만 만집니다.'],
+      ban:['바로 안아 올리기.','꼬리를 잡기.','손바닥으로 머리 덮기.'],
+      vet:''},
+     {k:'tip',tail:'tip',fig:'cat',label:'끝만 빠르게 톡톡 친다',sub:'몸은 가만히, 귀는 살짝 옆',
+      line:'“그만해, 짜증 나.”',
+      why:'꼬리 끝의 빠른 움직임은 <b>불만·경고</b>입니다. 이때 계속 만지면 물거나 할퀴게 됩니다.',
+      dos:['손을 즉시 멈추고 30초 무시합니다.','옆으로 물러나 고양이가 먼저 다가오게 둡니다.','놀이 중이었다면 장난감을 내려놓고 끝냅니다.'],
+      ban:['“귀여워”라며 계속 쓰다듬기.','손으로 장난치기(손을 사냥감으로 학습).'],
+      vet:'쓰다듬을 때만 반복되면 통증 부위가 있을 수 있습니다.'},
+     {k:'lash',tail:'lash',fig:'cat',label:'좌우로 크게 채찍질한다',sub:'등이 흔들리고 귀가 눕음',
+      line:'“지금 과열됐어.”',
+      why:'꼬리를 크게 좌우로 치는 것은 <b>과흥분·갈등</b> 상태입니다. 놀이가 지나쳤거나 자극이 많을 때 나옵니다.',
+      dos:['놀이를 즉시 멈추고 5분 조용히 둡니다.','장난감을 치우고 조명을 낮춥니다.','숨을 곳(캣타워 위·상자)을 열어 줍니다.'],
+      ban:['계속 놀이 이어 가기.','손으로 달래기.'],
+      vet:'식사·배변과 함께 계속되면 통증·갑상선 문제 확인.'}
+   ]},
+   {id:'purr',name:'골골',q:'골골 소리는 어느 쪽입니까?',opts:[
+     {k:'relaxed',body:'loaf',eyes:'closed',fig:'cat',label:'몸이 이완되고 눈을 반쯤 감는다',sub:'발을 접고 편하게 엎드림',
+      line:'“지금 좋아.”',
+      why:'골골은 만족뿐 아니라 <b>자기 진정</b>에도 나옵니다. 몸이 이완되고 눈이 반쯤 감기면 편안한 상태입니다.',
+      dos:['조용히 곁에 앉아 10분 둡니다.','쓰다듬지 말고 손을 무릎에 둡니다.','고양이가 먼저 오면 이마만 한 번 만집니다.'],
+      ban:['골골 소리만 듣고 안아 올리기.','배 만지기.'],
+      vet:''},
+     {k:'pain',body:'crouch',eyes:'wide',ear:'flat',fig:'cat',label:'웅크리고 눈을 크게 뜬 채 골골',sub:'몸이 낮고 귀가 옆으로',
+      line:'“아파… 그래서 골골.”',
+      why:'골골은 <b>통증 완화</b>를 위해서도 나옵니다. 몸을 웅크리고 눈을 크게 뜬 채 골골거리면 만족이 아니라 통증 신호입니다.',
+      dos:['만지지 말고 조용한 방에 혼자 둡니다(숨을 곳 제공).','24시간 안에 동물병원 진료를 예약합니다.','식사량·물·화장실 사용을 기록해 갑니다.'],
+      ban:['억지로 꺼내 안기.','식욕이 없다는데 간식으로 달래기.'],
+      vet:'숨음·식욕 저하·배변 이상이 동반되면 당일 진료.'}
+   ]},
+   {id:'ear',name:'귀',q:'귀 모양은?',opts:[
+     {k:'fwd',fig:'ear',label:'앞으로 쫑긋 세운다',sub:'머리를 들고 관심',
+      line:'“뭐가 들려?”',
+      why:'귀를 앞으로 세우는 것은 <b>관심·호기심</b>입니다. 놀이나 간식 타이밍으로 좋습니다.',
+      dos:['장난감을 천천히 움직여 사냥 놀이를 5분 합니다.','놀이 끝에는 반드시 먹이로 마무리합니다.','하루 2회 짧게 반복합니다.'],
+      ban:['손으로 갑자기 잡기.','놀이를 길게 늘여 과흥분시키기.'],
+      vet:''},
+     {k:'flat',fig:'ear',label:'옆으로 납작(비행기 귀)',sub:'몸을 낮추고 꼬리도 움직임',
+      line:'“불쾌해, 물러나.”',
+      why:'비행기 귀는 <b>불쾌·경계</b> 신호입니다. 이 상태에서 만지면 할퀴거나 물 수 있습니다.',
+      dos:['손을 거두고 시선을 피합니다.','고양이에게서 1m 이상 떨어집니다.','숨을 수 있는 공간을 비워 줍니다.'],
+      ban:['안아서 달래기.','큰 소리로 혼내기.'],
+      vet:'귀를 계속 긁거나 머리를 흔들면 귀 진드기·외이도염.'}
+   ]},
+   {id:'pose',name:'자세',q:'몸으로 무엇을 하고 있습니까?',opts:[
+     {kind:'rubbing',fig:'pose',label:'이마·볼을 문지른다',sub:'사람·가구 모서리에',
+      line:'“내 냄새로 표시하는 중.”',
+      why:'이마·볼의 냄새샘으로 <b>영역 표시</b>를 하며, 사람에게는 애정 표시입니다.',
+      dos:['손가락 한 개를 이마 높이에 대고 기다립니다.','고양이가 비비면 그 자리에서 손을 움직이지 않습니다.','10초 후 손을 천천히 내립니다.'],
+      ban:['양손으로 얼굴을 감싸기.','문지를 때 머리를 잡기.'],
+      vet:''},
+     {kind:'belly',fig:'pose',label:'배를 보이고 눕는다',sub:'몸을 길게 늘임',
+      line:'“편하지만 배는 내 거야.”',
+      why:'배를 보이는 것은 <b>신뢰</b>지만, 배는 가장 약한 곳이라 만지면 방어 반응이 나옵니다.',
+      dos:['배는 만지지 않고 눈을 천천히 깜빡여 줍니다.','손은 무릎 위에 둡니다.','고양이가 먼저 머리를 대면 이마만 만집니다.'],
+      ban:['배 문지르기 — 할퀴임의 대표 원인.','얼굴을 가까이 대기.'],
+      vet:''},
+     {kind:'knead',fig:'pose',label:'앞발로 꾹꾹 누른다(빵 만들기)',sub:'담요·무릎 위에서',
+      line:'“여기 편해, 잘게.”',
+      why:'니들링은 새끼 때 젖을 짜던 행동이 남은 것으로 <b>편안함·잠자리 준비</b>입니다.',
+      dos:['부드러운 담요를 깔아 줍니다.','발톱이 아프면 무릎 아래 쿠션을 둡니다.','방해하지 말고 그대로 둡니다.'],
+      ban:['발을 잡아 멈추게 하기.','갑자기 일어나기.'],
+      vet:''}
+   ]},
+   {id:'voice',name:'소리',q:'어떤 소리를 냅니까?',opts:[
+     {k:'short',fig:'wave',label:'짧은 “야옹” 한 번',sub:'사람을 보고 한 번',
+      line:'“밥 / 문 / 놀아 줘.”',
+      why:'성묘끼리는 거의 울지 않습니다. 사람에게 우는 것은 <b>요구</b>를 학습한 것입니다.',
+      dos:['요구 목록을 확인합니다: 밥·물·화장실·문·놀이.','맞으면 30초 안에 응답해 학습을 일정하게 만듭니다.','원하지 않을 때는 무반응보다 “안 돼” 대신 다른 행동을 유도합니다.'],
+      ban:['울 때마다 간식 주기 — 요구가 늘어납니다.','소리 지르기.'],
+      vet:'밤새 울고 물을 많이 마시면 갑상선·신장 검사.'},
+     {k:'long',fig:'wave',label:'길고 낮은 “야오옹”',sub:'끝을 길게 늘임',
+      line:'“불만 있어. 봐 줘.”',
+      why:'길게 늘어지는 울음은 <b>불만·요구</b>입니다. 마지막 식사 시간이나 화장실 상태를 먼저 확인하세요.',
+      dos:['마지막 급식 시간을 확인하고 정해진 시간에 급식합니다.','화장실을 치우고 모래를 확인합니다.','5분 놀이로 에너지를 풉니다.'],
+      ban:['울음에 계속 말로 응답하기(대화로 학습).','밤에 간식 주기.'],
+      vet:'식욕은 좋은데 계속 울면 갑상선 항진 검사.'},
+     {k:'alert',fig:'wave',label:'하악질·“쉬쉬”',sub:'입을 벌리고 이 보임',
+      line:'“더 오면 공격해.”',
+      why:'하악은 명확한 <b>위협·공포</b> 신호입니다. 물기 직전 단계이므로 접근을 멈춰야 합니다.',
+      dos:['즉시 거리를 두고 시선을 피합니다.','고양이가 도망갈 길을 열어 줍니다.','자극(낯선 사람·다른 동물)을 분리합니다.'],
+      ban:['손으로 달래기.','잡으려 하기.'],
+      vet:'갑작스러운 공격성은 통증·갑상선 문제일 수 있습니다.'}
+   ]},
+   {id:'rep',name:'반복행동',q:'같은 행동을 반복합니까?',opts:[
+     {k:'groom',fig:'rep',label:'한 곳만 계속 핥아 털이 빠진다',sub:'배·앞다리·옆구리',
+      line:'“가렵거나 불안해.”',
+      why:'과도한 그루밍은 <b>스트레스·피부병·통증</b> 신호입니다. 털이 빠질 정도면 원인 감별이 필요합니다.',
+      dos:['24시간 영상으로 핥는 시간을 확인합니다.','벼룩·피부 발진·귀 상태를 확인합니다.','페로몬·숨을 곳·놀이로 환경을 안정시킵니다.'],
+      ban:['연고를 임의로 바르기.','“버릇”이라며 두기.'],
+      vet:'반드시 진료 — 피부·내과·행동 문제를 나눠 봐야 합니다.'},
+     {k:'scratch',fig:'rep',label:'벽·문·가구를 긁는다',sub:'한 자리만 집중',
+      line:'“내 영역이야.”',
+      why:'긁기는 <b>영역 표시·발톱 관리·스트레칭</b>입니다. 막을 수 없으니 장소를 바꿔 주는 것이 정답입니다.',
+      dos:['긁는 곳 바로 옆에 수직 스크래처를 세웁니다(같은 재질·높이 60cm 이상).','긁을 때 조용히 칭찬하고 캣닙을 뿌려 둡니다.','가구에는 일시적으로 보호 커버를 붙입니다.'],
+      ban:['발톱 제거 수술.','물뿌리기·큰 소리로 혼내기.'],
+      vet:''},
+     {k:'chatter',fig:'rep',label:'창밖 새를 보며 입을 오물거린다',sub:'이를 딱딱 부딪는 소리',
+      line:'“잡고 싶어!”',
+      why:'새를 볼 때 나는 이갈기는 <b>사냥 본능</b>의 정상 행동입니다. 다만 식사할 때도 오물거리면 치과 통증을 의심합니다.',
+      dos:['정상이므로 방해하지 않습니다.','창가에 캣타워를 두어 관찰 자리를 만듭니다.','식사 중 한쪽으로만 씹는지 관찰합니다.'],
+      ban:['입을 손으로 벌려 확인하기.','창문을 막아 관찰을 빼앗기.'],
+      vet:'식사 시 통증 신호가 있으면 치과 검진.'}
+   ]}
+  ]
+}
+};
+
+/* =========================================================
+   화면
+   ========================================================= */
+var ST={sp:'dog',cat:null,opt:null};
+function optionsOf(){var d=DATA[ST.sp];for(var i=0;i<d.cats.length;i++)if(d.cats[i].id===ST.cat)return d.cats[i];return null;}
+function findOpt(key){
+  var c=optionsOf();if(!c)return null;
+  for(var i=0;i<c.opts.length;i++){var o=c.opts[i];if((o.k||o.kind)===key)return o;}
+  return null;
+}
+
+function screenHome(keepSp){
+  var sp=keepSp||(ST&&ST.sp)||'dog';
+  ST={sp:sp,cat:null,opt:null};
+  var h='<div class="hero"><b>비슷해 보이는 행동을 나눠서 봅니다</b><span>기쁨의 꼬리와 경계의 꼬리는 다릅니다. <b style="display:inline;color:var(--or2)">그림을 비교해 고르면</b> 행동학 근거와 함께 지금 바로 할 수 있는 1·2·3과 하면 안 되는 행동을 알려 드립니다.</span></div>';
+  h+='<div class="species">';
+  h+='<button data-sp="dog" type="button" class="'+(ST.sp==='dog'?'on':'')+'">강아지<span>개 행동학 기준</span></button>';
+  h+='<button data-sp="cat" type="button" class="'+(ST.sp==='cat'?'on':'')+'">고양이<span>묘 행동학 기준</span></button>';
+  h+='</div>';
+  h+='<section class="card"><h2><span class="n">1</span>무엇이 궁금합니까?</h2><div class="chips" id="cats">';
+  DATA[ST.sp].cats.forEach(function(c){
+    h+='<button class="chip" data-cat="'+c.id+'" type="button">'+c.name+'</button>';
+  });
+  h+='</div><p class="note">꼬리·귀·자세·소리·반복행동 중 하나를 고르면, 헷갈리는 두세 가지를 그림으로 나란히 보여 드립니다.</p></section>';
+  h+='<section class="card"><h2><span class="n">2</span>소리로도 확인 (마이크)</h2>';
+  h+='<div class="mic"><span class="dot" id="micDot"></span><b id="micState" style="font-size:13px">대기</b><button class="btn sm" id="btnMic" type="button">3초 듣기</button></div>';
+  h+='<div class="meter"><i id="meterBar"></i></div><div class="readout" id="micOut"></div>';
+  h+='<p class="warn">마이크는 음높이(주파수)와 크기만 봅니다. “무슨 말인지” 번역하는 기술은 없습니다 — 그래서 행동 체크와 함께 봐야 맞습니다.</p></section>';
+  h+='<p class="note">이 도구는 수의학 진단이 아닙니다. 아픈 신호가 보이면 병원이 먼저입니다.</p>';
+  $('#app').innerHTML=h;
+  $$('[data-sp]').forEach(function(b){b.addEventListener('click',function(){screenHome(b.getAttribute('data-sp'));});});
+  $$('[data-cat]').forEach(function(b){b.addEventListener('click',function(){ST.cat=b.getAttribute('data-cat');screenPick();});});
+  $('#btnMic').addEventListener('click',micStart);
+}
+
+function screenPick(){
+  var c=optionsOf();if(!c)return screenHome();
+  var h='<div class="card" style="margin-top:12px"><h2><span class="n">1</span>'+c.name+' <em style="margin-left:auto;font-size:11px;color:var(--gray);font-style:normal">'+(ST.sp==='dog'?'강아지':'고양이')+'</em></h2>';
+  h+='<p class="sub" style="margin-bottom:10px">'+c.q+' — 가장 비슷한 것을 고르세요. 두 개가 비슷하면 한 번씩 눌러 설명을 읽어 보세요.</p>';
+  h+='<div class="optgrid">';
+  c.opts.forEach(function(o){
+    var key=o.k||o.kind;
+    h+='<button class="opt" data-opt="'+key+'" type="button">'+figFor(o)+'<span class="lab"><b>'+esc(o.label)+'</b><span>'+esc(o.sub)+'</span></span></button>';
+  });
+  h+='</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn ghost" id="btnHome" type="button">← 처음으로</button><button class="btn ghost" id="btnOtherSp" type="button">'+(ST.sp==='dog'?'고양이로 보기':'강아지로 보기')+'</button></div>';
+  h+='</div>';
+  $('#app').innerHTML=h;
+  window.scrollTo({top:0,behavior:'smooth'});
+  $$('[data-opt]').forEach(function(b){b.addEventListener('click',function(){ST.opt=b.getAttribute('data-opt');screenResult();});});
+  $('#btnHome').addEventListener('click',screenHome);
+  $('#btnOtherSp').addEventListener('click',function(){ST.sp=ST.sp==='dog'?'cat':'dog';ST.cat=ST.cat;screenPick();});
+}
+
+function screenResult(){
+  var c=optionsOf(),o=findOpt(ST.opt);
+  if(!o)return screenPick();
+  var h='<div class="card" style="margin-top:12px">';
+  h+='<span class="pill live">행동전문가 기준</span><span class="pill info">'+(ST.sp==='dog'?'강아지':'고양이')+' · '+c.name+'</span>';
+  h+='<h2 style="display:block;margin:2px 0 0"><span style="font-size:15px;color:var(--or2)">'+esc(o.line)+'</span></h2>';
+  h+='<p class="headline" style="margin-top:6px">'+esc(o.label)+'</p>';
+  h+='<div style="margin:8px 0 2px;border-radius:12px;overflow:hidden;border:1px solid var(--line)">'+figFor(o)+'</div>';
+  h+='<div class="kv"><b>지금 무슨 뜻입니까</b><p>'+o.why+'</p></div>';
+  h+='<div class="kv ok"><b>지금 바로 1 · 2 · 3</b><ol class="dos">';
+  o.dos.forEach(function(d){h+='<li>'+d+'</li>';});
+  h+='</ol></div>';
+  h+='<div class="ban"><b>이건 하지 마세요</b>'+o.ban.join('<br>')+'</div>';
+  if(o.vet)h+='<div class="vetbox"><b>병원에 가야 하는 신호</b>'+esc(o.vet)+'</div>';
+  h+='<div class="note">같은 행동도 상황·개체에 따라 뜻이 달라집니다. 이 안내는 일반 행동학 기준이며 진단이 아닙니다.</div>';
+  h+='</div>';
+  h+='<div class="acts"><button class="btn pri" id="btnSave" type="button">저장 (그림·텍스트)</button>'+
+     '<button class="btn" id="btnShare" type="button">공유</button>'+
+     '<button class="btn wide" id="btnAgain" type="button">다른 행동 보기</button></div>';
+  h+='<p class="note">카톡 단톡방에 그림 카드로 바로 보낼 수 있습니다.</p>';
+  $('#app').innerHTML=h;
+  window.scrollTo({top:0,behavior:'smooth'});
+  $('#btnSave').addEventListener('click',saveAll);
+  $('#btnShare').addEventListener('click',shareIt);
+  $('#btnAgain').addEventListener('click',screenPick);
+}
+
+/* ---------- 마이크(음높이·크기만) ---------- */
+var micStream=null,micRAF=null;
+function micStart(){
+  var dot=$('#micDot'),state=$('#micState'),bar=$('#meterBar'),out=$('#micOut');
+  if(micStream){stopMic();return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    state.textContent='이 브라우저에서는 마이크를 쓸 수 없습니다';
+    out.textContent='휴대폰 브라우저에서 https 주소로 열면 사용할 수 있습니다.';
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    micStream=stream;
+    var ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=ctx.createMediaStreamSource(stream);
+    var an=ctx.createAnalyser();an.fftSize=2048;src.connect(an);
+    var td=new Uint8Array(an.fftSize),fd=new Uint8Array(an.frequencyBinCount);
+    var peaks=0,last=0,t0=Date.now(),maxRms=0,freqs=[];
+    dot.classList.add('on');state.textContent='듣는 중… 3초';
+    $('#btnMic').textContent='멈추기';
+    function loop(){
+      an.getByteTimeDomainData(td);an.getByteFrequencyData(fd);
+      var sum=0,peak=0,bi=0,bv=0;
+      for(var i=0;i<td.length;i++){var v=(td[i]-128)/128;sum+=v*v;if(Math.abs(v)>peak)peak=Math.abs(v);}
+      for(var j=0;j<fd.length;j++){if(fd[j]>bv){bv=fd[j];bi=j;}}
+      var rms=Math.sqrt(sum/td.length);
+      if(rms>maxRms)maxRms=rms;
+      var f=bi*ctx.sampleRate/an.fftSize;
+      if(rms>0.02){if(Date.now()-last>220)peaks++;last=Date.now();freqs.push(f);}
+      bar.style.width=Math.min(100,Math.round(rms*320))+'%';
+      if(Date.now()-t0<3000){micRAF=requestAnimationFrame(loop);return;}
+      stopMic(true);
+      var avg=freqs.length?freqs.reduce(function(a,b){return a+b;},0)/freqs.length:0;
+      var kind=avg<600?'낮은 소리(경계·불만 쪽)':(peaks>=3?'짧게 반복(요구·흥분 쪽)':'길게 이어짐(요구·불편 쪽)');
+      out.innerHTML='평균 음높이 <b>'+Math.round(avg)+'Hz</b> · 소리 낸 횟수 <b>'+peaks+'회</b> · 최대 크기 <b>'+Math.round(maxRms*100)+'%</b><br>→ '+kind+'<br><span style="color:#8FA0B8">음높이·길이만 본 결과입니다. 아래 행동 체크와 함께 판단하세요.</span>';
+      state.textContent='측정 완료';
+    }
+    loop();
+  }).catch(function(){
+    state.textContent='마이크 권한이 필요합니다';
+    out.textContent='주소창의 자물쇠 → 마이크 허용 후 다시 눌러 주세요. (file:// 로 열면 막힙니다)';
+  });
+}
+function stopMic(done){
+  if(micRAF){cancelAnimationFrame(micRAF);micRAF=null;}
+  if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}
+  var dot=$('#micDot');if(dot)dot.classList.remove('on');
+  var btn=$('#btnMic');if(btn)btn.textContent='3초 듣기';
+  var bar=$('#meterBar');if(bar&&!done)bar.style.width='0%';
+}
+
+/* ---------- 저장/공유 ---------- */
+function linesOf(){
+  var c=optionsOf(),o=findOpt(ST.opt),L=[];
+  L.push('■ '+(ST.sp==='dog'?'강아지':'고양이')+' · '+c.name);
+  L.push('■ '+o.line);
+  L.push('');
+  L.push('지금 뜻: '+o.label);
+  L.push(o.why.replace(/<[^>]+>/g,''));
+  L.push('');
+  L.push('지금 바로 1·2·3');
+  o.dos.forEach(function(d,i){L.push((i+1)+'. '+d.replace(/<[^>]+>/g,''));});
+  L.push('');
+  L.push('하지 마세요');
+  o.ban.forEach(function(b){L.push('· '+b);});
+  if(o.vet){L.push('');L.push('병원 신호: '+o.vet);}
+  L.push('');
+  L.push('행동 번역: autooneclick.com/petmind/');
+  return L;
+}
+function svgToImage(svg){
+  return new Promise(function(res){
+    try{var img=new Image();img.onload=function(){res(img);};img.onerror=function(){res(null);};
+      img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);}catch(e){res(null);}
+  });
+}
+function drawCard(img){
+  var W=900,H=1240,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var g=cv.getContext('2d');var c=optionsOf(),o=findOpt(ST.opt);
+  g.fillStyle='#0A1128';g.fillRect(0,0,W,H);
+  g.fillStyle='#0F1B33';g.fillRect(0,0,W,150);
+  g.fillStyle='#FF6B00';g.fillRect(0,0,14,H);
+  g.fillStyle='#FF6B00';g.font='bold 26px "Malgun Gothic",sans-serif';g.fillText('마음 번역기 · 행동전문가',64,58);
+  g.fillStyle='#F3F6FA';g.font='bold 36px "Malgun Gothic",sans-serif';
+  var tw=o.label,line2='';
+  if(g.measureText(tw).width>770){line2=tw.slice(36);tw=tw.slice(0,36)+'…';}
+  g.fillText(tw,64,108);
+  if(line2){g.font='bold 26px "Malgun Gothic",sans-serif';g.fillText(line2,64,142);}
+  var y=180;
+  if(img){
+    var bh=Math.round(760*(200/320));
+    g.fillStyle='#0B1526';g.fillRect(64,y,772,bh);
+    g.drawImage(img,64,y,772,bh);y+=bh+22;
+  }
+  g.font='22px "Malgun Gothic",sans-serif';
+  function out(s,color,bold,size){
+    g.fillStyle=color||'#DCE6F6';g.font=(bold?'bold ':'')+(size||22)+'px "Malgun Gothic",sans-serif';
+    var t='',ws=String(s).split(' ');
+    for(var i=0;i<ws.length;i++){
+      var tt=t?t+' '+ws[i]:ws[i];
+      if(g.measureText(tt).width>772&&t){g.fillText(t,64,y);y+=32;t=ws[i];}
+      else t=tt;
+    }
+    if(t)g.fillText(t,64,y);
+    y+=34;
+  }
+  out('“'+o.line+'”','#FFA24D',true,26);y+=6;
+  linesOf().slice(3).forEach(function(L){
+    if(y>H-130)return;
+    if(/^지금 뜻|^지금 바로|^하지 마세요|^병원/.test(L)){y+=4;out(L,'#FFA24D',true,23);}
+    else if(/^\d\./.test(L))out(L,'#8BF0B4',true);
+    else out(L);
+  });
+  g.fillStyle='#1D4ED8';g.fillRect(0,H-84,W,84);
+  g.fillStyle='#fff';g.font='bold 30px "Malgun Gothic",sans-serif';g.textAlign='center';
+  g.fillText('autooneclick.com',W/2,H-32);g.textAlign='left';
+  return cv;
+}
+function dl(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},3000);}
+async function saveAll(){
+  try{
+    var o=findOpt(ST.opt);
+    var img=await svgToImage(figFor(o));
+    drawCard(img).toBlob(function(b){if(b)dl(b,'마음번역_'+stamp()+'.png');});
+    dl(new Blob([linesOf().join('\n')],{type:'text/plain;charset=utf-8'}),'마음번역_'+stamp()+'.txt');
+    toast('그림과 텍스트를 저장했습니다');
+  }catch(e){toast('저장이 막혔습니다 — 공유로 시도해 주세요');}
+}
+function shareIt(){
+  var txt=linesOf().join('\n');
+  try{
+    if(navigator.share){
+      var o=findOpt(ST.opt);
+      svgToImage(figFor(o)).then(function(img){
+        drawCard(img).toBlob(function(b){
+          if(b&&navigator.canShare&&navigator.canShare({files:[new File([b],'마음번역.png',{type:'image/png'})]})){
+            navigator.share({title:'마음 번역기',text:txt,files:[new File([b],'마음번역.png',{type:'image/png'})]}).catch(function(){});
+          }else navigator.share({title:'마음 번역기',text:txt}).catch(function(){});
+        });
+      });
+    }else copy(txt);
+  }catch(e){copy(txt);}
+}
+function copy(t){
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast('복사했습니다');},function(){toast('복사가 막혔습니다');});return;}
+  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('복사했습니다');}catch(e){toast('복사가 막혔습니다');}ta.remove();
+}
+
+screenHome();
+})();
+</script>
+</body>
+</html>
