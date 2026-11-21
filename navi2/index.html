@@ -618,7 +618,8 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
     var evi = el('div', 'evi');
     evi.appendChild(el('span', null, '그림 ' + (res.view.interest ? res.view.interest.count : 0) + '장'));
-    evi.appendChild(el('span', null, '10문항 중 ' + res.lead + '문항 같은 결'));
+    evi.appendChild(el('span', null, '10문항 교차'));
+    evi.appendChild(el('span', null, res.lead * 2 >= res.answers ? res.lead + '문항 같은 결' : '두 결이 함께 보임'));
     if (res.repicks) evi.appendChild(el('span', null, '다시 고른 문항 ' + res.repicks + '개'));
     if (res.slow) evi.appendChild(el('span', null, '오래 고른 문항 ' + res.slow + '개'));
     evi.appendChild(el('span', null, res.groupNm + ' 쪽으로 파고듦'));
