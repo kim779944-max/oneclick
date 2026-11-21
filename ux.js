@@ -148,12 +148,14 @@
     }
   }
   /* ④-b 결과물 4버튼 — 확인하기 · 전체뷰 · 저장 · 공유하기 (결과가 생기면 그 위에 붙습니다) */
+  var INIT_TXT = {};
   function firstResult() {
     for (var i = 0; i < WM_SEL.length; i++) {
-      var el = d.querySelector(WM_SEL[i]);
+      var sel = WM_SEL[i], el = d.querySelector(sel);
       if (!el) continue;
-      var t = (el.textContent || '').replace(/\s/g, '');
-      if (t.length > 12) return el;
+      var now = (el.textContent || '').replace(/\s/g, '');
+      if (INIT_TXT[sel] === undefined) INIT_TXT[sel] = now;       /* 처음 화면(빈 상태)은 건너뜀 */
+      if (now.length > 12 && now !== INIT_TXT[sel]) return el;
     }
     return null;
   }
