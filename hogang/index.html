@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A1128">
 <title>호갱 탈출 내비 — 기종·요금제·약정 넣으면 최저가 한 줄</title>
-<meta name="description" content="기종·요금제·약정 잔여·결합·구매방식·데이터를 바꾸면 바로 다시 계산해, 맨 위에 최종 휴대폰값·월요금 1등과 사는 법 1·2·3을 보여 줍니다. 약정이 남았으면 위약금과 이득을 판정하고 번호이동·기기변경·자급제+알뜰폰·인터넷 결합 4경로를 비교합니다. 2026-11-21 기준 예시값.">
+<meta name="description" content="기종·요금제·약정 잔여·결합·구매방식·데이터를 바꾸면 바로 다시 계산해, 맨 위에 최종 휴대폰값·월요금 1등과 사는 법 1·2·3을 보여 줍니다. 약정이 남았으면 위약금과 이득을 판정하고 번호이동·기기변경·자급제+알뜰폰·인터넷 결합 4경로를 비교합니다. 2026-11-22 기준 예시값.">
 <link rel="icon" href="../icon.png">
 <style>
 :root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
@@ -132,7 +132,9 @@ input:focus,select:focus{outline:2px solid var(--or)}
 .pen3 span{display:block;font-size:14px;font-weight:900;margin-top:2px;word-break:break-all}
 details.calc{margin:8px 0 0}
 details.calc summary{cursor:pointer;font-size:12.5px;color:var(--or2);font-weight:800}
-details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;font-size:11.5px;line-height:1.65;color:var(--ink2);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px;margin:7px 0 0}
+.yr24{margin:2px 0 0}
+.yr24 summary{cursor:pointer;min-height:42px;display:flex;align-items:center;padding:10px 2px;color:var(--or2);font-size:13.5px;font-weight:800}
+details.calc pre,.yr24 pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;font-size:11.5px;line-height:1.65;color:var(--ink2);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px;margin:7px 0 0}
 .mdl{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
 .mdl img{width:120px;height:120px;object-fit:cover;border-radius:12px;background:#fff;border:1px solid var(--line)}
 .mdl .nm{font-size:16px;font-weight:900;word-break:keep-all}
@@ -163,8 +165,9 @@ details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;f
     <p class="fn" id="t1Sub">기기값 <b id="t1Dev">—</b>(한 번) + 요금 월 <b id="t1Mon">—</b></p>
     <div class="save"><span id="t1Save">—</span><em>어, 이렇게 싸?!</em></div>
     <ol id="t1How"><li>—</li><li>—</li><li>—</li></ol>
-    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+    <p class="fn">2026-11-22 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
   </section>
+  <details class="yr24" id="yr24"><summary>[2년 총액 자세히 보기]</summary><div id="yr24Body"></div></details>
 
   <!-- ② 입력 6종 — 바꾸는 즉시 다시 계산 -->
   <section class="card" id="inBox">
@@ -187,7 +190,7 @@ details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;f
   <section class="card">
     <h2><span class="n">2</span>나머지 후보 <em>월 납부액 낮은 순</em></h2>
     <div class="cands" id="cands"></div>
-    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+    <p class="fn">2026-11-22 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
   </section>
 
   <!-- ④ 약정이 남았을 때: 위약금 vs 이득 -->
@@ -205,7 +208,7 @@ details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;f
     </table>
     <div class="why1" id="why1">—</div>
     <a class="btn sm" id="btnAjd" href="https://www.ajd.co.kr/" target="_blank" rel="noopener" style="margin-top:9px">인터넷 결합 조건 확인</a>
-    <p class="fn">2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
+    <p class="fn">2026-11-22 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>
   </section>
 
   <!-- ⑥ 기종 카드 -->
@@ -222,7 +225,7 @@ details.calc pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;f
     <h2><span class="n">6</span>계산식 그대로 <em>직접 검산하세요</em></h2>
     <details class="calc" id="calcBox"><summary>펼쳐서 계산 과정 보기</summary><pre id="calcPre"></pre></details>
     <div class="graybox" style="margin-top:10px">
-      · 금액은 <b>2026-11-21 기준 예시값</b>입니다. 통신사 공시지원금·요금제·추가지원금은 통신사·대리점·시점마다 달라집니다.<br>
+      · 금액은 <b>2026-11-22 기준 예시값</b>입니다. 통신사 공시지원금·요금제·추가지원금은 통신사·대리점·시점마다 달라집니다.<br>
       · 이 화면은 통신사 시스템을 조회하지 않습니다. 넣은 조건으로 이 기기 안에서 계산만 합니다.<br>
       · 위약금(할인반환금)은 통신사 실제 산식과 다를 수 있으니, 바꾸기 전 고객센터·앱에서 정확한 금액을 확인하세요.<br>
       · 가입·개통을 대행하지 않습니다.
@@ -363,6 +366,7 @@ function penaltyView(best){
   if(L<=0){
     box.innerHTML='<div class="judge good">약정이 남지 않았습니다. <b>위약금 없이 지금 바로 바꾸면 됩니다.</b></div>'+
       '<p class="fn">약정 남은 개월을 고르면 위약금과 이득을 나란히 계산합니다.</p>';
+    PENYR='<p class="fn">약정이 남지 않아 위약금이 없습니다.</p>';
     return {txt:'약정 없음', L:0};
   }
   var pn=penaltyOf(L);
@@ -383,7 +387,12 @@ function penaltyView(best){
     '<div><b>바꾸면 달 납부</b><span>월 '+won(mon24(best.total))+'</span><p class="fn" style="margin:2px 0 0">기기값 포함 · 요금 월 '+won(nw)+'</p></div></div>'+
     '<div class="judge '+cls+'"><b id="penVerdict">'+esc(txt)+'</b><br>손익분기: '+(be!=null?'바꾼 뒤 <b id="penBE">'+be+'개월</b>이면 위약금을 메웁니다':'<b id="penBE">없음</b> — 새 월요금이 지금보다 싸지 않아 위약금을 메우지 못합니다')+
     (be!=null?'<br><span id="penMon">(바꾸면 요금이 매달 '+won(diff)+'씩 줄어, 위약금은 '+be+'개월이면 메웁니다)</span>':'')+'</div>'+
-    '<details class="calc"><summary>위약금 계산식 펼치기</summary><pre>'+esc(
+    '<p class="fn">'+L+'개월 합계·위약금 계산식은 맨 위 접힌 칸(<b>자세히 보기</b>)에 있습니다.</p>';
+  PENYR=
+    '<div class="pen3"><div><b>잔여 위약금(할인반환금)</b><span>'+won(pn.p)+'</span></div>'+
+    '<div><b>그대로 '+L+'개월 낼 돈</b><span>'+won(stay)+'</span></div>'+
+    '<div><b>지금 바꿔 '+L+'개월 낼 돈</b><span>'+won(move)+'</span></div></div>'+
+    '<b style="font-size:12.5px">위약금 계산식</b><pre>'+esc(
       '지금 월 납부 = 요금 '+won(IN.plan.m)+' × (1 − 0.25 선택약정) = '+won(cur)+'\n'+
       '새 월 납부(1등 '+WAYNM[best.way]+') = '+won(nw)+'\n'+
       '경과 '+pn.e+'개월 · 받은 할인 = '+won(IN.plan.m)+' × 0.25 × '+pn.e+' = '+won(pn.D)+'\n'+
@@ -395,11 +404,11 @@ function penaltyView(best){
       gl.map(function(g,i){return '  w='+i+' → '+won(g);}).join('\n')+'\n'+
       '손익분기 = 위약금 ÷ (지금 월 − 새 월) = '+(be!=null?be+'개월':'없음')+'\n'+
       '※ 예시 산식입니다. 실제 반환금은 통신사 앱·고객센터에서 확인하세요.'
-    )+'</pre></details>';
+    )+'</pre>';
   return {txt:txt, L:L, be:be, pen:pn.p};
 }
 
-var T0=0;
+var T0=0, PENYR='';
 function recalc(){
   T0=performance.now();
   readIn();
@@ -449,13 +458,27 @@ function recalc(){
   $('#why1').innerHTML='<b>왜 '+esc(WAYNM[best.way])+'이 제일 싼가</b> — '+esc(why);
 
   var pv=penaltyView(best);
+  /* [2년 총액 자세히 보기] — 기본 닫힘, 총액은 여기에만 */
+  $('#yr24Body').innerHTML=
+    '<table class="cmp" id="yr24Tbl"><thead><tr><th>경로</th><th>기기값</th><th>월 요금 × 24</th><th>유지비(6개월 상향분)</th><th>2년 총액</th><th>1등보다</th></tr></thead><tbody>'+
+    rs.map(function(x){
+      return '<tr class="'+(x===best?'best':'')+'"><td class="l" data-h="경로">'+esc(WAYNM[x.way])+(x===best?' ★':'')+'</td>'+
+        '<td data-h="기기값">'+won(x.dev)+'</td><td data-h="월 요금 × 24">'+won(x.mon*MONTHS)+' (월 '+won(x.mon)+')</td>'+
+        '<td data-h="유지비(6개월 상향분)">'+won(x.keepCost||0)+'</td><td data-h="2년 총액">'+won(x.total)+'</td>'+
+        '<td data-h="1등보다">+'+won(x.total-best.total)+'</td></tr>';
+    }).join('')+'</tbody></table>'+
+    '<div class="judge good" id="yr24Save">'+esc(saveTx.replace('보다 2년',' 대비 2년'))+'</div>'+
+    '<p class="fn" id="yr24Chk" style="font-size:12px;color:var(--ink2)">검산: 월 납부액 × 24 = '+fmt(bestM)+' × 24 = '+won(bestM*MONTHS)+
+      (bestM*MONTHS!==best.total?' (반올림 차 '+won(Math.abs(bestM*MONTHS-best.total))+' · 2년 총액 '+won(best.total)+')':'')+'</p>'+
+    '<div class="graybox" style="margin-top:8px"><b>약정이 남았다면 — '+(IN.left>0?IN.left+'개월 합계':'위약금')+'</b>'+PENYR+'</div>'+
+    '<p class="fn">2026-11-22 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다</p>';
   paintModel();
 
   $('#calcPre').textContent=rs.map(function(x){return '['+WAYNM[x.way]+'] '+x.f+' = 2년 '+won(x.total)+' → 월 '+won(mon24(x.total));}).join('\n')+
     '\n\n기준: 요금제 '+IN.plan.nm+' '+won(IN.plan.m)+' · 선택약정 25% · 결합 '+COMBO[IN.combo].nm+' 월 '+won(COMBO[IN.combo].d)+' 할인'+
     '\n공시지원금(예시) = 요금제 구간별 20만~60만 원, 출고가의 60% 이하 · 추가지원금 = 공시의 15%'+
     '\n번호이동 우대(예시) '+won(MNP_BONUS)+' — '+fmt(MNP_MIN)+'원 이상 요금제 '+KEEP+'개월 유지 조건'+
-    '\n※ 2026-11-21 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다';
+    '\n※ 2026-11-22 기준 예시값 · 통신사 공시지원금·요금제는 변동됩니다';
 
   window.__HOGANG={ms:+(performance.now()-T0).toFixed(2), best:{way:best.way,dev:best.dev,mon:best.mon,total:best.total,kind:best.kind,warn:best.warn},
     routes:rs.map(function(x){return {way:x.way,dev:x.dev,mon:x.mon,total:x.total,kind:x.kind,warn:x.warn,cond:x.cond||''};}), pen:pv, save:save, input:{model:IN.model.id,plan:IN.plan.id,left:IN.left,combo:IN.combo,way:IN.way,data:IN.data}};
