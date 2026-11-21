@@ -776,8 +776,8 @@
       }
     }
     g += '<button class="c lk" data-a="openslot"><span class="e">🔒</span><b>' + (s.slots + 1) + '칸</b></button>';
-    el.innerHTML = '<div class="ks-strip"><div class="h"><em>🔑 ' + (s.verified ? '내 박스' : '열쇠 4개') + '</em>' +
-      '<span class="keys">' + s.keys + '개</span><span class="sp"></span>' +
+    el.innerHTML = '<div class="ks-strip"><div class="h"><em>🔑 ' + (s.verified ? '내 박스' : '내 박스 4칸') + '</em>' +
+      '<span class="keys">' + (s.verified ? ('열쇠 ' + s.keys + '개') : '인증하면 열쇠 4개') + '</span><span class="sp"></span>' +
       '<button data-a="open">' + (s.verified ? '박스 관리' : '인증하고 받기') + '</button></div>' +
       '<div class="g" style="grid-template-columns:repeat(' + Math.min(5, s.slots + 1) + ',1fr)">' + g + '</div></div>';
     el.onclick = function (e) {

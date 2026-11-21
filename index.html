@@ -207,7 +207,7 @@ main{margin-top:16px}
 
   <section class="cpn" id="coupon">
     <a class="cpnbar" href="sms:01020022899?body=%5BKTS%20%EC%9B%90%ED%81%B4%EB%A6%AD%5D%20%EB%AC%B4%EB%A3%8C%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%20(%EC%97%85%EC%A2%85%2F%EC%97%B0%EB%9D%BD%EC%B2%98%3A%20)">
-      <span class="t"><b><i>무료</i>무료 이용권 · 사전예약</b>
+      <span class="t"><b><i>이용권</i>무료 이용권 · 사전예약</b>
         <span>번호만 남기면 이용권 1장을 문자로 — 결제 없음</span></span>
       <span class="a">신청 →</span>
     </a>
@@ -305,7 +305,7 @@ function render(){
       var soon = (t.status==='soon') || !t.link;
       var mine = (window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
       var bd = t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '';
-      var lim = limLine(k) || (soon ? '' : '<span class="lim zero">하루 무제한 무료</span>');
+      var lim = limLine(k);
       var detailHref = 'detail.html?k=' + encodeURIComponent(k);
       rows += '<div class="row' + (soon ? ' soon' : '') + '">' +
         '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +

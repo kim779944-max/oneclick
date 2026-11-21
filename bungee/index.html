@@ -438,6 +438,16 @@ function wrapText(ctx,text,x,y,maxW,lh){
 }
 $('#pGo').onclick=function(){ try{ renderPoster(); }catch(e){ toast('내용을 확인해 주세요'); } };
 
+/* 들어온 주소(#interior·#home·#poster)에 맞는 탭을 엽니다 — 쇼룸에서 바로 넘어올 때 */
+function pickTab(t){
+  if (['interior','home','poster'].indexOf(t) < 0) return;
+  Array.prototype.forEach.call($('#tabs').children, function(x){ x.classList.toggle('on', x.getAttribute('data-t')===t); });
+  ['interior','home','poster'].forEach(function(x){ $('#tab-'+x).hidden = (x!==t); });
+  try { window.scrollTo({top:0}); } catch(e){}
+}
+window.addEventListener('hashchange', function(){ pickTab((location.hash||'').replace('#','')); });
+pickTab((location.hash||'').replace('#',''));
+
 /* 처음 화면 — 견적 한 번 보여 주기 */
 try{ renderEst(); }catch(e){}
 </script>

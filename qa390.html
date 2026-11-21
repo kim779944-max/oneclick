@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>390px 검수판 (임시)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#111;color:#eee;font-family:system-ui,sans-serif}
+.row{padding:10px;border-bottom:1px solid #333}
+.row p{margin:0 0 6px;font-size:12px;color:#9ab}
+iframe{width:390px;height:844px;border:1px solid #444;background:#000;display:block}
+</style>
+</head>
+<body>
+<div id="rows"></div>
+<script>
+var LIST = [
+  ['쇼룸', '/?qa=1'],
+  ['번개알바 도구', '/bungee/'],
+  ['상품 상세(더뷰)', '/detail.html?k=viewer'],
+  ['폰정리', '/organizer/'],
+  ['더파일 변환기', '/converter.html'],
+  ['더싸인', '/sign/'],
+  ['더양식', '/theform/'],
+  ['더상세', '/thedetail/'],
+  ['더스캔', '/thescan/'],
+  ['더지우개', '/theeraser/'],
+  ['더통역', '/thetongyeok/'],
+  ['매물수집기', '/realty/'],
+  ['오늘의 특가', '/sale/'],
+  ['대출 조회기', '/loan.html']
+];
+var q = new URLSearchParams(location.search).get('only');
+var rows = document.getElementById('rows');
+LIST.forEach(function(it, i){
+  if (q && it[1].indexOf(q) < 0) return;
+  var d = document.createElement('div'); d.className='row';
+  d.innerHTML = '<p>' + (i+1) + '. ' + it[0] + ' — ' + it[1] + '</p>';
+  var f = document.createElement('iframe'); f.src = it[1]; f.id = 'f' + i;
+  d.appendChild(f); rows.appendChild(d);
+});
+</script>
+</body>
+</html>
