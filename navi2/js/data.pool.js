@@ -1,0 +1,307 @@
+/* ============================================================
+   독심술 v2.0 — 그림 16 + 교차·분기 스무고개 보기 풀 (2026-11-21)
+   ① 시작: 문항 없이 그림 16장. 관심 가는 것을 여러 장 고르고 시작.
+   ② 문항: 10층. 앞 답의 선두 결(A/B/C/D 갈래)에 따라 다음 층의
+      질문과 보기 4개가 통째로 갈아 끼워진다.
+      보기 풀 = 그림 16 + 보기 116(29벌 × 4).
+   ③ 한 문항의 보기 4개는 서로 다른 결(축)을 건드린다 — 겹치지 않게.
+   ④ 보기마다 p(다른 말 풀이)를 달아, 결과지에서 본인이 고른 말을
+      '전혀 다른 표현'으로 풀어 준다(앵무새 금지).
+   ============================================================ */
+(function (root) {
+
+/* ── 그림 키 → 사진 ── */
+var IMG = {
+  train:'img/opts/nav_photo_01_ticket_train.jpg',
+  map  :'img/opts/nav_photo_02_route_map.jpg',
+  cal  :'img/opts/nav_photo_03_calendar_two.jpg',
+  org  :'img/opts/nav_photo_04_home_organize.jpg',
+  price:'img/opts/nav_photo_05_price.jpg',
+  mood :'img/opts/nav_photo_06_mood.jpg',
+  meal :'img/opts/nav_photo_07_favmenu.jpg',
+  near :'img/opts/nav_photo_08_nearby.jpg',
+  desk :'img/opts/nav_photo_09_self.jpg',
+  meet :'img/opts/nav_photo_10_who.jpg',
+  fix  :'img/opts/nav_photo_11_fix.jpg',
+  cut  :'img/opts/nav_photo_12_cut.jpg',
+  win  :'img/opts/nav_photo_13_win.jpg',
+  fam  :'img/opts/nav_photo_14_famjoy.jpg',
+  clap :'img/opts/nav_photo_15_praised.jpg',
+  rest :'img/opts/nav_photo_16_free.jpg'
+};
+
+/* ── 시작 그림 16장: 문항 없이 '관심 가는 것'을 고른다 ──
+   t = 주된 결, t2 = 곁결. cap = 그림 아래 한 줄 이름, sub = 한 줄 뜻풀이 */
+var START = [
+  { id:'g1',  img:IMG.train, cap:'창밖을 보는 기차', sub:'지금 어디론가 가고 싶은 마음', t:'FREE',    t2:'SPEED' },
+  { id:'g2',  img:IMG.map,   cap:'지도 펼친 책상',   sub:'다음 길을 미리 그려 두는 쪽',   t:'PERFECT', t2:'EYE' },
+  { id:'g3',  img:IMG.cal,   cap:'둘이 맞춘 달력',   sub:'약속을 먼저 챙기는 쪽',         t:'LOYAL',   t2:'PERFECT' },
+  { id:'g4',  img:IMG.org,   cap:'정리하는 손',      sub:'쌓인 걸 하나씩 치우는 쪽',      t:'EYE',     t2:'PERFECT' },
+  { id:'g5',  img:IMG.price, cap:'소박한 한 끼',     sub:'남는 쪽부터 보는 쪽',           t:'CALC',    t2:'PUTOFF' },
+  { id:'g6',  img:IMG.mood,  cap:'촛불 켜진 저녁',   sub:'분위기가 있어야 마음이 움직임', t:'FREE',    t2:'FACE' },
+  { id:'g7',  img:IMG.meal,  cap:'따뜻한 밥상',      sub:'같이 먹어야 맛있는 쪽',         t:'LOYAL',   t2:'FACE' },
+  { id:'g8',  img:IMG.near,  cap:'동네 작은 집',     sub:'익숙한 자리가 편한 쪽',         t:'PUTOFF',  t2:'CALC' },
+  { id:'g9',  img:IMG.desk,  cap:'사무실 노트북',    sub:'일단 벌이고 보는 쪽',           t:'SPEED',   t2:'PERFECT' },
+  { id:'g10', img:IMG.meet,  cap:'마주 앉은 자리',   sub:'말보다 표정을 먼저 보는 쪽',    t:'EYE',     t2:'FACE' },
+  { id:'g11', img:IMG.fix,   cap:'밤 전화',          sub:'끝까지 수습하는 쪽',            t:'PERFECT', t2:'SPEED' },
+  { id:'g12', img:IMG.cut,   cap:'돌아서는 등',      sub:'선을 긋는 데 망설임이 없는 쪽', t:'SPEED',   t2:'FREE' },
+  { id:'g13', img:IMG.win,   cap:'사람들 앞',        sub:'앞에 서야 사는 쪽',             t:'FACE',    t2:'SPEED' },
+  { id:'g14', img:IMG.fam,   cap:'둘러앉은 식탁',    sub:'내 사람을 먼저 챙기는 쪽',      t:'LOYAL',   t2:'PUTOFF' },
+  { id:'g15', img:IMG.clap,  cap:'손을 든 사람들',   sub:'박수받을 자리를 아는 쪽',       t:'FACE',    t2:'LOYAL' },
+  { id:'g16', img:IMG.rest,  cap:'소파 위 오후',     sub:'비워야 채워지는 쪽',            t:'PUTOFF',  t2:'FREE' }
+];
+
+/* ── 10층 스무고개 ──
+   층마다 기본('*') 한 벌 + 갈래(A/B/C/D) 한 벌.
+   갈래는 그때까지의 선두 결이 정한다.  A=밀어붙임·완성 B=실속·인정
+   C=사람·관찰 D=자유·여유
+   opts: l=보기, t=주된 결, t2=곁결, p=다른 말 풀이, im=그림 키            */
+var Q = {
+
+/* ── L1 — 첫 문항부터 고른 그림 쪽으로 갈라진다 ── */
+1: {
+  '*': { q:'처음 가 보는 자리에 들어갈 때, {who}',
+    hint:'문을 열고 10초 — 손이 먼저 가는 곳이 그 사람입니다.',
+    opts:[
+      { l:'먼저 들어가 자리를 잡는다',       t:'SPEED', t2:'FACE',  p:'기다리는 시간이 길게 느껴집니다.', im:'win' },
+      { l:'누가 있는지부터 살핀다',         t:'EYE',   t2:'LOYAL', p:'사람을 먼저 읽고 그다음에 말을 고르는 쪽입니다.', im:'meet' },
+      { l:'아는 얼굴 옆에 붙는다',          t:'LOYAL', t2:'PUTOFF',p:'낯선 자리에서 혼자 있는 게 제일 불편한 쪽입니다.', im:'meal' },
+      { l:'구석에서 분위기를 본다',         t:'FREE',  t2:'EYE',   p:'눈에 익을 때까지 지켜봅니다.', im:'mood' }
+    ]},
+  A: { q:'모르는 사람들 사이에 앉았을 때, {who}',
+    hint:'어색함을 지나가는 방식이 결을 그대로 보여 줍니다.',
+    opts:[
+      { l:'먼저 말을 걸어 판을 연다',        t:'SPEED', t2:'FACE',  p:'어색한 시간을 못 견디는 쪽입니다.', im:'win' },
+      { l:'누가 어떤 사람인지 정리한다',    t:'EYE',   t2:'CALC',  p:'사람을 하나씩 제자리에 놓는 쪽입니다.', im:'meet' },
+      { l:'웃으면서 맞장구부터 친다',       t:'FACE',  t2:'LOYAL', p:'분위기를 먼저 맞춥니다.', im:'clap' },
+      { l:'핸드폰을 만지며 때를 기다린다',  t:'PUTOFF',t2:'FREE',  p:'들어갈 타이밍을 재는 쪽입니다.', im:'rest' }
+    ]},
+  B: { q:'모르는 사람들 앞에서 내 차례가 왔을 때, {who}',
+    hint:'사람들 앞에 섰을 때 무엇을 먼저 챙기는지 봅니다.',
+    opts:[
+      { l:'준비한 것부터 꺼낸다',            t:'PERFECT',t2:'EYE',  p:'순서대로 해야 마음이 놓이는 쪽입니다.', im:'map' },
+      { l:'어떻게 보일지부터 생각한다',      t:'FACE',  t2:'EYE',   p:'평가가 먼저 떠오르는 쪽입니다.', im:'meet' },
+      { l:'얻을 게 뭔지 따져 본다',          t:'CALC',  t2:'FACE',  p:'나에게 남는 것을 먼저 보는 쪽입니다.', im:'price' },
+      { l:'그냥 편하게 던진다',              t:'FREE',  t2:'SPEED', p:'완벽하게 하기보다 일단 하는 쪽입니다.', im:'mood' }
+    ]},
+  C: { q:'처음 보는 사람과 마주 앉았을 때, {who}',
+    hint:'낯선 한 사람 앞에서 무엇으로 가까워지는지 봅니다.',
+    opts:[
+      { l:'상대 표정을 먼저 읽는다',         t:'EYE',   t2:'LOYAL', p:'말보다 얼굴을 먼저 보는 쪽입니다.', im:'meet' },
+      { l:'아는 사람 얘기로 연결한다',       t:'LOYAL', t2:'FACE',  p:'공통점을 찾아 가까워지는 쪽입니다.', im:'meal' },
+      { l:'할 말을 정해 두고 간다',          t:'PERFECT',t2:'CALC', p:'미리 준비해야 편한 쪽입니다.', im:'cal' },
+      { l:'분위기 따라 즉석에서 정한다',     t:'FREE',  t2:'SPEED', p:'그 자리 흐름에 몸을 맡깁니다.', im:'mood' }
+    ]},
+  D: { q:'낯선 자리에 초대받았을 때, {who}',
+    hint:'나갈지 말지 정하는 그 시간이 이미 답입니다.',
+    opts:[
+      { l:'갈지 말지 한참 고민한다',         t:'PUTOFF',t2:'EYE',   p:'나가기 전에 마음이 오래 걸리는 쪽입니다.', im:'rest' },
+      { l:'일단 나가서 보자는 쪽',           t:'FREE',  t2:'SPEED', p:'가서 정하면 된다고 보는 쪽입니다.', im:'train' },
+      { l:'누가 오는지 먼저 확인한다',       t:'LOYAL', t2:'FACE',  p:'아는 사람이 있어야 편한 쪽입니다.', im:'cal' },
+      { l:'갈까 말까 30분이면 정한다',       t:'SPEED', t2:'CALC',  p:'오래 붙잡아 두지 않습니다.', im:'desk' }
+    ]}
+},
+
+/* ── L2 ── */
+2: {
+  '*': { q:'마음에 드는 게 생겼을 때, {who}',
+    hint:'갖고 싶은 마음이 생긴 그 순간의 첫 행동입니다.',
+    opts:[
+      { l:'가격부터 알아본다',              t:'CALC',  t2:'SPEED', p:'설렘보다 조건이 먼저 보이는 쪽입니다.', im:'price' },
+      { l:'일단 손에 넣는다',               t:'SPEED', t2:'FREE',  p:'없어질까 봐 먼저 잡는 쪽입니다.', im:'win' },
+      { l:'일주일 뒤에도 생각나면 산다',    t:'PUTOFF',t2:'CALC',  p:'마음이 식는지 스스로 확인합니다.', im:'near' },
+      { l:'누구에게 보여줄지 그려 본다',    t:'FACE',  t2:'LOYAL', p:'같이 나누는 기쁨이 더 큰 쪽입니다.', im:'clap' }
+    ]},
+  A: { q:'갖고 싶은 게 생각보다 비쌀 때, {who}',
+    hint:'지갑을 여는 순서에 그 사람의 우선순위가 있습니다.',
+    opts:[
+      { l:'일단 사고 나중에 맞춘다',        t:'SPEED', t2:'FREE',  p:'쓴 다음에 아끼는 쪽입니다.', im:'win' },
+      { l:'더 싼 곳을 찾아 나선다',         t:'CALC',  t2:'PERFECT',p:'같은 것을 싸게 사야 직성이 풀리는 쪽입니다.', im:'price' },
+      { l:'다음 달로 미뤄 둔다',            t:'PUTOFF',t2:'CALC',  p:'지금 꼭 사야 하는지 따집니다.', im:'cal' },
+      { l:'주변 반응을 먼저 확인한다',      t:'FACE',  t2:'EYE',   p:'쓰고 나서 평가가 신경 쓰이는 쪽입니다.', im:'meet' }
+    ]},
+  B: { q:'마음에 드는 걸 주변이 말릴 때, {who}',
+    hint:'반대가 들어왔을 때 어느 쪽을 먼저 보는지가 결입니다.',
+    opts:[
+      { l:'내 기준에 맞으면 산다',          t:'SPEED', t2:'CALC',  p:'남의 말보다 내 셈이 먼저인 쪽입니다.', im:'desk' },
+      { l:'말린 이유부터 듣는다',           t:'EYE',   t2:'PERFECT',p:'반대에도 이유가 있다고 봅니다.', im:'meet' },
+      { l:'결국 접는다',                    t:'PUTOFF',t2:'LOYAL', p:'사람과 부딪히느니 넘기는 쪽입니다.', im:'rest' },
+      { l:'미움받는 게 더 신경 쓰인다',     t:'FACE',  t2:'LOYAL', p:'관계가 어긋나는 자리가 제일 부담입니다.', im:'clap' }
+    ]}
+},
+
+/* ── L3 ── */
+3: {
+  '*': { q:'누가 부탁을 할 때, {who}',
+    hint:'부탁을 받은 순간의 첫 문장이 그 사람입니다.',
+    opts:[
+      { l:'내 일정부터 확인한다',           t:'CALC',  t2:'PERFECT',p:'가능한지부터 따져 답하는 쪽입니다.', im:'cal' },
+      { l:'일단 알겠다고 한다',             t:'LOYAL', t2:'FACE',  p:'거절이 어려운 쪽입니다.', im:'meal' },
+      { l:'왜 나에게 부탁했는지 본다',      t:'EYE',   t2:'CALC',  p:'부탁의 속을 한 번 봅니다.', im:'meet' },
+      { l:'된다 안 된다를 바로 말한다',     t:'SPEED', t2:'PERFECT',p:'돌려 말하지 않는 쪽입니다.', im:'fix' }
+    ]},
+  C: { q:'부탁이 내 일정과 겹칠 때, {who}',
+    hint:'내 시간과 남의 시간이 부딪힐 때 나오는 순서입니다.',
+    opts:[
+      { l:'내 일을 미루고 돕는다',          t:'LOYAL', t2:'PUTOFF', p:'내 시간이 줄어도 사람을 먼저 보는 쪽입니다.', im:'fam' },
+      { l:'못 한다고 분명히 말한다',        t:'SPEED', t2:'PERFECT',p:'관계보다 약속을 지키는 쪽입니다.', im:'cut' },
+      { l:'돕되 선을 정해 둔다',            t:'CALC',  t2:'FACE',  p:'손해를 만들지 않는 선에서 돕습니다.', im:'price' },
+      { l:'도와주는 척하고 마무리한다',     t:'PUTOFF',t2:'EYE',   p:'정면으로 부딪히지 않는 쪽입니다.', im:'rest' }
+    ]}
+},
+
+/* ── L4 ── */
+4: {
+  '*': { q:'정해야 할 일이 생겼을 때, {who}',
+    hint:'정하는 속도와 순서가 그대로 드러납니다.',
+    opts:[
+      { l:'결론부터 정하고 맞춘다',         t:'SPEED', t2:'PERFECT',p:'순서를 거꾸로 가는 쪽입니다.', im:'fix' },
+      { l:'기준표를 만들어 비교한다',       t:'CALC',  t2:'PERFECT',p:'느낌보다 숫자로 정리하는 쪽입니다.', im:'map' },
+      { l:'장단점을 다 적어 둔다',          t:'PERFECT',t2:'EYE',  p:'적어야 마음이 놓입니다.', im:'org' },
+      { l:'누구에게 물어볼지 정한다',       t:'LOYAL', t2:'FACE',  p:'혼자 정하는 게 부담인 쪽입니다.', im:'cal' }
+    ]},
+  B: { q:'두 가지가 비슷할 때, {who}',
+    hint:'비슷한 둘 앞에서 무엇을 버리는지 보면 됩니다.',
+    opts:[
+      { l:'먼저 말한 쪽으로 간다',          t:'SPEED', t2:'FACE',  p:'고민이 길어지면 손해라고 보는 쪽입니다.', im:'win' },
+      { l:'손해 볼 것부터 지운다',          t:'CALC',  t2:'PERFECT',p:'잃는 것에 예민하게 반응합니다.', im:'price' },
+      { l:'마음이 가는 쪽으로 간다',        t:'FREE',  t2:'LOYAL', p:'계산이 안 되면 몸이 먼저 움직이는 쪽입니다.', im:'mood' },
+      { l:'하루 재우고 다시 본다',          t:'PUTOFF',t2:'EYE',   p:'시간이 답을 준다고 믿는 쪽입니다.', im:'rest' }
+    ]}
+},
+
+/* ── L5 ── */
+5: {
+  '*': { q:'돈을 쓸 때, {who}',
+    hint:'어디에 먼저 나가는지가 그 사람의 순서입니다.',
+    opts:[
+      { l:'먼저 쓰고 나중에 기록한다',      t:'FREE',  t2:'SPEED', p:'통제보다 경험이 먼저인 쪽입니다.', im:'mood' },
+      { l:'쓸 곳을 미리 나눠 둔다',         t:'PERFECT',t2:'CALC', p:'계획이 없으면 불안한 쪽입니다.', im:'map' },
+      { l:'사람에게 쓰는 데 아깝지 않다',   t:'LOYAL', t2:'FACE',  p:'내 몫을 줄여 남에게 씁니다.', im:'fam' },
+      { l:'보이는 자리에 쓴다',             t:'FACE',  t2:'LOYAL', p:'티가 나는 곳에 돈이 가는 쪽입니다.', im:'clap' }
+    ]},
+  C: { q:'이번 달 돈이 빠듯할 때, {who}',
+    hint:'돈이 모자랄 때 무엇을 먼저 줄이는지가 결입니다.',
+    opts:[
+      { l:'내 씀씀이부터 줄인다',           t:'CALC',  t2:'PERFECT',p:'남에게 말하기 전에 내 몫을 깎는 쪽입니다.', im:'price' },
+      { l:'만나는 약속은 지킨다',           t:'LOYAL', t2:'FACE',  p:'돈이 없어도 관계는 안 줄이는 쪽입니다.', im:'meal' },
+      { l:'남는 일을 하나 더 벌인다',       t:'SPEED', t2:'CALC',  p:'줄이기보다 벌어서 메우는 길을 고릅니다.', im:'desk' },
+      { l:'다음 달로 넘긴다',               t:'PUTOFF',t2:'FREE',  p:'지금 안 정해도 된다고 보는 쪽입니다.', im:'rest' }
+    ]},
+  D: { q:'값비싼 걸 살까 말까 할 때, {who}',
+    hint:'큰 지출 앞에서 사람은 계산과 마음 사이에 섭니다.',
+    opts:[
+      { l:'지르고 오늘을 산다',             t:'FREE',  t2:'SPEED', p:'지금의 만족을 미루지 않는 쪽입니다.', im:'win' },
+      { l:'하루만 재고 다시 온다',          t:'PUTOFF',t2:'CALC',  p:'식지 않는지 확인하는 쪽입니다.', im:'near' },
+      { l:'꼭 필요한지 세 번 본다',         t:'PERFECT',t2:'EYE',  p:'안 사는 이유를 찾습니다.', im:'org' },
+      { l:'같이 볼 사람에게 먼저 보여준다',  t:'FACE',  t2:'LOYAL', p:'같이 정해야 좋은 쪽입니다.', im:'cal' }
+    ]}
+},
+
+/* ── L6 ── */
+6: {
+  '*': { q:'일이 틀어졌을 때, {who}',
+    hint:'사고가 난 뒤 첫 10분이 진짜 성격입니다.',
+    opts:[
+      { l:'일단 수습부터 나선다',           t:'SPEED', t2:'LOYAL', p:'원인은 나중에, 먼저 막는 쪽입니다.', im:'fix' },
+      { l:'누가 잘못했는지 정리한다',       t:'CALC',  t2:'PERFECT',p:'책임 소재가 먼저 보이는 쪽입니다.', im:'meet' },
+      { l:'혼자 조용히 되짚는다',           t:'EYE',   t2:'PUTOFF',p:'말보다 정리가 먼저인 쪽입니다.', im:'org' },
+      { l:'티 내지 않고 넘긴다',            t:'FACE',  t2:'PUTOFF',p:'드러내는 것 자체가 부담인 쪽입니다.', im:'cut' }
+    ]},
+  A: { q:'내 실수로 일이 틀어졌을 때, {who}',
+    hint:'내 잘못이 드러난 자리에서 나오는 반사 행동입니다.',
+    opts:[
+      { l:'먼저 인정하고 고친다',           t:'SPEED', t2:'LOYAL', p:'변명보다 순서가 빠른 쪽입니다.', im:'fix' },
+      { l:'끝까지 매만져 완성한다',         t:'PERFECT',t2:'EYE',  p:'어설프게 끝내는 걸 못 견디는 쪽입니다.', im:'org' },
+      { l:'어떻게 보일지 신경 쓰인다',      t:'FACE',  t2:'EYE',   p:'실수보다 평가가 무서운 쪽입니다.', im:'meet' },
+      { l:'잠깐 멈추고 숨을 고른다',        t:'PUTOFF',t2:'FREE',  p:'더 틀어질까 봐 멈추는 쪽입니다.', im:'rest' }
+    ]}
+},
+
+/* ── L7 ── */
+7: {
+  '*': { q:'기다리는 시간이 생겼을 때, {who}',
+    hint:'남는 시간을 어디에 쓰는지가 그 사람의 취향입니다.',
+    opts:[
+      { l:'할 일을 하나 더 한다',           t:'SPEED', t2:'PERFECT',p:'비는 시간이 아까운 쪽입니다.', im:'desk' },
+      { l:'누군가에게 연락한다',             t:'LOYAL', t2:'FACE',  p:'사람으로 시간을 채우는 쪽입니다.', im:'cal' },
+      { l:'멍하니 창밖을 본다',             t:'FREE',  t2:'PUTOFF',p:'비우는 것도 필요하다고 봅니다.', im:'train' },
+      { l:'주변을 살핀다',                  t:'EYE',   t2:'CALC',  p:'정보를 모으는 쪽입니다.', im:'meet' }
+    ]},
+  C: { q:'약속이 갑자기 미뤄졌을 때, {who}',
+    hint:'비어 버린 시간을 어떻게 채우는지 봅니다.',
+    opts:[
+      { l:'다른 약속을 바로 잡는다',        t:'SPEED', t2:'LOYAL', p:'비는 시간을 못 두는 쪽입니다.', im:'desk' },
+      { l:'그냥 집으로 간다',               t:'FREE',  t2:'PUTOFF',p:'혼자 있는 시간이 반가운 쪽입니다.', im:'rest' },
+      { l:'언제 다시 보자고 먼저 말한다',   t:'LOYAL', t2:'FACE',  p:'관계가 끊기는 걸 막는 쪽입니다.', im:'meal' },
+      { l:'속으로 서운함을 정리한다',       t:'EYE',   t2:'FACE',  p:'말없이 오래 남기는 쪽입니다.', im:'meet' }
+    ]}
+},
+
+/* ── L8 ── */
+8: {
+  '*': { q:'누가 나를 무시했다고 느낄 때, {who}',
+    hint:'자존심이 걸린 순간, 사람은 숨기지 못합니다.',
+    opts:[
+      { l:'그 자리에서 바로 말한다',        t:'SPEED', t2:'LOYAL', p:'참는 것보다 짚는 쪽입니다.', im:'cut' },
+      { l:'표정이 먼저 굳는다',             t:'FACE',  t2:'EYE',   p:'속이 얼굴에 먼저 오는 쪽입니다.', im:'meet' },
+      { l:'마음에서 지운다',                t:'FREE',  t2:'CALC',  p:'싸우느니 관계를 접는 쪽입니다.', im:'train' },
+      { l:'나중에 확실히 갚는다',           t:'CALC',  t2:'PERFECT',p:'기억해 두고 때를 보는 쪽입니다.', im:'price' }
+    ]},
+  B: { q:'내 공을 다른 사람이 가져갔을 때, {who}',
+    hint:'몫이 걸린 자리에서 어디까지 나가는지 봅니다.',
+    opts:[
+      { l:'바로 밝힌다',                    t:'SPEED', t2:'FACE',  p:'내 몫은 내가 지키는 쪽입니다.', im:'win' },
+      { l:'웃으면서 넘긴다',                t:'FACE',  t2:'LOYAL', p:'그 자리 분위기를 먼저 봅니다.', im:'clap' },
+      { l:'다음에 안 도와준다',             t:'CALC',  t2:'PERFECT',p:'손해를 기억하는 쪽입니다.', im:'price' },
+      { l:'조용히 거리를 둔다',             t:'FREE',  t2:'EYE',   p:'말없이 선을 긋는 쪽입니다.', im:'cut' }
+    ]}
+},
+
+/* ── L9 ── */
+9: {
+  '*': { q:'고를 게 여러 개일 때, {who}',
+    hint:'많은 것 앞에서 무엇을 먼저 버리는지 봅니다.',
+    opts:[
+      { l:'제일 좋은 하나만 고른다',        t:'SPEED', t2:'PERFECT',p:'빨리 정하고 미련을 안 두는 쪽입니다.', im:'win' },
+      { l:'다 비교해 순위를 매긴다',        t:'CALC',  t2:'PERFECT',p:'순위가 있어야 안심하는 쪽입니다.', im:'map' },
+      { l:'다 좋아서 못 고른다',            t:'LOYAL', t2:'FREE',  p:'하나를 버리는 게 아쉬운 쪽입니다.', im:'clap' },
+      { l:'고르다 지쳐 나중에 정한다',      t:'PUTOFF',t2:'FREE',  p:'미루면 답이 보인다고 믿는 쪽입니다.', im:'rest' }
+    ]},
+  D: { q:'아무도 안 정해 줄 때, {who}',
+    hint:'비어 있는 자리를 누가 채우는지가 결입니다.',
+    opts:[
+      { l:'내가 정하고 끌고 간다',          t:'SPEED', t2:'FACE',  p:'비어 있는 자리를 채우는 쪽입니다.', im:'desk' },
+      { l:'다 같이 정하자고 모은다',        t:'LOYAL', t2:'FACE',  p:'혼자 정하는 게 부담인 쪽입니다.', im:'cal' },
+      { l:'제일 편한 걸 고른다',            t:'PUTOFF',t2:'CALC',  p:'에너지를 아끼는 쪽입니다.', im:'near' },
+      { l:'하고 싶은 걸 한다',              t:'FREE',  t2:'SPEED', p:'남 보기보다 내 마음이 먼저인 쪽입니다.', im:'train' }
+    ]}
+},
+
+/* ── L10 ── */
+10: {
+  '*': { q:'한 해를 돌아볼 때, {who}',
+    hint:'무엇이 남았는지가 그 사람의 기준입니다.',
+    opts:[
+      { l:'해낸 것부터 센다',               t:'SPEED', t2:'CALC',  p:'성과로 확인해야 하는 쪽입니다.', im:'win' },
+      { l:'사람이 먼저 떠오른다',           t:'LOYAL', t2:'FACE',  p:'누구와 있었는지로 남는 쪽입니다.', im:'fam' },
+      { l:'못 한 것만 기억난다',            t:'PERFECT',t2:'EYE',  p:'아쉬운 것이 더 또렷한 쪽입니다.', im:'org' },
+      { l:'좋았던 장면만 남는다',           t:'FREE',  t2:'PUTOFF',p:'기분 좋은 것만 남기는 쪽입니다.', im:'mood' }
+    ]},
+  A: { q:'다음 해 계획을 세울 때, {who}',
+    hint:'앞을 그리는 방식에 그 사람의 기준이 있습니다.',
+    opts:[
+      { l:'숫자로 목표를 적는다',           t:'CALC',  t2:'PERFECT',p:'말로 하면 안 지켜진다고 보는 쪽입니다.', im:'map' },
+      { l:'하고 싶은 것부터 늘어놓는다',    t:'FREE',  t2:'SPEED', p:'설레는 자리부터 손댑니다.', im:'train' },
+      { l:'사람과의 시간부터 넣는다',       t:'LOYAL', t2:'PERFECT',p:'관계를 일정에 먼저 놓는 쪽입니다.', im:'cal' },
+      { l:'밀린 것부터 채운다',             t:'PUTOFF',t2:'PERFECT',p:'남은 숙제를 먼저 치우는 쪽입니다.', im:'fix' }
+    ]}
+}
+
+};
+
+  var POOL = { START:START, Q:Q, IMG:IMG };
+  if (root.NAVI) { root.NAVI.START = START; root.NAVI.Q = Q; root.NAVI.IMG = IMG; }
+  else root.NAVI = POOL;
+  if (typeof module !== 'undefined' && module.exports) module.exports = POOL;
+})(typeof window !== 'undefined' ? window : globalThis);
