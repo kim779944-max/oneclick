@@ -594,7 +594,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var v = res.view, c = res.ctx;
 
     var chips = $('#resChips'); chips.innerHTML = '';
-    chips.appendChild(el('span', 'tag o', '결 ' + res.cardNo + ' · ' + res.cardName));
+    chips.appendChild(el('span', 'tag o', res.cardName));
     chips.appendChild(el('span', 'tag', '제' + res.tno + '유형/' + (res.typeTotal || 64)));
     chips.appendChild(el('span', 'tag', res.flavorNm + ' 갈래'));
     if (res.mode === 'self' && c.age != null) chips.appendChild(el('span', 'tag', '만 ' + c.age + '세'));
@@ -608,7 +608,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     body.appendChild(img);
 
     var deck = el('div', 'deck');
-    deck.appendChild(el('b', null, '결 ' + res.cardNo + ' ' + res.cardName));
+    deck.appendChild(el('b', null, res.cardName));
     deck.appendChild(el('span', null, res.cardSub));
     body.appendChild(deck);
 
@@ -773,7 +773,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     x.fillStyle = '#93A4BC'; x.font = '700 24px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
     x.fillText('그림 16 · 10문항 · ' + r.ctx.dateKo, 72, 152);
     x.fillStyle = '#F3F6FA'; x.font = '900 66px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-    x.fillText('결 ' + r.cardNo + ' ' + r.cardName, 72, 264);
+    x.fillText(r.cardName, 72, 264);
     x.fillStyle = '#FFA24D'; x.font = '800 28px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
     x.fillText('제 ' + r.tno + ' / 64 유형 · ' + r.flavorNm + ' 갈래 · ' + r.pol + ' ' + r.lvl + '단계', 72, 312);
     x.strokeStyle = 'rgba(255,107,0,.5)'; x.lineWidth = 3;
@@ -833,7 +833,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   function shareText(){
     var r = ST.res, v = r.view;
     return '독심술 · ' + r.modeNm + '\n'
-      + '결 ' + r.cardNo + ' · ' + r.cardName + ' (제' + r.tno + '유형)\n'
+      + r.cardName + ' (제' + r.tno + ' / 64 유형)\n'
       + '① ' + v.teaser + '\n'
       + '② ' + v.read + '\n'
       + '→ ' + shareUrl() + '\n'
