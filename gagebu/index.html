@@ -109,6 +109,7 @@ details .in{padding-top:8px}
   .dt td::before{content:attr(data-h);color:var(--gray);font-weight:600;text-align:left;flex:0 0 auto}
   .dt td:first-child::before{content:none}
 }
+#oneBox #assume{font-size:10.5px;margin:4px 0 0;line-height:1.5}
 .concl{margin:8px 0 0;font-size:14px;font-weight:900;color:#CFF5E1;background:#0f2a20;border:1px solid #2d6b45;border-radius:10px;padding:9px 11px;word-break:keep-all}
 .sents{margin:8px 0 0;padding:0;list-style:none}
 .sents li{font-size:13px;line-height:1.6;padding:7px 0;border-top:1px solid var(--line);word-break:keep-all;color:var(--ink2)}
@@ -140,6 +141,8 @@ details .in{padding-top:8px}
   <section class="one" id="oneBox" aria-live="polite">
     <div class="hd1"><b id="oneHead">오늘 <em>0품목</em> · 0원</b><small id="oneDate"></small></div>
     <p class="cmpline" id="oneLine">오늘 산 것을 아래에 넣으면 여기에 한 줄로 정리됩니다.</p>
+    <div class="concl" id="concl">—</div>
+    <p class="hint" id="assume">한 달 환산 = 같은 품목을 이번 달 산 횟수만큼(처음 산 품목은 주 1회 = 월 4회로 가정) 똑같이 산다고 보고 계산합니다.</p>
     <button class="tg" id="btnDetail" type="button" aria-expanded="false">자세히 보기</button>
     <div id="detail" hidden>
       <table class="dt" id="dtTable">
@@ -147,8 +150,6 @@ details .in{padding-top:8px}
         <tbody></tbody>
       </table>
       <ul class="sents" id="sents"></ul>
-      <div class="concl" id="concl">—</div>
-      <p class="hint" id="assume">한 달 환산 = 같은 품목을 이번 달 산 횟수만큼(처음 산 품목은 주 1회 = 월 4회로 가정) 똑같이 산다고 보고 계산합니다.</p>
     </div>
   </section>
 
@@ -315,7 +316,7 @@ function render(){
   $('#dtTable tbody').innerHTML=tb;
   $('#sents').innerHTML=J.map(function(r){return '<li>'+esc(r.text)+'</li>';}).join('');
   var tot=J.reduce(function(a,r){return a+(r.month||0);},0);
-  $('#concl').textContent='한 달 똑같이 쓰고도 총 '+won(tot)+'을 줄일 수 있습니다';
+  $('#concl').textContent = tot>0 ? '한 달 똑같이 쓰고도 총 '+won(tot)+'을 줄일 수 있습니다' : (J.length ? '지금 넣은 품목에서는 더 줄일 돈이 없습니다' : '아직 비교할 품목이 없습니다');
   /* 장소 목록 (먼 곳 표시) */
   var places={}; Object.keys(DB.days).forEach(function(d){DB.days[d].forEach(function(x){places[x.place]=1;});}); DB.prices.forEach(function(x){places[x.place]=1;});
   var pk=Object.keys(places).filter(function(p){return p!=='(산 곳 미입력)';});
