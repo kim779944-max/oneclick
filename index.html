@@ -289,10 +289,11 @@ function byK(k){
   return {k:k, nm:k, sub:'', link:'', icon:'', ico:'·', badge:'', status:'soon', price:''};
 }
 function limLine(k){
-  var L = (window.KTS_KEYS && KTS_KEYS.limitOf) ? KTS_KEYS.limitOf(k) : 0;
-  if (!L) return '';
-  var u = UNIT[k] || '회';
-  return '<span class="lim">하루 ' + L + u + ' 무료 · 더 쓰기는 [그 이상 쓰기]</span>';
+  if (!window.KTS_KEYS || !KTS_KEYS.freeText) return '';
+  var t = KTS_KEYS.freeText(k);
+  if (!t) return '';
+  var L = KTS_KEYS.limitOf(k);
+  return '<span class="lim' + (L ? '' : ' zero') + '">' + t + (L ? ' · 더 쓰기는 [그 이상 쓰기]' : '') + '</span>';
 }
 var BADGE = {NEW:'new','무료':'free',PRO:'pro','준비':'soon'};
 

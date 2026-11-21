@@ -27,6 +27,7 @@
     if (!m || m[1] !== yymm()) return false;
     return fnv('kts-sign-' + m[1]).toString(16).toUpperCase().padStart(8, '0').slice(0, 4) === m[2];
   }
+  var LIMIT_UNIT = { photo2doc: '장', ad_magnet: '건' };
   function master() { return w.KTS_MASTER === true; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function lsGet(k) { try { return w.localStorage.getItem(k); } catch (e) { return null; } }
@@ -73,6 +74,8 @@
   }
   function sheet(html, bind) {
     css();
+    var old = d.querySelectorAll('.kk-dim');
+    for (var oi = 0; oi < old.length; oi++) { if (old[oi].parentNode) old[oi].parentNode.removeChild(old[oi]); }
     var dim = d.createElement('div'); dim.className = 'ksl-dim';
     dim.innerHTML = '<div class="ksl-box" role="dialog" aria-modal="true">' + html + '</div>';
     d.body.appendChild(dim);
@@ -280,7 +283,13 @@
   var ST = 'kts_keys_v1', SMS = '01020022899', FREE_SLOTS = 4;
 
   /* 도구별 하루 무료 횟수(0 = 제한 없음). 실제 사용 제한은 각 도구 안에서도 따릅니다. */
-  var LIMIT = { photo2doc: 3, theform: 5, contract: 3, sign: 4, thedetail: 2, thescan: 10, theeraser: 5, ad_magnet: 3, seller: 5, commerce: 5, keyword: 1 };
+  /* 도구별 '하루 몇 번까지 무료' — 실제 도구 화면에서 확인한 것만 적습니다(추측 금지).
+     photo2doc: 목록·변환기 화면 '3장 무료' · ad_magnet: 화면 '하루 3건' */
+  var LIMIT = { photo2doc: 3, ad_magnet: 3 };
+  /* 횟수가 아닌 무료 기준(양식 수·한 장 등) — 화면에 그대로 보이는 문구만 */
+  var FREE = { sign: '한 장 무료', theform: '기본 양식 5종 무료', contract: '서식 3종 무료',
+               viewer: '평생 무료', sale: '평생 무료', saycap: '무료', organizer: '무료',
+               tongyeok: '번역 무료', realty: '무료', exchange: '열람 무료' };
   /* products.js(catalog.json)에 없는 도구 — 쇼룸·박스에서 같이 씁니다 */
   var EXTRA = {
     thescan:   { nm: '더스캔',     ico: '▣', link: 'thescan/' },
@@ -334,6 +343,11 @@
     return out;
   }
   function limitOf(k) { return LIMIT[k] || 0; }
+  function freeText(k) {
+    var L = LIMIT[k];
+    if (L) return '하루 ' + L + (LIMIT_UNIT[k] || '회') + ' 무료';
+    return FREE[k] || '';
+  }
   function usedToday(k) {
     var r = load().daily[k];
     return (r && r.d === today()) ? (r.n || 0) : 0;
@@ -556,6 +570,8 @@
   /* ---------- 모달 ---------- */
   function sheet(html, bind) {
     css();
+    var old = d.querySelectorAll('.kk-dim');
+    for (var oi = 0; oi < old.length; oi++) { if (old[oi].parentNode) old[oi].parentNode.removeChild(old[oi]); }
     var dim = d.createElement('div'); dim.className = 'kk-dim';
     dim.innerHTML = '<div class="kk-box" role="dialog" aria-modal="true" aria-label="내 박스">' + html + '</div>';
     d.body.appendChild(dim);
@@ -622,9 +638,9 @@
     for (var i = 0; i < s.slots; i++) {
       var k = s.box[i];
       if (k) {
-        var t = info(k), L = limitOf(k), u = usedToday(k);
+        var t = info(k), L = limitOf(k), u = usedToday(k), ft = freeText(k);
         cells += '<div class="kk-cell full"><div class="t">' + (t.icon ? '<img src="' + esc(t.icon) + '" alt="">' : '<span class="e">' + esc(t.ico || '·') + '</span>') + '<b>' + esc(t.nm) + '</b></div>' +
-          '<div class="u">' + (L ? '오늘 <b>' + u + '/' + L + '회</b> 씀' : '하루 제한 없음') + '</div>' +
+          '<div class="u">' + (L ? '오늘 <b>' + u + '/' + L + '회</b> 씀' : (ft || '무료 횟수 안내 없음')) + '</div>' +
           '<div class="b"><a class="go" href="' + esc(t.link || '#') + '" data-a="use" data-k="' + esc(k) + '">쓰기</a><button class="sw" data-a="swap" data-i="' + i + '">교체</button></div></div>';
       } else {
         cells += '<button class="kk-add" data-a="pick" data-i="' + i + '"><b>+</b>' + (i + 1) + '칸 담기</button>';
@@ -804,7 +820,7 @@
   w.KTS_KEYS = {
     state: state, verified: function () { return !!load().verified; }, keys: function () { return load().keys || 0; },
     slots: function () { return load().slots; }, box: function () { return load().box.slice(); }, locked: function () { return load().locked.slice(); },
-    inBox: inBox, isLocked: isLocked, limitOf: limitOf, usedToday: usedToday, dayLeft: dayLeft,
+    inBox: inBox, isLocked: isLocked, limitOf: limitOf, freeText: freeText, usedToday: usedToday, dayLeft: dayLeft,
     request: request, put: put, unput: unput, revive: revive, openSlot: openSlot, addKeys: addKeys, useCode: useCode,
     verifyNow: commitVerify,
     openPanel: openPanel, picker: picker, strip: strip, badge: badge, toast: toast, onChange: onChange, changed: changed,
