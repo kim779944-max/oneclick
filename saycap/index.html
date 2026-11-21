@@ -2140,15 +2140,12 @@ async function paintViewer(){
   scale = 1; tx = 0; ty = 0; applyTransform();
   const c = p.caption || {};
   paintChip($('#viewChip'), c);
-  /* v2.8 : 왼쪽 위 주소는 1개만 — 날짜 칩의 장소가 아래 위치 주소와 같으면 날짜만 남긴다 */
+  /* 2026-11-22 : 전체화면 뷰어 상단 칩은 날짜만 — 장소·주소는 상세/지도 화면(#sheetMap)에서만 보인다 ('장소 미지정' 칩도 뜨지 않음) */
   (() => {
     const chip = $('#viewChip'); if(!chip) return;
-    const norm = v => String(v || '').replace(/\s+/g, '');
-    const pl = norm(c.place), ad = norm(p.addr);
-    const same = !!(pl && ad && (pl === ad || ad.endsWith(pl) || pl.endsWith(ad)));
     const pe = chip.querySelector('.p'), se = chip.querySelector('.sep');
-    if(pe) pe.style.display = same ? 'none' : '';
-    if(se) se.style.display = same ? 'none' : '';
+    if(pe) pe.style.display = 'none';
+    if(se) se.style.display = 'none';
   })();
   const vm = $('#viewMemo');
   const txt = c.memo || '';
@@ -2192,6 +2189,7 @@ $('#viewSave').onclick = () => openSheet('sheetSave');
 $('#viewNext').onclick = () => { if(viewIndex<viewerList.length-1){ viewIndex++; paintViewer(); } else toast('마지막 사진입니다', 1000); };
 function setViewUI(on){
   const t = $('#viewTop'); if(t){ t.style.opacity = on ? '1' : '0'; t.style.pointerEvents = on ? 'auto' : 'none'; }
+  const l = $('#viewLoc'); if(l){ l.style.opacity = on ? '1' : '0'; l.style.pointerEvents = on ? 'auto' : 'none'; }   /* 위치 배지도 UI가 보일 때만 */
   if(on) showViewDock(true); else hideViewDock();
 }
 /* 하단 글래스 독 — 열림 3초 뒤 자동 숨김(자막은 독이 열린 동안만 56px 위로) */
