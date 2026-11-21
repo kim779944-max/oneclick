@@ -214,7 +214,7 @@ main{padding:12px 14px 0}
   <div class="card">
     <h2><i>1</i>구역 찾기 <small id="totline">불러오는 중</small></h2>
     <div class="srch">
-      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="지번·구역명·자치구·동 (예: 개포동 138, 번동 411)">
+      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="지번·구역명·자치구·동 (예: 개포동 138, 미아동 476)">
       <button class="clr" id="clr">지움</button>
     </div>
     <div class="tabs" id="tabs">
@@ -394,9 +394,13 @@ function render(){
   $('muNote').style.display=(TAB==='moa')?'block':'none';
   var box=$('list');
   if(!arr.length){
+    /* 다른 탭(모아타운)에 있는 지번이면 한 줄 안내 — 실제로 그 탭에서 찾은 개수만 말한다 */
+    var moaHint='';
+    if(TAB!=='moa'&&Q.trim()){ var t0=TAB,f0=FILT; TAB='moa'; FILT='all'; var nMoa=filtered().length; TAB=t0; FILT=f0;
+      if(nMoa) moaHint='<br>이 검색어는 <b>모아타운</b> 탭에 '+nMoa.toLocaleString('ko-KR')+'곳 있습니다.'; }
     box.innerHTML='<div class="empty"><b>찾는 구역이 없습니다</b>'+(TAB==='moa'
       ? '동 이름·지번(예: 번동 411)이나 구 이름으로 넣어 보세요. 관리계획 승인·고시분만 실려 있습니다.'
-      : '지번은 「동 이름 + 번지」(예: 개포동 138)로 넣어 보세요.<br>전국 자료는 시·군·구까지만 있어 지번 검색이 안 됩니다.')+'</div>';
+      : '지번은 「동 이름 + 번지」(예: 개포동 138)로 넣어 보세요.<br>전국 자료는 시·군·구까지만 있어 지번 검색이 안 됩니다.'+moaHint)+'</div>';
     $('more').style.display='none'; return;
   }
   var part=arr.slice(0,SHOWN);
