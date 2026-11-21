@@ -293,7 +293,7 @@
   var EXTRA = {
     thescan:   { nm: '더스캔',     ico: '▣', link: 'thescan/' },
     theeraser: { nm: '더지우개',   ico: '⌫', link: 'theeraser/' },
-    ad_magnet: { nm: '광고유입기', ico: '✦', link: 'ad_magnet/' },
+    ad_magnet: { nm: '답글생성기(광고용)', ico: '✦', link: 'ad_magnet/' },
     seller:    { nm: '원클릭 셀러', ico: '▦', link: 'seller/' },
     ops:       { nm: '군단 상황판', ico: '□', link: 'ops/' }
   };

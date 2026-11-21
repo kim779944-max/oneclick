@@ -260,7 +260,7 @@ window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
 var LOCAL = {
   thescan:{nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', ico:'▣', badge:'NEW'},
   theeraser:{nm:'더지우개', sub:'사진 글씨·얼룩 지우기', link:'theeraser/', ico:'⌫', badge:'NEW'},
-  ad_magnet:{nm:'광고유입기', sub:'광고·댓글 문구 1분', link:'ad_magnet/', ico:'✦', badge:'NEW'},
+  ad_magnet:{nm:'답글생성기(광고용)', sub:'광고·댓글 답글 1분', link:'ad_magnet/', ico:'✦', badge:'NEW'},
   seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'},
   bungee_interior:{nm:'인테리어 평당 견적', sub:'평수·등급 → 3안 비교', link:'bungee/#interior', ico:'▤', badge:'NEW'},
   bungee_home:{nm:'단독 모바일 홈피', sub:'가게 정보 → 1장 홈피', link:'bungee/#home', ico:'▢', badge:'NEW'},
@@ -407,7 +407,7 @@ function masterGrid(){
   $('#mstN').textContent = String(LIVE.length);
   $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
   $('#mstGrid').innerHTML = LIVE.map(function(p){ return '<a href="' + p.link + '">' + String(p.nm).split(' — ')[0] + '</a>'; }).join('') +
-    '<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a><a href="bungee/">번개알바 도구</a><a href="ops/">군단 상황판</a>';
+    '<a href="ad_magnet/">답글생성기</a><a href="seller/">원클릭 셀러</a><a href="bungee/">번개알바 도구</a><a href="ops/">군단 상황판</a>';
 }
 (function(){
   var mst=$('#mst'), key=$('#mKey'), sheet=$('#msheet'), scrim=$('#mscrim'), pin=$('#mPin'), err=$('#mErr');
