@@ -345,7 +345,7 @@ details.adv .keyrow{margin-top:7px}
     <div class="pxstat" id="pxStat"></div>
     <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
     <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
-    <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 도면처럼 얇게 그려 색판이 번지지 않습니다.</p>
+    <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 화살촉이 크고 선이 굵어 폰에서도 방향이 한눈에 보입니다.</p>
     <button class="btn chk" type="button" id="chkGo"><b>확인하기</b><small>이 자리 그대로 결과 전체뷰를 엽니다</small></button>
   </section>
 
@@ -1000,7 +1000,7 @@ function drawMarker(g,x0,y0,w,h,o){
    색은 SLOPE10 10단계만(숫자 라벨 없음 — 값은 픽셀 보기에서 칸을 눌러 본다).
    필지 경계를 알면 그 안쪽만, 모르면 중심 정사각(±분석 반경) 안쪽만 그린다. 바탕 색칠 없음. */
 function arrowColor(s){ var b=bandOf(s); return SLOPE10[b<0?0:b].hex }
-var AR_DRAW=[], AR_LAST={n:0,gap:0};
+var AR_DRAW=[], AR_LAST={n:0,gap:0}, AR_SAMP=[];  /* AR_SAMP: 검수용 — 마지막으로 그린 화살표 중 구간별 최대 8개(클립 안쪽) */
 function drawSlopeArrows(g,x0,y0,w,h){
   if(!T||!T.elev) return;
   var ta=performance.now();
@@ -1033,7 +1033,7 @@ function drawSlopeArrows(g,x0,y0,w,h){
   g.save();
   if(clip) g.clip(clip,'evenodd');
   else { g.beginPath(); g.rect(cx-rad,cy-rad,rad*2,rad*2); g.clip() }
-  var eps=T.cellW*1.35, P=[], cas=new Path2D(), cnt=0;
+  var eps=T.cellW*1.35, P=[], cnt=0, samp=[], sCnt=[0,0,0,0,0,0,0,0,0,0], sTr=(g===ctx)?g.getTransform().a:0;
   for(var b=0;b<10;b++) P.push(new Path2D());
   for(var iv=iv0; iv<=iv1; iv++){
     var v=(iv+0.5)*stepU, y=v*W-y0;
@@ -1045,22 +1045,41 @@ function drawSlopeArrows(g,x0,y0,w,h){
       var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU; /* 내려가는 쪽(화면 px) */
       var L=Math.hypot(ax,ay);
       if(L<1e-9){ ax=0; ay=1; } else { ax/=L; ay/=L }
-      var len=clamp(3.2+s*0.14,3.2,8);
-      var xa=x-ax*len*0.5, ya=y-ay*len*0.5, xb=x+ax*len*0.5, yb=y+ay*len*0.5;
-      var hl=Math.min(2.2,len*0.5), hx=xb-ax*hl, hy=yb-ay*hl;
+      /* 길이·채운 삼각형 화살촉(값 고정): 전체 9~13px · 삼각형 길이 len/2 · 밑변 7.2px · 줄기 1.8px */
+      var len=clamp(9+s*0.12,9,13), hl=len*0.5, hw=3.6, tw=0.9;
+      var px2=-ay, py2=ax;                         /* 진행방향의 수직 단위벡터 */
+      var tX=x+ax*len*0.5, tY=y+ay*len*0.5;        /* 삼각형 꼭짓점(촉) = 내리막 쪽 */
+      var bX2=x-ax*len*0.5, bY2=y-ay*len*0.5;      /* 줄기 끝 = 오르막 쪽 */
+      var nX=tX-ax*hl, nY=tY-ay*hl;                /* 삼각형 밑변 중심(줄기와 만나는 곳) */
       var bi=bandOf(s), Q=P[bi<0?0:bi];
-      Q.moveTo(xa,ya); Q.lineTo(xb,yb); Q.moveTo(hx-ay*1.5,hy+ax*1.5); Q.lineTo(xb,yb); Q.lineTo(hx+ay*1.5,hy-ax*1.5);
-      if(bi<=1){ cas.moveTo(xa,ya); cas.lineTo(xb,yb); cas.moveTo(hx-ay*1.5,hy+ax*1.5); cas.lineTo(xb,yb); cas.lineTo(hx+ay*1.5,hy-ax*1.5) }
+      /* 곧은 줄기(1.8px) + 닫힌 채운 삼각형(밑변 7.2px) — 삼각형이 면적의 2/3 */
+      Q.moveTo(bX2+px2*tw, bY2+py2*tw);             /* 줄기 끝 왼쪽 */
+      Q.lineTo(nX +px2*tw, nY +py2*tw);             /* 줄기가 밑변에 닿는 왼쪽 */
+      Q.lineTo(nX +px2*hw, nY +py2*hw);             /* 삼각형 밑변 왼쪽 끝 */
+      Q.lineTo(tX, tY);                             /* 꼭짓점(촉) — 내리막 */
+      Q.lineTo(nX -px2*hw, nY -py2*hw);             /* 삼각형 밑변 오른쪽 끝 */
+      Q.lineTo(nX -px2*tw, nY -py2*tw);             /* 줄기가 밑변에 닿는 오른쪽 */
+      Q.lineTo(bX2-px2*tw, bY2-py2*tw);             /* 줄기 끝 오른쪽 */
+      Q.closePath();                                /* 닫힌 도형 → fill 로 꽉 찬다 */
+      if(sTr&&sCnt[bi<0?0:bi]<8){ var bk=bi<0?0:bi, ins=function(X,Y){ return X>=bx&&X<=bX&&Y>=by&&Y<=bY&&(clip?g.isPointInPath(clip,X*sTr,Y*sTr,'evenodd'):true) };
+        if(ins(tX+ax*2.5,tY+ay*2.5)&&ins(bX2-ax*2.5,bY2-ay*2.5)&&ins(nX+px2*5.7,nY+py2*5.7)&&ins(nX-px2*5.7,nY-py2*5.7)){ sCnt[bk]++;
+          samp.push({b:bk,s:+s.toFixed(2),x:+x.toFixed(2),y:+y.toFixed(2),ax:+ax.toFixed(4),ay:+ay.toFixed(4),len:+len.toFixed(2),hl:+hl.toFixed(2)}) } }
       cnt++;
     }
   }
   g.lineCap='round'; g.lineJoin='round'; g.globalAlpha=1;
-  /* 흰·연노랑(0~10°)만 위성 위 가시성용 0.7px 케이싱 — 본색은 그대로 */
-  g.strokeStyle='#1A2433'; g.lineWidth=0.85+1.4; g.stroke(cas);
-  g.lineWidth=0.85;
-  for(var b2=0;b2<10;b2++){ g.strokeStyle=SLOPE10[b2].hex; g.stroke(P[b2]) }
+  /* 1) 바깥 밝은 테 — 10색 전부 */
+  g.strokeStyle='rgba(255,255,255,.88)'; g.lineWidth=4.2;
+  for(var bb=0;bb<10;bb++) g.stroke(P[bb]);
+  /* 2) 안쪽 어두운 테 — 10색 전부 */
+  g.strokeStyle='#101A2B'; g.lineWidth=2.8;
+  for(var bb2=0;bb2<10;bb2++) g.stroke(P[bb2]);
+  /* 3) 본색 — 불투명 면. 테 안쪽 절반을 덮는다 */
+  for(var bb3=0;bb3<10;bb3++){ g.fillStyle=SLOPE10[bb3].hex; g.fill(P[bb3]) }
   g.restore();
-  if(g===ctx){ AR_LAST={n:cnt,gap:+gap.toFixed(2),k:k,m:m,blockPx:+blockPx.toFixed(2)}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
+  if(g===ctx){ AR_SAMP=samp; AR_LAST={n:cnt,gap:+gap.toFixed(2),k:k,m:m,blockPx:+blockPx.toFixed(2),
+           lenPx:[9,13],headLen:[4.5,6.5],headW:7.2,tailW:1.8,
+           casing:[4.2,2.8]}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
 }
 
 /* ---------------- 지도 조작 ---------------- */
@@ -2355,7 +2374,9 @@ window.__KTS_ARCH=function(){
     pnu:(PC&&PC.pnu)||'',areaM2:(PC&&PC.area)||0};
 };
 /* 검수용 읽기 전용 — 화살표가 정말 내려가는 쪽을 가리키는지(앞 6px 표고가 더 낮은지) */
-window.__KTS_ARROWS=function(){
+/* 인자 없음 → 필지 안쪽 12점 · [[fx,fy],…] → 그 화면 비율 지점 · 'drawn' → 마지막으로 그린 화살표 표본(AR_SAMP) */
+window.__KTS_ARROWS=function(arg){
+  if(arg==='drawn') return AR_SAMP.slice();
   if(!T||!T.elev) return null;
   var W=worldSize(S.zoom), x0=lng2w(S.lon)*W-VW()/2, y0=lat2w(S.lat)*W-VH()/2;
   var eps=T.cellW*1.35, mPerU=CIRC*Math.cos(S.lat*Math.PI/180), mPerV=CIRC;
@@ -2365,10 +2386,29 @@ window.__KTS_ARROWS=function(){
     if(e0==null||e1==null||e3==null||e4==null) return null;
     var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU, L=Math.hypot(ax,ay)||1; ax/=L; ay/=L;
     var ah=elevAt(u+(ax*6)/W,v+(ay*6)/W), bh=elevAt(u-(ax*6)/W,v-(ay*6)/W);
-    return {slope:sampleGrid(T.slope,u,v),dir:[+ax.toFixed(3),+ay.toFixed(3)],ahead:ah,behind:bh,
-      drop:(ah!=null&&bh!=null)?+(bh-ah).toFixed(2):null};
+    var drop=(ah!=null&&bh!=null)?+(bh-ah).toFixed(2):null;
+    return {slope:sampleGrid(T.slope,u,v),dir:[+ax.toFixed(3),+ay.toFixed(3)],elevCenter:elevAt(u,v),ahead:ah,behind:bh,
+      drop:drop,tipIsDownhill:(drop!=null&&drop>0),at:[+fx.toFixed(3),+fy.toFixed(3)]};
   }
-  return [probe(0.5,0.5),probe(0.32,0.34),probe(0.7,0.62),probe(0.24,0.72)];
+  /* 필지(없으면 화면 중앙 40%) 경계 상자 안쪽 4×3 격자 12점 */
+  var bx=0.3, bX=0.7, by=0.3, bY=0.7, pts=[];
+  if(arg&&arg.length){ arg.forEach(function(f){ pts.push(probe(f[0],f[1])) }); return pts }
+  if(PC&&PC.rings&&PC.rings[0]&&PC.rings[0].length>=3){
+    var a=1e9, b=1e9, c=-1e9, d=-1e9;
+    PC.rings[0].forEach(function(pt){ if(!pt) return; var X=(lng2w(pt[0])*W-x0)/VW(), Y=(lat2w(pt[1])*W-y0)/VH(); if(X<a)a=X; if(X>c)c=X; if(Y<b)b=Y; if(Y>d)d=Y });
+    bx=Math.max(a,0.02); bX=Math.min(c,0.98); by=Math.max(b,0.02); bY=Math.min(d,0.98);
+  }
+  for(var jj=0;jj<3;jj++) for(var ii=0;ii<4;ii++){ var q=probe(bx+(bX-bx)*(ii+0.5)/4, by+(bY-by)*(jj+0.5)/3); if(q) pts.push(q) }
+  return pts;
+};
+window.__KTS_ARROWDIR=function(){
+  var pts=window.__KTS_ARROWS(); if(!pts) return null;
+  pts=pts.filter(function(p){ return p.drop!=null });
+  return {points:pts, ok:pts.filter(function(p){ return p.slope>=5?p.drop>0:true }).length,
+    total:pts.length, downhill:pts.filter(function(p){ return p.drop>0 }).length,
+    minDrop:Math.min.apply(null,pts.map(function(p){ return p.drop })),
+    worst:pts.slice().sort(function(a,b){ return a.drop-b.drop })[0],
+    allDownhill:pts.every(function(p){ return p.slope<5||p.drop>0 })};
 };
 
 /* ---------------- 픽셀 보기 (2026-11-21 · 2026-11-22 개편) ----------------
