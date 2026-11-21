@@ -66,7 +66,8 @@ main{margin-top:16px}
 .secH .no{flex:0 0 auto;font-size:10px;font-weight:900;color:var(--amber2);letter-spacing:.08em}
 .secH h2{margin:0;font-size:14.5px;font-weight:900;letter-spacing:-.4px}
 .secH p{margin:0;font-size:10px;color:#7F8FA8;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rows{display:grid;gap:7px}
+.rows{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+.row{min-width:0}
 .row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;padding:9px 10px;
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));position:relative}
 .row.soon{opacity:.62}
