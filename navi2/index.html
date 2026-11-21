@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>독심술 v2 — 그림 16장으로 읽는 속마음</title>
+<title>독심술 v2 — 그림 16장으로 읽는 지금 마음과 앞일</title>
 <meta name="theme-color" content="#0A1224">
-<meta name="description" content="문항 없이 시작합니다. 관심 가는 그림을 여러 장 고르면 10문항 스무고개가 그쪽으로 파고들어, 고른 말을 다른 표현으로 풀어 주고 네 방향으로 앞일을 짚어 줍니다. 오락·참고용이며 심리검사·진단이 아닙니다.">
+<meta name="description" content="문항 없이 시작합니다. 당신이 고른 그림으로 지금 마음을 읽고, 앞으로 일어날 일과 오늘 조심할 것을 짚어 줍니다. 오락·참고용이며 심리검사·진단이 아닙니다.">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:title" content="독심술 v2 — 그림부터 고르면, 그 사람이 보입니다">
-<meta property="og:description" content="그림 16장 중 관심 가는 것을 고르고 10문항만 답하면, 고른 말을 다른 표현으로 풀어 주고 앞일을 네 방향으로 짚어 줍니다. 무료.">
+<meta property="og:description" content="당신이 고른 그림으로 지금 마음을 읽고, 앞으로 일어날 일과 오늘 조심할 것을 짚어 줍니다. 그림 16장 · 10문항 · 무료.">
 <meta property="og:image" content="https://autooneclick.com/navi2/img/cover.webp">
 <meta property="og:url" content="https://autooneclick.com/navi2/">
 <style>
@@ -104,7 +104,8 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   padding:0;overflow:hidden;cursor:pointer;position:relative;color:var(--ink);transition:border-color .15s,background .15s;
   display:flex;flex-direction:column;align-items:stretch}
 .opt .art{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#16264A;opacity:.92}
-.opt .tx{display:block;padding:8px 10px 10px;min-height:52px}
+.opt .tx{display:block;padding:34px 12px 14px;min-height:96px}
+.opt b{font-size:14px!important}
 .opt b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.3px;color:#fff;line-height:1.45;word-break:keep-all}
 .opt .no{position:absolute;left:7px;top:7px;width:19px;height:19px;border-radius:6px;background:rgba(10,18,36,.85);
   border:1px solid rgba(255,255,255,.22);color:#E7EDF6;font-size:10.5px;font-weight:900;display:grid;place-items:center}
@@ -358,13 +359,13 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 
 <div class="toast" id="toast"></div>
 
-<script src="js/lint.js?v=6"></script>
+<script src="js/lint.js?v=7"></script>
 <script src="js/data.cards.js?v=6"></script>
 <script src="js/data.modes.js?v=7"></script>
-<script src="js/data.subs.js?v=6"></script>
-<script src="js/data.pool.js?v=1"></script>
-<script src="js/data.fate.js?v=1"></script>
-<script src="js/engine.js?v=6"></script>
+<script src="js/data.subs.js?v=7"></script>
+<script src="js/data.pool.js?v=2"></script>
+<script src="js/data.fate.js?v=2"></script>
+<script src="js/engine.js?v=7"></script>
 <script>
 (function(){
   var $ = function(s){ return document.querySelector(s); };
@@ -403,7 +404,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var g = $('#gal16');
     NAVI.START.forEach(function(p, i){
       var b = el('button', 'pic'); b.type = 'button'; b.dataset.id = p.id;
-      b.title = p.cap + ' — ' + p.sub;
+      b.title = p.cap;
       var im = document.createElement('img');
       im.src = p.img; im.alt = p.cap; im.loading = 'lazy'; im.decoding = 'async';
       var cap = el('span', 'cap', p.cap);
@@ -507,10 +508,8 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     $('#qhint').textContent = set.hint || '';
     var g = $('#ogrid'); g.innerHTML = '';
     set.opts.forEach(function(o, i){
+      /* 보기는 글자 전용 — 시작 그림 16장을 문항에서 다시 쓰지 않는다 */
       var b = el('button', 'opt'); b.type = 'button'; b.dataset.idx = String(i);
-      var im = document.createElement('img');
-      im.className = 'art'; im.src = NAVI.IMG[o.im] || CARDS.SPEED.img; im.alt = ''; im.loading = 'eager'; im.decoding = 'async';
-      b.appendChild(im);
       b.appendChild(el('span', 'no', String(i + 1)));
       var tx = el('span', 'tx'); tx.appendChild(el('b', null, o.l)); b.appendChild(tx);
       b.addEventListener('click', function(){ tapOpt(o, i, b); });
@@ -526,7 +525,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var prev = ST.picks[ST.lv - 1];
     var repick = !!(prev && prev.idx !== idx);
     ST.picks[ST.lv - 1] = {
-      lv:ST.lv, idx:idx, l:o.l, t:o.t, t2:o.t2, p:o.p, im:o.im,
+      lv:ST.lv, idx:idx, l:o.l, t:o.t, t2:o.t2, p:o.p,
       setKey: 'L' + ST.lv
     };
     ST.hesit[ST.lv - 1] = {
@@ -640,96 +639,71 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     spec.appendChild(el('span', 'pol' + (res.pol === '약' ? ' weak' : ''), res.pol === '강' ? '강한 결' : '약한 결'));
     body.appendChild(spec);
 
-    /* ① 지금 마음의 방향 */
-    if (v.interest){
-      var s1 = el('div', 'sec intr');
-      s1.appendChild(el('div', 'cap', '① 그림이 말해 준 것 — ' + v.interest.nm));
-      s1.appendChild(el('div', 'line', v.interest.line));
-      s1.appendChild(el('div', 'why', v.interest.why));
-      s1.appendChild(el('div', 'why', v.interest.note));
-      var pr = el('div', 'picrow');
-      v.interest.pics.forEach(function(p){ var i = document.createElement('img'); i.src = p.img; i.alt = p.cap; pr.appendChild(i); });
-      s1.appendChild(pr);
-      body.appendChild(s1);
+    /* ── v2 결과지 4구획 (2026-11-21) ──
+       ① 선언 → ② 속마음 해석 → ③ 예언(소름) → ④ 풀어가는 과정 & 오늘 조심할 것
+       고른 그림 썸네일·고른 보기 문구는 결과지에 다시 쓰지 않는다(비밀). */
+    var F = NAVI.FATE, CP = F.COPY, isSelf = res.mode === 'self';
+    function who3(s){
+      s = String(s || '');
+      return isSelf ? s.replace(/이 사람/g, '당신') : s.replace(/당신/g, '그 사람');
     }
 
-    /* ② 비밀 발췌 — 본인이 고른 말 → 다른 말 풀이 */
-    var s2 = el('div', 'sec');
-    s2.appendChild(el('div', 'cap', '② 비밀 발췌 — 당신이 흘린 말 셋'));
-    s2.appendChild(el('div', 'lead', v.secretCap));
-    var box = el('div', 'ex1');
-    v.excerpt.forEach(function(x){
-      var it = el('div', 'it');
-      it.appendChild(el('div', 'ql', '「' + x.l + '」'));
-      it.appendChild(el('div', 'pl', x.p));
-      box.appendChild(it);
-    });
-    s2.appendChild(box);
-    var br = el('div', 'bridge');
-    br.appendChild(document.createTextNode(v.bridge + ' '));
-    var bnm = document.createElement('b'); bnm.textContent = res.cardName;
-    br.appendChild(bnm);
-    s2.appendChild(br);
+    /* ① 선언 */
+    var s1 = el('div', 'sec'); s1.dataset.part = '1';
+    s1.appendChild(el('div', 'cap', CP.cap1));
+    var d1 = el('div', 'line'); d1.style.cssText = 'font-size:18px;font-weight:900;line-height:1.55;letter-spacing:-.5px;word-break:keep-all;color:#fff';
+    d1.textContent = v.declare;
+    s1.appendChild(d1);
+    body.appendChild(s1);
+
+    /* ② 속마음 해석 */
+    var s2 = el('div', 'sec'); s2.dataset.part = '2';
+    s2.appendChild(el('div', 'cap', CP.cap2));
+    var p2 = el('p', 'exx'); p2.style.cssText = 'margin:0;font-size:15.5px;font-weight:800;line-height:1.75;color:#F2F6FB;word-break:keep-all;letter-spacing:-.3px';
+    var mind = v.interest ? (v.interest.line + ' ') : '';
+    p2.textContent = mind + who3(v.inner) + ' ' + who3(v.read);
+    s2.appendChild(p2);
+    if (v.ex){
+      var ex = el('p', 'exx'); ex.style.cssText = 'margin:10px 0 0;font-size:13px;color:var(--ink2);line-height:1.7;word-break:keep-all';
+      ex.textContent = who3(v.ex);
+      s2.appendChild(ex);
+    }
     body.appendChild(s2);
 
-    /* ③ 핵심 한 문장 + 생활 예시 */
-    var s3 = el('div', 'sec');
-    s3.appendChild(el('div', 'cap', '③ 내가 본 핵심'));
-    var rd = el('div', 'line'); rd.style.cssText = 'font-size:17px;font-weight:900;line-height:1.55;letter-spacing:-.4px;word-break:keep-all';
-    rd.textContent = v.read;
-    s3.appendChild(rd);
+    /* ③ 예언 — 소름 */
+    var s3 = el('div', 'sec'); s3.dataset.part = '3';
+    s3.appendChild(el('div', 'cap', CP.cap3));
+    s3.appendChild(el('div', 'lead', CP.lead3));
+    var r3 = el('div', 'rows');
+    r3.appendChild(blockRow('k', '소', '이미 일어났을 일', who3(v.past)));
+    r3.appendChild(blockRow('p', '좋', '앞으로 일어날 좋은 쪽', who3(v.soon)));
+    r3.appendChild(blockRow('w', '조', '앞으로 일어날 조심할 쪽', who3(v.risk)));
+    s3.appendChild(r3);
     body.appendChild(s3);
 
-    if (v.ex){
-      var ex = el('div', 'card ex');
-      ex.appendChild(el('div', 'ctit', '이럴 때 이렇습니다 — 생활 속 예시'));
-      ex.appendChild(el('p', 'exx', v.ex));
-      body.appendChild(ex);
-    }
-
-    /* ④ 강점 / 대하는 법 */
-    var s4 = el('div', 'sec');
-    var rows4 = el('div', 'rows');
-    if (res.mode === 'self'){
-      s4.appendChild(el('div', 'cap', '④ 이 사람의 힘'));
-      s4.appendChild(el('div', 'lead', v.strengthCap));
-      rows4.appendChild(blockRow('s', '강', '강점', v.strength));
-      rows4.appendChild(blockRow('w', '면', '그 힘의 이면', v.softness));
+    /* ④ 풀어가는 과정 & 오늘 조심할 것 */
+    var s4 = el('div', 'sec'); s4.dataset.part = '4';
+    s4.appendChild(el('div', 'cap', CP.cap4));
+    s4.appendChild(el('div', 'lead', CP.lead4));
+    var r4 = el('div', 'rows');
+    if (isSelf){
+      r4.appendChild(blockRow('s', '행', '오늘 할 행동 하나', v.rx));
+      r4.appendChild(blockRow('w', '조', '오늘 조심할 것', v.hedge));
     } else {
-      s4.appendChild(el('div', 'cap', '④ 이렇게 대하세요'));
-      s4.appendChild(el('div', 'lead', '강점을 먼저 살리고, 건드리면 안 되는 자리는 비켜 가면 됩니다.'));
-      rows4.appendChild(blockRow('s', '강', '강점 살리기', v.keep));
-      rows4.appendChild(blockRow('w', '피', '건드리지 말 것', v.avoid));
+      r4.appendChild(blockRow('s', '강', '이렇게 대하면 풀립니다', v.keep));
+      r4.appendChild(blockRow('w', '피', '오늘 건드리지 말 것', v.avoid));
+      r4.appendChild(blockRow('p', '말', '실제로 꺼낼 한마디', v.script));
     }
-    s4.appendChild(rows4);
+    s4.appendChild(r4);
+    var pv = el('div', 'bridge'); pv.textContent = who3(v.prevent);
+    s4.appendChild(pv);
     body.appendChild(s4);
 
-    /* ⑤ 4방향 예보 — 소름 · 예언 · 경고 · 예방 */
-    if (res.mode === 'self'){
-      var s5 = el('div', 'sec');
-      s5.appendChild(el('div', 'cap', '⑤ 앞일 네 방향 — 소름 · 예언 · 경고 · 예방'));
-      s5.appendChild(el('div', 'lead', v.fourCap));
-      var r5 = el('div', 'rows');
-      r5.appendChild(blockRow('k', '소', '이미 겪으셨을 것 — 소름', v.past));
-      r5.appendChild(blockRow('p', '예', '곧 겪으실 것 — 예언', v.soon));
-      r5.appendChild(blockRow('w', '경', '조심하실 것 — 경고', v.risk));
-      r5.appendChild(blockRow('s', '방', '오늘 지키실 것 — 예방', v.hedge));
-      s5.appendChild(r5);
-      body.appendChild(s5);
-    } else {
-      var s5b = el('div', 'sec');
-      s5b.appendChild(el('div', 'cap', '⑤ 실제로 꺼낼 한마디'));
-      s5b.appendChild(el('div', 'quote', v.script));
-      body.appendChild(s5b);
-    }
-
-    /* ⑥ 한 줄 처방 */
-    if (res.mode === 'self'){
-      var s6 = el('div', 'sec');
-      s6.appendChild(el('div', 'cap', '⑥ 오늘 하나만'));
-      var rx = el('div', 'mid', v.rx);
-      s6.appendChild(rx);
-      body.appendChild(s6);
+    /* 결과지 자체 검사(lint ㉠~㉣) — 콘솔·window.__NAVI_LINT 로 남김 */
+    if (window.LINT && window.LINT.checkResult){
+      var rep = window.LINT.checkResult(body, ST.picks, ST.pics);
+      window.__NAVI_LINT = rep;
+      try { console.log('[navi2-lint]', JSON.stringify(rep)); } catch (e) {}
     }
 
   }
@@ -782,24 +756,16 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var y = wrapText(x, v.teaser, 72, 430, 936, 62) + 22;
     x.fillStyle = '#FFD9BC'; x.font = '800 32px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
     y = wrapText(x, v.read, 72, y, 936, 44) + 30;
-    /* 비밀 발췌 2개 */
-    x.fillStyle = '#FFA24D'; x.font = '900 26px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-    x.fillText('당신이 흘린 말', 72, y); y += 44;
+    /* 고른 그림·고른 말은 저장 이미지에도 넣지 않는다(비밀) — ①선언 한 줄 */
     x.fillStyle = '#FFF4E8'; x.font = '800 31px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-    v.excerpt.slice(0, 2).forEach(function(it){
-      if (y > 900) return;
-      y = wrapText(x, '「' + it.l + '」', 72, y, 936, 42);
-      x.fillStyle = '#C2CFDF'; x.font = '700 26px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-      y = wrapText(x, '→ ' + it.p, 72, y + 2, 936, 38) + 16;
-      x.fillStyle = '#FFF4E8'; x.font = '800 31px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-    });
-    /* 네 방향 중 셋 */
+    y = wrapText(x, v.declare, 72, y, 936, 42) + 16;
+    /* ③ 예언 · ④ 오늘 조심할 것 */
     y += 8;
     x.fillStyle = '#C2CFDF'; x.font = '700 27px "Apple SD Gothic Neo","Malgun Gothic",sans-serif';
     var four = [
-      ['이미 겪으셨을 것', v.past],
-      ['곧 겪으실 것', v.soon],
-      ['오늘 지키실 것', v.hedge]
+      ['이미 일어났을 일', v.past],
+      ['앞으로 일어날 일', v.soon],
+      ['오늘 조심할 것', v.hedge]
     ];
     for (var fi = 0; fi < four.length; fi++){
       if (y > 1150) break;

@@ -158,7 +158,7 @@
     var interest = ck ? {
       key: ck, nm: FATE.CLUSTER[ck].nm, line: FATE.CLUSTER[ck].line, why: FATE.CLUSTER[ck].why,
       second: cList[1] ? FATE.CLUSTER[cList[1]].nm : null,
-      count: pics.length, pics: pics.slice(0, 6),
+      count: pics.length,
       note: pics.length <= 1 ? FATE.PIC_NOTE.one : pics.length <= 3 ? FATE.PIC_NOTE.few : FATE.PIC_NOTE.many
     } : null;
 
@@ -195,6 +195,9 @@
       risk: ctx.dayLead + ' ' + card.risk[band],
       hedge: card.hedge[band],
       fourCap: FATE.COPY.fourCap,
+      declare: isSelf ? (card.line[band] || card.line.mid) : card.rel[mode].line,
+      inner: sub.inner + " " + (sub.softness || ""),
+      prevent: FATE.PREVENT[primary],
       keep: card.rel[isSelf ? 'love' : mode] ? card.rel[isSelf ? 'love' : mode].keep : card.rel.deal.keep,
       avoid: card.rel[isSelf ? 'love' : mode] ? card.rel[isSelf ? 'love' : mode].avoid : card.rel.deal.avoid,
       script: (sub.script && sub.script[isSelf ? 'love' : mode]) || card.rel[isSelf ? 'love' : mode].script

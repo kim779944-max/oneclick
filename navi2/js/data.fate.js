@@ -89,10 +89,29 @@ var COPY = {
   bridge:'이 셋이 가리키는 곳은 한 군데입니다.',
   bridgeMixed:'겉으로는 달라 보여도, 이 셋이 가리키는 곳은 한 군데입니다.',
   strengthCap:'강점부터 말하겠습니다. 이 사람은 여기서 힘이 납니다.',
-  fourCap:'앞으로 벌어질 일을 네 방향으로만 짚겠습니다. 겁주려는 게 아니라, 미리 알고 계시라는 겁니다.'
+  fourCap:'앞으로 벌어질 일을 네 방향으로만 짚겠습니다. 겁주려는 게 아니라, 미리 알고 계시라는 겁니다.',
+  /* v2 결과지 4구획 (2026-11-21 개편) — 고른 그림·고른 답은 결과지에 다시 쓰지 않는다 */
+  cap1:'① 선언',
+  cap2:'② 속마음 해석 — 겉과 속',
+  cap3:'③ 그래서 이런 사람은 이런 일이 자주 일어났거나, 앞으로 일어납니다',
+  cap4:'④ 풀어가는 과정 & 오늘 조심할 것',
+  lead3:'겁주려는 게 아니라, 미리 알고 계시면 피해 갈 수 있다는 뜻입니다.',
+  lead4:'오늘 하나만 하고, 하나만 조심하면 됩니다.'
 };
 
-  var FATE = { CLUSTER_OF:CLUSTER_OF, CLUSTER:CLUSTER, READ:READ, PAST:PAST, PIC_NOTE:PIC_NOTE, COPY:COPY };
+/* ── ④ 마지막 '예방' 한 줄 — 결마다 ── */
+var PREVENT = {
+  SPEED:  '예방 — 큰 결정은 하룻밤 재운 뒤 아침에 한 번 더 보세요.',
+  PUTOFF: '예방 — 미룬 일 하나는 오늘 5분만 손대 두세요. 시작이 반입니다.',
+  EYE:    '예방 — 머릿속으로 짐작한 마음은 한 번 직접 물어서 확인하세요.',
+  FACE:   '예방 — 남 앞에서 약속하기 전에, 혼자서 한 번 되물어 보세요.',
+  CALC:   '예방 — 아끼는 기준에 사람과 시간도 한 칸 넣어 두세요.',
+  LOYAL:  '예방 — 부탁을 받으면 바로 답하지 말고 하루만 두고 정하세요.',
+  PERFECT:'예방 — 오늘은 80점에서 손을 떼는 연습을 한 번만 해 보세요.',
+  FREE:   '예방 — 떠나고 싶을 때일수록 오늘 할 일 하나는 끝내고 움직이세요.'
+};
+
+  var FATE = { CLUSTER_OF:CLUSTER_OF, CLUSTER:CLUSTER, READ:READ, PAST:PAST, PIC_NOTE:PIC_NOTE, COPY:COPY, PREVENT:PREVENT };
   if (root.NAVI) { root.NAVI.FATE = FATE; } else { root.NAVI = { FATE:FATE }; }
   if (typeof module !== 'undefined' && module.exports) module.exports = FATE;
 })(typeof window !== 'undefined' ? window : globalThis);

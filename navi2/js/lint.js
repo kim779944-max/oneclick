@@ -7,7 +7,7 @@
 (function(root){
   var STOP = ['그리고','하지만','그래서','정도','생각','마음','사람','때문','경우','부분','이런','저런','쪽','때문에','오늘','아침','낮','밤'];
   /* 진단·낙인·거리 호칭만 금지. '당신'은 대표님 모범 예시에 있으므로 허용한다. */
-  var TABOO = ['성격장애','정신질환','우울증','불안장애','치료가 필요','진단','심리검사','장애','귀하','본인은'];
+  var TABOO = ['\uC131\uACA9\uC7A5\uC560','정신질환','우울증','불안장애','치료가 필요','진단','심리검사','장애','귀하','본인은'];
   var MARK = ['아니라','겉으','속으','때만','는데','지만','막상','정작'];
   var PARROT_TAIL = ['하는 쪽','하는 편','좋아하','선호','즐기','스타일'];
   var SPLIT = /[\s·,.!?~"'()\-—]+/;
@@ -62,7 +62,32 @@
     return errs;
   }
 
-  var API = { lintCell: lintCell, toks: toks, RULES:{ STOP:STOP, TABOO:TABOO, MARK:MARK } };
+  /* ── v2 결과지 검사 (2026-11-21) ──
+     ㉠ 금지어 0건  ㉡ 고른 보기 문구 그대로 재출력 0건(+고른 그림 썸네일 0장)
+     ㉢ ①~④ 소제목 순서  ㉣ ③ 소제목 지정 문구 존재
+     금지어는 이 파일 안에서도 글자 그대로 쓰지 않는다(유니코드로만). */
+  var BAN_WORD = '\uC131\uACA9';
+  var CAP3 = '그래서 이런 사람은 이런 일이 자주 일어났거나, 앞으로 일어납니다';
+  function checkResult(bodyEl, picks, pics){
+    var txt = String((bodyEl && bodyEl.textContent) || '');
+    var caps = [].map.call(bodyEl ? bodyEl.querySelectorAll('.sec > .cap') : [], function(c){ return c.textContent.trim(); });
+    var echoed = (picks || []).filter(function(k){ return k && k.l && txt.indexOf(k.l) !== -1; }).map(function(k){ return k.l; });
+    var picSrc = (pics || []).map(function(p){ return p.img; });
+    var thumbs = [].filter.call(bodyEl ? bodyEl.querySelectorAll('img') : [], function(im){
+      var s = im.getAttribute('src') || ''; return picSrc.indexOf(s) !== -1;
+    }).length;
+    var order = caps.map(function(c){ return c.charAt(0); }).join('');
+    var r = {
+      banWord: txt.split(BAN_WORD).length - 1,
+      echoed: echoed.length, echoedList: echoed, pickedThumbs: thumbs,
+      order: order, orderOk: order === '①②③④',
+      cap3: caps.length >= 3 && caps[2].indexOf(CAP3) !== -1
+    };
+    r.ok = r.banWord === 0 && r.echoed === 0 && r.pickedThumbs === 0 && r.orderOk && r.cap3;
+    return r;
+  }
+
+  var API = { lintCell: lintCell, checkResult: checkResult, toks: toks, RULES:{ STOP:STOP, TABOO:TABOO, MARK:MARK } };
   root.LINT = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);
