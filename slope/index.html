@@ -1024,11 +1024,13 @@ function drawSlopeArrows(g,x0,y0,w,h){
   if(!clip){ bx=cx-rad; bX=cx+rad; by=cy-rad; bY=cy+rad }
   bx=Math.max(bx,0); by=Math.max(by,0); bX=Math.min(bX,w); bY=Math.min(bY,h);
   if(bX<=bx||bY<=by) return;
-  /* 간격: 5m 칸(blockPx)을 k등분 → 화면 7~12px, 월드 격자에 고정(밀어도 흔들리지 않음) */
-  var blockPx=5/mpp, k=Math.max(1,Math.round(blockPx/9)), m=1, gap=blockPx/k;
-  if(gap<7) m=Math.ceil(7/gap);
-  while(((bX-bx)/(gap*m)+1)*((bY-by)/(gap*m)+1)>2500) m++;
-  gap=gap*m;
+  /* 간격: 5m 칸(blockPx)을 k등분 → 화면 16px 이상, 월드 격자 고정(밀어도 흔들리지 않음) */
+  var gapMin=16, cap=900;
+  var blockPx=5/mpp, k=Math.max(1,Math.round(blockPx/gapMin));
+  var gap=blockPx/k, m=1;
+  if(gap<gapMin) m=Math.ceil(gapMin/gap);
+  gap*=m;
+  while(((bX-bx)/gap+1)*((bY-by)/gap+1)>cap){ m++; gap=blockPx/k*m }
   var stepU=gap/W, iu0=Math.floor((x0+bx)/W/stepU), iu1=Math.floor((x0+bX)/W/stepU), iv0=Math.floor((y0+by)/W/stepU), iv1=Math.floor((y0+bY)/W/stepU);
   g.save();
   if(clip) g.clip(clip,'evenodd');
@@ -1079,7 +1081,7 @@ function drawSlopeArrows(g,x0,y0,w,h){
   g.restore();
   if(g===ctx){ AR_SAMP=samp; AR_LAST={n:cnt,gap:+gap.toFixed(2),k:k,m:m,blockPx:+blockPx.toFixed(2),
            lenPx:[9,13],headLen:[4.5,6.5],headW:7.2,tailW:1.8,
-           casing:[4.2,2.8]}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
+           casing:[4.2,2.8],cap:900,gapMin:16}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
 }
 
 /* ---------------- 지도 조작 ---------------- */
