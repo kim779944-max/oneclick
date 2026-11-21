@@ -139,7 +139,7 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
     </div>
     <div class="unlock" id="unlock">
       <span id="ulMsg">이용권 코드를 넣으면 워터마크 없이 저장됩니다. 코드가 없으면 <b style="color:#FFA24D">미리보기(워터마크)</b>로 먼저 써 보세요.</span>
-      <div class="r" id="ulRow">
+      <div class="r" id="ulRow" data-kts-money="이용권 보기">
         <input id="ulCode" placeholder="이용권 코드 (예: KS2611-XXXX)" autocomplete="off">
         <button type="button" id="ulGo">확인</button>
         <a id="ulBuy" href="sms:01020022899">월 4,900원 신청</a>
@@ -684,4 +684,8 @@ if(window.KTSSlots){
 sizePad(); paintPlan(); seedFromForm();
 if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
 </script>
+
+<!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
+<script>window.KTS_UX_CFG={tool:"sign",free:"한 장 무료",more:"여러 장 · 간인(사이간자)은 <b>월 4,900원</b> 이용권입니다. 문자로 신청하면 그 달 코드를 보내 드립니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%8D%94%EC%8B%B8%EC%9D%B8%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:["#stage"],flow:1};</script>
+<script src="../ux.js"></script>
 </body></html>

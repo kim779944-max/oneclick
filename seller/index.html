@@ -812,5 +812,9 @@ if ($('#setupMargin')) $('#setupMargin').value = num(cfg.margin) || 32;
 if (cfg.market && $('#setupMarket')) $('#setupMarket').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === cfg.market));
 render();
 </script>
+
+<!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
+<script>window.KTS_UX_CFG={tool:"seller",wm:[],flow:1};</script>
+<script src="../ux.js"></script>
 </body>
 </html>

@@ -133,6 +133,7 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
 
 <script src="master.js"></script>
 <script src="products.js?v=20261121b"></script>
+<script src="slots.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
@@ -251,6 +252,42 @@ if (!p){
 renderDetail();
 /* catalog.json 을 받은 뒤 목록이 바뀌었으면 같은 화면을 다시 그린다(추가 상품 바로 열림) */
 document.addEventListener('kts:catalog', () => { renderDetail(); });
+</script>
+
+<!-- 🔑 열쇠·내 박스 (1트랙 2026-11-21) -->
+<script>
+(function(){
+  var k = new URLSearchParams(location.search).get('k') || 'photo2doc';
+  var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === k; })[0];
+  if (!p || !window.KTS_KEYS) return;
+  var app = document.getElementById('app');
+  function paint(){
+    var el = document.getElementById('ktsBox');
+    if (!el){ el = document.createElement('div'); el.id='ktsBox'; el.className='note-block'; app.appendChild(el); }
+    var mine = KTS_KEYS.inBox(k), L = KTS_KEYS.limitOf(k);
+    el.innerHTML = '<p style="font-size:11.5px;color:#DCE6F2;line-height:1.75;margin:0">' +
+      '<b style="color:#FFA24D">🔑 열쇠 4개</b> — 이 도구는 <b>1회 무료 시연</b> 뒤 <b>내 박스</b>에 담아 계속 씁니다.' +
+      (L ? ' 하루 <b style="color:#FFD9A6">' + L + '회</b> 무료.' : ' 하루 제한 없음.') +
+      '<br><span style="font-size:10.5px;color:#8FA0B8">더 쓸 때의 결제 안내는 도구 안 [그 이상 쓰기] 버튼 안쪽에만 있습니다.</span></p>' +
+      '<div style="display:flex;gap:7px;margin-top:9px">' +
+      (mine ? '<span style="flex:1;text-align:center;font-size:11.5px;font-weight:900;color:#FFA24D;border:1px solid rgba(255,107,0,.45);border-radius:10px;padding:9px">내 박스에 담김</span>'
+            : '<button type="button" id="ktsPut" style="flex:1;font-family:inherit;font-size:11.5px;font-weight:900;color:#0A1224;border:0;border-radius:10px;padding:9px;background:linear-gradient(180deg,#FF8A2B,#FF6B00)">내 박스에 담기</button>') +
+      '<button type="button" id="ktsPanel" style="flex:1;font-family:inherit;font-size:11.5px;font-weight:900;color:#DCE6F2;border:1px solid #2E4370;border-radius:10px;padding:9px;background:#12203C">내 박스 보기</button>' +
+      '</div>';
+    var put = document.getElementById('ktsPut');
+    if (put) put.onclick = function(){ KTS_KEYS.put(k); paint(); };
+    document.getElementById('ktsPanel').onclick = function(){ KTS_KEYS.openPanel(KTS_KEYS.verified()?'box':'verify'); };
+  }
+  paint();
+  KTS_KEYS.onChange(paint);
+  /* 무료 체험 버튼도 같은 관문을 지납니다 */
+  var open = document.getElementById('btnOpen');
+  if (open) open.addEventListener('click', function(e){
+    if (!p.link) return;
+    var r = KTS_KEYS.request(k);
+    if (!r.ok){ e.preventDefault(); }
+  }, true);
+})();
 </script>
 </body>
 </html>

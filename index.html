@@ -4,300 +4,184 @@
 <meta charset="utf-8">
 <meta name="google-site-verification" content="lYmN-G6G7n84ZvzlaZR01dR60i8R7C37aXGGJjXfJPw" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 원클릭 — 만든 도구를 한자리에</title>
+<title>KTS 원클릭 — 폰으로 바로 쓰는 업무 도구</title>
 <meta name="theme-color" content="#0A1224">
-<meta name="description" content="표 사진을 한글·엑셀로, 만능 뷰어, 기업 대출·자금 조회기, 창업 세무구조 내비, 독심술 32유형까지. KTS 원클릭에서 바로 열어 씁니다.">
+<meta name="description" content="표 사진을 한글·엑셀로, 만능 뷰어, 계약서·양식·서명, 매물수집기·경사도, 대출·세무 점검까지. 쓰는 순서대로 늘어놓았습니다. 설치·로그인·결제 없이 폰에서 바로.">
 <link rel="icon" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="KTS 원클릭">
-<meta property="og:description" content="사진 한 장이 문서가 되고, 재무제표가 자금 계획이 됩니다.">
-<meta property="og:image" content="https://kim779944-max.github.io/K0612766940K-/oneclick/icon.png">
-<meta property="og:url" content="https://kim779944-max.github.io/K0612766940K-/oneclick/">
+<meta property="og:description" content="폰 하나로 서류·매물·장사를 끝냅니다. 쓰는 순서대로 모아 둔 업무 도구.">
+<meta property="og:image" content="https://autooneclick.com/icon.png">
+<meta property="og:url" content="https://autooneclick.com/">
 <style>
-:root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+:root{--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
   --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--gold:#C6A054}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{background:radial-gradient(120% 55% at 50% -8%,#132A4E 0%,transparent 60%),var(--bg2);color:var(--ink);
+body{background:radial-gradient(120% 45% at 50% -6%,#132A4E 0%,transparent 62%),var(--bg2);color:var(--ink);
   font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
   -webkit-font-smoothing:antialiased;min-height:100vh}
-#app{max-width:560px;margin:0 auto;padding:0 16px 46px}
-header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg2) 78%,rgba(10,18,36,0));padding-top:13px}
-.hd{display:flex;align-items:center;gap:9px;padding:0 2px 11px}
-.hd img{width:31px;height:31px;border-radius:9px}
-.hd .brand{font-size:15px;font-weight:900;letter-spacing:-.4px}
+#app{max-width:560px;margin:0 auto;padding:0 15px 40px}
+header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg,var(--bg2) 84%,rgba(10,18,36,0));padding-top:11px}
+.hd{display:flex;align-items:center;gap:8px;padding:0 1px 9px}
+.hd a.home{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;min-width:0}
+.hd img{width:30px;height:30px;border-radius:9px}
+.hd .brand{font-size:14.5px;font-weight:900;letter-spacing:-.4px;white-space:nowrap}
 .hd .brand span{color:var(--amber2)}
-.hd .brand small{display:block;font-size:10px;color:var(--gray);font-weight:700;margin-top:1px;letter-spacing:0}
 .hd .sp{flex:1}
-.hd a.tel{font-size:11.5px;font-weight:800;color:#C7D3E3;text-decoration:none;border:1px solid var(--line2);
-  border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.03)}
-.hero{padding:8px 0 0}
-.kicker{display:inline-block;font-size:11px;font-weight:900;color:var(--on);
-  background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:999px;padding:6px 11px}
-h1{font-size:26px;line-height:1.3;letter-spacing:-1.1px;margin:13px 0 0;font-weight:900;word-break:keep-all}
+.hd .kbtn,.hd .mkey{flex:0 0 auto;font-family:inherit;font-size:11px;font-weight:900;border-radius:999px;padding:6px 10px;cursor:pointer;
+  border:1px solid rgba(255,107,0,.5);background:rgba(255,107,0,.1);color:#FFA24D;white-space:nowrap}
+.hd .mkey{width:30px;height:30px;padding:0;border-radius:9px;background:rgba(255,255,255,.03);border-color:var(--line2);color:#9DAEC5;font-size:13px}
+.hd .mkey.on{width:auto;padding:0 8px;font-size:9px;letter-spacing:.06em;color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
+.hd a.tel{flex:0 0 auto;font-size:11px;font-weight:800;color:#C7D3E3;text-decoration:none;border:1px solid var(--line2);
+  border-radius:999px;padding:6px 9px;background:rgba(255,255,255,.03);white-space:nowrap}
+
+/* ① 위쪽 업데이트 띠 — 한 줄, 누르면 접힘 */
+.nb{display:flex;align-items:center;gap:7px;border:1px solid #23334F;border-radius:10px;background:rgba(255,255,255,.025);
+  padding:7px 9px;font-size:10.5px;line-height:1.4;color:#AFBDD0;overflow:hidden}
+.nb b{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#0A1224;background:linear-gradient(90deg,#FF8A2B,#FFA24D);border-radius:999px;padding:2px 7px}
+.nb span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb button{flex:0 0 auto;width:20px;height:20px;border:0;border-radius:6px;background:rgba(255,255,255,.05);color:#8FA0B8;font-family:inherit;font-size:10px;font-weight:900;cursor:pointer;line-height:1}
+.nbOff{display:none}
+
+.hero{padding:14px 0 0}
+.kicker{display:inline-block;font-size:10px;font-weight:900;color:var(--on);
+  background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:999px;padding:5px 10px;letter-spacing:.01em}
+h1{font-size:23px;line-height:1.34;letter-spacing:-.9px;margin:11px 0 0;font-weight:900;word-break:keep-all}
 h1 em{font-style:normal;color:var(--amber)}
-.lead{font-size:13px;line-height:1.72;color:var(--ink2);margin:11px 0 0;word-break:keep-all}
+.lead{font-size:12.5px;line-height:1.7;color:var(--ink2);margin:9px 0 0;word-break:keep-all}
 .lead b{color:#fff}
-.quick{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
-.qcard{border:1px solid var(--line);border-radius:15px;padding:12px 13px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
-  text-decoration:none;color:var(--ink);display:block}
-.qcard.new{border-color:rgba(255,107,0,.45);background:linear-gradient(180deg,rgba(255,107,0,.1),rgba(255,255,255,.015))}
-.qcard .qk{font-size:9.5px;font-weight:900;letter-spacing:.13em;color:var(--amber2)}
-.qcard b{display:block;font-size:13.5px;font-weight:900;margin-top:5px;letter-spacing:-.35px}
-.qcard span{display:block;font-size:10.5px;color:var(--gray);margin-top:3px;line-height:1.45}
-.tabs{display:flex;gap:6px;overflow:auto;margin-top:18px;padding-bottom:3px;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabs button{flex:0 0 auto;font-family:inherit;font-size:12px;font-weight:800;color:var(--gray);
-  background:#0E1B33;border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
-.tabs button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
-.count{font-size:11px;color:var(--gray);margin:11px 0 4px}
-/* ⭐ 자주 쓰는 바로가기 (2026-11-19 · 적립메모 88번) — 추가분만, 기존 틀 무변경 */
-.fav{margin:7px 0 3px}
-.favH{display:flex;align-items:baseline;gap:7px;margin:0 0 7px}
-.favH b{font-size:12.5px;font-weight:900;color:#fff;letter-spacing:-.35px}
-.favH span{font-size:9.5px;color:#7F8FA8;font-weight:700}
-.favRow{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}
-.favRow::-webkit-scrollbar{display:none}
-.fchip{flex:0 0 auto;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);
-  border:1px solid var(--line2);border-radius:12px;padding:6px 10px 6px 6px;background:#0F1B33;max-width:178px}
-.fchip:active{transform:translateY(1px)}
-.fchip img{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid rgba(198,160,84,.3);flex:0 0 auto}
-.fchip .fnm{min-width:0}
-.fchip .fn{display:block;font-size:11px;font-weight:900;letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fchip .fk{display:block;font-size:8.5px;font-weight:900;color:var(--amber2);letter-spacing:.04em;margin-top:1px}
-.favEmpty{font-size:10.5px;color:#7F8FA8;font-weight:700;border:1px dashed #2A3C63;border-radius:11px;padding:9px 11px}
-.plist{display:grid;gap:8px;margin-top:8px}
-.prow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px 11px;
+
+/* ② 내 박스 */
+.boxwrap{margin-top:13px}
+.boxwrap .lbl{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:900;color:#8FA0B8;margin:0 0 6px;letter-spacing:.02em}
+.boxwrap .lbl b{color:#fff}
+
+/* ③ 쓰는 순서 섹션 */
+main{margin-top:16px}
+.sec{margin-top:20px}
+.sec:first-child{margin-top:0}
+.secH{display:flex;align-items:baseline;gap:8px;margin:0 0 7px}
+.secH .no{flex:0 0 auto;font-size:10px;font-weight:900;color:var(--amber2);letter-spacing:.08em}
+.secH h2{margin:0;font-size:14.5px;font-weight:900;letter-spacing:-.4px}
+.secH p{margin:0;font-size:10px;color:#7F8FA8;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rows{display:grid;gap:7px}
+.row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;padding:9px 10px;
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));position:relative}
-.prow.soon{opacity:.72}
-.pico{width:44px;height:44px;border-radius:11px;flex:0 0 auto;overflow:hidden;background:#0B1730;
-  border:1px solid rgba(198,160,84,.35)}
-.pico img{width:100%;height:100%;display:block;object-fit:cover}
-.pmain{flex:1;min-width:0}
-.pname{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:900;letter-spacing:-.4px;color:#fff}
-.pname .bd{font-size:9px;font-weight:900;border-radius:999px;padding:2px 6px;letter-spacing:.05em;flex:0 0 auto}
+.row.soon{opacity:.62}
+.ico{width:40px;height:40px;border-radius:10px;flex:0 0 auto;overflow:hidden;background:#0B1730;
+  display:grid;place-items:center;border:1px solid rgba(198,160,84,.32);font-size:17px;color:var(--amber2);font-weight:900}
+.ico img{width:100%;height:100%;object-fit:cover;display:block}
+.main{flex:1;min-width:0;text-decoration:none;color:inherit}
+.nm{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:900;letter-spacing:-.4px;color:#fff;min-width:0}
+.nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bd{flex:0 0 auto;font-size:8.5px;font-weight:900;border-radius:999px;padding:2px 5px;letter-spacing:.04em}
 .bd.new{color:var(--on);background:linear-gradient(90deg,#FF8A2B,#FFA24D)}
 .bd.free{color:#0B2C1B;background:#4ADE80}
 .bd.pro{color:#20180A;background:linear-gradient(90deg,#D9B876,#C6A054)}
 .bd.soon{color:#3A2200;background:#FCD34D}
-.psub{font-size:10.5px;color:var(--amber2);margin-top:1px;font-weight:700;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pdesc{font-size:11.5px;color:var(--ink2);line-height:1.55;margin-top:5px;word-break:keep-all}
-.pbot{display:flex;align-items:center;gap:6px;margin-top:5px}
-.price{font-size:11.5px;font-weight:900;color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.price small{display:block;font-size:10px;color:var(--gray);font-weight:700;margin-top:2px}
-.pbtns{margin-left:auto;display:flex;gap:5px;flex:0 0 auto}
-.pbtns a,.pbtns button{font-family:inherit;font-size:11px;font-weight:900;border-radius:9px;padding:6px 9px;
-  cursor:pointer;text-decoration:none;border:1px solid var(--line2);background:var(--card2);color:var(--ink);line-height:1.15}
-.pbtns a.go{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
-.pbtns .soonbtn{opacity:.6;pointer-events:none}
-.pbtns .star{width:26px;padding:6px 0;text-align:center;color:#7F8FA8;background:#0E1B33;font-size:12px}
-.pbtns .star.on{color:var(--amber2);border-color:rgba(255,107,0,.6);background:rgba(255,107,0,.12)}
-.foot{margin-top:26px;border-top:1px solid #1B2946;padding-top:16px;font-size:10.5px;line-height:1.75;color:#7D8CA6;word-break:keep-all}
+.sub{font-size:10.5px;color:#93A4BC;margin-top:2px;line-height:1.45;word-break:keep-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lim{display:inline-block;margin-top:4px;font-size:10px;font-weight:900;color:#FFD9A6;background:rgba(255,107,0,.12);
+  border:1px solid rgba(255,107,0,.35);border-radius:6px;padding:1px 6px}
+.lim.zero{color:#9FE3B7;background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.3)}
+.act{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.act .go{font-family:inherit;font-size:11.5px;font-weight:900;border-radius:9px;padding:7px 11px;cursor:pointer;border:1px solid var(--amber);
+  background:linear-gradient(180deg,#FF8A2B,var(--amber));color:var(--on);text-decoration:none;white-space:nowrap;line-height:1.1}
+.act .go[disabled],.act .soonb{background:#152441;border-color:#2A3C63;color:#7F8FA8;cursor:default}
+.act .mine{font-size:8.5px;font-weight:900;color:#FFA24D;letter-spacing:.02em}
+
+/* 무료 이용권 띠 (기존 #coupon 링크가 오는 곳) */
+.cpn{margin-top:22px}
+.cpnbar{display:flex;align-items:center;gap:10px;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:14px;
+  padding:11px 12px;background:linear-gradient(100deg,rgba(255,107,0,.14),rgba(255,255,255,.015) 72%)}
+.cpnbar .t{flex:1;min-width:0}
+.cpnbar .t b{display:block;font-size:12.5px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.cpnbar .t b i{font-style:normal;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px;margin-right:5px;vertical-align:1px}
+.cpnbar .t span{display:block;font-size:10.5px;color:#AFBDD0;margin-top:2px}
+.cpnbar .a{flex:0 0 auto;font-size:12px;font-weight:900;color:#FFA24D}
+
+/* ④ 해주세요 · Q&A */
+.ask{margin-top:24px;border:1px solid rgba(255,107,0,.45);border-radius:16px;padding:13px 14px;
+  background:linear-gradient(150deg,rgba(255,107,0,.13),rgba(255,255,255,.015) 62%)}
+.ask .h{display:flex;align-items:center;gap:7px}
+.ask .h em{font-style:normal;font-size:9px;font-weight:900;color:#0A1224;background:linear-gradient(90deg,#FF8A2B,#FFA24D);border-radius:999px;padding:2px 7px}
+.ask .h b{font-size:14px;font-weight:900;letter-spacing:-.4px}
+.ask p{margin:6px 0 0;font-size:11px;line-height:1.6;color:#AFBDD0;word-break:keep-all}
+.ask button{width:100%;margin-top:10px;font-family:inherit;font-size:13px;font-weight:900;color:var(--on);border:0;border-radius:11px;
+  padding:12px;background:linear-gradient(180deg,#FF8A2B,var(--amber));cursor:pointer}
+
+/* 하단 안내 */
+.foot{margin-top:24px;border-top:1px solid #1B2946;padding-top:14px;font-size:10.5px;line-height:1.7;color:#7D8CA6;word-break:keep-all}
 .foot b{color:#C7D3E3}
 .foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
-.notice{border:1px solid #22314F;border-radius:12px;background:rgba(255,255,255,.02);padding:11px 12px;margin-top:14px}
-.notice b{display:block;font-size:10.5px;color:#8FA0B8;letter-spacing:.08em;margin-bottom:6px}.notice p{margin:0;font-size:10.5px;line-height:1.7;color:#93A4BC}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(10,17,40,.97);
-  border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;
-  opacity:0;transition:.25s;z-index:90;pointer-events:none}
-.toast.on{opacity:1}
-.freebar{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px 12px;text-decoration:none;
-  border:1px solid rgba(255,107,0,.5);border-radius:15px;background:linear-gradient(100deg,rgba(255,107,0,.16),rgba(255,255,255,.02) 65%)}
-.freebar .fb{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:4px 8px}
-.freebar .ft{flex:1;min-width:0}
-.freebar .ft b{display:block;font-size:12.5px;font-weight:900;letter-spacing:-.35px;color:#fff}
-.freebar .ft span{display:block;font-size:10.5px;color:#AFBDD0;margin-top:2px;line-height:1.45}
-.freebar .fa{flex:0 0 auto;font-size:16px;font-weight:900;color:var(--amber2)}
-.hd a.home{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
-/* 하단 전 도구 타일 허브 */
-.hub{margin-top:24px;border:1px solid rgba(255,107,0,.4);border-radius:18px;padding:14px 12px 12px;
-  background:linear-gradient(180deg,rgba(255,107,0,.08),rgba(10,17,40,.6) 40%)}
-.hub h2{margin:0;font-size:15px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:7px}
-.hub h2 i{font-style:normal;font-size:10px;font-weight:900;color:var(--on);background:var(--amber);border-radius:6px;padding:2px 6px}
-.hub p{margin:4px 0 11px;font-size:11px;color:var(--gray)}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:92px;padding:11px 4px 9px;
-  border:1px solid var(--line);border-radius:14px;background:#0F1B33;text-decoration:none;color:var(--ink);text-align:center;position:relative}
-.tile:active{transform:translateY(1px)}
-.tile .ti{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;font-weight:900;
-  background:rgba(255,107,0,.13);border:1px solid rgba(255,107,0,.4);color:var(--amber2);overflow:hidden}
-.tile .ti img{width:100%;height:100%;object-fit:cover;display:block}
-.tile b{font-size:11.5px;font-weight:900;letter-spacing:-.4px;line-height:1.25;word-break:keep-all}
-.tile small{font-size:9.5px;color:var(--gray);line-height:1.3;word-break:keep-all}
-.tile .nw{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber)}
-.tile.off{opacity:.5}
-/* 상단 원클릭 복귀 */
-.totop{position:fixed;right:max(14px,calc(50% - 266px));bottom:20px;z-index:40;display:flex;align-items:center;gap:5px;
-  font-family:inherit;font-size:12px;font-weight:900;color:var(--on);background:linear-gradient(135deg,var(--amber),var(--amber2));
-  border:0;border-radius:999px;padding:10px 14px;box-shadow:0 8px 20px rgba(255,107,0,.35);cursor:pointer;
-  opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}
-.totop.on{opacity:1;transform:none;pointer-events:auto}
+.note{border:1px solid #22314F;border-radius:11px;background:rgba(255,255,255,.02);padding:9px 11px;margin-top:12px;font-size:10px;line-height:1.65;color:#8FA0B8}
+.note b{color:#C7D3E3}
 
-/* 사전예약 (2026-11-18 신규 섹션 — 기존 틀 무변경) */
-.rsv{margin-top:12px;border:1px solid rgba(255,107,0,.55);border-radius:18px;padding:14px 14px 13px;
-  background:linear-gradient(160deg,rgba(255,107,0,.16),rgba(255,107,0,.03) 46%,rgba(255,255,255,.015))}
-.rsvTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.rsvTop .live{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;
-  border-radius:999px;padding:4px 8px;letter-spacing:.02em}
-.rsvTop .pr{font-size:11px;font-weight:800;color:#AFBDD0}
-.rsvTop .pr s{color:#8494AC;margin-right:6px;text-decoration-thickness:1.5px;text-underline-offset:2px}
-.rsvTop .pr b{color:#FF6B00;font-size:13px;font-weight:900}
-.rsv h2{margin:9px 0 0;font-size:17px;font-weight:900;letter-spacing:-.6px;line-height:1.32;word-break:keep-all}
-.rsv h2 em{font-style:normal;color:var(--amber)}
-.rsv .desc{margin:6px 0 0;font-size:11.5px;line-height:1.6;color:#AFBDD0;word-break:keep-all}
-.rsv form{margin-top:11px;display:grid;gap:7px}
-.rsv .row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.rsv input{width:100%;font-family:inherit;font-size:12.5px;font-weight:700;color:#fff;background:#0B1730;
-  border:1px solid #2E4370;border-radius:11px;padding:11px 12px;letter-spacing:-.2px}
-.rsv input::placeholder{color:#6F819C;font-weight:600}
-.rsv input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
-.rsv button{font-family:inherit;font-size:13.5px;font-weight:900;color:var(--on);border:0;border-radius:12px;
-  padding:13px 12px;background:linear-gradient(180deg,#FF8A2B,var(--amber));cursor:pointer;
-  box-shadow:0 6px 16px rgba(255,107,0,.22);letter-spacing:-.3px}
-.rsv button:active{transform:translateY(1px)}
-.rsv .fine{margin:8px 0 0;font-size:10px;line-height:1.6;color:#7F8FA8;word-break:keep-all}
-.rsv .fine b{color:#C7D3E3}
-.rsvDone{margin-top:10px;border:1px solid rgba(74,222,128,.45);border-radius:14px;padding:12px;
-  background:rgba(74,222,128,.07)}
-.rsvDone .no{font-size:11px;font-weight:900;color:#4ADE80;letter-spacing:.04em}
-.rsvDone .sum{margin:5px 0 0;font-size:11.5px;line-height:1.6;color:#DCE5F1;font-weight:700;word-break:keep-all}
-.rsvDone .acts{display:flex;gap:7px;margin-top:9px}
-.rsvDone a,.rsvDone button.ghost{flex:1;text-align:center;font-family:inherit;font-size:11.5px;font-weight:900;
-  text-decoration:none;border-radius:10px;padding:10px 8px;border:1px solid #2E4370;background:#12203C;color:#D9E3F0}
-.rsvDone a.go{background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
-.rsv .err{margin:2px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
-.rsvShare{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
-.rsvShare a{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:900;
-  text-decoration:none;color:#D9E3F0;background:#12203C;border:1px solid #2E4370;border-radius:10px;padding:9px 6px;
-  letter-spacing:-.2px;text-align:center}
-.rsvShare a:active{transform:translateY(1px)}
-.rsvPrev{margin-top:9px;border:1px dashed rgba(255,167,77,.45);border-radius:11px;padding:9px 11px;
-  font-size:10.5px;line-height:1.55;color:#C7D3E3;font-weight:700;word-break:keep-all;display:none}
-.rsvPrev.on{display:block}
-.rsvPrev b{color:#FFA24D}
-.rsvPrev a{color:#FFA24D;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(255,162,77,.4)}
-
-/* 마스터 모드 (대표님 전용 · PIN 2899) — 기존 틀은 그대로, 아래는 추가분만 */
-.mkey{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;font-family:inherit;font-size:13px;
-  color:#9DAEC5;background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:9px;cursor:pointer;padding:0;line-height:1}
-.mkey.on{width:auto;padding:0 8px;font-size:9px;font-weight:900;letter-spacing:.06em;color:var(--on);
-  background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
-.mst{margin-top:12px;border:1px solid rgba(255,107,0,.55);border-radius:16px;padding:12px 13px 11px;
+/* 마스터 */
+.mst{margin-top:12px;border:1px solid rgba(255,107,0,.55);border-radius:15px;padding:11px 12px;
   background:linear-gradient(160deg,rgba(255,107,0,.15),rgba(255,107,0,.03) 50%,rgba(255,255,255,.015))}
 .mstTop{display:flex;align-items:center;gap:7px}
 .mstB{font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--on);background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:6px;padding:3px 7px;flex:0 0 auto}
-.mstTop b{font-size:13px;font-weight:900;letter-spacing:-.4px;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mstOff{margin-left:auto;font-family:inherit;font-size:10.5px;font-weight:900;color:#C7D3E3;background:#12203C;
-  border:1px solid var(--line2);border-radius:8px;padding:5px 8px;cursor:pointer;flex:0 0 auto}
-.mstLine{margin:8px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
+.mstTop b{font-size:12.5px;font-weight:900;letter-spacing:-.4px}
+.mstOff{margin-left:auto;font-family:inherit;font-size:10.5px;font-weight:900;color:#C7D3E3;background:#12203C;border:1px solid var(--line2);border-radius:8px;padding:5px 8px;cursor:pointer}
+.mstLine{margin:7px 0 0;font-size:10.5px;line-height:1.55;color:#AFBDD0}
 .mstLine b{color:#FFA24D}
-.mstGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
-.mstGrid a{display:block;font-size:11px;font-weight:800;color:#DCE5F1;text-decoration:none;background:#101E38;
-  border:1px solid #26375F;border-radius:9px;padding:8px 9px;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mstGrid a:active{background:#152747}
-.mstNote{margin:8px 0 0;font-size:10px;line-height:1.5;color:#7F8FA8}
+.mstGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.mstGrid a{display:block;font-size:11px;font-weight:800;color:#DCE5F1;text-decoration:none;background:#101E38;border:1px solid #26375F;border-radius:8px;padding:7px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mscrim{position:fixed;inset:0;background:rgba(3,7,16,.72);z-index:80}
-.msheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(84vw,320px);z-index:81;
-  background:#0F1B33;border:1px solid rgba(255,107,0,.45);border-radius:18px;padding:16px 16px 14px;
-  box-shadow:0 24px 60px rgba(0,0,0,.55)}
-.msheet b{display:block;font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.msheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(84vw,320px);z-index:81;background:#0F1B33;
+  border:1px solid rgba(255,107,0,.45);border-radius:18px;padding:16px 16px 14px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.msheet b{display:block;font-size:14.5px;font-weight:900;color:#fff}
 .msheet p{margin:6px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
-.msheet input{width:100%;margin-top:10px;font-family:inherit;font-size:20px;font-weight:900;letter-spacing:.35em;
-  text-align:center;color:#fff;background:#0B1730;border:1px solid #2E4370;border-radius:12px;padding:11px 8px}
-.msheet input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
+.msheet input{width:100%;margin-top:10px;font-family:inherit;font-size:20px;font-weight:900;letter-spacing:.35em;text-align:center;
+  color:#fff;background:#0B1730;border:1px solid #2E4370;border-radius:12px;padding:11px 8px}
+.msheet input:focus{outline:none;border-color:var(--amber)}
 .mrow{display:flex;gap:7px;margin-top:10px}
 .mrow button{flex:1;font-family:inherit;font-size:12.5px;font-weight:900;border-radius:11px;padding:11px 8px;cursor:pointer}
 #mGo{background:linear-gradient(180deg,#FF8A2B,var(--amber));border:0;color:var(--on)}
 .mrow button.ghost{background:#12203C;border:1px solid var(--line2);color:#D9E3F0}
 .merr{margin:8px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
-
-/* 시연 상태 배지 (2026-11-19 · 적립메모 74번) — 추가분만, 기존 틀 무변경 */
-.sbadge{position:absolute;right:9px;top:9px;z-index:2;font-family:inherit;font-size:9.5px;font-weight:900;
-  letter-spacing:.02em;line-height:1;border:0;border-radius:999px;padding:4px 7px 4px 6px;cursor:pointer;
-  background:var(--sc,#94A3B8);color:var(--sk,#0B1726);box-shadow:0 2px 6px rgba(0,0,0,.3)}
-.sbadge:active{transform:translateY(1px)}
-.sbadge::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7;margin-right:3px;vertical-align:1px}
-.prow .pname{padding-right:58px}
-.slegend{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:5px 0 0;font-size:10px;font-weight:800;color:#8FA0B8}
-.slegend i{display:inline-flex;align-items:center;gap:4px;font-style:normal}
-.slegend i u{width:7px;height:7px;border-radius:50%;display:inline-block;text-decoration:none}
-.sscrim{position:fixed;inset:0;background:rgba(3,7,16,.74);z-index:85}
-.ssheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90vw,368px);max-height:80vh;overflow:auto;
-  z-index:86;background:#0F1B33;border:1px solid rgba(255,107,0,.45);border-radius:18px;padding:15px 15px 13px;
-  box-shadow:0 24px 60px rgba(0,0,0,.6);-webkit-overflow-scrolling:touch}
-.sHead{display:flex;align-items:center;gap:8px}
-.sPill{flex:0 0 auto;font-size:9.5px;font-weight:900;border-radius:999px;padding:4px 8px;background:var(--sc,#94A3B8);color:var(--sk,#0B1726)}
-.sName{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.4px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sX{margin-left:auto;flex:0 0 auto;width:26px;height:26px;font-family:inherit;font-size:12px;font-weight:900;color:#C7D3E3;
-  background:#12203C;border:1px solid var(--line2);border-radius:8px;cursor:pointer;line-height:1;padding:0}
-.sSub{margin:8px 0 0;font-size:11px;line-height:1.55;color:#AFBDD0}
-.sList{margin:9px 0 0;padding:0;list-style:none;display:grid;gap:6px}
-.sList li{position:relative;font-size:11.5px;line-height:1.6;color:#DCE5F1;font-weight:700;padding-left:11px;word-break:keep-all}
-.sList li::before{content:"";position:absolute;left:0;top:6px;width:4px;height:4px;border-radius:50%;background:var(--sc,#FF6B00)}
-.sFoot{display:flex;gap:7px;margin-top:12px}
-.sFoot a,.sFoot button{flex:1;text-align:center;font-family:inherit;font-size:12px;font-weight:900;border-radius:11px;padding:10px 8px;text-decoration:none;cursor:pointer}
-.sFoot a{background:linear-gradient(180deg,#FF8A2B,var(--amber));border:1px solid var(--amber);color:var(--on)}
-.sFoot button{background:#12203C;border:1px solid var(--line2);color:#D9E3F0}
-/* 모바일 쿠폰 받기 (2026-11-19 · 적립메모 71번) — 누를 때만 번호 입력 */
-.cpn{margin-top:12px}
-.cpnBtn{width:100%;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;cursor:pointer;color:var(--ink);
-  border:1px solid rgba(255,107,0,.6);border-radius:15px;padding:13px 14px;
-  background:linear-gradient(100deg,rgba(255,107,0,.2),rgba(255,255,255,.02) 72%)}
-.cpnBtn:active{transform:translateY(1px)}
-.cpnBtn .ct{flex:1;min-width:0}
-.cpnBtn .ct b{display:block;font-size:14px;font-weight:900;letter-spacing:-.4px;color:#fff}
-.cpnBtn .ct b i{font-style:normal;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;
-  padding:3px 7px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
-.cpnBtn .ct small{display:block;font-size:10.5px;color:#AFBDD0;margin-top:3px;line-height:1.4}
-.cpnBtn .ca{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
-  font-size:13px;font-weight:900;color:var(--amber2);border:1px solid rgba(255,107,0,.5);background:rgba(255,107,0,.12)}
-.cpnIn{margin-top:10px}
-.cpnIn input{width:100%;font-family:inherit;font-size:17px;font-weight:800;letter-spacing:.03em;text-align:center;color:#fff;
-  background:#0B1730;border:1px solid #2E4370;border-radius:12px;padding:12px 10px}
-.cpnIn input::placeholder{font-size:14px;letter-spacing:0;color:#6F819C;font-weight:700}
-.cpnIn input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.18)}
-.cpnIn button{width:100%;margin-top:8px;font-family:inherit;font-size:14px;font-weight:900;color:var(--on);border:0;border-radius:12px;
-  padding:13px;background:linear-gradient(180deg,#FF8A2B,var(--amber));cursor:pointer}
-.cpnErr{margin:7px 0 0;font-size:10.5px;font-weight:800;color:#FF9C7A}
-.cpnDone{margin-top:10px;border:1px solid rgba(74,222,128,.45);border-radius:13px;padding:11px;background:rgba(74,222,128,.07)}
-.cpnDone .no{font-size:11px;font-weight:900;color:#4ADE80;letter-spacing:.03em}
-.cpnDone .sum{margin:5px 0 0;font-size:11.5px;line-height:1.55;color:#DCE5F1;font-weight:700;word-break:keep-all}
-.cpnActs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
-.cpnActs a{text-align:center;font-size:11.5px;font-weight:900;text-decoration:none;border-radius:10px;padding:10px 6px;
-  border:1px solid #2E4370;background:#12203C;color:#D9E3F0}
-.cpnActs a.go{grid-column:1/-1;background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);color:var(--on)}
-.cpnFine{margin:7px 0 0;font-size:10px;line-height:1.55;color:#7F8FA8}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:rgba(10,17,40,.97);
+  border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;
+  opacity:0;transition:.25s;z-index:200;pointer-events:none;max-width:92%;text-align:center}
+.toast.on{opacity:1}
+.totop{position:fixed;right:max(14px,calc(50% - 265px));bottom:18px;z-index:40;font-family:inherit;font-size:11.5px;font-weight:900;
+  color:var(--on);background:linear-gradient(135deg,var(--amber),var(--amber2));border:0;border-radius:999px;padding:9px 13px;
+  box-shadow:0 8px 20px rgba(255,107,0,.35);cursor:pointer;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}
+.totop.on{opacity:1;transform:none;pointer-events:auto}
 </style>
 </head>
 <body>
 <div id="app">
-  <header id="top">
+  <header>
     <div class="hd">
       <a class="home" href="./" id="homeLink" aria-label="원클릭 처음으로">
         <img src="icon.png" alt="">
-        <div class="brand">KTS <span>원클릭</span><small>만든 도구를 한자리에</small></div>
+        <div class="brand">KTS <span>원클릭</span></div>
       </a>
       <div class="sp"></div>
-      <button class="mkey" id="mKey" type="button" aria-label="대표님 마스터 모드 열기">⚙</button>
+      <button class="kbtn" id="kBtn" type="button" data-kk-badge>🔑 0</button>
+      <button class="mkey" id="mKey" type="button" aria-label="대표님 마스터 모드">⚙</button>
       <a class="tel" href="tel:01020022899">010-2002-2899</a>
+    </div>
+    <div class="nb" id="nb">
+      <b>11/21</b><span id="nbTxt">🔑 열쇠 4개 지급 · 내 박스 4칸 · [해주세요] 창 열렸습니다</span>
+      <button type="button" id="nbX" aria-label="공지 접기">✕</button>
     </div>
   </header>
 
   <section class="mst" id="mst" hidden>
     <div class="mstTop">
-      <span class="mstB">MASTER</span>
-      <b>대표님 전용 마스터 쇼룸</b>
+      <span class="mstB">MASTER</span><b>대표님 전용</b>
       <button class="mstOff" id="mstOff" type="button">해제</button>
     </div>
-    <p class="mstLine">전 상품 <b>횟수 제한·이용권 창 없이</b> 열립니다 · 열린 상품 <b id="mstN">0</b>종 · <span id="mstVer">-</span></p>
+    <p class="mstLine">열쇠·잠금 없이 전 도구가 열립니다 · 열린 도구 <b id="mstN">0</b>종 · <span id="mstVer">-</span></p>
     <div class="mstGrid" id="mstGrid"></div>
-    <p class="mstNote">신상품은 catalog.json에 항목 1개만 추가하면 이 목록에 자동으로 늘어납니다.</p>
   </section>
 
   <div class="mscrim" id="mscrim" hidden></div>
-  <div class="msheet" id="msheet" role="dialog" aria-modal="true" aria-label="마스터 모드 PIN" hidden>
+  <div class="msheet" id="msheet" role="dialog" aria-modal="true" aria-label="마스터 PIN" hidden>
     <b>마스터 모드</b>
     <p>대표님 전용입니다. PIN 4자리를 넣어 주세요.</p>
     <input id="mPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" aria-label="PIN">
@@ -308,433 +192,267 @@ h1 em{font-style:normal;color:var(--amber)}
     <p class="merr" id="mErr" hidden>PIN이 맞지 않습니다</p>
   </div>
 
-  <div class="sscrim" id="sscrim" hidden></div>
-  <div class="ssheet" id="ssheet" role="dialog" aria-modal="true" aria-label="시연 상태·수정 내역" hidden>
-    <div class="sHead">
-      <span class="sPill" id="sPill">수정중</span>
-      <span class="sName" id="sName">상품</span>
-      <button class="sX" id="sX" type="button" aria-label="닫기">✕</button>
-    </div>
-    <p class="sSub" id="sSub"></p>
-    <ul class="sList" id="sList"></ul>
-    <div class="sFoot">
-      <a id="sGo" href="#">이 상품 열기</a>
-      <button id="sClose" type="button">닫기</button>
-    </div>
+  <div class="hero">
+    <span class="kicker">설치 없이 · 로그인 없이 · 결제 없이</span>
+    <h1>폰 하나로 <em>서류·매물·장사</em>를<br>끝냅니다.</h1>
+    <p class="lead">쓰는 순서대로 늘어놓았습니다. <b>위에서부터 4개를 박스에 담으면</b> 매일 바로 열립니다.</p>
   </div>
 
-  <div class="sscrim" id="cscrim" hidden></div>
-  <div class="ssheet" id="csheet" role="dialog" aria-modal="true" aria-label="모바일 쿠폰 받기" hidden>
-    <div class="sHead">
-      <span class="sPill" style="--sc:#22C55E;--sk:#05260F">무료</span>
-      <span class="sName">모바일 쿠폰 받기</span>
-      <button class="sX" id="cxX" type="button" aria-label="닫기">✕</button>
-    </div>
-    <p class="sSub" id="cpGuide">번호만 남겨 주세요. 무료 이용권 1장을 문자로 보내 드리고, 결제는 없습니다.</p>
-    <form class="cpnIn" id="cpForm" novalidate>
-      <input id="cpTel" type="tel" inputmode="tel" maxlength="13" placeholder="010-0000-0000" autocomplete="tel" aria-label="연락처">
-      <button type="submit" id="cpGo">쿠폰 받기</button>
-      <p class="cpnErr" id="cpErr" hidden></p>
-    </form>
-    <div class="cpnDone" id="cpDone" hidden>
-      <div class="no" id="cpNo"></div>
-      <p class="sum" id="cpSum"></p>
-      <div class="cpnActs">
-        <a class="go" id="cpSms" href="#">문자로 받기</a>
-        <a id="cpImg" href="tickets/free_ticket_500k_share5.png" target="_blank" rel="noopener" download="KTS_무료이용권.png">이용권 저장</a>
-        <a id="cpHome" href="tickets/free_ticket_daangn_home.png" target="_blank" rel="noopener" download="KTS_당근홈피_제작권.png">홈피 제작권 저장</a>
-      </div>
-    </div>
-    <p class="cpnFine">번호는 쿠폰 발송 연락에만 씁니다. 이 화면에서는 결제하지 않습니다.</p>
+  <div class="boxwrap" id="boxStripWrap">
+    <div class="lbl">🔑 <b>내 박스</b> — 담은 도구는 계속 열립니다</div>
+    <div id="boxStrip"></div>
   </div>
 
-  <a class="freebar" href="sale/">
-    <span class="fb">무료</span>
-    <span class="ft"><b>오늘의 특가 — 할인만 모은 가격비교</b>
-      <span>편의점 1+1 · 마트 전단 · 사장님 업소 식자재 → 체크하면 발주서 1초</span></span>
-    <span class="fa">→</span>
-  </a>
-
+  <main id="sections"></main>
 
   <section class="cpn" id="coupon">
-    <button class="cpnBtn" id="cpnOpen" type="button" aria-haspopup="dialog">
-      <span class="ct"><b><i>무료</i>모바일 쿠폰 받기</b>
-        <small>번호만 남기면 무료 이용권 1장을 문자로 — 오픈 순서대로 연락드립니다</small></span>
-      <span class="ca">→</span>
-    </button>
+    <a class="cpnbar" href="sms:01020022899?body=%5BKTS%20%EC%9B%90%ED%81%B4%EB%A6%AD%5D%20%EB%AC%B4%EB%A3%8C%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%20(%EC%97%85%EC%A2%85%2F%EC%97%B0%EB%9D%BD%EC%B2%98%3A%20)">
+      <span class="t"><b><i>무료</i>무료 이용권 · 사전예약</b>
+        <span>번호만 남기면 이용권 1장을 문자로 — 결제 없음</span></span>
+      <span class="a">신청 →</span>
+    </a>
   </section>
 
-  <div class="hero">
-    <span class="kicker">설치 없이 · 로그인 없이</span>
-    <h1>사진 한 장이 문서가 되고,<br><em>재무제표가 자금 계획</em>이 됩니다.</h1>
-    <p class="lead">표 사진은 한글·엑셀로, 열리지 않던 첨부는 <b>더뷰</b>로, 재무제표는 <b>대출 조회기</b>로,
-      상담 자리는 <b>독심술</b>로. 만든 도구를 한자리에 모았습니다.</p>
-    <div class="quick">
-      <a class="qcard new" href="loan.html">
-        <div class="qk">NEW</div><b>기업 대출·자금 조회기</b>
-        <span>재무제표 → 가능한 기관 → 준비 순서</span>
-      </a>
-      <a class="qcard new" href="tax.html">
-        <div class="qk">NEW</div><b>창업·대출 세무구조 내비</b>
-        <span>4대보험·통장·과세 유형 사전 점검</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="tabs" id="tabs">
-    <button class="on" data-c="all">전체</button>
-    <button data-c="fav">★ 내 단축바</button>
-    <button data-c="convert">변환·문서</button>
-    <button data-c="money">자금·세무</button>
-    <button data-c="talk">대화</button>
-    <button data-c="auto">업무 자동화</button>
-    <button data-c="etc">생활</button>
-    <button data-c="soon">준비 중</button>
-  </div>
-  <div id="refNote"></div>
-  <div class="count" id="count"></div>
-  <div id="favSlots" style="display:none"></div>
-  <div class="slegend" id="slegend"></div>
-
-  <div class="plist" id="plist"></div>
-
-  <section class="hub" id="hub">
-    <h2><i>ALL</i>전 도구 한눈에</h2>
-    <p>누르면 바로 열립니다 · 설치·로그인 없음</p>
-    <div class="tiles" id="tiles"></div>
+  <section class="ask">
+    <div class="h"><em>의뢰</em><b>해주세요 · Q&amp;A</b></div>
+    <p>필요한 도구를 적어 주세요. <b style="color:#FFD9A6">10표가 모이면 만듭니다.</b> 맞춤 제작은 5:5, 외부 제작자 입점은 3:7로 정산합니다.</p>
+    <button type="button" id="askOpen">해주세요 · Q&amp;A 열기</button>
   </section>
 
-  <div class="notice">
-    <b>이 사이트에서 결제하지 않습니다</b>
-    <p>원클릭은 도구를 소개하고 <b>맛보기·미리보기</b>를 여는 곳입니다. 유료 도구의 결제는 별도 판매 채널(크몽 등)에서
-      안내드리고, 이 사이트에는 카드·계좌 입력 화면을 두지 않습니다. 문의는 문자·전화로 받습니다.</p>
+  <div class="note">
+    <b>결제는 이 사이트에서 하지 않습니다.</b> 무료로 열어 보고, 더 쓸 때의 안내는 각 도구 안 [그 이상 쓰기] 버튼 안쪽에만 있습니다.
+    카드·계좌 입력 화면은 없습니다.
   </div>
 
   <div class="foot">
     <b>KTS 원클릭</b> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>
-    모든 도구는 브라우저에서 직접 처리하며, 올린 파일은 서버로 전송되지 않습니다.<br>
-    가격·구성은 사전 고지 후 변경될 수 있고, 결제 전에는 어떤 금액도 청구되지 않습니다.<br>
-    <a href="./">KTS 바로가기</a> · <a href="navi2/">독심술 32유형</a> · <a href="saycap/">세이캡</a>
+    올린 파일은 서버로 보내지 않고 브라우저 안에서만 처리합니다.<br>
+    <a href="detail.html?k=viewer">도구 소개</a> · <a href="navi2/">독심술</a> · <a href="saycap/">세이캡</a> · <a href="exchange/">교환급매물</a> · <a href="bungee/">번개알바 도구</a>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<button class="totop" id="toTop" type="button" aria-label="원클릭 맨 위로">↑ 원클릭</button>
+<button class="totop" id="toTop" type="button">↑ 위로</button>
 
 <script src="master.js"></script>
+<script src="products.js"></script>
 <script src="slots.js"></script>
-<script src="products.js?v=20261121b"></script>
 <script src="status.js"></script>
 <script>
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-let cur = 'all';
-const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
+var $ = function(s){ return document.querySelector(s); };
+function toastMsg(m){ var t=$('#toast'); if(!t) return; t.textContent=m; t.classList.add('on');
+  clearTimeout(toastMsg._t); toastMsg._t=setTimeout(function(){ t.classList.remove('on'); },2400); }
+window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
 
-/* 시연 상태 배지 — status.js 한 파일만 바꾸면 카드·팝업이 따라옵니다(적립메모 74번) */
-function stMeta(p){
-  const S = window.KTS_STATUS; if (!S) return null;
-  if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) return null;
-  const it = (S.items || {})[p.k] || {};
-  if (it.hide) return null;                       /* 표시 안 함(시연 합격·확정 상품) */
-  const key = it.st || 'before';
-  const def = (S.states || {})[key] || { label:'수정전', color:'#94A3B8', ink:'#0B1726' };
-  return { key:key, def:def, it:it };
-}
-function renderLegend(){
-  const box = $('#slegend'); if (!box) return;
-  const S = window.KTS_STATUS; if (!S) { box.innerHTML = ''; return; }
-  if (S.show === 'master' && !(window.KTS && window.KTS.isMaster && window.KTS.isMaster())) { box.innerHTML = ''; return; }
-  const cnt = {after:0, fix:0, before:0};
-  window.PRODUCTS.forEach(p => { const it = (S.items || {})[p.k] || {}; if (it.hide) return; const k = it.st || 'before'; if (cnt[k] != null) cnt[k]++; });
-  box.innerHTML = ['after','fix','before'].filter(k => S.states[k]).map(k => {
-    const d = S.states[k];
-    return `<i><u style="background:${d.color}"></u>${d.label} ${cnt[k]}</i>`;
-  }).join('') + '<i style="color:#6F819C">· 배지를 누르면 수정 내역</i>';
-}
+/* ============================================================================
+   ① 공지 띠 — 한 줄, 접으면 이 기기에서 기억
+   ========================================================================== */
+(function(){
+  var KEY='kts_nb_20261121';
+  var off=false; try{ off = localStorage.getItem(KEY)==='1'; }catch(e){}
+  if (off) $('#nb').classList.add('nbOff');
+  $('#nbX').onclick=function(){ $('#nb').classList.add('nbOff'); try{ localStorage.setItem(KEY,'1'); }catch(e){} };
+})();
 
-/* ⭐ 자주 쓰는 바로가기 (2026-11-19 · 적립메모 88번)
-   카드의 ☆로 고정한 도구 + 최근에 많이 연 도구를 최대 6개까지 위에 띄웁니다.
-   저장은 이 브라우저(localStorage)에만 합니다 — 서버로 보내지 않습니다. */
-var FAV_KEY = 'kts_favs', REC_KEY = 'kts_recent';
-var FAV_DEFAULT = ['viewer','photo2doc','thedetail','contract','navi','sign'];
-function lsArr(k){ try { var v = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
-function lsPut(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-/* 무료 4칸 고정 · 월 1회 초기화 · 5칸째 칸 추가 (적립메모 120번, slots.js)
-   손님이 ☆로 직접 담는 칸에만 적용 — FAV_DEFAULT(추천)는 내 칸이 아니므로 그대로.
-   옛 kts_favs 는 지우지 않고 처음 한 번 그대로 옮긴다(4개 넘게 담아 둔 분은 유예). */
-var FAVSL = window.KTSSlots ? window.KTSSlots({ key:'fav', free:4, label:'내 단축바', el:'#favSlots',
-  cellHtml: function(it){ var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === it.id; })[0];
-    if (!p) return '<span>'+it.id+'</span>';
-    return '<img src="'+p.icon+'" alt=""><span style="font-size:9px;line-height:1.15">'+String(p.nm).split(' — ')[0]+'</span><button type="button" data-use="1">열기</button>'; },
-  onUse: function(it){ var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === it.id; })[0];
-    if (p) location.href = p.link || ('detail.html?k=' + p.k); },
-  migrate: function(){ return lsArr(FAV_KEY).map(function(k){ return { id:k, kind:'tool' }; }); }, migrateKey:'kts_favs',
-  onChange: function(){ try { render(); } catch(e){} } }) : null;
-function favIds(){ return FAVSL ? FAVSL.items().map(function(i){ return i.id; }) : lsArr(FAV_KEY); }
-function isFav(k){ return favIds().indexOf(k) >= 0; }
-function toggleFav(k){
-  if (FAVSL){
-    if (isFav(k)){ if (FAVSL.remove(k)) toastMsg('★ 내 단축바에서 뺐습니다'); return; }
-    FAVSL.add({ id:k, kind:'tool' });
-    return;
-  }
-  var f = lsArr(FAV_KEY), i = f.indexOf(k);
-  if (i >= 0) f.splice(i, 1); else { f.unshift(k); if (f.length > 8) f = f.slice(0, 8); }
-  lsPut(FAV_KEY, f);
-  render();
-  toastMsg(i >= 0 ? '★ 내 단축바에서 뺐습니다' : '★ 내 단축바에 담았습니다');
+/* ============================================================================
+   ② 쓰는 순서 — 직업/용도별 묶음. 여기 순서만 바꾸면 화면이 그대로 따라옵니다.
+   ========================================================================== */
+var LOCAL = {
+  thescan:{nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', ico:'▣', badge:'NEW'},
+  theeraser:{nm:'더지우개', sub:'사진 글씨·얼룩 지우기', link:'theeraser/', ico:'⌫', badge:'NEW'},
+  ad_magnet:{nm:'광고유입기', sub:'광고·댓글 문구 1분', link:'ad_magnet/', ico:'✦', badge:'NEW'},
+  seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'},
+  bungee_interior:{nm:'인테리어 평당 견적', sub:'평수·등급 → 3안 비교', link:'bungee/#interior', ico:'▤', badge:'NEW'},
+  bungee_home:{nm:'단독 모바일 홈피', sub:'가게 정보 → 1장 홈피', link:'bungee/#home', ico:'▢', badge:'NEW'},
+  bungee_poster:{nm:'포스터 만들기', sub:'업종·혜택 → A4 포스터', link:'bungee/#poster', ico:'▣', badge:'NEW'}
+};
+var UNIT = {photo2doc:'장', theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:'장', theeraser:'장',
+  ad_magnet:'회', seller:'회', commerce:'회', keyword:'회'};
+
+var GROUPS = [
+  {no:'01', t:'받은 서류부터 연다', s:'안 열리는 첨부 · 폰 정리', ks:['viewer','thescan','organizer']},
+  {no:'02', t:'문서로 만든다', s:'사진·종이 → 한글·엑셀·계약서·서명', ks:['photo2doc','theform','contract','sign','theeraser']},
+  {no:'03', t:'팔고 알린다', s:'상세페이지·광고·키워드·등록', ks:['thedetail','ad_magnet','commerce','seller','keyword']},
+  {no:'04', t:'땅과 매물을 본다', s:'매물 정리 · 경사도 · 재개발 · 급매', ks:['realty','slope','redev','exchange']},
+  {no:'05', t:'사람을 읽고 말한다', s:'상담 자리 · 외국 손님', ks:['navi','tongyeok']},
+  {no:'06', t:'돈과 세무를 본다', s:'대출 가능성 · 창업 순서', ks:['loan','tax']},
+  {no:'07', t:'번개알바 — 가게 홍보', s:'견적 · 단독 홈피 · 포스터', ks:['bungee_interior','bungee_home','bungee_poster']},
+  {no:'08', t:'생활', s:'장보기 값 비교 · 사진 일기', ks:['sale','saycap']},
+  {no:'09', t:'준비 중', s:'나오면 맨 위에 알려 드립니다', ks:['append','youtube','travel']}
+];
+
+function byK(k){
+  var p = (window.PRODUCTS||[]).filter(function(x){ return x.k===k; })[0];
+  if (p) return {k:k, nm:String(p.nm).split(' — ')[0], sub:p.sub||'', link:p.link||('detail.html?k='+k),
+                 icon:p.icon||'', badge:p.badge||'', cat:p.cat||'', status:p.status||'live', price:p.price||''};
+  var e = LOCAL[k];
+  if (e) return {k:k, nm:e.nm, sub:e.sub, link:e.link, icon:e.icon||'', ico:e.ico||'', badge:e.badge||'', status:'live', price:''};
+  return {k:k, nm:k, sub:'', link:'', icon:'', ico:'·', badge:'', status:'soon', price:''};
 }
-/* ★ 내 단축바 탭에 담을 도구 = 카드의 ☆를 누른 것만 */
-function favList(){ return (window.PRODUCTS || []).filter(p => isFav(p.k)); }
-function markRecent(k){
-  if (!k) return;
-  var r = lsArr(REC_KEY).filter(x => x !== k);
-  r.unshift(k); if (r.length > 12) r = r.slice(0, 12);
-  lsPut(REC_KEY, r);
-  try { renderFav(); } catch(e){}
+function limLine(k){
+  var L = (window.KTS_KEYS && KTS_KEYS.limitOf) ? KTS_KEYS.limitOf(k) : 0;
+  if (!L) return '';
+  var u = UNIT[k] || '회';
+  return '<span class="lim">하루 ' + L + u + ' 무료 · 더 쓰기는 [그 이상 쓰기]</span>';
 }
-function renderFav(){
-  var box = $('#favRow'); if (!box) return;
-  var by = {}; (window.PRODUCTS || []).forEach(p => { by[p.k] = p; });
-  var pinned = favIds().filter(k => by[k]);
-  var rec = lsArr(REC_KEY);
-  var out = pinned.slice();
-  var add = k => { if (by[k] && out.indexOf(k) < 0 && out.length < 6) out.push(k); };
-  rec.forEach(add);
-  FAV_DEFAULT.forEach(add);
-  if (!out.length){ box.innerHTML = '<span class="favEmpty">☆ 누르면 이 줄에 고정됩니다</span>'; return; }
-  box.innerHTML = out.map(k => {
-    var p = by[k], pin = pinned.indexOf(k) >= 0;
-    var href = p.link || ('detail.html?k=' + k);
-    var nm = String(p.nm).split(' — ')[0];
-    var tag = pin ? '★ 고정' : (rec.indexOf(k) >= 0 ? '최근' : '추천');
-    return `<a class="fchip" href="${href}"><img src="${p.icon}" alt=""><span class="fnm"><span class="fn">${nm}</span><span class="fk">${tag}</span></span></a>`;
-  }).join('');
-}
-/* 별표·열기 버튼은 카드가 다시 그려져도 한 곳에서 받습니다 */
-document.addEventListener('click', e => {
-  if (!e.target.closest) return;
-  var st = e.target.closest('[data-fav]');
-  if (st){ e.preventDefault(); e.stopPropagation(); toggleFav(st.getAttribute('data-fav')); return; }
-  var go = e.target.closest('.pbtns a.go');
-  if (go) markRecent(go.getAttribute('data-k'));
-}, true);
+var BADGE = {NEW:'new','무료':'free',PRO:'pro','준비':'soon'};
 
 function render(){
-  const favMode = cur === 'fav';
-  const fsl = $('#favSlots'); if (fsl){ fsl.style.display = favMode ? '' : 'none'; if (favMode && FAVSL) FAVSL.paint(); }
-  const list = favMode ? favList()
-    : window.PRODUCTS.filter(p => cur === 'all' ? p.status !== 'soon' : (cur === 'soon' ? p.status === 'soon' : p.cat === cur));
-  $('#count').textContent = favMode ? (list.length ? list.length + '개 담김' : '') : list.length + '개';
-  renderLegend();
-  if (favMode && !list.length){
-    $('#plist').innerHTML = '<div class="favEmpty">카드 아래 ☆를 누르면 자주 쓰는 도구가 여기에 담깁니다</div>';
-    renderFav(); return;
-  }
-  $('#plist').innerHTML = list.map(p => {
-    const m = stMeta(p);
-    const fv = isFav(p.k);
-    const safeNm = String(p.nm).replace(/"/g,'&quot;');
-    return `
-    <div class="prow${p.status==='soon'?' soon':''}">
-      ${m ? `<button class="sbadge" type="button" data-k="${p.k}" style="--sc:${m.def.color};--sk:${m.def.ink}" aria-label="${safeNm} 시연 상태 ${m.def.label} — 누르면 수정 내역">${m.def.label}</button>` : ''}
-      <div class="pico"><img src="${p.icon}" alt="" loading="lazy"></div>
-      <div class="pmain">
-        <div class="pname"><span class="pnm">${p.nm}</span>${p.badge ? `<span class="bd ${BADGE[p.badge]||'new'}">${p.badge}</span>` : ''}</div>
-        <div class="psub">${p.sub}</div>
-        <div class="pbot">
-          <div class="price">${p.price}</div>
-          <div class="pbtns">
-            <button class="star${fv?' on':''}" type="button" data-fav="${p.k}" aria-pressed="${fv}" aria-label="${safeNm} 자주 쓰는 바로가기 ${fv?'해제':'고정'}">${fv?'★':'☆'}</button>
-            <a href="detail.html?k=${p.k}">자세히</a>
-            ${p.link ? `<a class="go" href="${p.link}" data-k="${p.k}">열기</a>`
-                     : `<button class="soonbtn" type="button">준비 중</button>`}
-          </div>
-        </div>
-      </div>
-    </div>`; }).join('');
-  renderFav();
-}
-$$('#tabs button').forEach(b => b.onclick = () => {
-  cur = b.dataset.c;
-  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-  render();
-});
-render();
-/* 카톡 초대 링크로 들어온 기기 — 안내 1줄만(자동 해금 없음) */
-try { if (window.KTSSlots) window.KTSSlots.ref.notice($('#refNote')); } catch(e){}
-/* 마스터 모드(PIN 2899)를 켜고 끌 때 배지 표시 기준(status.js show)이 바로 반영되게 */
-document.addEventListener('kts:master', () => { try { render(); } catch(e){} });
-
-/* 하단 전 도구 타일 허브 — products.js(열린 도구) + 직통 도구 */
-function buildTiles(){
-  const EXTRA = [
-    {nm:'더스캔', sub:'찍으면 바로 스캔', link:'thescan/', ico:'▣', nw:1},
-    {nm:'더싸인', sub:'사인·도장·간인', link:'sign/', ico:'✍', nw:1},
-    {nm:'더지우개', sub:'글씨·얼룩 지우기', link:'theeraser/', ico:'⌫'},
-    {nm:'더상세', sub:'상세페이지 1장', link:'thedetail/', ico:'▤'},
-    {nm:'더파일', sub:'표 사진 → 한글·엑셀', link:'converter.html', img:'shots/ic_photo2doc.png', nw:1},
-    {nm:'광고유입기', sub:'광고·댓글 문구 1분', link:'ad_magnet/', ico:'✦', nw:1},
-    {nm:'원클릭 셀러', sub:'담기→올리기→발주', link:'seller/', ico:'▦', nw:1}
-  ];
-  const short = s => String(s||'').split(/ — | \(/)[0];
-  /* catalog.json이 링크 뒤에 ?v=판번호를 붙이므로 같은 도구인지는 물음표 앞으로 비교합니다 */
-  const norm = u => String(u||'').split('?')[0];
-  const live = window.PRODUCTS.filter(p => p.status === 'live' && p.link && !EXTRA.some(e => norm(e.link) === norm(p.link)))
-    .map(p => ({nm:short(p.nm), sub:p.sub.split(' · ')[0].split('→')[0].trim(), link:p.link, img:p.icon, nw:p.badge==='NEW'}));
-  const soon = window.PRODUCTS.filter(p => p.status === 'soon').map(p => ({nm:short(p.nm), sub:'준비 중', img:p.icon, off:1}));
-  const all = [...EXTRA, ...live, ...soon];
-  /* 대표님 확정 순서 — 더뷰 · 더스캔 · 더지우개 · 더상세 · 더파일 · 더싸인 · 롱테일 · 독심술 · 세이캡 · 오늘의 특가 먼저, 나머지는 뒤로 */
-  const PRIORITY = ['viewer.html','thescan/','theeraser/','thedetail/','converter.html','sign/','longtail.html','navi2/','saycap/','sale/','seller/','ad_magnet/'];
-  const ord = t => { const i = PRIORITY.indexOf(norm(t.link)); return i < 0 ? 99 : i; };
-  all.sort((a, b) => ord(a) - ord(b));
-  $('#tiles').innerHTML = all.map(t => {
-    const ic = t.img ? `<img src="${t.img}" alt="" loading="lazy">` : t.ico;
-    const inner = `${t.nw ? '<span class="nw"></span>' : ''}<span class="ti">${ic}</span><b>${t.nm}</b><small>${t.sub}</small>`;
-    return t.off ? `<div class="tile off soonbtn">${inner}</div>` : `<a class="tile" href="${t.link}">${inner}</a>`;
-  }).join('');
-}
-buildTiles();
-
-/* 상단 원클릭 복귀 — 로고·떠 있는 버튼 모두 맨 위(처음 화면)로 */
-(function(){
-  const btn = $('#toTop');
-  const goTop = ev => {
-    if (ev) ev.preventDefault();
-    if (cur !== 'all'){ const b = $('#tabs button[data-c="all"]'); if (b) b.click(); }
-    window.scrollTo({top:0, behavior:'smooth'});
-  };
-  btn.onclick = goTop;
-  $('#homeLink').addEventListener('click', goTop);
-  const onScroll = () => btn.classList.toggle('on', window.scrollY > 420);
-  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
-})();
-/* 준비 중 카드 안내 */
-document.querySelectorAll('.soonbtn').forEach(b => b.onclick = () => {
-  const t = $('#toast'); t.textContent = '출시 준비 중입니다 — 문의 주시면 열리면 먼저 알려드립니다';
-  t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2000);
-});
-
-/* 시연 상태 배지 팝업 (2026-11-19 · 적립메모 74번) — 배지를 누를 때만 뜨고 카드 이동은 막습니다 */
-(function(){
-  const sheet = $('#ssheet'), scrim = $('#sscrim');
-  if (!sheet) return;
-  function openStatus(k){
-    const S = window.KTS_STATUS || { states:{}, items:{} };
-    const p = (window.PRODUCTS || []).filter(x => x.k === k)[0] || null;
-    const it = (S.items || {})[k] || {};
-    const key = it.st || 'before';
-    const def = (S.states || {})[key] || { label:'수정전', color:'#94A3B8', ink:'#0B1726' };
-    const pill = $('#sPill'), list = $('#sList'), go = $('#sGo');
-    pill.textContent = def.label;
-    pill.style.setProperty('--sc', def.color); pill.style.setProperty('--sk', def.ink);
-    list.style.setProperty('--sc', def.color);
-    $('#sName').textContent = p ? String(p.nm).split(' — ')[0] : k;
-    $('#sSub').textContent = it.sub || (key === 'before' ? '아직 시연·검수 전입니다.' : '');
-    const lines = (it.memo && it.memo.length) ? it.memo
-      : ['아직 시연·검수 전입니다. 대표님 시연 순서가 오면 여기서 바로 잡습니다.'];
-    list.innerHTML = lines.map(t => '<li>' + t + '</li>').join('');
-    if (p && p.link){ go.href = p.link; go.hidden = false;
-      go.textContent = key === 'done' ? '확정 상품 열기' : '이 상품 열기'; }
-    else { go.hidden = true; }
-    scrim.hidden = false; sheet.hidden = false; sheet.scrollTop = 0;
-  }
-  function closeStatus(){ sheet.hidden = true; scrim.hidden = true; }
-  document.addEventListener('click', e => {
-    const b = e.target.closest ? e.target.closest('.sbadge') : null;
-    if (!b) return;
-    e.preventDefault(); e.stopPropagation();
-    openStatus(b.getAttribute('data-k'));
-  }, true);
-  scrim.onclick = closeStatus; $('#sX').onclick = closeStatus; $('#sClose').onclick = closeStatus;
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) closeStatus(); });
-})();
-
-/* 모바일 쿠폰 받기 (2026-11-19 · 적립메모 71번) — 누를 때만 번호 입력, 서버 전송 없음 */
-(function(){
-  const open = $('#cpnOpen'), sheet = $('#csheet'), scrim = $('#cscrim');
-  if (!open || !sheet) return;
-  const TEL = '01020022899';
-  const onlyNum = s => String(s||'').replace(/[^0-9]/g,'');
-  const fmt = v => { v = onlyNum(v).slice(0,11);
-    return v.length === 11 ? v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7) : v; };
-  const tel = $('#cpTel'), err = $('#cpErr'), form = $('#cpForm'), done = $('#cpDone');
-  function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.add('on');
-    clearTimeout(toastMsg._t); toastMsg._t = setTimeout(()=>t.classList.remove('on'), 2400); }
-  function showDone(no, telText){
-    $('#cpNo').textContent = '쿠폰번호 ' + no;
-    $('#cpSum').textContent = (telText ? fmt(telText) + ' · ' : '') + '아래 문자를 보내면 접수 완료됩니다.';
-    $('#cpSms').href = 'sms:' + TEL + '?body=' + encodeURIComponent(
-      '[KTS 원클릭 모바일 쿠폰]\n쿠폰번호: ' + no + '\n연락처: ' + fmt(telText)
-      + '\n※ 보내신 순서대로 연락드립니다.');
-    done.hidden = false; form.hidden = true; $('#cpGuide').hidden = true;
-  }
-  function openSheet(){
-    let v = null; try { v = JSON.parse(localStorage.getItem('kts_rsv') || 'null'); } catch(_){}
-    if (v && v.no) showDone(v.no, v.tel || '');
-    scrim.hidden = false; sheet.hidden = false; sheet.scrollTop = 0;
-    if (form.hidden === false) setTimeout(()=>{ try { tel.focus(); } catch(_){} }, 90);
-  }
-  function closeSheet(){ sheet.hidden = true; scrim.hidden = true; }
-  open.onclick = e => { e.preventDefault(); openSheet(); };
-  scrim.onclick = closeSheet; $('#cxX').onclick = closeSheet;
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
-  tel.addEventListener('input', e => { e.target.value = fmt(e.target.value); });
-  form.addEventListener('submit', e => {
-    e.preventDefault(); err.hidden = true;
-    const num = onlyNum(tel.value);
-    if (num.length < 9 || num.length > 11){
-      err.textContent = '번호를 정확히 적어 주세요. 예) 010-1234-5678'; err.hidden = false; return; }
-    const no = 'C-1119-' + String(Math.floor(Math.random()*9000)+1000);
-    try { localStorage.setItem('kts_rsv', JSON.stringify({no:no, tel:fmt(num), at:new Date().toISOString()})); } catch(_){}
-    showDone(no, num);
+  var html = '';
+  GROUPS.forEach(function(g){
+    var rows = '';
+    g.ks.forEach(function(k){
+      var t = byK(k);
+      var soon = (t.status==='soon') || !t.link;
+      var mine = (window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
+      var bd = t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '';
+      var lim = limLine(k) || (soon ? '' : '<span class="lim zero">하루 무제한 무료</span>');
+      var detailHref = 'detail.html?k=' + encodeURIComponent(k);
+      rows += '<div class="row' + (soon ? ' soon' : '') + '">' +
+        '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
+        '<a class="main" href="' + detailHref + '">' +
+          '<div class="nm"><span>' + t.nm + '</span>' + bd + '</div>' +
+          '<div class="sub">' + (t.sub || '') + '</div>' + lim + '</a>' +
+        '<div class="act">' + mine +
+          (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
+                : '<button class="go" type="button" data-open="' + k + '">열기</button>') +
+        '</div></div>';
+    });
+    html += '<section class="sec"><div class="secH"><span class="no">' + g.no + '</span><h2>' + g.t + '</h2><p>' + g.s + '</p></div>' +
+      '<div class="rows">' + rows + '</div></section>';
   });
-})();
+  $('#sections').innerHTML = html;
+  if (window.KTS_KEYS) { KTS_KEYS.badge(); KTS_KEYS.strip('#boxStrip'); }
+}
 
-/* ===== 대표님 전용 마스터 모드 (PIN 2899) — 추가만, 손님 화면은 그대로 ===== */
-function toastMsg(m){ const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.add('on');
-  clearTimeout(toastMsg._t); toastMsg._t = setTimeout(()=>t.classList.remove('on'), 2200); }
+/* 열기 — 1회 무료 시연 → 내 박스 관문 */
+document.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('[data-open]') : null;
+  if (!b || !window.KTS_KEYS) return;
+  e.preventDefault();
+  var k = b.getAttribute('data-open'), t = byK(k);
+  if (!t.link) { toastMsg('아직 주소가 없습니다'); return; }
+  var r = KTS_KEYS.request(k);
+  if (r.ok) location.href = t.link;
+}, true);
+
+/* ============================================================================
+   ④ 해주세요 · Q&A (쇼룸 안쪽 창) — 투표 · 정산표
+   ========================================================================== */
+var ASK = [
+  {k:'ledger', nm:'카톡·문자 가계부', sub:'카드·문자 결제를 한 장으로', votes:3},
+  {k:'lease',  nm:'임대차 갱신 알림', sub:'만기 전에 문자로 알려 줌', votes:2},
+  {k:'invoice',nm:'세금계산서 1초', sub:'거래명세서 → 발행 서식', votes:2},
+  {k:'premium',nm:'상가 권리금 분석', sub:'권리금·임대료 적정선', votes:1},
+  {k:'job',    nm:'구인 공고 만들기', sub:'시급·조건 → 공고문 1장', votes:1},
+  {k:'review', nm:'손님 리뷰 답글', sub:'리뷰에 3초 답글', votes:1}
+];
+function askModal(){
+  var votes = {}; try { votes = JSON.parse(localStorage.getItem('kts_ask_votes')||'{}'); } catch(e){ votes = {}; }
+  var my = function(k){ return votes[k] ? 1 : 0; };
+  var rows = ASK.map(function(a){
+    var n = a.votes + my(a.k);
+    return '<div class="row"><div class="ico">' + a.sub.slice(0,1) + '</div>' +
+      '<div class="main"><div class="nm"><span>' + a.nm + '</span></div><div class="sub">' + a.sub + '</div>' +
+      '<span class="lim">' + n + '표 / 10표</span></div>' +
+      '<div class="act"><button class="go" type="button" data-vote="' + a.k + '"' + (my(a.k)?' disabled':'') + '>' + (my(a.k)?'투표함':'+1표') + '</button></div></div>';
+  }).join('');
+  var settle =
+    '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:2px">' +
+    '<tr><th style="border:1px solid #22314F;padding:7px;background:#132244;text-align:left;font-size:10.5px">만드는 사람</th>' +
+    '<th style="border:1px solid #22314F;padding:7px;background:#132244;text-align:left;font-size:10.5px">나누는 비율</th></tr>' +
+    '<tr><td style="border:1px solid #22314F;padding:7px;color:#DCE6F2;font-weight:800">원클릭이 맞춤 제작</td>' +
+    '<td style="border:1px solid #22314F;padding:7px;color:#AFBDD0">의뢰비 <b style="color:#FFD9A6">5 : 5</b></td></tr>' +
+    '<tr><td style="border:1px solid #22314F;padding:7px;color:#DCE6F2;font-weight:800">외부 제작자 입점</td>' +
+    '<td style="border:1px solid #22314F;padding:7px;color:#AFBDD0">제작자 <b style="color:#FFD9A6">70</b> : 원클릭 <b style="color:#FFD9A6">30</b></td></tr></table>';
+  var el = document.createElement('div'); el.className = 'kk-dim';
+  el.innerHTML = '<div class="kk-box" role="dialog" aria-modal="true" aria-label="해주세요 Q&A">' +
+    '<div class="kk-hd"><b>해주세요 · Q&amp;A</b><button class="x" data-a="close" aria-label="닫기">✕</button></div>' +
+    '<p class="kk-lead">필요한 도구에 한 표 주세요. <b style="color:#FFC98F">10표가 모이면 만듭니다</b> — 사람이 늘면 20·50·100표로 올립니다.</p>' +
+    '<div class="rows">' + rows + '</div>' +
+    '<div class="kk-sec"><b class="t">정산 방식</b><div class="ln">맞춤 의뢰는 5:5, 외부 제작자 입점은 3:7(제작자 70%)로 나눕니다. 사용 횟수와 정산 내역은 마이페이지 정산표에서 실시간으로 봅니다.</div>' + settle + '</div>' +
+    '<div class="kk-sec"><b class="t">이야기 보내기</b><div class="ln">투표는 지금 이 기기에서만 세고, 문자로 보내신 표를 대표님이 직접 셉니다. 만들었으면 좋겠는 도구를 한 줄로 적어 보내 주세요.</div>' +
+    '<a class="kk-b p" href="sms:01020022899?body=' + encodeURIComponent('[KTS 원클릭] 해주세요 — 만들었으면 하는 도구: ') + '">문자로 의뢰하기</a></div>' +
+    '<p class="kk-note">투표·의뢰는 앱 안에서 결제하지 않습니다. 제작이 정해지면 견적과 일정을 문자로 안내합니다.</p>' +
+    '<button class="kk-b g" data-a="close">닫기</button></div>';
+  document.body.appendChild(el);
+  function close(){ if (el.parentNode) el.parentNode.removeChild(el); }
+  el.addEventListener('click', function(e){ if (e.target === el) close(); });
+  Array.prototype.forEach.call(el.querySelectorAll('[data-a="close"]'), function(b){ b.onclick = close; });
+  Array.prototype.forEach.call(el.querySelectorAll('[data-vote]'), function(b){
+    b.onclick = function(){
+      var k = b.getAttribute('data-vote'), v = {};
+      try { v = JSON.parse(localStorage.getItem('kts_ask_votes')||'{}'); } catch(e){ v = {}; }
+      v[k] = 1; try { localStorage.setItem('kts_ask_votes', JSON.stringify(v)); } catch(e){}
+      close(); toastMsg('한 표 담았습니다 · 문자로도 보내시면 대표님이 직접 셉니다'); askModal();
+    };
+  });
+}
+$('#askOpen').onclick = askModal;
+
+/* 박스 버튼 */
+$('#kBtn').onclick = function(){ if (window.KTS_KEYS) KTS_KEYS.openPanel(KTS_KEYS.verified()?'box':'verify'); };
+if (window.KTS_KEYS) KTS_KEYS.onChange(function(){ render(); });
+
+/* 다시 그리기 — catalog.json이 늦게 와도 순서·이름이 그대로 */
+document.addEventListener('kts:catalog', function(){ render(); if (window.KTS && KTS.isMaster()) masterGrid(); });
+
+/* ============================================================================
+   마스터 모드 (PIN 2899)
+   ========================================================================== */
+function masterGrid(){
+  var LIVE = (window.PRODUCTS||[]).filter(function(p){ return p.status==='live' && p.link; });
+  var cat = window.KTS_CATALOG || {};
+  $('#mstN').textContent = String(LIVE.length);
+  $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
+  $('#mstGrid').innerHTML = LIVE.map(function(p){ return '<a href="' + p.link + '">' + String(p.nm).split(' — ')[0] + '</a>'; }).join('') +
+    '<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a><a href="bungee/">번개알바 도구</a><a href="ops/">군단 상황판</a>';
+}
 (function(){
-  const mst = $('#mst'), key = $('#mKey'), sheet = $('#msheet'), scrim = $('#mscrim'), pin = $('#mPin'), err = $('#mErr');
-  /* ?master=2899 로 들어오면 PIN 창 없이 바로 마스터 모드 (적립메모 86번) */
+  var mst=$('#mst'), key=$('#mKey'), sheet=$('#msheet'), scrim=$('#mscrim'), pin=$('#mPin'), err=$('#mErr');
   try{
-    const mm = (location.search.match(/[?&]master=([^&]+)/) || [])[1];
+    var mm=(location.search.match(/[?&]master=([^&]+)/)||[])[1];
     if (mm && window.KTS && window.KTS.setMaster(decodeURIComponent(mm))) {
-      setTimeout(() => { try { toastMsg('마스터 모드 — 전 상품 무제한으로 열립니다'); } catch(e){} }, 60);
+      setTimeout(function(){ toastMsg('마스터 모드 — 열쇠·잠금 없이 전부 열립니다'); }, 60);
     }
   }catch(e){}
-  const LIVE = () => (window.PRODUCTS || []).filter(p => p.status === 'live' && p.link);
-  function masterGrid(){
-    const cat = window.KTS_CATALOG || {};
-    $('#mstN').textContent = String(LIVE().length);
-    $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
-    $('#mstGrid').innerHTML = LIVE().map(p => `<a href="${p.link}">${String(p.nm).split(' — ')[0]}</a>`).join('')
-      + `<a href="ad_magnet/">광고유입기</a><a href="seller/">원클릭 셀러</a><a href="ops/">군단 상황판</a>`;
-  }
-  function paintMaster(){
-    const on = !!(window.KTS && window.KTS.isMaster());
-    mst.hidden = !on;
-    key.classList.toggle('on', on);
+  function paint(){
+    var on = !!(window.KTS && window.KTS.isMaster());
+    mst.hidden = !on; key.classList.toggle('on', on);
     key.textContent = on ? 'MASTER' : '⚙';
     key.setAttribute('aria-label', on ? '마스터 모드 사용 중 — 눌러 해제' : '대표님 마스터 모드 열기');
     if (on) masterGrid();
   }
   function closeSheet(){ sheet.hidden = true; scrim.hidden = true; }
-  key.onclick = () => {
-    if (window.KTS && window.KTS.isMaster()){ window.KTS.clearMaster(); paintMaster();
-      toastMsg('마스터 모드를 껐습니다 · 손님 화면(한도 그대로)'); return; }
-    err.hidden = true; pin.value = ''; sheet.hidden = false; scrim.hidden = false; setTimeout(()=>pin.focus(), 60);
+  key.onclick = function(){
+    if (window.KTS && window.KTS.isMaster()){ window.KTS.clearMaster(); paint(); toastMsg('마스터 모드를 껐습니다'); return; }
+    err.hidden = true; pin.value=''; sheet.hidden=false; scrim.hidden=false; setTimeout(function(){ pin.focus(); },60);
   };
   $('#mCancel').onclick = closeSheet; scrim.onclick = closeSheet;
-  $('#mGo').onclick = () => {
-    if (window.KTS && window.KTS.setMaster(pin.value)){ closeSheet(); paintMaster();
-      toastMsg('마스터 모드 — 전 상품 무제한으로 열립니다'); }
-    else { err.hidden = false; pin.value = ''; pin.focus(); }
+  $('#mGo').onclick = function(){
+    if (window.KTS && window.KTS.setMaster(pin.value)){ closeSheet(); paint(); toastMsg('마스터 모드 — 열쇠·잠금 없이 전부 열립니다'); }
+    else { err.hidden=false; pin.value=''; pin.focus(); }
   };
-  pin.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('#mGo').click(); } });
-  $('#mstOff').onclick = () => { window.KTS.clearMaster(); paintMaster(); toastMsg('마스터 모드를 껐습니다'); };
-  document.addEventListener('kts:catalog', () => { render(); buildTiles(); if (window.KTS && window.KTS.isMaster()) masterGrid(); });
-  paintMaster();
+  pin.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); $('#mGo').click(); } });
+  $('#mstOff').onclick = function(){ window.KTS.clearMaster(); paint(); toastMsg('마스터 모드를 껐습니다'); };
+  document.addEventListener('kts:master', function(){ try{ paint(); render(); }catch(e){} });
+  paint();
+})();
+
+/* 초대 링크로 들어온 기기 안내 */
+try {
+  if (window.KTSSlots && KTSSlots.ref && /[?&]invite=/.test(location.search)) {
+    var t=$('#nbTxt'); if (t) t.textContent = '초대 링크로 들어오셨습니다 · 본인 인증하면 열쇠 4개를 드립니다';
+    $('#nb').classList.remove('nbOff');
+  }
+} catch(e){}
+
+render();
+
+/* 맨 위로 */
+(function(){
+  var btn=$('#toTop');
+  btn.onclick=function(){ window.scrollTo({top:0,behavior:'smooth'}); };
+  window.addEventListener('scroll', function(){ btn.classList.toggle('on', window.scrollY>420); }, {passive:true});
 })();
 </script>
 </body>

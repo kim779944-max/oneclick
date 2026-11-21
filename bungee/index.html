@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script src="../master.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>번개알바 도구 — 인테리어 견적 · 단독 홈피 · 포스터</title>
+<meta name="theme-color" content="#0A1224">
+<meta name="description" content="평당 견적 3안 비교, 사장님 단독 모바일 홈피 1장, A4 포스터. 설치 없이 폰에서 만들고 바로 저장합니다.">
+<link rel="icon" href="../icon.png">
+<style>
+:root{--bg:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+ --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--or:#FF6B00;--or2:#FFA24D;--on:#0A1224}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+ font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;letter-spacing:-.3px}
+body{padding-bottom:30px}
+#app{max-width:560px;margin:0 auto;padding:0 15px}
+header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--bg) 82%,rgba(10,18,36,0));padding:12px 0 8px;display:flex;align-items:center;gap:9px}
+header b{font-size:15px;font-weight:900;letter-spacing:-.5px}
+header b i{font-style:normal;color:var(--or2)}
+header .sp{flex:1}
+header a{font-size:11px;font-weight:800;color:#FFA24D;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:6px 9px;white-space:nowrap}
+h1{font-size:20px;line-height:1.34;letter-spacing:-.8px;margin:8px 0 0;font-weight:900;word-break:keep-all}
+h1 em{font-style:normal;color:var(--or)}
+.lead{font-size:12px;line-height:1.65;color:var(--ink2);margin:8px 0 0;word-break:keep-all}
+.tabs{display:flex;gap:6px;overflow:auto;margin-top:13px;padding-bottom:3px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;font-family:inherit;font-size:12px;font-weight:800;color:var(--gray);background:#0E1B33;border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
+.tabs button.on{color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or)}
+.card{border:1px solid var(--line);border-radius:15px;padding:12px 13px;margin-top:11px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.card h2{margin:0 0 9px;font-size:13px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
+.card h2 i{font-style:normal;font-size:9.5px;font-weight:900;color:var(--on);background:linear-gradient(90deg,#FF8A2B,#FFA24D);border-radius:6px;padding:2px 6px}
+.f{display:grid;gap:8px}
+.f label{display:block;font-size:10.5px;font-weight:900;color:#9DADC4;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:#0B1729;
+ border:1px solid #2E4370;border-radius:10px;padding:10px 11px;letter-spacing:-.2px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--or)}
+.f .two{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.hint{font-size:9.5px;color:#7C8DA6;line-height:1.5;margin:5px 0 0}
+.chk{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chk label{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#DCE6F2;background:#0E1A33;
+ border:1px solid #26375F;border-radius:9px;padding:7px 9px;cursor:pointer;margin:0}
+.chk input{width:auto;margin:0}
+.chk label.on{border-color:rgba(255,107,0,.6);background:rgba(255,107,0,.12);color:#fff}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;font-family:inherit;font-size:13.5px;font-weight:900;
+ border:0;border-radius:11px;padding:12px;cursor:pointer;margin-top:10px;background:linear-gradient(180deg,#FF8A2B,var(--or));color:var(--on)}
+.btn.g{background:#12203C;border:1px solid var(--line2);color:#DCE6F2;font-size:12.5px;padding:11px}
+.btn:active{transform:translateY(1px)}
+.res{margin-top:11px;border:1px solid rgba(255,107,0,.45);border-radius:13px;background:linear-gradient(160deg,rgba(255,107,0,.12),rgba(255,255,255,.015) 60%);padding:11px 12px}
+.res .h{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:#fff}
+.res .h em{font-style:normal;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px}
+.tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:11.5px}
+.tbl th,.tbl td{border:1px solid #22314F;padding:7px 8px;text-align:left;line-height:1.5}
+.tbl th{background:#132244;color:#fff;font-weight:900;font-size:10.5px}
+.tbl td.num{text-align:right;font-weight:900;color:#fff;white-space:nowrap}
+.tbl tr.rec td{background:rgba(255,107,0,.08)}
+.big{font-size:20px;font-weight:900;color:#FFA24D;letter-spacing:-.6px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.acts a,.acts button{display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:12px;font-weight:900;
+ text-decoration:none;border-radius:10px;padding:10px 8px;border:1px solid var(--line2);background:#12203C;color:#DCE6F2;cursor:pointer}
+.acts .go{grid-column:1/-1;background:linear-gradient(180deg,#FF8A2B,var(--or));border-color:var(--or);color:var(--on)}
+/* 홈피 미리보기 */
+.device{border:1px solid #2E4370;border-radius:18px;padding:8px;background:#0B1729;margin-top:9px}
+.shot{background:#0A1128;border-radius:12px;overflow:hidden;color:#F3F6FA}
+.shot .top{padding:18px 14px 14px;background:radial-gradient(120% 80% at 50% 0%,#16305A 0%,transparent 70%)}
+.shot .top .k{display:inline-block;font-size:9px;font-weight:900;color:#0A1224;background:linear-gradient(90deg,#FF8A2B,#FFA24D);border-radius:999px;padding:3px 8px}
+.shot .top h3{margin:9px 0 0;font-size:20px;font-weight:900;letter-spacing:-.6px;line-height:1.25}
+.shot .top p{margin:5px 0 0;font-size:11px;color:#AFBDD0;line-height:1.55}
+.shot .info{display:grid;gap:6px;padding:0 14px 14px}
+.shot .info div{font-size:11px;color:#DCE6F2;font-weight:800;background:rgba(255,255,255,.04);border:1px solid #22314F;border-radius:9px;padding:8px 10px}
+.shot .menu{padding:0 14px 14px}
+.shot .menu .mi{display:flex;align-items:baseline;gap:8px;font-size:11.5px;padding:7px 0;border-top:1px solid #1B2946}
+.shot .menu .mi b{font-weight:900;color:#fff}
+.shot .menu .mi .d{flex:1;border-bottom:1px dashed #2A3C63;margin:0 2px 2px}
+.shot .menu .mi .p{font-weight:900;color:#FFA24D}
+.shot .cta{display:block;margin:0 14px 14px;text-align:center;background:linear-gradient(90deg,#FF8A2B,#FF6B00);color:#0A1224;
+ font-weight:900;font-size:12px;text-decoration:none;border-radius:10px;padding:11px}
+/* 포스터 */
+.poster{margin-top:9px;border:1px solid #2E4370;border-radius:12px;overflow:hidden;background:#0A1128}
+.poster .ph{padding:22px 18px 16px;background:linear-gradient(160deg,#12233F,#0A1128)}
+.poster .ph .lab{display:inline-block;font-size:9px;font-weight:900;color:#0A1224;background:#4ADE80;border-radius:999px;padding:3px 8px}
+.poster .ph h3{margin:10px 0 0;font-size:23px;line-height:1.22;font-weight:900;letter-spacing:-.8px}
+.poster .ph h3 em{font-style:normal;color:#FFA24D}
+.poster .ph p{margin:7px 0 0;font-size:11.5px;color:#AFBDD0;line-height:1.5}
+.poster ul{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.poster ul li{font-size:12px;font-weight:800;color:#F3F6FA;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.35);border-radius:9px;padding:8px 10px}
+.poster .pf{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:11px;border-top:1px solid #22314F}
+.poster .pf b{font-size:15px;font-weight:900;color:#FFA24D}
+.poster .pf span{font-size:10px;color:#8FA0B8;font-weight:700}
+/* 전체뷰 */
+.full{position:fixed;inset:0;z-index:120;background:#070D1C;overflow:auto;display:none}
+.full.on{display:block}
+.full .bar{position:sticky;top:0;display:flex;align-items:center;gap:7px;padding:11px 14px;background:rgba(7,13,28,.96);border-bottom:1px solid #1B2946}
+.full .bar b{font-size:12px;font-weight:900;flex:1}
+.full .bar button{font-family:inherit;font-size:11.5px;font-weight:900;border-radius:9px;padding:7px 10px;border:1px solid var(--line2);background:#12203C;color:#DCE6F2;cursor:pointer}
+.full .body{padding:14px;max-width:560px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);
+ color:#fff;font-size:12px;font-weight:800;padding:9px 14px;border-radius:999px;opacity:0;transition:.2s;z-index:200;pointer-events:none;max-width:92%;text-align:center}
+.toast.on{opacity:1}
+.note{font-size:10px;line-height:1.6;color:#7C8DA6;margin:10px 0 0;word-break:keep-all}
+.note b{color:#C7D3E3}
+.foot{margin-top:20px;border-top:1px solid #1B2946;padding-top:13px;font-size:10.5px;line-height:1.7;color:#7D8CA6}
+.foot a{color:#9DAEC5;text-decoration:none;border-bottom:1px solid #2C3F66}
+@media print{
+  header,.tabs,.card:not(.keep),.acts,.note,.foot,.res .h em,.full .bar{display:none!important}
+  body{background:#fff;color:#000}
+  .poster{border:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <b>번개알바 <i>도구</i></b>
+    <span class="sp"></span>
+    <a href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭 쇼룸</a>
+  </header>
+
+  <h1>가게 홍보 3종 — <em>견적 · 홈피 · 포스터</em></h1>
+  <p class="lead">평당 견적을 비교하고, 단독 모바일 홈피 1장과 A4 포스터를 폰에서 바로 만듭니다. 만든 것은 저장·공유합니다.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="on" data-t="interior">인테리어 견적</button>
+    <button data-t="home">단독 홈피</button>
+    <button data-t="poster">포스터</button>
+  </div>
+
+  <!-- ============ 1. 인테리어 견적 ============ -->
+  <section id="tab-interior">
+    <div class="card">
+      <h2><i>01</i>어디를 얼마에 고치나</h2>
+      <div class="f">
+        <div class="two">
+          <div><label>평수</label><input id="iPyeong" type="number" inputmode="numeric" value="20" min="3" max="300"></div>
+          <div><label>등급</label>
+            <select id="iGrade"><option value="basic">실속 (임대·급한 공사)</option><option value="std" selected>표준 (사는 집)</option><option value="high">고급 (매장·노출)</option></select>
+          </div>
+        </div>
+        <div>
+          <label>공사 범위 (빼면 그만큼 줄어듭니다)</label>
+          <div class="chk" id="iScope">
+            <label class="on"><input type="checkbox" value="demo" checked>철거</label>
+            <label class="on"><input type="checkbox" value="elec" checked>전기</label>
+            <label class="on"><input type="checkbox" value="paper" checked>도배</label>
+            <label class="on"><input type="checkbox" value="tile" checked>타일·장판</label>
+            <label class="on"><input type="checkbox" value="kitchen" checked>주방</label>
+            <label class="on"><input type="checkbox" value="bath" checked>욕실</label>
+          </div>
+        </div>
+        <div class="two">
+          <div><label>기준 평당 단가(만원)</label><input id="iUnit" type="number" inputmode="numeric" value="105"></div>
+          <div><label>업체 수</label><input id="iVend" type="number" inputmode="numeric" value="3" min="1" max="6"></div>
+        </div>
+      </div>
+      <button class="btn" id="iGo" type="button">확인하기</button>
+      <p class="hint">평당 단가는 2026년 상반기 수도권 시세를 참고한 기본값입니다. 업체마다 다르니 받은 견적과 비교해 고쳐 쓰세요.</p>
+    </div>
+    <div id="iRes"></div>
+  </section>
+
+  <!-- ============ 2. 단독 홈피 ============ -->
+  <section id="tab-home" hidden>
+    <div class="card">
+      <h2><i>02</i>사장님 단독 홈피 1장</h2>
+      <div class="f">
+        <div class="two">
+          <div><label>가게 이름</label><input id="hName" value="미사 순대국" placeholder="예: 미사 순대국"></div>
+          <div><label>업종</label><input id="hKind" value="순대국·수육" placeholder="예: 순대국·수육"></div>
+        </div>
+        <div class="two">
+          <div><label>전화</label><input id="hTel" value="010-2002-2899" inputmode="tel"></div>
+          <div><label>영업시간</label><input id="hTime" value="매일 09:00 ~ 21:00" ></div>
+        </div>
+        <div><label>주소</label><input id="hAddr" value="경기 하남시 미사강변대로 100"></div>
+        <div><label>한 줄 소개</label><input id="hIntro" value="매일 아침 끓이는 사골, 미사에서 가장 진한 국물"></div>
+        <div><label>대표 메뉴 (이름 / 값 · 쉼표로 구분)</label><input id="hMenu" value="순대국밥 10,000 / 수육 소 25,000 / 오소리감투 12,000"></div>
+      </div>
+      <button class="btn" id="hGo" type="button">확인하기</button>
+    </div>
+    <div id="hRes"></div>
+  </section>
+
+  <!-- ============ 3. 포스터 ============ -->
+  <section id="tab-poster" hidden>
+    <div class="card">
+      <h2><i>03</i>A4 포스터 1장</h2>
+      <div class="f">
+        <div class="two">
+          <div><label>가게 이름</label><input id="pName" value="미사 순대국"></div>
+          <div><label>업종</label><input id="pKind" value="순대국·수육 전문"></div>
+        </div>
+        <div><label>큰 문구</label><input id="pHead" value="오늘 하루, 국물값 인상 없이"></div>
+        <div><label>혜택 3줄 (줄바꿈 또는 / 로 구분)</label>
+          <textarea id="pBenefits" rows="3">순대국밥 10,000원 · 수육 소 25,000원
+단독 홈피 · 메뉴사진 무료 제작
+구인·광고는 번개알바로 문의</textarea></div>
+        <div class="two">
+          <div><label>전화</label><input id="pTel" value="010-2002-2899" inputmode="tel"></div>
+          <div><label>아래 작은 글씨</label><input id="pFoot" value="미사점 · 매일 09:00~21:00"></div>
+        </div>
+      </div>
+      <button class="btn" id="pGo" type="button">확인하기</button>
+    </div>
+    <div id="pRes"></div>
+  </section>
+
+  <p class="note">
+    <b>이 화면에서는 결제하지 않습니다.</b> 만들고 저장하는 것은 모두 무료이고, 홈피·포스터에 들어가는 업체 확인(주소·전화·영업시간)은
+    사장님이 마지막에 한 번 봐 주세요. 견적은 참고값이며 계약 전 현장 확인이 필요합니다.
+  </p>
+  <div class="foot">
+    <b>KTS 원클릭</b> · <a href="https://autooneclick.com/" target="_blank" rel="noopener">쇼룸</a> ·
+    <a href="https://bungaealba.kr/" target="_blank" rel="noopener">번개알바</a> · 문의 <a href="tel:01020022899">010-2002-2899</a>
+  </div>
+</div>
+
+<div class="full" id="full">
+  <div class="bar"><b id="fullT">전체뷰</b>
+    <button type="button" id="fullPrint">인쇄</button>
+    <button type="button" id="fullClose">닫기 ✕</button>
+  </div>
+  <div class="body" id="fullBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var $=function(s){return document.querySelector(s);};
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('on');},2200);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function num(v){var n=Number(String(v||'').replace(/[^0-9.]/g,''));return isFinite(n)?n:0;}
+function won(n){return Number(n||0).toLocaleString('ko-KR');}
+function dl(name,text,type){
+  var b=new Blob([text],{type:(type||'text/plain')+';charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},900);
+}
+function shareText(title,text){
+  if(navigator.share){return navigator.share({title:title,text:text}).catch(function(){});}
+  if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(text).then(function(){toast('복사했습니다 — 카톡에 붙여 넣으세요');});}
+  toast('복사가 안 되는 브라우저입니다');
+}
+/* 전체뷰 */
+function openFull(title,html){$('#fullT').textContent=title;$('#fullBody').innerHTML=html;$('#full').classList.add('on');window.scrollTo({top:0});}
+$('#fullClose').onclick=function(){$('#full').classList.remove('on');};
+$('#fullPrint').onclick=function(){window.print();};
+
+/* 탭 */
+$('#tabs').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  Array.prototype.forEach.call($('#tabs').children,function(x){x.classList.toggle('on',x===b);});
+  ['interior','home','poster'].forEach(function(t){$('#tab-'+t).hidden=(t!==b.getAttribute('data-t'));});
+});
+
+/* 범위 체크 표시 */
+Array.prototype.forEach.call($('#iScope').querySelectorAll('input'),function(cb){
+  cb.addEventListener('change',function(){cb.closest('label').classList.toggle('on',cb.checked);});
+});
+
+/* ================= 1. 인테리어 ================= */
+var SCOPE={demo:['철거',6],elec:['전기',8],paper:['도배',10],tile:['타일·장판',10],kitchen:['주방',22],bath:['욕실',14]};
+var GRADE={basic:['실속',75,95],std:['표준',105,125],high:['고급',140,165]};
+var lastEst=null;
+function scopeList(){
+  var on=[];Array.prototype.forEach.call($('#iScope').querySelectorAll('input'),function(cb){if(cb.checked)on.push(cb.value);});
+  return on;
+}
+function estimate(){
+  var p=num($('#iPyeong').value), unit=num($('#iUnit').value), g=$('#iGrade').value, v=num($('#iVend').value)||3;
+  var on=scopeList(), cut=0;
+  Object.keys(SCOPE).forEach(function(k){ if(on.indexOf(k)<0) cut+=SCOPE[k][1]; });
+  var keep=Math.max(0.2,1-cut/100);
+  var base=GRADE[g][1];
+  var rows=[
+    {nm:'실속', per:Math.round(base*0.72), note:'자재·마감 기본, 공정 최소'},
+    {nm:'표준', per:Math.round(base), note:'사는 집 기준, 하자 적은 기본 자재'},
+    {nm:'고급', per:Math.round(base*1.38), note:'노출되는 매장·거실 마감'}
+  ].map(function(r){
+    var per=Math.round(r.per*keep);
+    return {nm:r.nm, per:per, total:Math.round(per*p), note:r.note};
+  });
+  return {pyeong:p, unit:unit, v:v, on:on, cut:cut, rows:rows, grade:GRADE[g][0]};
+}
+function renderEst(){
+  var e=estimate();lastEst=e;
+  var min=Math.round(e.rows[0].total*0.92), max=Math.round(e.rows[2].total*1.08);
+  var scopeTxt=e.on.map(function(k){return SCOPE[k][0];}).join(' · ')||'범위 없음';
+  var rows=e.rows.map(function(r,i){
+    return '<tr'+(i===1?' class="rec"':'')+'><td>'+r.nm+'<div style="font-size:9.5px;color:#8FA0B8;font-weight:700">'+r.note+'</div></td>'+
+      '<td class="num">'+won(r.per)+'만</td><td class="num">'+won(r.total)+'만원</td></tr>';
+  }).join('');
+  var box=`
+  <div class="res">
+    <div class="h"><em>확인</em> ${e.pyeong}평 · ${e.grade} 기준 3안</div>
+    <table class="tbl">
+      <tr><th>등급</th><th style="text-align:right">평당</th><th style="text-align:right">총액</th></tr>
+      ${rows}
+    </table>
+    <p style="margin:8px 0 0;font-size:11px;color:#AFBDD0;line-height:1.6">
+      범위 <b style="color:#FFD9A6">${esc(scopeTxt)}</b>${e.cut?' · 뺀 항목 '+e.cut+'% 반영':''}<br>
+      업체 ${e.v}곳이면 대략 <b style="color:#FFD9A6">${won(Math.round(e.rows[1].total/e.v))}만원</b>씩 나눠 받습니다.</p>
+    <div class="acts">
+      <button class="go" type="button" id="iFull">전체뷰로 보기</button>
+      <button type="button" id="iCopy">복사</button>
+      <button type="button" id="iShare">공유하기</button>
+    </div>
+  </div>`;
+  $('#iRes').innerHTML=box;
+  $('#iFull').onclick=function(){openFull('견적 3안',estFullHtml(e));};
+  $('#iCopy').onclick=function(){shareText('견적',estText(e));};
+  $('#iShare').onclick=function(){shareText('KTS 번개알바 견적',estText(e));};
+}
+function estText(e){
+  return '[인테리어 견적 참고]\n'+e.pyeong+'평 · 범위: '+e.on.map(function(k){return SCOPE[k][0];}).join(', ')+
+   '\n'+e.rows.map(function(r){return '· '+r.nm+' 평당 '+won(r.per)+'만 → 총 '+won(r.total)+'만원';}).join('\n')+
+   '\n※ 참고값입니다. 계약 전 현장 확인·업체 견적 비교가 필요합니다.';
+}
+function estFullHtml(e){
+  return '<div class="card keep"><h2><i>견적</i>'+e.pyeong+'평 · 3안 비교</h2>'+
+   '<table class="tbl"><tr><th>등급</th><th style="text-align:right">평당</th><th style="text-align:right">총액</th></tr>'+
+   e.rows.map(function(r){return '<tr><td>'+r.nm+'</td><td class="num">'+won(r.per)+'만</td><td class="num">'+won(r.total)+'만원</td></tr>';}).join('')+
+   '</table><p style="font-size:11px;color:#AFBDD0;margin-top:8px">범위: '+esc(e.on.map(function(k){return SCOPE[k][0];}).join(' · '))+'</p>'+
+   '<p class="note">참고 시세입니다. 업체 견적서와 비교해 고쳐 쓰세요.</p>'+
+   '<div class="acts"><button class="go" type="button" onclick="window.print()">저장(인쇄·PDF)</button>'+
+   '<button type="button" onclick="shareText(\'견적\',\''+estText(e).replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">공유하기</button></div></div>';
+}
+$('#iGo').onclick=function(){ try{ renderEst(); }catch(err){ toast('숫자를 확인해 주세요'); } };
+
+/* ================= 2. 단독 홈피 ================= */
+function homeData(){
+  var menu=String($('#hMenu').value||'').split('/').map(function(x){return x.trim();}).filter(Boolean).map(function(x){
+    var m=x.split(/\s+/); var price=m.pop(); return {nm:m.join(' '), pr:price};
+  });
+  return {nm:$('#hName').value.trim()||'가게 이름', kind:$('#hKind').value.trim(), tel:$('#hTel').value.trim(),
+    time:$('#hTime').value.trim(), addr:$('#hAddr').value.trim(), intro:$('#hIntro').value.trim(), menu:menu};
+}
+function homeHtml(d){
+  return '<div class="shot"><div class="top"><span class="k">'+esc(d.kind||'가게')+'</span>'+
+    '<h3>'+esc(d.nm)+'</h3><p>'+esc(d.intro||'')+'</p></div>'+
+    '<div class="info">'+(d.time?'<div>🕘 '+esc(d.time)+'</div>':'')+
+    (d.addr?'<div>📍 '+esc(d.addr)+'</div>':'')+(d.tel?'<div>📞 '+esc(d.tel)+'</div>':'')+'</div>'+
+    (d.menu.length?'<div class="menu">'+d.menu.map(function(m){return '<div class="mi"><b>'+esc(m.nm)+'</b><span class="d"></span><span class="p">'+esc(m.pr)+'</span></div>';}).join('')+'</div>':'')+
+    '<a class="cta" href="tel:'+esc((d.tel||'').replace(/[^0-9]/g,''))+'">전화 걸기</a></div>';
+}
+var lastHome=null;
+function homePageHtml(d){
+  return '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">'+
+   '<meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.nm)+'</title>'+
+   '<style>body{margin:0;background:#0A1128;color:#F3F6FA;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}'+
+   '.top{padding:44px 22px 26px;background:radial-gradient(120% 80% at 50% 0%,#16305A,transparent 70%)}'+
+   '.k{display:inline-block;font-size:11px;font-weight:900;color:#0A1224;background:linear-gradient(90deg,#FF8A2B,#FFA24D);border-radius:999px;padding:4px 10px}'+
+   'h1{margin:12px 0 0;font-size:27px;line-height:1.25;letter-spacing:-1px}.lead{margin:8px 0 0;font-size:13px;color:#AFBDD0;line-height:1.6}'+
+   '.info{display:grid;gap:8px;padding:0 22px 22px}.info div{font-size:13px;font-weight:800;background:rgba(255,255,255,.05);border:1px solid #22314F;border-radius:11px;padding:11px 13px}'+
+   '.menu{padding:0 22px 22px}.mi{display:flex;gap:10px;align-items:baseline;font-size:14px;padding:10px 0;border-top:1px solid #1B2946}.mi b{font-weight:900}.mi .d{flex:1;border-bottom:1px dashed #2A3C63;margin-bottom:3px}.mi .p{color:#FFA24D;font-weight:900}'+
+   '.cta{display:block;margin:0 22px 30px;text-align:center;background:linear-gradient(90deg,#FF8A2B,#FF6B00);color:#0A1224;font-weight:900;text-decoration:none;border-radius:12px;padding:15px}'+
+   '.wm{text-align:center;font-size:11px;color:#4DA3FF;padding-bottom:26px;text-decoration:none;display:block}</style></head><body>'+
+   '<div class="top"><span class="k">'+esc(d.kind||'가게')+'</span><h1>'+esc(d.nm)+'</h1><p class="lead">'+esc(d.intro||'')+'</p></div>'+
+   '<div class="info">'+(d.time?'<div>🕘 '+esc(d.time)+'</div>':'')+(d.addr?'<div>📍 '+esc(d.addr)+'</div>':'')+(d.tel?'<div>📞 '+esc(d.tel)+'</div>':'')+'</div>'+
+   (d.menu.length?'<div class="menu">'+d.menu.map(function(m){return '<div class="mi"><b>'+esc(m.nm)+'</b><span class="d"></span><span class="p">'+esc(m.pr)+'</span></div>';}).join('')+'</div>':'')+
+   '<a class="cta" href="tel:'+esc((d.tel||'').replace(/[^0-9]/g,''))+'">전화 걸기</a>'+
+   '<a class="wm" href="https://autooneclick.com/" target="_blank">autooneclick.com</a>'+
+   '</body></html>';
+}
+function renderHome(){
+  var d=homeData();lastHome=d;
+  $('#hRes').innerHTML='<div class="res"><div class="h"><em>확인</em>'+esc(d.nm)+' 홈피 1장</div>'+
+    '<div class="device">'+homeHtml(d)+'</div>'+
+    '<div class="acts"><button class="go" type="button" id="hFull">전체뷰로 보기</button>'+
+    '<button type="button" id="hSave">저장(HTML)</button><button type="button" id="hShare">공유하기</button></div></div>';
+  $('#hFull').onclick=function(){openFull('홈피 미리보기','<div class="device">'+homeHtml(d)+'</div>');};
+  $('#hSave').onclick=function(){
+    dl((d.nm||'가게')+'_홈피.html',homePageHtml(d),'text/html');
+    toast('홈피 파일을 저장했습니다 · 카톡으로 보내면 바로 열립니다');
+  };
+  $('#hShare').onclick=function(){
+    shareText(d.nm+' 홈피',d.nm+'\n'+(d.intro||'')+'\n'+(d.time||'')+'\n'+(d.addr||'')+'\n'+(d.tel||''));
+  };
+}
+$('#hGo').onclick=function(){ try{ renderHome(); }catch(e){ toast('가게 정보를 확인해 주세요'); } };
+
+/* ================= 3. 포스터 ================= */
+function posterData(){
+  var b=String($('#pBenefits').value||'').split(/\n|\//).map(function(x){return x.trim();}).filter(Boolean).slice(0,4);
+  return {nm:$('#pName').value.trim(), kind:$('#pKind').value.trim(), head:$('#pHead').value.trim(),
+    ben:b, tel:$('#pTel').value.trim(), foot:$('#pFoot').value.trim()};
+}
+function posterHtml(d){
+  return '<div class="poster"><div class="ph"><span class="lab">'+esc(d.kind||'가게')+'</span>'+
+    '<h3>'+esc(d.nm)+'<br><em>'+esc(d.head)+'</em></h3>'+
+    '<ul>'+d.ben.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>'+
+    '<div class="pf"><b>'+esc(d.tel)+'</b><span>'+esc(d.foot)+'</span></div></div></div>';
+}
+var lastPoster=null;
+function renderPoster(){
+  var d=posterData();lastPoster=d;
+  $('#pRes').innerHTML='<div class="res"><div class="h"><em>확인</em>A4 포스터 1장</div>'+
+    posterHtml(d)+
+    '<div class="acts"><button class="go" type="button" id="pFull">전체뷰로 보기</button>'+
+    '<button type="button" id="pImg">이미지 저장</button><button type="button" id="pPrint">인쇄(저장)</button></div></div>';
+  $('#pFull').onclick=function(){openFull('포스터','<div style="max-width:420px;margin:0 auto">'+posterHtml(d)+'</div>');};
+  $('#pPrint').onclick=function(){window.print();};
+  $('#pImg').onclick=function(){ posterPng(d); };
+}
+/* 캔버스로 PNG 저장 (794x1123 = A4 96dpi) */
+function posterPng(d){
+  try{
+    var W=794,H=1123,c=document.createElement('canvas');c.width=W;c.height=H;
+    var x=c.getContext('2d');
+    var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#12233F');g.addColorStop(1,'#0A1128');
+    x.fillStyle=g;x.fillRect(0,0,W,H);
+    x.fillStyle='#FF6B00';x.fillRect(0,0,W,10);
+    x.fillStyle='#4ADE80';x.font='900 22px sans-serif';x.fillText('번개알바',60,90);
+    x.fillStyle='#F3F6FA';x.font='900 62px sans-serif';
+    wrapText(x,d.nm,60,180,W-120,70);
+    x.fillStyle='#FFA24D';wrapText(x,d.head,60,300,W-120,66);
+    x.fillStyle='#F3F6FA';x.font='800 28px sans-serif';
+    var y=440;
+    d.ben.forEach(function(t){ x.fillStyle='rgba(255,107,0,.14)';x.fillRect(60,y-32,W-120,52); x.fillStyle='#F3F6FA'; x.fillText(t,80,y); y+=72; });
+    x.fillStyle='#22314F';x.fillRect(60,H-190,W-120,1);
+    x.fillStyle='#FFA24D';x.font='900 44px sans-serif';x.fillText(d.tel,60,H-120);
+    x.fillStyle='#8FA0B8';x.font='700 22px sans-serif';x.fillText(d.foot,60,H-80);
+    x.fillStyle='#4DA3FF';x.font='900 20px sans-serif';x.fillText('autooneclick.com',W-250,H-40);
+    c.toBlob(function(b){
+      var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(d.nm||'가게')+'_포스터.png';
+      document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},900);
+      toast('포스터 그림을 저장했습니다');
+    },'image/png');
+  }catch(e){ toast('이 브라우저에서는 인쇄로 저장해 주세요'); }
+}
+function wrapText(ctx,text,x,y,maxW,lh){
+  var words=String(text).split(' '),line='',yy=y;
+  for(var i=0;i<words.length;i++){
+    var t=line?line+' '+words[i]:words[i];
+    if(ctx.measureText(t).width>maxW && line){ ctx.fillText(line,x,yy); line=words[i]; yy+=lh; }
+    else line=t;
+  }
+  if(line) ctx.fillText(line,x,yy);
+}
+$('#pGo').onclick=function(){ try{ renderPoster(); }catch(e){ toast('내용을 확인해 주세요'); } };
+
+/* 처음 화면 — 견적 한 번 보여 주기 */
+try{ renderEst(); }catch(e){}
+</script>
+
+<script>window.KTS_UX_CFG={tool:"bungee",free:"가게 홍보 3종 무료",wm:["#iRes","#hRes","#pRes"],flow:1};</script>
+<script src="../ux.js"></script>
+</body>
+</html>
