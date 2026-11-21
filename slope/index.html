@@ -233,6 +233,16 @@ details.adv .keyrow{margin-top:7px}
 .rcredit a{color:#5AA9FF;text-decoration:none}
 .rcredit.off{display:none}
 .rcopy{display:block;width:100%;margin-top:8px;border:0;background:none;color:#8FA1B8;font-size:11px;font-weight:900;text-decoration:underline;cursor:pointer;padding:8px}
+/* 2026-11-21 픽셀 보기 — 5m 칸을 SUBDIV×SUBDIV 로 나눠 칸마다 자기 경사 색(하드 엣지) */
+.pxrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pxl{font-size:10.5px;font-weight:900;color:#8FA1B8}
+.pxseg{display:inline-flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.pxseg button{border:0;background:#0E1A33;color:#9FB0C8;font-size:11px;font-weight:900;padding:6px 10px;cursor:pointer;font-family:inherit}
+.pxseg button.on{background:rgba(255,107,0,.18);color:#FFC98F}
+.pxnote{font-size:10px;color:#8FA1B8;margin:6px 2px 0;line-height:1.55;font-weight:700}
+.pxnote b{color:#FFD9A6}
+.pxtip{margin:6px 0 0;font-size:12px;font-weight:900;color:#FFE3CC;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.45);border-radius:9px;padding:7px 10px}
+.pxtip.hide,.pxnote.hide{display:none}
 </style></head>
 <body>
 <div id="app">
@@ -306,6 +316,14 @@ details.adv .keyrow{margin-top:7px}
       <button type="button" data-l="zone" class="lk">용도지역<small>Vworld</small></button>
       <button type="button" data-l="sat">위성<small>Vworld</small></button>
     </div>
+    <div class="pxrow" id="pxRow">
+      <span class="pxl">보기</span>
+      <div class="pxseg" id="pxView"><button type="button" data-v="arrow" class="on">화살표</button><button type="button" data-v="px">픽셀</button></div>
+      <span class="pxl">격자 밀도</span>
+      <div class="pxseg" id="pxSub"><button type="button" data-s="3" class="on">3×3</button><button type="button" data-s="6">6×6</button></div>
+    </div>
+    <p class="pxnote hide" id="pxNote"></p>
+    <div class="pxtip hide" id="pxTip" role="status" aria-live="polite"></div>
     <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
     <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
     <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 길고 붉을수록 급하고, 숫자는 그 칸의 경사(°)입니다. 도면처럼 얇게 그려 색판이 번지지 않습니다.</p>
@@ -2337,6 +2355,141 @@ window.__KTS_ARROWS=function(){
   }
   return [probe(0.5,0.5),probe(0.32,0.34),probe(0.7,0.62),probe(0.24,0.72)];
 };
+
+/* ---------------- 픽셀 보기 (2026-11-21) ----------------
+   5m 칸 하나를 SUBDIV×SUBDIV 로 나눠, 칸마다 자기 경사 밴드 색을 하드 엣지로 채운다(번짐·그라데이션 없음).
+   값은 DEM 격자 경사를 양선형 보간해 칸 중심에서 읽는다 — 원본보다 촘촘한 '보간'이다(측량값 아님).
+   기존 2D 함수 본문은 건드리지 않고 drawBase 뒤에 한 층을 덧그린다. */
+var SUBDIV=3;                       /* 상수 하나로 밀도 조절: 3, 6, 9 … (화면에서는 3×3 · 6×6) */
+var PX_BANDS=[[0,31,159,110],[2,79,191,87],[5,183,211,74],[10,243,211,74],[15,245,169,59],[20,255,107,0],[25,226,58,46],[30,164,20,60]];
+var PXG=null, pxTimer=0, PX_LAST=null;
+S.lay.px=0;
+function pxBand(s){ for(var i=PX_BANDS.length-1;i>=0;i--){ if(s>=PX_BANDS[i][0]) return i } return 0 }
+function pxMPerW(){ return CIRC*Math.cos(S.lat*Math.PI/180) }
+function buildPx(){
+  if(!T||!T.slope) return null;
+  var t0=performance.now(), mPerW=pxMPerW(), cm=5/SUBDIV, du=cm/mPerW;
+  var R=S.radius*1.3, cu=lng2w(S.lon), cvv=lat2w(S.lat), M=R/mPerW, CAP=420/mPerW;
+  var u0=cu-M, u1=cu+M, v0=cvv-M, v1=cvv+M;
+  if(PC&&PC.rings){ PC.rings.forEach(function(r){ r.forEach(function(pt){ if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) return; var pu=lng2w(pt[0]), pv=lat2w(pt[1]);
+    if(pu<u0)u0=Math.max(pu,cu-CAP); if(pu>u1)u1=Math.min(pu,cu+CAP); if(pv<v0)v0=Math.max(pv,cvv-CAP); if(pv>v1)v1=Math.min(pv,cvv+CAP); }) }) }
+  var gx0=Math.floor(u0/du), gy0=Math.floor(v0/du), n=Math.ceil((u1-u0)/du)+2, ny=Math.ceil((v1-v0)/du)+2;
+  var can=document.createElement('canvas'); can.width=n; can.height=ny;
+  var cx=can.getContext('2d'), id=cx.createImageData(n,ny), d=id.data;
+  var sl=new Float32Array(n*ny), bd=new Uint8Array(n*ny), inside=0, r2=Math.pow(S.radius/cm,2);
+  var ci=(cu/du)-gx0, cj=(cvv/du)-gy0;
+  for(var j=0;j<ny;j++){
+    var v=(gy0+j+0.5)*du;
+    for(var i=0;i<n;i++){
+      var u=(gx0+i+0.5)*du, k=j*n+i, p=k*4, s=sampleGrid(T.slope,u,v);
+      if(s==null){ sl[k]=NaN; d[p+3]=0; continue }
+      var b=pxBand(s), c=PX_BANDS[b];
+      sl[k]=s; bd[k]=b; d[p]=c[1]; d[p+1]=c[2]; d[p+2]=c[3]; d[p+3]=255;
+      if(Math.pow(i+0.5-ci,2)+Math.pow(j+0.5-cj,2)<=r2) inside++;
+    }
+  }
+  cx.putImageData(id,0,0);
+  PXG={gx0:gx0,gy0:gy0,du:du,n:n,ny:ny,PC:PC,can:can,sl:sl,bd:bd,sub:SUBDIV,cm:cm,lat:S.lat,lon:S.lon,r:S.radius,T:T,inside:inside,
+       ms:+(performance.now()-t0).toFixed(1)};
+  /* 성능 안전장치 — 6×6 이상이 너무 느리면 3×3 으로 낮추고 알린다 */
+  if(PXG.ms>700&&SUBDIV>3){ SUBDIV=3; pxPaintSub(); toast('칸이 많아 격자 밀도를 3×3으로 낮췄습니다'); return buildPx() }
+  return PXG;
+}
+function pxStale(){
+  if(!PXG) return true;
+  if(PXG.T!==T||PXG.sub!==SUBDIV||PXG.r!==S.radius||PXG.PC!==PC) return true;
+  var mPerW=pxMPerW(), off=Math.hypot(lng2w(S.lon)-lng2w(PXG.lon),lat2w(S.lat)-lat2w(PXG.lat))*mPerW;
+  return off>S.radius*0.28;
+}
+var PX_DRAW=[];
+function drawSlopePixels(g,x0,y0,w,h){
+  if(!T) return;
+  var td=performance.now();
+  if(!PXG||PXG.T!==T||PXG.sub!==SUBDIV||PXG.r!==S.radius||PXG.PC!==PC) buildPx();
+  else if(pxStale()){ clearTimeout(pxTimer); pxTimer=setTimeout(function(){ buildPx(); requestRender() },140) }
+  if(!PXG) return;
+  var W=worldSize(S.zoom), cs=PXG.du*W, X=PXG.gx0*cs-x0, Y=PXG.gy0*cs-y0;
+  var mpp=mppAt(S.zoom,S.lat), cx=lng2w(S.lon)*W-x0, cy=lat2w(S.lat)*W-y0, rad=S.radius/mpp;
+  g.save();
+  var clip=null;
+  if(PC&&PC.rings){
+    var p0=new Path2D(), any=false;
+    for(var i=0;i<PC.rings.length;i++){ var r=PC.rings[i], st=false;
+      for(var j=0;j<r.length;j++){ var pt=r[j]; if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) continue;
+        var XX=lng2w(pt[0])*W-x0, YY=lat2w(pt[1])*W-y0; if(!st){p0.moveTo(XX,YY);st=true}else p0.lineTo(XX,YY); any=true }
+      if(st) p0.closePath() }
+    if(any) clip=p0;
+  }
+  if(clip) g.clip(clip,'evenodd');
+  else { g.beginPath(); g.arc(cx,cy,rad,0,Math.PI*2); g.clip() }
+  g.imageSmoothingEnabled=false; g.globalAlpha=0.92;
+  g.drawImage(PXG.can,X,Y,PXG.n*cs,PXG.ny*cs);
+  g.restore();
+  PX_DRAW.push(performance.now()-td); if(PX_DRAW.length>200) PX_DRAW.shift();
+}
+/* drawBase 뒤에 픽셀 층을 덧그린다(본문 무변경) */
+var _pxDrawBase=drawBase;
+drawBase=function(g,x0,y0,w,h){ _pxDrawBase.apply(this,arguments); if(S.lay.px) drawSlopePixels(g,x0,y0,w,h) };
+var _pxPaintLegend=paintLegend;
+paintLegend=function(){ _pxPaintLegend.apply(this,arguments); var cb=$('#cbw'); if(cb&&S.lay.px) cb.style.display='block' };
+
+function pxDir(a){ var N=['북','북동','동','남동','남','남서','서','북서']; return N[Math.round(((a%360)+360)%360/45)%8] }
+function pxCellAt(px,py){
+  if(!PXG) return null;
+  var W=worldSize(S.zoom), x0=lng2w(S.lon)*W-VW()/2, y0=lat2w(S.lat)*W-VH()/2;
+  var u=(x0+px)/W, v=(y0+py)/W, i=Math.floor(u/PXG.du)-PXG.gx0, j=Math.floor(v/PXG.du)-PXG.gy0;
+  if(i<0||j<0||i>=PXG.n||j>=PXG.ny) return null;
+  var k=j*PXG.n+i, s=PXG.sl[k]; if(!isFinite(s)) return null;
+  var uc=(PXG.gx0+i+0.5)*PXG.du, vc=(PXG.gy0+j+0.5)*PXG.du;
+  var mPerW=pxMPerW(), dist=Math.hypot(uc-lng2w(S.lon),vc-lat2w(S.lat))*mPerW;
+  if(PC&&PC.rings){ if(!pxInParcel(px,py)) return null } else if(dist>S.radius) return null;
+  var fx=Math.floor((uc-T.wx0)/T.cellW), fy=Math.floor((vc-T.wy0)/T.cellH), a=T.asp[fy*T.cols+fx];
+  return {i:i,j:j,slope:+s.toFixed(1),band:PXG.bd[k],elev:+elevAt(uc,vc).toFixed(1),asp:Math.round(a),dir:pxDir(a),u:uc,v:vc,cm:PXG.cm};
+}
+var pxScratch=document.createElement('canvas').getContext('2d');
+function pxInParcel(px,py){
+  var W=worldSize(S.zoom), x0=lng2w(S.lon)*W-VW()/2, y0=lat2w(S.lat)*W-VH()/2, p0=new Path2D();
+  PC.rings.forEach(function(r){ var st=false; r.forEach(function(pt){ if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) return; var X=lng2w(pt[0])*W-x0, Y=lat2w(pt[1])*W-y0; if(!st){p0.moveTo(X,Y);st=true}else p0.lineTo(X,Y) }); if(st) p0.closePath() });
+  return pxScratch.isPointInPath(p0,px,py,'evenodd');
+}
+function pxShowTip(c){
+  var el=$('#pxTip'); if(!el) return;
+  if(!c){ el.classList.add('hide'); return }
+  el.textContent='이 칸('+c.cm.toFixed(2)+'m) · 경사 '+c.slope+'° · 표고 '+c.elev+'m · 향 '+c.dir+'('+c.asp+'°)';
+  el.classList.remove('hide');
+}
+/* 픽셀 보기에서 칸을 톡 → 값 표시(지점 옮기기 대신). 캡처 단계에서 먼저 받아 기존 처리는 '끌기'로 넘긴다 */
+cv.parentNode.addEventListener('pointerup',function(e){
+  if(!S.lay.px||!downPos||moved>=8||ptrs.size!==1) return;
+  var p=localPt(e), c=pxCellAt(p.x,p.y);
+  if(!c) return;
+  PX_LAST=c; pxShowTip(c); moved=99;
+},true);
+
+function pxPaintNote(){
+  var el=$('#pxNote'); if(!el) return;
+  el.classList.toggle('hide',!S.lay.px);
+  var base=S.demTpl?'5m 수치지형도 기반 보간 · 참고용(측량값 아님)':'5m 격자 기반 보간 · 참고용(측량값 아님) · 원본 고도는 공개 terrarium 타일(SRTM 계열 30m)';
+  el.innerHTML='픽셀 = 5m 칸을 <b>'+SUBDIV+'×'+SUBDIV+'</b>(한 칸 '+(5/SUBDIV).toFixed(2)+'m)으로 나눠 칸마다 자기 경사 색 · 칸을 누르면 경사·표고·향<br>'+base+'. '+(5/SUBDIV).toFixed(2)+'m 값은 원본보다 촘촘한 보간입니다.';
+}
+function pxPaintSub(){ document.querySelectorAll('#pxSub button').forEach(function(b){ b.classList.toggle('on',+b.getAttribute('data-s')===SUBDIV) }); pxPaintNote() }
+function pxSetView(v){
+  S.lay.px=v==='px'?1:0; S.lay.arrow=v==='px'?0:1;
+  document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===v) });
+  var ab=document.querySelector('#togs button[data-l="arrow"]'); if(ab) ab.classList.toggle('on',!!S.lay.arrow);
+  if(!S.lay.px) pxShowTip(null);
+  pxPaintNote(); paintLegend(); requestRender();
+}
+document.querySelectorAll('#pxView button').forEach(function(b){ b.addEventListener('click',function(){ pxSetView(b.getAttribute('data-v')) }) });
+document.querySelectorAll('#pxSub button').forEach(function(b){ b.addEventListener('click',function(){ SUBDIV=+b.getAttribute('data-s'); PXG=null; pxPaintSub(); requestRender() }) });
+/* 화살표 층 버튼을 직접 누를 때도 보기 버튼 표시를 맞춘다 */
+(function(){ var ab=document.querySelector('#togs button[data-l="arrow"]'); if(ab) ab.addEventListener('click',function(){ if(S.lay.arrow&&S.lay.px){ S.lay.px=0; pxShowTip(null) } document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===(S.lay.px?'px':'arrow')) }); pxPaintNote(); requestRender() }) })();
+/* 검수용 읽기 전용 */
+window.__KTS_PX=function(){ return PXG?{drawMsMedian:(function(){var a=PX_DRAW.slice().sort(function(x,y){return x-y});return a.length?+a[Math.floor(a.length/2)].toFixed(2):null})(),drawMsMax:(PX_DRAW.length?+Math.max.apply(null,PX_DRAW).toFixed(2):null),drawSamples:PX_DRAW.length,sub:PXG.sub,cm:PXG.cm,n:PXG.n,ny:PXG.ny,parcel:!!PXG.PC,inside:PXG.inside,buildMs:PXG.ms,radius:PXG.r,on:!!S.lay.px,last:PX_LAST,
+  baseCells5m:Math.round(Math.PI*Math.pow(PXG.r/5,2))}:{on:!!S.lay.px} };
+window.__KTS_PXCELL=function(px,py){ return pxCellAt(px,py) };
+window.__KTS_PXSET=function(v,s){ if(s){SUBDIV=s;PXG=null;pxPaintSub()} pxSetView(v); return true };
+window.__KTS_PXSLOPE=function(u,v){ return sampleGrid(T.slope,u,v) };
 
 /* ---------------- 시작 ---------------- */
 fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key,S.key?'기본 키 사용 중 — 연속지적도·용도지역·위성지도가 겹쳐 열립니다.':'미연결 — 지도·경사도는 지금도 그대로 동작합니다.'); paintLegend();
