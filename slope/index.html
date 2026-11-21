@@ -2600,7 +2600,8 @@ drawParcelHL=function(g){
 var _pxVWImg=drawVWImg;
 drawVWImg=function(g,x0,y0,w,h,kind){
   if(!(S.lay.px&&kind==='parcel'&&PXG&&PXG.total)) return _pxVWImg.apply(this,arguments);
-  g.save(); g.globalCompositeOperation='multiply';
+  /* Vworld 그림의 연한 크림색 바탕(≈255,251,237)을 밝기 1.08 로 순백으로 올린 뒤 곱하기 → 칸 본색 그대로 */
+  g.save(); g.globalCompositeOperation='multiply'; if(typeof g.filter==='string') g.filter='brightness(1.08)';
   try{ return _pxVWImg.apply(this,arguments) } finally{ g.restore() }
 };
 var _pxDrawMarker=drawMarker;
