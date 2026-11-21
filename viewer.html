@@ -118,7 +118,7 @@ body.docopen .doc{position:fixed;left:50%;transform:translateX(-50%);width:100%;
 body.docopen .doc .bar{display:none}
 body.docopen .doc .body{padding:0;height:100%;background:#070D1E}
 body.docopen #out{position:relative;height:100%;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
- touch-action:pan-x pan-y;background:#070D1E;padding:10px 0 18px}
+ touch-action:none;background:#070D1E;padding:10px 0 18px}
 body.docopen.ppnoticemode #out{padding:18px 12px}
 body.docopen .banner{display:none!important}
 body.docopen .kipfoot{display:none}
@@ -738,6 +738,43 @@ out.addEventListener('touchmove', e => {
 }, {passive: false});
 out.addEventListener('touchend', e => { if (pinch && e.touches.length < 2){ pinch = null; ppHiRes(); } }, {passive: true});
 out.addEventListener('touchcancel', () => { pinch = null; }, {passive: true});
+/* 한 손가락 끌기 = JS 스크롤 — 문서 열림 상태의 #out 은 touch-action:none(두 손가락 핀치를 브라우저가 가로채지 않게)이라
+   한 손가락 이동은 여기서 scrollTop/scrollLeft 로 직접 옮기고, 손을 떼면 관성으로 미끄러진다. 두 손가락은 위 핀치 핸들러. */
+let pan = null, panRaf = 0;
+function panStop(){ if (panRaf){ cancelAnimationFrame(panRaf); panRaf = 0; } }
+out.addEventListener('touchstart', e => {
+  panStop();
+  if (!document.body.classList.contains('docopen') || e.touches.length !== 1){ pan = null; return; }
+  const t = e.target;
+  if (t && t.closest && t.closest('.edobj')){ pan = null; return; }                  /* 편집 도장·글자 끌기는 그대로 */
+  if (t && t.isContentEditable && document.activeElement && document.activeElement.contains(t)){ pan = null; return; }  /* 글 고치는 중엔 글자 선택 */
+  const p = e.touches[0];
+  pan = {x: p.clientX, y: p.clientY, t: performance.now(), vx: 0, vy: 0};
+}, {passive: true});
+out.addEventListener('touchmove', e => {
+  if (!pan || pinch || e.touches.length !== 1) return;
+  const p = e.touches[0], now = performance.now();
+  const dx = p.clientX - pan.x, dy = p.clientY - pan.y, dt = Math.max(1, now - pan.t);
+  out.scrollLeft -= dx; out.scrollTop -= dy;
+  pan.vx = 0.8 * (dx / dt) + 0.2 * pan.vx; pan.vy = 0.8 * (dy / dt) + 0.2 * pan.vy;
+  pan.x = p.clientX; pan.y = p.clientY; pan.t = now;
+  if (e.cancelable) e.preventDefault();
+}, {passive: false});
+out.addEventListener('touchend', e => {
+  if (!pan) return;
+  if (e.touches.length){ pan = null; return; }
+  let vx = pan.vx, vy = pan.vy, last = performance.now();
+  const idle = last - pan.t; pan = null;
+  if (idle > 90 || Math.abs(vx) + Math.abs(vy) < 0.05) return;
+  const step = now => {
+    const dt = Math.min(40, now - last); last = now;
+    out.scrollLeft -= vx * dt; out.scrollTop -= vy * dt;
+    const k = Math.pow(0.996, dt); vx *= k; vy *= k;
+    panRaf = (Math.abs(vx) + Math.abs(vy) > 0.02) ? requestAnimationFrame(step) : 0;
+  };
+  panRaf = requestAnimationFrame(step);
+}, {passive: true});
+out.addEventListener('touchcancel', () => { pan = null; }, {passive: true});
 out.addEventListener('wheel', e => {
   if (!e.ctrlKey) return;
   e.preventDefault();
