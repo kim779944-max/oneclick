@@ -2,7 +2,7 @@
 <script src="../master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재개발·재건축 진행조회기 — 지번 넣으면 정비구역 지정부터 착공까지 (무료)</title>
-<meta name="description" content="서울 1,198 · 경기 533 · 전국 1,566 정비사업을 지번·구역명으로 바로 조회. 추진단계 사다리(구역지정→추진위→조합설립→사업시행→관리처분→이주·철거→착공), 인가일, 세대수, 정보몽땅 원문, 현장 내비까지 한 화면에.">
+<meta name="description" content="서울 1,198 · 경기 533 · 전국 1,566 정비사업과 서울 모아타운(관리계획 승인·고시분)을 지번·구역명으로 바로 조회. 추진단계 사다리(구역지정→추진위→조합설립→사업시행→관리처분→이주·철거→착공), 인가일, 세대수, 정보몽땅 원문, 현장 내비까지 한 화면에.">
 <meta name="theme-color" content="#0A1128">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="../icon.png">
@@ -27,11 +27,11 @@ main{padding:12px 14px 0}
 .hero h1{margin:2px 0 5px;font-size:20px;font-weight:900;letter-spacing:-.8px;line-height:1.32}
 .hero h1 b{color:var(--amber2)}
 .hero p{margin:0;font-size:12px;color:var(--ink2)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px}
-.stats div{background:linear-gradient(180deg,#12203C,#0F1B33);border:1px solid var(--line);border-radius:11px;padding:8px 6px;text-align:center}
-.stats b{display:block;font-size:16px;font-weight:900;color:#fff;letter-spacing:-.4px}
-.stats span{display:block;font-size:10px;font-weight:800;color:var(--gray);margin-top:1px}
-.stats em{display:block;font-size:9px;font-weight:900;color:var(--amber2);font-style:normal;margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:11px}
+.stats div{background:linear-gradient(180deg,#12203C,#0F1B33);border:1px solid var(--line);border-radius:11px;padding:7px 3px;text-align:center}
+.stats b{display:block;font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.stats span{display:block;font-size:9.5px;font-weight:800;color:var(--gray);margin-top:1px}
+.stats em{display:block;font-size:8.5px;font-weight:900;color:var(--amber2);font-style:normal;margin-top:1px}
 .card{background:linear-gradient(180deg,#12203C,#0F1B33);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:11px}
 .card h2{display:flex;align-items:center;gap:7px;margin:0 0 9px;font-size:13.5px;font-weight:900;letter-spacing:-.4px}
 .card h2 i{width:19px;height:19px;border-radius:6px;background:var(--amber);color:var(--on);font-size:10.5px;font-weight:900;display:grid;place-items:center;font-style:normal;flex:0 0 auto}
@@ -42,9 +42,9 @@ main{padding:12px 14px 0}
 .srch input:focus{border-color:rgba(255,107,0,.65)}
 .srch input::placeholder{color:#6D7E97}
 .srch .clr{flex:0 0 auto;border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:11px;padding:0 11px;font-size:12px;font-weight:900;cursor:pointer;display:none}
-.tabs{display:flex;gap:5px;margin-top:8px}
-.tabs button{flex:1;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:10px;padding:8px 4px;font-size:12px;font-weight:900;cursor:pointer;line-height:1.25}
-.tabs button small{display:block;font-size:9px;font-weight:800;color:#7186A2}
+.tabs{display:flex;gap:4px;margin-top:8px}
+.tabs button{flex:1;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:10px;padding:7px 2px;font-size:11.5px;font-weight:900;cursor:pointer;line-height:1.2;white-space:nowrap}
+.tabs button small{display:block;font-size:8.5px;font-weight:800;color:#7186A2;margin-top:1px}
 .tabs button.on{border-color:var(--amber);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2));box-shadow:0 6px 14px rgba(255,107,0,.22)}
 .tabs button.on small{color:#4A2600}
 .chips{display:flex;gap:5px;overflow-x:auto;margin-top:8px;padding-bottom:3px;scrollbar-width:none}
@@ -79,7 +79,7 @@ main{padding:12px 14px 0}
 /* 상세 */
 #panel{position:fixed;inset:0;z-index:60;display:none;justify-content:center;background:rgba(4,8,18,.72)}
 #panel.on{display:flex}
-.sheet{width:100%;max-width:460px;background:linear-gradient(180deg,#0F1B33,#0A1128 40%);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 96px}
+.sheet{width:100%;max-width:460px;background:linear-gradient(180deg,#0F1B33,#0A1128 40%);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 104px}
 .shd{position:sticky;top:0;z-index:2;background:rgba(10,17,40,.96);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 14px;display:flex;align-items:center;gap:8px}
 .shd button{border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:900;cursor:pointer}
 .shd span{font-size:11px;font-weight:900;color:var(--gray);margin-left:auto}
@@ -164,6 +164,28 @@ main{padding:12px 14px 0}
 .foot{margin:16px 4px 0;font-size:10px;color:#6E82A1;line-height:1.7;text-align:center}
 .foot b{color:#9FB0C8}
 .foot a{color:var(--amber2);font-weight:900}
+/* 2트랙 — 모아타운 항목·버튼·확인 결과 바닥 */
+.moreinfo{margin-top:11px;border:1px solid var(--line);border-radius:14px;background:#0E1A33;padding:10px 12px}
+.moreinfo summary{font-size:11.5px;font-weight:900;color:#B9C8DA;cursor:pointer}
+.moreinfo .note{margin-top:8px}
+.moreinfo .warn{margin-top:8px}
+.chk{margin-left:auto;font-size:9.5px;font-weight:900;color:var(--amber2);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.sact{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;z-index:65;background:linear-gradient(180deg,rgba(10,17,40,.78),#0A1128 46%);padding:9px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:7px}
+.sact .row2{display:flex;gap:7px}
+.sact button{flex:1;border:0;border-radius:11px;padding:12px;font-size:13.5px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.sact button.gh{background:#12203C;color:#DCE6F2;border:1px solid var(--line2)}
+.scredit{text-align:center;font-size:12px;font-weight:900}
+.scredit a{color:#5AA9FF}
+.scredit.off{display:none}
+.mst{display:flex;gap:3px;margin-top:8px}
+.mst i{flex:1;height:5px;border-radius:3px;background:#1E2C4A;font-style:normal}
+.mst i.on{background:linear-gradient(90deg,#FF6B00,#FFA24D)}
+.mst i.last{background:#2ED47A}
+.mlad{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:5px}
+.mlad div{text-align:center;font-size:8px;font-weight:800;color:#6E82A1;line-height:1.2;letter-spacing:-.4px}
+.mlad div b{display:block;font-size:9px;color:#8FA1B8;font-weight:900}
+.mlad div.on{color:#FFC98F}.mlad div.on b{color:#FFC98F}
+.mlad div.now b{color:#0A1224;background:var(--amber2);border-radius:5px;display:block;width:fit-content;min-width:13px;margin:0 auto;padding:0 4px}
 .spin{display:flex;align-items:center;justify-content:center;gap:8px;padding:26px 0;font-size:12px;color:#8FA1B8;font-weight:800}
 .spin i{width:14px;height:14px;border:2px solid #2E4370;border-top-color:var(--amber2);border-radius:50%;animation:sp .8s linear infinite;font-style:normal}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -180,44 +202,49 @@ main{padding:12px 14px 0}
 <main>
   <div class="hero">
     <h1>재개발·재건축, <b>어디까지 갔나</b></h1>
-    <p>지번만 넣으면 정비구역 지정부터 착공까지. 인가일·세대수·원문까지 한 화면.</p>
-    <div class="stats">
-      <div><b>1,198</b><span>서울</span><em>26.6 기준</em></div>
-      <div><b>533</b><span>경기</span><em>25.9 기준</em></div>
-      <div><b>1,566</b><span>전국</span><em>26.5 기준</em></div>
+    <p>지번만 넣으면 정비구역 지정부터 착공까지. <b>모아타운 관리지역</b>까지 한 화면.</p>
+    <div class="stats" id="stats">
+      <div><b id="stS">—</b><span>서울</span><em>26.6</em></div>
+      <div><b id="stG">—</b><span>경기</span><em>25.9</em></div>
+      <div><b id="stN">—</b><span>전국</span><em>26.5</em></div>
+      <div><b id="stM">—</b><span>모아타운</span><em>승인·고시</em></div>
     </div>
   </div>
 
   <div class="card">
     <h2><i>1</i>구역 찾기 <small id="totline">불러오는 중</small></h2>
     <div class="srch">
-      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="지번·구역명·자치구 (예: 개포동 138)">
+      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="지번·구역명·자치구·동 (예: 개포동 138, 번동 411)">
       <button class="clr" id="clr">지움</button>
     </div>
     <div class="tabs" id="tabs">
-      <button data-t="seoul" class="on">서울<small>1,198</small></button>
-      <button data-t="gyeonggi">경기<small>533</small></button>
-      <button data-t="nation">전국<small>1,566</small></button>
+      <button data-t="seoul" class="on">서울<small>—</small></button>
+      <button data-t="gyeonggi">경기<small>—</small></button>
+      <button data-t="nation">전국<small>—</small></button>
+      <button data-t="moa">모아타운<small>—</small></button>
     </div>
     <div class="chips" id="chips"></div>
     <div class="countline"><b id="cnt">—</b><span>건</span><span class="base" id="base">—</span></div>
+    <div class="warn" id="muNote" style="margin-top:9px;display:none"><b>모아타운</b>은 관리계획 <b>승인·고시분</b>만 실려 있습니다. 대상지 선정·계획 수립 중인 곳은 서울주거포털·자치구 공고로 확인하세요.</div>
     <div class="list" id="list"><div class="spin"><i></i>자료를 불러오고 있습니다</div></div>
     <button class="more" id="more" style="display:none">더 보기</button>
   </div>
 
-  <div class="card">
-    <h2><i>2</i>이 화면에서 바로 되는 것 <small>로그인 없음</small></h2>
+  <details class="moreinfo">
+    <summary>이 화면에서 되는 것 · 자료 기준 · 주의</summary>
     <div class="note" style="margin:0;font-size:11.5px;line-height:1.75">
       · <b>진행 사다리</b> — 구역지정 → 추진위 → 조합설립 → 사업시행 → 관리처분 → 이주·철거 → 착공에 지금 어디인지, 인가일까지.<br>
-      · <b>정보몽땅 원문</b> — 서울 사업장은 사업개요·공개자료 원문으로 바로.<br>
+      · <b>모아타운 탭</b> — 서울 모아타운 관리지역의 승인·고시일·면적·세대수·모아주택 구역 수.<br>
+      · <b>원문</b> — 정보몽땅 사업개요·모아타운 아카이브 원문으로 바로.<br>
       · <b>현장 내비</b> — 네이버지도·카카오맵·티맵으로 그 자리까지.<br>
-      · <b>단계 변경 알림</b> — 무료 1구역까지. 단계가 넘어가면 문자·메일로.
+      · <b>알림</b> — 단계가 넘어가면 문자·메일로(무료 1구역).
     </div>
-    <div class="warn"><b>먼저 알아두실 것</b> — 1차 버전은 신속통합기획(신통기획)·모아타운·시공사를 담지 않았습니다. 공개 데이터를 그대로 모은 <b>참고 자료</b>이고 법적 효력은 없습니다. 고시·인가 내용은 구청·정보몽땅 원문으로 확인하세요.</div>
-  </div>
+    <div class="warn"><b>먼저 알아두실 것</b> — 공개 데이터를 그대로 모은 <b>참고 자료</b>이고 법적 효력은 없습니다. 신속통합기획(신통기획)·시공사는 담지 않았습니다. 고시·인가 내용은 구청·정보몽땅 원문으로 확인하세요.</div>
+  </details>
 
   <p class="foot"><b>KTS 원클릭 · 재개발 진행조회기</b><br>
   서울: 정비사업 정보몽땅 · 서울 열린데이터광장 OA-22856 (26년 6월 기준)<br>
+  모아타운: 서울시 모아주택·모아타운 온라인 아카이브 (관리계획 승인·고시분 · 26.11 수집)<br>
   경기: 경기데이터드림 일반 정비사업 추진현황 (2025-09-30 기준 · 지연 있음)<br>
   전국: 국토교통부 전국 도시정비사업 통합 데이터 (2026-05-18 기준 · 연 1회 갱신)<br>
   매물: <a href="https://autooneclick.com/exchange/" target="_blank" rel="noopener">교환·급매 전문관</a> · 문의 <a href="tel:01020022899">010-2002-2899</a></p>
@@ -249,10 +276,15 @@ function keyOf(r){ return norm(r.n+r.g+r.j+(r.rd||'')+(r.sd||'')); }
 function load(){
   fetch('data/redev.json',{cache:'force-cache'}).then(function(r){return r.json();}).then(function(j){
     D=j;
-    rows('seoul').forEach(function(r){r._k=keyOf(r);});
-    rows('gyeonggi').forEach(function(r){r._k=keyOf(r);r.sd='경기';});
-    rows('nation').forEach(function(r){r._k=keyOf(r);});
-    $('totline').textContent='서울 1,198 · 경기 533 · 전국 1,566';
+    ['seoul','gyeonggi','nation','moa'].forEach(function(t){ rows(t).forEach(function(r,i){ r._k=keyOf(r)+(r.dn||''); r.__i=i; }); });
+    rows('gyeonggi').forEach(function(r){ r.sd='경기'; });
+    var nS=rows('seoul').length, nG=rows('gyeonggi').length, nN=rows('nation').length, nM=rows('moa').length;
+    $('stS').textContent=won(nS); $('stG').textContent=won(nG); $('stN').textContent=won(nN); $('stM').textContent=won(nM);
+    document.querySelectorAll('#tabs button').forEach(function(b){
+      var t=b.getAttribute('data-t'), n=t==='seoul'?nS:(t==='gyeonggi'?nG:(t==='nation'?nN:nM));
+      var s=b.querySelector('small'); if(s) s.textContent=won(n);
+    });
+    $('totline').textContent='서울 '+won(nS)+' · 경기 '+won(nG)+' · 전국 '+won(nN)+' · 모아타운 '+won(nM);
     buildChips(); render();
   }).catch(function(){
     $('list').innerHTML='<div class="empty"><b>자료를 열지 못했습니다</b>잠시 뒤 새로고침해 주세요.</div>';
@@ -273,6 +305,10 @@ function buildChips(){
   }else if(t==='gyeonggi'){
     arr.push(['stop','준공·청산 제외']);
     ['재건축','재개발','주거환경개선'].forEach(function(v){arr.push([v,v]);});
+  }else if(t==='moa'){
+    [['2026','’26 승인'],['2025','’25 승인'],['2024','’24 승인'],['2023','’23 승인'],['2022','’22 승인']].forEach(function(v){arr.push(v);});
+    arr.push(['공공관리','공공관리']);
+    arr.push(['시범사업','시범사업']);
   }else{
     arr.push(['재개발(주택정비)','재개발(주택)']);
     arr.push(['재건축(공동주택)','재건축']);
@@ -283,6 +319,10 @@ function buildChips(){
 }
 function pass(r){
   if(FILT==='all') return true;
+  if(TAB==='moa'){
+    if(FILT==='공공관리'||FILT==='시범사업') return (r.fl||[]).indexOf(FILT)>=0;
+    return String(r.up||'').slice(0,4)===FILT;
+  }
   if(TAB==='seoul'&&FILT==='stop') return r.o==='일시중단';
   if(TAB==='gyeonggi'&&FILT==='stop') return r.st!=='준공'&&r.st!=='청산';
   return r.t===FILT;
@@ -300,7 +340,9 @@ function filtered(){
 }
 
 /* ---------- 목록 ---------- */
+function shortDate(d){ if(!d) return '—'; return d.slice(2).replace(/-/g,'.'); }
 function stageLabel(r){
+  if(TAB==='moa') return '승인·고시'+(r.up?' ’'+shortDate(r.up):'');
   if(TAB==='seoul') return r.st||'단계 미기재';
   if(TAB==='gyeonggi') return r.st||'—';
   return r.st||'—';
@@ -316,7 +358,21 @@ function barHTML(s){
   }
   return '<div class="bar">'+h+'</div>';
 }
+function moaBar(){
+  return '<div class="bar"><i class="on"></i><i class="on"></i><i class="now"></i><i></i></div>';
+}
 function itemHTML(r){
+  if(TAB==='moa'){
+    var flags=(r.fl||[]).join(' · ');
+    return '<button class="item" data-i="'+esc(r.__i)+'">'+
+      '<div class="nm">'+esc(r.n)+'</div>'+
+      '<div class="lo"><em>'+esc(r.g)+'</em><span>'+esc((r.ar?won(Math.round(r.ar))+'㎡':'면적 미상')+(r.bl?' · 모아주택 '+r.bl+'개 구역':''))+'</span></div>'+
+      moaBar()+
+      '<div class="bot"><span class="stp">'+esc(stageLabel(r))+'</span>'+
+        (flags?'<span class="stop" style="background:#14213B;color:#C9D6E6;border-color:#243352">'+esc(flags)+'</span>':'')+
+        '<span class="chk">확인하기 ›</span></div>'+
+    '</button>';
+  }
   var s=r.s==null?-1:r.s;
   var cls=(s>=7?'done':(s<0?'wait':''));
   var where=(TAB==='nation'? (r.sd+' '+r.g) : r.g);
@@ -326,17 +382,21 @@ function itemHTML(r){
     '<div class="lo"><em>'+esc(where)+'</em><span>'+esc(TAB==='nation'?'세대수 '+(r.hn?won(r.hn)+'세대':'미기재'):(r.j||'위치 미기재'))+'</span></div>'+
     barHTML(s)+
     '<div class="bot"><span class="stp '+cls+'">'+esc(stageLabel(r))+'</span>'+
-      (r.o==='일시중단'?'<span class="stop">일시중단</span>':'')+ mb +'</div>'+
+      (r.o==='일시중단'?'<span class="stop">일시중단</span>':'')+ mb +
+      (mb?'':'<span class="chk">확인하기 ›</span>')+'</div>'+
   '</button>';
 }
 function render(){
   var arr=filtered();
   rows(TAB).forEach(function(r,i){r.__i=i;});
   $('cnt').textContent=arr.length.toLocaleString('ko-KR');
-  $('base').textContent=(TAB==='seoul'?'서울 26.6 기준':TAB==='gyeonggi'?'경기 25.9 기준':'전국 26.5 기준');
+  $('base').textContent=(TAB==='seoul'?'서울 26.6':TAB==='gyeonggi'?'경기 25.9':TAB==='moa'?'서울 아카이브 26.11':'전국 26.5');
+  $('muNote').style.display=(TAB==='moa')?'block':'none';
   var box=$('list');
   if(!arr.length){
-    box.innerHTML='<div class="empty"><b>찾는 구역이 없습니다</b>지번은 「동 이름 + 번지」(예: 개포동 138)로 넣어 보세요.<br>전국 자료는 시·군·구까지만 있어 지번 검색이 안 됩니다.</div>';
+    box.innerHTML='<div class="empty"><b>찾는 구역이 없습니다</b>'+(TAB==='moa'
+      ? '동 이름·지번(예: 번동 411)이나 구 이름으로 넣어 보세요. 관리계획 승인·고시분만 실려 있습니다.'
+      : '지번은 「동 이름 + 번지」(예: 개포동 138)로 넣어 보세요.<br>전국 자료는 시·군·구까지만 있어 지번 검색이 안 됩니다.')+'</div>';
     $('more').style.display='none'; return;
   }
   var part=arr.slice(0,SHOWN);
@@ -380,6 +440,7 @@ function ladderHTML(r){
   return h+'</div>';
 }
 function addrOf(r){
+  if(TAB==='moa') return ('서울특별시 '+r.g+' '+r.j).trim();
   if(TAB==='seoul') return ('서울특별시 '+r.g+' '+(r.j||'')).trim();
   if(TAB==='gyeonggi'){
     if(!r.j) return '경기도 '+r.g+' (위치 미기재)';
@@ -424,6 +485,7 @@ function dealHTML(r){
 function isMember(){ var m=store(MEM_KEY); return !!(m&&m.phone); }
 
 function sheetHTML(r){
+  if(TAB==='moa') return moaSheetHTML(r);
   var t=TAB, tags='';
   function tag(v,cls){ if(!v) return ''; tags+='<span class="'+(cls||'')+'">'+esc(v)+'</span>'; }
   tag(TAB==='seoul'?r.t:(TAB==='gyeonggi'?r.t:r.t));
@@ -486,6 +548,62 @@ function sheetHTML(r){
   '</div>';
 }
 
+/* ---------- 모아타운 상세(확인 결과) ---------- */
+function sameDongDeals(r){
+  var dn=r.dn||'';
+  if(!dn) return [];
+  return rows('seoul').filter(function(x){
+    return x.g===r.g && String(x.j||'').indexOf(dn)>=0 && (x.t==='가로주택정비'||x.t==='소규모재건축');
+  }).slice(0,6);
+}
+function moaSheetHTML(r){
+  var flags=(r.fl||[]).map(function(f){return '<span class="hot">'+esc(f)+'</span>'}).join('');
+  var kvs='';
+  function kv(lab,val,unit){ if(val==null||val==='') return; kvs+='<div><span>'+lab+'</span><b>'+val+(unit?'<small>'+unit+'</small>':'')+'</b></div>' }
+  kv('승인·고시일', r.up?r.up.replace(/-/g,'.'):'미기재');
+  kv('관리지역 면적', r.ar?won(Math.round(r.ar)):'미기재','㎡');
+  kv('계획 세대수', r.hh?won(r.hh):'미기재','세대');
+  kv('모아주택 구역', r.bl?r.bl+'개':'미기재');
+  if(r.fa) kv('용적률', r.fa, '%');
+  if(r.flr) kv('최고층', r.flr, '층');
+  var deals=sameDongDeals(r);
+  var dealHtml=deals.length
+    ? deals.map(function(x){
+        return '<div class="rowr" style="display:flex;gap:6px;font-size:11px;color:#C9D6E6;padding:4px 0;border-bottom:1px solid #16233D"><b style="flex:1;font-weight:900;color:#fff">'+esc(x.n.slice(0,26))+'</b><span style="color:#9FB0C8">'+esc(x.t)+'</span><span style="color:#FFC98F;font-weight:800">'+esc(x.st||'—')+'</span></div>';
+      }).join('')
+    : '<div class="note" style="margin:0">같은 동에 가로주택·소규모 사업장이 공개 목록에 없습니다. 관리지역 안 개별 사업은 서울 탭에서 동 이름으로 찾아보세요.</div>';
+  return '<div class="shd"><button data-act="close">← 목록</button><span>모아타운 · 확인 결과</span></div>'+
+  '<div class="sbody">'+
+    '<div class="dt"><h3>'+esc(r.n)+'</h3><div class="lo">'+esc(addrOf(r))+'</div>'+
+      '<div class="tags"><span class="hot">'+esc(stageLabel(r))+'</span>'+flags+
+        '<span>모아타운 · '+esc(r.rg||'서울')+'</span>'+(r.bl?'<span>모아주택 '+r.bl+'개 구역</span>':'')+'</div></div>'+
+    '<div class="lad"><div class="mlad">'+
+      '<div class="on"><b>1</b>대상지 선정</div><div class="on"><b>2</b>관리계획 수립</div>'+
+      '<div class="on now"><b>3</b>승인·고시</div><div><b>4</b>모아주택 착공</div></div>'+
+      '<div class="mst"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>'+
+      '<div class="note" style="margin-top:6px">승인·고시까지 확인된 상태입니다. 4단계(모아주택 착공)는 관리지역 안 개별 사업장마다 달라서, 아래 같은 동 사업장과 구청 공고로 확인하세요.</div></div>'+
+    '<div class="kv">'+kvs+'</div>'+
+    (r.scale?'<div class="note"><b>규모(원문)</b> '+esc(r.scale)+'</div>':'')+
+    '<div class="card"><h2><i>→</i>현장 내비 <small>바로 열기</small></h2>'+navHTML(r)+
+      '<div class="note">티맵은 앱이 설치된 폰에서 바로 열립니다. 앱이 없으면 주소를 복사해 쓰세요.</div></div>'+
+    '<div class="card"><h2><i>▤</i>같은 동 모아주택 후보 <small>가로주택·소규모</small></h2>'+dealHtml+
+      '<div class="note">대표지번이 같은 동인 사업장을 보여 드리는 <b>참고 목록</b>입니다. 관리지역 경계 안 필지 전체를 가리키지는 않습니다.</div></div>'+
+    '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+
+      (r.lk?'<a href="'+esc(r.lk)+'" target="_blank" rel="noopener"><i>📄</i>서울시 모아타운 아카이브 원문<em>변경 전·후 도면</em></a>':'')+
+      '<a href="https://news.seoul.go.kr/citybuild/moa-housing-town/archive" target="_blank" rel="noopener"><i>📚</i>모아주택·모아타운 아카이브 전체<em>권역별</em></a>'+
+      '<a href="https://housing.seoul.go.kr/site/main/content/sh_080003" target="_blank" rel="noopener"><i>🏠</i>서울주거포털 모아주택·모아타운<em>정책·현황</em></a></div>'+
+      '<div class="note"><b>기준일</b> 서울시 온라인 아카이브(관리계획 승인·고시분) · 26.11 수집<br>아카이브에 없는 대상지(선정·계획 수립 중)는 이 화면에 없습니다. 공개 자료를 모은 <b>참고용</b>이고 법적 효력은 없습니다.</div></div>'+
+    '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
+  '</div>';
+}
+/* ---------- 확인 결과 바닥(저장·공유) — 모든 탭 공통 ---------- */
+function paidUser(){ return !!(window.KTS&&window.KTS.isMaster&&window.KTS.isMaster()) }
+function actBar(){
+  return '<div class="sact"><div class="row2">'+
+    '<button data-act="save">저장</button><button class="gh" data-act="share">공유하기</button></div>'+
+    '<div class="scredit'+(paidUser()?' off':'')+'" id="scredit"><a href="https://autooneclick.com/" target="_blank" rel="noopener">autooneclick.com</a></div></div>';
+}
+
 /* ---------- 알림 ---------- */
 function alerts(){ return store(ALERT_KEY)||[]; }
 function alertHTML(r){
@@ -529,12 +647,150 @@ var CURDATA=null,CURKEY=null;
 function openSheet(i){
   var r=rows(TAB)[i]; if(!r) return;
   CURDATA=r; CURKEY=i;
-  $('sheet').innerHTML=sheetHTML(r);
+  $('sheet').innerHTML=sheetHTML(r)+actBar();
   $('sheet').scrollTop=0;
   $('panel').classList.add('on');
   document.body.style.overflow='hidden';
 }
 function closeSheet(){ $('panel').classList.remove('on'); document.body.style.overflow=''; }
+
+/* ---------- 저장·공유 (확인 결과 → 카드 그림/문구) ---------- */
+function stampNow(){var d=new Date();return d.getFullYear()+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+function wrapC(g,text,x,y,maxW,lh){
+  var words=String(text).split(' '), line='', yy=y;
+  for(var i=0;i<words.length;i++){
+    var t=line?line+' '+words[i]:words[i];
+    if(g.measureText(t).width>maxW&&line){ g.fillText(line,x,yy); yy+=lh; line=words[i] }
+    else line=t;
+  }
+  if(line) g.fillText(line,x,yy);
+  return yy;
+}
+function shareText(r){
+  var L=['[KTS 재개발 진행조회기] '+r.n, addrOf(r)];
+  if(TAB==='moa'){
+    L.push('모아타운 관리지역 · 승인·고시 '+(r.up||'미기재')+' · 면적 '+(r.ar?won(Math.round(r.ar))+'㎡':'—')+(r.hh?' · 계획 '+won(r.hh)+'세대':'')+(r.bl?' · 모아주택 '+r.bl+'개 구역':''));
+  }else{
+    L.push('진행단계: '+stageLabel(r));
+    var d=r.dt||{};
+    DATE_KEYS.forEach(function(k,i){ if(d[k]) L.push(DATE_LABELS[i]+' '+d[k]) });
+    if(r.hn) L.push('건립 세대수 '+won(r.hn)+'세대');
+  }
+  L.push('출처: '+(TAB==='moa'?'서울시 모아주택·모아타운 아카이브':'정비사업 정보몽땅 · 경기데이터드림 · 국토부 통합데이터'));
+  L.push('※ 공개 데이터 참고용 · 법적 효력 없음');
+  L.push('KTS 원클릭 autooneclick.com/redev/');
+  return L.join('\n');
+}
+function copyText(t){
+  function fb(){
+    var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('문구를 복사했습니다 · 카톡에 붙여 넣으세요') }catch(e){ toast('복사가 막혔습니다 · 화면 캡처를 써 주세요') }
+    ta.remove();
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){toast('문구를 복사했습니다 · 카톡에 붙여 넣으세요')},fb);
+  else fb();
+}
+function boxC(g,x,y,w,h,label,val){
+  g.fillStyle='#0B1729'; g.fillRect(x,y,w,h);
+  g.strokeStyle='#1D2C49'; g.lineWidth=1; g.strokeRect(x,y,w,h);
+  g.fillStyle='#8FA1B8'; g.font='800 15px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(label,x+13,y+22);
+  g.fillStyle='#F3F6FA'; g.font='900 24px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(String(val),x+13,y+54);
+}
+function drawCard(r){
+  var d=r.dt||{}, dd=0;
+  if(TAB!=='moa') DATE_KEYS.forEach(function(k){ if(d[k]&&dd<5) dd++ });
+  var H=(TAB==='moa')
+    ? 720+((r.fa||r.flr)?80:0)+(r.scale?36:0)
+    : 700+dd*26+((r.j)?26:0);
+  var c=document.createElement('canvas'); c.width=900; c.height=H;
+  var g=c.getContext('2d');
+  var bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#0E1B3A'); bg.addColorStop(.55,'#0B1428'); bg.addColorStop(1,'#0A1128');
+  g.fillStyle=bg; g.fillRect(0,0,900,H);
+  g.fillStyle='#FF6B00'; g.fillRect(0,0,900,8);
+  g.fillStyle='#FFA24D'; g.font='900 24px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('KTS 원클릭 · 재개발 진행조회기',40,60);
+  g.fillStyle='#7C8DA6'; g.font='700 16px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText((TAB==='moa'?'모아타운 · ':'')+stampNow()+' · '+($('base').textContent||''),40,88);
+  g.fillStyle='#FFFFFF'; g.font='900 30px -apple-system,"Noto Sans KR",sans-serif';
+  var y=wrapC(g,r.n,40,146,820,38);
+  g.fillStyle='#9FB0C8'; g.font='800 18px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(addrOf(r),40,y+26);
+  y+=64;
+  if(TAB==='moa'){
+    boxC(g,40,y,400,70,'승인·고시일',r.up?r.up.replace(/-/g,'.'):'미기재');
+    boxC(g,460,y,400,70,'관리지역 면적',r.ar?won(Math.round(r.ar))+'㎡':'미기재');
+    boxC(g,40,y+80,400,70,'계획 세대수',r.hh?won(r.hh)+'세대':'미기재');
+    boxC(g,460,y+80,400,70,'모아주택 구역',r.bl?r.bl+'개':'미기재');
+    y+=170;
+    if(r.fa||r.flr){ boxC(g,40,y,400,70,'용적률',r.fa?r.fa+'%':'—'); boxC(g,460,y,400,70,'최고층',r.flr?r.flr+'층':'—'); y+=80 }
+    var st=['대상지 선정','관리계획 수립','승인·고시','모아주택 착공'];
+    st.forEach(function(s,i){
+      var x=40+i*205;
+      g.fillStyle=i<3?'#FF6B00':'#1E2C4A'; g.fillRect(x,y,195,10);
+      g.fillStyle=i<3?'#FFC98F':'#6E82A1'; g.font='800 14px -apple-system,"Noto Sans KR",sans-serif'; g.fillText((i+1)+' '+s,x,y+30);
+    });
+    y+=56;
+    if(r.scale){ g.fillStyle='#8FA1B8'; g.font='800 15px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('규모',40,y); g.fillStyle='#DCE6F2'; wrapC(g,r.scale,110,y,750,22); y+=34 }
+    var dn=sameDongDeals(r).length;
+    g.fillStyle='#9FB0C8'; g.font='700 15px -apple-system,"Noto Sans KR",sans-serif';
+    g.fillText('같은 동 가로주택·소규모 사업장 '+dn+'곳(참고)',40,y+6); y+=34;
+  }else{
+    var s=(r.s==null?-1:r.s), i2;
+    for(i2=0;i2<7;i2++){
+      var xx=40+i2*117;
+      g.fillStyle=(s===7||i2<s)?'#FF6B00':(i2===s?'#FFA24D':'#1E2C4A');
+      g.fillRect(xx,y,110,10);
+      g.fillStyle=(i2<=s||s===7)?'#FFC98F':'#6E82A1'; g.font='800 13px -apple-system,"Noto Sans KR",sans-serif';
+      g.fillText((i2+1)+' '+STEPS_S[i2],xx,y+26);
+    }
+    y+=50;
+    var shown=0;
+    DATE_KEYS.forEach(function(k,ix){ if(!d[k]||shown>4) return; shown++;
+      g.fillStyle='#8FA1B8'; g.font='800 15px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(DATE_LABELS[ix],40,y);
+      g.fillStyle='#E6EDF7'; g.font='900 16px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(d[k],180,y); y+=26;
+    });
+    if(!shown){ g.fillStyle='#8FA1B8'; g.font='800 15px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('인가일: 공개 자료에 없음',40,y); y+=26 }
+    y+=8;
+    boxC(g,40,y,400,70,'현재 단계',stageLabel(r));
+    boxC(g,460,y,400,70,'건립 세대수',r.hn?won(r.hn)+'세대':(r.hs?won(r.hs)+'세대(기존)':'미기재'));
+    y+=90;
+    if(r.j){ g.fillStyle='#8FA1B8'; g.font='700 15px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('대표지번 '+r.j,40,y) }
+  }
+  /* 꼬리 — 내용 끝에 맞춰 높이를 줄인다(빈 공간 남기지 않음) */
+  var H2=Math.max(520,Math.min(H,y+140));
+  function tail(gg,HH){
+    gg.fillStyle='#7C8DA6'; gg.font='700 14px -apple-system,"Noto Sans KR",sans-serif';
+    wrapC(gg,'공개 데이터를 그대로 모은 참고 자료입니다. 법적 효력이 없고, 고시·인가 내용은 구청·정보몽땅 원문이 기준입니다.',40,HH-92,820,20);
+    gg.fillStyle='#FFA24D'; gg.font='900 17px -apple-system,sans-serif'; gg.fillText('KTS 원클릭 · 재개발 진행조회기',40,HH-34);
+    if(!paidUser()){
+      gg.fillStyle='#5AA9FF'; gg.font='900 18px -apple-system,sans-serif';
+      gg.fillText('autooneclick.com',860-gg.measureText('autooneclick.com').width,HH-34);
+    }
+  }
+  if(H2<H){
+    var c2=document.createElement('canvas'); c2.width=900; c2.height=H2;
+    var g2=c2.getContext('2d'); g2.drawImage(c,0,0);
+    tail(g2,H2); return c2;
+  }
+  tail(g,H);
+  return c;
+}
+function saveCard(){
+  var r=CURDATA; if(!r){ toast('구역을 먼저 골라 주세요'); return }
+  try{
+    var c=drawCard(r);
+    var a=document.createElement('a');
+    a.href=c.toDataURL('image/png');
+    a.download='재개발_'+(r.n||'').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,24)+'_'+new Date().toISOString().slice(0,10)+'.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('카드로 저장했습니다');
+  }catch(e){ toast('저장에 실패했습니다 · 화면 캡처를 써 주세요') }
+}
+function shareCard(){
+  var r=CURDATA; if(!r){ toast('구역을 먼저 골라 주세요'); return }
+  var t=shareText(r);
+  if(navigator.share){ navigator.share({title:'재개발 · '+r.n,text:t,url:location.href}).then(function(){},function(){ copyText(t) }) }
+  else copyText(t);
+}
 
 /* ---------- 모달 ---------- */
 function modal(html){ $('modalbox').innerHTML=html; $('modal').classList.add('on'); }
@@ -597,6 +853,8 @@ $('panel').addEventListener('click',function(e){
   var b=e.target.closest('[data-act]'); if(!b) return;
   var a=b.dataset.act;
   if(a==='close') closeSheet();
+  if(a==='save') saveCard();
+  if(a==='share') shareCard();
   if(a==='alertSave') saveAlert();
   if(a==='alertDel'){ store(ALERT_KEY,[]); openSheet(CURKEY); toast('알림 신청을 취소했습니다'); }
   if(a==='alertDelOne'){ var l=alerts(); l.splice(Number(b.dataset.i),1); store(ALERT_KEY,l); openSheet(CURKEY); }

@@ -57,6 +57,10 @@ main{padding:12px 14px 0}
 .legend .bar{height:8px;border-radius:4px;background:linear-gradient(90deg,#1F9F6E,#4FBF57 18%,#B7D34A 34%,#F3D34A 50%,#F5A93B 64%,#FF6B00 76%,#E23A2E 90%,#A4143C)}
 .legend .lb{display:flex;justify-content:space-between;font-size:8.5px;font-weight:900;color:#C9D6E6;margin-top:2px;letter-spacing:0}
 .legend .tt{font-size:9px;font-weight:900;color:#E7EEF7;margin-bottom:1px}
+.aleg{display:flex;gap:9px;font-size:8.5px;font-weight:800;color:#C9D6E6;letter-spacing:0;margin-top:1px}
+.aleg span{display:flex;align-items:center;gap:3px;white-space:nowrap}
+.aleg i{font-style:normal;font-size:11px;font-weight:900;line-height:1}
+#cbw{margin-top:3px}
 .hint{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(10,17,40,.9);border:1px solid rgba(255,107,0,.5);color:#FFD9A6;
  font-size:10.5px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap;pointer-events:none;transition:.3s;opacity:1}
 .hint.off{opacity:0}
@@ -202,6 +206,33 @@ details.adv .keyrow{margin-top:7px}
 .anote2{font-size:9.5px;color:#6D7E97;line-height:1.6;margin:8px 2px 2px}
 .anote2 b{color:#B9C8DA}
 .aload{font-size:10.5px;color:#FFD9A6;font-weight:800;padding:10px 2px;line-height:1.6}
+/* 2트랙 — 경사 화살표 · 키 접기 · 결과 전체뷰 */
+.btn.chk{flex-direction:column;gap:0;line-height:1.25;padding:12px}
+.btn.chk b{font-size:15px;letter-spacing:-.3px}
+.btn.chk small{font-size:10.5px;font-weight:800;opacity:.82;margin-top:2px}
+.arrow-note{font-size:10px;color:#8FA1B8;margin:7px 2px 0;line-height:1.55;font-weight:700}
+.arrow-note b{color:#FFD9A6}
+.keyopen{width:100%;margin-top:7px;border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:10px;padding:9px;font-size:11.5px;font-weight:900;cursor:pointer}
+#keyBox{margin-top:8px;border-top:1px dashed #243352;padding-top:9px}
+#res{position:fixed;inset:0;z-index:75;display:none;justify-content:center;background:rgba(4,8,18,.94)}
+#res.on{display:flex}
+.rvw{width:100%;max-width:460px;background:linear-gradient(180deg,#0F1B33,#0A1128 34%);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:26px}
+.rhd{position:sticky;top:0;z-index:2;background:rgba(10,17,40,.97);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 14px;display:flex;align-items:center;gap:8px}
+.rhd button{border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:900;cursor:pointer}
+.rhd span{margin-left:auto;font-size:10.5px;font-weight:900;color:var(--amber2);white-space:nowrap}
+.rbody{padding:11px 13px 0}
+.rtit{font-size:16px;font-weight:900;letter-spacing:-.5px;line-height:1.35;word-break:break-all}
+.rtit small{display:block;font-size:10px;color:#8FA1B8;font-weight:800;margin-top:3px;letter-spacing:0}
+#resShot{display:block;width:100%;margin-top:9px;border-radius:12px;border:1px solid var(--line2);background:#0B1729}
+.rsec{margin-top:11px}
+.rsec h4{margin:0 0 6px;font-size:10.5px;font-weight:900;color:#8FA1B8;letter-spacing:.02em}
+#resPf{display:block;width:100%;height:122px;border-radius:10px;background:#0A1526;border:1px solid #1D2C49}
+.rnote{font-size:9.5px;color:#6D7E97;line-height:1.62;margin:9px 2px 0}
+.rnote b{color:#B9C8DA}
+.rcredit{margin:15px 0 0;text-align:center;font-size:12.5px;font-weight:900;letter-spacing:-.2px}
+.rcredit a{color:#5AA9FF;text-decoration:none}
+.rcredit.off{display:none}
+.rcopy{display:block;width:100%;margin-top:8px;border:0;background:none;color:#8FA1B8;font-size:11px;font-weight:900;text-decoration:underline;cursor:pointer;padding:8px}
 </style></head>
 <body>
 <div id="app">
@@ -247,9 +278,16 @@ details.adv .keyrow{margin-top:7px}
       <div class="hint" id="hint">밀어서 필지에 맞추세요</div>
       <span class="attr" id="mapAttr">© OpenStreetMap · DEM</span>
       <div class="legend">
-        <div class="tt">경사도(°) · 칸 하나 3.8m(5m 격자)</div>
+        <div class="tt">화살표 = 물이 흐르는 방향 · 숫자 = 경사(°) · 5m 격자</div>
+        <div class="aleg" id="aleg">
+          <span><i style="color:#1E3E6C">→</i>15° 미만</span>
+          <span><i style="color:#BE6200">→</i>15~25°</span>
+          <span><i style="color:#A82018">→</i>25° 이상</span>
+        </div>
+        <div id="cbw">
         <div class="bar"></div>
         <div class="lb"><span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30+</span></div>
+        </div>
       </div>
     </div>
     <div class="arch hide" id="arch">
@@ -260,7 +298,8 @@ details.adv .keyrow{margin-top:7px}
       <p class="anote2">1차 <b>법정 기준</b> 참고용입니다. 법정 상한은 조례로 더 낮아질 수 있으니 최종은 <b>지자체 조례·고시</b>와 토지이음 확인이 기준입니다.</p>
     </div>
     <div class="togs" id="togs">
-      <button type="button" data-l="slope" class="on">경사도<small>색</small></button>
+      <button type="button" data-l="arrow" class="on">경사 화살표<small>방향·구배</small></button>
+      <button type="button" data-l="slope">경사도<small>색</small></button>
       <button type="button" data-l="cont" class="on">등고선<small>2m</small></button>
       <button type="button" data-l="grid">5m 격자<small>눈금</small></button>
       <button type="button" data-l="parcel" class="lk">필지 경계<small>Vworld</small></button>
@@ -269,6 +308,8 @@ details.adv .keyrow{margin-top:7px}
     </div>
     <div class="rng"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
     <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
+    <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 길고 붉을수록 급하고, 숫자는 그 칸의 경사(°)입니다. 도면처럼 얇게 그려 색판이 번지지 않습니다.</p>
+    <button class="btn chk" type="button" id="chkGo"><b>확인하기</b><small>이 자리 그대로 결과 전체뷰를 엽니다</small></button>
   </section>
 
   <section class="card">
@@ -286,10 +327,7 @@ details.adv .keyrow{margin-top:7px}
     <p class="addrline hide" id="pcInfo" style="color:#FFC98F"></p>
     <p class="addrline hide" id="pv" style="color:#FFC98F"></p>
     <p class="addrline" id="dist">15° 넘는 땅 <b>—</b> · 25° 넘는 땅 <b>—</b></p>
-    <div class="two">
-      <button class="btn" type="button" id="savePng">그림으로 저장</button>
-      <button class="btn ghost" type="button" id="copyTxt">문구 복사</button>
-    </div>
+    <p class="addrline" style="color:#8FA1B8">위 지도 카드의 <b>[확인하기]</b>를 누르면 이 결과가 전체뷰로 펼쳐지고, 거기서 <b>[저장]·[공유하기]</b>로 넘어갑니다.</p>
   </section>
 
   <section class="card">
@@ -309,21 +347,24 @@ details.adv .keyrow{margin-top:7px}
       <a href="https://ecvam.neins.go.kr/" target="_blank" rel="noopener"><i>◈</i>국토환경성평가지도<em>경사·표고 주제도</em></a>
       <a href="https://www.vworld.kr/" target="_blank" rel="noopener"><i>◎</i>브이월드 연속지적도<em>필지 경계</em></a>
     </div>
-    <p class="note">지형은 <b>공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산</b>한 그림입니다. 30m 픽셀의 굵은 계단은 없어지지만, 5m 실측 등고와 100% 같지는 않습니다. 인허가·설계·매매 판단의 최종 수치는 위 <b>5m 수치지형도</b>로 확인해 주세요.</p>
+    <p class="note">지형은 <b>공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산</b>한 그림입니다. 30m 픽셀의 굵은 계단은 없어지지만, 5m 실측 등고와 100% 같지는 않습니다. <b>국토정보플랫폼 공개 DEM은 회원 로그인 뒤 img 파일로 받는 자료</b>라 화면에서 타일로 바로 불러올 수 없습니다(그래서 기본 DEM을 씁니다). 인허가·설계·매매 판단의 최종 수치는 위 <b>5m 수치지형도</b> 도엽으로 확인해 주세요.</p>
   </section>
 
   <section class="card">
-    <h2><i>6</i>Vworld 키 넣기<small>선택 · 이 기기에만</small></h2>
-    <div class="keyrow">
-      <input id="vk" type="text" placeholder="Vworld 오픈키 (없으면 그냥 두세요)" aria-label="Vworld 오픈키" autocomplete="off" spellcheck="false">
-      <button type="button" id="vkSave">연결</button>
-    </div>
+    <h2><i>6</i>지도 연결<small>선택 · 이 기기에만</small></h2>
     <div class="keyst" id="vkSt"><i></i><span>미연결 — 지도·경사도는 지금도 그대로 동작합니다.</span></div>
-    <details class="adv"><summary>정밀 DEM 타일 주소 (선택 · 5m 수치지형도 타일용)</summary>
-      <div class="keyrow"><input id="demTpl" type="text" placeholder="https://…/{z}/{x}/{y}.png" aria-label="정밀 DEM 타일 주소" autocomplete="off" spellcheck="false"><button type="button" id="demSave">적용</button></div>
-      <p class="note">비워 두면 기본 공개 DEM(30m)을 5m 격자로 계산합니다. 5m 수치지형도 타일을 직접 올리셨다면 주소만 넣으면 같은 화면에서 그대로 씁니다.</p>
-    </details>
-    <p class="note">키를 넣으면 <b>연속지적도 필지 경계·용도지역·위성지도</b>가 겹쳐 열립니다. 키는 서버로 보내지 않고 이 기기 브라우저에만 저장됩니다. 무료 키 1개로 하루 4만 건까지 쓸 수 있습니다.</p>
+    <button type="button" class="keyopen" id="keyOpen">키 바꾸기 (필요할 때만)</button>
+    <div id="keyBox" class="hide">
+      <div class="keyrow">
+        <input id="vk" type="text" placeholder="Vworld 오픈키 (없으면 그냥 두세요)" aria-label="Vworld 오픈키" autocomplete="off" spellcheck="false">
+        <button type="button" id="vkSave">연결</button>
+      </div>
+      <details class="adv"><summary>정밀 DEM 타일 주소 (선택 · 5m 수치지형도 타일용)</summary>
+        <div class="keyrow"><input id="demTpl" type="text" placeholder="https://…/{z}/{x}/{y}.png" aria-label="정밀 DEM 타일 주소" autocomplete="off" spellcheck="false"><button type="button" id="demSave">적용</button></div>
+        <p class="note">비워 두면 기본 공개 DEM(30m)을 5m 격자로 계산합니다. 5m 수치지형도 타일을 직접 올리셨다면 주소만 넣으면 같은 화면에서 그대로 씁니다.</p>
+      </details>
+      <p class="note">키를 넣으면 <b>연속지적도 필지 경계·용도지역·위성지도</b>가 겹쳐 열립니다. 키는 서버로 보내지 않고 이 기기 브라우저에만 저장됩니다.</p>
+    </div>
   </section>
 
   <section class="card">
@@ -352,6 +393,23 @@ details.adv .keyrow{margin-top:7px}
   지적 <a href="https://www.vworld.kr/" target="_blank" rel="noopener">© Vworld</a><br>
   참고용 그림입니다. 경계·지목·인허가의 법적 판단은 공부(公簿)와 담당 관청 확인이 기준입니다.</p>
 </main>
+<div id="res"><div class="rvw">
+  <div class="rhd"><button type="button" id="resClose">← 지도</button><span id="resTag2">결과 전체뷰</span></div>
+  <div class="rbody">
+    <div class="rtit" id="resAddr">—<small id="resWhere">—</small></div>
+    <canvas id="resShot" width="700" height="760" aria-label="경사도 결과 지도"></canvas>
+    <div class="verdict" id="vd2" style="margin-top:9px"><b>—</b><span>—</span></div>
+    <div class="kv" id="kv2"></div>
+    <div class="rsec"><h4>동–서 · 남–북 단면 (±150m)</h4><canvas id="resPf" width="340" height="122" aria-label="단면도"></canvas><p class="pfnote" id="resPfn">—</p></div>
+    <div class="rsec"><h4>경사 화살표 읽는 법</h4>
+      <p class="rnote" style="margin:0">화살표는 <b>물이 흘러내리는 방향</b>입니다. 길수록 급하고, 남색은 15° 미만, 주황은 15~25°, 붉은색은 25° 이상입니다. 화살표 옆 숫자는 그 칸의 경사(°)입니다.</p>
+    </div>
+    <div class="two"><button class="btn" type="button" id="savePng">저장</button><button class="btn ghost" type="button" id="shareBtn">공유하기</button></div>
+    <button type="button" class="rcopy" id="copyTxt">문구 복사 (카톡·문자에 붙여넣기)</button>
+    <p class="rnote">지형은 <b>공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산</b>한 값입니다. 인허가·설계·매매 판단의 최종 수치는 국토정보플랫폼 <b>5m 수치지형도</b>와 공부(公簿)·관청 확인이 기준입니다.</p>
+    <p class="rcredit" id="resCredit"><a href="https://autooneclick.com/" target="_blank" rel="noopener">autooneclick.com</a></p>
+  </div>
+</div></div>
 <div class="toast" id="toast"></div>
 </div>
 <script>
@@ -373,7 +431,7 @@ var DEFAULT_VW_KEY='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
 function todayKey(){var t=new Date().getTime()+9*3600*1000, d=new Date(t);return d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2)}
 var S={
   lat:37.8319, lon:127.3668, zoom:16.2,
-  lay:{slope:1,cont:1,grid:0,parcel:0,zone:0,sat:0},
+  lay:{arrow:1,slope:0,cont:1,grid:0,parcel:0,zone:0,sat:0},
   op:0.38, radius:100, addr:'가평 · 신하리 일대(예시 지점)', profile:'ew',
   key:(function(){var v=LS.get('kts_slope_vk',null); return v==null?DEFAULT_VW_KEY:v})(), demTpl:LS.get('kts_slope_dem',''),
   free:(function(){var d=todayKey();if(LS.get('kts_slope_day','')!==d){LS.set('kts_slope_day',d);LS.set('kts_slope_free','0');return 0}return parseInt(LS.get('kts_slope_free','0'),10)||0})(),
@@ -423,7 +481,10 @@ function getTile(z,x,y,layer){
     if(layer&&S.key&&!t.retried){ /* Vworld 타일이 막혔거나 키가 틀릴 때 오픈 지도로 대신 */
       t.retried=true;
       var i2=new Image(); i2.crossOrigin='anonymous'; i2.decoding='async';
-      i2.onload=function(){t.img=i2;t.ok=true;requestRender()};
+      i2.onload=function(){t.img=i2;t.ok=true;S.baseFB=1;
+        var ma=$('#mapAttr'); if(ma) ma.textContent='지도 © Vworld / OSM · DEM';
+        var ms=$('#mapSrc'); if(ms){ ms.href='https://www.openstreetmap.org/copyright'; ms.textContent='© OpenStreetMap' }
+        requestRender()};
       i2.onerror=function(){t.fail=true};
       i2.src='https://tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png';
       return;
@@ -672,6 +733,7 @@ function scene(g,w,h,o){
   if(S.lay.parcel) drawVWImg(g,x0,y0,w,h,'parcel');
   if(S.lay.zone) drawVWImg(g,x0,y0,w,h,'zone');
   if(PC) drawParcelHL(g,x0,y0,w,h);
+  if(S.lay.arrow) drawSlopeArrows(g,x0,y0,w,h);
   drawMarker(g,x0,y0,w,h,o);
   g.restore();
 }
@@ -884,6 +946,90 @@ function drawMarker(g,x0,y0,w,h,o){
   g.restore();
 }
 
+/* ---------------- 경사 화살표(도면식) -------------
+   5m 격자마다 그 칸의 경사 방향(물이 흘러내리는 쪽)을 얇은 화살표로,
+   경사(°)를 숫자로 적는다. 색판이 번지는 대신 선으로 읽히게.
+   필지 경계를 알면 그 안쪽만, 모르면 분석 반경 안쪽만 그린다. */
+function arrowColor(s){
+  if(s>=25) return 'rgba(168,32,24,.97)';
+  if(s>=15) return 'rgba(190,98,0,.96)';
+  if(s>=5) return 'rgba(16,40,76,.92)';
+  return 'rgba(30,62,108,.66)';
+}
+function drawSlopeArrows(g,x0,y0,w,h){
+  if(!T||!T.elev) return;
+  var W=worldSize(S.zoom), mpp=mppAt(S.zoom,S.lat);
+  var gap=S.zoom>=17.3?11:(S.zoom>=16.2?14:18);
+  var cx=lng2w(S.lon)*W-x0, cy=lat2w(S.lat)*W-y0, rad=S.radius/mpp;
+  var clip=null, bx=1e9, by=1e9, bX=-1e9, bY=-1e9;
+  if(PC&&PC.rings){
+    var p0=new Path2D(), any=false;
+    for(var i=0;i<PC.rings.length;i++){
+      var r=PC.rings[i], st=false;
+      for(var j=0;j<r.length;j++){
+        var pt=r[j]; if(!pt||!isFinite(pt[0])||!isFinite(pt[1])) continue;
+        var X=lng2w(pt[0])*W-x0, Y=lat2w(pt[1])*W-y0;
+        if(!st){ p0.moveTo(X,Y); st=true } else p0.lineTo(X,Y);
+        if(X<bx)bx=X; if(X>bX)bX=X; if(Y<by)by=Y; if(Y>bY)bY=Y;
+        any=true;
+      }
+      if(st) p0.closePath();
+    }
+    if(any){ clip=p0;
+      /* 필지가 작게 보일 때는 더 조밀하게 — 필지 폭에 화살표 여덟 개 남짓 */
+      var bw=bX-bx, bh=bY-by;
+      if(isFinite(bw)&&isFinite(bh)) gap=clamp(Math.min(bw,bh)/8,8,18);
+    }
+  }
+  g.save();
+  if(clip) g.clip(clip,'evenodd');
+  else { g.beginPath(); g.arc(cx,cy,rad,0,Math.PI*2); g.clip() }
+  var eps=T.cellW*1.35;
+  var mPerU=CIRC*Math.cos(S.lat*Math.PI/180), mPerV=CIRC;
+  var halo=new Path2D(), pale=new Path2D(), mid=new Path2D(), warm=new Path2D(), hard=new Path2D(), lab=[];
+  var row=0, col=0;
+  for(var y=gap*0.55; y<h; y+=gap, row++){
+    col=0;
+    for(var x=gap*0.55; x<w; x+=gap, col++){
+      var u=(x0+x)/W, v=(y0+y)/W;
+      var e0=elevAt(u-eps,v), e1=elevAt(u+eps,v), e3=elevAt(u,v-eps), e4=elevAt(u,v+eps);
+      if(e0==null||e1==null||e3==null||e4==null) continue;
+      var s=sampleGrid(T.slope,u,v); if(s==null) continue;
+      var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU; /* 내려가는 쪽(화면 px) */
+      var L=Math.hypot(ax,ay);
+      var len=clamp(3.4+s*0.42,4.2,12);
+      if(L<1e-9){ ax=0; ay=1; } else { ax/=L; ay/=L }
+      var xa=x-ax*len*0.5, ya=y-ay*len*0.5, xb=x+ax*len*0.5, yb=y+ay*len*0.5;
+      var hx=xb-ax*3.0, hy=yb-ay*3.0;
+      var P=(s>=25?hard:(s>=15?warm:(s>=5?mid:pale)));
+      halo.moveTo(xa,ya); halo.lineTo(xb,yb);
+      halo.moveTo(hx-ay*1.8,hy+ax*1.8); halo.lineTo(xb,yb);
+      halo.lineTo(hx+ay*1.8,hy-ax*1.8);
+      P.moveTo(xa,ya); P.lineTo(xb,yb);
+      P.moveTo(hx-ay*1.8,hy+ax*1.8); P.lineTo(xb,yb);
+      P.lineTo(hx+ay*1.8,hy-ax*1.8);
+      if(row%3===1&&col%3===1&&s>=0.8) lab.push([xa-ay*6, ya+ax*6, s]);
+    }
+  }
+  g.lineCap='round'; g.lineJoin='round';
+  g.strokeStyle='rgba(255,255,255,.84)'; g.lineWidth=2.2; g.stroke(halo);
+  g.strokeStyle='rgba(30,62,108,.66)'; g.lineWidth=0.95; g.stroke(pale);
+  g.strokeStyle='rgba(16,40,76,.92)'; g.lineWidth=1.05; g.stroke(mid);
+  g.strokeStyle='rgba(190,98,0,.96)'; g.lineWidth=1.2; g.stroke(warm);
+  g.strokeStyle='rgba(168,32,24,.97)'; g.lineWidth=1.3; g.stroke(hard);
+  if(lab.length){
+    g.font='900 8px -apple-system,"Noto Sans KR",sans-serif';
+    g.textAlign='center'; g.textBaseline='middle';
+    for(var k=0;k<lab.length;k++){
+      var t=lab[k][2]<10?lab[k][2].toFixed(1):String(Math.round(lab[k][2]));
+      g.lineWidth=2.8; g.strokeStyle='rgba(255,255,255,.92)'; g.strokeText(t+'°',lab[k][0],lab[k][1]);
+      g.fillStyle=lab[k][2]>=25?'#A82018':(lab[k][2]>=15?'#9A4F00':'#10284C'); g.fillText(t+'°',lab[k][0],lab[k][1]);
+    }
+    g.textAlign='left'; g.textBaseline='alphabetic';
+  }
+  g.restore();
+}
+
 /* ---------------- 지도 조작 ---------------- */
 var ptrs=new Map(), moved=0, lastDist=0, dragId=null, downPos=null;
 function localPt(e){var r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}}
@@ -1016,8 +1162,8 @@ function verdictOf(mean,p95,g15,g25){
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
 /* ---------------- 단면도 ---------------- */
-function drawProfile(){
-  var c=$('#pfcv'), g=c.getContext('2d');
+function drawProfile(target){
+  var c=target||$('#pfcv'), g=c.getContext('2d');
   var w=c.clientWidth||340, h=132, d=Math.min(2,window.devicePixelRatio||1);
   c.width=Math.round(w*d); c.height=Math.round(h*d);
   g.setTransform(d,0,0,d,0,0);
@@ -1226,9 +1372,16 @@ document.querySelectorAll('#togs button').forEach(function(b){
     if((k==='parcel'||k==='zone'||k==='sat')&&!S.key){ toast('Vworld 키를 넣으면 열립니다 · 경사도는 지금도 그대로'); return }
     S.lay[k]=S.lay[k]?0:1;
     b.classList.toggle('on',!!S.lay[k]);
+    if(k==='slope') paintLegend();
     requestRender(); requestRender();
   });
 });
+/* 범례 — 색판을 꺼 두면 화살표 범례만 남긴다(도면처럼) */
+function paintLegend(){
+  var cb=$('#cbw'), al=$('#aleg');
+  if(cb) cb.style.display=S.lay.slope?'block':'none';
+  if(al) al.style.display=S.lay.arrow?'flex':'none';
+}
 $('#op').addEventListener('input',function(){ S.op=(+this.value)/100; $('#opv').textContent=this.value+'%'; requestRender() });
 $('#rad').addEventListener('input',function(){ S.radius=+this.value; $('#radv').textContent=this.value+'m'; requestRender(); analyze() });
 function paintKey(ok,msg){
@@ -1253,6 +1406,12 @@ if(demGo){ demGo.addEventListener('click',function(){
   S.demTpl=v; LS.set('kts_slope_dem',v); demCache.clear(); T=null;
   toast(v?'정밀 DEM 타일로 다시 계산합니다':'기본 DEM으로 되돌렸습니다'); buildTerrain();
 }) }
+/* 키 입력칸은 기본으로 접어 둔다 — 갈아끼울 때만 연다 */
+$('#keyOpen').addEventListener('click',function(){
+  var box=$('#keyBox'), on=box.classList.toggle('hide');
+  this.textContent=on?'키 바꾸기 (필요할 때만)':'키 입력 닫기';
+  if(!on){ var v=$('#vk'); if(v&&document.activeElement!==v) v.focus() }
+});
 
 /* ---------------- 그림 저장 ---------------- */
 function stamp(){ var d=new Date(); return d.getFullYear()+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2) }
@@ -1306,9 +1465,12 @@ function paintCard(c,withBase){
   g.fillStyle='#D7E1EC'; wrap(g,v.s,62,vy+72,780,24,'700 17px -apple-system,"Noto Sans KR",sans-serif');
   /* 꼬리 */
   g.fillStyle='#7C8DA6'; g.font='700 16px -apple-system,"Noto Sans KR",sans-serif';
-  g.fillText('좌표 '+S.lat.toFixed(5)+', '+S.lon.toFixed(5)+' · 반경 '+S.radius+'m · 경사 색은 5m 격자 기준',40,H-150);
+  g.fillText('좌표 '+S.lat.toFixed(5)+', '+S.lon.toFixed(5)+' · 반경 '+S.radius+'m · 화살표·숫자 5m 격자 기준',40,H-150);
   wrap(g,'지형은 공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산한 그림입니다. 인허가·설계·매매 판단은 국토정보플랫폼 5m 수치지형도와 공부(公簿)로 확인하세요.',40,H-118,820,22,'700 15px -apple-system,"Noto Sans KR",sans-serif');
-  g.fillStyle='#FFA24D'; g.font='900 18px -apple-system,sans-serif'; g.fillText('autooneclick.com/slope  ·  KTS 원클릭',40,H-30);
+  g.fillStyle='#FFA24D'; g.font='900 18px -apple-system,sans-serif'; g.fillText('KTS 원클릭 · 지번·경사도 지도',40,H-30);
+  if(!paidUser()){
+    g.fillStyle='#5AA9FF'; g.font='900 19px -apple-system,sans-serif'; g.fillText('autooneclick.com',W-40-g.measureText('autooneclick.com').width,H-30);
+  }
   if(S.preview){
     g.save(); g.globalAlpha=.17; g.fillStyle='#FF6B00'; g.font='900 60px -apple-system,"Noto Sans KR",sans-serif';
     g.translate(450,700); g.rotate(-Math.PI/9);
@@ -1359,6 +1521,71 @@ $('#copyTxt').addEventListener('click',function(){
     navigator.clipboard.writeText(t).then(function(){toast('문구를 복사했습니다 · 카톡에 붙여 넣으세요')},fallback);
   } else fallback();
 });
+
+/* ---------------- 결과 전체뷰 · 저장 · 공유 (2트랙) ----------------
+   [확인하기] → 전체뷰 → [저장] / [공유하기] 한 동선. */
+function paidUser(){ return master()||S.cred>0 }
+function paintShot(){
+  var c=$('#resShot'); if(!c) return;
+  var w=VW(), h=VH(), sc=2;
+  c.width=Math.round(w*sc); c.height=Math.round(h*sc);
+  var g=c.getContext('2d');
+  try{
+    scene(g,w,h,{scale:sc});
+    /* 그림 안에 범례 한 줄 — 화면에는 HTML 범례가 있고, 이 그림은 따로 저장되니까 */
+    g.save(); g.setTransform(sc,0,0,sc,0,0);
+    var t='화살표 = 물이 흐르는 방향 · 숫자 = 경사(°) · 5m 격자';
+    g.font='900 9px -apple-system,"Noto Sans KR",sans-serif';
+    var tw=g.measureText(t).width+16;
+    g.fillStyle='rgba(8,14,30,.82)'; g.fillRect(8,h-118,tw,17);
+    g.fillStyle='#E7EEF7'; g.fillText(t,16,h-106);
+    g.restore();
+  }catch(e){}
+}
+function kvRow(lab,val,unit){
+  return '<div><span>'+lab+'</span><b>'+val+(unit?'<small>'+unit+'</small>':'')+'</b></div>';
+}
+function openResult(){
+  if(!RES||!T){ toast('지형 계산이 끝난 뒤에 확인해 주세요'); return }
+  var R=RES;
+  $('#resAddr').innerHTML=esc(S.addr||'선택한 지점')+'<small>'+S.lat.toFixed(5)+', '+S.lon.toFixed(5)+' · 반경 '+S.radius+'m · '+stamp()+'</small>';
+  paintShot();
+  var v=verdictOf(R.mean,R.p95,R.g15p,R.g25p), vd=$('#vd2');
+  vd.className='verdict'+(v.c?' '+v.c:''); vd.innerHTML='<b>'+v.t+'</b><span>'+v.s+'</span>';
+  $('#kv2').innerHTML=
+    kvRow('중심 표고',fmt(R.el,0),'m')+kvRow('중심 경사',fmt(R.sl,1),'°')+
+    kvRow('평균 경사',fmt(R.mean,1),'°')+kvRow('가장 급한 곳',fmt(R.p95,1),'°')+
+    kvRow('표고 차',fmt(R.emax-R.emin,0),'m')+kvRow('사면 방향',dirName(R.as),'')+
+    kvRow('15° 초과',fmt(R.g15p,0),'%')+kvRow('25° 초과',fmt(R.g25p,0),'%');
+  $('#resCredit').classList.toggle('off',paidUser());
+  $('#resTag2').textContent='결과 전체뷰';
+  $('#res').classList.add('on');
+  document.body.style.overflow='hidden';
+  setTimeout(function(){
+    try{ drawProfile($('#resPf')) }catch(e){}
+    $('#resPfn').textContent=$('#pfn').textContent;
+  },40);
+}
+function closeResult(){ $('#res').classList.remove('on'); document.body.style.overflow='' }
+$('#resClose').addEventListener('click',closeResult);
+$('#chkGo').addEventListener('click',function(){
+  if(!RES||!T){ toast('지형을 받는 중입니다 · 잠시 뒤 다시 눌러 주세요'); return }
+  openResult();
+});
+function copyFallback(t){
+  var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('문구를 복사했습니다 · 카톡에 붙여 넣으세요') }catch(e){ toast('복사가 막혔습니다 · 그림 저장을 써 주세요') }
+  ta.remove();
+}
+$('#shareBtn').addEventListener('click',function(){
+  if(!RES){ toast('먼저 확인하기를 눌러 주세요'); return }
+  var t=summaryText();
+  if(navigator.share){
+    navigator.share({title:'KTS 경사도 · '+(S.addr||''),text:t,url:location.href}).then(function(){},function(){ copyFallback(t) });
+  } else copyFallback(t);
+});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('#res').classList.contains('on')) closeResult() });
 
 /* ---------------- 3D 지형 보기(121번) ----------------
    WebGL1 직접 · 라이브러리/CDN 없음. 2D 상태(S·T·PC)는 읽기만 하고 바꾸지 않는다.
@@ -2093,9 +2320,25 @@ window.__KTS_ARCH=function(){
     land:{jimok:L.lndcgrCodeNm||'',san:L.regstrSeCodeNm||'',road:L.roadSideCodeNm||'',jiga:L.pblntfPclnd||'',year:L.stdrYear||''},
     pnu:(PC&&PC.pnu)||'',areaM2:(PC&&PC.area)||0};
 };
+/* 검수용 읽기 전용 — 화살표가 정말 내려가는 쪽을 가리키는지(앞 6px 표고가 더 낮은지) */
+window.__KTS_ARROWS=function(){
+  if(!T||!T.elev) return null;
+  var W=worldSize(S.zoom), x0=lng2w(S.lon)*W-VW()/2, y0=lat2w(S.lat)*W-VH()/2;
+  var eps=T.cellW*1.35, mPerU=CIRC*Math.cos(S.lat*Math.PI/180), mPerV=CIRC;
+  function probe(fx,fy){
+    var x=VW()*fx, y=VH()*fy, u=(x0+x)/W, v=(y0+y)/W;
+    var e0=elevAt(u-eps,v), e1=elevAt(u+eps,v), e3=elevAt(u,v-eps), e4=elevAt(u,v+eps);
+    if(e0==null||e1==null||e3==null||e4==null) return null;
+    var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU, L=Math.hypot(ax,ay)||1; ax/=L; ay/=L;
+    var ah=elevAt(u+(ax*6)/W,v+(ay*6)/W), bh=elevAt(u-(ax*6)/W,v-(ay*6)/W);
+    return {slope:sampleGrid(T.slope,u,v),dir:[+ax.toFixed(3),+ay.toFixed(3)],ahead:ah,behind:bh,
+      drop:(ah!=null&&bh!=null)?+(bh-ah).toFixed(2):null};
+  }
+  return [probe(0.5,0.5),probe(0.32,0.34),probe(0.7,0.62),probe(0.24,0.72)];
+};
 
 /* ---------------- 시작 ---------------- */
-fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key);
+fitCanvas(); buildChips(); paintQuota(); paintKey(!!S.key,S.key?'기본 키 사용 중 — 연속지적도·용도지역·위성지도가 겹쳐 열립니다.':'미연결 — 지도·경사도는 지금도 그대로 동작합니다.'); paintLegend();
 if(S.key){ $('#vk').value=S.key }
 /* 바탕 지도 출처 표기 — 키가 있으면 Vworld WMTS 바탕을 쓴다 */
 if(S.key){ var ms=$('#mapSrc'); if(ms){ ms.href='https://www.vworld.kr/'; ms.textContent='© Vworld' } 
