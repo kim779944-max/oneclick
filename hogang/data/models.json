@@ -18,7 +18,21 @@
     "ipair":"Ahmad Ali Karim · CC0 (위키미디어 공용)",
     "ip17pm":"Ahmad Ali Karim · CC0 (위키미디어 공용)",
     "ip16p":"Padgriffin · CC BY 4.0 (위키미디어 공용)",
-    "ip15":"ThePhotoGraphIc · CC BY-SA 4.0 (위키미디어 공용)"
+    "ip15":"ThePhotoGraphIc · CC BY-SA 4.0 (위키미디어 공용)",
+    "s26u":"Kyu3a · CC BY-SA 4.0 (위키미디어 공용)",
+    "s26p":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "s26":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "fold8u":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "fold8":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "flip8":"Kyu3a · CC BY-SA 4.0 (위키미디어 공용)",
+    "ip18pm":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "ip18p":"茅野ふたば · CC BY-SA 4.0 (위키미디어 공용)",
+    "ipduo":"SimonWaldherr · CC BY 4.0 (위키미디어 공용)",
+    "s25fe":"삼성전자 뉴스룸 · 제조사 제공",
+    "flip7":"Matabalt · CC0 (위키미디어 공용)",
+    "ip17":"AzureSaturn · CC0 (위키미디어 공용)",
+    "ip16":"メイド理世 · CC BY-SA 4.0 (위키미디어 공용)",
+    "ip13":"Kskhh · CC BY-SA 4.0 (위키미디어 공용)"
   },
   "models": [
     {"id":"s26u","name":"갤럭시 S26 울트라","maker":"삼성","launchPrice":1947000,"display":"6.9형 QHD+ 1~120Hz","chip":"스냅드래곤 8 Elite Gen 5 for Galaxy","cam":"200MP+50MP 초광각+50MP 5배+10MP 3배","batt":"5,000mAh","weight":"214g","launch":"2026-03","img":"img/s26u.webp","source":"삼성전자 뉴스룸 국내 사양(2026-02-25) · 출고가(256GB) 2026-10-01 인상 반영(출시 1,797,400원 → 1,947,000원, SBS Biz·아이뉴스24 2026-10-01)","asOf":"2026-11-22"},
