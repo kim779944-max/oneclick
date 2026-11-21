@@ -2,7 +2,7 @@
 
 모든 사진은 위키미디어 공용(Wikimedia Commons)에서 내려받아 이 저장소에 넣은 사본입니다(핫링크 없음). 라이선스는 CC0 · 퍼블릭도메인 · CC BY · CC BY-SA 만 썼습니다. 크기 조정·잘라내기·WebP 변환을 했습니다(CC BY-SA 사진의 변경본은 같은 CC BY-SA 조건을 따릅니다).
 
-확인일: 2026-11-21
+확인일: 2026-11-21 (고양이 판 9장 추가 2026-11-22)
 
 | 파일 | 원본 | 저자 | 라이선스 |
 |---|---|---|---|
@@ -21,5 +21,14 @@
 | `dog_relaxed_lying.webp` | [DSC 8677 Happy pup soaking up the sun with a big smile and wagging tail.jpg](https://commons.wikimedia.org/wiki/File:DSC_8677_Happy_pup_soaking_up_the_sun_with_a_big_smile_and_wagging_tail.jpg) | PattayaPatrol | CC BY-SA 4.0 |
 | `dog_teeth.webp` | [Killer Chihuahua.jpg](https://commons.wikimedia.org/wiki/File:Killer_Chihuahua.jpg) | David Shankbone | CC BY 3.0 |
 | `dog_yawn.webp` | [Picography-dog-yawning-1.jpg](https://commons.wikimedia.org/wiki/File:Picography-dog-yawning-1.jpg) | Picography | CC0 |
+| `cat_scratcher.webp` | [Corrugated fiberboard scratch pad with cat.jpg](https://commons.wikimedia.org/wiki/File:Corrugated_fiberboard_scratch_pad_with_cat.jpg) | Arria Belli | CC BY-SA 2.0 |
+| `cat_scratch_wrong.webp` | [Cat scratching tire.jpg](https://commons.wikimedia.org/wiki/File:Cat_scratching_tire.jpg) | pelican | CC BY-SA 2.0 |
+| `cat_litter_box.webp` | [Japanese litter box in use.jpg](https://commons.wikimedia.org/wiki/File:Japanese_litter_box_in_use.jpg) | Ocdp | CC BY-SA 3.0 |
+| `cat_plant_pot.webp` | [Cat Peeing in Plant.jpg](https://commons.wikimedia.org/wiki/File:Cat_Peeing_in_Plant.jpg) | Panini! | CC0 |
+| `cat_hiding.webp` | [2020-05-06 16 47 31 A tabby cat hiding under a bed in the Franklin Farm section of Oak Hill, Fairfax County, Virginia.jpg](https://commons.wikimedia.org/wiki/File:2020-05-06_16_47_31_A_tabby_cat_hiding_under_a_bed_in_the_Franklin_Farm_section_of_Oak_Hill,_Fairfax_County,_Virginia.jpg) | Famartin | CC BY-SA 4.0 |
+| `cat_licking.webp` | [Limerick Licking - Flickr - Martin Cathrae.jpg](https://commons.wikimedia.org/wiki/File:Limerick_Licking_-_Flickr_-_Martin_Cathrae.jpg) | Martin Cathrae from Charlottetown, PE, Canada | CC BY-SA 2.0 |
+| `cat_meowing.webp` | [Black male domestic cat 004.jpg](https://commons.wikimedia.org/wiki/File:Black_male_domestic_cat_004.jpg) | Julián Monge-Nájera | CC BY-SA 4.0 |
+| `cats_together.webp` | [Two-ginger-cats-fight.jpg](https://commons.wikimedia.org/wiki/File:Two-ginger-cats-fight.jpg) | Benyon3 | CC BY-SA 3.0 |
+| `cats_fighting.webp` | [Two cats jump to playfight.jpg](https://commons.wikimedia.org/wiki/File:Two_cats_jump_to_playfight.jpg) | Adrian Jack Bunsby | CC BY 2.0 |
 
 확보 실패: 강아지 귀를 뒤로 젖힌 컷(편안/불편 비교용 단독 사진) — 검색 결과 중 재배포 가능한 알맞은 사진이 없어 글로만 설명합니다.
