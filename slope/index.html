@@ -2595,13 +2595,14 @@ drawParcelHL=function(g){
   var f=g.fill; g.fill=function(p,rule){ if(rule==='evenodd') return; return f.apply(g,arguments) };
   try{ return _pxParcelHL.apply(this,arguments) } finally{ delete g.fill }
 };
-/* 픽셀 보기에서 Vworld 연속지적도(WMS) 그림은 '곱하기'로 겹친다 — 흰 바탕 채움이 칸 본색을 파스텔로 뿌옇게 만들지 않고,
+/* 픽셀 보기에서 Vworld 연속지적도(WMS) 그림은 '어둡게'로 겹친다 — 흰 바탕 채움이 칸 본색을 파스텔로 뿌옇게 만들지 않고,
    지적선·지번 글자만 그대로 보인다(본문 무변경, 합성 방식만 바깥에서 지정) */
 var _pxVWImg=drawVWImg;
 drawVWImg=function(g,x0,y0,w,h,kind){
   if(!(S.lay.px&&kind==='parcel'&&PXG&&PXG.total)) return _pxVWImg.apply(this,arguments);
-  /* Vworld 그림의 연한 크림색 바탕(≈255,251,237)을 밝기 1.08 로 순백으로 올린 뒤 곱하기 → 칸 본색 그대로 */
-  g.save(); g.globalCompositeOperation='multiply'; if(typeof g.filter==='string') g.filter='brightness(1.08)';
+  /* Vworld 그림의 연한 크림색 바탕을 '어둡게(채널별 최솟값)'로 겹친다 — 크림색이 칸 색보다 밝은 채널은 영향 0,
+     지적선·글자처럼 어두운 것만 남는다. 밝기 1.15 로 크림을 순백으로 올려 흰 칸(0~5°)도 그대로 둔다 */
+  g.save(); g.globalCompositeOperation='darken'; if(typeof g.filter==='string') g.filter='brightness(1.15)';
   try{ return _pxVWImg.apply(this,arguments) } finally{ g.restore() }
 };
 var _pxDrawMarker=drawMarker;
