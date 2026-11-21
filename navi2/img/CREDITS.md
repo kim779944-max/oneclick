@@ -15,7 +15,7 @@
 | `s07_two_bowls.webp` | [Rice bowl with sunny side egg.jpg](https://commons.wikimedia.org/wiki/File:Rice_bowl_with_sunny_side_egg.jpg) | Bibazi | CC BY 4.0 |
 | `s08_slippers.webp` | [Italy, Venice, early 18th century - Pair of Slippers - 1947.104 - Cleveland Museum of Art.jpg](https://commons.wikimedia.org/wiki/File:Italy,_Venice,_early_18th_century_-_Pair_of_Slippers_-_1947.104_-_Cleveland_Museum_of_Art.jpg) | ? | CC0 |
 | `s09_start_blocks.webp` | [2018-10-16 Stage 2 (Girls' 400 metre hurdles) at 2018 Summer Youth Olympics by Sandro Halank–016.jpg](https://commons.wikimedia.org/wiki/File:2018-10-16_Stage_2_(Girls%27_400_metre_hurdles)_at_2018_Summer_Youth_Olympics_by_Sandro_Halank%E2%80%93016.jpg) | Sandro Halank | CC BY-SA 4.0 |
-| `s10_magnifier.webp` | [Lupa.JPG](https://commons.wikimedia.org/wiki/File:Lupa.JPG) | The original uploader was Nguyen at Czech Wikipedia. | CC BY-SA 3.0 |
+| `s10_face_reading.webp` | [Into the Deep (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Into_the_Deep_(Unsplash).jpg) | JD Mason (jmason) | CC0 |
 | `s11_last_piece.webp` | [Red jigsaw puzzle piece on green pieces.jpg](https://commons.wikimedia.org/wiki/File:Red_jigsaw_puzzle_piece_on_green_pieces.jpg) | Profpcde | CC0 |
 | `s12_scissors.webp` | [Pair of scissors with black handle, 2015-06-07.jpg](https://commons.wikimedia.org/wiki/File:Pair_of_scissors_with_black_handle,_2015-06-07.jpg) | Crisco 1492 | CC BY-SA 4.0 |
 | `s13_microphone.webp` | [Hemicycle atmosphere in Strasbourg.jpg](https://commons.wikimedia.org/wiki/File:Hemicycle_atmosphere_in_Strasbourg.jpg) | European Parliament | CC BY 2.0 |

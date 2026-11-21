@@ -68,12 +68,12 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   color:var(--ink2);padding:9px 2px;font-size:11.5px;font-weight:800;cursor:pointer}
 .chipsRow button.on{background:rgba(255,107,0,.14);border-color:var(--or);color:#fff}
 /* 시작 그림 16 */
-.gal16{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px}
+.gal16{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:12px}
 .pic{position:relative;border:0;padding:0;background:transparent;font-family:inherit;cursor:pointer;
   border-radius:12px;overflow:hidden;border:2px solid transparent;line-height:0}
 .pic img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;opacity:.9}
-.pic .cap{line-height:1.25;font-size:8.5px;font-weight:800;color:#C9D5E6;background:#0C1730;
-  padding:4px 3px;text-align:center;letter-spacing:-.25px;word-break:keep-all;height:32px;
+.pic .cap{line-height:1.3;font-size:12px;font-weight:800;color:#C9D5E6;background:#0C1730;
+  padding:4px 3px;text-align:center;letter-spacing:-.25px;word-break:keep-all;height:40px;
   display:flex;align-items:center;justify-content:center}
 .pic.on{border-color:var(--or)}
 .pic.on img{opacity:1}
@@ -105,6 +105,7 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
   display:flex;flex-direction:column;align-items:stretch}
 .opt .art{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#16264A;opacity:.92}
 .opt .tx{display:block;padding:34px 12px 14px;min-height:96px}
+.opt .art + .tx{padding-top:12px;min-height:0}
 .opt b{font-size:14px!important}
 .opt b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.3px;color:#fff;line-height:1.45;word-break:keep-all}
 .opt .no{position:absolute;left:7px;top:7px;width:19px;height:19px;border-radius:6px;background:rgba(10,18,36,.85);
@@ -363,9 +364,9 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 <script src="js/data.cards.js?v=6"></script>
 <script src="js/data.modes.js?v=7"></script>
 <script src="js/data.subs.js?v=7"></script>
-<script src="js/data.pool.js?v=2"></script>
+<script src="js/data.pool.js?v=3"></script>
 <script src="js/data.fate.js?v=2"></script>
-<script src="js/engine.js?v=7"></script>
+<script src="js/engine.js?v=8"></script>
 <script>
 (function(){
   var $ = function(s){ return document.querySelector(s); };
@@ -508,9 +509,11 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     $('#qhint').textContent = set.hint || '';
     var g = $('#ogrid'); g.innerHTML = '';
     set.opts.forEach(function(o, i){
-      /* 보기는 글자 전용 — 시작 그림 16장을 문항에서 다시 쓰지 않는다 */
+      /* 보기마다 전용 사진(img/opts) — 시작 그림 16장은 문항에서 다시 쓰지 않는다 */
       var b = el('button', 'opt'); b.type = 'button'; b.dataset.idx = String(i);
       b.appendChild(el('span', 'no', String(i + 1)));
+      if (o.img){ var im = document.createElement('img'); im.className = 'art'; im.src = o.img;
+                  im.alt = o.l || ''; im.loading = 'lazy'; im.decoding = 'async'; b.appendChild(im); }
       var tx = el('span', 'tx'); tx.appendChild(el('b', null, o.l)); b.appendChild(tx);
       b.addEventListener('click', function(){ tapOpt(o, i, b); });
       g.appendChild(b);

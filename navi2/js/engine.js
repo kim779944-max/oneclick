@@ -268,7 +268,7 @@
 
   /* ── 보기 풀 통계(실측·검증용) ── */
   function poolStats(){
-    var QS = root.NAVI.Q, sets = 0, opts = 0, bad = [], byAxis = {}, lvSets = {};
+    var QS = root.NAVI.Q, sets = 0, opts = 0, bad = [], byAxis = {}, lvSets = {}, imgMissing = 0;
     for (var lv in QS){
       lvSets[lv] = Object.keys(QS[lv]);
       for (var k in QS[lv]){
@@ -278,6 +278,7 @@
         var seen = {};
         o.forEach(function(x){
           byAxis[x.t] = (byAxis[x.t] || 0) + 1;
+          if (!x.img) imgMissing++;
           if (seen[x.t]) bad.push(lv + k + ' 축 중복:' + x.t);
           seen[x.t] = 1;
           if (o.length === 4 && Object.keys(seen).length === 4 && false) {}
@@ -287,7 +288,7 @@
       }
     }
     return { pics: root.NAVI.START.length, sets: sets, options: opts, pool: opts + root.NAVI.START.length,
-             axes: byAxis, levels: Object.keys(QS).length, lvSets: lvSets, bad: bad };
+             axes: byAxis, levels: Object.keys(QS).length, lvSets: lvSets, imgMissing: imgMissing, bad: bad };
   }
 
   var APP = {
