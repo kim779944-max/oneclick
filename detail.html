@@ -131,9 +131,9 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
   </div>
 </div>
 
-<script src="master.js?v=20261121g"></script>
-<script src="products.js?v=20261121g"></script>
-<script src="slots.js?v=20261121g"></script>
+<script src="master.js?v=20261121h"></script>
+<script src="products.js?v=20261121h"></script>
+<script src="slots.js?v=20261121h"></script>
 <script>
 const $ = s => document.querySelector(s);
 const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
@@ -264,10 +264,10 @@ document.addEventListener('kts:catalog', () => { renderDetail(); });
   function paint(){
     var el = document.getElementById('ktsBox');
     if (!el){ el = document.createElement('div'); el.id='ktsBox'; el.className='note-block'; app.appendChild(el); }
-    var mine = KTS_KEYS.inBox(k), L = KTS_KEYS.limitOf(k);
+    var mine = KTS_KEYS.inBox(k), L = KTS_KEYS.limitOf(k), ft = KTS_KEYS.freeText ? KTS_KEYS.freeText(k) : '';
     el.innerHTML = '<p style="font-size:11.5px;color:#DCE6F2;line-height:1.75;margin:0">' +
       '<b style="color:#FFA24D">🔑 열쇠 4개</b> — 이 도구는 <b>1회 무료 시연</b> 뒤 <b>내 박스</b>에 담아 계속 씁니다.' +
-      (L ? ' 하루 <b style="color:#FFD9A6">' + L + '회</b> 무료.' : ' 하루 제한 없음.') +
+      (L ? ' 하루 <b style="color:#FFD9A6">' + L + '회</b> 무료.' : (ft ? ' <b style="color:#FFD9A6">' + ft + '</b>.' : '')) +
       '<br><span style="font-size:10.5px;color:#8FA0B8">더 쓸 때의 결제 안내는 도구 안 [그 이상 쓰기] 버튼 안쪽에만 있습니다.</span></p>' +
       '<div style="display:flex;gap:7px;margin-top:9px">' +
       (mine ? '<span style="flex:1;text-align:center;font-size:11.5px;font-weight:900;color:#FFA24D;border:1px solid rgba(255,107,0,.45);border-radius:10px;padding:9px">내 박스에 담김</span>'
