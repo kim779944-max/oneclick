@@ -284,11 +284,11 @@
   /* 도구별 하루 무료 횟수(0 = 제한 없음). 실제 사용 제한은 각 도구 안에서도 따릅니다. */
   /* 도구별 '하루 몇 번까지 무료' — 실제 도구 화면에서 확인한 것만 적습니다(추측 금지).
      photo2doc: 목록·변환기 화면 '3장 무료' · ad_magnet: 화면 '하루 3건' */
-  var LIMIT = { photo2doc: 3, ad_magnet: 3 };
+  var LIMIT = { photo2doc: 3, ad_magnet: 3, interior: 1 };
   /* 횟수가 아닌 무료 기준(양식 수·한 장 등) — 화면에 그대로 보이는 문구만 */
   var FREE = { sign: '한 장 무료', theform: '기본 양식 5종 무료', contract: '서식 3종 무료',
                viewer: '평생 무료', sale: '평생 무료' };
-  var LIMIT_UNIT = { photo2doc: '장', ad_magnet: '건' };
+  var LIMIT_UNIT = { photo2doc: '장', ad_magnet: '건', interior: '장' };
   /* products.js(catalog.json)에 없는 도구 — 쇼룸·박스에서 같이 씁니다 */
   var EXTRA = {
     thescan:   { nm: '더스캔',     ico: '▣', link: 'thescan/' },
