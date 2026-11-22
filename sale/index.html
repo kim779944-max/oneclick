@@ -59,6 +59,11 @@ h1 em{font-style:normal;color:var(--or)}
 .gh .tg{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#20180A;background:linear-gradient(90deg,#FF8A2B,#FFA24D);
   border-radius:999px;padding:3px 7px;white-space:nowrap}
 .gh .tg.hot{color:#0B2C1B;background:var(--ok)}
+.gh .th{flex:0 0 auto;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#fff;
+  border:1px solid rgba(255,255,255,.10);display:grid;place-items:center}
+.gh .th img{width:100%;height:100%;object-fit:contain;display:block}
+.gh .th.ph{background:#12203C;border-color:var(--line2)}
+.gh .th.ph span{font-size:15px;font-weight:900;color:#C7D3E3;letter-spacing:-.5px}
 .rows{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line)}
 .row{display:flex;align-items:center;gap:9px;background:#0D1930;padding:9px 12px;cursor:pointer}
 .row.on{background:rgba(255,107,0,.1)}
@@ -255,7 +260,17 @@ h1 em{font-style:normal;color:var(--or)}
     var m = /(\d{1,2})%/.exec(o.c || '');
     return m ? Number(m[1]) : 0;
   }
-  function isEndToday(u){ return /11\/1[78]|오늘|11\/17/.test(u || ''); }
+  /* (수정 2026-11-22) 기준일(D.asOf)에서 계산 — 날짜를 코드에 박지 않는다 */
+  function isEndToday(u){
+    if (!u) return false;
+    if (/오늘/.test(u)) return true;
+    var part = String(u).split('~').pop()          // '11/12~11/18' → '11/18'
+                  .replace(/까지|부터|\(.*?\)/g, '');
+    var m = /(\d{1,2})\/(\d{1,2})/.exec(part);
+    if (!m) return false;
+    var b = D.asOf.split('-');                     // '2026-11-22'
+    return (+m[1] === +b[1]) && (+m[2] === +b[2]); // 끝나는 날 == 기준일
+  }
   function isBogo(g, o){ return /1\+1|2\+1/.test((o && o.c) || '') || /^1\+1$|^2\+1$/.test(g.tag || ''); }
 
   /* ── 탭 ── */
@@ -319,6 +334,24 @@ h1 em{font-style:normal;color:var(--or)}
       var multi = prices.length > 1;
 
       var head = document.createElement('div'); head.className = 'gh';
+
+      /* (추가 2026-11-22) 카드 좌측 썸네일 — 사진 없으면 이니셜 타일 */
+      var th = document.createElement('div'); th.className = 'th';
+      if (g.img){
+        var im = document.createElement('img');
+        im.src = g.img; im.alt = g.item; im.width = 56; im.height = 56;
+        im.loading = 'lazy'; im.decoding = 'async';
+        im.addEventListener('error', function(){          // 실패해도 빈 칸 + 첫 글자 (가짜 사진 금지)
+          th.className = 'th ph';
+          th.innerHTML = '<span>' + String(g.item || '?').slice(0,1) + '</span>';
+        });
+        th.appendChild(im);
+      } else {
+        th.className = 'th ph';
+        th.innerHTML = '<span>' + String(g.item || '?').slice(0,1) + '</span>';
+      }
+      head.appendChild(th);                               // ← .t 보다 먼저 (좌측)
+
       var t = document.createElement('div'); t.className = 't';
       var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = g.item; t.appendChild(nm);
       var sp = document.createElement('div'); sp.className = 'sp2';
