@@ -504,8 +504,8 @@ function mppAt(z,lat){return 156543.03392*Math.cos(clamp(lat,-85,85)*Math.PI/180
 var tiles=new Map();
 function tileUrl(z,x,y,layer){
   if(S.key){
-    var L=layer==='sat'?'Satellite':'Base';
-    return 'https://api.vworld.kr/req/wmts/1.0.0/'+encodeURIComponent(S.key)+'/'+L+'/'+z+'/'+y+'/'+x+'.png';
+    var L=layer==='sat'?'Satellite':'Base', ext=layer==='sat'?'.jpeg':'.png';
+    return 'https://api.vworld.kr/req/wmts/1.0.0/'+encodeURIComponent(S.key)+'/'+L+'/'+z+'/'+y+'/'+x+ext;
   }
   return 'https://tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png';
 }
