@@ -949,7 +949,7 @@ function drawParcelHL(g,x0,y0,w,h){
   if(bX<0||bx>w||bY<0||by>h) return; /* 화면 밖 */
   PC.bb={bx:Math.round(bx),by:Math.round(by),bX:Math.round(bX),bY:Math.round(bY),w:w,h:h};
   g.save();
-  g.fillStyle='rgba(255,107,0,.17)'; g.fill(p,'evenodd');          /* 은은한 반투명 채우기 */
+  /* 반투명 채우기 제거: 위성사진이 뿌옇게 가려지지 않도록 테두리선만 유지 */
   g.lineJoin='round'; g.lineCap='round';
   g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=7.5; g.stroke(p); /* 흰 테두리(바깥) */
   g.strokeStyle='#FF6B00'; g.lineWidth=4.5; g.stroke(p);              /* 굵은 오렌지 */
