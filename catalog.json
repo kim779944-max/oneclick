@@ -48,7 +48,7 @@
   },
   {
    "k": "photo2doc",
-   "nm": "원클릭 변환기",
+   "nm": "문서변환기",
    "sub": "표 사진 → 한글(.hwpx)·엑셀(.xlsx)",
    "cat": "convert",
    "badge": "NEW",
