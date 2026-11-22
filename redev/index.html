@@ -47,6 +47,15 @@ main{padding:12px 14px 0}
 .tabs button small{display:block;font-size:8.5px;font-weight:800;color:#7186A2;margin-top:1px}
 .tabs button.on{border-color:var(--amber);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2));box-shadow:0 6px 14px rgba(255,107,0,.22)}
 .tabs button.on small{color:#4A2600}
+.moarow{margin-top:7px}
+.moarow button{width:100%;height:36px;display:flex;align-items:center;justify-content:center;gap:5px;border:1px dashed rgba(255,162,77,.55);background:rgba(255,107,0,.08);color:#FFD9A6;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;overflow:hidden;padding:0 8px}
+.moarow button i{font-style:normal}
+.moarow button b{color:#fff}
+.moarow button small{font-size:10px;font-weight:800;color:#9FB0C8;margin-left:4px}
+.moarow button.on{border:1px solid var(--amber);background:linear-gradient(135deg,var(--amber),var(--amber2));color:#0A1224}
+.moarow button.on b,.moarow button.on small{color:#0A1224}
+.src{font-size:9.5px;font-weight:900;border-radius:6px;padding:2px 6px;background:#14213B;color:#C9D6E6;border:1px solid #2E4370;white-space:nowrap}
+.src.moa{border-color:var(--amber2);color:#FFC98F;background:rgba(255,107,0,.10)}
 .chips{display:flex;gap:5px;overflow-x:auto;margin-top:8px;padding-bottom:3px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chips button{flex:0 0 auto;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer}
@@ -221,7 +230,9 @@ main{padding:12px 14px 0}
       <button data-t="seoul" class="on">서울<small>—</small></button>
       <button data-t="gyeonggi">경기<small>—</small></button>
       <button data-t="nation">전국<small>—</small></button>
-      <button data-t="moa">모아타운<small>—</small></button>
+    </div>
+    <div class="moarow" id="moaRow">
+      <button type="button" id="moaBtn"><i>🏘</i>모아타운 <b id="moaCnt">—</b>곳<small>서울 관리계획 승인·고시분</small></button>
     </div>
     <div class="chips" id="chips"></div>
     <div class="countline"><b id="cnt">—</b><span>건</span><span class="base" id="base">—</span></div>
@@ -257,7 +268,9 @@ main{padding:12px 14px 0}
 <script>
 (function(){
 "use strict";
-var D=null, TAB='seoul', FILT='all', Q='', SHOWN=40, CUR=null;
+var D=null, TAB='seoul', LAST='seoul', PIN=false, FILT='all', Q='', SHOWN=40, CUR=null;
+/* TAB = 지금 화면(seoul|gyeonggi|nation|moa|all=통합). 목록·상세·복사·인쇄는 행마다 심은 r.__tab 을 본다 */
+var TABS=['seoul','gyeonggi','nation','moa'], TABNM={seoul:'서울',gyeonggi:'경기',nation:'전국',moa:'모아타운'};
 var ALERT_KEY='kts_redev_alerts_v1', MEM_KEY='kts_redev_member_v1';
 var TEL='01020022899';
 var STEPS=['정비구역 지정','추진위원회','조합설립','사업시행인가','관리처분인가','이주·철거','착공'];
@@ -271,12 +284,19 @@ function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(
 function norm(s){return String(s||'').toLowerCase().replace(/\s+/g,'');}
 
 /* ---------- 데이터 ---------- */
-function rows(t){ return (D&&D[t])||[]; }
+function rows(t){
+  if(t==='all'){ var a=[]; TABS.forEach(function(x){ a=a.concat(rows(x)); }); return a; }
+  return (D&&D[t])||[];
+}
+function baseOf(t){ return t==='seoul'?'서울 26.6':t==='gyeonggi'?'경기 25.9':t==='moa'?'서울 아카이브 26.11':t==='all'?'통합 4개 자료':'전국 26.5'; }
 function keyOf(r){ return norm(r.n+r.g+r.j+(r.rd||'')+(r.sd||'')); }
 function load(){
-  fetch('data/redev.json',{cache:'force-cache'}).then(function(r){return r.json();}).then(function(j){
+  function get(u,o){ return fetch(u,o).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }); }
+  get('data/redev.json?v=20261122a',{cache:'no-cache'}).catch(function(){
+    return get('data/redev.json?_='+Date.now(),{cache:'no-store'}); /* 1회 재시도 */
+  }).then(function(j){
     D=j;
-    ['seoul','gyeonggi','nation','moa'].forEach(function(t){ rows(t).forEach(function(r,i){ r._k=keyOf(r)+(r.dn||''); r.__i=i; }); });
+    TABS.forEach(function(t){ rows(t).forEach(function(r,i){ r._k=keyOf(r)+(r.dn||''); r.__i=i; r.__tab=t; }); });
     rows('gyeonggi').forEach(function(r){ r.sd='경기'; });
     var nS=rows('seoul').length, nG=rows('gyeonggi').length, nN=rows('nation').length, nM=rows('moa').length;
     $('stS').textContent=won(nS); $('stG').textContent=won(nG); $('stN').textContent=won(nN); $('stM').textContent=won(nM);
@@ -284,7 +304,8 @@ function load(){
       var t=b.getAttribute('data-t'), n=t==='seoul'?nS:(t==='gyeonggi'?nG:(t==='nation'?nN:nM));
       var s=b.querySelector('small'); if(s) s.textContent=won(n);
     });
-    $('totline').textContent='서울 '+won(nS)+' · 경기 '+won(nG)+' · 전국 '+won(nN)+' · 모아타운 '+won(nM);
+    $('moaCnt').textContent=won(nM);
+    $('totline').textContent=baseLine();
     buildChips(); render();
   }).catch(function(){
     $('list').innerHTML='<div class="empty"><b>자료를 열지 못했습니다</b>잠시 뒤 새로고침해 주세요.</div>';
@@ -292,8 +313,10 @@ function load(){
 }
 
 /* ---------- 필터 칩 ---------- */
+function baseLine(){ return '서울 '+won(rows('seoul').length)+' · 경기 '+won(rows('gyeonggi').length)+' · 전국 '+won(rows('nation').length)+' · 모아타운 '+won(rows('moa').length); }
 function buildChips(){
   var c=$('chips'), t=TAB;
+  c.style.display=(t==='all')?'none':'';
   var arr=[['all','전체']];
   if(t==='seoul'){
     arr.push(['stop','일시중단']);
@@ -318,7 +341,7 @@ function buildChips(){
   c.innerHTML=arr.map(function(a){return '<button data-f="'+esc(a[0])+'"'+(FILT===a[0]?' class="on"':'')+'>'+esc(a[1])+'</button>';}).join('');
 }
 function pass(r){
-  if(FILT==='all') return true;
+  if(FILT==='all'||TAB==='all') return true;
   if(TAB==='moa'){
     if(FILT==='공공관리'||FILT==='시범사업') return (r.fl||[]).indexOf(FILT)>=0;
     return String(r.up||'').slice(0,4)===FILT;
@@ -342,9 +365,9 @@ function filtered(){
 /* ---------- 목록 ---------- */
 function shortDate(d){ if(!d) return '—'; return d.slice(2).replace(/-/g,'.'); }
 function stageLabel(r){
-  if(TAB==='moa') return '승인·고시'+(r.up?' ’'+shortDate(r.up):'');
-  if(TAB==='seoul') return r.st||'단계 미기재';
-  if(TAB==='gyeonggi') return r.st||'—';
+  if(r.__tab==='moa') return '승인·고시'+(r.up?' ’'+shortDate(r.up):'');
+  if(r.__tab==='seoul') return r.st||'단계 미기재';
+  if(r.__tab==='gyeonggi') return r.st||'—';
   return r.st||'—';
 }
 function barHTML(s){
@@ -361,38 +384,49 @@ function barHTML(s){
 function moaBar(){
   return '<div class="bar"><i class="on"></i><i class="on"></i><i class="now"></i><i></i></div>';
 }
+function srcBadge(r){ return TAB==='all'? '<span class="src'+(r.__tab==='moa'?' moa':'')+'">'+TABNM[r.__tab]+'</span>':''; }
 function itemHTML(r){
-  if(TAB==='moa'){
+  if(r.__tab==='moa'){
     var flags=(r.fl||[]).join(' · ');
-    return '<button class="item" data-i="'+esc(r.__i)+'">'+
+    return '<button class="item" data-t="'+r.__tab+'" data-i="'+esc(r.__i)+'">'+
       '<div class="nm">'+esc(r.n)+'</div>'+
       '<div class="lo"><em>'+esc(r.g)+'</em><span>'+esc((r.ar?won(Math.round(r.ar))+'㎡':'면적 미상')+(r.bl?' · 모아주택 '+r.bl+'개 구역':''))+'</span></div>'+
       moaBar()+
       '<div class="bot"><span class="stp">'+esc(stageLabel(r))+'</span>'+
         (flags?'<span class="stop" style="background:#14213B;color:#C9D6E6;border-color:#243352">'+esc(flags)+'</span>':'')+
-        '<span class="chk">확인하기 ›</span></div>'+
+        srcBadge(r)+'<span class="chk">확인하기 ›</span></div>'+
     '</button>';
   }
   var s=r.s==null?-1:r.s;
   var cls=(s>=7?'done':(s<0?'wait':''));
-  var where=(TAB==='nation'? (r.sd+' '+r.g) : r.g);
+  var where=(r.__tab==='nation'? (r.sd+' '+r.g) : r.g);
   var mb=r.l? '<span class="mb">매물 '+r.l+'</span>':'';
-  return '<button class="item" data-i="'+esc(r.__i)+'">'+
+  return '<button class="item" data-t="'+r.__tab+'" data-i="'+esc(r.__i)+'">'+
     '<div class="nm">'+esc(r.n)+'</div>'+
-    '<div class="lo"><em>'+esc(where)+'</em><span>'+esc(TAB==='nation'?'세대수 '+(r.hn?won(r.hn)+'세대':'미기재'):(r.j||'위치 미기재'))+'</span></div>'+
+    '<div class="lo"><em>'+esc(where)+'</em><span>'+esc(r.__tab==='nation'?'세대수 '+(r.hn?won(r.hn)+'세대':'미기재'):(r.j||'위치 미기재'))+'</span></div>'+
     barHTML(s)+
     '<div class="bot"><span class="stp '+cls+'">'+esc(stageLabel(r))+'</span>'+
-      (r.o==='일시중단'?'<span class="stop">일시중단</span>':'')+ mb +
+      (r.o==='일시중단'?'<span class="stop">일시중단</span>':'')+ srcBadge(r) + mb +
       (mb?'':'<span class="chk">확인하기 ›</span>')+'</div>'+
   '</button>';
 }
 function render(){
   var arr=filtered();
-  rows(TAB).forEach(function(r,i){r.__i=i;});
+  paintTabs();
   $('cnt').textContent=arr.length.toLocaleString('ko-KR');
-  $('base').textContent=(TAB==='seoul'?'서울 26.6':TAB==='gyeonggi'?'경기 25.9':TAB==='moa'?'서울 아카이브 26.11':'전국 26.5');
+  $('base').textContent=baseOf(TAB);
   $('muNote').style.display=(TAB==='moa')?'block':'none';
+  if(D){
+    if(TAB==='all'){
+      var by={seoul:0,gyeonggi:0,nation:0,moa:0}; arr.forEach(function(r){ by[r.__tab]++; });
+      $('totline').textContent='통합 '+arr.length.toLocaleString('ko-KR')+'건 · 서울 '+won(by.seoul)+' · 경기 '+won(by.gyeonggi)+' · 전국 '+won(by.nation)+' · 모아타운 '+won(by.moa);
+    }else $('totline').textContent=baseLine();
+  }
   var box=$('list');
+  if(!arr.length&&TAB==='all'){
+    box.innerHTML='<div class="empty"><b>정비사업·모아타운 어디에도 없습니다</b>지번은 「동 이름 + 번지」(예: 개포동 138)로 넣어 보세요.</div>';
+    $('more').style.display='none'; return;
+  }
   if(!arr.length){
     /* 다른 탭(모아타운)에 있는 지번이면 한 줄 안내 — 실제로 그 탭에서 찾은 개수만 말한다 */
     var moaHint='';
@@ -415,13 +449,13 @@ function datesHTML(r){
   var dt=r.dt||{}, out='';
   DATE_KEYS.forEach(function(k,i){
     if(!dt[k]) return;
-    var lab=(TAB==='gyeonggi'&&k==='h')?'착공':DATE_LABELS[i];
+    var lab=(r.__tab==='gyeonggi'&&k==='h')?'착공':DATE_LABELS[i];
     out+='<div><span>'+lab+'</span><b>'+esc(dt[k])+'</b></div>';
   });
-  if(TAB==='gyeonggi'&&dt.z) out+='<div><span>준공</span><b>'+esc(dt.z)+'</b></div>';
+  if(r.__tab==='gyeonggi'&&dt.z) out+='<div><span>준공</span><b>'+esc(dt.z)+'</b></div>';
   if(!out){
     return '<div class="dates"><div><span>인가일</span><b>공개 자료에 없음</b></div></div>'+
-      '<div class="note">'+(TAB==='seoul'
+      '<div class="note">'+(r.__tab==='seoul'
         ? '이 구역은 서울시 추진현황(495건)에 없어 인가일·세대수가 비어 있습니다. 정보몽땅 원문 사업개요에서 확인하세요.'
         : '이 구역은 공개 자료에 일자가 비어 있습니다. 원문에서 확인하세요.')+'</div>';
   }
@@ -444,9 +478,9 @@ function ladderHTML(r){
   return h+'</div>';
 }
 function addrOf(r){
-  if(TAB==='moa') return ('서울특별시 '+r.g+' '+r.j).trim();
-  if(TAB==='seoul') return ('서울특별시 '+r.g+' '+(r.j||'')).trim();
-  if(TAB==='gyeonggi'){
+  if(r.__tab==='moa') return ('서울특별시 '+r.g+' '+r.j).trim();
+  if(r.__tab==='seoul') return ('서울특별시 '+r.g+' '+(r.j||'')).trim();
+  if(r.__tab==='gyeonggi'){
     if(!r.j) return '경기도 '+r.g+' (위치 미기재)';
     return r.j.indexOf('경기')===0? r.j : '경기도 '+r.j;
   }
@@ -465,7 +499,7 @@ function navHTML(r){
 }
 function dealHTML(r){
   var n=r.l||0, ids=r.li||[];
-  if(TAB==='nation'){
+  if(r.__tab==='nation'){
     return '<div class="deal"><div class="big">매물 연동은 <b>서울·경기</b>만</div>'+
       '<p>전국 자료는 시·도·시·군·구까지만 있어 지번으로 매물을 맞출 수 없습니다. 교환·급매 전문관에서 지역명으로 직접 찾아보세요.</p>'+
       '<a class="btn ghost sm" href="https://autooneclick.com/exchange/" target="_blank" rel="noopener" style="margin-top:9px">교환·급매 전문관 열기</a></div>';
@@ -489,19 +523,19 @@ function dealHTML(r){
 function isMember(){ var m=store(MEM_KEY); return !!(m&&m.phone); }
 
 function sheetHTML(r){
-  if(TAB==='moa') return moaSheetHTML(r);
-  var t=TAB, tags='';
+  if(r.__tab==='moa') return moaSheetHTML(r);
+  var t=r.__tab, tags='';
   function tag(v,cls){ if(!v) return ''; tags+='<span class="'+(cls||'')+'">'+esc(v)+'</span>'; }
-  tag(TAB==='seoul'?r.t:(TAB==='gyeonggi'?r.t:r.t));
+  tag(r.__tab==='seoul'?r.t:(r.__tab==='gyeonggi'?r.t:r.t));
   tag(stageLabel(r),'hot');
   if(r.o==='일시중단') tag('일시중단','stop');
-  tag(TAB==='nation'?'전국 통합':'추진단계 사다리');
+  tag(r.__tab==='nation'?'전국 통합':'추진단계 사다리');
   var kvs='';
   function kv(lab,val,unit){ if(val==null||val==='') return; kvs+='<div><span>'+lab+'</span><b>'+won(val)+(unit?'<small>'+unit+'</small>':'')+'</b></div>'; }
-  if(TAB==='seoul'){
+  if(r.__tab==='seoul'){
     kv('기존 세대수',r.hs,'세대'); kv('건립 세대수',r.hn,'세대');
     kv('분양',r.sa,'세대'); kv('임대',r.re,'세대');
-  }else if(TAB==='gyeonggi'){
+  }else if(r.__tab==='gyeonggi'){
     kv('구역면적',r.ar,'㎡'); kv('기존 세대수',r.hs,'세대');
     kv('사업시행 세대수',r.hn,'세대'); kv('임대',r.re,'세대');
     kv('기존 용적률',r.fo,'%'); kv('신축 용적률',r.fn,'%');
@@ -510,13 +544,13 @@ function sheetHTML(r){
     kv('공급 예정 세대수',r.hn,'세대');
   }
   var srcLinks='';
-  if(TAB==='seoul'){
+  if(r.__tab==='seoul'){
     if(r.cu){
       srcLinks+='<a href="https://cleanup.seoul.go.kr/cafe/mainIndx.do?cafeUrl='+encodeURIComponent(r.cu)+'" target="_blank" rel="noopener"><i>📄</i>정보몽땅 사업장 원문<em>사업개요·공개자료</em></a>';
     }else{
       srcLinks+='<a href="https://cleanup.seoul.go.kr/cleanup/bsnssttus/lscrMainIndx.do" target="_blank" rel="noopener"><i>🔎</i>정보몽땅에서 「'+esc(r.n.slice(0,14))+'」 검색<em>원문</em></a>';
     }
-  }else if(TAB==='gyeonggi'){
+  }else if(r.__tab==='gyeonggi'){
     srcLinks+='<a href="https://data.gg.go.kr/" target="_blank" rel="noopener"><i>📄</i>경기데이터드림 원문 확인<em>25.9 기준</em></a>';
   }else{
     srcLinks+='<a href="https://www.data.go.kr/data/15160169/fileData.do" target="_blank" rel="noopener"><i>📄</i>국토부 전국 데이터 원문<em>26.5 기준</em></a>';
@@ -525,7 +559,7 @@ function sheetHTML(r){
   var priceQ=encodeURIComponent(addr);
   var telLine=r.tel? '<div class="note"><b>구역 담당</b> '+esc(r.tel)+'</div>':'';
 
-  return '<div class="shd"><button data-act="close">← 목록</button><span>'+(TAB==='seoul'?'서울':TAB==='gyeonggi'?'경기':'전국')+' · '+esc(stageLabel(r))+'</span></div>'+
+  return '<div class="shd"><button data-act="close">← 목록</button><span>'+(r.__tab==='seoul'?'서울':r.__tab==='gyeonggi'?'경기':'전국')+' · '+esc(stageLabel(r))+'</span></div>'+
   '<div class="sbody">'+
     '<div class="dt"><h3>'+esc(r.n)+'</h3><div class="lo">'+esc(addr)+'</div><div class="tags">'+tags+'</div></div>'+
     ladderHTML(r)+
@@ -546,7 +580,7 @@ function sheetHTML(r){
     dealHTML(r)+
     alertHTML(r)+
     '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+srcLinks+'</div>'+
-      '<div class="note"><b>도면</b> 정비구역 도면·고시문은 정보몽땅 원문의 공개자료에서 내려받습니다. (공개자료가 없는 구역은 구청 도시정비과로 문의)<br><b>기준일</b> '+(TAB==='seoul'?'서울 26.6 (정보몽땅은 수시 갱신)':TAB==='gyeonggi'?'경기 25.9 — 원본이 2025-09-30 기준이라 최근 1년 변경분이 빠져 있습니다':'전국 26.5 — 연 1회 갱신')+'<br>공개 데이터를 그대로 모은 참고 자료이며 <b>법적 효력이 없습니다.</b></div>'+
+      '<div class="note"><b>도면</b> 정비구역 도면·고시문은 정보몽땅 원문의 공개자료에서 내려받습니다. (공개자료가 없는 구역은 구청 도시정비과로 문의)<br><b>기준일</b> '+(r.__tab==='seoul'?'서울 26.6 (정보몽땅은 수시 갱신)':r.__tab==='gyeonggi'?'경기 25.9 — 원본이 2025-09-30 기준이라 최근 1년 변경분이 빠져 있습니다':'전국 26.5 — 연 1회 갱신')+'<br>공개 데이터를 그대로 모은 참고 자료이며 <b>법적 효력이 없습니다.</b></div>'+
     '</div>'+
     '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
   '</div>';
@@ -648,9 +682,9 @@ function saveAlert(){
 }
 function CURD(){ return CURDATA; }
 var CURDATA=null,CURKEY=null;
-function openSheet(i){
-  var r=rows(TAB)[i]; if(!r) return;
-  CURDATA=r; CURKEY=i;
+function openSheet(k){ /* k = [자료 탭, 행 번호] — 통합 모드에서도 그 행이 속한 탭의 상세로 연다 */
+  var r=rows(k[0])[k[1]]; if(!r) return;
+  CURDATA=r; CURKEY=k;
   $('sheet').innerHTML=sheetHTML(r)+actBar();
   $('sheet').scrollTop=0;
   $('panel').classList.add('on');
@@ -672,7 +706,7 @@ function wrapC(g,text,x,y,maxW,lh){
 }
 function shareText(r){
   var L=['[KTS 재개발 진행조회기] '+r.n, addrOf(r)];
-  if(TAB==='moa'){
+  if(r.__tab==='moa'){
     L.push('모아타운 관리지역 · 승인·고시 '+(r.up||'미기재')+' · 면적 '+(r.ar?won(Math.round(r.ar))+'㎡':'—')+(r.hh?' · 계획 '+won(r.hh)+'세대':'')+(r.bl?' · 모아주택 '+r.bl+'개 구역':''));
   }else{
     L.push('진행단계: '+stageLabel(r));
@@ -680,7 +714,7 @@ function shareText(r){
     DATE_KEYS.forEach(function(k,i){ if(d[k]) L.push(DATE_LABELS[i]+' '+d[k]) });
     if(r.hn) L.push('건립 세대수 '+won(r.hn)+'세대');
   }
-  L.push('출처: '+(TAB==='moa'?'서울시 모아주택·모아타운 아카이브':'정비사업 정보몽땅 · 경기데이터드림 · 국토부 통합데이터'));
+  L.push('출처: '+(r.__tab==='moa'?'서울시 모아주택·모아타운 아카이브':'정비사업 정보몽땅 · 경기데이터드림 · 국토부 통합데이터'));
   L.push('※ 공개 데이터 참고용 · 법적 효력 없음');
   L.push('KTS 원클릭 autooneclick.com/redev/');
   return L.join('\n');
@@ -703,8 +737,8 @@ function boxC(g,x,y,w,h,label,val){
 }
 function drawCard(r){
   var d=r.dt||{}, dd=0;
-  if(TAB!=='moa') DATE_KEYS.forEach(function(k){ if(d[k]&&dd<5) dd++ });
-  var H=(TAB==='moa')
+  if(r.__tab!=='moa') DATE_KEYS.forEach(function(k){ if(d[k]&&dd<5) dd++ });
+  var H=(r.__tab==='moa')
     ? 720+((r.fa||r.flr)?80:0)+(r.scale?36:0)
     : 700+dd*26+((r.j)?26:0);
   var c=document.createElement('canvas'); c.width=900; c.height=H;
@@ -714,12 +748,12 @@ function drawCard(r){
   g.fillStyle='#FF6B00'; g.fillRect(0,0,900,8);
   g.fillStyle='#FFA24D'; g.font='900 24px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('KTS 원클릭 · 재개발 진행조회기',40,60);
   g.fillStyle='#7C8DA6'; g.font='700 16px -apple-system,"Noto Sans KR",sans-serif';
-  g.fillText((TAB==='moa'?'모아타운 · ':'')+stampNow()+' · '+($('base').textContent||''),40,88);
+  g.fillText((r.__tab==='moa'?'모아타운 · ':'')+stampNow()+' · '+baseOf(r.__tab),40,88);
   g.fillStyle='#FFFFFF'; g.font='900 30px -apple-system,"Noto Sans KR",sans-serif';
   var y=wrapC(g,r.n,40,146,820,38);
   g.fillStyle='#9FB0C8'; g.font='800 18px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(addrOf(r),40,y+26);
   y+=64;
-  if(TAB==='moa'){
+  if(r.__tab==='moa'){
     boxC(g,40,y,400,70,'승인·고시일',r.up?r.up.replace(/-/g,'.'):'미기재');
     boxC(g,460,y,400,70,'관리지역 면적',r.ar?won(Math.round(r.ar))+'㎡':'미기재');
     boxC(g,40,y+80,400,70,'계획 세대수',r.hh?won(r.hh)+'세대':'미기재');
@@ -834,14 +868,28 @@ function toast(msg){
 }
 
 /* ---------- 이벤트 ---------- */
-$('q').addEventListener('input',function(){ Q=this.value; SHOWN=40; $('clr').style.display=Q?'block':'none'; render(); });
-$('clr').addEventListener('click',function(){ $('q').value=''; Q=''; this.style.display='none'; render(); });
+/* 검색어가 있으면 통합(4개 자료 한 목록). 탭·모아타운 버튼을 직접 누르면 그 자료만(PIN). 검색어를 지우면 마지막 탭으로 */
+function syncMode(){
+  var was=TAB;
+  if(!Q.trim()){ PIN=false; TAB=LAST; }
+  else if(!PIN) TAB='all';
+  if(was!==TAB) buildChips();
+}
+function paintTabs(){
+  document.querySelectorAll('#tabs button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===TAB); });
+  $('moaBtn').classList.toggle('on', TAB==='moa');
+}
+function pickTab(t){
+  TAB=t; LAST=t; PIN=!!Q.trim(); FILT='all'; SHOWN=40;
+  buildChips(); render();
+}
+$('q').addEventListener('input',function(){ Q=this.value; SHOWN=40; $('clr').style.display=Q?'block':'none'; syncMode(); render(); });
+$('clr').addEventListener('click',function(){ $('q').value=''; Q=''; this.style.display='none'; SHOWN=40; syncMode(); render(); });
 $('tabs').addEventListener('click',function(e){
   var b=e.target.closest('button'); if(!b) return;
-  this.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
-  b.classList.add('on'); TAB=b.dataset.t; FILT='all'; SHOWN=40; Q=''; $('q').value=''; $('clr').style.display='none';
-  buildChips(); render();
+  pickTab(b.dataset.t);
 });
+$('moaBtn').addEventListener('click',function(){ pickTab('moa'); });
 $('chips').addEventListener('click',function(e){
   var b=e.target.closest('button'); if(!b) return;
   this.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
@@ -850,7 +898,7 @@ $('chips').addEventListener('click',function(e){
 $('more').addEventListener('click',function(){ SHOWN+=40; render(); });
 $('list').addEventListener('click',function(e){
   var b=e.target.closest('.item'); if(!b) return;
-  openSheet(Number(b.dataset.i));
+  openSheet([b.dataset.t, Number(b.dataset.i)]);
 });
 $('panel').addEventListener('click',function(e){
   if(e.target===this){ closeSheet(); return; }
