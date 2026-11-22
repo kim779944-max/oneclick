@@ -128,28 +128,9 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
     <p>사인은 투명 PNG로 만들어 문서 위에 바로 찍습니다. 이 기기 안에서만 처리(서버 전송 없음).</p>
   </div>
 
-  <!-- 1. 요금 선택 -->
+  <!-- 1. 사인·도장 만들기 3택 -->
   <section class="card">
-    <h2><i>1</i>어떻게 쓰실 건가요</h2>
-    <div class="plans">
-      <button class="plan on" type="button" data-p="free"><span class="ck"></span><span class="pk">FREE</span><b>한 장 문서</b>
-        <span class="pr">무료</span><span class="ds">1쪽 계약서·영수증·확인서에 사인 1곳</span></button>
-      <button class="plan" type="button" data-p="pro"><span class="ck"></span><span class="pk">PRO</span><b>여러 장 + 간인</b>
-        <span class="pr">4,900원<small> /월</small></span><span class="ds">여러 쪽 · 쪽마다 사인 · 사이간자(간인) 자동</span></button>
-    </div>
-    <div class="unlock" id="unlock">
-      <span id="ulMsg">이용권 코드를 넣으면 워터마크 없이 저장됩니다. 코드가 없으면 <b style="color:#FFA24D">미리보기(워터마크)</b>로 먼저 써 보세요.</span>
-      <div class="r" id="ulRow">
-        <input id="ulCode" placeholder="이용권 코드 (예: KS2611-XXXX)" autocomplete="off">
-        <button type="button" id="ulGo">확인</button>
-        <a id="ulBuy" href="sms:01020022899">월 4,900원 신청</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. 사인 만들기 3택 -->
-  <section class="card">
-    <h2><i>2</i>사인 만들기<small>3가지 중 하나</small></h2>
+    <h2><i>1</i>사인·도장 만들기<small>3가지 중 하나</small></h2>
     <div class="seg" id="mk">
       <button type="button" class="on" data-m="draw">직접 사인<small>손가락으로</small></button>
       <button type="button" data-m="seal">사인도장<small>이름 → 도장</small></button>
@@ -198,9 +179,9 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
     <div id="stampBox"></div>
   </section>
 
-  <!-- 3. 문서에 찍기 -->
+  <!-- 2. 문서에 도장 찍기 -->
   <section class="card">
-    <h2><i>3</i>문서에 찍기<small id="docInfo">사진·PDF</small></h2>
+    <h2><i>2</i>문서에 도장 찍기<small id="docInfo">사진·PDF</small></h2>
     <div class="drop" id="docDrop"><b>문서 올리기</b><span id="docDropSub">사진(JPG·PNG) 또는 PDF · 무료는 1쪽</span></div>
     <input type="file" id="docFile" accept="image/*,application/pdf,.pdf" multiple hidden>
     <div class="hide" id="docArea">
@@ -212,7 +193,6 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
       <div class="row"><button class="mini fix" type="button" id="sigFix">+ 이 도장 확정하고 다른 도장 추가</button></div>
       <div class="stcount" id="stCount"></div>
       <div class="boxask hide" id="boxAsk"><span>방금 확정한 도장을 <b style="color:#FFA24D">도장함</b>에 담아 둘까요?</span><span class="sp"></span><button class="mini" type="button" id="boxYes">도장함에 담기</button><button class="mini" type="button" id="boxNo">괜찮아요</button></div>
-      <div class="tog" id="ganin"><span class="sw"></span><span class="tt">간인 (사이간자) 자동<small>쪽과 쪽 사이 경계에 도장을 반씩 걸쳐 찍습니다</small></span><span class="lk" id="ganinLk">PRO</span></div>
       <div class="two">
         <button class="btn" type="button" id="outImg">날인본 이미지 저장</button>
         <button class="btn ghost" type="button" id="outPdf">PDF 한 권 저장</button>
@@ -220,6 +200,35 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
     </div>
     <div class="note">· 전자서명법상 효력은 서명 방식·당사자 합의에 따라 달라집니다. 중요한 계약은 상대방과 방식을 먼저 맞추세요.<br>
     · 결제는 이 사이트에서 받지 않습니다. 월 4,900원 이용권은 문자로 신청하면 코드를 보내 드립니다.</div>
+  </section>
+  <!-- 3. 간인 찍기 (사이간자) -->
+  <section class="card">
+    <h2><i>3</i>간인 찍기<small>사이간자 · PRO</small></h2>
+    <div class="tog" id="ganin"><span class="sw"></span><span class="tt">간인 (사이간자) 자동<small>쪽과 쪽 사이 경계에 도장을 반씩 걸쳐 찍습니다</small></span><span class="lk" id="ganinLk">PRO</span></div>
+    <div class="note">· 여러 쪽 문서에서 쪽과 쪽 사이 경계에 ①에서 만든 도장을 반씩 걸쳐 찍습니다(오른쪽 여백).<br>
+    · ②에 2쪽 이상 올린 뒤 켜면 바로 보입니다. 1쪽 문서에는 찍히지 않습니다.</div>
+    <div class="note">· <b style="color:#FFA24D">[간인 미리보기]</b> — 아래 [이용권]에서 PRO 를 고르면 코드 없이 워터마크가 들어간 미리보기로 먼저 써 볼 수 있습니다.</div>
+  </section>
+
+  <!-- 4. 이용권 · 요금 (맨 아래 · 접힘) -->
+  <section class="card">
+    <h2><i style="width:auto;padding:0 6px">이용권</i>여러 장·간인 쓰기</h2>
+    <div data-kts-money="여러 장 · 간인 쓰기">
+    <div class="plans">
+      <button class="plan on" type="button" data-p="free"><span class="ck"></span><span class="pk">FREE</span><b>한 장 문서</b>
+        <span class="pr">무료</span><span class="ds">1쪽 계약서·영수증·확인서에 사인 1곳</span></button>
+      <button class="plan" type="button" data-p="pro"><span class="ck"></span><span class="pk">PRO</span><b>여러 장 + 간인</b>
+        <span class="pr">4,900원<small> /월</small></span><span class="ds">여러 쪽 · 쪽마다 사인 · 사이간자(간인) 자동</span></button>
+    </div>
+    <div class="unlock" id="unlock">
+      <span id="ulMsg">이용권 코드를 넣으면 워터마크 없이 저장됩니다. 코드가 없으면 <b style="color:#FFA24D">미리보기(워터마크)</b>로 먼저 써 보세요.</span>
+      <div class="r" id="ulRow">
+        <input id="ulCode" placeholder="이용권 코드 (예: KS2611-XXXX)" autocomplete="off">
+        <button type="button" id="ulGo">확인</button>
+        <a id="ulBuy" href="sms:01020022899">월 4,900원 신청</a>
+      </div>
+    </div>
+    </div>
   </section>
 </main>
 <div class="foot"><a href="https://autooneclick.com/">KTS 원클릭</a> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>모든 처리는 이 기기 브라우저 안에서 합니다.</div>
@@ -563,7 +572,7 @@ $('#boxYes').onclick=()=>{
   stampBox.add({id:'st'+fnv(url).toString(16), kind:'stamp', data:url}).then(r=>{ if(r!=='cancel') $('#boxAsk').classList.add('hide'); });
 };
 $('#ganin').onclick=()=>{
-  if(!isPro()){ toast('간인(사이간자)은 월 4,900원 PRO — 위 ①에서 고르면 미리보기로 써 볼 수 있습니다'); return; }
+  if(!isPro()){ toast('간인(사이간자)은 월 4,900원 PRO — 아래 [이용권]에서 고르면 미리보기로 써 볼 수 있습니다'); return; }
   if(docs.length<2){ toast('간인은 2쪽 이상일 때 찍힙니다'); }
   ganin=!ganin; $('#ganin').classList.toggle('on',ganin); renderStage();
 };
@@ -686,6 +695,6 @@ if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
 </script>
 
 <!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
-<script>window.KTS_UX_CFG={tool:"sign",free:"한 장 무료",more:"여러 장 · 간인(사이간자)은 <b>월 4,900원</b> 이용권입니다. 문자로 신청하면 그 달 코드를 보내 드립니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%8D%94%EC%8B%B8%EC%9D%B8%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:["#stage"],flow:1};</script>
+<script>window.KTS_UX_CFG={tool:"sign",after:'.ktsRsv',free:"한 장 무료",more:"여러 장 · 간인(사이간자)은 <b>월 4,900원</b> 이용권입니다. 문자로 신청하면 그 달 코드를 보내 드립니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%8D%94%EC%8B%B8%EC%9D%B8%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:["#stage"],flow:1};</script>
 <script src="../ux.js?v=20261121k"></script>
 </body></html>
