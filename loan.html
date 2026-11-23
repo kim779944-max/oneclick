@@ -145,6 +145,26 @@ h1 em{font-style:normal;color:var(--amber)}
     <a href="index.html" target="_blank" rel="noopener">← 원클릭</a>
   </div>
 
+<!-- 사업자 대출 탭 (162 · 2026-11-23) — loan.html · tax.html 공통 1벌 -->
+<style>
+.bizTabs{margin:0 0 12px}
+.bizTabs .bt-t{font-size:11px;font-weight:900;color:#ff994b;letter-spacing:.02em;margin:0 0 6px}
+.bizTabs .bt-r{display:flex;gap:6px}
+.bizTabs a{flex:1;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;text-decoration:none;
+ font-size:13.5px;font-weight:900;letter-spacing:-.3px;color:#a5b1c7;background:#141f38;border:1px solid #36425c}
+.bizTabs a.on{color:#141414;background:linear-gradient(180deg,#ff994b,#ff6b00);border-color:#ff6b00}
+</style>
+<nav class="bizTabs" aria-label="사업자 대출">
+  <p class="bt-t">사업자 대출 — 한 화면 두 탭</p>
+  <div class="bt-r">
+    <a href="loan.html" data-bt="loan">기업 대출</a>
+    <a href="tax.html?tab=biz" data-bt="tax">창업·세무</a>
+  </div>
+</nav>
+<script>(function(){var f=/tax\.html/.test(location.pathname)?'tax':'loan';
+  Array.prototype.forEach.call(document.querySelectorAll('.bizTabs a'),function(a){
+    var on=a.getAttribute('data-bt')===f; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page');});})();</script>
+
   <h1>재무제표를 올리면,<br><em>가능한 기관부터</em> 나옵니다.</h1>
   <p class="sub">대차대조표·손익계산서 사진이나 PDF를 올리고, 심사에서 걸리는 <b>네 가지만</b> 확인해 주세요.
     비율 계산 → 기관 매칭 → <b>부족한 항목의 원인과 준비 순서</b>까지 한 장으로 나옵니다.</p>
