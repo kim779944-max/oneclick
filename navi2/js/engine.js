@@ -24,7 +24,21 @@
   };
   var GROUP_NM = { A:'밀어붙임·완성', B:'실속·인정', C:'사람·관찰', D:'자유·여유' };
 
-  var TOTAL = 10;
+  /* 153번: 기본 = 압축 6문항(NAVI.Q6) · ?deep=1 = 기존 10문항(NAVI.Q, 선택 심화) */
+  var DEEP = typeof location !== 'undefined' && /[?&]deep=1(&|$)/.test(location.search || '');
+  function QS(){ var N = root.NAVI || {}; return (!DEEP && N.Q6) ? N.Q6 : N.Q; }
+  var TOTAL = (DEEP || !(root.NAVI && root.NAVI.Q6)) ? 10 : 6;
+
+  /* 153번: 문항마다 1~3개 복수 체크 — picks[lv-1] = [ {idx,l,t,t2,p,s}, ... ]. 예전 단일 객체도 그대로 읽는다 */
+  function isArr(x){ return Object.prototype.toString.call(x) === '[object Array]'; }
+  function flatPicks(picks){
+    var out = [];
+    (picks || []).forEach(function(k){
+      if (!k) return;
+      if (isArr(k)) k.forEach(function(x){ if (x) out.push(x); }); else out.push(k);
+    });
+    return out;
+  }
 
   var REL_LEAD = {
     JEONG: {},
@@ -81,7 +95,13 @@
     function add(t, w){ if (!t || !(t in s)) return; s[t] += w; total += w; }
 
     (state.pics || []).forEach(function(p){ add(p.t, 1.8); add(p.t2, 0.6); });
-    (state.picks || []).forEach(function(k){ add(k.t, 1.0); add(k.t2, 0.32); });
+    /* 한 문항에서 n개를 고르면 보기마다 t 1.0/n · t2 0.32/n (문항당 합 = 단일 선택과 같음) */
+    var weights = [];
+    (state.picks || []).forEach(function(k){
+      var arr = isArr(k) ? k.filter(Boolean) : (k ? [k] : []);
+      var n = arr.length || 1;
+      arr.forEach(function(x){ add(x.t, 1.0 / n); add(x.t2, 0.32 / n); weights.push({ lv:x.lv, t:x.t, w:1.0 / n, t2:x.t2, w2:0.32 / n }); });
+    });
     /* 망설임: 다시 고름 = 한 번 더 확인하는 사람(EYE), 오래 고름 = 벼리는 사람(PERFECT) */
     (state.hesit || []).forEach(function(h){
       if (h.repick) add('EYE', 0.32);
@@ -91,14 +111,15 @@
     var arr = AXES.map(function(a, i){ return { t:a, v:s[a] || 0, i:i }; });
     arr.sort(function(a, b){ return (b.v - a.v) || (a.i - b.i); });
     var top = arr[0].v, second = arr[1] ? arr[1].v : 0;
-    var picks = state.picks || [];
+    /* lead·answers 는 '고른 보기 수' 기준 — 복수 체크로 강/약 판정이 기울지 않게 */
+    var picks = flatPicks(state.picks);
     var lead = 0;
     picks.forEach(function(k){ if (k.t === arr[0].t) lead++; });
     return {
       primary: arr[0].t, secondary: arr[1] ? arr[1].t : null,
       gap: top - second, rank: arr, scores: s,
       total: total || 1, share: top / (total || 1),
-      lead: lead, answers: picks.length
+      lead: lead, answers: picks.length, questions: (state.picks || []).filter(Boolean).length, weights: weights
     };
   }
 
@@ -112,12 +133,13 @@
 
   /* ── 다음 층 보기 고르기: 선두 갈래의 벌 → (없으면) 기본 벌 ── */
   function setFor(lv, state){
-    var table = (root.NAVI.Q || {})[lv];
+    var table = (QS() || {})[lv];
     if (!table) return null;
     var keys = Object.keys(table);
     if (!state) return table['*'] || table[keys[0]];
     var g = groupOf(score(state).primary);
-    return table[g] || table['*'] || table[keys[0]];
+    var g2 = (g === 'A' || g === 'B') ? 'X' : 'Y';          /* 6문항: 2갈래(X 일·실속 / Y 사람·여유) */
+    return table[g] || table[g2] || table['*'] || table[keys[0]];
   }
 
   function hash(str){
@@ -163,7 +185,7 @@
     } : null;
 
     /* ② 비밀 발췌 — 본인이 고른 말 중 '선두 결'을 받쳐 주는 셋을 가져와 다른 말로 푼다 */
-    var picks = state.picks || [];
+    var picks = flatPicks(state.picks);
     var want = [];
     function push(k){ if (!k) return; if (want.indexOf(k) === -1) want.push(k); }
     picks.filter(function(k){ return k.t === primary; }).forEach(function(k){ if (want.length < 3) push(k); });
@@ -175,6 +197,23 @@
     var excerpt = want.slice(0, 3).sort(function(a, b){ return a.lv - b.lv; }).map(function(k){
       return { lv:k.lv, l:k.l, p:k.p || '', t:k.t };
     });
+
+    /* 153번: ① 문항에서 직접 물어본 영역의 단정 한 줄 + ② 반전 한 줄 (뜻풀이 없음) */
+    var V = NAV.VOICE || { DECL:{}, TURN:{} };
+    var secAxis = sc.rank[1] && sc.rank[1].v > 0 ? sc.rank[1].t : OPP[primary];
+    var turn = (V.TURN[primary] || {})[groupOf(secAxis)] || '';
+    var ordered = picks.slice().sort(function(a, b){ return (a.lv - b.lv) || 0; });
+    var mainPick = ordered.filter(function(k){ return k.t === primary && k.s; })[0] || null;
+    var subj = isSelf ? '당신은 ' : '그 사람은 ';
+    var decl = String(V.DECL[primary] || '').replace(/^당신은 /, subj);
+    var said = mainPick ? subj + mainPick.s : decl;
+    var declare = (said + ' ' + turn).trim();
+    var more = [], usedLv = {};
+    if (mainPick) usedLv[mainPick.lv] = 1;
+    ordered.filter(function(k){ return k.s && k !== mainPick && (k.t === secAxis || k.t2 === primary); })
+      .concat(ordered.filter(function(k){ return k.s && k !== mainPick; }))
+      .forEach(function(k){ if (more.length < 2 && !usedLv[k.lv]){ usedLv[k.lv] = 1; more.push(k.s); } });
+    var voiceInner = [mainPick ? decl : ''].concat(more).filter(Boolean).join(' ');
 
     var view = {
       teaser: isSelf ? (sub.line[band] || sub.line.mid)
@@ -202,8 +241,14 @@
       avoid: card.rel[isSelf ? 'love' : mode] ? card.rel[isSelf ? 'love' : mode].avoid : card.rel.deal.avoid,
       script: (sub.script && sub.script[isSelf ? 'love' : mode]) || card.rel[isSelf ? 'love' : mode].script
     };
+    /* 153번: 화면 결과문 = 단정 + 반전. 설명 문단(read·ex·inner 해설)은 내보내지 않는다 */
+    view.teaser = declare;
+    view.declare = declare;
+    view.turn = turn;
+    view.inner = voiceInner || decl;
+    view.read = '';
+    view.ex = '';
     if (!isSelf){
-      view.teaser = (REL_LEAD[flavor] && REL_LEAD[flavor][mode] ? REL_LEAD[flavor][mode] : '') + card.rel[mode].line;
       view.keep = card.rel[mode].keep;
       view.avoid = card.rel[mode].avoid;
       view.script = (sub.script && sub.script[mode]) || card.rel[mode].script;
@@ -227,7 +272,8 @@
       scores: sc.scores,
       next: (sc.rank[1] ? { nm: (S[sc.rank[1].t] && S[sc.rank[1].t][flavor] ? S[sc.rank[1].t][flavor].nm : C[sc.rank[1].t].name) } : null),
       view: view,
-      picks: picks.map(function(k){ return { lv:k.lv, l:k.l, t:k.t, t2:k.t2 }; })
+      picks: picks.map(function(k){ return { lv:k.lv, l:k.l, t:k.t, t2:k.t2 }; }),
+      total: TOTAL, deep: DEEP, weights: sc.weights
     };
   }
 
@@ -239,7 +285,7 @@
     try { return decodeURIComponent(escape(atob(str))); } catch (e) { return ''; }
   }
   function shareLink(mode, res){
-    var payload = { m:mode, c:res.card, n:res.cardName, s:res.view.teaser, j:res.view.read };
+    var payload = { m:mode, c:res.card, n:res.cardName, s:res.view.teaser, j:res.view.inner || res.view.read };
     return '#r=' + b64enc(JSON.stringify(payload));
   }
   function readShare(hashStr){
@@ -268,7 +314,7 @@
 
   /* ── 보기 풀 통계(실측·검증용) ── */
   function poolStats(){
-    var QS = root.NAVI.Q, sets = 0, opts = 0, bad = [], byAxis = {}, lvSets = {}, imgMissing = 0;
+    var QS = (function(){ var N = root.NAVI || {}; return (!DEEP && N.Q6) ? N.Q6 : N.Q; })(), sets = 0, opts = 0, bad = [], byAxis = {}, lvSets = {}, imgMissing = 0;
     for (var lv in QS){
       lvSets[lv] = Object.keys(QS[lv]);
       for (var k in QS[lv]){
@@ -295,7 +341,7 @@
     context: context, score: score, compose: compose, setFor: setFor, flavorOf: flavorOf, groupOf: groupOf,
     GROUPS: GROUPS, GROUP_NM: GROUP_NM, AXES: AXES, OPP: OPP, FLAVOR_NM: FLAVOR_NM,
     shareLink: shareLink, readShare: readShare, loadHistory: loadHistory, saveHistory: saveHistory,
-    typeCount: function(){ return 64; }, TOTAL: TOTAL, poolStats: poolStats,
+    typeCount: function(){ return 64; }, TOTAL: TOTAL, DEEP: DEEP, flatPicks: flatPicks, poolStats: poolStats,
     CARDS: C, MODES: M, SUBS: S
   };
   root.APP = APP;
