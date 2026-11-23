@@ -2,6 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>/* 2026-11-23 통합: 문서변환기 → 더양식(158) · 창업·세무 → 사업자 대출(162) */
+(function(){var M={photo2doc:'theform',tax:'loan'},q=new URLSearchParams(location.search),k=q.get('k')||'theform';
+ if(M[k]){q.set('k',M[k]);location.replace('detail.html?'+q.toString());}})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 원클릭 — 상품 상세</title>
 <meta name="theme-color" content="#0A1224">
@@ -132,7 +135,7 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
 </div>
 
 <script src="master.js?v=20261121k"></script>
-<script src="products.js?v=20261122a"></script>
+<script src="products.js?v=20261123c"></script>
 <script src="slots.js?v=20261121k"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -143,15 +146,15 @@ function faqFor(p){
     ['설치가 필요한가요?', '아니요. 브라우저에서 바로 열립니다. 일부 도구는 앱(.apk)으로도 쓸 수 있습니다.'],
     ['파일이 서버로 올라가나요?', '올라가지 않습니다. 문서는 이 기기 안에서 처리되고, 서버 전송은 없습니다.']
   ];
-  if (p.k === 'photo2doc') base.push(['사진 글자를 자동으로 읽나요?', 'AI 키를 넣으면 자동으로 읽습니다. 키가 없으면 표를 붙여넣기로 넣어 그대로 쓸 수 있습니다.']);
+  if (p.k === 'theform') base.push(['표 사진 글자를 자동으로 읽나요?', 'AI 키를 넣으면 자동으로 읽습니다. 키가 없으면 표를 붙여넣기로 넣어 그대로 쓸 수 있습니다.']);
   if (p.k === 'loan') base.push(['이 진단으로 대출이 확정되나요?', '아니요. 기관 심사 전에 어디가 걸리는지 먼저 보는 도구입니다.']);
-  if (p.k === 'tax') base.push(['세무 상담을 대신하나요?', '아니요. 세무사에게 물어볼 항목을 미리 정리해 드립니다.']);
+  if (p.k === 'loan') base.push(['[창업·세무] 탭이 세무 상담을 대신하나요?', '아니요. 세무사에게 물어볼 항목을 미리 정리해 드립니다.']);
   if (p.k === 'navi') base.push(['결과가 서버에 저장되나요?', '아니요. 답과 결과는 이 기기 안에서만 계산됩니다. 공유는 요약 링크로만 나갑니다.']);
   return base;
 }
 
 function renderDetail(){
-const key = new URLSearchParams(location.search).get('k') || 'photo2doc';
+const key = new URLSearchParams(location.search).get('k') || 'theform';
 const p = window.PRODUCTS.find(x => x.k === key);
 if (!p){
   $('#doc').innerHTML = '<div class="missing">상품을 찾지 못했습니다.<br><a href="index.html" style="color:#FFA24D">전체 도구로 돌아가기</a></div>';
@@ -168,8 +171,8 @@ if (!p){
   const BEFORE = {
     photo2doc:'카톡으로 받은 표 사진을 보며 한 칸씩 다시 타이핑',
     viewer:'폰에서 .hwp 첨부가 안 열리고 앱 설치부터 요구',
-    loan:'어느 기관에 넣을지 몰라 여기저기 전화 문의',
-    tax:'창업 순서·통장·과세 유형을 몰라 처음부터 상담',
+    loan:'어느 기관에 넣을지, 창업 순서·통장·과세 유형은 어떻게 할지 몰라 여기저기 문의',
+    theform:'종이 양식·표 사진을 보며 한글·엑셀에 한 칸씩 다시 타이핑',
     navi:'상담 자리에서 무슨 말을 꺼낼지 몰라 망설임',
     saycap:'사진만 쌓이고 그날의 이야기는 잊힘',
     organizer:'앱 서랍이 뒤죽박죽, 쓸 앱을 매번 찾음',
@@ -257,7 +260,7 @@ document.addEventListener('kts:catalog', () => { renderDetail(); });
 <!-- 🔑 열쇠·내 박스 (1트랙 2026-11-21) -->
 <script>
 (function(){
-  var k = new URLSearchParams(location.search).get('k') || 'photo2doc';
+  var k = new URLSearchParams(location.search).get('k') || 'theform';
   var p = (window.PRODUCTS||[]).filter(function(x){ return x.k === k; })[0];
   if (!p || !window.KTS_KEYS) return;
   var app = document.getElementById('app');

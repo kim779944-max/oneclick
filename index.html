@@ -72,7 +72,16 @@ main{margin-top:16px}
 .row{min-width:0}
 .row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;padding:9px 10px;
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));position:relative}
-.row.soon{opacity:.62}
+.row.soon{opacity:.58;filter:grayscale(.3);pointer-events:none;cursor:default}
+.row.soon .main{cursor:default}
+/* 카테고리 칩 — 섹션 필터(151) */
+.chips{display:flex;gap:6px;overflow-x:auto;margin:18px 0 0;padding:2px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;font-family:inherit;font-size:11.5px;font-weight:900;color:#C9D4E3;background:#12203C;
+  border:1px solid #2A3C63;border-radius:999px;padding:0 12px;min-height:36px;cursor:pointer;white-space:nowrap}
+.chips button.on{color:#0A1224;background:linear-gradient(180deg,#FF8A2B,#FF6B00);border-color:#FF6B00}
+.chips button.s{color:#8FA0B8}
+.sec[hidden]{display:none}
 .ico{width:40px;height:40px;border-radius:10px;flex:0 0 auto;overflow:hidden;background:#0B1730;
   display:grid;place-items:center;border:1px solid rgba(198,160,84,.32);font-size:17px;color:var(--amber2);font-weight:900}
 .ico img{width:100%;height:100%;object-fit:cover;display:block}
@@ -200,6 +209,8 @@ html[data-kts-theme="light"] .row.big.hi{background:linear-gradient(150deg,rgba(
 html[data-kts-theme="light"] .ico{background:var(--k-panel-2);border-color:var(--k-line-2)}
 html[data-kts-theme="light"] .lim{color:#a2410a}
 html[data-kts-theme="light"] .lim.zero{color:#15803d;background:rgba(22,163,74,.1)}
+html[data-kts-theme="light"] .chips button{background:var(--k-panel-2);border-color:var(--k-line-2);color:var(--k-ink-2)}
+html[data-kts-theme="light"] .chips button.on{color:#fff;background:#FF6B00;border-color:#FF6B00}
 html[data-kts-theme="light"] .act .go[disabled],html[data-kts-theme="light"] .act .soonb{background:var(--k-panel-2);border-color:var(--k-line-2);color:var(--k-ink-3)}
 html[data-kts-theme="light"] .nb{background:var(--k-panel);border-color:var(--k-line)}
 html[data-kts-theme="light"] .nb button,html[data-kts-theme="light"] .hd .mkey:not(.on),html[data-kts-theme="light"] .hd a.tel{background:var(--k-panel);border-color:var(--k-line-2);color:var(--k-ink-2)}
@@ -285,6 +296,7 @@ html[data-kts-theme="light"] .ks-strip .c.lk{border-color:var(--k-line-2);color:
   </div>
 
   <div id="allGroups">
+  <nav class="chips" id="catChips" aria-label="카테고리"></nav>
   <main id="sections"></main>
   </div>
 
@@ -310,7 +322,7 @@ html[data-kts-theme="light"] .ks-strip .c.lk{border-color:var(--k-line-2);color:
   <div class="foot k-foot">
     <b>케이티에스 원클릭</b> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>
     올린 파일은 서버로 보내지 않고 브라우저 안에서만 처리합니다.<br>
-    <a href="detail.html?k=viewer">도구 소개</a> · <a href="navi2/">독심술</a> · <a href="saycap/">세이캡</a> · <a href="exchange/">교환급매물</a> · <a href="bungee/">번개알바 도구</a><br>
+    <a href="detail.html?k=viewer">도구 소개</a> · <a href="navi2/">독심술</a> · <a href="saycap/">세이캡</a> · <a href="exchange/">교환급매물</a><br>
     이용약관 · 개인정보처리방침 — 준비 중(결제·회원가입이 없어 따로 모으는 개인정보가 없습니다)
   </div>
 </div>
@@ -318,7 +330,7 @@ html[data-kts-theme="light"] .ks-strip .c.lk{border-color:var(--k-line-2);color:
 <button class="totop" id="toTop" type="button">↑ 위로</button>
 
 <script src="master.js?v=20261121k"></script>
-<script src="products.js?v=20261123a"></script>
+<script src="products.js?v=20261123c"></script>
 <script src="slots.js?v=20261121k"></script>
 <script src="status.js?v=20261121k"></script>
 <script>
@@ -343,22 +355,22 @@ window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
 var LOCAL = {
   thescan:{nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', ico:'▣', badge:'NEW'},
   theeraser:{nm:'더지우개', sub:'사진 글씨·얼룩 지우기', link:'theeraser/', ico:'⌫', badge:'NEW'},
-  ad_magnet:{nm:'답글생성기(광고용)', sub:'광고·댓글 답글 1분', link:'ad_magnet/', ico:'✦', badge:'NEW'},
-  seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'},
-  bungee_interior:{nm:'인테리어 평당 견적', sub:'평수·등급 → 3안 비교', link:'bungee/#interior', ico:'▤', badge:'NEW'},
-  bungee_home:{nm:'단독 모바일 홈피', sub:'가게 정보 → 1장 홈피', link:'bungee/#home', ico:'▢', badge:'NEW'},
-  bungee_poster:{nm:'포스터 만들기', sub:'업종·혜택 → A4 포스터', link:'bungee/#poster', ico:'▣', badge:'NEW'}
+  seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'}
 };
-var UNIT = {photo2doc:'장', theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:'장', theeraser:'장',
-  ad_magnet:'회', seller:'회', commerce:'회', keyword:'회'};
+/* 2026-11-23 쇼룸 제외: 답글생성기 ad_magnet(내부용 · 165) · 번개알바 bungee_*(별도 플랫폼 · 156) — 폴더는 그대로 */
+var UNIT = {theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:'장', theeraser:'장',
+  seller:'회', commerce:'회', keyword:'회'};
 
+/* 마인드맵(2026-11-23 확정 · 쓰는 순서 축)과 1:1 — K0612766940K-/output/서비스_마인드맵_20261123/쇼룸_버튼구조.md */
 var GROUPS = [
-  {no:'01', t:'부동산·중개사', s:'매물·계약·권리·경사도', ks:['listing','realty','exchange','slope','redev','contract','theform','sign','viewer','thescan']},
-  {no:'02', t:'쇼핑몰·셀러', s:'상품·상세·광고·등록', ks:['commerce','seller','thedetail','keyword','ad_magnet','photo2doc','theeraser']},
-  {no:'03', t:'자영업·매장', s:'홍보·가계부·외국 손님·자금', ks:['bungee_home','bungee_poster','bungee_interior','gagebu','tongyeok','loan','tax','interior']},
-  {no:'04', t:'개인·생활', s:'장보기·휴대폰·취미·기록', ks:['sale','hogang','golf','petmind','saycap','navi','organizer']},
-  {no:'05', t:'준비 중', s:'나오면 맨 위에 알려 드립니다', ks:['append','youtube','travel']}
+  {no:'01', cat:'realty', t:'부동산·중개', s:'경사도 → 매물수집 → 매물장 → 물건 포스터', ks:['slope','realty','listing','redev','exchange']},
+  {no:'02', cat:'biz',    t:'사업자·매장', s:'상품·판매·자금·인테리어',                    ks:['thedetail','seller','commerce','keyword','sale','gagebu','tongyeok','loan','interior']},
+  {no:'03', cat:'doc',    t:'서류·계약',   s:'스캔 → 열람 → 양식 → 서명 → 계약',            ks:['thescan','viewer','theform','theeraser','sign','contract']},
+  {no:'04', cat:'life',   t:'생활·기록',   s:'정리·사진·휴대폰·취미',                       ks:['organizer','saycap','navi','hogang','golf','petmind']},
+  {no:'05', cat:'soon',   t:'준비 중',     s:'나오면 맨 위에 알려 드립니다 (보기만)',        ks:['append','youtube','travel']}
 ];
+var CHIPS = [{c:'all', t:'전체'},{c:'realty', t:'부동산·중개'},{c:'biz', t:'사업자·매장'},{c:'doc', t:'서류·계약'},{c:'life', t:'생활·기록'},{c:'soon', t:'준비 중'}];
+var CHIP_KEY = 'kts_cat_chip';
 /* 대표 3종 — 강조용 복제(목록 완전성 검사에서 제외) */
 var FEATURED = [
   {k:'listing', one:'매물 하나가 영업하는 홈페이지가 됩니다'},
@@ -372,7 +384,7 @@ function byK(k){
   if (p) return {k:k, nm:String(p.nm).split(' — ')[0], sub:p.sub||'', link:p.link||('detail.html?k='+k),
                  icon:p.icon||'', badge:p.badge||'', cat:p.cat||'', status:p.status||'live', price:p.price||''};
   var e = LOCAL[k];
-  if (e) return {k:k, nm:e.nm, sub:e.sub, link:e.link, icon:e.icon||'', ico:e.ico||'', badge:e.badge||'', status:'live', price:''};
+  if (e) return {k:k, nm:e.nm, sub:e.sub, link:e.link, icon:e.icon||'', ico:e.ico||'', badge:e.badge||'', status:'live', price:'', local:true};
   return {k:k, nm:k, sub:'', link:'', icon:'', ico:'·', badge:'', status:'soon', price:''};
 }
 function limLine(k){
@@ -391,27 +403,56 @@ function render(){
     g.ks.forEach(function(k){
       var t = byK(k);
       var soon = (t.status==='soon') || !t.link;
-      var mine = (window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
-      var bd = t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '';
-      var lim = limLine(k);
-      var detailHref = 'detail.html?k=' + encodeURIComponent(k);
-      rows += '<div class="row' + (soon ? ' soon' : '') + '">' +
+      var mine = (!soon && window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
+      /* 준비 중: '준비 중' 배지만(NEW·무료 배지 없음) */
+      var bd = soon ? '<span class="bd soon">준비 중</span>'
+                    : (t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '');
+      var lim = soon ? '' : limLine(k);
+      var inner = '<div class="nm"><span>' + t.nm + '</span>' + bd + '</div>' +
+          '<div class="sub">' + (t.sub || '') + '</div>' + lim;
+      /* 151: 준비 중 = 보이기만(링크·tabindex·클릭 0) · 상세 페이지가 없는 LOCAL = [열기]와 같은 동작 */
+      var main = soon ? '<div class="main" role="presentation">' + inner + '</div>'
+               : (t.local ? '<div class="main" data-open="' + k + '" style="cursor:pointer">' + inner + '</div>'
+                          : '<a class="main" href="detail.html?k=' + encodeURIComponent(k) + '">' + inner + '</a>');
+      rows += '<div class="row' + (soon ? ' soon' : '') + '" data-k="' + k + '"' + (soon ? ' aria-disabled="true"' : '') + '>' +
         '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
-        '<a class="main" href="' + detailHref + '">' +
-          '<div class="nm"><span>' + t.nm + '</span>' + bd + '</div>' +
-          '<div class="sub">' + (t.sub || '') + '</div>' + lim + '</a>' +
+        main +
         '<div class="act">' + mine +
           (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
                 : '<button class="go" type="button" data-open="' + k + '">열기</button>') +
         '</div></div>';
     });
-    html += '<section class="sec" id="sec' + g.no + '"><div class="secH"><span class="no">' + g.no + '</span><h2>' + g.t + '</h2><p>' + g.s + '</p></div>' +
+    html += '<section class="sec" id="sec' + g.no + '" data-cat="' + g.cat + '"><div class="secH"><span class="no">' + g.no + '</span><h2>' + g.t + '</h2><p>' + g.s + '</p></div>' +
       '<div class="rows">' + rows + '</div></section>';
   });
   $('#sections').innerHTML = html;
+  renderChips();
   renderFeat();
   if (window.KTS_KEYS) { KTS_KEYS.badge(); KTS_KEYS.strip('#boxStrip'); }
 }
+
+/* 카테고리 칩 — 누르면 그 섹션만(필터) · 마지막 선택은 이 기기에 기억 */
+function chipNow(){ var c='all'; try{ c = localStorage.getItem(CHIP_KEY) || 'all'; }catch(e){}
+  return CHIPS.some(function(x){ return x.c===c; }) ? c : 'all'; }
+function applyChip(c){
+  Array.prototype.forEach.call(document.querySelectorAll('#sections .sec'), function(s){
+    s.hidden = !(c==='all' || s.getAttribute('data-cat')===c); });
+  Array.prototype.forEach.call(document.querySelectorAll('#catChips button'), function(b){
+    var on = b.getAttribute('data-cat')===c; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+}
+function renderChips(){
+  var box = $('#catChips'); if (!box) return;
+  box.innerHTML = CHIPS.map(function(x){
+    return '<button type="button" data-cat="' + x.c + '"' + (x.c==='soon' ? ' class="s"' : '') + '>' + x.t + '</button>'; }).join('');
+  applyChip(chipNow());
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('#catChips button[data-cat]') : null;
+  if (!b) return;
+  var c = b.getAttribute('data-cat');
+  try{ localStorage.setItem(CHIP_KEY, c); }catch(err){}
+  applyChip(c);
+});
 
 function renderFeat(){
   var box = $('#featRows'); if (!box) return;
@@ -420,11 +461,11 @@ function renderFeat(){
     var soon = (t.status==='soon') || !t.link;
     var ft = (window.KTS_KEYS && KTS_KEYS.freeText) ? KTS_KEYS.freeText(f.k) : '';
     var badge = soon ? '<span class="k-badge soon">준비 중</span>' : (ft ? '<span class="k-badge lim">' + ft + '</span>' : '');
-    return '<div class="row big' + (i===0 ? ' hi' : '') + (soon ? ' soon' : '') + '">' +
+    var inner = '<div class="nm"><span>' + t.nm + '</span></div>' + '<div class="one">' + f.one + '</div>';
+    return '<div class="row big' + (i===0 ? ' hi' : '') + (soon ? ' soon' : '') + '" data-k="' + f.k + '"' + (soon ? ' aria-disabled="true"' : '') + '>' +
       '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
-      '<a class="main" href="detail.html?k=' + encodeURIComponent(f.k) + '">' +
-        '<div class="nm"><span>' + t.nm + '</span></div>' +
-        '<div class="one">' + f.one + '</div></a>' +
+      (soon ? '<div class="main" role="presentation">' + inner + '</div>'
+            : '<a class="main" href="detail.html?k=' + encodeURIComponent(f.k) + '">' + inner + '</a>') +
       '<div class="act">' + badge +
         (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
               : '<button class="go" type="button" data-open="' + f.k + '">열기</button>') +
@@ -437,6 +478,7 @@ document.addEventListener('click', function(e){
   if (!a) return;
   var el = document.getElementById(a.getAttribute('data-jump')); if (!el) return;
   e.preventDefault();
+  if (el.hidden) { try{ localStorage.setItem(CHIP_KEY,'all'); }catch(err){} applyChip('all'); }
   var hd = document.querySelector('header'), off = hd ? hd.getBoundingClientRect().height + 8 : 0;
   window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - off, behavior:'smooth'});
 });
@@ -447,6 +489,7 @@ document.addEventListener('click', function(e){
   if (!b || !window.KTS_KEYS) return;
   e.preventDefault();
   var k = b.getAttribute('data-open'), t = byK(k);
+  if (t.status==='soon' || (b.closest && b.closest('.row.soon'))) return;   /* 151: 준비 중은 클릭 0 */
   if (!t.link) { toastMsg('아직 주소가 없습니다'); return; }
   var r = KTS_KEYS.request(k);
   if (r.ok) location.href = t.link;
@@ -522,7 +565,7 @@ function masterGrid(){
   $('#mstN').textContent = String(LIVE.length);
   $('#mstVer').textContent = cat.version ? ('최신판 ' + cat.version) : '내장 목록';
   $('#mstGrid').innerHTML = LIVE.map(function(p){ return '<a href="' + p.link + '">' + String(p.nm).split(' — ')[0] + '</a>'; }).join('') +
-    '<a href="ad_magnet/">답글생성기</a><a href="seller/">원클릭 셀러</a><a href="bungee/">번개알바 도구</a><a href="ops/">군단 상황판</a>';
+    '<a href="seller/">원클릭 셀러</a><a href="thescan/">더스캔</a><a href="theeraser/">더지우개</a><a href="ops/">군단 상황판</a>';
 }
 (function(){
   var mst=$('#mst'), key=$('#mKey'), sheet=$('#msheet'), scrim=$('#mscrim'), pin=$('#mPin'), err=$('#mErr');

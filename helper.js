@@ -26,11 +26,10 @@
     hogang: { nm: '호갱탈출' },
     thescan: { nm: '더스캔', k: 'thescan' },
     theeraser: { nm: '더지우개', k: 'theeraser' },
-    thedetail: { nm: '더상세', k: 'thedetail' },
-    theform: { nm: '더양식', k: 'theform' },
+    thedetail: { nm: '설명서 제작기', k: 'thedetail' },
+    theform: { nm: '더양식 (양식 채우기 · 표 변환 탭)', k: 'theform' },
     contract: { nm: '더계약서', k: 'contract' },
     sale: { nm: '오늘의 특가', k: 'sale' },
-    converter: { nm: '문서변환기', k: 'photo2doc' },
     viewer: { nm: '만능 뷰어', k: 'viewer' },
     ad_magnet: { nm: '답글생성기', k: 'ad_magnet' },
     seller: { nm: '원클릭 셀러', k: 'seller' },
@@ -45,8 +44,8 @@
     bungee: { nm: '번개알바 도구' },
     saycap: { nm: '세이캡' },
     thetongyeok: { nm: '더통역' },
-    loan: { nm: '대출 점검', k: 'loan' },
-    tax: { nm: '세무 점검', k: 'tax' },
+    loan: { nm: '사업자 대출 · 기업 대출', k: 'loan' },
+    tax: { nm: '사업자 대출 · 창업·세무', k: 'tax' },
     longtail: { nm: '롱테일 키워드' },
     interior: { nm: '인테리어 견적기' }
   };
@@ -55,7 +54,7 @@
   /* sel: [여기로] 를 눌렀을 때 갈 곳(앞에서부터 화면에 보이는 첫 요소) */
   var STEPS = {
     index: [
-      { t: '01~09 쓰는 순서대로 고르기', d: '받은 서류 열기(01)부터 생활(08)까지, 하는 일 순서대로 늘어놓았습니다.', sel: ['#sections'] },
+      { t: '카테고리 칩 → 01~04 쓰는 순서대로 고르기', d: '부동산·중개(01) · 사업자·매장(02) · 서류·계약(03) · 생활·기록(04) — 칩을 누르면 그 묶음만 보입니다. 준비 중은 보기만 됩니다.', sel: ['#catChips', '#sections'] },
       { t: '위에서부터 4개를 박스에 담기', d: '내 박스에 담은 도구는 매일 바로 열립니다. 열쇠로 칸을 더 엽니다.', sel: ['#boxStripWrap'] },
       { t: '없는 도구는 [해주세요]', d: '필요한 도구를 적어 주시면 10표가 모일 때 만듭니다.', sel: ['#askOpen'] }
     ],
@@ -95,7 +94,7 @@
       { t: '[1초 만에 상세페이지 만들기] → 저장', d: '만든 뒤 PNG·PDF·JPG로 저장하거나 HTML 을 복사합니다.', sel: ['#screenInput .go'] }
     ],
     theform: [
-      { t: '양식 고르기·등록', d: '표준 양식을 바로 쓰거나, 내 종이 양식 사진을 등록합니다.', sel: ['#s1'] },
+      { t: '양식 고르기·등록', d: '표준 양식을 바로 쓰거나, 내 종이 양식 사진을 등록합니다. 표 사진을 한글·엑셀로 바꾸려면 위쪽 [② 표 사진 → 한글·엑셀] 탭.', sel: ['#s1'] },
       { t: '채울 자리 찍기', d: '값이 들어갈 칸을 양식 위에 찍어 둡니다(한 번만).', sel: ['#s2'] },
       { t: '값 입력 → 미리보기·내보내기', d: '값만 채우면 미리보기를 거쳐 출력·저장합니다.', sel: ['#s3'] }
     ],
