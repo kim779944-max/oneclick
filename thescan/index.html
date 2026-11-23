@@ -43,6 +43,21 @@ header a{font-size:12px;font-weight:800;color:#9DAEC5;text-decoration:none}
 .btn.ghost .led{background:var(--amber2)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .foot-hint{margin:9px 2px 0;font-size:10.5px;color:#8194AD;line-height:1.6;text-align:center}
+/* ---------- 촬영 중 셔터 고정 (147번) — 높이는 '지금 보이는 화면'(dvh, vh 폴백) · 프리뷰만 줄고 셔터는 그대로 ---------- */
+html,body{height:100%}
+#app{min-height:100vh;min-height:100dvh;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.capacts{flex-shrink:0}
+body.live{overflow:hidden;overscroll-behavior:none}
+body.live #app{height:100vh;height:100dvh;min-height:0;max-height:100dvh;
+  display:flex;flex-direction:column;overflow:hidden;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+body.live header{flex:0 0 auto}
+body.live .cap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin:10px 14px 0}
+body.live .capbox{transition:none}
+body.live .capbox.live{flex:1 1 auto;min-height:120px;height:auto}
+body.live .capacts{flex:0 0 auto;flex-shrink:0;margin-top:0}
+body.live .foot-hint{flex:0 0 auto;margin-bottom:0}
+body.live .gal,body.live #prog{display:none}
 /* ---------- 보정 중 ---------- */
 #prog{display:none;margin:12px 14px 0;border:1px solid rgba(255,107,0,.4);border-radius:14px;background:linear-gradient(180deg,#14213D,#0D1830);padding:15px 14px}
 #prog.on{display:block}
@@ -764,7 +779,7 @@ $('#btnLive').addEventListener('click', async ()=>{
   try{
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:2560}}, audio:false});
     const v=$('#vid'); v.srcObject=stream; await v.play();
-    $('#capbox').classList.add('live');
+    $('#capbox').classList.add('live'); document.body.classList.add('live');
     $('#btnLive').innerHTML='<span class="led"></span>실시간 끄기';
     startAutoCapture();
   }catch(e){
@@ -772,6 +787,7 @@ $('#btnLive').addEventListener('click', async ()=>{
   }
 });
 function stopLive(){
+  document.body.classList.remove('live');
   if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
   $('#capbox').classList.remove('live'); $('#btnLive').innerHTML='<span class="led"></span>실시간 카메라';
