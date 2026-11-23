@@ -1,0 +1,42 @@
+{
+  "v": "20261123a",
+  "note": "실사 사진 위에 고른 자재만 얹기 위한 영역 좌표. 좌표는 사진 원본 픽셀(1200×900) 기준이고 [x,y] 순서다. 선은 사람이 눈으로 잰 시작값이므로, 390 실측 캡처에서 벽·바닥 경계와 어긋나면 이 파일 값만 고쳐 맞춘다(코드는 이 파일을 읽는다).",
+  "photos": {
+    "living": {
+      "file": "img/ba_living.jpg",
+      "label": "거실",
+      "order": 1,
+      "wall":  [[170,195],[905,195],[905,660],[170,660]],
+      "floor": [[0,668],[1200,668],[1200,900],[0,900]],
+      "wallNote": "정면 벽. 왼쪽 세로 모서리 x≈170, 오른쪽 복도 입구 x≈905, 상단 몰딩 아래 y≈195, 걸레받이 위 y≈660"
+    },
+    "room": {
+      "file": "img/ba_room.jpg",
+      "label": "원룸",
+      "order": 2,
+      "wall":  [[282,178],[958,172],[958,688],[282,688]],
+      "floor": [[0,690],[1200,690],[1200,900],[0,900]],
+      "wallNote": "왼쪽 문틀 오른쪽 x≈282, 오른쪽 창벽 모서리 x≈958"
+    },
+    "shop": {
+      "file": "img/ba_shop.jpg",
+      "label": "매장",
+      "order": 3,
+      "wall":  [[290,250],[948,250],[948,690],[290,690]],
+      "floor": [[0,695],[1200,695],[1200,900],[0,900]],
+      "wallNote": "왼쪽 기둥 오른쪽 x≈290, 오른쪽 모서리 x≈948, 상단 덕트 아래 y≈250"
+    }
+  },
+  "materials": [
+    {"id":"denbar",    "nm":"덴바보드", "img":"img/mat_denbar.jpg",    "zone":"wall", "bundle":["걸레받이"]},
+    {"id":"marble",    "nm":"대리석",   "img":"img/mat_marble.jpg",    "zone":"wall", "bundle":[]},
+    {"id":"wallpaper", "nm":"도배",     "img":"img/mat_wallpaper.jpg", "zone":"wall", "bundle":["몰딩"]},
+    {"id":"tile",      "nm":"타일",     "img":"img/mat_tile.jpg",      "zone":"wall", "bundle":["줄눈"]},
+    {"id":"floor",     "nm":"강마루",   "img":"img/mat_floor.jpg",     "zone":"floor","bundle":["걸레받이"]}
+  ],
+  "layout": {
+    "space": "living",
+    "before": {"file":"img/living_setA.jpg", "label":"배치 전 (소파 왼쪽)"},
+    "after":  {"file":"img/living_setB.jpg", "label":"배치 후 (소파 오른쪽 · 식탁 왼쪽)"}
+  }
+}
