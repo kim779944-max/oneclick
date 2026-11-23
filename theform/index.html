@@ -78,6 +78,25 @@ main{padding:12px 14px 120px}
 .delbox{position:absolute;z-index:6;font-family:inherit;font-size:11px;font-weight:900;color:#fff;background:#EF4444;
   border:0;border-radius:6px;padding:4px 9px;box-shadow:0 4px 10px rgba(0,0,0,.35);cursor:pointer;letter-spacing:-.2px}
 .delbox:active{transform:scale(.96)}
+/* 146번 — 1클릭 자동 빈칸 · ✕ · 다음 칸 · 프리셋 */
+.tools.autow{flex-wrap:wrap}
+.tools button.auto{flex:1 1 100%;min-height:40px;font-size:12.5px;font-weight:900;color:#FFC08A;border-color:rgba(255,107,0,.55);background:rgba(255,107,0,.12)}
+.tools button.auto:disabled{opacity:.6}
+.fld .xauto{position:absolute;right:-2px;top:-14px;width:22px;height:22px;border-radius:50%;background:#DC2626;color:#fff;font-size:12px;font-weight:900;border:2px solid #fff;display:flex;align-items:center;justify-content:center;z-index:3;padding:0;line-height:1;font-family:inherit}
+.fld .xauto::before{content:'';position:absolute;left:-8px;top:-8px;width:34px;height:34px}
+#autoBar{display:none;align-items:center;gap:8px;margin-top:6px;font-size:11.5px;font-weight:800;color:#FFC08A;line-height:1.45}
+#autoBar span{flex:1}#autoBar button{flex:none;font-size:11.5px;font-weight:900;color:#FFC9C9;border:1px solid rgba(239,68,68,.55);background:rgba(239,68,68,.14);border-radius:8px;padding:9px 10px;min-height:36px}
+.psbox{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.psbox .psrow{display:flex;gap:6px;align-items:center;margin-top:6px}.psbox .psrow input{flex:1;min-width:0}
+.psbox .psrow button,.psi button{flex:none;font-size:12px;font-weight:900;border-radius:9px;padding:9px 11px;min-height:40px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
+.psbox .psrow button{color:var(--on-amber);background:var(--amber2);border-color:var(--amber2)}
+.psi{display:flex;gap:6px;align-items:center;margin-top:6px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:#0B1729}
+.psi .pn{flex:1;min-width:0;font-size:12.5px;font-weight:900;color:#E6EDF7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.psi .pn small{display:block;font-size:10.5px;font-weight:700;color:var(--gray)}
+.nfrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:center;margin-top:10px}
+.nfrow button{min-height:44px;font-size:12.5px;font-weight:900;border-radius:10px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
+.nfrow #nfNext{color:var(--on-amber);background:var(--amber2);border-color:var(--amber2)}
+.nfrow #nfPos{text-align:center;font-size:13px;font-weight:900;color:#FFC08A}
+#valList input,#valList textarea{scroll-margin-top:88px}
 .microw{display:flex;gap:7px;margin-top:8px}.microw>*{flex:1}
 #voiceBtn.on{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
 #fillInfo{font-size:10.5px;color:var(--gray);margin-top:6px;line-height:1.55}
@@ -177,12 +196,13 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  <div class="card">
   <h2><span class="n">2</span>채울 자리 찍기</h2>
   <p class="sub" id="s2tip">미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.</p>
-  <div class="tools">
-   <button class="pl" id="addF" title="칸 추가">+</button><button class="pl txt" id="delF" title="칸 삭제">칸 삭제</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
+  <div class="tools autow">
+   <button class="auto" id="autoF" type="button">⚡ 1클릭 자동 빈칸</button><button class="pl" id="addF" title="칸 추가">+</button><button class="pl txt" id="delF" title="칸 삭제">칸 삭제</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
   </div>
   <div class="tools"><button id="ezBtn" title="그림·로고·도장 자리를 지웁니다">🖼 그림·도장 지우기</button></div>
   <p class="kv" id="ezTip">그림·로고·도장이 있는 자리를 눌러 <b style="color:#FFC08A">흰색으로 지우고</b>, 그 자리에 글자를 넣고 싶으면 [글자 칸으로]를 누르세요.</p>
   <div class="stage" id="edStage"></div>
+  <div id="autoBar"><span>자동으로 <b id="autoN">0</b>칸을 찾았습니다 · 틀린 칸은 ✕로 지우세요</span><button type="button" id="autoClr">모두 지우기</button></div>
   <div id="fEdit" style="display:none">
    <div class="row" id="ezConvRow" style="display:none;margin-top:0"><button class="btn pri sm" id="ezConv">🅰 이 자리에 글자 칸 만들기</button></div>
    <label class="lb">이름표<em>예: 성명 · 금액 · 날짜</em></label>
@@ -191,6 +211,11 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
    <div class="seg" id="fType"><button data-v="text">일반 글자</button><button data-v="sign">서명</button></div>
   </div>
   <p class="kv" id="fCount"></p>
+  <div class="psbox">
+   <label class="lb" style="margin-top:0">💾 이 배치를 내 양식 프리셋으로<em>칸 자리만 저장 · 값은 저장 안 함</em></label>
+   <div class="psrow"><input id="psName" maxlength="30" placeholder="이름 예: 우리 거래명세서"><button type="button" id="psSave">저장</button></div>
+   <div id="psList"></div>
+  </div>
  </div>
  <div class="card">
   <h2><span class="n">+</span>AI로 빈칸 자동 찾기 <small style="font-size:10.5px;color:var(--gray);font-weight:700">(내 제미나이 무료 열쇠 필요)</small></h2>
@@ -213,6 +238,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
   <input type="file" id="handIn" accept="image/*" hidden>
   <input type="file" id="photoIn2" accept="image/*" hidden>
   <div id="fillInfo">사진 자동 채우기: AI 열쇠가 있으면 정확하게, 없으면 기기 안 무료 글자 인식으로 읽습니다.</div>
+  <div class="nfrow" id="nfRow"><button type="button" id="nfPrev">◀ 이전 칸</button><div id="nfPos">- / -</div><button type="button" id="nfNext">다음 칸 ▶</button></div>
   <div id="valList"></div>
   <div class="row"><button class="btn sec sm" id="clearVals">값 모두 지우기</button><button class="btn sec sm" id="sampleVals">예시 값 넣기</button></div>
  </div>
@@ -1920,7 +1946,7 @@ function drawEditor(){
   CUR.fields.forEach((f, i) => {
     const d = document.createElement('div'); d.className = 'fld' + (i === SEL ? ' sel' : '') + ((f.type === 'erase' || f.erase) ? ' ez' : ''); d.dataset.i = i;
     d.style.cssText = `left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%`;
-    d.innerHTML = (ro() && !f._add ? '' : `<span>${escH(f.type === 'erase' ? '지운 자리' : f.label + ' · ' + TYPE_NM[f.type])}</span>`) + '<i class="hd2"></i>';
+    d.innerHTML = (ro() && !f._add ? '' : `<span>${escH(f.type === 'erase' ? '지운 자리' : f.label + ' · ' + TYPE_NM[f.type])}</span>`) + '<i class="hd2"></i>' + (f._auto && !ro() ? `<button type="button" class="xauto" data-x="${i}" title="이 칸 지우기">✕</button>` : '');
     st.appendChild(d);
   });
   /* 잘못 만든 칸을 누르면 박스 바로 위에 [삭제] 버튼이 즉시 뜬다 */
@@ -1940,7 +1966,8 @@ function drawEditor(){
   $('#fEdit').style.display = f ? 'block' : 'none';
   $('#ezConvRow').style.display = (f && f.type === 'erase') ? 'flex' : 'none';
   if (f){ $('#fLabel').value = f.label; $$('#fType button').forEach(b => b.classList.toggle('on', b.dataset.v === (f.type === 'sign' ? 'sign' : 'text'))); $('#fLabel').disabled = ro() && !f._add; }
-  $('#fCount').textContent = `빈칸 ${CUR.fields.filter(x => x.type !== 'erase').length}개 · 지운 자리 ${CUR.fields.filter(x => x.type === 'erase').length}곳 · 되돌리기 ${UNDO.length}단계 저장됨` + (ro() ? ' · 기본 양식은 보기 전용' : '');
+  $('#fCount').textContent = `빈칸 ${CUR.fields.filter(x => x.type !== 'erase').length}개 · 지운 자리 ${CUR.fields.filter(x => x.type === 'erase').length}곳 · 되돌리기 ${UNDO.length}단계 저장됨` + (CUR.fields.some(x => x._auto) ? ` · 자동 ${CUR.fields.filter(x => x._auto).length}칸` : '') + ` · 프리셋 ${myPresets().length}개` + (ro() ? ' · 기본 양식은 보기 전용' : '');
+  updAutoBar(); renderPresets();
   $('#s2tip').textContent = ro() ? '기본 양식입니다. 칸 위치를 바꾸려면 목록에서 [복제]한 뒤 고치세요. 그림·도장은 [🖼 그림·도장 지우기]로 바로 지울 수 있습니다.'
     : '미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.';
   $('#formName').value = CUR.name || '';
@@ -1951,6 +1978,11 @@ const TYPE_NM = {text:'일반 글자', sign:'서명', number:'일반 글자', da
   const st = $('#edStage'); let drag = null;
   const pct = e => { const r = st.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
   st.addEventListener('pointerdown', e => {
+    const xa = e.target.closest('.xauto');
+    if (xa){                         /* 자동 칸 ✕ — 한 번에 지운다(드래그 시작 안 함) */
+      const i = +xa.dataset.x; if (!CUR.fields[i] || !CUR.fields[i]._auto) return;
+      e.preventDefault(); snap(); CUR.fields.splice(i, 1); SEL = -1; drawEditor(); toast('칸을 지웠습니다'); return;
+    }
     const delb = e.target.closest('.delbox');
     if (delb){                       /* 박스 위 [삭제] 버튼 — 그 칸만 지운다 */
       const i = +delb.dataset.del; const fi = CUR.fields[i];
@@ -2003,6 +2035,214 @@ $('#fLabel').addEventListener('change', () => { const f = CUR.fields[SEL]; if (f
 $("#formName").addEventListener("input", e => { if (CUR && !ro()) CUR.name = e.target.value; });
 $("#fType").onclick = e => { const b = e.target.closest('button'); const f = CUR.fields[SEL]; if (!b || !f || ro()) return; snap(); f.type = b.dataset.v; saveAddF(); drawEditor(); };
 
+/* ---------- ⚡ 1클릭 자동 빈칸 (적립 146번) — 캔버스 픽셀 분석만 · 외부 요청 0 ----------
+   조명 정규화 → 잉크 마스크 → 가로·세로 괘선 → (가) 밑줄 위 빈칸 · (나) 표 빈 칸 · (다) 글자 칸 안 넓은 여백 → 겹침 정리 */
+const AUTO_CFG = {ink:170, lineInk:215, hRun:40, vRun:20, lineT:4, ulInk:.025, cellInk:.015};
+function autoDetectFields(){
+  const t0 = performance.now();
+  const W0 = bgW(), H0 = bgH(), SW = Math.min(1000, W0), SH = Math.round(SW * H0 / W0), N = SW * SH, sc = SW / 1000;
+  const cv = document.createElement('canvas'); cv.width = SW; cv.height = SH;
+  const g = cv.getContext('2d', {willReadFrequently:true}); g.fillStyle = '#fff'; g.fillRect(0, 0, SW, SH); g.drawImage(BG, 0, 0, SW, SH);
+  const px = g.getImageData(0, 0, SW, SH).data, L = new Float32Array(N);
+  for (let i = 0, j = 0; i < N; i++, j += 4) L[i] = .299 * px[j] + .587 * px[j + 1] + .114 * px[j + 2];
+  /* 1) 조명 정규화 — 블록별 80퍼센타일 = 종이 밝기 → 3×3 평균 → 선형 보간 */
+  const BS = Math.max(16, Math.round(Math.min(SW, SH) / 12)), bx = Math.ceil(SW / BS), by = Math.ceil(SH / BS), blk = new Float32Array(bx * by), hist = new Uint32Array(256);
+  for (let j = 0; j < by; j++) for (let i = 0; i < bx; i++){
+    hist.fill(0); let n = 0;
+    for (let y = j * BS; y < Math.min(SH, (j + 1) * BS); y += 2) for (let x = i * BS; x < Math.min(SW, (i + 1) * BS); x += 2){ hist[L[y * SW + x] | 0]++; n++; }
+    let k = 0, c = 0; const need = n * .8; while (k < 255 && c + hist[k] < need) c += hist[k++];
+    blk[j * bx + i] = k;
+  }
+  const blk2 = new Float32Array(bx * by);
+  for (let j = 0; j < by; j++) for (let i = 0; i < bx; i++){ let s = 0, n = 0;
+    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++){ const a = i + di, b = j + dj; if (a >= 0 && b >= 0 && a < bx && b < by){ s += blk[b * bx + a]; n++; } }
+    blk2[j * bx + i] = s / n; }
+  const ink = new Uint8Array(N), L2 = new Float32Array(N);
+  for (let y = 0; y < SH; y++){
+    const fy = Math.max(0, Math.min(by - 1, (y + .5) / BS - .5)), y0 = Math.floor(fy), y1 = Math.min(by - 1, y0 + 1), ty = fy - y0;
+    for (let x = 0; x < SW; x++){
+      const fx = Math.max(0, Math.min(bx - 1, (x + .5) / BS - .5)), x0 = Math.floor(fx), x1 = Math.min(bx - 1, x0 + 1), tx = fx - x0;
+      const m = (blk2[y0 * bx + x0] * (1 - tx) + blk2[y0 * bx + x1] * tx) * (1 - ty) + (blk2[y1 * bx + x0] * (1 - tx) + blk2[y1 * bx + x1] * tx) * ty;
+      const i = y * SW + x; L2[i] = Math.min(255, L[i] * 235 / Math.max(20, m)); if (L2[i] < AUTO_CFG.ink) ink[i] = 1;
+    }
+  }
+  /* 적분 영상 — 사각형 안 잉크 수를 바로 잰다 */
+  const II = new Uint32Array((SW + 1) * (SH + 1));
+  for (let y = 0; y < SH; y++){ let r = 0; for (let x = 0; x < SW; x++){ r += ink[y * SW + x]; II[(y + 1) * (SW + 1) + x + 1] = II[y * (SW + 1) + x + 1] + r; } }
+  const inkIn = (x0, y0, x1, y1) => (x1 < x0 || y1 < y0) ? 0 : II[(y1 + 1) * (SW + 1) + x1 + 1] - II[y0 * (SW + 1) + x1 + 1] - II[(y1 + 1) * (SW + 1) + x0] + II[y0 * (SW + 1) + x0];
+  /* 2) 괘선 — 연속 run(점선은 짧은 틈 허용)을 이웃 줄과 묶어 두께 1~lineT 만 선으로(더 두꺼우면 글씨·도장) */
+  const lineT = Math.max(AUTO_CFG.lineT, Math.round(AUTO_CFG.lineT * sc));
+  /* 괘선용 마스크 — 옅은 회색 선도 잡도록 '양옆 3px 보다 확실히 어두운 능선'(L2<lineInk)만. 넓은 색 칠한 칸은 능선이 아니라 빠진다 */
+  const ridge = (horiz) => { const M = new Uint8Array(N), d = horiz ? 3 * SW : 3;
+    for (let y = 3; y < SH - 3; y++) for (let x = 3; x < SW - 3; x++){ const i = y * SW + x, v = L2[i];
+      if (ink[i] || (v < AUTO_CFG.lineInk && Math.min(L2[i - d], L2[i + d]) - v > 22)) M[i] = 1; }
+    return M; };
+  const HM = ridge(true), VM = ridge(false);
+  function lines(horiz, minRun, gapTol, MK){
+    const A = horiz ? SH : SW, B = horiz ? SW : SH;
+    const out = []; let act = [];
+    for (let a = 0; a < A; a++){
+      const runs = []; let s = -1, e = -1, cnt = 0;
+      for (let b = 0; b <= B; b++){ const v = b < B && (horiz ? MK[a * SW + b] : MK[b * SW + a]);
+        if (v){ if (s < 0){ s = b; cnt = 0; } e = b; cnt++; }
+        else if (s >= 0 && (b >= B || b - e > gapTol)){ if (e - s + 1 >= minRun && cnt / (e - s + 1) >= .18) runs.push([s, e, cnt]); s = -1; } }
+      const nx = [];
+      runs.forEach(([s0, s1, c]) => {
+        const k = act.findIndex(q => q.a1 === a - 1 && Math.min(q.b1, s1) - Math.max(q.b0, s0) > .5 * Math.min(q.b1 - q.b0, s1 - s0));
+        if (k >= 0){ const q = act.splice(k, 1)[0]; q.a1 = a; q.b0 = Math.min(q.b0, s0); q.b1 = Math.max(q.b1, s1); q.c += c; nx.push(q); }
+        else nx.push({a0:a, a1:a, b0:s0, b1:s1, c});
+      });
+      act.forEach(q => out.push(q)); act = nx;
+    }
+    act.forEach(q => out.push(q));
+    return out.filter(q => q.a1 - q.a0 + 1 <= lineT).map(q => ({a:Math.round((q.a0 + q.a1) / 2), a0:q.a0, a1:q.a1, b0:q.b0, b1:q.b1, d:q.c / ((q.b1 - q.b0 + 1) * (q.a1 - q.a0 + 1))}));
+  }
+  const tol = Math.max(3, Math.round(3 * sc)), m = Math.max(2, Math.round(2 * sc));
+  const HL = lines(true, Math.round(AUTO_CFG.hRun * sc), 0, HM), VL = lines(false, Math.round(AUTO_CFG.vRun * sc), 0, VM);   /* HL: a=y, b=x · VL: a=x, b=y */
+  /* 점선(특약사항 줄 등) — 6px 이하 틈을 이어 붙여 폭 30% 이상, 실선과 겹치지 않는 것 */
+  const DL = lines(true, Math.round(.3 * SW), Math.round(6 * sc), HM).filter(d => d.d < .85 && !HL.some(h => Math.abs(h.a - d.a) <= tol && Math.min(h.b1, d.b1) - Math.max(h.b0, d.b0) > .5 * (d.b1 - d.b0)));
+  const cand = [];
+  const minW = .035 * SW, minH = .012 * SH, hMax = Math.round(.045 * SH), ulH = Math.round(.028 * SH), gapW = .05 * SW;
+  const push = (x0, y0, x1, y1, k) => { if (x1 - x0 >= .03 * SW && y1 - y0 >= minH) cand.push({x0, y0, x1, y1, k}); };
+  /* (다) 글자가 있는 칸 안의 넓은 빈 구간 — 양옆에 글자가 있는 빈 열 구간(gapW 이상)만. 글자 한 자씩 띄운 머리글('주   소')은 뺀다 */
+  function gaps(x0, y0, x1, y1, Y0, Y1){
+    const segs = []; let s = x0, cur = inkIn(x0, y0, x0, y1) === 0;
+    for (let x = x0 + 1; x <= x1 + 1; x++){
+      const e = x <= x1 && inkIn(x, y0, x, y1) === 0;
+      if (x > x1 || e !== cur){ segs.push({e:cur, a:s, b:x - 1}); s = x; cur = e; }
+    }
+    const big = segs.filter(q => q.e && q.b - q.a + 1 >= gapW);
+    const blocks = []; let bs = null;   /* 큰 빈 구간으로 나뉜 글자 덩어리 */
+    segs.forEach(q => { if (q.e && q.b - q.a + 1 >= gapW){ if (bs) blocks.push(bs); bs = null; } else if (!q.e){ bs = bs ? {a:bs.a, b:q.b} : {a:q.a, b:q.b}; } });
+    if (bs) blocks.push(bs);
+    if (blocks.length >= 2 && blocks.every(q => q.b - q.a < .035 * SW)) return;   /* '주   소'·'위  임  장'처럼 글자를 띄운 머리글 */
+    big.forEach(q => { if (q.a > x0 && q.b < x1) push(q.a + 2, Y0, q.b - 2, Y1, 'gap'); });
+  }
+  /* (나) 표 칸 — 괘선 마스크로 막힌 빈 영역을 이어 칠하기(병합 칸·긴 칸도 그대로 잡힌다) */
+  const mask = new Uint8Array(N);
+  const fillM = (x0, y0, x1, y1) => { x0 = Math.max(0, x0); y0 = Math.max(0, y0); x1 = Math.min(SW - 1, x1); y1 = Math.min(SH - 1, y1); for (let y = y0; y <= y1; y++) mask.fill(1, y * SW + x0, y * SW + x1 + 1); };
+  HL.forEach(h => fillM(h.b0 - tol, h.a0 - 1, h.b1 + tol, h.a1 + 1));
+  VL.forEach(v => fillM(v.a0 - 1, v.b0 - tol, v.a1 + 1, v.b1 + tol));
+  const lab = new Int32Array(N), stk = new Int32Array(N), comp = [0]; let cid = 0;
+  for (let p0 = 0; p0 < N; p0++){
+    if (mask[p0] || lab[p0]) continue;
+    let sp = 0, cnt = 0, edge = false, X0 = SW, Y0 = SH, X1 = 0, Y1 = 0; stk[sp++] = p0; lab[p0] = ++cid;
+    while (sp){ const p = stk[--sp], x = p % SW, y = (p - x) / SW; cnt++;
+      if (x < X0) X0 = x; if (x > X1) X1 = x; if (y < Y0) Y0 = y; if (y > Y1) Y1 = y;
+      if (x === 0 || y === 0 || x === SW - 1 || y === SH - 1){ edge = true; }
+      if (x > 0 && !mask[p - 1] && !lab[p - 1]){ lab[p - 1] = cid; stk[sp++] = p - 1; }
+      if (x < SW - 1 && !mask[p + 1] && !lab[p + 1]){ lab[p + 1] = cid; stk[sp++] = p + 1; }
+      if (y > 0 && !mask[p - SW] && !lab[p - SW]){ lab[p - SW] = cid; stk[sp++] = p - SW; }
+      if (y < SH - 1 && !mask[p + SW] && !lab[p + SW]){ lab[p + SW] = cid; stk[sp++] = p + SW; } }
+    const w = X1 - X0 + 1, h = Y1 - Y0 + 1;
+    comp[cid] = !edge && cnt / (w * h) >= .8;   /* 괘선으로 막힌 네모 칸인가 */
+    if (edge || w < minW || h < minH || h > .25 * SH || w * h > .3 * N || cnt / (w * h) < .8) continue;
+    const cx0 = X0 + m, cx1 = X1 - m, cy0 = Y0 + m, cy1 = Y1 - m, area = (cx1 - cx0 + 1) * (cy1 - cy0 + 1); if (area <= 0) continue;
+    if (inkIn(cx0, cy0, cx1, cy1) / area < AUTO_CFG.cellInk) push(X0, Y0, X1, Y1, 'cell');
+    else gaps(cx0, cy0, cx1, cy1, Y0, Y1);
+  }
+  /* (가) 밑줄·점선 위 빈칸 — 표 괘선(세로선과 만나는 선)은 빼고, 위로 첫 잉크까지(한 줄 높이 이내) */
+  HL.concat(DL).forEach(h => {
+    const y = h.a0, a = h.b0, b = h.b1;
+    if (b - a < minW || b - a > .9 * SW) return;
+    if (VL.some(v => v.a >= a - tol && v.a <= b + tol && v.b0 <= h.a1 + tol && v.b1 >= y - tol)) return;
+    /* 표 테두리 조각인가 — 선 바로 위·아래가 서로 다른 칸(아래나 위가 네모 칸)이면 테두리다. 칸 안 밑줄은 위아래가 같은 칸 */
+    let border = 0, probe = 0;
+    for (let t = 1; t <= 3; t++){ const x = Math.round(a + (b - a) * t / 4), yu = h.a0 - 2, yd = h.a1 + 2; if (yu < 3 || yd >= SH - 3) continue;
+      let u = 0, d = 0; for (let k = 0; k < 3 && !u; k++) u = lab[(yu - k) * SW + x]; for (let k = 0; k < 3 && !d; k++) d = lab[(yd + k) * SW + x];
+      if (!u || !d) continue; probe++; if (u !== d && (comp[u] || comp[d])) border++; }
+    if (probe && border * 2 >= probe) return;
+    let top = y - hMax;
+    for (let yy = y - 2; yy >= Math.max(0, y - hMax); yy--){ if (inkIn(a + m, yy, b - m, yy) >= 2){ top = yy + 1; break; } }
+    top = Math.max(0, top, y - ulH);
+    const area = (b - a + 1) * (y - top);
+    if (area > 0 && inkIn(a, top, b, y - 1) / area < AUTO_CFG.ulInk) push(a, top, b, y - 1, h.d < .85 ? 'dot' : 'line');
+  });
+  /* 3) 겹침 정리(IoU>.45 합침 · 넓은 쪽 유지) · 기존 칸과 IoU>.3 이면 버림 · % 변환 · 최대 200칸 */
+  const iou = (p, q) => { const ix = Math.max(0, Math.min(p.x + p.w, q.x + q.w) - Math.max(p.x, q.x)), iy = Math.max(0, Math.min(p.y + p.h, q.y + q.h) - Math.max(p.y, q.y)), I = ix * iy; return I / (p.w * p.h + q.w * q.h - I || 1); };
+  const r2 = v => Math.round(v * 100) / 100;
+  const P = cand.map(c => ({x:r2(c.x0 / SW * 100), y:r2(c.y0 / SH * 100), w:r2((c.x1 - c.x0) / SW * 100), h:r2((c.y1 - c.y0) / SH * 100), k:c.k}))
+    .filter(f => f.w >= 3 && f.h >= 1.2).sort((p, q) => q.w * q.h - p.w * p.h);
+  const keep = [];
+  P.forEach(f => { if (!keep.some(q => iou(f, q) > .45)) keep.push(f); });
+  const old = CUR.fields.slice();
+  const fin = keep.filter(f => !old.some(o => iou(f, o) > .3)).sort((p, q) => (Math.abs(p.y - q.y) < 1 ? p.x - q.x : p.y - q.y)).slice(0, 200);
+  const ms = Math.round(performance.now() - t0);
+  return {fields:fin, ms, SW, SH, nH:HL.length, nV:VL.length, kinds:fin.reduce((o, f) => (o[f.k] = (o[f.k] || 0) + 1, o), {})};
+}
+function runAutoDetect(){
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  if (ro()) return toast('기본 양식은 이미 빈칸이 잡혀 있습니다 · 내 양식에서 쓰세요');
+  if (!BG || BG instanceof HTMLCanvasElement) return toast('사진으로 등록한 양식에서 씁니다');
+  const b = $('#autoF'); b.disabled = true; b.textContent = '자동으로 찾는 중…';
+  setTimeout(() => {
+    let r = null;
+    try{ r = autoDetectFields(); }catch(e){ toast('자동으로 찾지 못했습니다'); }
+    b.disabled = false; b.textContent = '⚡ 1클릭 자동 빈칸';
+    if (!r) return;
+    window.TF_AUTO_LAST = {ms:r.ms, n:r.fields.length, SW:r.SW, SH:r.SH, nH:r.nH, nV:r.nV, kinds:r.kinds};
+    if (!r.fields.length){ drawEditor(); return toast('찾은 빈칸이 없습니다 · 빈 곳을 눌러 손으로 찍어 주세요'); }
+    snap();
+    let n = CUR.fields.filter(f => f.type !== 'erase').length;
+    r.fields.forEach(f => CUR.fields.push({id:uid(), label:'칸' + (++n), type:'text', x:f.x, y:f.y, w:f.w, h:f.h, _auto:1}));
+    SEL = -1; drawEditor();
+    toast(`자동으로 ${r.fields.length}칸을 찾았습니다 · 틀린 칸은 ✕로 지우세요`);
+  }, 30);
+}
+function updAutoBar(){
+  const bar = $('#autoBar'); if (!bar) return;
+  const n = CUR ? CUR.fields.filter(f => f._auto).length : 0;
+  bar.style.display = n ? 'flex' : 'none';
+  $('#autoN').textContent = n;
+}
+$('#autoF').onclick = runAutoDetect;
+$('#autoClr').onclick = () => {
+  if (!CUR || !CUR.fields.some(f => f._auto)) return;
+  snap(); CUR.fields = CUR.fields.filter(f => !f._auto); SEL = -1; drawEditor(); toast('자동으로 찾은 칸을 모두 지웠습니다 · [되돌리기]로 복구');
+};
+
+/* ---------- 💾 내 양식 프리셋 — 칸 배치만 저장(값·서명 0건) · tf_presets_v1 · 최대 12개 ---------- */
+const LS_PRESET = 'tf_presets_v1';
+const myPresets = () => lsGet(LS_PRESET, []);
+function renderPresets(){
+  const box = $('#psList'); if (!box) return;
+  const a = myPresets();
+  box.innerHTML = a.length ? a.map((p, i) => `<div class="psi"><div class="pn">${escH(p.name)}<small>${p.n}칸 · 저장 ${escH(String(p.at || '').slice(0, 10))}</small></div><button type="button" data-pload="${i}">불러오기</button><button type="button" data-pdel="${i}">지우기</button></div>`).join('')
+    : '<p class="kv" style="margin:6px 0 0">저장한 프리셋이 없습니다. 칸을 다 찍은 뒤 이름을 적고 [저장]을 누르세요.</p>';
+}
+function savePreset(){
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  if (ro()) return toast('기본 양식은 [복제] 후 쓰세요');
+  /* 지운 자리(erase·_add)는 종이마다 다르므로 빼고, 자동 칸도 손님이 남긴 것이면 배치로 저장한다 */
+  const fs = CUR.fields.filter(f => !f._add && f.type !== 'erase').map(f => ({label:f.label, type:f.type, x:f.x, y:f.y, w:f.w, h:f.h}));
+  if (!fs.length) return toast('저장할 칸이 없습니다 · 칸을 먼저 찍어 주세요');
+  const name = $('#psName').value.trim(); if (!name){ $('#psName').focus(); return toast('프리셋 이름을 적어 주세요'); }
+  let a = myPresets(); const k = a.findIndex(p => p.name === name);
+  if (k >= 0){ if (!confirm('같은 이름이 있습니다. 덮어쓸까요?')) return; a.splice(k, 1); }
+  a.unshift({id:uid(), name, n:fs.length, w:bgW(), h:bgH(), at:new Date().toISOString().slice(0, 10), fields:fs});
+  if (a.length > 12) a = a.slice(0, 12);
+  if (!lsSet(LS_PRESET, a)) return;
+  $('#psName').value = ''; renderPresets(); drawEditor(); toast(`프리셋 "${name}" 저장 · ${fs.length}칸`);
+}
+function loadPreset(i){
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  if (ro()) return toast('기본 양식은 [복제] 후 쓰세요');
+  const p = myPresets()[i]; if (!p) return;
+  const r0 = p.w / p.h, r1 = bgW() / bgH();
+  if (Math.abs(r1 - r0) / r0 > .08 && !confirm('종이 비율이 조금 다릅니다. 그래도 이 배치를 얹을까요?')) return;
+  const n = CUR.fields.length;
+  if (n && !confirm(`지금 칸 ${n}개를 프리셋 배치(${p.fields.length}개)로 바꿉니다. 되돌리기 1번이면 원래대로 돌아옵니다.`)) return;
+  snap(); CUR.fields = p.fields.map(f => Object.assign({id:uid()}, f)); SEL = -1; drawEditor();
+  toast(`프리셋 배치를 얹었습니다 · ${p.fields.length}칸`);
+}
+$('#psSave').onclick = savePreset;
+$('#psList').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.pload != null) loadPreset(+b.dataset.pload);
+  else if (b.dataset.pdel != null){ if (!confirm('이 프리셋을 지울까요?')) return; const a = myPresets(); a.splice(+b.dataset.pdel, 1); lsSet(LS_PRESET, a); renderPresets(); if (CUR) drawEditor(); }
+};
+
+
 async function saveCurrent(){
   if (ro()) return true;
   const name = $('#formName').value.trim();
@@ -2040,6 +2280,7 @@ function renderInputs(){
   }).join('');
   $('#valList').innerHTML = h;
   $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
+  updNavPos(-1);
 }
 $('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) LAST_INPUT = e.target; });
 $('#valList').addEventListener('input', e => {
@@ -2049,6 +2290,49 @@ $('#valList').addEventListener('input', e => {
 });
 $('#valList').addEventListener('change', e => { const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i]; if (f.type === 'number') e.target.value = fmtNum(VALS[f.label]); });
 $('#valList').addEventListener('click', e => { const b = e.target.closest('[data-sigclr]'); if (!b) return; const f = CUR.fields[+b.dataset.sigclr]; delete VALS[f.label]; saveVals(); renderInputs(); });
+/* ---------- 다음 칸 연속 입력 (적립 146번) — 배열 순서 · 지운 자리·서명·자동 계산 칸은 건너뜀 ---------- */
+function navIdx(){
+  if (!CUR) return [];
+  return CUR.fields.map((f, i) => i).filter(i => { const f = CUR.fields[i];
+    return f.type !== 'erase' && f.type !== 'sign' && !(CUR.calc && CUR.calc[f.label]) && $(`#valList [data-f="${i}"]`); });
+}
+function navEl(i){ return $(`#valList [data-f="${i}"]`); }
+function navFocus(i){
+  const el = navEl(i); if (!el) return;
+  el.focus({preventScroll:true});
+  try{ if (el.value && el.select) el.select(); }catch(e){}
+  el.scrollIntoView({block:'center', behavior:'smooth'});
+  updNavPos(i);
+}
+function updNavPos(i){
+  const L = navIdx(), k = L.indexOf(i), el = $('#nfPos'); if (!el) return;
+  el.textContent = (k >= 0 ? k + 1 : '-') + ' / ' + (L.length || '-');
+}
+function nextField(i){
+  const L = navIdx(), nx = L.find(k => k > i);
+  if (nx == null){ toast('마지막 칸입니다 · [미리보기]로 넘어가세요'); const nb = $('#nextBtn'); if (nb){ nb.focus(); nb.scrollIntoView({block:'center', behavior:'smooth'}); } return; }
+  navFocus(nx);
+}
+function prevField(i){
+  const L = navIdx(); let pv = null; L.forEach(k => { if (k < i) pv = k; });
+  if (pv == null) return toast('첫 칸입니다');
+  navFocus(pv);
+}
+const navCur = () => { const a = document.activeElement; if (a && a.closest && a.closest('#valList') && a.dataset.f != null) return +a.dataset.f;
+  return (LAST_INPUT && LAST_INPUT.isConnected && LAST_INPUT.dataset.f != null) ? +LAST_INPUT.dataset.f : -1; };
+$('#valList').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.isComposing || e.keyCode === 229) return;        /* 한글 조합 중 Enter = 글자 확정 → 이동하지 않는다 */
+  const i = e.target.dataset.f; if (i == null) return;
+  if (e.target.tagName === 'TEXTAREA') return;            /* 여러 줄 칸은 줄바꿈 그대로 */
+  e.preventDefault();
+  nextField(+i);
+});
+$('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) updNavPos(+e.target.dataset.f); });
+/* 버튼을 눌러도 입력칸 포커스(모바일 자판)가 빠지지 않게 pointerdown 기본 동작을 막는다 */
+['#nfPrev', '#nfNext'].forEach(s => $(s).addEventListener('pointerdown', e => e.preventDefault()));
+$('#nfNext').onclick = () => { const c = navCur(); if (c < 0){ const L = navIdx(); if (L.length) navFocus(L[0]); return; } nextField(c); };
+$('#nfPrev').onclick = () => { const c = navCur(); if (c < 0){ const L = navIdx(); if (L.length) navFocus(L[0]); return; } prevField(c); };
 function runCalc(changed){
   if (!CUR.calc) return;
   for (let pass = 0; pass < 3; pass++) Object.keys(CUR.calc).forEach(k => {
@@ -2526,7 +2810,8 @@ $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGe
 
 /* 시험·설명서용 손잡이 */
 window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, onPhoto, addField, addErase, undo, redo, saveCurrent, myForms, BUILT, mapRecord, personFamily, fieldKind, personOptions,
-  get CUR(){ return CUR; }, get VALS(){ return VALS; }, set VALS(v){ VALS = v; }, get SEL(){ return SEL; }, set SEL(v){ SEL = v; }, get UNDO(){ return UNDO; }, drawEditor, runCalc, saveVals, renderInputs};
+  get CUR(){ return CUR; }, get VALS(){ return VALS; }, set VALS(v){ VALS = v; }, get SEL(){ return SEL; }, set SEL(v){ SEL = v; }, get UNDO(){ return UNDO; }, drawEditor, runCalc, saveVals, renderInputs,
+  autoDetectFields, runAutoDetect, nextField, prevField, navIdx, savePreset, loadPreset, myPresets, get BG(){ return BG; }, set BG(v){ BG = v; }, set CUR(v){ CUR = v; }};
 updKey(); go(1);
 </script>
 
