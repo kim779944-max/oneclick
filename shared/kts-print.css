@@ -13,7 +13,7 @@
   body *{color:#111827!important;background-color:transparent!important;background-image:none!important;
     box-shadow:none!important;text-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  header,footer,.k-hd,.k-noprint,.k-hd .k-theme,.k-theme{display:none!important}
+  header,footer,.k-hd,.k-noprint,.k-hd .k-theme,.k-theme,.k-theme2{display:none!important}
   .k-card,.k-tbl tr{break-inside:avoid;page-break-inside:avoid}
   .k-card{border-color:#9ca3af!important}
   .wrap,#app{max-width:none!important}

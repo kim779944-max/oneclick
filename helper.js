@@ -221,9 +221,11 @@
     'padding:0;margin:0;line-height:1;-webkit-tap-highlight-color:transparent;transition:bottom .15s,left .15s,right .15s,opacity .15s;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}' +
     /* 159번: 38px 아이콘 · 누르거나 끌 때만 불투명 · 끌어서 아무 데나(좌/우 가장자리 스냅) */
     '#kts-helper-btn:active,#kts-helper-btn.kh-drag{opacity:1;cursor:grabbing}#kts-helper-btn.kh-drag{transition:none;box-shadow:0 8px 22px rgba(255,107,0,.45),0 2px 8px rgba(0,0,0,.4)}' +
-    /* 133번: 오른쪽 아래는 카드 [열기]/[+] 자리 → 390(≤719px)은 왼쪽 아래, 넓은 화면은 본문 바깥 왼쪽 여백 */
-    '@media (max-width:719px){#kts-helper-btn{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:38px;height:38px}}' +
-    '@media (min-width:720px){#kts-helper-btn{left:max(10px,calc(50% - 300px));right:auto}}' +
+    /* 159 보완(11-24): 왼쪽 아래는 가격표·[저장]·표 마지막 행을 덮음 → 기본 자리 = 오른쪽 가장자리 · 세로 38% (하단 고정 바와 안 겹침) */
+    '@media (max-width:719px){#kts-helper-btn{left:auto;right:8px;top:38%;bottom:auto;width:38px;height:38px}}' +
+    '@media (min-width:720px){#kts-helper-btn{left:auto;right:max(12px,calc(50% - 300px));top:38%;bottom:auto}}' +
+    /* 스크롤 0.8초 이상 · 입력 중이면 흐리게(.35) — 손대면 1 */
+    '#kts-helper-btn.kh-dim{opacity:.35}' +
     '#kts-helper-btn b{font-size:16px;font-weight:900;line-height:1;pointer-events:none}' +
     '#kts-helper-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
     '#kts-helper{position:fixed;inset:0;z-index:250;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.66);' +
@@ -280,8 +282,12 @@
     };
     d.body.appendChild(btn);
     bindDrag();
+    bindDim();
+    autoTop.until = Date.now() + 4000;                     /* 늦게 그려지는 본문(소개 접힘 3초 등)까지 보고 고정 */
     place();
-    w.addEventListener('resize', place);
+    setTimeout(place, 3700);
+    var lastW = w.innerWidth;                              /* 주소창이 접히는 세로 리사이즈에는 다시 고르지 않음(회전·폭 변화만) */
+    w.addEventListener('resize', function () { if (w.innerWidth !== lastW) { lastW = w.innerWidth; autoTop.v = null; } place(); });
     w.addEventListener('scroll', function () { if (!place._r) { place._r = 1; requestAnimationFrame(function () { place._r = 0; place(); }); } }, { passive: true });
     setInterval(place, 2000);                              /* 늦게 붙는 하단 바(ux.js·slots.js) 대응 — 계산만, 요청 없음 */
   }
@@ -379,14 +385,79 @@
     if (drag.on) return;
     var saved = loadPos();
     if (saved) { applyPos(saved); btn.setAttribute('data-bar', 'user'); return; }   /* 사용자가 정한 자리 — 자동 회피 중지 */
-    var prev = btn.style.bottom;
-    btn.style.transition = 'none'; btn.style.bottom = '';   /* CSS 기본 자리(390: 왼쪽 아래 10px+안전영역)부터 */
-    var cssB = parseFloat(w.getComputedStyle(btn).bottom) || 14;
-    btn.style.bottom = prev; btn.style.transition = '';
-    var bar = bottomBarHeight(), b = bar ? Math.max(cssB, bar + 10) : cssB, tt = totopTop(b);
-    if (tt) b = Math.max(b, tt + 10);
-    btn.style.bottom = (b !== cssB) ? b + 'px' : '';
-    btn.setAttribute('data-bar', String(bar));
+    /* 159 보완(11-24): 기본 자리 = 오른쪽 가장자리. 세로는 38%를 먼저 보되, 첫 화면의 버튼·입력·표를 가장 덜 가리는
+       높이(30~75%)를 화면이 뜰 때 한 번 골라 고정한다(스크롤 중에는 움직이지 않음 · 하단 고정 바 위로만) */
+    var s = btn.style; s.left = ''; s.right = ''; s.bottom = '';
+    btn.removeAttribute('data-pos');
+    if (autoTop.v === null || (Date.now() < autoTop.until && (w.scrollY || 0) < 4)) { autoTop.v = pickTop(); autoTop.cur = autoTop.v; }
+    var t = autoTop.cur === null ? autoTop.v : autoTop.cur;
+    s.top = t === null ? '' : t + 'px';
+    btn.setAttribute('data-bar', 'mid');
+  }
+  var autoTop = { v: null, cur: null, until: 0 }, TOP_PREF = [38, 30, 45, 55, 65, 75];
+  var HIT_SEL = 'button,input,textarea,select,table,a[href],[role="button"],.acts';
+  var KEY_RE = /저장|인쇄|결제|PDF|내보내기|보내기|구매/;
+  function hitRects(onlyKey) {
+    var H = w.innerHeight, br = btn.getBoundingClientRect(), rects = [];
+    [].slice.call(d.querySelectorAll(HIT_SEL)).forEach(function (e) {
+      if (e === btn || (root && root.contains(e))) return;
+      var r = e.getBoundingClientRect();
+      if (!r.width || !r.height || r.bottom < 0 || r.top > H || r.right <= br.left || r.left >= br.right) return;
+      var cs = w.getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none') return;
+      if (onlyKey && !KEY_RE.test((e.textContent || e.value || '') + ' ' + (e.getAttribute('aria-label') || ''))) return;
+      rects.push(r);
+    });
+    return rects;
+  }
+  function areaAt(t, rects) {
+    var bh = btn.offsetHeight || 38, br = btn.getBoundingClientRect(), a = 0;
+    rects.forEach(function (r) {
+      var x = Math.min(br.right, r.right) - Math.max(br.left, r.left), y = Math.min(t + bh, r.bottom) - Math.max(t, r.top);
+      if (x > 0 && y > 0) a += x * y;
+    });
+    return a;
+  }
+  function pickTop(avoidKey) {
+    var H = w.innerHeight, bh = btn.offsetHeight || 38, floor = H - bottomBarHeight() - bh - 8;
+    var rects = hitRects(false), keys = avoidKey ? hitRects(true) : [];
+    var best = null, bestA = Infinity;
+    TOP_PREF.forEach(function (p) {
+      var t = Math.round(H * p / 100); if (t > floor) return;
+      if (avoidKey && areaAt(t, keys) > 0) return;
+      var a = areaAt(t, rects);
+      if (a < bestA) { bestA = a; best = t; }
+    });
+    btn.setAttribute('data-hit', String(Math.round(bestA === Infinity ? -1 : bestA)));
+    return best;
+  }
+  /* 스크롤이 멈췄을 때 [저장]·[인쇄]·결제류 버튼 위에 있으면 비어 있는 높이로 잠깐 비켜 섬(그 외에는 원래 자리) */
+  function dodge() {
+    if (!btn || drag.on || loadPos() || autoTop.v === null) return;
+    var keys = hitRects(true), t = autoTop.v;
+    if (areaAt(t, keys) > 0) { var alt = pickTop(true); if (alt !== null) t = alt; }
+    autoTop.cur = t; btn.style.top = t + 'px';
+    btn.setAttribute('data-dodge', t === autoTop.v ? '0' : '1');
+  }
+  /* 159 보완: 스크롤이 0.8초 넘게 이어지거나 입력칸에 포커스가 있으면 흐리게 — 버튼에 손대면 바로 1 */
+  var dimS = { t0: 0, end: 0, focus: false };
+  function setDim() {
+    if (!btn) return;
+    var on = dimS.focus || (dimS.t0 && Date.now() - dimS.t0 >= 800);
+    btn.classList.toggle('kh-dim', !!on && !drag.on);
+  }
+  function bindDim() {
+    w.addEventListener('scroll', function () {
+      if (!dimS.t0) dimS.t0 = Date.now();
+      clearTimeout(dimS.end);
+      dimS.end = setTimeout(function () { dimS.t0 = 0; setDim(); dodge(); }, 600);
+      setDim();
+    }, { passive: true });
+    d.addEventListener('focusin', function (e) {
+      var t = e.target; if (!t || (root && root.contains(t))) return;
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) { dimS.focus = true; setDim(); }
+    });
+    d.addEventListener('focusout', function () { dimS.focus = false; setTimeout(setDim, 0); });
+    btn.addEventListener('pointerdown', function () { dimS.t0 = 0; dimS.focus = false; btn.classList.remove('kh-dim'); });
   }
 
   function buildPanel() {
@@ -505,7 +576,56 @@
   function close() { if (root) root.classList.remove('on'); }
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root && root.classList.contains('on')) close(); });
 
-  w.KTS_HELPER = { v: '20261123a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY };
+  w.KTS_HELPER = { v: '20261124a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY };
 
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', build); else build();
+})(window, document);
+
+/* ==========================================================================
+   171보강 ② 도구 상단 이름·소개 — 처음 1회만 펼침 (2026-11-24)
+   대상: [data-kts-intro="<tool>"] 가 붙은 기존 제목 블록 하나(새 버튼 자리를 만들지 않는다 · 178-4)
+   · 저장값 localStorage['kts_tool_intro_seen_<tool>'] 없음 → 펼친 채 시작, 3초 뒤 또는 첫 스크롤에 접힘 + 저장
+   · 저장값 있음 → 접힌 채 시작(제목 1줄 + [?], 높이 44px 이하) · 누르면 다시 펼침/접힘(저장값은 그대로)
+   ========================================================================== */
+(function (w, d) {
+  'use strict';
+  function init() {
+    var el = d.querySelector('[data-kts-intro]'); if (!el || el.getAttribute('data-kts-intro-on')) return;
+    el.setAttribute('data-kts-intro-on', '1');
+    var tool = el.getAttribute('data-kts-intro') || 'tool', KEY = 'kts_tool_intro_seen_' + tool;
+    var st = d.createElement('style');
+    st.textContent =
+      '[data-kts-intro] .kts-intro-bar{display:none}' +
+      '[data-kts-intro].kts-intro-c{padding-top:0!important;padding-bottom:0!important;cursor:pointer}' +
+      '[data-kts-intro].kts-intro-c>*:not(.kts-intro-bar){display:none!important}' +
+      '[data-kts-intro].kts-intro-c .kts-intro-bar{display:flex;align-items:center;gap:8px;height:42px;max-height:42px}' +
+      '.kts-intro-bar span{flex:1;min-width:0;font-size:14px;font-weight:900;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      '.kts-intro-bar button{flex:0 0 auto;width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,162,77,.6);background:rgba(255,107,0,.12);color:#FFA24D;font-family:inherit;font-size:14px;font-weight:900;line-height:1;cursor:pointer}' +
+      '@media print{[data-kts-intro]{display:none!important}}';
+    d.head.appendChild(st);
+    var h = el.querySelector('h1,h2'), t = h ? (h.innerText || h.textContent || '').replace(/\s*\n\s*/g, ' ').trim() : '';
+    var bar = d.createElement('div'); bar.className = 'kts-intro-bar';
+    bar.innerHTML = '<span></span><button type="button" aria-label="소개 펼치기">?</button>';
+    bar.firstChild.textContent = t;
+    el.appendChild(bar);
+    function set(c) { el.classList.toggle('kts-intro-c', c); el.setAttribute('aria-expanded', c ? 'false' : 'true'); }
+    el.addEventListener('click', function (e) {
+      if (el.classList.contains('kts-intro-c')) { set(false); return; }
+      if (e.target.closest && e.target.closest('a,button,input,select,textarea,label')) return;   /* 펼친 상태의 원래 버튼·링크는 그대로 */
+      set(true);
+    });
+    var seen = false; try { seen = !!w.localStorage.getItem(KEY); } catch (e) { }
+    if (seen) { set(true); return; }
+    set(false);
+    var done = false;
+    function fold() {
+      if (done) return; done = true;
+      try { w.localStorage.setItem(KEY, '1'); } catch (e) { }
+      w.removeEventListener('scroll', fold);
+      set(true);
+    }
+    setTimeout(fold, 3000);
+    w.addEventListener('scroll', fold, { passive: true });
+  }
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();
 })(window, document);

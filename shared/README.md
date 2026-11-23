@@ -25,5 +25,10 @@
 | `kts-ui.css` | `.k-hd` `.k-theme` `.k-nb` `.k-card` `.k-badge` `.k-btn` `.k-btn.ghost` `.k-tog` `.k-tbl` `.k-foot` |
 | `kts-print.css` | `@media print` — 흰 배경·검은 글씨 강제, `header/footer/.k-noprint/.k-theme` 숨김, `.k-card{break-inside:avoid}` |
 | `kts-ui.js` | `window.KTSUI = {theme(), setTheme(t), toggle()}` · `beforeprint`/`afterprint` → `html.kts-printing` |
+| `kts-edge.js` (11-24) | `window.KTSEdge = {open(list,opts), close(), get(), set(arr), reset(), apply(list), sheet(title,html)}` — 내 메뉴 편집(엣지 패널 320px · ⠿끌기·▲▼·[빼기]·[+ 추가하기]·되돌리기) · `localStorage['kts_my_menu_v1']` · `[?]` 바텀시트 |
 
 글꼴은 시스템 폰트(`--k-font`) — 웹폰트(2MB)를 내려받지 않는다. 390px 화면에서 10.5px 미만 글자 금지.
+
+### 색깔 1 · 색깔 2 (11-24 · 179)
+
+`<span class="k-theme2" role="group"><button type="button" data-kts-theme-set="dark">색깔1</button><button type="button" data-kts-theme-set="light">색깔2</button></span>` — `kts-ui.js` 가 고른 쪽에 `aria-pressed="true"` 를 채운다. 저장 키는 그대로 `kts_theme`(dark|light). 인쇄 때 숨김. 예전 `.k-theme` 단일 토글도 계속 동작한다.

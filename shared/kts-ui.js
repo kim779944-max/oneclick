@@ -4,6 +4,7 @@
    ② 인쇄: beforeprint → html.kts-printing / afterprint → 해제
    ③ window.KTSUI = { theme(), setTheme(t), toggle() }
    토글 버튼: [data-kts-theme-toggle] 또는 .k-theme 를 자동으로 연결
+   색깔 1·2 (179): .k-theme2 > button[data-kts-theme-set="dark|light"] — 누르면 그 벌로, 고른 쪽 aria-pressed="true"
    ========================================================================== */
 (function (w, d) {
   'use strict';
@@ -22,6 +23,11 @@
       b.setAttribute('aria-pressed', light ? 'true' : 'false');
       b.setAttribute('aria-label', light ? '어둡게 보기' : '밝게 보기');
       b.setAttribute('title', light ? '어둡게 보기' : '밝게 보기');
+    });
+    /* 179: 색깔 1(다크) / 색깔 2(라이트) 두 버튼 — [data-kts-theme-set="dark|light"] */
+    Array.prototype.forEach.call(d.querySelectorAll('[data-kts-theme-set]'), function (b) {
+      var v = b.getAttribute('data-kts-theme-set') === 'light' ? 'light' : 'dark';
+      b.setAttribute('aria-pressed', v === t ? 'true' : 'false');
     });
     var m = d.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', light ? '#ffffff' : '#0b132b');
@@ -45,6 +51,8 @@
   function bind() {
     paint();
     d.addEventListener('click', function (e) {
+      var s = e.target && e.target.closest ? e.target.closest('[data-kts-theme-set]') : null;
+      if (s) { e.preventDefault(); setTheme(s.getAttribute('data-kts-theme-set')); return; }
       var b = e.target && e.target.closest ? e.target.closest('[data-kts-theme-toggle],.k-theme') : null;
       if (!b) return;
       e.preventDefault();
