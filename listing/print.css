@@ -1,0 +1,94 @@
+/* ==========================================================================
+   매물장 — A4 판형·인쇄 규칙 (index.html · build.html 공용) · 140번
+   A4 210×297mm · 여백 10mm 고정 → 인쇄 영역 190×277mm
+   한 장 높이 고정(min-height 277mm) · 위(top)·중(mid)·하(bot) 앵커
+   내용이 적어도 위로 끌어올리지 않는다 — 남는 높이는 .sheet-mid 가 받는다
+   본문 축약 금지 · 넘칠 때만 2장(층 7개 초과) · 잘림 0(break-inside:avoid)
+   ========================================================================== */
+@page{size:A4 portrait;margin:10mm}
+
+.sheet{display:flex;flex-direction:column;box-sizing:border-box}
+.sheet-top{flex:0 0 auto}
+.sheet-mid{flex:1 1 auto}
+.sheet-bot{flex:0 0 auto;margin-top:auto}
+.print-only{display:none}
+
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff!important;color:#111827!important;width:auto!important;margin:0!important;padding:0!important;font-size:8.6pt}
+  body *{color:#1f2937!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-color:#9ca3af!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  nav,.bar,.btns,.fab,.toolbtns,.chat,.thumb,.noprint,.toast,dialog{display:none!important}
+  .print-only{display:block!important}
+
+  /* 판형: 폭 190mm · 높이 277mm 고정 */
+  .sheet{width:190mm!important;max-width:none!important;min-height:277mm;height:auto;margin:0!important;padding:0!important;
+    display:flex!important;flex-direction:column;box-shadow:none;border:0}
+  .sheet,.block,table,tr,.point,.card{break-inside:avoid;page-break-inside:avoid}
+  .sheet-top{flex:0 0 auto;display:flex;flex-direction:column;padding:0!important}
+  .sheet-mid{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;gap:2.5mm;padding:2mm 0!important}
+  .sheet-bot{flex:0 0 auto;margin-top:auto;padding:0!important;display:block!important}
+
+  /* ── 상단(26 + 46 + 24mm) ── */
+  .phead{order:0;display:flex!important;align-items:center;justify-content:space-between;height:6mm;border-bottom:.3mm solid #111827!important;font-size:8pt}
+  .phead b{font-size:9.5pt;color:#111827!important}
+  .titleblk{order:1;height:20mm;padding:1.5mm 0 0!important;margin:0!important;display:grid!important;grid-template-columns:1fr auto;grid-template-rows:auto auto auto;column-gap:6mm;align-content:start}
+  .titleblk .chips{grid-column:1;margin:0 0 .8mm!important}
+  .titleblk h1{grid-column:1;font-size:17pt!important;line-height:1.15!important;margin:0!important;color:#000!important;letter-spacing:-.4pt}
+  .titleblk .addr{grid-column:1;font-size:8.6pt!important;margin:.8mm 0 0!important}
+  .titleblk .pricebox{grid-column:2;grid-row:1/4;text-align:right;align-self:center}
+  .titleblk .price{font-size:19pt!important;color:#000!important}
+  .chip{border:.25mm solid #6b7280!important;padding:.2mm 1.6mm!important;font-size:7.5pt!important;border-radius:1mm!important}
+  .chip.deal{background:#111827!important;color:#fff!important}
+  .hero{display:none!important}
+  .strip{order:2;display:flex!important;gap:2mm;height:46mm;margin:0 0 2mm}
+  .strip img{flex:1 1 0;min-width:0;height:46mm;object-fit:cover;border-radius:1.2mm;display:block}
+  .stats{order:3;height:22mm;display:grid!important;grid-template-columns:repeat(3,1fr);gap:2.5mm!important;margin:0!important}
+  .stat{padding:2mm 3mm!important;border:.25mm solid #9ca3af!important;border-radius:1.5mm!important;display:flex;flex-direction:column;justify-content:center}
+  .stat .lbl{font-size:7.8pt!important}
+  .stat strong{font-size:16pt!important;color:#000!important;margin:.3mm 0!important;line-height:1.1!important}
+  .stat .note{font-size:6.8pt!important;line-height:1.25!important;color:#4b5563!important}
+  .warn{order:4;margin:1.5mm 0 0!important;padding:.6mm 2mm!important;font-size:7.4pt!important;line-height:1.3!important;align-items:center!important;border:.25mm solid #b45309!important;border-radius:1mm!important}
+  .warn,.warn *{color:#92400e!important}
+  .warn svg{width:3.4mm!important;height:3.4mm!important;margin:0!important}
+
+  /* ── 중단(42 + 42 + 30mm) ── */
+  .panel{padding:0!important;border:0!important;border-radius:0!important;margin:0!important}
+  .sectitle{margin:0 0 1mm!important;gap:1.5mm!important;break-after:avoid;page-break-after:avoid}
+  .sectitle h2{font-size:10pt!important;color:#000!important;margin:0!important}
+  .sectitle svg{width:3.6mm!important;height:3.6mm!important}
+  .tag{font-size:6.8pt!important;border:.25mm solid #9ca3af!important;padding:0 1.2mm!important}
+  table{font-size:8.2pt!important}
+  td,th{padding:0 1.6mm!important;height:4.5mm;line-height:4.5mm}
+  tr{border-bottom:.2mm solid #d1d5db!important}
+  .spec th,.spec td{font-size:8.2pt!important;padding:0 1.6mm!important;line-height:4.5mm!important}
+  .spec th{width:30mm!important;color:#4b5563!important;font-weight:500}
+  .spec td{color:#000!important;font-weight:600}
+  thead{display:table-header-group}
+  tfoot{display:table-footer-group}
+  thead tr{background:#eef0f3!important}
+  tfoot td{font-weight:700;color:#000!important}
+  .unk{color:#6b7280!important}
+  .point{padding:.7mm 0!important;gap:2.5mm!important}
+  .point i{width:5.5mm!important;height:5.5mm!important;border:.25mm solid #9ca3af!important;border-radius:1.2mm!important}
+  .point i svg{width:3.6mm!important;height:3.6mm!important}
+  .point b{font-size:8.8pt;line-height:1.25}
+  .point p{font-size:7.6pt!important;margin:0!important;line-height:1.25!important}
+
+  /* ── 하단(18 + 10mm) — 명함은 반드시 인쇄 ── */
+  .card.broker{padding:2mm 3mm!important;border:.35mm solid #111827!important;border-radius:1.5mm!important;margin:0 0 1.5mm!important;
+    display:grid!important;grid-template-columns:1fr 1fr;column-gap:4mm;min-height:18mm;align-content:center}
+  .broker .bname{font-size:11pt!important;color:#000!important}
+  .broker .bline{font-size:8pt!important;margin:.4mm 0 0!important}
+  .broker .bbtns{display:none!important}
+  .footnote{font-size:7pt!important;line-height:1.35!important;padding:0!important;margin:0!important;min-height:9mm;color:#4b5563!important}
+
+  /* 층 7개 초과 매물만 2장 — 8번째 행 앞에서 넘기고 표 머리 반복 */
+  .sheet.multi{display:block!important;min-height:0;break-inside:auto;page-break-inside:auto}
+  .sheet.multi .sheet-mid,.sheet.multi .leases{break-inside:auto;page-break-inside:auto}
+  .sheet.multi .sheet-mid{display:block}
+  .sheet.multi .sheet-mid>*{margin-bottom:3mm!important}
+  .leases table{break-inside:auto;page-break-inside:auto}
+  tr.pgbrk{break-after:page;page-break-after:always}
+}

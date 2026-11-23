@@ -1,0 +1,329 @@
+{
+ "v": "20261123b",
+ "unit": "만원",
+ "note": "예시 매물입니다(가상 데이터). 금액 단위는 만원.",
+ "listings": [
+  {
+   "id": "BN-2048",
+   "title": "세아빌딩",
+   "deal": "매매",
+   "type": "근린생활시설",
+   "address": "서울 성동구 성수동2가 148-86 (2필지)",
+   "lat": 37.5446,
+   "lng": 127.0559,
+   "price": {
+    "sale": 450000,
+    "appraisal": 520000,
+    "loanAmount": 275000,
+    "loanRate": 4.2,
+    "deposit": 15000,
+    "rent": 1050,
+    "realInvest": 137000,
+    "yield": 8.6,
+    "note": "감정가 52억 · 거래 45억"
+   },
+   "gross": 1775,
+   "site": 297,
+   "floors": "지상 5층 · 옥상",
+   "moveIn": "협의",
+   "facts": {
+    "zone": "일반상업지역(2종)",
+    "built": "2017-09",
+    "site": "297㎡",
+    "gross": "1,775㎡",
+    "structure": "철근콘크리트",
+    "use": "제2종 근린생활시설",
+    "lift": 1,
+    "parking": 2,
+    "landPrice": "13,928,528",
+    "landPriceUnit": "원/㎡",
+    "power": "—",
+    "behind": "대선형·한도업원빌딩·교보증권·KCC"
+   },
+   "leases": [
+    {
+     "room": "101",
+     "use": "편의점",
+     "deposit": 5000,
+     "rent": 350
+    },
+    {
+     "room": "201",
+     "use": "뷰티",
+     "deposit": 3000,
+     "rent": 200
+    },
+    {
+     "room": "301",
+     "use": "오피스",
+     "deposit": 3000,
+     "rent": 200
+    },
+    {
+     "room": "401",
+     "use": "스튜디오",
+     "deposit": 2000,
+     "rent": 150
+    },
+    {
+     "room": "501",
+     "use": "오피스",
+     "deposit": 2000,
+     "rent": 150
+    },
+    {
+     "room": "옥상",
+     "use": "공용 테라스",
+     "deposit": null,
+     "rent": null
+    }
+   ],
+   "points": [
+    {
+     "icon": "train",
+     "t": "성수역 도보권 · 성수 핵심 상권",
+     "s": "2호선 역세권 · 오피스와 리테일 수요가 함께 있는 입지"
+    },
+    {
+     "icon": "shield",
+     "t": "101~501호 전 층 임대 중",
+     "s": "월세 합계 1,050만 원 · 옥상은 공용 테라스"
+    }
+   ],
+   "photos": [
+    "img/seongsu.jpg",
+    "img/ex2.jpg",
+    "img/ex3.jpg",
+    "img/ex4.jpg"
+   ],
+   "private": false,
+   "broker": {
+    "name": "홍길동",
+    "office": "세아 공인중개사사무소",
+    "title": "공인중개사",
+    "regno": "제00000-0000호",
+    "phone": "010-0000-0000",
+    "email": "example@example.com",
+    "address": "서울 성동구 성수동2가",
+    "note": "가상 예시 중개사입니다(실제 인물·번호 아님)."
+   }
+  },
+  {
+   "id": "BN-2051",
+   "title": "성수 코너상가",
+   "deal": "매매",
+   "type": "근린생활시설",
+   "address": "서울 성동구 성수동1가 (예시)",
+   "lat": null,
+   "lng": null,
+   "price": {
+    "sale": 320000,
+    "appraisal": 300000,
+    "loanAmount": 120000,
+    "loanRate": null,
+    "deposit": 14000,
+    "rent": 890,
+    "realInvest": null,
+    "yield": 5.7,
+    "note": "감정가 30억 · 거래 32억"
+   },
+   "gross": 2140,
+   "site": 412,
+   "floors": "지상 4층",
+   "moveIn": "즉시",
+   "facts": {
+    "zone": "제2종일반주거지역",
+    "built": "2009-03",
+    "site": "412㎡",
+    "gross": "2,140㎡",
+    "structure": "철근콘크리트",
+    "use": "제1·2종 근린생활시설",
+    "lift": 1,
+    "parking": 6,
+    "landPrice": null,
+    "power": null,
+    "behind": null
+   },
+   "leases": [
+    {
+     "room": "101",
+     "use": "카페",
+     "deposit": 4000,
+     "rent": 250
+    },
+    {
+     "room": "102",
+     "use": "약국",
+     "deposit": 3000,
+     "rent": 220
+    },
+    {
+     "room": "201",
+     "use": "학원",
+     "deposit": 3000,
+     "rent": 180
+    },
+    {
+     "room": "301",
+     "use": "사무실",
+     "deposit": 2000,
+     "rent": 120
+    },
+    {
+     "room": "401",
+     "use": "사무실",
+     "deposit": 2000,
+     "rent": 120
+    }
+   ],
+   "points": [
+    {
+     "icon": "pin",
+     "t": "대로변 코너 자리",
+     "s": "두 방향 도로에 접한 1층 상가 노출"
+    },
+    {
+     "icon": "shield",
+     "t": "5개 호실 임대 중",
+     "s": "카페·약국·학원 등 생활 업종 구성"
+    }
+   ],
+   "photos": [
+    "img/ex3.jpg",
+    "img/ex4.jpg"
+   ],
+   "private": false,
+   "broker": {
+    "name": "홍길동",
+    "office": "세아 공인중개사사무소",
+    "title": "공인중개사",
+    "regno": "제00000-0000호",
+    "phone": "010-0000-0000",
+    "email": "example@example.com",
+    "address": "서울 성동구 성수동2가",
+    "note": "가상 예시 중개사입니다(실제 인물·번호 아님)."
+   }
+  },
+  {
+   "id": "BN-2055",
+   "title": "을지로 사무빌딩",
+   "deal": "매매",
+   "type": "업무시설",
+   "address": "서울 중구 을지로3가 (예시)",
+   "lat": null,
+   "lng": null,
+   "price": {
+    "sale": 680000,
+    "appraisal": 720000,
+    "loanAmount": 400000,
+    "loanRate": 4.5,
+    "deposit": 33000,
+    "rent": 2010,
+    "realInvest": null,
+    "yield": null,
+    "note": "감정가 72억 · 거래 68억"
+   },
+   "gross": 2980,
+   "site": 356,
+   "floors": "지하 1층 · 지상 8층",
+   "moveIn": "협의",
+   "facts": {
+    "zone": "일반상업지역",
+    "built": "1998-06",
+    "site": "356㎡",
+    "gross": "2,980㎡",
+    "structure": "철근콘크리트",
+    "use": "업무시설",
+    "lift": 2,
+    "parking": 8,
+    "landPrice": null,
+    "power": null,
+    "behind": "을지로3가역 · 인쇄·조명 골목"
+   },
+   "leases": [
+    {
+     "room": "B01",
+     "use": "창고",
+     "deposit": 2000,
+     "rent": 90
+    },
+    {
+     "room": "101",
+     "use": "식당",
+     "deposit": 6000,
+     "rent": 380
+    },
+    {
+     "room": "201",
+     "use": "사무실",
+     "deposit": 3000,
+     "rent": 200
+    },
+    {
+     "room": "301",
+     "use": "사무실",
+     "deposit": 3000,
+     "rent": 200
+    },
+    {
+     "room": "401",
+     "use": "사무실",
+     "deposit": 3000,
+     "rent": 200
+    },
+    {
+     "room": "501",
+     "use": "디자인 스튜디오",
+     "deposit": 4000,
+     "rent": 230
+    },
+    {
+     "room": "601",
+     "use": "사무실",
+     "deposit": 4000,
+     "rent": 230
+    },
+    {
+     "room": "701",
+     "use": "사무실",
+     "deposit": 4000,
+     "rent": 240
+    },
+    {
+     "room": "801",
+     "use": "사무실",
+     "deposit": 4000,
+     "rent": 240
+    }
+   ],
+   "points": [
+    {
+     "icon": "train",
+     "t": "을지로3가역 도보권",
+     "s": "2·3호선 환승역 배후 업무 수요"
+    },
+    {
+     "icon": "shield",
+     "t": "9개 층 임대 중",
+     "s": "지하 창고부터 8층 사무실까지 임대"
+    }
+   ],
+   "photos": [
+    "img/seongsu.jpg",
+    "img/ex2.jpg",
+    "img/ex3.jpg"
+   ],
+   "private": true,
+   "broker": {
+    "name": "홍길동",
+    "office": "세아 공인중개사사무소",
+    "title": "공인중개사",
+    "regno": "제00000-0000호",
+    "phone": "010-0000-0000",
+    "email": "example@example.com",
+    "address": "서울 성동구 성수동2가",
+    "note": "가상 예시 중개사입니다(실제 인물·번호 아님)."
+   }
+  }
+ ]
+}

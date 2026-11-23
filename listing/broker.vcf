@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:홍;길동;;;
+FN:홍길동
+ORG:세아 공인중개사사무소
+TITLE:공인중개사
+TEL;TYPE=CELL:010-0000-0000
+EMAIL:example@example.com
+ADR:;;서울 성동구 성수동2가;;;;
+NOTE:등록번호 제00000-0000호 (가상 예시 중개사)
+END:VCARD

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ko" data-kts-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>매물장 만들기 — 케이티에스 원클릭</title>
+<meta name="description" content="매물 정보와 사진 2~4장을 넣으면 매물장 HTML 1개와 A4 한 장 인쇄본이 만들어집니다. 서버 전송 없음.">
+<meta name="theme-color" content="#0b132b">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="../shared/kts-tokens.css">
+<link rel="stylesheet" href="../shared/kts-ui.css">
+<style>
+:root{--bg:var(--k-bg);--panel:var(--k-panel);--line:var(--k-line);--muted:var(--k-ink-2);--accent:#ff6b00;--ink:var(--k-ink);--p3:#19253d;--b2:#39455f;--hd:#0c152b}
+html[data-kts-theme="light"]{--p3:#f6f7f9;--b2:#d3d9e3;--hd:#ffffff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--k-font);word-break:keep-all}
+button,a{font:inherit;cursor:pointer;color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid #ff994b;outline-offset:3px}
+h1,h2,p{margin:0}
+.bar{position:sticky;top:0;z-index:5;height:48px;display:flex;align-items:center;gap:8px;padding:0 6px 0 14px;background:var(--hd);border-bottom:1px solid var(--line)}
+.bar b{font-size:15px}.bar .sp{flex:1}.bar .k-theme{width:44px;height:44px;min-height:44px}
+.brandicon{height:20px;display:flex;align-items:flex-end;gap:2px}
+.brandicon i{width:5px;background:var(--accent);height:12px;transform:skewY(-16deg);border-radius:1px}
+.brandicon i:nth-child(2){height:17px}.brandicon i:nth-child(3){height:21px}
+.lay{max-width:1180px;margin:auto;padding:14px 16px 40px;display:grid;gap:18px}
+@media(min-width:900px){.lay{grid-template-columns:1fr 410px;align-items:start}.pv{position:sticky;top:60px}}
+.box{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px;margin-bottom:14px}
+.box h2{font-size:16px;margin-bottom:10px;letter-spacing:-.4px}
+.note{font-size:12.5px;color:var(--muted);line-height:1.6}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g .w{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+input,select,textarea{min-height:44px;border-radius:8px;border:1px solid var(--b2);background:var(--bg);color:var(--ink);padding:8px 10px;font:inherit;font-size:14px;width:100%}
+textarea{min-height:120px;font-size:13px;line-height:1.5;font-family:ui-monospace,Consolas,var(--k-font)}
+.ck{flex-direction:row;align-items:center;gap:8px;min-height:44px;font-size:14px;color:var(--ink)}
+.ck input{width:22px;min-height:22px;height:22px}
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--b2);border-radius:8px;background:var(--p3);font-size:14px;font-weight:650;padding:0 14px;white-space:nowrap}
+.btn.or{background:var(--accent);border-color:var(--accent);color:#171d29}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.photos div{position:relative;height:64px;border-radius:7px;overflow:hidden;border:1.5px dashed var(--b2);display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.photos img{width:100%;height:100%;object-fit:cover}
+.photos button{position:absolute;right:2px;top:2px;width:44px;height:44px;border:0;background:transparent;color:#fff;font-size:16px;text-shadow:0 0 4px #000}
+.chk{list-style:none;padding:0;margin:0;display:grid;gap:6px;font-size:13px}
+.chk li{padding:8px 10px;border-radius:8px;background:var(--p3)}
+.chk .ok{color:#4ade80}.chk .ng{color:#ffd666}.chk .na{color:var(--muted)}
+html[data-kts-theme="light"] .chk .ok{color:#15803d}html[data-kts-theme="light"] .chk .ng{color:#a16207}
+.chk b{float:right}
+iframe{width:100%;max-width:390px;height:780px;border:1px solid var(--line);border-radius:12px;background:var(--bg);display:block;margin:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;border:1px solid #ff8126;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+.toast.on{opacity:1}
+</style>
+<link rel="stylesheet" href="../shared/kts-print.css">
+<link rel="stylesheet" href="print.css">
+<script src="../shared/kts-ui.js" defer></script>
+</head>
+<body>
+<div class="bar"><span class="brandicon" aria-hidden="true"><i></i><i></i><i></i></span><b>매물장 만들기</b><span class="sp"></span><a class="btn" href="./" style="min-height:44px;font-size:13px">매물장 보기</a><button class="k-theme" type="button"></button></div>
+<main class="lay">
+  <div class="noprint">
+    <div class="box">
+      <h2>1. 시작</h2>
+      <p class="note">입력한 내용과 사진은 <b>이 브라우저 안에서만</b> 처리합니다. 서버로 보내거나 업로드하지 않습니다. 금액 단위는 <b>만원</b>입니다(45억 = 450000). 모르는 값은 비워 두면 매물장에 <b>미확인</b>으로 나옵니다.</p>
+      <div class="g" style="margin-top:10px"><label class="w">예시 매물 불러오기<select id="seed"></select></label></div>
+    </div>
+    <form id="f" autocomplete="off">
+      <div class="box"><h2>2. 매물</h2>
+        <div class="g">
+          <label>매물번호<input name="id"></label><label>제목<input name="title"></label>
+          <label>거래유형<select name="deal"><option>매매</option><option>월세</option><option>전세</option></select></label><label>종류<input name="type"></label>
+          <label class="w">주소<input name="address"></label>
+          <label>규모(층)<input name="floors"></label><label>입주<input name="moveIn" placeholder="즉시 / 협의"></label>
+          <label class="ck w"><input type="checkbox" name="private">비공개 매물(목록에서 빼고 직접 링크로만)</label>
+        </div></div>
+      <div class="box"><h2>3. 가격(만원)</h2>
+        <div class="g">
+          <label>매매가<input name="p.sale" type="number" inputmode="decimal"></label><label>감정가<input name="p.appraisal" type="number" inputmode="decimal"></label>
+          <label>승계대출<input name="p.loanAmount" type="number" inputmode="decimal"></label><label>금리(연 %)<input name="p.loanRate" type="number" step="0.01" inputmode="decimal"></label>
+          <label>보증금 합계(표기)<input name="p.deposit" type="number" inputmode="decimal"></label><label>월세 합계(표기)<input name="p.rent" type="number" step="0.1" inputmode="decimal"></label>
+          <label>실투자금(표기·선택)<input name="p.realInvest" type="number" inputmode="decimal"></label><label>표기 수익률(%·선택)<input name="p.yield" type="number" step="0.1" inputmode="decimal"></label>
+          <label class="w">가격 부제<input name="p.note" placeholder="감정가 52억 · 거래 45억"></label>
+        </div></div>
+      <div class="box"><h2>4. 제원(물건 개요 9항목)</h2>
+        <div class="g">
+          <label>용도지역<input name="f.zone"></label><label>준공(YYYY-MM)<input name="f.built"></label>
+          <label>대지<input name="f.site" placeholder="297㎡"></label><label>연면적<input name="f.gross" placeholder="1,775㎡"></label>
+          <label>구조<input name="f.structure"></label><label>용도<input name="f.use"></label>
+          <label>승강기(대)<input name="f.lift" type="number"></label><label>주차(대)<input name="f.parking" type="number"></label>
+          <label>공시지가<input name="f.landPrice"></label><label>공시지가 단위<input name="f.landPriceUnit" placeholder="원/㎡"></label>
+          <label class="w">배후 상권<input name="f.behind"></label>
+        </div></div>
+      <div class="box"><h2>5. 층별 임대차 · 투자 포인트</h2>
+        <label>층별 임대차 — 한 줄에 <b>호실,업종,보증금,월세</b> (공용은 보증금·월세 비움 · 7줄 넘으면 인쇄 2장)<textarea name="leases"></textarea></label>
+        <label style="margin-top:10px">투자 포인트 — 한 줄에 <b>제목|부제</b> (감정가 대비 줄은 숫자로 자동 생성)<textarea name="points" style="min-height:80px"></textarea></label>
+      </div>
+      <div class="box"><h2>6. 사진 2~4장</h2>
+        <p class="note">사진은 4칸 고정입니다. 2장만 넣어도 3·4칸은 빈 자리로 남고 위치가 올라오지 않습니다. 큰 사진은 긴 변 1600px로 줄여 이 파일 안에 담습니다.</p>
+        <input type="file" id="ph" accept="image/*" multiple style="margin-top:8px">
+        <div class="photos" id="phs"></div>
+      </div>
+      <div class="box"><h2>7. 명함</h2>
+        <div class="g">
+          <label>이름<input name="b.name"></label><label>직함<input name="b.title" placeholder="공인중개사"></label>
+          <label class="w">사무소<input name="b.office"></label>
+          <label>등록번호<input name="b.regno"></label><label>전화<input name="b.phone" type="tel"></label>
+          <label>이메일<input name="b.email" type="email"></label><label>주소<input name="b.address"></label>
+        </div></div>
+    </form>
+  </div>
+  <aside class="pv">
+    <div class="box noprint">
+      <h2>숫자 검증 체크리스트</h2>
+      <ol class="chk" id="chk"></ol>
+    </div>
+    <div class="acts noprint"><button class="btn or" type="button" id="save">매물장 저장(HTML 1개)</button><button class="btn" type="button" id="print">A4 인쇄</button></div>
+    <iframe id="pvf" src="index.html?preview=1" title="매물장 미리보기(390)"></iframe>
+  </aside>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+  'use strict';
+  var F = document.getElementById('f'), PV = document.getElementById('pvf'), SEEDS = [], PHOTOS = [], BASE = null;
+  function has(v) { return v !== null && v !== undefined && v !== ''; }
+  function toast(t) { var e = document.getElementById('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, 2600); }
+  function el(n) { return F.elements[n]; }
+  function nv(v) { if (!has(String(v).trim())) return null; var n = Number(String(v).replace(/,/g, '')); return isNaN(n) ? null : n; }
+  function sv(v) { v = String(v == null ? '' : v).trim(); return v ? v : null; }
+
+  function fill(l) {
+    BASE = JSON.parse(JSON.stringify(l));
+    var p = l.price || {}, f = l.facts || {}, b = l.broker || {};
+    ['id', 'title', 'deal', 'type', 'address', 'floors', 'moveIn'].forEach(function (k) { el(k).value = has(l[k]) ? l[k] : ''; });
+    el('private').checked = !!l.private;
+    ['sale', 'appraisal', 'loanAmount', 'loanRate', 'deposit', 'rent', 'realInvest', 'yield', 'note'].forEach(function (k) { el('p.' + k).value = has(p[k]) ? p[k] : ''; });
+    ['zone', 'built', 'site', 'gross', 'structure', 'use', 'lift', 'parking', 'landPrice', 'landPriceUnit', 'behind'].forEach(function (k) { el('f.' + k).value = has(f[k]) ? f[k] : ''; });
+    ['name', 'title', 'office', 'regno', 'phone', 'email', 'address'].forEach(function (k) { el('b.' + k).value = has(b[k]) ? b[k] : ''; });
+    el('leases').value = (l.leases || []).map(function (r) { return [r.room, r.use || '', has(r.deposit) ? r.deposit : '', has(r.rent) ? r.rent : ''].join(','); }).join('\n');
+    el('points').value = (l.points || []).map(function (x) { return x.t + '|' + (x.s || ''); }).join('\n');
+    PHOTOS = (l.photos || []).slice(0, 4); drawPhotos(); push();
+  }
+  function read() {
+    var l = JSON.parse(JSON.stringify(BASE || {}));
+    ['id', 'title', 'deal', 'type', 'address', 'floors', 'moveIn'].forEach(function (k) { l[k] = sv(el(k).value); });
+    l.id = l.id || 'BN-0000'; l.title = l.title || '이름 없는 매물';
+    l.private = el('private').checked;
+    l.price = l.price || {};
+    ['sale', 'appraisal', 'loanAmount', 'loanRate', 'deposit', 'rent', 'realInvest', 'yield'].forEach(function (k) { l.price[k] = nv(el('p.' + k).value); });
+    l.price.note = sv(el('p.note').value);
+    l.facts = l.facts || {};
+    ['zone', 'built', 'site', 'gross', 'structure', 'use', 'landPrice', 'landPriceUnit', 'behind'].forEach(function (k) { l.facts[k] = sv(el('f.' + k).value); });
+    l.facts.lift = nv(el('f.lift').value); l.facts.parking = nv(el('f.parking').value);
+    l.gross = l.facts.gross ? nv(l.facts.gross.replace(/[^0-9.,]/g, '')) : null;
+    l.broker = {};
+    ['name', 'title', 'office', 'regno', 'phone', 'email', 'address'].forEach(function (k) { l.broker[k] = sv(el('b.' + k).value); });
+    l.leases = el('leases').value.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean).map(function (s) { var a = s.split(/\s*,\s*/); return { room: a[0] || '', use: sv(a[1]), deposit: nv(a[2] || ''), rent: nv(a[3] || '') }; });
+    l.points = el('points').value.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean).map(function (s) { var a = s.split('|'); return { icon: 'bulb', t: a[0].trim(), s: (a[1] || '').trim() }; });
+    (BASE && BASE.points || []).forEach(function (x, i) { if (l.points[i] && x.icon) l.points[i].icon = x.icon; });
+    l.photos = PHOTOS.slice(0, 4);
+    return l;
+  }
+  function checks(l) {
+    var c = PV.contentWindow && PV.contentWindow.KTS_LISTING ? PV.contentWindow.KTS_LISTING.calc(l) : null, p = l.price || {};
+    if (!c) return [];
+    return [
+      ['층별 표 보증금 합계 = 표기 보증금', !has(p.deposit) || c.dep == null ? null : p.deposit === c.dep, c.dep != null ? c.dep.toLocaleString('ko-KR') + '만' : '—'],
+      ['층별 표 월세 합계 = 표기 월세', !has(p.rent) || c.rent == null ? null : p.rent === c.rent, c.rent != null ? c.rent.toLocaleString('ko-KR') + '만' : '—'],
+      ['계산 수익률 ↔ 표기 차이 0.3%p 이하', !has(p.yield) || c.y == null ? null : Math.abs(p.yield - c.y) <= 0.3, c.y != null ? c.y.toFixed(2) + '%' : '미확인'],
+      ['감정가 ≥ 매매가(저평가 문구 조건)', c.gap == null ? null : c.gap >= 0, c.gap != null ? c.gap.toFixed(1) + '%' : '미확인'],
+      ['금리·대출액 모두 있음 → 월 이자', c.mi != null ? true : false, c.mi != null ? (Math.round(c.mi * 10) / 10).toLocaleString('ko-KR') + '만' : '미확인']
+    ];
+  }
+  function push() {
+    var l = read();
+    try { PV.contentWindow.postMessage({ type: 'kts-listing', listing: l }, location.origin === 'null' ? '*' : location.origin); } catch (e) {}
+    var ck = checks(l);
+    document.getElementById('chk').innerHTML = ck.map(function (x) { return '<li class="' + (x[1] === true ? 'ok' : x[1] === false ? 'ng' : 'na') + '">' + (x[1] === true ? '✓ ' : x[1] === false ? '⚠ ' : '– ') + x[0] + '<b>' + x[2] + '</b></li>'; }).join('');
+  }
+  var tmr; F.addEventListener('input', function () { clearTimeout(tmr); tmr = setTimeout(push, 150); });
+  F.addEventListener('submit', function (e) { e.preventDefault(); });
+
+  function drawPhotos() {
+    var h = ''; for (var i = 0; i < 4; i++) h += PHOTOS[i] ? '<div><img src="' + PHOTOS[i].replace(/"/g, '&quot;') + '" alt=""><button type="button" data-rm="' + i + '" aria-label="사진 ' + (i + 1) + ' 빼기">✕</button></div>' : '<div>빈 칸</div>';
+    document.getElementById('phs').innerHTML = h;
+  }
+  document.getElementById('phs').addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (!b) return; PHOTOS.splice(+b.getAttribute('data-rm'), 1); drawPhotos(); push(); });
+  function shrink(src, max) {
+    return new Promise(function (ok, no) {
+      var im = new Image(); im.onload = function () {
+        var s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
+        cv.width = Math.round(im.naturalWidth * s); cv.height = Math.round(im.naturalHeight * s);
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); ok(cv.toDataURL('image/jpeg', 0.82));
+      }; im.onerror = no; im.src = src;
+    });
+  }
+  document.getElementById('ph').addEventListener('change', function () {
+    var fs = Array.prototype.slice.call(this.files || []);
+    if (PHOTOS.length + fs.length > 4) toast('사진은 4장까지 · 앞의 ' + (4 - PHOTOS.length) + '장만 넣습니다');
+    fs.slice(0, Math.max(0, 4 - PHOTOS.length)).reduce(function (pr, f) {
+      return pr.then(function () { return new Promise(function (ok) { var r = new FileReader(); r.onload = function () { shrink(r.result, 1600).then(function (d) { PHOTOS.push(d); ok(); }, ok); }; r.readAsDataURL(f); }); });
+    }, Promise.resolve()).then(function () { drawPhotos(); push(); });
+    this.value = '';
+  });
+
+  /* 저장: index.html 을 받아 CSS·JS를 안에 넣고 데이터·사진을 담아 HTML 1개로 */
+  function txt(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u); return r.text(); }); }
+  function toData(src) { if (/^data:/.test(src)) return Promise.resolve(src); return shrink(src, 1600); }
+  document.getElementById('save').addEventListener('click', function () {
+    var l = read(); if (!l.photos.length) toast('사진이 없습니다 · 사진 없이 저장합니다');
+    Promise.all(l.photos.map(toData)).then(function (ph) {
+      l.photos = ph;
+      return txt('index.html').then(function (html) {
+        var links = [], re = /<link rel="stylesheet" href="([^"]+)">/g, m;
+        while ((m = re.exec(html))) links.push(m[1]);
+        var scr = [], re2 = /<script src="([^"]+)"( defer)?><\/script>/g;
+        while ((m = re2.exec(html))) scr.push(m[1]);
+        return Promise.all(links.map(txt)).then(function (css) {
+          return Promise.all(scr.map(txt)).then(function (js) {
+            links.forEach(function (u, i) { html = html.replace('<link rel="stylesheet" href="' + u + '">', function () { return '<style>/* ' + u + ' */\n' + css[i] + '\n</style>'; }); });
+            scr.forEach(function (u, i) { html = html.replace(new RegExp('<script src="' + u.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + '"( defer)?><\\/script>'), function () { return '<script>/* ' + u + ' */\n' + js[i].replace(/<\/script/gi, '<\\/script') + '\n<\/script>'; }); });
+            html = html.replace(/<link rel="icon"[^>]*>\n?/, '');
+            var data = JSON.stringify({ listings: [l], broker: l.broker }).replace(/</g, '\\u003c');
+            html = html.replace('<script id="embedded" type="application/json"><' + '/script>', function () { return '<script id="embedded" type="application/json">' + data + '<\/script>'; });
+            var blob = new Blob([html], { type: 'text/html;charset=utf-8' }), u = URL.createObjectURL(blob), a = document.createElement('a');
+            a.href = u; a.download = '매물장_' + (l.id || 'listing').replace(/[\\\/:*?"<>|]/g, '_') + '.html'; document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(u); }, 5000);
+            toast('매물장 HTML 1개를 저장했습니다(' + Math.round(blob.size / 1024) + 'KB) · 카톡·문자로 파일째 보낼 수 있습니다');
+          });
+        });
+      });
+    }).catch(function (e) { toast('저장하지 못했습니다 · ' + (e && e.message || e)); });
+  });
+  document.getElementById('print').addEventListener('click', function () { try { PV.contentWindow.focus(); PV.contentWindow.print(); } catch (e) { window.open('index.html?m=' + encodeURIComponent(read().id), '_blank', 'noopener'); } });
+
+  fetch('data/listings.json').then(function (r) { return r.json(); }).then(function (d) {
+    SEEDS = d.listings || []; var s = document.getElementById('seed');
+    s.innerHTML = SEEDS.map(function (l, i) { return '<option value="' + i + '">' + l.id + ' · ' + l.title + (l.private ? ' (비공개)' : '') + '</option>'; }).join('');
+    s.addEventListener('change', function () { fill(SEEDS[+s.value]); });
+    var go = function () { fill(SEEDS[0]); };
+    if (PV.contentWindow && PV.contentWindow.KTS_LISTING) go(); else PV.addEventListener('load', function () { setTimeout(go, 150); }, { once: true });
+  });
+})();
+</script>
+</body>
+</html>
