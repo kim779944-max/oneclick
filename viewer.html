@@ -1472,7 +1472,7 @@ function mfAddBlock(file){
   const x = document.createElement('button'); x.type = 'button'; x.className = 'mfx'; x.textContent = '✕'; x.setAttribute('aria-label', '이 파일 닫기');
   x.onclick = ev => { ev.stopPropagation(); mfRemove(MF.items.indexOf(it)); };
   hd.appendChild(n); hd.appendChild(x); blk.appendChild(hd);
-  PP.scale.appendChild(blk);
+  PP.scale.insertBefore(blk, PP.scale.querySelector(':scope > .mfend'));   /* 끝 여백 앞에 붙인다 */
   it.blk = blk; it.hd = hd; it.hdN = n;
   MF.items.push(it);
   return it;
@@ -1482,6 +1482,10 @@ function mfAddBlock(file){
 function mfRelayout(){
   if (!MF.multi || !PP.scale) return;
   PP.kind = 'multi';
+  /* 끝 여백(.mfend)은 재기 전에 맨 끝·높이 0 으로 — 블록 위치가 여백에 밀리지 않게 */
+  let end = PP.scale.querySelector(':scope > .mfend');
+  if (!end){ end = document.createElement('div'); end.className = 'mfend'; }
+  PP.scale.appendChild(end); end.style.height = '0px';
   PP.w = Math.max.apply(null, MF.items.map(it => it.w || 340).concat([340]));
   const fz = fitZoom();
   MF.items.forEach((it, fi) => {
@@ -1507,9 +1511,6 @@ function mfRelayout(){
   MF.total = MF.pages.length;
   PP.tops = MF.pages.map(g => g.top);
   /* 끝 여백 — 마지막 장이 짧아도(한 장짜리 표·사진) 그 장까지 넘겨 볼 수 있게(ppTrack 감지선 34% 아래까지 스크롤 여유) */
-  let end = PP.scale.querySelector(':scope > .mfend');
-  if (!end){ end = document.createElement('div'); end.className = 'mfend'; }
-  PP.scale.appendChild(end); end.style.height = '0px';
   const hc = PP.scale.offsetHeight, last = PP.tops[PP.tops.length - 1] || 0;
   const ch = (out.clientHeight || 600) / Math.min(PP.zoom || fz, fz);
   end.style.height = Math.max(0, Math.ceil(last + ch * 0.66 + 8 - hc)) + 'px';
