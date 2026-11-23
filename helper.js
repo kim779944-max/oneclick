@@ -220,7 +220,10 @@
     'background:linear-gradient(160deg,#FF8A2B,#FF6B00);color:#0A1224;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;' +
     'box-shadow:0 8px 20px rgba(255,107,0,.35),0 2px 6px rgba(0,0,0,.35);cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;' +
     'padding:0;margin:0;line-height:1;-webkit-tap-highlight-color:transparent;transition:bottom .15s}' +
-    '#kts-helper-btn b{font-size:20px;font-weight:900;line-height:1}#kts-helper-btn span{font-size:9.5px;font-weight:900;margin-top:2px;letter-spacing:-.3px}' +
+    /* 133번: 오른쪽 아래는 카드 [열기]/[+] 자리 → 390(≤719px)은 왼쪽 아래, 넓은 화면은 본문 바깥 왼쪽 여백 */
+    '@media (max-width:719px){#kts-helper-btn{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:48px;height:48px}}' +
+    '@media (min-width:720px){#kts-helper-btn{left:max(10px,calc(50% - 300px));right:auto}}' +
+    '#kts-helper-btn b{font-size:20px;font-weight:900;line-height:1}#kts-helper-btn span{font-size:10.5px;font-weight:900;margin-top:2px;letter-spacing:-.3px}' +
     '#kts-helper{position:fixed;inset:0;z-index:250;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.66);' +
     'font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;letter-spacing:-.2px;word-break:keep-all;line-height:1.5}' +
     '#kts-helper.on{display:flex}' +
@@ -297,17 +300,25 @@
     });
     return Math.round(best);
   }
-  function totopTop() {                                     /* .totop(↑ 위로) — 보이지 않을 때도 자리는 비워 둔다 */
+  function totopTop(base) {                                 /* .totop(↑ 위로) — 보이지 않을 때도 자리는 비워 둔다 */
     var t = d.querySelector('.totop,#toTop'); if (!t) return 0;
     var cs = w.getComputedStyle(t); if (cs.position !== 'fixed' || cs.display === 'none') return 0;
+    /* 133번: 같은 세로줄(가로로 겹침)에 있고, 도우미 버튼 자리보다 아래에서 시작할 때만 피한다 */
+    var tr = t.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    if (tr.right <= br.left || tr.left >= br.right) return 0;
     var b = parseFloat(cs.bottom) || 0, h = t.offsetHeight || 0;
+    if (b >= base + (btn.offsetHeight || 0) + 4) return 0;   /* 이미 도우미 위에 있음 */
     return Math.round(b + h);
   }
   function place() {
     if (!btn) return;
-    var bar = bottomBarHeight(), b = bar ? bar + 10 : 14, tt = totopTop();
+    var prev = btn.style.bottom;
+    btn.style.transition = 'none'; btn.style.bottom = '';   /* CSS 기본 자리(390: 왼쪽 아래 10px+안전영역)부터 */
+    var cssB = parseFloat(w.getComputedStyle(btn).bottom) || 14;
+    btn.style.bottom = prev; btn.style.transition = '';
+    var bar = bottomBarHeight(), b = bar ? Math.max(cssB, bar + 10) : cssB, tt = totopTop(b);
     if (tt) b = Math.max(b, tt + 10);
-    btn.style.bottom = b + 'px';
+    btn.style.bottom = (b !== cssB) ? b + 'px' : '';
     btn.setAttribute('data-bar', String(bar));
   }
 
