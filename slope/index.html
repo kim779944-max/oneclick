@@ -422,7 +422,7 @@ details.adv .keyrow{margin-top:7px}
           <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
           <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
           <p class="pxnote" id="pxNote"></p>
-          <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 화살촉이 크고 선이 굵어 폰에서도 방향이 한눈에 보입니다.</p>
+          <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 화살표는 항공사진을 가리지 않게 가늘게 그립니다. 화살표를 켜면 지도가 항공사진으로 바뀌고 경사색은 함께 꺼집니다.</p>
           <p class="advkey">필지 경계·용도지역·위성은 Vworld 지도 연결(6번 카드)로 열립니다.</p>
         </div>
       </details>
@@ -1141,42 +1141,43 @@ function drawSlopeArrows(g,x0,y0,w,h){
       var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU; /* 내려가는 쪽(화면 px) */
       var L=Math.hypot(ax,ay);
       if(L<1e-9){ ax=0; ay=1; } else { ax/=L; ay/=L }
-      /* 길이·채운 삼각형 화살촉(값 고정): 전체 9~13px · 삼각형 길이 len/2 · 밑변 7.2px · 줄기 1.8px */
-      var len=clamp(9+s*0.12,9,13), hl=len*0.5, hw=3.6, tw=0.9;
-      var px2=-ay, py2=ax;                         /* 진행방향의 수직 단위벡터 */
-      var tX=x+ax*len*0.5, tY=y+ay*len*0.5;        /* 삼각형 꼭짓점(촉) = 내리막 쪽 */
-      var bX2=x-ax*len*0.5, bY2=y-ay*len*0.5;      /* 줄기 끝 = 오르막 쪽 */
-      var nX=tX-ax*hl, nY=tY-ay*hl;                /* 삼각형 밑변 중심(줄기와 만나는 곳) */
+      /* 화살촉 밑변 4.2px · 촉 길이 3.5~4.5px · 줄기 1.1px · 꼬리 3.0px (2026-11-23 144번) — 항공사진을 가리지 않게 */
+      var head=clamp(3.5+s*0.025,3.5,4.5), tail=3.0, L=head+tail;
+      var hw=2.1, tw=0.55;
+      var px2=-ay, py2=ax;                         /* 진행방향 수직 단위벡터 */
+      var tX=x+ax*L*0.5, tY=y+ay*L*0.5;            /* 촉 꼭짓점 — 내리막 */
+      var eX=x-ax*L*0.5, eY=y-ay*L*0.5;            /* 줄기 끝 — 오르막 */
+      var nX=tX-ax*head, nY=tY-ay*head;            /* 촉 밑변 중심 */
       var bi=bandOf(s), Q=P[bi<0?0:bi];
-      /* 곧은 줄기(1.8px) + 닫힌 채운 삼각형(밑변 7.2px) — 삼각형이 면적의 2/3 */
-      Q.moveTo(bX2+px2*tw, bY2+py2*tw);             /* 줄기 끝 왼쪽 */
-      Q.lineTo(nX +px2*tw, nY +py2*tw);             /* 줄기가 밑변에 닿는 왼쪽 */
-      Q.lineTo(nX +px2*hw, nY +py2*hw);             /* 삼각형 밑변 왼쪽 끝 */
+      Q.moveTo(eX+px2*tw, eY+py2*tw);               /* 줄기 끝 왼쪽 */
+      Q.lineTo(nX+px2*tw, nY+py2*tw);               /* 줄기가 밑변에 닿는 왼쪽 */
+      Q.lineTo(nX+px2*hw, nY+py2*hw);               /* 밑변 왼쪽 끝 */
       Q.lineTo(tX, tY);                             /* 꼭짓점(촉) — 내리막 */
-      Q.lineTo(nX -px2*hw, nY -py2*hw);             /* 삼각형 밑변 오른쪽 끝 */
-      Q.lineTo(nX -px2*tw, nY -py2*tw);             /* 줄기가 밑변에 닿는 오른쪽 */
-      Q.lineTo(bX2-px2*tw, bY2-py2*tw);             /* 줄기 끝 오른쪽 */
+      Q.lineTo(nX-px2*hw, nY-py2*hw);               /* 밑변 오른쪽 끝 */
+      Q.lineTo(nX-px2*tw, nY-py2*tw);               /* 줄기가 밑변에 닿는 오른쪽 */
+      Q.lineTo(eX-px2*tw, eY-py2*tw);               /* 줄기 끝 오른쪽 */
       Q.closePath();                                /* 닫힌 도형 → fill 로 꽉 찬다 */
       if(sTr&&sCnt[bi<0?0:bi]<8){ var bk=bi<0?0:bi, ins=function(X,Y){ return X>=bx&&X<=bX&&Y>=by&&Y<=bY&&(clip?g.isPointInPath(clip,X*sTr,Y*sTr,'evenodd'):true) };
-        if(ins(tX+ax*2.5,tY+ay*2.5)&&ins(bX2-ax*2.5,bY2-ay*2.5)&&ins(nX+px2*5.7,nY+py2*5.7)&&ins(nX-px2*5.7,nY-py2*5.7)){ sCnt[bk]++;
-          samp.push({b:bk,s:+s.toFixed(2),x:+x.toFixed(2),y:+y.toFixed(2),ax:+ax.toFixed(4),ay:+ay.toFixed(4),len:+len.toFixed(2),hl:+hl.toFixed(2)}) } }
+        if(ins(tX+ax*1.6,tY+ay*1.6)&&ins(eX-ax*1.6,eY-ay*1.6)&&ins(nX+px2*3.2,nY+py2*3.2)&&ins(nX-px2*3.2,nY-py2*3.2)){ sCnt[bk]++;
+          samp.push({b:bk,s:+s.toFixed(2),x:+x.toFixed(2),y:+y.toFixed(2),ax:+ax.toFixed(4),ay:+ay.toFixed(4),len:+L.toFixed(2),hl:+head.toFixed(2)}) } }
       cnt++;
     }
   }
   g.lineCap='round'; g.lineJoin='round'; g.globalAlpha=1;
-  /* 1) 바깥 밝은 테 — 10색 전부 */
-  g.strokeStyle='rgba(255,255,255,.88)'; g.lineWidth=4.2;
-  for(var bb=0;bb<10;bb++) g.stroke(P[bb]);
-  /* 2) 안쪽 어두운 테 — 10색 전부 */
-  g.strokeStyle='#101A2B'; g.lineWidth=2.8;
-  for(var bb2=0;bb2<10;bb2++) g.stroke(P[bb2]);
-  /* 3) 본색 — 불투명 면. 테 안쪽 절반을 덮는다 */
-  for(var bb3=0;bb3<10;bb3++){ g.fillStyle=SLOPE10[bb3].hex; g.fill(P[bb3]) }
+  /* 테 1겹(1.6px · 본색이 안쪽 절반을 덮어 노출 0.8px) — 1) 0~2단계(밝은 색)만 어두운 테 */
+  g.strokeStyle='rgba(16,26,43,.92)'; g.lineWidth=1.6;
+  for(var b0=0;b0<3;b0++) g.stroke(P[b0]);
+  /* 2) 3~9단계는 밝은 테 */
+  g.strokeStyle='rgba(255,255,255,.92)'; g.lineWidth=1.6;
+  for(var b1=3;b1<10;b1++) g.stroke(P[b1]);
+  /* 3) 본색 — 불투명 면(테 안쪽 절반을 덮는다) */
+  for(var b2=0;b2<10;b2++){ g.fillStyle=SLOPE10[b2].hex; g.fill(P[b2]) }
   g.restore();
   if(g===ctx){ AR_SAMP=samp; AR_LAST={n:cnt,gap:+gap.toFixed(2),k:k,m:m,blockPx:+blockPx.toFixed(2),
-           lenPx:[9,13],headLen:[4.5,6.5],headW:7.2,tailW:1.8,
-           casing:[4.2,2.8],cap:900,gapMin:16}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
+           lenPx:[6.5,7.5],headLen:[3.5,4.5],headW:4.2,tailW:1.1,
+           casing:[1.6],cap:900,gapMin:16}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
 }
+window.__KTS_AR=function(){return AR_LAST};  /* 검증용 읽기 전용 — 화면·동작 영향 없음 */
 
 /* ---------------- 지도 조작 ---------------- */
 var ptrs=new Map(), moved=0, lastDist=0, dragId=null, downPos=null;
@@ -2917,17 +2918,38 @@ function pxPaintNote(){
   el.innerHTML='칸 = 5m를 <b>'+SUBDIV+'×'+SUBDIV+'</b>('+(5/SUBDIV).toFixed(2)+'m)으로 나눈 색 · 번호 = '+bm+'m 칸 · 칸을 누르면 번호·경사·표고·향<br>'+base+'. '+(5/SUBDIV).toFixed(2)+'m 값은 원본보다 촘촘한 보간입니다.';
 }
 function pxPaintSub(){ document.querySelectorAll('#pxSub button').forEach(function(b){ b.classList.toggle('on',+b.getAttribute('data-s')===SUBDIV) }); pxPaintNote() }
+/* 화살표 보기 — 화살표 말고는 전부 실제 항공사진이 또렷하게 보이도록 층을 한 번 정리한다.
+   (이후 사용자가 [위성]·[경사색]을 직접 누르는 것은 그대로 허용 — 감시·강제 복원 없음) */
+function arrowView(){
+  S.lay.px=0;        /* 픽셀 채색 OFF */
+  S.lay.arrow=1;     /* 화살표 ON */
+  S.lay.sat=1;       /* 위성(항공사진) ON — Vworld 키 불필요 */
+  S.lay.slope=0;     /* 경사색 OFF — 색판이 항공사진을 덮지 않게 */
+  /* 버튼 표시를 실제 상태에 맞춘다(4곳) */
+  document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-v')==='arrow') });
+  var satB=document.querySelector('#togs button[data-l="sat"]');      if(satB)  satB.classList.toggle('on',true);
+  var axB =document.querySelector('#togsAdv button[data-l="arrow"]'); if(axB)   axB.classList.toggle('on',true);
+  var slB =document.querySelector('#togsAdv button[data-l="slope"]'); if(slB)   slB.classList.toggle('on',false);
+  if(typeof pxShowTip==='function') pxShowTip(null);
+  pxPaintNote(); paintLegend(); requestRender(); requestRender();
+}
 function pxSetView(v){
-  S.lay.px=v==='px'?1:0; S.lay.arrow=v==='px'?0:1;
-  document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===v) });
-  var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(ab) ab.classList.toggle('on',!!S.lay.arrow);
-  if(!S.lay.px) pxShowTip(null);
-  pxPaintNote(); paintLegend(); requestRender();
+  if(v!=='px'){ arrowView(); return }        /* 화살표 보기 → 위성 ON·경사색 OFF·픽셀 OFF */
+  S.lay.px=1; S.lay.arrow=0;
+  document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')==='px') });
+  var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(ab) ab.classList.toggle('on',false);
+  pxShowTip(null); pxPaintNote(); paintLegend(); requestRender();
 }
 document.querySelectorAll('#pxView button').forEach(function(b){ b.addEventListener('click',function(){ pxSetView(b.getAttribute('data-v')) }) });
 document.querySelectorAll('#pxSub button').forEach(function(b){ b.addEventListener('click',function(){ SUBDIV=+b.getAttribute('data-s'); PXG=null; PX_SEL=null; pxPaintSub(); requestRender() }) });
 /* 화살표 층 버튼을 직접 누를 때도 보기 버튼 표시를 맞춘다 */
-(function(){ var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(ab) ab.addEventListener('click',function(){ if(S.lay.arrow&&S.lay.px){ S.lay.px=0; pxShowTip(null) } document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===(S.lay.px?'px':'arrow')) }); pxPaintNote(); paintLegend(); requestRender() }) })();
+(function(){ var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(!ab) return;
+  ab.addEventListener('click',function(){
+    if(S.lay.arrow){ arrowView(); }                 /* 방금 켜졌다 → 위성 ON·경사색 OFF (일반 토글 리스너가 먼저 반전 — 여기선 읽기만) */
+    else { /* 끌 때: 보기 표시만 지금 규칙대로 되돌린다(자동 정리 취소 없음) */
+      document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-v')===(S.lay.px?'px':'arrow')) });
+      pxPaintNote(); paintLegend(); requestRender() }
+  }) })();
 
 /* ---------------- 통계표 — 5° 구간 면적·구성비 + 번호별 평균 경사 ---------------- */
 var PXS_PAGE=0, PXS_OPEN=false, PXS_PER=30;
