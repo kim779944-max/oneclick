@@ -266,6 +266,77 @@ details.adv .keyrow{margin-top:7px}
 .pxstat .pg button:disabled{opacity:.4}
 .pxstat .pg span{font-weight:900;color:#AFBDD0}
 .pxstat .pg input{width:72px;margin-left:auto;border:1px solid #2E4370;background:#0A1526;color:#fff;border-radius:8px;padding:4px 6px;font-size:11px;font-family:inherit}
+/* 137번 — 조작부 정돈(v0 시안 척도: 한 줄 그룹 · 44px 이상 · radius 12 · tabular-nums). 기능·색판은 그대로 */
+.vmode{grid-template-columns:repeat(3,1fr);gap:3px;padding:2px;border-radius:12px;background:#0B1729}
+.vmode button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 6px;border-radius:10px;font-size:13px;font-family:inherit}
+.vmode button svg,.ctl svg{width:16px;height:16px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.vmode button.on{color:#0A1224}
+.ctl{display:flex;flex-direction:column;gap:8px;margin-top:9px}
+.ctl .pxrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+.ctl .pxseg{display:grid;grid-template-columns:1fr 1fr;border-radius:12px;background:#0B1729}
+.ctl .pxseg button{min-height:44px;font-size:13px;padding:0 4px}
+.ctl .pxseg button+button{border-left:1px solid var(--line2)}
+.ctl .pxtip{margin:0}
+.ctl .togs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0;padding:0;overflow:visible}
+.ctl .togs.tg3{grid-template-columns:repeat(3,1fr)}
+.ctl .togs button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:0 4px;border-radius:12px;font-size:12.5px;color:#AFBDD0;border-color:#26375F;background:#0E1A33;white-space:nowrap;font-family:inherit}
+.ctl .togs button.on{border-color:var(--amber);color:#FFD9A6;background:rgba(255,107,0,.12)}
+.ctl .togs button.lk:not(.on){opacity:.8}
+.outrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.outrow button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:-.3px}
+.outrow .op1{border:0;background:linear-gradient(135deg,var(--amber),var(--amber2));color:#0A1224}
+.outrow .op2{border:1px solid #2E4370;background:#0B1729;color:#DCE6F2}
+.outrow svg{width:18px;height:18px}
+.advbox{border:1px solid var(--line);border-radius:12px;background:#0B1729}
+.advbox>summary{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 12px;font-size:13px;font-weight:900;color:#DCE6F2;cursor:pointer;list-style:none}
+.advbox>summary::-webkit-details-marker{display:none}
+.advbox>summary::after{content:"▾";margin-left:auto;color:#8FA1B8;transition:transform .2s}
+.advbox[open]>summary::after{transform:rotate(180deg)}
+.advbox .advon{font-size:11px;font-weight:900;color:#FFC98F}
+.advbox .advon:empty{display:none}
+.advbox .advon::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:4px;vertical-align:1px}
+.advin{display:flex;flex-direction:column;gap:8px;padding:2px 10px 12px}
+.advin .rng,.advin .arrow-note,.advin .pxnote{margin:0}
+.advin .rng{min-height:44px;font-size:12px}
+.advin .rng b{font-size:12px}
+.advkey{font-size:10.5px;color:#8FA1B8;margin:0;line-height:1.5;font-weight:700}
+.card.mArch .advbox,.card.mArch .outrow{display:none}
+#printSheet{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff!important;color:#111827!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
+  body>*:not(#printSheet){display:none!important}
+  #printSheet{display:block!important;width:190mm;height:277mm;overflow:hidden;font:10pt/1.35 -apple-system,"Noto Sans KR","Malgun Gothic",sans-serif;color:#111827;word-break:keep-all;font-variant-numeric:tabular-nums}
+  #printSheet *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printSheet>*{break-inside:avoid;page-break-inside:avoid;overflow:hidden}
+}
+.ps-head{height:14mm;display:flex;align-items:center;justify-content:space-between;border-bottom:.6mm solid #FF6B00}
+.ps-head b{font-size:14pt;font-weight:900;letter-spacing:-.3px}
+.ps-head span{font-size:9pt;color:#4B5563}
+.ps-addr{height:12mm;padding-top:1.5mm}
+.ps-addr b{display:block;font-size:11.5pt;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-addr span{display:block;font-size:8.5pt;color:#4B5563}
+.ps-map{height:92mm}
+.ps-map canvas,.ps-pf canvas{display:block;width:100%;height:100%}
+.ps-kv{height:36mm;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:1mm 3mm;padding:2mm 0 1mm}
+.ps-kv div{display:flex;align-items:center;justify-content:space-between;border:.25mm solid #9CA3AF;border-radius:1.5mm;padding:0 3mm}
+.ps-kv span{font-size:9pt;color:#4B5563}
+.ps-kv b{font-size:11pt;font-weight:900}
+.ps-tbl{height:62mm;padding-top:1mm}
+.ps-tbl table{width:100%;height:60mm;border-collapse:collapse;table-layout:fixed;font-size:9pt}
+.ps-tbl th,.ps-tbl td{border:.25mm solid #9CA3AF;padding:0 3mm;text-align:right;height:5mm;line-height:1}
+.ps-tbl th{background:#F3F4F6;font-weight:700;text-align:center;color:#374151}
+.ps-tbl td:first-child{text-align:left;font-weight:700}
+.ps-tbl td.c{text-align:center}
+.ps-tbl .sw{display:inline-block;width:12mm;height:3mm;border:.25mm solid #374151;vertical-align:middle}
+.ps-tbl tr.sum td{font-weight:900;background:#FFF4EB}
+.ps-vd{height:12mm;display:flex;align-items:center;border-left:1.2mm solid #FF6B00;padding-left:3mm;background:#FFF4EB}
+.ps-vd p{margin:0;font-size:9pt;line-height:1.3;color:#374151}
+.ps-vd b{font-size:10.5pt;font-weight:900;color:#111827;margin-right:2mm}
+.ps-vd.long p{font-size:8.5pt}
+.ps-pf{height:34mm;padding-top:1.5mm}
+.ps-foot{height:10mm;display:flex;align-items:flex-end;justify-content:space-between;gap:4mm;font-size:7.5pt;color:#4B5563;line-height:1.35}
+.ps-foot em{font-style:normal;font-weight:900;color:#111827;white-space:nowrap}
 </style></head>
 <body>
 <div id="app">
@@ -294,7 +365,7 @@ details.adv .keyrow{margin-top:7px}
 
   <section class="card" id="mapCard">
     <h2><i>2</i>필지 경사도 지도<small id="demTag">5m 격자</small></h2>
-    <div class="vmode" id="vmode"><button type="button" data-v="2d" class="on">2D 지도</button><button type="button" data-v="3d">3D 지형</button><button type="button" data-v="arch">건축·규제</button></div>
+    <div class="vmode" id="vmode" role="group" aria-label="보기 전환"><button type="button" data-v="2d" class="on" aria-label="2D 지도"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>2D</button><button type="button" data-v="3d" aria-label="3D 지형"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19l6-9 4 5 3-4 7 8z"/></svg>3D</button><button type="button" data-v="arch" aria-label="건축·규제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11z"/><path d="M9 20v-6h6v6"/></svg>규제</button></div>
     <div class="mapwrap">
       <canvas id="mapcv" width="360" height="392" aria-label="경사도 지도"></canvas>
       <canvas id="cv3d" class="hide" aria-label="3D 지형"></canvas>
@@ -325,27 +396,38 @@ details.adv .keyrow{margin-top:7px}
       <div id="aBody"></div>
       <p class="anote2">1차 <b>법정 기준</b> 참고용입니다. 법정 상한은 조례로 더 낮아질 수 있으니 최종은 <b>지자체 조례·고시</b>와 토지이음 확인이 기준입니다.</p>
     </div>
-    <div class="togs" id="togs">
-      <button type="button" data-l="arrow">경사 화살표<small>방향·구배</small></button>
-      <button type="button" data-l="slope">경사도<small>색</small></button>
-      <button type="button" data-l="cont" class="on">등고선<small>2m</small></button>
-      <button type="button" data-l="grid">5m 격자<small>눈금</small></button>
-      <button type="button" data-l="parcel" class="lk">필지 경계<small>Vworld</small></button>
-      <button type="button" data-l="zone" class="lk">용도지역<small>Vworld</small></button>
-      <button type="button" data-l="sat">위성<small>Vworld</small></button>
+    <div class="ctl" id="ctl">
+      <div class="pxrow" id="pxRow">
+        <div class="pxseg" id="pxView" role="group" aria-label="보기"><button type="button" data-v="arrow">화살표</button><button type="button" data-v="px" class="on">픽셀</button></div>
+        <div class="pxseg" id="pxSub" role="group" aria-label="격자 밀도"><button type="button" data-s="3" class="on" aria-label="격자 밀도 3×3">3×3</button><button type="button" data-s="6" aria-label="격자 밀도 6×6">6×6</button></div>
+      </div>
+      <div class="pxtip hide" id="pxTip" role="status" aria-live="polite"></div>
+      <div class="togs" id="togs" role="group" aria-label="지도 겹치기">
+        <button type="button" data-l="cont" class="on" aria-label="등고선 2m"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c4-5 6 2 9-3s5-2 9-4"/><path d="M3 11c4-4 6 1 9-3s5-1 9-3"/></svg>등고선</button>
+        <button type="button" data-l="grid" aria-label="5m 격자"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM4 12h16M12 4v16"/></svg>격자</button>
+        <button type="button" data-l="parcel" class="lk" aria-label="필지 경계"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l9-2 6 6-3 10-12-3z"/></svg>필지</button>
+        <button type="button" data-l="sat" aria-label="위성"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9l6 6M4 14l5-5 6 6-5 5zM14 4l6 6-3 3-6-6z"/></svg>위성</button>
+      </div>
+      <div class="outrow">
+        <button type="button" class="op1" id="printA4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><path d="M7 14h10v7H7z"/></svg>A4 인쇄</button>
+        <button type="button" class="op2" id="saveImg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 16l5-5 4 4 2-2 5 5"/><circle cx="15.5" cy="9" r="1.5"/></svg>이미지 저장</button>
+      </div>
+      <details class="advbox" id="advBox"><summary>상세 설정<span class="advon" id="advOn"></span></summary>
+        <div class="advin">
+          <div class="togs tg3" id="togsAdv" role="group" aria-label="상세 겹치기">
+            <button type="button" data-l="arrow" aria-label="경사 화살표"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19L19 5M10 5h9v9"/></svg>화살표</button>
+            <button type="button" data-l="slope" aria-label="경사도 색"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18L3 6z"/></svg>경사색</button>
+            <button type="button" data-l="zone" class="lk" aria-label="용도지역"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>용도지역</button>
+          </div>
+          <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
+          <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
+          <p class="pxnote" id="pxNote"></p>
+          <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 화살촉이 크고 선이 굵어 폰에서도 방향이 한눈에 보입니다.</p>
+          <p class="advkey">필지 경계·용도지역·위성은 Vworld 지도 연결(6번 카드)로 열립니다.</p>
+        </div>
+      </details>
     </div>
-    <div class="pxrow" id="pxRow">
-      <span class="pxl">보기</span>
-      <div class="pxseg" id="pxView"><button type="button" data-v="arrow">화살표</button><button type="button" data-v="px" class="on">픽셀</button></div>
-      <span class="pxl">격자 밀도</span>
-      <div class="pxseg" id="pxSub"><button type="button" data-s="3" class="on">3×3</button><button type="button" data-s="6">6×6</button></div>
-    </div>
-    <p class="pxnote" id="pxNote"></p>
-    <div class="pxtip hide" id="pxTip" role="status" aria-live="polite"></div>
     <div class="pxstat" id="pxStat"></div>
-    <div class="rng" id="opRow"><span>경사 색 진하기</span><input type="range" id="op" min="0" max="100" value="38" aria-label="경사 색 진하기"><b id="opv">38%</b></div>
-    <div class="rng"><span>분석 반경</span><input type="range" id="rad" min="30" max="300" step="10" value="100" aria-label="분석 반경"><b id="radv">100m</b></div>
-    <p class="arrow-note">필지 안에 <b>5m 격자마다 화살표</b>를 그립니다. 화살표는 <b>물이 흘러내리는 방향</b>, 색은 경사 10단계(흰색 0~5° → 노랑 → 주황 → 빨강 → 검붉음 45° 이상)로 붉을수록 급합니다. 값은 픽셀 보기에서 칸을 누르면 나옵니다. 화살촉이 크고 선이 굵어 폰에서도 방향이 한눈에 보입니다.</p>
     <button class="btn chk" type="button" id="chkGo"><b>확인하기</b><small>이 자리 그대로 결과 전체뷰를 엽니다</small></button>
   </section>
 
@@ -449,6 +531,16 @@ details.adv .keyrow{margin-top:7px}
   </div>
 </div></div>
 <div class="toast" id="toast"></div>
+</div>
+<div id="printSheet" aria-hidden="true">
+  <div class="ps-head"><b>KTS 원클릭 · 지번·경사도 분석</b><span id="psStamp">—</span></div>
+  <div class="ps-addr"><b id="psAddr">—</b><span id="psCoord">—</span></div>
+  <div class="ps-map"><canvas id="psMap" width="1900" height="920"></canvas></div>
+  <div class="ps-kv" id="psKv"></div>
+  <div class="ps-tbl" id="psTbl"></div>
+  <div class="ps-vd" id="psVd"><p><b>—</b></p></div>
+  <div class="ps-pf"><canvas id="psPf" width="1900" height="325"></canvas></div>
+  <div class="ps-foot"><span>지형: 공개 수치표고(SRTM 계열 30m)를 5m 격자로 재계산 · 참고용<br>인허가·설계 판단은 국토정보플랫폼 5m 수치지형도와 공부(公簿)</span><em>autooneclick.com/slope/</em></div>
 </div>
 <script>
 (function(){
@@ -1422,7 +1514,7 @@ function buildChips(){
 }
 
 /* ---------------- 층·슬라이더·키 ---------------- */
-document.querySelectorAll('#togs button').forEach(function(b){
+document.querySelectorAll('#togs button,#togsAdv button').forEach(function(b){
   b.addEventListener('click',function(){
     var k=b.getAttribute('data-l');
     if((k==='parcel'||k==='zone')&&!S.key){ toast('Vworld 키를 넣으면 열립니다 · 경사도는 지금도 그대로'); return }
@@ -1483,9 +1575,19 @@ function wrap(g,text,x,y,maxW,lh,font){
   if(line) g.fillText(line,x,yy);
   g.restore(); return yy+lh;
 }
+/* 범례 막대(SLOPE10 10단계 · 0~45+) — 저장 그림·인쇄 판이 같이 쓴다. dark=어두운 바탕용 글자색 */
+function drawLegendBar(g,x,y,w,h,dark,fs){
+  var n=SLOPE10.length, sw=w/n;
+  SLOPE10.forEach(function(b,i){ g.fillStyle=b.hex; g.fillRect(x+i*sw,y,Math.ceil(sw),h) });
+  g.strokeStyle=dark?'#2E4370':'#374151'; g.lineWidth=Math.max(1,h/14); g.strokeRect(x,y,w,h);
+  g.fillStyle=dark?'#C9D6E6':'#111827'; g.font='800 '+fs+'px -apple-system,"Noto Sans KR",sans-serif'; g.textAlign='center';
+  for(var i=0;i<n;i++) g.fillText(i===n-1?'45+':String(i*5),x+i*sw+sw/2,y+h+fs*1.15);
+  g.textAlign='left';
+}
 function paintCard(c,withBase){
-  var g=c.getContext('2d'), W=c.width, H=c.height, R=RES||{};
-  g.setTransform(1,0,0,1,0,0);
+  /* 137번: 캔버스 폭이 900을 넘으면(1600판) 900×1700 좌표계를 그대로 비율 확대해 그린다 — 글자·여백이 함께 커진다 */
+  var g=c.getContext('2d'), k=c.width/900, W=900, H=Math.round(c.height/k), R=RES||{};
+  g.setTransform(k,0,0,k,0,0);
   var bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#0E1B3A'); bg.addColorStop(.5,'#0B1428'); bg.addColorStop(1,'#0A1128');
   g.fillStyle=bg; g.fillRect(0,0,W,H);
   g.fillStyle='#FF6B00'; g.fillRect(0,0,W,8);
@@ -1494,15 +1596,23 @@ function paintCard(c,withBase){
   var addrTxt=String(S.addr||'—'); if(addrTxt.length>44) addrTxt=addrTxt.slice(0,44)+'…';
   g.fillStyle='#FFFFFF'; wrap(g,addrTxt,40,142,820,38,'900 30px -apple-system,"Noto Sans KR",sans-serif');
   /* 지도 — 지금 화면 그대로(같은 범위)를 2배로 그려 잘림 없이 넣는다 */
-  var mw=660, mh=Math.round(mw*VH()/VW()), mx=Math.round((W-mw)/2), my=196;
-  var m=document.createElement('canvas'); m.width=Math.round(VW()*2); m.height=Math.round(VH()*2);
-  try{ scene(m.getContext('2d'),VW(),VH(),{base:withBase,scale:2}) }catch(e){}
+  var mw=660, mh=Math.round(mw*VH()/VW()), my=196;
+  if(mh>780){ mh=780; mw=Math.round(mh*VW()/VH()) }   /* 세로로 긴 화면이면 폭을 줄여 비율 유지(범례 자리 확보) */
+  var mx=Math.round((W-mw)/2);
+  var msc=Math.max(2,Math.ceil(mw*k/VW()));           /* 1600판은 지도를 화면의 약 3~4배로 그려 흐리지 않게 */
+  var m=document.createElement('canvas'); m.width=Math.round(VW()*msc); m.height=Math.round(VH()*msc);
+  try{ scene(m.getContext('2d'),VW(),VH(),{base:withBase,scale:msc}) }catch(e){}
   g.save();
   if(g.roundRect){ g.beginPath(); g.roundRect(mx,my,mw,mh,16); g.clip() } else { g.beginPath(); g.rect(mx,my,mw,mh); g.clip() }
   g.drawImage(m,mx,my,mw,mh); g.restore();
   g.strokeStyle='#2E4370'; g.lineWidth=2; if(g.roundRect){ g.beginPath(); g.roundRect(mx,my,mw,mh,16); g.stroke() } else g.strokeRect(mx,my,mw,mh);
+  /* 범례 — 받은 사람이 색을 읽을 수 있게 지도 바로 아래에 */
+  var ly=my+mh+14;
+  drawLegendBar(g,mx,ly,mw,16,true,13);
+  g.fillStyle='#AFBDD0'; g.font='800 14px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText('경사(°) 10단계 · 화살표 = 물이 흐르는 방향 · 5m 격자',mx,ly+52);
   /* 수치 */
-  var ty=my+mh+40, cw=W/2-40, chh=86;
+  var ty=my+mh+40+40, cw=W/2-40, chh=78;
   var rows=[['중심 표고',fmt(R.el,0)+' m'],['중심 경사',fmt(R.sl,1)+'° ('+pctOf(R.sl)+')'],
             ['사면 방향',dirName(R.as)],['반경 '+S.radius+'m 평균',fmt(R.mean,1)+'°'],
             ['가장 급한 곳(상위 5%)',fmt(R.p95,1)+'°'],['표고 차',fmt(R.emax-R.emin,0)+' m'],
@@ -1537,7 +1647,7 @@ function paintCard(c,withBase){
 }
 function exportPng(){
   if(!RES){ toast('지형 계산이 끝난 뒤에 저장해 주세요'); return }
-  var c=document.createElement('canvas'); c.width=900; c.height=1700;
+  var c=document.createElement('canvas'); c.width=1600; c.height=Math.round(1600*1700/900);   /* 1600×3022 · 900:1700 비율 유지 */
   function go(withBase){
     paintCard(c,withBase);
     var url=null;
@@ -1553,6 +1663,115 @@ function exportPng(){
   } else toast(S.preview?'미리보기 그림을 저장했습니다':'그림을 저장했습니다');
 }
 $('#savePng').addEventListener('click',exportPng);
+
+/* ---------------- 137번: A4 인쇄 판(#printSheet) · 메인 화면 [이미지 저장] ----------------
+   화면을 인쇄용으로 바꾸지 않고, 숨겨 둔 인쇄 전용 판 한 장만 채워서 @media print 로 그 판만 찍는다.
+   계산은 새로 하지 않는다 — RES · pxStatData() · verdictOf() · pctOf() · dirName() 를 그대로 읽는다. */
+function psMapPaint(){
+  var c=$('#psMap'), g=c.getContext('2d'), CW=c.width, CH=c.height;
+  g.setTransform(1,0,0,1,0,0); g.fillStyle='#FFFFFF'; g.fillRect(0,0,CW,CH);
+  var vw=VW(), vh=VH(); if(!cv.clientWidth&&cv.width){ vw=cv.width/dpr; vh=cv.height/dpr }   /* 인쇄 레이아웃 중(화면 지도 숨김)에도 화면과 같은 범위 */
+  /* 지도: 지금 화면과 같은 범위 · 높이 꽉 채움 */
+  var mh=CH, mw=Math.round(mh*vw/vh); if(mw>CW*0.62){ mw=Math.round(CW*0.62); mh=Math.round(mw*vh/vw) }
+  var msc=Math.max(2,Math.ceil(mw/vw));
+  var m=document.createElement('canvas'); m.width=Math.round(vw*msc); m.height=Math.round(vh*msc);
+  try{ scene(m.getContext('2d'),vw,vh,{scale:msc}) }catch(e){}
+  g.drawImage(m,0,0,mw,mh);
+  g.strokeStyle='#374151'; g.lineWidth=3; g.strokeRect(1.5,1.5,mw-3,mh-3);
+  if(S.preview){
+    g.save(); g.beginPath(); g.rect(0,0,mw,mh); g.clip();
+    g.globalAlpha=.22; g.fillStyle='#FF6B00'; g.font='900 64px -apple-system,"Noto Sans KR",sans-serif';
+    g.translate(mw/2,mh/2); g.rotate(-Math.PI/9);
+    for(var k=-2;k<3;k++) g.fillText('미리보기 · KTS 경사도',-330,k*190);
+    g.restore();
+  }
+  /* 오른쪽: 범례 — 10단계 색칩 + 읽는 법 + 아래쪽 범례 막대(0~45+) */
+  var x=mw+60, rw=CW-x-10, y=56;
+  g.fillStyle='#111827'; g.font='900 44px -apple-system,"Noto Sans KR",sans-serif'; g.fillText('범례 · 경사(°) 10단계',x,y);
+  var colW=rw/2, rh=74;
+  SLOPE10.forEach(function(b,i){
+    var cx=x+Math.floor(i/5)*colW, cy=y+40+(i%5)*rh;
+    g.fillStyle=b.hex; g.fillRect(cx,cy,110,48);
+    g.strokeStyle='#374151'; g.lineWidth=2; g.strokeRect(cx,cy,110,48);
+    g.fillStyle='#111827'; g.font='800 36px -apple-system,"Noto Sans KR",sans-serif'; g.fillText(b.nm,cx+130,cy+38);
+  });
+  var ny=y+40+5*rh+44;
+  g.fillStyle='#374151'; g.font='700 30px -apple-system,"Noto Sans KR",sans-serif';
+  var view=S.lay.px?('픽셀 '+SUBDIV+'×'+SUBDIV):(S.lay.arrow?'화살표':'지도');
+  var lay=[view]; if(S.lay.cont) lay.push('등고선 2m'); if(S.lay.grid) lay.push('5m 격자'); if(S.lay.parcel) lay.push('필지 경계'); if(S.lay.zone) lay.push('용도지역'); if(S.lay.sat) lay.push('위성'); if(S.lay.slope) lay.push('경사색');
+  g.fillText('화살표 = 물이 흐르는 방향 · 5m 격자',x,ny);
+  g.fillText('보기: '+lay.join(' · '),x,ny+44);
+  g.fillText('가운데 표시 = 분석 중심 · 위쪽 = 북',x,ny+88);
+  drawLegendBar(g,x,CH-110,rw,50,false,30);
+}
+function psProfilePaint(){
+  var c=$('#psPf'), g=c.getContext('2d'), w=c.width, h=c.height;
+  g.setTransform(1,0,0,1,0,0); g.fillStyle='#FFFFFF'; g.fillRect(0,0,w,h);
+  g.strokeStyle='#9CA3AF'; g.lineWidth=2; g.strokeRect(1,1,w-2,h-2);
+  if(!T) return;
+  /* drawProfile() 과 같은 표본(중심 ±150m · 1m 간격) — 인쇄용 흰 바탕으로만 다시 그린다 */
+  var perM=1/(CIRC*Math.cos(S.lat*Math.PI/180)), uC=lng2w(S.lon), vC=lat2w(S.lat), pts=[], mn=1e9, mx=-1e9;
+  for(var dd=-150;dd<=150;dd+=1){
+    var e=elevAt(S.profile==='ew'?uC+dd*perM:uC, S.profile==='ew'?vC:vC+dd*perM);
+    if(e!=null){ if(e<mn)mn=e; if(e>mx)mx=e } pts.push(e);
+  }
+  if(mn>1e8) return;
+  var pad=Math.max(2,(mx-mn)*0.18), lo=mn-pad, hi=mx+pad, L=130, Tp=56, Rr=24, B=50, gw=w-L-Rr, gh=h-Tp-B;
+  g.fillStyle='#111827'; g.font='900 32px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText('단면 '+(S.profile==='ew'?'동 ↔ 서':'남 ↔ 북')+' 300m · 표고 '+fmt(mn,0)+'~'+fmt(mx,0)+'m (차 '+fmt(mx-mn,0)+'m)',L,40);
+  g.strokeStyle='#E5E7EB'; g.lineWidth=2;
+  for(var k=0;k<=3;k++){ var yy=Tp+gh*k/3; g.beginPath(); g.moveTo(L,yy); g.lineTo(L+gw,yy); g.stroke() }
+  function path(){ var st=false; g.beginPath(); for(var i=0;i<pts.length;i++){ if(pts[i]==null){st=false;continue} var X=L+gw*i/(pts.length-1), Y=Tp+gh*(1-(pts[i]-lo)/(hi-lo)); if(!st){g.moveTo(X,Y);st=true} else g.lineTo(X,Y) } }
+  path(); g.lineTo(L+gw,Tp+gh); g.lineTo(L,Tp+gh); g.closePath(); g.fillStyle='rgba(255,107,0,.18)'; g.fill();
+  path(); g.strokeStyle='#E35F00'; g.lineWidth=5; g.stroke();
+  g.beginPath(); g.moveTo(L+gw/2,Tp); g.lineTo(L+gw/2,Tp+gh); g.strokeStyle='#6B7280'; g.lineWidth=2; g.setLineDash([10,8]); g.stroke(); g.setLineDash([]);
+  g.fillStyle='#374151'; g.font='800 26px -apple-system,"Noto Sans KR",sans-serif';
+  g.fillText(fmt(hi,0)+'m',14,Tp+18); g.fillText(fmt(lo,0)+'m',14,Tp+gh);
+  g.textAlign='center'; g.fillText('−150m',L+40,h-14); g.fillText('중심',L+gw/2,h-14); g.fillText('+150m',L+gw-40,h-14); g.textAlign='left';
+}
+function fillPrintSheet(){
+  if(!RES){
+    $('#psAddr').textContent='지형 계산이 끝난 뒤에 인쇄해 주세요'; $('#psCoord').textContent='autooneclick.com/slope/ 에서 지번을 찾은 뒤 [A4 인쇄]를 눌러 주세요.';
+    $('#psKv').innerHTML=''; $('#psTbl').innerHTML=''; return false;
+  }
+  var R=RES;
+  $('#psStamp').textContent='출력 '+stamp().replace(/\./g,'-');
+  var a=String(S.addr||'선택한 지점'); if(a.length>44) a=a.slice(0,44)+'…';
+  $('#psAddr').textContent=a;
+  $('#psCoord').textContent='좌표 '+S.lat.toFixed(5)+', '+S.lon.toFixed(5)+' · 반경 '+S.radius+'m';
+  psMapPaint();
+  var kv=[['중심 표고',fmt(R.el,0)+' m'],['중심 경사',fmt(R.sl,1)+'° ('+pctOf(R.sl)+')'],['사면 방향',dirName(R.as)],['반경 '+S.radius+'m 평균',fmt(R.mean,1)+'°'],
+          ['가장 급한 곳(상위 5%)',fmt(R.p95,1)+'°'],['표고 차',fmt(R.emax-R.emin,0)+' m'],['15° 초과',fmt(R.g15p,0)+' %'],['25° 초과',fmt(R.g25p,0)+' %']];
+  $('#psKv').innerHTML=kv.map(function(r){ return '<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>' }).join('');
+  pxEnsure();
+  var D=pxStatData(), h='<table><thead><tr><th>경사 구간</th><th>색상</th><th>면적(㎡)</th><th>구성비(%)</th></tr></thead><tbody>';
+  if(D&&D.cells){
+    D.bands.forEach(function(b){ h+='<tr><td>'+b.nm+'</td><td class="c"><span class="sw" style="background:'+b.hex+'"></span></td><td>'+pxFmt(b.area,1)+'</td><td>'+pxFmt(b.pct,2)+'</td></tr>' });
+    h+='<tr class="sum"><td>합계</td><td class="c">—</td><td>'+pxFmt(D.totalArea,1)+'</td><td>'+pxFmt(D.sumPct,2)+'</td></tr>';
+  } else h+='<tr><td colspan="4" style="text-align:center">채울 칸이 없습니다 — 필지를 다시 골라 주세요</td></tr>';
+  $('#psTbl').innerHTML=h+'</tbody></table>';
+  var v=verdictOf(R.mean,R.p95,R.g15p,R.g25p), vd=$('#psVd');
+  vd.className='ps-vd'+(v.s.length>90?' long':'');
+  vd.innerHTML='<p><b>판정 · '+esc(v.t)+'</b>'+esc(v.s)+'</p>';
+  psProfilePaint();
+  return true;
+}
+function printSheet(){
+  if(!RES){ toast('지형 계산이 끝난 뒤에 인쇄해 주세요'); return }
+  fillPrintSheet(); PS_AT=Date.now();
+  try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다 · 브라우저 메뉴의 인쇄를 이용해 주세요') }
+}
+var PS_AT=0;   /* 버튼으로 막 채웠으면 beforeprint 에서 다시 그리지 않는다(인쇄 레이아웃에선 화면 지도 폭이 0이 될 수 있음) */
+window.addEventListener('beforeprint',function(){ if(Date.now()-PS_AT<5000) return; if(!cv.clientWidth&&PS_AT) return; try{ fillPrintSheet() }catch(e){} });   /* Ctrl+P 로도 같은 판(채우기만) */
+$('#printA4').addEventListener('click',printSheet);
+$('#saveImg').addEventListener('click',exportPng);
+/* 상세 설정 안 토글이 켜져 있으면 summary 에 '켜짐 n' 점 표시 */
+(function(){
+  var box=$('#togsAdv'), out=$('#advOn'); if(!box||!out) return;
+  function paint(){ var n=box.querySelectorAll('button.on').length; out.textContent=n?('켜짐 '+n):'' }
+  if(window.MutationObserver) new MutationObserver(paint).observe(box,{attributes:true,subtree:true,attributeFilter:['class']});
+  paint();
+})();
 function summaryText(){
   var R=RES||{}, v=verdictOf(R.mean,R.p95,R.g15p,R.g25p);
   return ['[필지 경사도 분석] '+stamp(),
@@ -2701,14 +2920,14 @@ function pxPaintSub(){ document.querySelectorAll('#pxSub button').forEach(functi
 function pxSetView(v){
   S.lay.px=v==='px'?1:0; S.lay.arrow=v==='px'?0:1;
   document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===v) });
-  var ab=document.querySelector('#togs button[data-l="arrow"]'); if(ab) ab.classList.toggle('on',!!S.lay.arrow);
+  var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(ab) ab.classList.toggle('on',!!S.lay.arrow);
   if(!S.lay.px) pxShowTip(null);
   pxPaintNote(); paintLegend(); requestRender();
 }
 document.querySelectorAll('#pxView button').forEach(function(b){ b.addEventListener('click',function(){ pxSetView(b.getAttribute('data-v')) }) });
 document.querySelectorAll('#pxSub button').forEach(function(b){ b.addEventListener('click',function(){ SUBDIV=+b.getAttribute('data-s'); PXG=null; PX_SEL=null; pxPaintSub(); requestRender() }) });
 /* 화살표 층 버튼을 직접 누를 때도 보기 버튼 표시를 맞춘다 */
-(function(){ var ab=document.querySelector('#togs button[data-l="arrow"]'); if(ab) ab.addEventListener('click',function(){ if(S.lay.arrow&&S.lay.px){ S.lay.px=0; pxShowTip(null) } document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===(S.lay.px?'px':'arrow')) }); pxPaintNote(); paintLegend(); requestRender() }) })();
+(function(){ var ab=document.querySelector('#togsAdv button[data-l="arrow"]'); if(ab) ab.addEventListener('click',function(){ if(S.lay.arrow&&S.lay.px){ S.lay.px=0; pxShowTip(null) } document.querySelectorAll('#pxView button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-v')===(S.lay.px?'px':'arrow')) }); pxPaintNote(); paintLegend(); requestRender() }) })();
 
 /* ---------------- 통계표 — 5° 구간 면적·구성비 + 번호별 평균 경사 ---------------- */
 var PXS_PAGE=0, PXS_OPEN=false, PXS_PER=30;
