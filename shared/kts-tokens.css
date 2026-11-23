@@ -1,0 +1,34 @@
+/* ==========================================================================
+   케이티에스 원클릭 — 공통 토큰 (디자인 시스템 1벌)
+   :root = 다크(기본) · html[data-kts-theme="light"] = 라이트
+   오렌지(#ff6b00)는 두 벌 모두 고정 — 브랜드색
+   기준: refs/v0_listing_20261123/app/globals.css (bg·panel·line·muted·accent)
+   ========================================================================== */
+:root,html[data-kts-theme="dark"]{
+  color-scheme:dark;
+  --k-bg:#0b132b; --k-panel:#141f38; --k-panel-2:#1a2745; --k-line:#2a354e; --k-line-2:#36425c;
+  --k-ink:#f4f6fb; --k-ink-2:#a5b1c7; --k-ink-3:#7d8ba3;
+  --k-accent:#ff6b00; --k-accent-2:#ff994b; --k-on-accent:#141414;
+  --k-ok:#22c55e; --k-warn:#f59e0b; --k-danger:#ef4444;
+  --k-hd-bg:rgba(11,19,43,.94);
+  --k-tog-on:#ffd9a6;
+  --k-glow:radial-gradient(120% 45% at 50% -6%,#132a4e 0%,transparent 62%);
+}
+html[data-kts-theme="light"]{
+  color-scheme:light;
+  --k-bg:#f6f7f9; --k-panel:#ffffff; --k-panel-2:#faf7f2; --k-line:#e3e7ee; --k-line-2:#cfd6e0;
+  --k-ink:#111827; --k-ink-2:#5b6878; --k-ink-3:#8794a5;
+  --k-accent:#ff6b00; --k-accent-2:#ff8a33; --k-on-accent:#ffffff;
+  --k-ok:#16a34a; --k-warn:#d97706; --k-danger:#dc2626;
+  --k-hd-bg:rgba(255,255,255,.9);
+  --k-tog-on:#a2410a;
+  --k-glow:radial-gradient(120% 45% at 50% -6%,#fff1e6 0%,transparent 62%);
+}
+:root{
+  --k-radius:12px; --k-radius-lg:14px; --k-radius-sm:8px;
+  --k-sp-1:6px; --k-sp-2:10px; --k-sp-3:14px; --k-sp-4:18px; --k-sp-5:24px; --k-sp-6:32px;
+  --k-fs-h1:27px; --k-fs-h2:19px; --k-fs-h3:16px; --k-fs:15px; --k-fs-sm:13px; --k-fs-xs:12px; --k-fs-2xs:10.5px;
+  --k-tap:44px;                    /* 모든 버튼 최소 높이 */
+  --k-shadow:0 8px 20px rgba(0,0,0,.18);
+  --k-font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+}

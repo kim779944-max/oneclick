@@ -1,0 +1,21 @@
+/* ==========================================================================
+   케이티에스 원클릭 — A4 인쇄 공통 (페이지 CSS 뒤에 링크)
+   화면이 다크든 라이트든 인쇄는 항상 흰 배경 · 검은 글씨
+   ========================================================================== */
+@media print{
+  @page{size:A4;margin:12mm}
+  :root,html[data-kts-theme="light"],html[data-kts-theme="dark"]{
+    color-scheme:light;
+    --k-bg:#fff; --k-panel:#fff; --k-panel-2:#fff; --k-line:#9ca3af; --k-line-2:#9ca3af;
+    --k-ink:#111827; --k-ink-2:#4b5563; --k-ink-3:#4b5563; --k-hd-bg:#fff; --k-glow:none;
+  }
+  html,body{background:#fff!important;color:#111827!important}
+  body *{color:#111827!important;background-color:transparent!important;background-image:none!important;
+    box-shadow:none!important;text-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header,footer,.k-hd,.k-noprint,.k-hd .k-theme,.k-theme{display:none!important}
+  .k-card,.k-tbl tr{break-inside:avoid;page-break-inside:avoid}
+  .k-card{border-color:#9ca3af!important}
+  .wrap,#app{max-width:none!important}
+  a{text-decoration:none}
+}
