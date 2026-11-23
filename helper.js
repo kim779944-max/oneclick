@@ -215,14 +215,17 @@
 
   /* ---------- 화면 ---------- */
   var CSS =
-    '#kts-helper-btn{position:fixed;z-index:240;right:max(12px,calc(50% - 274px));bottom:14px;width:52px;height:52px;border:0;border-radius:14px;' +
-    'background:linear-gradient(160deg,#FF8A2B,#FF6B00);color:#0A1224;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;' +
-    'box-shadow:0 8px 20px rgba(255,107,0,.35),0 2px 6px rgba(0,0,0,.35);cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;' +
-    'padding:0;margin:0;line-height:1;-webkit-tap-highlight-color:transparent;transition:bottom .15s}' +
+    '#kts-helper-btn{position:fixed;z-index:240;right:max(12px,calc(50% - 274px));bottom:14px;width:38px;height:38px;border:0;border-radius:12px;' +
+    'background:linear-gradient(160deg,#FF8A2B,#FF6B00);color:#0A1224;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:.86;' +
+    'box-shadow:0 4px 12px rgba(255,107,0,.32),0 1px 4px rgba(0,0,0,.35);cursor:grab;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;' +
+    'padding:0;margin:0;line-height:1;-webkit-tap-highlight-color:transparent;transition:bottom .15s,left .15s,right .15s,opacity .15s;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}' +
+    /* 159번: 38px 아이콘 · 누르거나 끌 때만 불투명 · 끌어서 아무 데나(좌/우 가장자리 스냅) */
+    '#kts-helper-btn:active,#kts-helper-btn.kh-drag{opacity:1;cursor:grabbing}#kts-helper-btn.kh-drag{transition:none;box-shadow:0 8px 22px rgba(255,107,0,.45),0 2px 8px rgba(0,0,0,.4)}' +
     /* 133번: 오른쪽 아래는 카드 [열기]/[+] 자리 → 390(≤719px)은 왼쪽 아래, 넓은 화면은 본문 바깥 왼쪽 여백 */
-    '@media (max-width:719px){#kts-helper-btn{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:48px;height:48px}}' +
+    '@media (max-width:719px){#kts-helper-btn{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:38px;height:38px}}' +
     '@media (min-width:720px){#kts-helper-btn{left:max(10px,calc(50% - 300px));right:auto}}' +
-    '#kts-helper-btn b{font-size:20px;font-weight:900;line-height:1}#kts-helper-btn span{font-size:10.5px;font-weight:900;margin-top:2px;letter-spacing:-.3px}' +
+    '#kts-helper-btn b{font-size:16px;font-weight:900;line-height:1;pointer-events:none}' +
+    '#kts-helper-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
     '#kts-helper{position:fixed;inset:0;z-index:250;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.66);' +
     'font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;letter-spacing:-.2px;word-break:keep-all;line-height:1.5}' +
     '#kts-helper.on{display:flex}' +
@@ -271,8 +274,12 @@
     btn = d.createElement('button');
     btn.type = 'button'; btn.id = 'kts-helper-btn'; btn.setAttribute('aria-label', '도우미 열기 — 사용법·자주 묻는 질문·문의');
     btn.innerHTML = '<b>?</b><span>도우미</span>';
-    btn.onclick = function () { open(0); };
+    btn.onclick = function (e) {
+      if (Date.now() < drag.noClick) { e.preventDefault(); e.stopPropagation(); return; }   /* 6px 넘게 끌었으면 창 안 열림 */
+      open(0);
+    };
     d.body.appendChild(btn);
+    bindDrag();
     place();
     w.addEventListener('resize', place);
     w.addEventListener('scroll', function () { if (!place._r) { place._r = 1; requestAnimationFrame(function () { place._r = 0; place(); }); } }, { passive: true });
@@ -309,8 +316,69 @@
     if (b >= base + (btn.offsetHeight || 0) + 4) return 0;   /* 이미 도우미 위에 있음 */
     return Math.round(b + h);
   }
+  /* ---------- 159번: 손가락으로 끌어 이동 · 가장자리 스냅 · 위치 저장 ---------- */
+  var POS_KEY = 'kts_helper_pos_v1', EDGE = 10, VPAD = 8, SLOP = 6;
+  var drag = { id: null, on: false, sx: 0, sy: 0, ox: 0, oy: 0, noClick: 0 };
+  function loadPos() {
+    try {
+      var p = JSON.parse(localStorage.getItem(POS_KEY) || 'null');
+      if (p && (p.side === 'left' || p.side === 'right')) return p;
+    } catch (e) { }
+    return null;
+  }
+  function clampY(y) {
+    var h = btn.offsetHeight || 38, H = w.innerHeight;
+    return Math.round(Math.max(VPAD, Math.min(H - h - VPAD, y)));
+  }
+  function applyPos(p) {
+    var y = p.y;
+    if (typeof p.r === 'number' && isFinite(p.r)) y = p.r * w.innerHeight;   /* 회전·리사이즈: 비율로 다시 계산 */
+    var s = btn.style;
+    if (p.side === 'right') { s.left = 'auto'; s.right = EDGE + 'px'; } else { s.left = EDGE + 'px'; s.right = 'auto'; }
+    if (y === null || y === undefined || !isFinite(y)) { s.top = ''; return; }   /* 높이 미지정 = CSS 기본 bottom */
+    s.top = clampY(y) + 'px'; s.bottom = 'auto';
+    btn.setAttribute('data-pos', p.side);
+  }
+  function bindDrag() {
+    btn.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button > 0) return;
+      var r = btn.getBoundingClientRect();
+      drag.id = e.pointerId; drag.on = false; drag.sx = e.clientX; drag.sy = e.clientY; drag.ox = e.clientX - r.left; drag.oy = e.clientY - r.top;
+      try { btn.setPointerCapture(e.pointerId); } catch (x) { }
+    });
+    btn.addEventListener('pointermove', function (e) {
+      if (drag.id !== e.pointerId) return;
+      var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+      if (!drag.on) {
+        if (Math.sqrt(dx * dx + dy * dy) < SLOP) return;   /* 6px 미만 = 탭 */
+        drag.on = true; btn.classList.add('kh-drag');
+      }
+      e.preventDefault();
+      var W = w.innerWidth, H = w.innerHeight, bw = btn.offsetWidth || 38, bh = btn.offsetHeight || 38;
+      var x = Math.max(0, Math.min(W - bw, e.clientX - drag.ox)), y = Math.max(0, Math.min(H - bh, e.clientY - drag.oy));
+      var s = btn.style; s.right = 'auto'; s.bottom = 'auto'; s.left = Math.round(x) + 'px'; s.top = Math.round(y) + 'px';
+    });
+    function end(e) {
+      if (drag.id !== e.pointerId) return;
+      drag.id = null;
+      try { btn.releasePointerCapture(e.pointerId); } catch (x) { }
+      if (!drag.on) return;                                  /* 탭 → click 이 open(0) */
+      drag.on = false; btn.classList.remove('kh-drag');
+      drag.noClick = Date.now() + 450;                       /* 끌기 뒤 따라오는 click 억제 */
+      var r = btn.getBoundingClientRect(), side = (r.left + r.width / 2) < w.innerWidth / 2 ? 'left' : 'right';
+      var y = clampY(r.top), p = { side: side, y: y, r: Math.round(y / w.innerHeight * 10000) / 10000 };
+      try { localStorage.setItem(POS_KEY, JSON.stringify(p)); } catch (x) { }
+      applyPos(p);
+    }
+    btn.addEventListener('pointerup', end);
+    btn.addEventListener('pointercancel', end);
+  }
+
   function place() {
     if (!btn) return;
+    if (drag.on) return;
+    var saved = loadPos();
+    if (saved) { applyPos(saved); btn.setAttribute('data-bar', 'user'); return; }   /* 사용자가 정한 자리 — 자동 회피 중지 */
     var prev = btn.style.bottom;
     btn.style.transition = 'none'; btn.style.bottom = '';   /* CSS 기본 자리(390: 왼쪽 아래 10px+안전영역)부터 */
     var cssB = parseFloat(w.getComputedStyle(btn).bottom) || 14;
@@ -437,7 +505,7 @@
   function close() { if (root) root.classList.remove('on'); }
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root && root.classList.contains('on')) close(); });
 
-  w.KTS_HELPER = { v: '20261122a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY };
+  w.KTS_HELPER = { v: '20261123a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY };
 
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', build); else build();
 })(window, document);
