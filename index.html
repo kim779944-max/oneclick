@@ -380,7 +380,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
     <b>결제는 이 사이트에서 하지 않습니다.</b> 무료로 열어 보고, 더 쓸 때의 안내는 각 도구 안 [그 이상 쓰기] 버튼 안쪽에만 있습니다.<br>
     결제는 <b>① 크몽·스마트스토어 ② 계좌이체 ③ 이용권 코드</b> 셋 중 하나입니다.
     <button type="button" id="payNoteBtn" style="margin-top:8px;border:1px solid rgba(255,162,77,.5);background:rgba(255,107,0,.12);color:#FFC98F;border-radius:9px;padding:7px 11px;font-family:inherit;font-size:11px;font-weight:900;cursor:pointer">계좌이체 · 이용권 코드 안내</button>
-    <span id="payNoteMsg" hidden style="display:block;margin-top:6px;color:#FFA24D;font-size:11px;font-weight:800">결제 안내를 열지 못했습니다 — 문자 010-2002-2899 로 문의해 주세요.</span>
+    <span id="payNoteMsg" hidden style="display:none;margin-top:6px;color:#FFA24D;font-size:11px;font-weight:800">결제 안내를 열지 못했습니다 — 문자 010-2002-2899 로 문의해 주세요.</span>
   </div>
 
   <div class="foot k-foot">
@@ -630,7 +630,7 @@ $('#cpnBtn').onclick = showCoupon;
 /* 수익 구조: 이용권 코드 + 계좌이체 안내 (pay.js) — 결제 단계에서만 금액·부가세를 보입니다 */
 $('#payNoteBtn').onclick = function(){
   if (window.KTSPay) { KTSPay.open({label:'이용권 · 열쇠'}); return; }
-  $('#payNoteMsg').hidden = false;
+  var _m = $('#payNoteMsg'); _m.hidden = false; _m.style.display = 'block';   /* 인라인 display:none 이 hidden 속성을 이기므로 둘 다 푼다 */
 };
 $('#startBtn').onclick = function(){ showGate('realty', true); };
 document.addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('[data-cpn]') : null; if (b) { e.preventDefault(); showCoupon(); } });

@@ -447,6 +447,14 @@
     if (!t) { t = d.createElement('div'); t.className = 'kk-toast'; d.body.appendChild(t); }
     t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2600);
   }
+  /* 이름 끝 받침에 맞춰 조사 고르기 — '더뷰을(를)' 같은 어색한 말이 나가지 않게 */
+  function josa(word, pair) {
+    var w = String(word || '').replace(/[\s~!?.,]+$/, '');
+    var ch = w.slice(-1), c = ch ? ch.charCodeAt(0) : 0;
+    var p = pair.split('/');
+    var jong = (c >= 0xAC00 && c <= 0xD7A3) ? ((c - 0xAC00) % 28) !== 0 : false;
+    return w + (jong ? p[0] : p[1]);
+  }
   var listeners = [];
   function changed() { try { listeners.forEach(function (f) { f(); }); } catch (e) {} }
   function onChange(f) { if (typeof f === 'function') listeners.push(f); }
@@ -522,7 +530,7 @@
       s.box[idx] = k;
       if (old && old !== k && !s.locked.some(function (x) { return x.id === old; })) {
         s.locked.push({ id: old, at: today() });
-        toast('칸을 바꿨습니다 · ' + info(old).nm + '은(는) 잠겼습니다(열쇠 1개로 부활)');
+        toast('칸을 바꿨습니다 · ' + josa(info(old).nm, '은/는') + ' 잠겼습니다(열쇠 1개로 부활)');
       } else { toast('칸을 바꿨습니다'); }
     }
     if (s.box.length > s.slots) s.box = s.box.slice(0, s.slots);
@@ -534,7 +542,7 @@
     if (!k) return;
     s.box.splice(+idx, 1);
     if (!s.locked.some(function (x) { return x.id === k; })) s.locked.push({ id: k, at: today() });
-    save(s); changed(); toast(info(k).nm + '을(를) 뺐습니다 · 잠김(열쇠 1개로 부활)');
+    save(s); changed(); toast(josa(info(k).nm, '을/를') + ' 뺐습니다 · 잠김(열쇠 1개로 부활)');
   }
   function revive(id) {
     var s = load();
@@ -542,7 +550,7 @@
     if (s.box.length >= s.slots) { toast('빈칸이 없습니다 · 칸을 바꾸거나 5칸째를 여세요'); return false; }
     s.keys--; s.locked = s.locked.filter(function (x) { return x.id !== String(id); });
     if (s.box.indexOf(String(id)) < 0) s.box.push(String(id));
-    save(s); changed(); toast('🔑 열쇠 1개를 써서 ' + info(id).nm + '을(를) 되살렸습니다');
+    save(s); changed(); toast('🔑 열쇠 1개를 써서 ' + josa(info(id).nm, '을/를') + ' 되살렸습니다');
     return true;
   }
   /* 5칸째 열기 — 설명서·미리보기 → "열까요?" → 열쇠 1개 */
@@ -662,7 +670,7 @@
       '<p class="kk-lead">' + (s.verified
         ? esc(s.name || '') + '님 · ' + s.slots + '칸 중 ' + s.box.length + '칸 사용 · 담은 도구는 계속 열립니다. 하루 무료 횟수만 지킵니다.'
         : '아직 본인 확인 전입니다. 박스에 담으려면 아래 [본인 간편인증]을 먼저 해 주세요.') + '</p>' +
-      (hint ? '<div class="kk-prev"><div class="ln" style="font-size:11px;color:#FFD9A6;font-weight:800">' + esc(info(hint).nm) + '은(는) 아직 박스에 없습니다.</div>' +
+      (hint ? '<div class="kk-prev"><div class="ln" style="font-size:11px;color:#FFD9A6;font-weight:800">' + esc(josa(info(hint).nm, '은/는')) + ' 아직 박스에 없습니다.</div>' +
         '<div class="ln" style="font-size:10.5px;color:#AFBDD0;margin-top:3px">박스에 담으면 다음부터 바로 열립니다. 지금은 1회 무료 시연까지 됩니다.</div></div>' : '') +
       '<div class="kk-grid">' + cells + '</div>' +
       (s.verified ? '' : '<button class="kk-b p" data-a="verify">본인 간편인증 · 🔑 열쇠 4개 받기</button>') +

@@ -346,7 +346,9 @@
   function stripChatPrefix(line){
     var v = line;
     v = v.replace(/^\d{4}년\s*\d{1,2}월\s*\d{1,2}일\s*(오전|오후)\s*\d{1,2}:\d{2}(:\d{2})?,\s*/,"");
-    v = v.replace(/^\[[^\]]{1,20}\]\s*/,"");
+    /* 앞 대괄호는 카톡·문자 앱 꼬리표일 수도 있지만, [매매]·[전세]·[급매]처럼
+       거래 종류를 달고 온 경우에는 그 말을 살려야 줄이 매물로 인식됩니다 */
+    v = v.replace(/^\[([^\]]{1,20})\]\s*/, function(m0, inner){ return hasRealtyWord(inner) ? inner + ' ' : ''; });
     v = v.replace(/^\[?(오전|오후)\s*\d{1,2}:\d{2}\]?\s*/,"");
     var m = /^([^:：]{1,20})\s*[:：]\s*/.exec(v);
     if(m && !hasRealtyWord(m[1])) v = v.slice(m[0].length);
@@ -730,7 +732,7 @@
         left--;
         if(left === 0) say(total + "개 파일을 정리했습니다.");
       };
-      r.onerror = function(){ left--; say(f.name + " 을(를) 읽지 못했습니다.", true); };
+      r.onerror = function(){ left--; say(f.name + " 파일을 읽지 못했습니다.", true); };
       r.readAsText(f, "utf-8");
     });
   };

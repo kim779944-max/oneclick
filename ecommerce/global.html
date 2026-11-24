@@ -426,7 +426,7 @@ async function boot(){
   drawSets();
   K.shell(); K.tabs('#tabs');
   K.$$('#ctry button').forEach(function(b){ b.onclick = function(){ showSet(b.getAttribute('data-c')); }; });
-  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); if (!K.num($('#inWeight').value)) m.push('중량'); return m.length ? m.join('·') + '을(를) 넣어 주세요' : ''; });
+  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); if (!K.num($('#inWeight').value)) m.push('중량'); return m.length ? m.join('·') + ' — 넣어 주세요' : ''; });
   function oh(){ $('#originHint').textContent = madeIn() ? '원산지가 한국이라 문구에 Made in Korea / 韓国製 를 넣습니다.' : '원산지가 한국이 아니라 Made in Korea 대신 Shipped from Korea / 韓国発送 으로 적습니다(원산지 허위 표기 방지).'; }
   $('#inOrigin').addEventListener('input', oh); oh();
   $('#inWeight').addEventListener('input', shipHints);

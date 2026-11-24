@@ -268,7 +268,7 @@ async function boot(){
   await K.loadData(['fees', 'tags_ko', 'copy_ko', 'sample_products']);
   $('#inCat').innerHTML = Object.keys(K.D.tags_ko.categories).map(function(c){ return '<option>' + c + '</option>'; }).join('');
   K.shell(); K.tabs('#tabs');
-  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); return m.length ? m.join('·') + '을(를) 넣어 주세요' : ''; });
+  K.gate('#btnGo', '#need', function(){ var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); return m.length ? m.join('·') + ' — 넣어 주세요' : ''; });
   $('#inPhoto').addEventListener('change', async function(){ S.photos = await K.readPhotos(this.files, 6); $('#thumbs').innerHTML = S.photos.map(function(p){ return '<img src="' + p.url + '" alt="">'; }).join(''); });
   $('#btnGo').addEventListener('click', go); $('#btnCopy').addEventListener('click', curCopy); $('#btnDl').addEventListener('click', curDl);
   if (K.qs('sample') === '1'){

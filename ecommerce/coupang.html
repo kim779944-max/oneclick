@@ -558,7 +558,7 @@ async function boot(){
   $('#inCat').innerHTML = K.D.fees.coupang.categories.map(function(c){ return '<option>' + c.name + '</option>'; }).join('');
   K.shell(); K.tabs('#tabs');
   K.gate('#btnGo', '#need', function(){
-    var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); return m.join('·') ? m.join('·') + '을(를) 넣어 주세요' : '';
+    var m = []; if (!$('#inName').value.trim()) m.push('상품명'); if (!K.num($('#inCost').value)) m.push('매입가'); return m.length ? m.join('·') + ' — 넣어 주세요' : '';
   });
   $('#inLink').addEventListener('input', linkInfo);
   $('#inPhoto').addEventListener('change', async function(){
