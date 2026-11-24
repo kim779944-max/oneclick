@@ -8,24 +8,71 @@
      카드 PG 직접 결제는 없습니다 — 없는 결제수단을 만들지 않습니다.
    · 이용권 코드는 문자로 받은 KS+YYMM-4자리, 그 달에만 열립니다(이 기기에서 확인).
    · 돈 이야기는 여기(결제 단계) 안에서만. 도구 화면에는 [그 이상 쓰기] 버튼만.
-   · 계좌 정보는 아래 ACCOUNT 에만 있습니다. 비어 있으면 화면은 '문자로 안내'로
-     바뀝니다 — 계좌번호를 지어내지 않습니다.
+   · 계좌 정보는 대표님이 채우는 3칸(은행·계좌번호·예금주)입니다. 코드가 지어내지
+     않습니다. 비어 있으면 시트는 '계좌 미설정' 상태로 문자 안내로 바뀝니다.
+     채우는 길은 둘 — ① admin.html 에서 3칸 저장(이 기기에 바로) ② pay-config.js
+     한 줄을 커밋(모든 손님 기기에 적용). 읽는 순서도 그 순서입니다.
    ============================================================================= */
 (function (w, d) {
   'use strict';
 
-  /* ---------- 대표님이 채우실 자리 ----------
-     bank: 은행 이름 / no: 계좌번호 / holder: 예금주
-     셋 다 채우면 시트에 그대로 인쇄됩니다. 하나라도 비면 '문자로 안내'로 표시. */
+  /* ---------- 대표님이 채우실 자리: 은행 · 계좌번호 · 예금주 3칸 ----------
+     읽는 순서
+       ① admin.html 에서 저장한 값 → 이 기기 localStorage (kts_pay_account_v1)
+       ② pay-config.js 의 window.KTS_PAY_ACCOUNT → 사이트 전체(모든 손님 기기)
+       ③ 이 파일의 기본값 ACCOUNT              → 커밋으로 배포
+     셋 다 비면 시트에 '계좌 미설정'이 뜨고, 손님에게는 문자로 계좌를 보내는 안내로
+     바뀝니다. 계좌번호를 코드가 지어내지 않습니다. */
   var ACCOUNT = {
     bank: '',
     no: '',
     holder: ''
   };
+  var AKEY = 'kts_pay_account_v1';
   var SMS = '01020022899';
   var ST = 'kts_pay_v1';
+  /* pay-config.js 위치 — 이 파일과 같은 폴더 */
+  var SELF = (function () { try { return (d.currentScript && d.currentScript.src) || ''; } catch (e) { return ''; } })();
+  var BASE = SELF ? SELF.replace(/pay\.js(\?.*)?$/, '') : '';
+  var CFG_SRC = SELF ? BASE + 'pay-config.js?v=20261124a' : '';
 
-  function full() { return !!(ACCOUNT.bank && ACCOUNT.no && ACCOUNT.holder); }
+  function clean(v) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
+  function pick(a) { a = a || {}; return { bank: clean(a.bank), no: clean(a.no), holder: clean(a.holder) }; }
+  function has3(a) { return !!(a && clean(a.bank) && clean(a.no) && clean(a.holder)); }
+  /* ① 관리자 화면에서 저장한 값 */
+  function adminAcct() {
+    var o = null; try { o = JSON.parse(ls(AKEY) || 'null'); } catch (e) { o = null; }
+    return (o && typeof o === 'object') ? o : null;
+  }
+  /* 지금 실제로 쓸 계좌 — 어디서 왔는지(src)도 같이 돌려줍니다 */
+  function acct() {
+    var a = adminAcct();
+    if (a && (clean(a.bank) || clean(a.no) || clean(a.holder))) { var p = pick(a); p.src = 'admin'; return p; }
+    if (w.KTS_PAY_ACCOUNT && (clean(w.KTS_PAY_ACCOUNT.bank) || clean(w.KTS_PAY_ACCOUNT.no) || clean(w.KTS_PAY_ACCOUNT.holder))) {
+      var q = pick(w.KTS_PAY_ACCOUNT); q.src = 'config'; return q;
+    }
+    var r = pick(ACCOUNT);
+    r.src = (r.bank || r.no || r.holder) ? 'file' : 'none';
+    return r;
+  }
+  var SRC_NAME = { admin: 'admin.html 저장값(이 기기)', config: 'pay-config.js(사이트 전체)', file: 'pay.js 기본값', none: '미설정' };
+  function full() { return has3(acct()); }
+  /* 관리자 화면에서 저장 · 지우기 — 지우면 ②·③ 순서로 돌아갑니다 */
+  function setAccount(o) {
+    var v = pick(o || {});
+    try { w.localStorage.setItem(AKEY, JSON.stringify({ bank: v.bank, no: v.no, holder: v.holder })); } catch (e) {}
+    return acct();
+  }
+  function clearAccount() { try { w.localStorage.removeItem(AKEY); } catch (e) {} return acct(); }
+  /* pay-config.js 는 한 번만 불러 봅니다(없으면 조용히 넘어감) */
+  var cfgAsked = false;
+  function loadConfig() {
+    if (cfgAsked || w.KTS_PAY_ACCOUNT || !CFG_SRC) return;
+    cfgAsked = true;
+    var s = d.createElement('script'); s.src = CFG_SRC; s.async = true;
+    s.onerror = function () { /* 아직 파일이 없으면 그냥 없음 */ };
+    (d.head || d.documentElement).appendChild(s);
+  }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function ls(k, v) { try { if (v === undefined) return w.localStorage.getItem(k); w.localStorage.setItem(k, v); return true; } catch (e) { return null; } }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -115,14 +162,16 @@
   function accountHtml(opt) {
     opt = opt || {};
     css();
-    var who = full() ? '' :
-      '<div class="ln">계좌는 <b>문자로 바로</b> 보내 드립니다. 아래 [문자로 계좌 받기]를 누르시면 답장으로 은행·계좌번호·예금주를 보내 드립니다.</div>' +
-      '<a class="kpay-b g" style="margin-top:7px" href="' + smsHref('[KTS 원클릭] ' + (opt.label || '이용권') + ' 계좌 안내 부탁드립니다. 이름: ') + '">문자로 계좌 받기</a>';
-    var acct = full() ?
-      '<div class="acct"><div><span class="k">은행</span> <span class="v">' + esc(ACCOUNT.bank) + '</span></div>' +
-      '<div><span class="k">계좌번호</span> <span class="v">' + esc(ACCOUNT.no) + '</span></div>' +
-      '<div><span class="k">예금주</span> <span class="v">' + esc(ACCOUNT.holder) + '</span></div></div>' : '';
-    return '<div class="kpay-sec"><b class="t"><em>②</em>계좌이체</b>' + acct + who +
+    var a = acct(), ok = has3(a);
+    var who = ok ? '' :
+      '<div class="ln">입금 계좌는 <b>아직 등록 전</b>입니다. 아래 [문자로 계좌 받기]를 누르시면 답장으로 은행·계좌번호·예금주를 보내 드립니다.</div>' +
+      '<a class="kpay-b g" style="margin-top:7px" href="' + smsHref('[KTS 원클릭] ' + (opt.label || '이용권') + ' 계좌 안내 부탁드립니다. 이름: ') + '">문자로 계좌 받기</a>' +
+      (master() ? '<div class="ln" style="margin-top:6px;color:#FFA24D">계좌 미설정 — ' + (BASE ? '<a href="' + esc(BASE) + 'admin.html" style="color:#FFC98F">admin.html</a>' : 'admin.html') + ' 에서 3칸을 넣으면 여기에 바로 인쇄됩니다.</div>' : '');
+    var box = ok ?
+      '<div class="acct"><div><span class="k">은행</span> <span class="v">' + esc(a.bank) + '</span></div>' +
+      '<div><span class="k">계좌번호</span> <span class="v">' + esc(a.no) + '</span></div>' +
+      '<div><span class="k">예금주</span> <span class="v">' + esc(a.holder) + '</span></div></div>' : '';
+    return '<div class="kpay-sec"><b class="t"><em>②</em>계좌이체</b>' + box + who +
       '<div class="ln" style="margin-top:6px"><b>입금자명</b>은 신청하신 성함 그대로 넣어 주세요. 다른 이름으로 넣으시면 확인이 늦어집니다.</div>' +
       '<div class="ln">입금하신 뒤 <b>[입금 알림]</b> 문자를 보내 주시면, 그 달 <b>이용권 코드</b>(KS+연월-4자리)를 문자로 보내 드립니다.</div>' +
       '<a class="kpay-b g" style="margin-top:7px" href="' + smsHref('[KTS 원클릭] ' + (opt.label || '이용권') + ' 입금했습니다. 입금자명: / 금액: ') + '">입금 알림 문자 보내기</a></div>';
@@ -152,8 +201,8 @@
       '<div class="ln">문자로 받은 코드(KS+연월-4자리)를 넣으면 이번 달 이용권이 열립니다. 지난달 코드는 열리지 않습니다.</div>' +
       '<div class="kpay-row"><input data-a="code" placeholder="예: KS2611-XXXX" autocomplete="off" aria-label="이용권 코드"><button type="button" class="kpay-b p" style="width:auto;padding:10px 14px" data-a="go">확인</button></div>' +
       '<div class="ln" data-a="ok" hidden style="margin-top:6px;color:#9BE7A8"></div></div>' +
-      '<p class="kpay-note">이용권 코드는 그 달에만 열립니다. 이 사이트는 카드번호·계좌번호를 저장하지 않고, 결제도 이 화면에서 하지 않습니다.</p>' +
-      (master() ? '<p class="kpay-note" style="color:#FFA24D">마스터 · 계좌 칸: ' + (full() ? '입력됨' : '비어 있음(pay.js ACCOUNT)') + ' · 이번 달 코드 ' + codeOf() + '</p>' : '');
+      '<p class="kpay-note">이용권 코드는 그 달에만 열립니다. 손님의 카드번호·계좌번호는 저장하지 않고, 결제도 이 화면에서 하지 않습니다.</p>' +
+      (master() ? '<p class="kpay-note" style="color:#FFA24D">마스터 · 계좌 ' + (full() ? '입력됨' : '미설정') + ' · ' + SRC_NAME[acct().src] + ' · 이번 달 코드 ' + codeOf() + '</p>' : '');
 
     sheet(html, function (el, close) {
       var inp = el.querySelector('[data-a="code"]');
@@ -205,9 +254,16 @@
     el.appendChild(box);
   }
 
-  w.KTSPay = {
-    ACCOUNT: ACCOUNT, open: open, accountHtml: accountHtml, codeOk: codeOk, codeOf: codeOf,
+  var API = {
+    open: open, accountHtml: accountHtml, codeOk: codeOk, codeOf: codeOf,
     redeem: redeem, redeemed: redeemed, hasThisMonth: hasThisMonth, vat: vat, toast: toast, line: line,
-    sms: SMS, ready: function () { return full(); }
+    sms: SMS, full: full, account: acct, setAccount: setAccount, clearAccount: clearAccount,
+    srcName: function () { return SRC_NAME[acct().src]; }, base: BASE, AKEY: AKEY,
+    ready: function () { return full(); }
   };
+  /* KTSPay.ACCOUNT 는 지금 쓰이는 3칸(읽기 전용) — 예전 이름 그대로 읽어도 값이 맞게 */
+  try { Object.defineProperty(API, 'ACCOUNT', { get: acct, enumerable: true }); }
+  catch (e) { API.ACCOUNT = ACCOUNT; }
+  w.KTSPay = API;
+  loadConfig();
 })(window, document);

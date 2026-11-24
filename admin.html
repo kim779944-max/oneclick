@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>KTS 원클릭 — 계좌 설정(관리자)</title>
+<meta name="theme-color" content="#0A1224">
+<link rel="icon" href="../icon.png">
+<style>
+:root{--bg:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
+  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#8FA0B8;--amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 46% at 50% -6%,#132A4E 0%,transparent 60%),var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Noto Sans KR",sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.6}
+#app{max-width:520px;margin:0 auto;padding:0 14px 60px}
+.hd{display:flex;align-items:center;gap:9px;padding:14px 2px 8px}
+.hd img{width:30px;height:30px;border-radius:8px}
+.hd b{font-size:14px;font-weight:900;letter-spacing:-.3px}
+.hd b span{color:var(--amber2)}
+.hd .sp{flex:1}
+.hd a{font-size:11px;font-weight:800;color:#9DAEC5;text-decoration:none;border:1px solid var(--line2);border-radius:999px;padding:5px 9px}
+h1{font-size:19px;font-weight:900;letter-spacing:-.7px;margin:6px 0 2px;word-break:keep-all}
+.lead{font-size:12px;color:var(--ink2);margin:0 0 12px;line-height:1.65;word-break:keep-all}
+.card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  padding:12px;margin-top:10px}
+.card>b.t{display:block;font-size:12.5px;font-weight:900;margin-bottom:7px}
+.card>b.t em{font-style:normal;color:var(--amber2);margin-right:5px}
+.fld{margin-top:8px}
+.fld label{display:block;font-size:11.5px;font-weight:800;color:#C7D3E3;margin-bottom:4px}
+.fld label i{font-style:normal;color:var(--gray);font-weight:700;font-size:10.5px;margin-left:4px}
+.fld input{width:100%;box-sizing:border-box;background:#0B1729;border:1px solid var(--line2);border-radius:10px;
+  color:var(--ink);font-size:15px;padding:11px 12px;font-family:inherit}
+.fld input:focus{outline:0;border-color:rgba(255,162,77,.75)}
+.row{display:flex;gap:7px;margin-top:10px}
+button{font-family:inherit;font-weight:900;cursor:pointer;border-radius:11px;font-size:13px;padding:11px 12px;border:0}
+.b-p{background:linear-gradient(135deg,#FF6B00,#FFA24D);color:var(--on);flex:1}
+.b-g{background:var(--card2);color:#DCE6F2;border:1px solid var(--line2);flex:1}
+.b-s{background:transparent;color:#8FA1B8;border:1px solid var(--line2);padding:9px 11px;font-size:11.5px}
+.st{font-size:11.5px;line-height:1.6;border-radius:10px;padding:8px 10px;margin-top:9px;word-break:keep-all}
+.st.ok{background:rgba(46,212,122,.1);border:1px solid rgba(46,212,122,.4);color:#9BE7A8}
+.st.warn{background:rgba(255,162,77,.09);border:1px solid rgba(255,162,77,.4);color:#FFC98F}
+.st.bad{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.4);color:#FCA5A5}
+.kv{display:flex;gap:8px;font-size:12px;padding:3px 0;color:#C7D3E3}
+.kv span{flex:0 0 auto;width:62px;color:var(--gray)}
+.kv b{font-weight:900;color:var(--ink);word-break:break-all}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px}
+pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px solid var(--line2);border-radius:10px;
+  padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#DCE6F2;margin:8px 0 0;line-height:1.7}
+.note{font-size:10.5px;color:#7C8DA6;line-height:1.65;margin:8px 0 0;word-break:keep-all}
+.pin{display:flex;gap:60px;justify-content:center;margin-top:14px}
+.digit{width:44px;height:56px;text-align:center;font-size:24px;font-weight:900;background:#0B1729;border:1px solid var(--line2);
+  border-radius:12px;color:var(--ink);font-family:inherit;padding:0}
+.digit:focus{outline:0;border-color:rgba(255,162,77,.75)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hd">
+    <img src="../icon.png" alt="">
+    <b>KTS <span>원클릭</span></b>
+    <div class="sp"></div>
+    <a href="../index.html">쇼룸</a>
+  </div>
+  <div id="doc"></div>
+</div>
+
+<script src="../master.js?v=20261121k"></script>
+<script src="../pay.js?v=20261124d"></script>
+<script>
+(function(){
+  var BANKS = ['국민','신한','우리','하나','농협','기업','카카오뱅크','토스뱅크','케이뱅크','우체국','새마을','수협','부산','대구','경남','광주','전북','제주','SC제일','씨티'];
+  var $doc = document.getElementById('doc');
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  /* ---------- ① 잠금 화면 (대표님 번호 4자리) ---------- */
+  function gate(){
+    $doc.innerHTML =
+      '<h1>계좌 설정 · 관리자</h1>' +
+      '<p class="lead">대표님 전용 화면입니다. 폰 뒷자리 <b style="color:#FFC98F">4자리</b>를 넣어 주세요.<br>' +
+      '한 번 넣으면 이 기기에서는 다시 묻지 않습니다.</p>' +
+      '<div class="card"><b class="t"><em>①</em>관리자 번호</b>' +
+      '<div class="pin">' +
+      '<input class="digit" id="d1" inputmode="numeric" maxlength="1" aria-label="1번째 자리">' +
+      '<input class="digit" id="d2" inputmode="numeric" maxlength="1" aria-label="2번째 자리">' +
+      '<input class="digit" id="d3" inputmode="numeric" maxlength="1" aria-label="3번째 자리">' +
+      '<input class="digit" id="d4" inputmode="numeric" maxlength="1" aria-label="4번째 자리">' +
+      '</div>' +
+      '<div class="row"><button class="b-p" id="pinGo">들어가기</button></div>' +
+      '<div class="st bad" id="pinMsg" hidden></div></div>';
+    var ds = ['d1','d2','d3','d4'].map(function(id){ return document.getElementById(id); });
+    ds.forEach(function(el, i){
+      el.addEventListener('input', function(){
+        el.value = el.value.replace(/\D/g,'').slice(0,1);
+        if (el.value && i < 3) ds[i+1].focus();
+        if (ds.every(function(x){ return x.value.length === 1; })) go();
+      });
+      el.addEventListener('keydown', function(e){ if (e.key === 'Backspace' && !el.value && i > 0) ds[i-1].focus(); });
+    });
+    function go(){
+      var code = ds.map(function(x){ return x.value; }).join('');
+      var msg = document.getElementById('pinMsg');
+      if (window.KTS && KTS.setMaster && KTS.setMaster(code)) { panel(); return; }
+      msg.hidden = false; msg.textContent = '번호가 맞지 않습니다. 다시 넣어 주세요.';
+      ds.forEach(function(x){ x.value = ''; }); ds[0].focus();
+    }
+    document.getElementById('pinGo').onclick = go;
+    ds[0].focus();
+  }
+
+  /* ---------- ② 계좌 3칸 ---------- */
+  function panel(){
+    var a = KTSPay.account();
+    var ok = KTSPay.full();
+    $doc.innerHTML =
+      '<h1>계좌 설정</h1>' +
+      '<p class="lead">결제 시트 ② 계좌이체에 인쇄될 <b>3칸</b>입니다. 여기서 넣으면 이 기기(폰)에서는 바로 나옵니다. ' +
+      '손님 기기까지 나오게 하려면 아래 <b>복사용 코드</b>를 사무실 PC에 넘겨 주세요.</p>' +
+
+      '<div class="card"><b class="t"><em>지금</em>결제 시트에 나오는 계좌</b>' +
+        (ok ? '<div class="kv"><span>은행</span><b id="kBank">' + esc(a.bank) + '</b></div>' +
+              '<div class="kv"><span>계좌번호</span><b id="kNo">' + esc(a.no) + '</b></div>' +
+              '<div class="kv"><span>예금주</span><b id="kHolder">' + esc(a.holder) + '</b></div>' +
+              '<div class="st ok">이 계좌로 결제 시트가 인쇄됩니다 · 출처: ' + esc(KTSPay.srcName()) + '</div>'
+            : '<div class="st warn">계좌 미설정 — 지금은 손님에게 <b>문자로 계좌를 보내는 안내</b>로 나갑니다.<br>아래 3칸을 넣고 [저장]을 누르세요.</div>') +
+      '</div>' +
+
+      '<div class="card"><b class="t"><em>①</em>3칸 입력</b>' +
+        '<div class="fld"><label for="fBank">은행</label>' +
+          '<input id="fBank" list="bankList" autocomplete="off" placeholder="예: 국민" value="' + esc(a.bank) + '">' +
+          '<datalist id="bankList">' + BANKS.map(function(b){ return '<option value="' + b + '">'; }).join('') + '</datalist></div>' +
+        '<div class="fld"><label for="fNo">계좌번호 <i>숫자와 - 만</i></label>' +
+          '<input id="fNo" inputmode="numeric" autocomplete="off" placeholder="예: 123456-01-234567" value="' + esc(a.no) + '"></div>' +
+        '<div class="fld"><label for="fHolder">예금주 <i>통장에 적힌 이름 그대로</i></label>' +
+          '<input id="fHolder" autocomplete="off" placeholder="예: 김태수" value="' + esc(a.holder) + '"></div>' +
+        '<div class="row"><button class="b-p" id="save">저장</button>' +
+          '<button class="b-g" id="clear">이 기기 값 지우기</button></div>' +
+        '<div class="st bad" id="msg" hidden></div>' +
+        '<p class="note">저장은 이 브라우저에만 됩니다. 다른 기기·손님에게는 나가지 않습니다.</p>' +
+      '</div>' +
+
+      '<div class="card"><b class="t"><em>②</em>손님 화면 미리보기</b>' +
+        '<div id="prev"></div>' +
+        '<div class="row"><button class="b-g" id="sheet">결제 시트 통째로 보기</button></div>' +
+      '</div>' +
+
+      '<div class="card"><b class="t"><em>③</em>사이트 전체에 적용 (사무실 PC)</b>' +
+        '<p class="note" style="margin-top:0">아래 한 줄을 <code>pay-config.js</code> 의 같은 줄과 바꿔 커밋하면 모든 손님 기기에 나옵니다. ' +
+        '지니에게 보내도 됩니다.</p>' +
+        '<pre id="code"></pre>' +
+        '<div class="row"><button class="b-p" id="copy">복사</button>' +
+          '<button class="b-g" id="sms">문자로 보내기</button></div>' +
+        '<div class="st ok" id="copied" hidden>복사했습니다 — pay-config.js 에 붙여 넣으세요.</div>' +
+      '</div>' +
+
+      '<div class="card"><b class="t"><em>읽는 순서</em>값이 겹칠 때</b>' +
+        '<p class="note" style="margin-top:0">① 이 화면에서 저장한 값(이 기기) → ② <code>pay-config.js</code>(사이트 전체) → ③ <code>pay.js</code> 기본값. ' +
+        '그래서 폰에서 시험해 본 값이 남아 있으면 사이트 전체 값이 가려집니다. 그때는 [이 기기 값 지우기]를 누르세요.</p>' +
+      '</div>';
+    bind();
+  }
+
+  function values(){
+    return {
+      bank: document.getElementById('fBank').value,
+      no: document.getElementById('fNo').value,
+      holder: document.getElementById('fHolder').value
+    };
+  }
+  function paintPreview(){
+    var box = document.getElementById('prev');
+    if (box) box.innerHTML = KTSPay.accountHtml({ label: '이용권' });
+    var v = values();
+    var line = "window.KTS_PAY_ACCOUNT = { bank: '" + String(v.bank||'').replace(/'/g,'') + "', no: '" +
+      String(v.no||'').replace(/'/g,'') + "', holder: '" + String(v.holder||'').replace(/'/g,'') + "' };";
+    var c = document.getElementById('code'); if (c) c.textContent = line;
+    return line;
+  }
+  function bind(){
+    ['fBank','fNo','fHolder'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', paintPreview);
+    });
+    document.getElementById('fNo').addEventListener('input', function(){ 
+      var el = this, p = el.selectionStart, before = el.value;
+      el.value = before.replace(/[^\d\-]/g, '');
+      if (el.value !== before) { try { el.setSelectionRange(p-1, p-1); } catch (e) {} }
+      paintPreview();
+    });
+    document.getElementById('save').onclick = function(){
+      var v = values(), msg = document.getElementById('msg');
+      var digits = String(v.no||'').replace(/[^\d]/g,'');
+      function bad(t){ msg.hidden = false; msg.textContent = t; }
+      if (!v.bank.trim()) return bad('은행을 넣어 주세요.');
+      if (digits.length < 6) return bad('계좌번호를 확인해 주세요(숫자 6자리 이상).');
+      if (!v.holder.trim()) return bad('예금주를 넣어 주세요.');
+      KTSPay.setAccount(v);
+      panel();
+      var p = document.getElementById('msg'); if (p) { p.hidden = false; p.className = 'st ok'; p.textContent = '저장했습니다 — 이 기기 결제 시트에 바로 나옵니다.'; }
+    };
+    document.getElementById('clear').onclick = function(){
+      if (!confirm('이 기기에 저장한 계좌를 지울까요? (pay-config.js 값이 있으면 그 값으로 돌아갑니다)')) return;
+      KTSPay.clearAccount(); panel();
+    };
+    document.getElementById('sheet').onclick = function(){ KTSPay.open({ label: '이용권 · 열쇠' }); };
+    document.getElementById('copy').onclick = function(){
+      var t = document.getElementById('code').textContent;
+      function done(){ var d = document.getElementById('copied'); if (d) { d.hidden = false; setTimeout(function(){ d.hidden = true; }, 2600); } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done, function(){ fallback(); });
+      } else fallback();
+      function fallback(){
+        var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    };
+    document.getElementById('sms').onclick = function(){
+      var t = document.getElementById('code').textContent;
+      var body = '[KTS 계좌] ' + t + ' — pay-config.js 에 넣어 주세요(사이트 전체 적용).';
+      location.href = 'sms:01020022899?body=' + encodeURIComponent(body);
+    };
+    paintPreview();
+  }
+
+  if (window.KTS && KTS.isMaster && KTS.isMaster()) panel(); else gate();
+})();
+</script>
+</body>
+</html>
