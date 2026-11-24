@@ -301,7 +301,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
       </a>
       <div class="sp"></div>
       <button class="ebtn" id="editBtn" type="button" aria-label="내 메뉴 편집 — 쓰는 도구만 골라 순서 정하기">편집</button>
-      <span class="k-theme2" role="group" aria-label="화면 색깔"><button type="button" data-kts-theme-set="dark" aria-pressed="true" title="색깔 1 — 어두운 남색 바탕에 주황" aria-label="색깔 1 — 어두운 남색 바탕에 주황">색깔1</button><button type="button" data-kts-theme-set="light" aria-pressed="false" title="색깔 2 — 흰 바탕에 남색" aria-label="색깔 2 — 흰 바탕에 남색">색깔2</button></span>
+      <span class="k-theme2" role="group" aria-label="화면 어두운·밝은 고르기"><button type="button" data-kts-theme-set="dark" aria-pressed="true" title="어두운 화면 — 남색 바탕에 주황" aria-label="어두운 화면 — 남색 바탕에 주황">어두운</button><button type="button" data-kts-theme-set="light" aria-pressed="false" title="밝은 화면 — 흰 바탕에 남색" aria-label="밝은 화면 — 흰 바탕에 남색">밝은</button></span>
       <button class="kbtn" id="kBtn" type="button" data-kk-badge>🔑 0</button>
       <button class="mkey" id="mKey" type="button" aria-label="대표님 마스터 모드">⚙</button>
     </div>
@@ -613,7 +613,7 @@ var HELP_HTML =
   '<p><b>반복 업무, 클릭 한 번으로 끝내세요.</b><br>설치 없이 바로 쓰는 사업자용 업무 도구입니다. 매물 정리부터 상품 콘텐츠·서명까지.</p>' +
   '<p>① 위의 <b>5대 분류</b> 중 하나를 누르면 그 구역 도구만 나옵니다. <b>[← 전체 분류]</b>로 돌아옵니다.<br>' +
   '② 오른쪽 위 <b>[편집]</b>에서 내가 쓰는 도구만 남기고 순서를 바꿉니다. 뺀 도구는 [+ 추가하기]로 되살립니다.<br>' +
-  '③ <b>색깔 1</b>(어두운 남색) · <b>색깔 2</b>(흰 바탕)를 고를 수 있습니다. 인쇄는 항상 흰 바탕입니다.</p>' +
+  '③ <b>어두운</b>(남색 바탕) · <b>밝은</b>(흰 바탕)을 고를 수 있습니다. 인쇄는 항상 흰 바탕입니다.</p>' +
   '<p>설치·로그인·결제 없이 씁니다. 무료 이용권은 아래 <b>[이용권]</b>에서.</p>' +
   '<div class="homeRow" style="justify-content:flex-start;margin:4px 4px 0"><button type="button" class="hbtn" data-cpn>이용권 · 해주세요 보기</button>' +
   '<a class="hbtn" href="tel:01020022899" style="display:inline-flex;align-items:center;text-decoration:none">전화 010-2002-2899</a></div>';
@@ -813,6 +813,6 @@ window.addEventListener('hashchange', function(){ if (location.hash === '#coupon
   window.addEventListener('scroll', function(){ btn.classList.toggle('on', window.scrollY>420); }, {passive:true});
 })();
 </script>
-<script src="helper.js?v=20261124a"></script>
+<script src="helper.js?v=20261125a"></script>
 </body>
 </html>

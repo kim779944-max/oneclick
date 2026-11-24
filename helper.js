@@ -415,8 +415,9 @@
     btn.addEventListener('pointercancel', end);
   }
 
-  /* 본문 글자 위에 걸치면 더 흐리게 — 글자를 가리지 않는다 */
+  /* 본문 글자·사진 위에 걸치면 더 흐리게 — 글자와 사진을 가리지 않는다 */
   var TEXT_RE = /^(P|LI|TD|TH|H1|H2|H3|H4|H5|H6|SPAN|B|STRONG|EM|I|SMALL|LABEL|DT|DD|BLOCKQUOTE|PRE|CODE)$/;
+  var PHOTO_TAG = /^(IMG|CANVAS|VIDEO|PICTURE)$/;
   function overText() {
     if (!btn || btn.classList.contains('kh-guide')) return false;
     var r = btn.getBoundingClientRect();
@@ -427,9 +428,11 @@
       var el = list[i];
       if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
       if (el === d.body || el === d.documentElement) return false;
+      if (PHOTO_TAG.test((el.tagName || '').toUpperCase())) return true;   /* 사진 위 — 흐리게 */
       var t = (el.textContent || '').replace(/\s+/g, '');
       if (TEXT_RE.test(el.tagName) && t.length > 1) return true;
       var st = w.getComputedStyle(el);
+      if (/url\(/i.test(st.backgroundImage || '')) return true;           /* 사진 타일 위 — 흐리게 */
       if ((st.backgroundColor && st.backgroundColor !== 'rgba(0, 0, 0, 0)') || st.backgroundImage !== 'none') return false;   /* 카드·바탕이면 글자가 아니다 */
       var par = el.parentElement;
       if (par && TEXT_RE.test(par.tagName) && (par.textContent || '').replace(/\s+/g, '').length > 1) return true;
@@ -481,17 +484,63 @@
     });
     return a;
   }
+  /* 211: 그 높이에 실제로 깔린 것 — 사진 3 · 제목/글자/버튼 2 · 카드 바탕 0 (위에서 아래로 3점을 본다) */
+  function elPenalty(el) {
+    if (!el || el.nodeType !== 1) return 0;
+    var tg = (el.tagName || '').toUpperCase();
+    if (PHOTO_TAG.test(tg)) return 3;
+    var cs;
+    try { cs = w.getComputedStyle(el); } catch (e) { cs = null; }
+    if (cs && /url\(/i.test(cs.backgroundImage || '')) return 3;
+    if (/^(BUTTON|INPUT|SELECT|TEXTAREA|A)$/.test(tg)) return 2;
+    var t = (el.textContent || '').replace(/\s+/g, '');
+    if (TEXT_RE.test(tg) && t.length > 0 && t.length <= 120) return 2;
+    return 0;
+  }
+  function coverScore(top) {
+    if (!btn) return 0;
+    var r = btn.getBoundingClientRect(), bh = btn.offsetHeight || 38;
+    var x = Math.min(w.innerWidth - 2, Math.max(2, r.left + r.width / 2));
+    var pts = [top + 5, top + bh / 2, top + bh - 5], sum = 0;
+    for (var i = 0; i < pts.length; i++) {
+      var y = Math.min(w.innerHeight - 2, Math.max(2, pts[i])), list = [];
+      try { list = (d.elementsFromPoint ? d.elementsFromPoint(x, y) : []) || []; } catch (e) { list = []; }
+      for (var j = 0; j < list.length; j++) {
+        var el = list[j];
+        if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
+        if (el === d.body || el === d.documentElement) break;      /* 바탕까지 내려왔으면 깔린 것이 없다 */
+        sum += elPenalty(el);
+        break;                                                     /* 가장 위에 깔린 요소 하나만 */
+      }
+    }
+    return sum;
+  }
   function pickTop(avoidKey) {
     var H = w.innerHeight, bh = btn.offsetHeight || 38, floor = H - bottomBarHeight() - bh - 8;
-    var rects = hitRects(false), keys = avoidKey ? hitRects(true) : [];
-    var best = null, bestA = Infinity;
-    TOP_PREF.forEach(function (p) {
+    var rects = hitRects(false), keys = avoidKey ? hitRects(true) : [], keyW = avoidKey ? 5000 : 0;
+    function costOf(t) {
+      var cv = coverScore(t), ar = areaAt(t, rects);
+      return { c: cv * 2000 + ar + areaAt(t, keys) * keyW, cv: cv, ar: ar };
+    }
+    var best = null, bestC = Infinity, bestCv = 0, bestA = 0;
+    TOP_PREF.forEach(function (p) {                  /* 38%를 먼저 — 같은 점수면 이 순서를 지킨다 */
       var t = Math.round(H * p / 100); if (t > floor) return;
-      if (avoidKey && areaAt(t, keys) > 0) return;
-      var a = areaAt(t, rects);
-      if (a < bestA) { bestA = a; best = t; }
+      var q = costOf(t);
+      if (q.c < bestC - 0.5) { bestC = q.c; best = t; bestCv = q.cv; bestA = q.ar; }
     });
-    btn.setAttribute('data-hit', String(Math.round(bestA === Infinity ? -1 : bestA)));
+    if (bestCv > 0) {         /* 기본 후보가 모두 제목·사진·버튼을 가리면 — 8px 단위로 빈 높이까지 훑는다 */
+      var mid = Math.round(H * 0.38), lo = Math.round(Math.max(12, H * 0.20)), hi = Math.min(floor, Math.round(H * 0.80));
+      var cand = [], t2;
+      for (t2 = lo; t2 <= hi; t2 += 8) if (t2 !== best) cand.push(t2);
+      cand.sort(function (a, b) { return Math.abs(a - mid) - Math.abs(b - mid); });   /* 38%에 가까운 자리부터 */
+      for (var i = 0; i < cand.length; i++) {
+        var q2 = costOf(cand[i]);
+        if (q2.c < bestC - 0.5) { bestC = q2.c; best = cand[i]; bestCv = q2.cv; bestA = q2.ar; }
+        if (bestCv === 0 && bestA === 0) break;        /* 완전히 빈 자리를 찾았으면 거기서 멈춘다 */
+      }
+    }
+    btn.setAttribute('data-hit', String(Math.round(bestA)));
+    btn.setAttribute('data-cover', String(bestCv));
     return best;
   }
   /* 스크롤이 멈췄을 때 [저장]·[인쇄]·결제류 버튼 위에 있으면 비어 있는 높이로 잠깐 비켜 섬(그 외에는 원래 자리) */

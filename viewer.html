@@ -301,7 +301,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
 <div class="mfmenu" id="mfMenu">
   <button type="button" id="mfSaveCur">지금 장 PNG</button>
   <button type="button" id="mfSaveZip">전체 장 PNG(ZIP)</button>
-  <button type="button" id="mfToForm">더양식에서 편집하기 →</button>
+  <button type="button" id="mfToForm">양식만들기에서 편집하기 →</button>
 </div>
 <div class="mfsheet" id="mfList">
   <div class="pane">
@@ -310,7 +310,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
     <div class="ft"><button type="button" id="mfListAdd">＋ 파일 추가</button><button type="button" class="all" id="mfCloseAll">모두 닫기</button></div>
   </div>
 </div>
-<a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
+<a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:6px;margin:8px 12px 0;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,107,0,.38);background:rgba(255,107,0,.08);text-decoration:none;color:#C7D3E3;line-height:1.25;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:8.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0;font-size:10.5px;font-weight:800;color:#AFBDD0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">현재 지역 <b style="color:#FFA24D;font-weight:900">무료 세팅</b> 사전예약 중</span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:12px">→</span></a>
 
 
 <div class="drop" id="drop">
@@ -324,7 +324,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
   <button class="big" onclick="document.getElementById('f').click()">파일 열기</button>
   <input type="file" id="f" hidden multiple accept=".hwp,.hwpx,.xlsx,.xlsm,.docx,.csv,.txt,.pdf,image/*">
   <div class="hint">파일을 고르면 표·문서가 화면 전체로 바로 펼쳐집니다</div>
-  <a class="shopmore" href="https://autooneclick.com/">원클릭 다른 도구 더보기 · 쇼룸 가기 →<span>더양식 · 더계약서 · 더상세 · 더스캔 · 더싸인 한자리</span></a>
+  <a class="shopmore" href="https://autooneclick.com/">원클릭 다른 도구 더보기 · 쇼룸 가기 →<span>양식만들기 · 더계약서 · 더상세 · 더스캔 · 더싸인 한자리</span></a>
 </div>
 
 <div id="loader">
@@ -2383,21 +2383,21 @@ body.edcap .xlwrap{overflow:visible!important}
 <script>window.KTS_UX_CFG={tool:"viewer",wm:["#doc"],flow:1};</script>
 <script src="shared/kts-handoff.js?v=20261124b"></script>
 <script>
-/* ===== 188번: 더뷰 → 더양식 =====
-   지금 보고 있는 문서(여러 장이면 전부)를 그림으로 넘겨 더양식이 그 자리에서 양식으로 만들어 준다.
-   넘긴 그림은 이 브라우저 안 IndexedDB 에만 잠시 담기고, 더양식이 꺼내면 지운다. */
+/* ===== 188번: 더뷰 → 양식만들기 =====
+   지금 보고 있는 문서(여러 장이면 전부)를 그림으로 넘겨 양식만들기가 그 자리에서 양식으로 만들어 준다.
+   넘긴 그림은 이 브라우저 안 IndexedDB 에만 잠시 담기고, 양식만들기가 꺼내면 지운다. */
 async function sendToForm(){
   if (!PP.kind) return showToast('먼저 문서를 열어 주세요');
-  if (!window.KTSHandoff) return showToast('더양식 연동을 불러오지 못했습니다 — 새로고침 후 다시 해 주세요');
+  if (!window.KTSHandoff) return showToast('양식만들기 연동을 불러오지 못했습니다 — 새로고침 후 다시 해 주세요');
   const list = mfSaveList().filter(c => mfCanSave(c.it));
-  if (!list.length) return showToast('이 형식은 더양식으로 넘길 수 없습니다 · PDF나 사진으로 열어 주세요');
+  if (!list.length) return showToast('이 형식은 양식만들기로 넘길 수 없습니다 · PDF나 사진으로 열어 주세요');
   if (list.length > 20) return showToast('한 번에 20장까지 넘길 수 있습니다');
   if (MF.busy) return;
   MF.busy = true;
   const pages = [];
   try{
     for (let i = 0; i < list.length; i++){
-      mfProg(true, list[i].it.name, '더양식으로 넘기는 중… ' + (i + 1) + ' / ' + list.length, Math.round((i + 1) / list.length * 95));
+      mfProg(true, list[i].it.name, '양식만들기로 넘기는 중… ' + (i + 1) + ' / ' + list.length, Math.round((i + 1) / list.length * 95));
       const r = await mfJpeg(list[i].it, list[i].pi);
       if (r && r.data) pages.push(r.data);
     }
@@ -2407,10 +2407,10 @@ async function sendToForm(){
   }catch(e){
     console.warn('send to theform fail', e);
     mfProg(false); MF.busy = false;
-    showToast('더양식으로 넘기지 못했습니다 · [PDF 저장] 후 더양식에서 [양식 사진 찍기]로 올려 주세요');
+    showToast('양식만들기로 넘기지 못했습니다 · [PDF 저장] 후 양식만들기에서 [양식 사진 찍기]로 올려 주세요');
   }
 }
 </script>
-<script src="ux.js?v=20261124b"></script>
-<script src="helper.js?v=20261122a"></script>
+<script src="ux.js?v=20261125a"></script>
+<script src="helper.js?v=20261125a"></script>
 </body></html>

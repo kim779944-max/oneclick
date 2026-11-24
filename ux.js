@@ -12,6 +12,8 @@
       (페이지 안의 요금표에는 data-kts-money 를 붙이면 같은 버튼으로 접힙니다)
    ③ 결과물 맨 밑에 파란 글씨 autooneclick.com — 마스터(대표님)면 지웁니다.
    ④ 결과물 순서 안내: [확인하기] → 전체뷰 → [저장] / [공유하기]
+     (2026-11-25) 이 안내는 첫 화면에 미리 깔지 않고, 결과가 실제로 생겨 4버튼이 붙는 순간 함께 붙습니다.
+     첫 화면에서 안내 3단이 입력칸을 밀어내지 않게 하려는 것입니다(양식만들기 guide:0 과 같은 방향).
    · 저장은 이 파일이 하지 않습니다. 각 도구의 기존 저장·복사 기능을 그대로 씁니다.
    ============================================================================= */
 (function (w, d) {
@@ -191,6 +193,10 @@
     }
     return null;
   }
+  function guideLine() {
+    return '결과물은 <b>[확인하기] → 전체뷰 → [저장] · [공유하기]</b> 순서로 받으세요.' +
+      (master() ? ' (대표님 화면 — 아래 파란 글씨 표시 없음)' : '');
+  }
   function flowBar() {
     if (!CFG.flow) return;
     var host = firstResult();
@@ -202,7 +208,19 @@
       '<button type="button" data-f="full">전체뷰</button>' +
       '<button type="button" data-f="save">저장</button>' +
       '<button type="button" data-f="share">공유하기</button>';
-    host.parentNode.insertBefore(bar, host);
+    /* 첫 화면을 덮지 않도록 — 순서 안내는 결과가 생겨 이 4버튼이 붙을 때 같이 붙는다 */
+    if (CFG.guide !== 0) {
+      var wrap = d.createElement('div');
+      wrap.className = 'kux-flowwrap';
+      host.parentNode.insertBefore(wrap, host);
+      wrap.appendChild(bar);
+      var gp = d.createElement('p');
+      gp.className = 'kuxguide';
+      gp.innerHTML = guideLine();
+      wrap.appendChild(gp);
+    } else {
+      host.parentNode.insertBefore(bar, host);
+    }
     bar.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('[data-f]') : null;
       if (!b) return;
@@ -251,24 +269,11 @@
     } catch (e) {}
   }
 
-  /* ④ 결과물 순서 — [확인하기] → 전체뷰 → [저장]/[공유하기] */
-  function guide() {
-    if (!CFG.flow) return;
-    if (CFG.guide === 0) return;        /* 도구가 안내줄을 직접 쓰는 화면(양식만들기 등) */
-    var p = d.createElement('p');
-    p.className = 'kuxguide';
-    p.innerHTML = '결과물은 <b>[확인하기] → 전체뷰 → [저장] · [공유하기]</b> 순서로 받으세요.' +
-      (master() ? ' (대표님 화면 — 아래 파란 글씨 표시 없음)' : '');
-    var anchor = d.querySelector('.kux-free') || d.querySelector('header');
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(p, anchor.nextSibling);
-  }
-
   ready(function () {
     style();
     homeLinks();
     moneyBlocks();
     hurdle();
-    guide();
     watermark();
     flowBar();
     watch();
