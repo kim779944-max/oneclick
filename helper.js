@@ -486,6 +486,13 @@
     if (/^(BUTTON|INPUT|SELECT|TEXTAREA|A)$/.test(tg)) return 2;
     var t = (el.textContent || '').replace(/\s+/g, '');
     if (TEXT_RE.test(tg) && t.length > 0 && t.length <= 120) return 2;
+    /* 라벨·배지: class 가 tg·tag·badge 류이거나, 자식 없이 자기 글자만 가진 짧은 상자 */
+    var cl = (typeof el.className === 'string' ? el.className : '');
+    if (/(^|\s)(tg|tag|badge|chip|pill|tbd|tbox)(\s|$)/.test(cl)) return 2;
+    var own = '';
+    for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3) own += n.nodeValue;
+    own = own.replace(/\s+/g, '');
+    if (own.length > 0 && own.length <= 20 && !el.querySelector('img,canvas,button,input,table,svg')) return 2;
     return 0;
   }
   /* 211: 그 점에 가장 위로 깔린 것 하나만 본다 — 사진 3 · 제목/글자/버튼 2 · 카드 바탕 0 */
