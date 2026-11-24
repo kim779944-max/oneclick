@@ -230,6 +230,9 @@
     '@media (min-width:720px){#kts-helper-btn{left:auto;right:max(12px,calc(50% - 300px));top:38%;bottom:auto}}' +
     /* 스크롤 0.8초 이상 · 입력 중이면 흐리게(.35) — 손대면 1 */
     '#kts-helper-btn.kh-dim{opacity:.35}' +
+    /* 2026-11-25: 본문 글자 위에 걸칠 때는 더 흐리게(0.25) — 손대면 바로 1 */
+    '#kts-helper-btn.kh-faint{opacity:.25}' +
+    '#kts-helper-btn.kh-faint:hover,#kts-helper-btn.kh-faint:focus-visible,#kts-helper-btn.kh-faint:active{opacity:1}' +
     '#kts-helper-btn b{font-size:16px;font-weight:900;line-height:1;pointer-events:none}' +
     '#kts-helper-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
     '#kts-helper{position:fixed;inset:0;z-index:250;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.66);' +
@@ -412,9 +415,38 @@
     btn.addEventListener('pointercancel', end);
   }
 
+  /* 본문 글자 위에 걸치면 더 흐리게 — 글자를 가리지 않는다 */
+  var TEXT_RE = /^(P|LI|TD|TH|H1|H2|H3|H4|H5|H6|SPAN|B|STRONG|EM|I|SMALL|LABEL|DT|DD|BLOCKQUOTE|PRE|CODE)$/;
+  function overText() {
+    if (!btn || btn.classList.contains('kh-guide')) return false;
+    var r = btn.getBoundingClientRect();
+    var x = r.left + r.width / 2, y = r.top + r.height / 2;
+    var list = [];
+    try { list = (d.elementsFromPoint ? d.elementsFromPoint(x, y) : []) || []; } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var el = list[i];
+      if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
+      if (el === d.body || el === d.documentElement) return false;
+      var t = (el.textContent || '').replace(/\s+/g, '');
+      if (TEXT_RE.test(el.tagName) && t.length > 1) return true;
+      var st = w.getComputedStyle(el);
+      if ((st.backgroundColor && st.backgroundColor !== 'rgba(0, 0, 0, 0)') || st.backgroundImage !== 'none') return false;   /* 카드·바탕이면 글자가 아니다 */
+      var par = el.parentElement;
+      if (par && TEXT_RE.test(par.tagName) && (par.textContent || '').replace(/\s+/g, '').length > 1) return true;
+      return false;
+    }
+    return false;
+  }
+  function paintFaint() {
+    if (!btn) return;
+    var on = overText();
+    btn.classList.toggle('kh-faint', on);
+    btn.setAttribute('data-faint', on ? '1' : '0');
+  }
   function place() {
     if (!btn) return;
     if (drag.on) return;
+    paintFaint();
     var saved = loadPos();
     if (saved) { applyPos(saved); btn.setAttribute('data-bar', 'user'); return; }   /* 사용자가 정한 자리 — 자동 회피 중지 */
     /* 159 보완(11-24): 기본 자리 = 오른쪽 가장자리. 세로는 38%를 먼저 보되, 첫 화면의 버튼·입력·표를 가장 덜 가리는
@@ -489,7 +521,7 @@
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) { dimS.focus = true; setDim(); }
     });
     d.addEventListener('focusout', function () { dimS.focus = false; setTimeout(setDim, 0); });
-    btn.addEventListener('pointerdown', function () { dimS.t0 = 0; dimS.focus = false; btn.classList.remove('kh-dim'); });
+    btn.addEventListener('pointerdown', function () { dimS.t0 = 0; dimS.focus = false; btn.classList.remove('kh-dim'); btn.classList.remove('kh-faint'); });
   }
 
   function buildPanel() {
