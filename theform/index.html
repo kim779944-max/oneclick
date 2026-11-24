@@ -2420,12 +2420,13 @@ function dateVal(base){
   const y = g.y ? String(VALS[g.y.lab] || '').trim() : '';
   const m = g.m ? String(VALS[g.m.lab] || '').trim() : '';
   const d = g.d ? String(VALS[g.d.lab] || '').trim() : '';
-  if (!/^\d{4}$/.test(y) || !/^\d{1,2}$/.test(m) || !/^\d{1,2}$/.test(d)) return '';
+  if (!/^(19|20|21)\d{2}$/.test(y) || !/^\d{1,2}$/.test(m) || !/^\d{1,2}$/.test(d)) return '';
   return y + '-' + String(+m).padStart(2, '0') + '-' + String(+d).padStart(2, '0');
 }
 function setDateGroup(base, val){
   const g = DATE_GROUPS[base]; if (!g || !val) return;
   const p = val.split('-');
+  if (!/^(19|20|21)\d{2}$/.test(p[0])){ toast('날짜를 다시 골라 주세요'); return; }
   if (g.y) VALS[g.y.lab] = p[0];
   if (g.m) VALS[g.m.lab] = String(+p[1]);
   if (g.d) VALS[g.d.lab] = String(+p[2]);
@@ -2729,6 +2730,7 @@ function guideState(){
   else i = L.find(k => { const el = navEl(k); return el && !String(el.value || '').trim(); });
   if (i == null) i = L[L.length - 1];
   const el = navEl(i), mic = inList || GUIDE_I === i;
+  if (!inList) updNavPos(i);
   return {
     active: true, mode: mic ? 'mic' : 'cursor',
     label: CUR.fields[i].label, pos: (L.indexOf(i) + 1) + ' / ' + L.length, el: el,
@@ -2967,7 +2969,7 @@ $('#photoIn2').onchange = async e => {
 };
 $('#keyBtn').onclick = () => { let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){} $('#keyIn').value = k; $('#keyModal').classList.add('on'); };
 $('#keyClose').onclick = () => $('#keyModal').classList.remove('on');
-$('#keySave').onclick = () => { const k = $('#keyIn').value.trim(); if (!/^AIza[\w-]{20,}$/.test(k)) return toast('AIza로 시작하는 열쇠를 넣어 주세요');
+$('#keySave').onclick = () => { const k = $('#keyIn').value.trim(); if (!/^(AIza|AQ\.)[\w.\-]{18,}$/.test(k)) return toast('AIza… 또는 AQ.… 로 시작하는 열쇠를 넣어 주세요');
   try{ localStorage.setItem('kts_ai_key', k); }catch(e){} updKey(); $('#keyModal').classList.remove('on'); toast('이 기기에만 저장했습니다'); };
 $('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catch(e){} $('#keyIn').value = ''; updKey(); toast('열쇠를 지웠습니다'); };
 
