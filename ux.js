@@ -87,7 +87,7 @@
     if (w.KTSPay) { w.KTSPay.open(opt); return; }
     if (!PAY_BASE) { toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); return; }
     var s = d.createElement('script');
-    s.src = PAY_BASE + 'pay.js?v=20261124b';
+    s.src = PAY_BASE + 'pay.js?v=20261124c';
     s.onload = function () { if (w.KTSPay) w.KTSPay.open(opt); else toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); };
     s.onerror = function () { toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); };
     (d.head || d.documentElement).appendChild(s);
