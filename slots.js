@@ -199,7 +199,12 @@
       S = load(); S.added = { ym: yymm(), n: ADD_N, code: String(code).trim().toUpperCase() }; save(S); changed();
       return true;
     }
-    function openAdd() {
+    /* 결제 단계 계좌이체 안내 — pay.js 한 벌을 그대로 씁니다(계좌 정보는 pay.js ACCOUNT 한 곳) */
+  function payAcct(label) {
+    try { if (w.KTSPay && w.KTSPay.accountHtml) return w.KTSPay.accountHtml({ label: label }); } catch (e) {}
+    return '<span class="ln">계좌이체는 문자로 계좌·금액을 보내 드립니다. 입금자명은 신청하신 성함으로 넣어 주세요. 입금 뒤 문자로 알리면 그 달 이용권 코드(KS+연월-4자리)를 받습니다.</span>';
+  }
+  function openAdd() {
       var body = '[KTS 원클릭] ' + LABEL + ' 칸 추가 신청합니다.';
       sheet('<h3><b>+ 칸 추가</b> · ' + esc(LABEL) + '</h3>' +
         '<p>무료 ' + FREE + '칸이 다 찼습니다(지금 ' + S.items.length + '칸). 5칸째부터는 칸 추가로 엽니다.</p>' +
@@ -209,7 +214,9 @@
         '<div class="ksl-sec"><b class="t">③ 카톡 친구 초대</b><span class="ln">1칸 추가 = 친구 3명 · 2칸 추가 = 친구 5명 <b style="color:#FFC98F">(확인 후 해금)</b><br>내 초대 링크 <code data-a="link">' + esc(refLink()) + '</code></span>' +
         '<button type="button" class="ksl-b g" style="margin-top:6px;width:100%" data-a="share">초대 링크 보내기</button>' +
         '<span class="ln" style="display:block;margin-top:5px;color:#7C8DA6">친구가 들어온 숫자는 자동으로 세지 않습니다. 대표님이 확인한 뒤 코드로 열어 드립니다.</span></div>' +
-        '<p class="ksl-note">금액은 문자로 안내드립니다 · 이 사이트에서는 결제하지 않습니다.</p>' +
+        '<div class="ksl-sec"><b class="t">결제 방법</b><span class="ln">① 크몽·스마트스토어 ② 계좌이체 ③ 이용권 코드 — 이 사이트에서는 카드 결제를 받지 않습니다.</span>' +
+        payAcct('칸 추가') + '</div>' +
+        '<p class="ksl-note">금액·부가세·입금 계좌는 결제 단계에서 안내합니다.</p>' +
         '<button type="button" class="ksl-b g" style="width:100%;margin-top:8px" data-a="close">닫기</button>',
         function (el, close) {
           el.querySelector('[data-a="go"]').onclick = function () {
@@ -665,6 +672,16 @@
       '<p class="kk-note">담기·잠금은 이 기기 브라우저에만 저장됩니다. 기기를 바꾸면 처음부터 다시 담습니다.</p>';
   }
 
+  /* 결제 단계 계좌이체 안내 — pay.js 한 벌(계좌 정보는 pay.js ACCOUNT 한 곳) */
+  function payAcct(label) {
+    try { if (w.KTSPay && w.KTSPay.accountHtml) return w.KTSPay.accountHtml({ label: label }); } catch (e) {}
+    return '<div class="ln">계좌이체는 문자로 계좌·금액을 보내 드립니다. 입금자명은 신청하신 성함으로 넣어 주세요.</div>';
+  }
+  function openPay(opt) {
+    try { if (w.KTSPay) { w.KTSPay.open(opt || {}); return true; } } catch (e) {}
+    toast('결제 안내는 문자로 보내 드립니다 · ' + SMS); return false;
+  }
+
   function panelKey(s) {
     var need = 5, n = (s.invites || 0) % need, pct = Math.round(n / need * 100);
     return '<div class="kk-hd"><b>🔑 열쇠</b><span class="k">' + (s.verified ? '인증됨' : '인증 전') + '</span><button class="x" data-a="close" aria-label="닫기">✕</button></div>' +
@@ -674,9 +691,11 @@
       '<div class="kk-prog"><i style="width:' + pct + '%"></i></div>' +
       '<button class="kk-b g" data-a="invite">초대 링크 보내기 (카톡·문자)</button>' +
       '<div class="ln" style="margin-top:6px;color:#7C8DA6">친구가 실제로 들어왔는지는 서버가 없어 자동으로 확인하지 못합니다. 지금은 "보낸 횟수"로 세고, 확인이 필요하면 대표님이 문자로 확인합니다.</div></div>' +
-      '<div class="kk-sec"><b class="t">② 열쇠 구입 · 문자 신청</b>' +
-      '<div class="ln">사이트에서는 결제하지 않습니다. 문자로 신청하시면 금액과 입금 안내를 보내 드리고, 이용권 코드(KS+연월-4자리)를 문자로 받습니다.</div>' +
-      '<a class="kk-b g" data-a="sms" href="sms:' + SMS + '?body=' + encodeURIComponent('[KTS 원클릭] 열쇠 구입 신청합니다.') + '">열쇠 구입 · 문자 신청</a>' +
+      '<div class="kk-sec"><b class="t">② 열쇠 구입 · 결제 방법</b>' +
+      '<div class="ln">① 크몽·스마트스토어에서 결제 → 받은 코드를 아래에 넣기<br>② 계좌이체 → 입금 후 문자로 알리면 그 달 코드를 보냅니다<br>③ 이미 코드가 있으면 아래에 바로 넣기</div>' +
+      payAcct('열쇠') +
+      '<a class="kk-b g" style="margin-top:7px" data-a="sms" href="sms:' + SMS + '?body=' + encodeURIComponent('[KTS 원클릭] 열쇠 구입 신청합니다.') + '">열쇠 구입 · 문자 신청</a>' +
+      '<button type="button" class="kk-b g" style="margin-top:6px" data-a="pay">결제 안내 자세히 (부가세·입금액)</button>' +
       '<div class="kk-row"><input data-a="code" placeholder="이용권 코드  예: KS2611-XXXX" autocomplete="off"><button class="kk-b p w" data-a="usecode">열쇠 받기</button></div></div>' +
       '<button class="kk-b g" data-a="tab" data-t="box">← 내 박스로</button>' +
       '<p class="kk-note">열쇠 코드는 그 달에만 열립니다. 금액은 부가세 별도이며 문자로만 안내합니다.</p>';
@@ -714,6 +733,7 @@
         b.onclick = function () { if (revive(b.getAttribute('data-k'))) { close(); openPanel('box', opt); } };
       });
       on('[data-a="invite"]', function () { inviteShare(); });
+      on('[data-a="pay"]', function () { close(); openPay({ label: '열쇠' }); });
       on('[data-a="usecode"]', function () {
         var v = el.querySelector('[data-a="code"]').value, r = useCode(v);
         if (r === 'ok') { close(); toast('이용권 확인 · 🔑 열쇠 1개를 받았습니다'); openPanel('key'); }

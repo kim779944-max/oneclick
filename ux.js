@@ -75,6 +75,24 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  /* ⑤ 결제 단계 안내 — pay.js(계좌이체·이용권 코드). [그 이상 쓰기] 안쪽에서만 엽니다.
+     도구 페이지는 ux.js 한 줄만 넣으므로, pay.js 는 이 파일과 같은 폴더에서 스스로 불러옵니다. */
+  var PAY_BASE = '';
+  try { var self = d.currentScript; if (self && self.src) PAY_BASE = self.src.replace(/ux\.js(\?.*)?$/, ''); } catch (e) {}
+  function priceOf(html) {
+    var m = String(html || '').match(/([\d,]{3,})\s*원/);
+    return m ? +m[1].replace(/,/g, '') : 0;
+  }
+  function payOpen(opt) {
+    if (w.KTSPay) { w.KTSPay.open(opt); return; }
+    if (!PAY_BASE) { toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); return; }
+    var s = d.createElement('script');
+    s.src = PAY_BASE + 'pay.js?v=20261124a';
+    s.onload = function () { if (w.KTSPay) w.KTSPay.open(opt); else toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); };
+    s.onerror = function () { toastMsg('결제 안내를 열지 못했습니다 — 문자로 문의해 주세요'); };
+    (d.head || d.documentElement).appendChild(s);
+  }
+
   /* ② 하루 무료 횟수 크게 + [그 이상 쓰기] 안쪽에 돈 이야기 */
   function hurdle() {
     if (!CFG.free) return;
@@ -98,6 +116,18 @@
       box.hidden = !box.hidden;
       b.textContent = box.hidden ? '그 이상 쓰기 ▾' : '접기 ▴';
     };
+    /* 결제 단계 — ① 크몽·스마트스토어 ② 계좌이체 ③ 이용권 코드 */
+    var mbox = bar.querySelector('.kux-more-in');
+    if (mbox && !mbox.querySelector('[data-paygo]')) {
+      var pb = d.createElement('button');
+      pb.type = 'button'; pb.className = 'm'; pb.style.marginTop = '8px';
+      pb.setAttribute('data-paygo', '1');
+      pb.textContent = '계좌이체 · 이용권 코드 안내 ▾';
+      pb.onclick = function () {
+        payOpen({ label: CFG.toolTitle || CFG.tool || '이용권', amount: CFG.amount || priceOf(CFG.more) });
+      };
+      mbox.appendChild(pb);
+    }
   }
 
   /* ②-b 페이지 안 요금표 접기 — data-kts-money */
