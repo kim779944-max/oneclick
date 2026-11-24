@@ -1095,6 +1095,18 @@ function drawMarker(g,x0,y0,w,h,o){
    필지 경계를 알면 그 안쪽만, 모르면 중심 정사각(±분석 반경) 안쪽만 그린다. 바탕 색칠 없음. */
 function arrowColor(s){ var b=bandOf(s); return SLOPE10[b<0?0:b].hex }
 var AR_DRAW=[], AR_LAST={n:0,gap:0}, AR_SAMP=[];  /* AR_SAMP: 검수용 — 마지막으로 그린 화살표 중 구간별 최대 8개(클립 안쪽) */
+/* 189 — 점→선분 거리(px). 필지 경계까지 여유를 재서 경계를 넘는 화살표를 아예 안 그린다 */
+function distSeg(px,py,x1,y1,x2,y2){
+  var dx=x2-x1, dy=y2-y1, L2=dx*dx+dy*dy, t=L2?((px-x1)*dx+(py-y1)*dy)/L2:0; t=t<0?0:t>1?1:t;
+  var qx=x1+t*dx, qy=y1+t*dy; return Math.hypot(px-qx,py-qy);
+}
+function distRings(rings,px,py){
+  var m=1e9,i,j,r,a,b,d;
+  for(i=0;i<rings.length;i++){ r=rings[i];
+    for(j=0;j<r.length;j++){ a=r[j]; b=r[j+1]||r[0];
+      d=distSeg(px,py,a[0],a[1],b[0],b[1]); if(d<m) m=d; } }
+  return m;
+}
 function drawSlopeArrows(g,x0,y0,w,h){
   if(!T||!T.elev) return;
   var ta=performance.now();
@@ -1115,67 +1127,95 @@ function drawSlopeArrows(g,x0,y0,w,h){
     }
     if(nv>=3) clip=p0;
   }
+  /* 필지 경계 여유 계산용 다각형(화면 좌표) — 링별로 모아 둔다(경계 넘는 화살표를 안 그린다) */
+  var polys=[];
+  if(clip&&PC&&PC.rings){
+    for(var pr=0;pr<PC.rings.length;pr++){
+      var rg=PC.rings[pr], arr=[];
+      for(var pj=0;pj<rg.length;pj++){ var q=rg[pj]; if(!q||!isFinite(q[0])||!isFinite(q[1])) continue; arr.push([lng2w(q[0])*W-x0, lat2w(q[1])*W-y0]); }
+      if(arr.length>=3) polys.push(arr);
+    }
+  }
   if(!clip){ bx=cx-rad; bX=cx+rad; by=cy-rad; bY=cy+rad }
   bx=Math.max(bx,0); by=Math.max(by,0); bX=Math.min(bX,w); bY=Math.min(bY,h);
   if(bX<=bx||bY<=by) return;
-  /* 간격: 5m 칸(blockPx)을 k등분 → 화면 16px 이상, 월드 격자 고정(밀어도 흔들리지 않음) */
-  var gapMin=16, cap=900;
+  /* 189 — 간격·크기를 구간별로 바꾼다.
+     기준 간격(gap)은 지금까지의 16px 규칙 그대로 두고, 그 절반(fine)을 "몰린 구간" 격자로 쓴다.
+     · 몰린 구간(필지 경계에 가까움 · 급경사 · 평지 흰색) = fine 격자 전부 + 작은 화살표(0.66~0.85배)
+     · 넓게 트인 구간 = fine 격자의 짝수 칸만 → 간격·크기가 기존과 같다
+     격자는 5m 블록의 약수라 밀어도 흔들리지 않는다(월드 고정). */
+  var gapMin=16, cap=1800;
   var blockPx=5/mpp, k=Math.max(1,Math.round(blockPx/gapMin));
   var gap=blockPx/k, m=1;
   if(gap<gapMin) m=Math.ceil(gapMin/gap);
   gap*=m;
-  while(((bX-bx)/gap+1)*((bY-by)/gap+1)>cap){ m++; gap=blockPx/k*m }
-  var stepU=gap/W, iu0=Math.floor((x0+bx)/W/stepU), iu1=Math.floor((x0+bX)/W/stepU), iv0=Math.floor((y0+by)/W/stepU), iv1=Math.floor((y0+bY)/W/stepU);
+  var fine=gap/2;
+  var est=((bX-bx)/fine+1)*((bY-by)/fine+1);
+  if(est>cap*1.6) fine*=Math.sqrt(est/(cap*1.6));   /* 아주 넓은 필지에서만 늘린다 */
+  var stepU=fine/W, iu0=Math.floor((x0+bx)/W/stepU), iu1=Math.floor((x0+bX)/W/stepU), iv0=Math.floor((y0+by)/W/stepU), iv1=Math.floor((y0+bY)/W/stepU);
   g.save();
   if(clip) g.clip(clip,'evenodd');
   else { g.beginPath(); g.rect(cx-rad,cy-rad,rad*2,rad*2); g.clip() }
   var eps=T.cellW*1.35, P=[], cnt=0, samp=[], sCnt=[0,0,0,0,0,0,0,0,0,0], sTr=(g===ctx)?g.getTransform().a:0;
+  var denseN=0, openN=0, edgeSkip=0, scMin=1, scMax=1, lenMax=0;
   for(var b=0;b<10;b++) P.push(new Path2D());
   for(var iv=iv0; iv<=iv1; iv++){
     var v=(iv+0.5)*stepU, y=v*W-y0;
     for(var iu=iu0; iu<=iu1; iu++){
       var u=(iu+0.5)*stepU, x=u*W-x0;
+      var s=sampleGrid(T.slope,u,v); if(s==null) continue;
+      /* 몰림 정도 C(0~1): 경계에 가까운 좁은 필지 · 급경사 · 평지(흰색) 순으로 커진다 */
+      var ed=polys.length?distRings(polys,x,y):999, C=0;
+      if(ed<52) C=1-ed/52;
+      if(s>15) C=Math.max(C,Math.min(1,(s-15)/25));
+      if(bandOf(s)<=1) C=Math.max(C,0.55);
+      var dense=C>=0.45;
+      if(!dense&&!((iu%2===0)&&(iv%2===0))) continue;   /* 트인 구간은 기존 간격 유지 */
+      var sc=1-0.34*C;
+      /* 화살촉 밑변 · 촉 길이 · 줄기 — 144번 기본값에 구간 배율만 곱한다 */
+      var head=clamp(3.5+s*0.025,3.5,4.5)*sc, tail=3.0*sc, L=head+tail, hw=2.1*sc, tw=Math.max(0.5,0.55*sc);
+      if(ed<L*0.6+1.2){ edgeSkip++; continue; }        /* 필지 경계 침범 0 */
       var e0=elevAt(u-eps,v), e1=elevAt(u+eps,v), e3=elevAt(u,v-eps), e4=elevAt(u,v+eps);
       if(e0==null||e1==null||e3==null||e4==null) continue;
-      var s=sampleGrid(T.slope,u,v); if(s==null) continue;
       var ax=-(e1-e0)*mPerV, ay=-(e4-e3)*mPerU; /* 내려가는 쪽(화면 px) */
-      var L=Math.hypot(ax,ay);
-      if(L<1e-9){ ax=0; ay=1; } else { ax/=L; ay/=L }
-      /* 화살촉 밑변 4.2px · 촉 길이 3.5~4.5px · 줄기 1.1px · 꼬리 3.0px (2026-11-23 144번) — 항공사진을 가리지 않게 */
-      var head=clamp(3.5+s*0.025,3.5,4.5), tail=3.0, L=head+tail;
-      var hw=2.1, tw=0.55;
+      var Len=Math.hypot(ax,ay);
+      if(Len<1e-9){ ax=0; ay=1; } else { ax/=Len; ay/=Len }
       var px2=-ay, py2=ax;                         /* 진행방향 수직 단위벡터 */
-      var tX=x+ax*L*0.5, tY=y+ay*L*0.5;            /* 촉 꼭짓점 — 내리막 */
+      var tX=x+ax*L*0.5, tY=y+ay*L*0.5;            /* 촉 꼭지점 — 내리막 */
       var eX=x-ax*L*0.5, eY=y-ay*L*0.5;            /* 줄기 끝 — 오르막 */
       var nX=tX-ax*head, nY=tY-ay*head;            /* 촉 밑변 중심 */
       var bi=bandOf(s), Q=P[bi<0?0:bi];
-      Q.moveTo(eX+px2*tw, eY+py2*tw);               /* 줄기 끝 왼쪽 */
-      Q.lineTo(nX+px2*tw, nY+py2*tw);               /* 줄기가 밑변에 닿는 왼쪽 */
-      Q.lineTo(nX+px2*hw, nY+py2*hw);               /* 밑변 왼쪽 끝 */
-      Q.lineTo(tX, tY);                             /* 꼭짓점(촉) — 내리막 */
-      Q.lineTo(nX-px2*hw, nY-py2*hw);               /* 밑변 오른쪽 끝 */
-      Q.lineTo(nX-px2*tw, nY-py2*tw);               /* 줄기가 밑변에 닿는 오른쪽 */
-      Q.lineTo(eX-px2*tw, eY-py2*tw);               /* 줄기 끝 오른쪽 */
-      Q.closePath();                                /* 닫힌 도형 → fill 로 꽉 찬다 */
+      Q.moveTo(eX+px2*tw, eY+py2*tw);
+      Q.lineTo(nX+px2*tw, nY+py2*tw);
+      Q.lineTo(nX+px2*hw, nY+py2*hw);
+      Q.lineTo(tX, tY);
+      Q.lineTo(nX-px2*hw, nY-py2*hw);
+      Q.lineTo(nX-px2*tw, nY-py2*tw);
+      Q.lineTo(eX-px2*tw, eY-py2*tw);
+      Q.closePath();
       if(sTr&&sCnt[bi<0?0:bi]<8){ var bk=bi<0?0:bi, ins=function(X,Y){ return X>=bx&&X<=bX&&Y>=by&&Y<=bY&&(clip?g.isPointInPath(clip,X*sTr,Y*sTr,'evenodd'):true) };
         if(ins(tX+ax*1.6,tY+ay*1.6)&&ins(eX-ax*1.6,eY-ay*1.6)&&ins(nX+px2*3.2,nY+py2*3.2)&&ins(nX-px2*3.2,nY-py2*3.2)){ sCnt[bk]++;
-          samp.push({b:bk,s:+s.toFixed(2),x:+x.toFixed(2),y:+y.toFixed(2),ax:+ax.toFixed(4),ay:+ay.toFixed(4),len:+L.toFixed(2),hl:+head.toFixed(2)}) } }
+          samp.push({b:bk,s:+s.toFixed(2),x:+x.toFixed(2),y:+y.toFixed(2),ax:+ax.toFixed(4),ay:+ay.toFixed(4),len:+L.toFixed(2),hl:+head.toFixed(2),sc:+sc.toFixed(2)}) } }
+      if(dense) denseN++; else openN++;
+      if(sc<scMin) scMin=sc; if(sc>scMax) scMax=sc; if(L>lenMax) lenMax=L;
       cnt++;
     }
   }
   g.lineCap='round'; g.lineJoin='round'; g.globalAlpha=1;
-  /* 테 1겹(1.6px · 본색이 안쪽 절반을 덮어 노출 0.8px) — 1) 0~2단계(밝은 색)만 어두운 테 */
-  g.strokeStyle='rgba(16,26,43,.92)'; g.lineWidth=1.6;
+  /* 테 1겹 — 1) 0~2단계(밝은 색)만 어두운 테 */
+  var caseW=1.6;                     /* 테 두께는 144번 그대로 — 크기만 구간별로 줄인다 */
+  g.strokeStyle='rgba(16,26,43,.92)'; g.lineWidth=caseW;
   for(var b0=0;b0<3;b0++) g.stroke(P[b0]);
   /* 2) 3~9단계는 밝은 테 */
-  g.strokeStyle='rgba(255,255,255,.92)'; g.lineWidth=1.6;
+  g.strokeStyle='rgba(255,255,255,.92)'; g.lineWidth=caseW;
   for(var b1=3;b1<10;b1++) g.stroke(P[b1]);
   /* 3) 본색 — 불투명 면(테 안쪽 절반을 덮는다) */
   for(var b2=0;b2<10;b2++){ g.fillStyle=SLOPE10[b2].hex; g.fill(P[b2]) }
   g.restore();
   if(g===ctx){ AR_SAMP=samp; AR_LAST={n:cnt,gap:+gap.toFixed(2),k:k,m:m,blockPx:+blockPx.toFixed(2),
-           lenPx:[6.5,7.5],headLen:[3.5,4.5],headW:4.2,tailW:1.1,
-           casing:[1.6],cap:900,gapMin:16}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
+           lenPx:[+(6.5*scMin).toFixed(2),+(7.5*scMax).toFixed(2)],headLen:[+(3.5*scMin).toFixed(2),+(4.5*scMax).toFixed(2)],headW:+(4.2*scMin).toFixed(2),tailW:+(1.1*scMin).toFixed(2),
+           casing:[+caseW.toFixed(2)],cap:cap,gapMin:gapMin,fine:+fine.toFixed(2),dense:denseN,open:openN,edgeSkip:edgeSkip,
+           sc:[+scMin.toFixed(2),+scMax.toFixed(2)],lenMax:+lenMax.toFixed(2),overlapFree:(lenMax<=fine+0.01)}; AR_DRAW.push(performance.now()-ta); if(AR_DRAW.length>200) AR_DRAW.shift() }
 }
 window.__KTS_AR=function(){return AR_LAST};  /* 검증용 읽기 전용 — 화면·동작 영향 없음 */
 

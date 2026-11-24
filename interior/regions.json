@@ -1,6 +1,6 @@
 {
-  "v": "20261124a",
-  "note": "실사 사진 위에 고른 자재만 얹기 위한 영역 좌표. 좌표는 사진 원본 픽셀(1200×900) 기준이고 [x,y] 순서다. 2026-11-24 확대 실측으로 경계를 다시 맞췄다(시작값 20261123a 대비). wall=정면 벽, floor=바닥(옆벽·문·창·기둥 하단 제외), base=걸레받이 띠(기존 걸레받이 자리), mold=몰딩 띠, vp=바닥 원근 소실점(옆벽 걸레받이선 연장 교점), keep=[x,y,w,h] 자재를 얹어도 원본을 지키는 사각형(콘센트 등). 경계가 어긋나면 이 파일 값만 고친다(코드는 이 파일을 읽는다).",
+  "v": "20261124b",
+  "note": "실사 사진 위에 고른 자재만 얹기 위한 영역 좌표. 좌표는 사진 원본 픽셀(1200×900) 기준이고 [x,y] 순서다. 2026-11-24 확대 실측으로 경계를 다시 맞췄다(시작값 20261123a 대비). wall=정면 벽, floor=바닥(옆벽·문·창·기둥 하단 제외), base=걸레받이 띠(기존 걸레받이 자리), mold=몰딩 띠, vp=바닥 원근 소실점(옆벽 걸레받이선 연장 교점), keep=[x,y,w,h] 자재를 얹어도 원본을 지키는 사각형(콘센트 등). 경계가 어긋나면 이 파일 값만 고친다(코드는 이 파일을 읽는다). 20261124b: 4단(부위→자재→색)용으로 자재마다 grade(견적 단가 등급)와 styles(색 3종 — tint 로 색을 곱하고 mult 로 단가 배수)를 넣고, 타일 zone 을 wall→floor 로 바로잡았다(바닥 4단: 강마루·타일). 색은 톤 차이 미리보기이고 실물 자재 사진은 준비 중이다.",
   "photos": {
     "living": {
       "file": "img/ba_living.jpg",
@@ -40,12 +40,13 @@
     }
   },
   "materials": [
-    {"id":"denbar",    "nm":"덴바보드", "img":"img/mat_denbar.jpg",    "zone":"wall", "bundle":["걸레받이"]},
-    {"id":"marble",    "nm":"대리석",   "img":"img/mat_marble.jpg",    "zone":"wall", "bundle":[]},
-    {"id":"wallpaper", "nm":"도배",     "img":"img/mat_wallpaper.jpg", "zone":"wall", "bundle":["몰딩"]},
-    {"id":"tile",      "nm":"타일",     "img":"img/mat_tile.jpg",      "zone":"wall", "bundle":["줄눈"], "grout":160},
-    {"id":"floor",     "nm":"강마루",   "img":"img/mat_floor.jpg",     "zone":"floor","bundle":["걸레받이"]}
+    {"id":"denbar",    "nm":"덴바보드", "img":"img/mat_denbar.jpg",    "zone":"wall", "bundle":["걸레받이"], "grade":"l", "styles":[{"id":"oak","nm":"오크","mult":1.00,"tint":[1.02,0.99,0.93],"bright":1.00,"sat":1.00,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"walnut","nm":"월넛","mult":1.15,"tint":[0.92,0.74,0.56],"bright":0.88,"sat":1.06,"contrast":1,"sepia":0.10,"overlay":"","alpha":0},{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
+    {"id":"marble",    "nm":"대리석",   "img":"img/mat_marble.jpg",    "zone":"wall", "bundle":[], "grade":"h", "styles":[{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"beige","nm":"베이지","mult":1.08,"tint":[1.04,0.96,0.84],"bright":1.02,"sat":1.02,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"gray","nm":"그레이","mult":1.15,"tint":[0.86,0.88,0.93],"bright":0.98,"sat":0.30,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
+    {"id":"wallpaper", "nm":"도배",     "img":"img/mat_wallpaper.jpg", "zone":"wall", "bundle":["몰딩"], "grade":"m", "styles":[{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"beige","nm":"베이지","mult":1.08,"tint":[1.04,0.96,0.84],"bright":1.02,"sat":1.02,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"gray","nm":"그레이","mult":1.15,"tint":[0.86,0.88,0.93],"bright":0.98,"sat":0.30,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
+    {"id":"floor",     "nm":"강마루",   "img":"img/mat_floor.jpg",     "zone":"floor","bundle":["걸레받이"], "grade":"", "styles":[{"id":"oak","nm":"오크","mult":1.00,"tint":[1.02,0.99,0.93],"bright":1.00,"sat":1.00,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"walnut","nm":"월넛","mult":1.15,"tint":[0.92,0.74,0.56],"bright":0.88,"sat":1.06,"contrast":1,"sepia":0.10,"overlay":"","alpha":0},{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
+    {"id":"tile",      "nm":"타일",     "img":"img/mat_tile.jpg",      "bundle":["줄눈"], "grout":160, "zone":"floor", "grade":"", "styles":[{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"beige","nm":"베이지","mult":1.08,"tint":[1.04,0.96,0.84],"bright":1.02,"sat":1.02,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"gray","nm":"그레이","mult":1.15,"tint":[0.86,0.88,0.93],"bright":0.98,"sat":0.30,"contrast":1,"sepia":0,"overlay":"","alpha":0}]}
   ],
+  "styleNote": "톤 차이 미리보기 · 실물 자재 사진은 준비 중",
   "layout": {
     "space": "living",
     "before": {"file":"img/living_setA.jpg", "label":"배치 전 · 소파 왼쪽"},
