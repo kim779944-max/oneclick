@@ -656,8 +656,8 @@ async function doPrint(){
   const n = +S.cp || 1;
   busyOn('인쇄할 종이를 만드는 중…');
   try{
-    const pages = await compositeAll();
-    const urls = pages.map(c => c.toDataURL('image/jpeg', 0.94));
+    const pages = await compositeAll(2480);
+    const urls = pages.map(c => c.toDataURL('image/jpeg', 0.98));
     let html = '';
     for (let k = 0; k < n; k++) urls.forEach(u => { html += '<img src="' + u + '" alt="">'; });
     $('#printArea').innerHTML = html;
@@ -669,7 +669,7 @@ async function doPrint(){
 async function doPng(){
   busyOn('사진으로 만드는 중…');
   try{
-    const pages = await compositeAll();
+    const pages = await compositeAll(2480);
     const base = (curForm().name || '계약서').replace(/\s/g, '') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const names = [];
     for (let i = 0; i < pages.length; i++){

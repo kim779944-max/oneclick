@@ -3085,7 +3085,7 @@ $('#exHwpx').onclick = () => doExport('hwpx');
 $('#exXlsx').onclick = () => doExport('xlsx');
 $('#exPrint').onclick = async () => { busyOn('인쇄할 종이를 만드는 중…');
   try{ const n = tfPageCount(), urls = [];
-    for (let p = 1; p <= n; p++){ const c = await composite(0, p); urls.push(c.toDataURL('image/png')); }
+    for (let p = 1; p <= n; p++){ const c = await composite(2480, p); urls.push(c.toDataURL('image/png')); }
     $('#printArea').innerHTML = urls.map(u => `<img src="${u}" alt="">`).join('');
     busyOff(); setTimeout(() => window.print(), 140);
     $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
@@ -3221,8 +3221,8 @@ if ($('#sealBox')){
 async function tfJpegPages(){
   var n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), out = [];
   for (var c = 0; c < cp; c++) for (var p = 1; p <= n; p++){
-    var cv = await composite(1600, p);
-    out.push({ dataUrl: cv.toDataURL('image/jpeg', 0.92), p: p, c: c + 1 });
+    var cv = await composite(2480, p);
+    out.push({ dataUrl: cv.toDataURL('image/jpeg', 0.98), p: p, c: c + 1 });
   }
   return out;
 }
@@ -3244,7 +3244,7 @@ $('#exPng').onclick = async function(){
   try{
     var n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), base = outBase(), k = 0;
     for (var c = 1; c <= cp; c++) for (var p = 1; p <= n; p++){
-      var cv = await composite(1600, p);
+      var cv = await composite(2480, p);
       var blob = await new Promise(function(r){ cv.toBlob(r, 'image/png'); });
       download(blob, base + (cp > 1 ? '_' + c + '부' : '') + (n > 1 ? '_' + p + 'p' : '') + '.png');
       k++; await new Promise(function(r){ setTimeout(r, 300); });
