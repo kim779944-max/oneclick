@@ -66,6 +66,15 @@ main{padding:12px 14px 0}
 .hint{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(10,17,40,.9);border:1px solid rgba(255,107,0,.5);color:#FFD9A6;
  font-size:10.5px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap;pointer-events:none;transition:.3s;opacity:1}
 .hint.off{opacity:0}
+/* 203 (2026-11-24): 필지 경계를 못 읽었을 때 — 사각형을 '필지 경계'로 오해하지 않게 안내 */
+.plost{position:absolute;left:8px;right:46px;top:36px;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;
+ background:rgba(10,17,40,.95);border:1px solid rgba(127,178,255,.8);border-left:3px solid #7FB2FF;border-radius:9px;padding:6px 8px}
+.plost .sw{display:inline-block;flex:0 0 auto;width:15px;height:10px;border:1.5px dashed #7FB2FF;border-radius:2px;vertical-align:-1px}
+.plost b{font-size:10.5px;font-weight:900;color:#DCEBFF;letter-spacing:-.2px}
+.plost span{flex:1 1 100%;font-size:10px;font-weight:800;color:#B9CBE4;line-height:1.4;letter-spacing:-.2px}
+.plost a,.plost button{font-family:inherit;font-size:10px;font-weight:900;color:#FFC98F;background:rgba(255,107,0,.12);border:1px solid rgba(255,162,77,.55);
+ border-radius:999px;padding:2px 8px;cursor:pointer;text-decoration:none;line-height:1.5}
+.mapwrap.m3d .plost{display:none!important}
 /* 토글 */
 .togs{display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;margin-top:8px;padding-bottom:3px;scrollbar-width:none}
 .togs::-webkit-scrollbar{display:none}
@@ -380,6 +389,11 @@ details.adv .keyrow{margin-top:7px}
       <div class="mapbadge"><span id="bPos">—</span><span id="bEl">—</span><span class="warn" id="bSl">—</span></div>
       <div class="zoomctl"><button type="button" id="zIn" aria-label="확대">+</button><button type="button" id="zOut" aria-label="축소">−</button></div>
       <div class="hint" id="hint">밀어서 필지에 맞추세요</div>
+      <div class="plost hide" id="plost" role="status" aria-live="polite">
+        <i class="sw" aria-hidden="true"></i><b id="plostT">필지 경계를 못 읽었습니다</b>
+        <span id="plostB">필지 경계를 못 읽어 분석 범위(점선 사각형)만 표시 중 · 지번을 다시 넣어 주세요.</span>
+        <button type="button" id="plostA" data-act="q">지번 다시 넣기</button>
+      </div>
       <span class="attr" id="mapAttr">© OpenStreetMap · DEM</span>
       <div class="legend">
         <div class="tt">경사(°) 10단계 · 화살표 = 물이 흐르는 방향 · 5m 격자</div>
@@ -469,7 +483,7 @@ details.adv .keyrow{margin-top:7px}
     <p class="note">지형은 <b>공개 수치표고(SRTM 계열 30m)를 5m 격자로 다시 계산</b>한 그림입니다. 30m 픽셀의 굵은 계단은 없어지지만, 5m 실측 등고와 100% 같지는 않습니다. <b>국토정보플랫폼 공개 DEM은 회원 로그인 뒤 img 파일로 받는 자료</b>라 화면에서 타일로 바로 불러올 수 없습니다(그래서 기본 DEM을 씁니다). 인허가·설계·매매 판단의 최종 수치는 위 <b>5m 수치지형도</b> 도엽으로 확인해 주세요.</p>
   </section>
 
-  <section class="card">
+  <section class="card" id="keyCard">
     <h2><i>6</i>지도 연결<small>선택 · 이 기기에만</small></h2>
     <div class="keyst" id="vkSt"><i></i><span>미연결 — 지도·경사도는 지금도 그대로 동작합니다.</span></div>
     <button type="button" class="keyopen" id="keyOpen">키 바꾸기 (필요할 때만)</button>
@@ -575,6 +589,8 @@ function saveQ(){LS.set('kts_slope_day',todayKey());LS.set('kts_slope_free',Stri
 function rollDay(){var d=todayKey();if(LS.get('kts_slope_day','')===d)return false;LS.set('kts_slope_day',d);LS.set('kts_slope_free','0');S.free=0;S.preview=false;S.counted=null;return true}
 /* 검수용 읽기 전용 상태(손님 화면에는 영향 없음) — 줌·필지 확인 */
 window.__KTS_ST=function(){ return {zoom:S.zoom, tileZ:clamp(Math.round(S.zoom),3,TZMAX), maxZoom:ZMAX,jibun:(PC&&PC.jibun)||'', pnu:(PC&&PC.pnu)||'', pcLoaded:!!PC, bb:(PC&&PC.bb)||null} };
+/* 203 검수용 읽기 전용 — 필지 실패 상태·안내 표시 여부(화면·동작 영향 없음) */
+window.__KTS_PCF=function(){ var el=document.getElementById('plost'); return {st:(PCF&&PCF.st)||'', code:(PCF&&PCF.code)||'', jibun:(PC&&PC.jibun)||'', notice:!!(el&&!el.classList.contains('hide')), text:el?String(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,160):''} };
 
 /* ---------------- 작은 도구 ---------------- */
 var toastT=0;
@@ -877,6 +893,7 @@ function scene(g,w,h,o){
   if(S.lay.zone) drawVWImg(g,x0,y0,w,h,'zone');
   if(PC) drawParcelHL(g,x0,y0,w,h);
   if(S.lay.arrow) drawSlopeArrows(g,x0,y0,w,h);
+  drawRangeBox(g,x0,y0,w,h); /* 203: 필지 경계 대신 분석 범위만 그린 상태를 점선으로 분명히 */
   drawMarker(g,x0,y0,w,h,o);
   g.restore();
 }
@@ -977,7 +994,7 @@ function drawVWImg(g,x0,y0,w,h,kind){
   if(im.ok){ g.save(); g.globalAlpha=kind==='parcel'?0.9:0.45; g.drawImage(im.img,0,0,w,h); g.restore() }
 }
 /* ---------------- 찾은 필지 경계 강조(Vworld 연속지적도 Data API) ---------------- */
-var PC=null, PCseq=0;
+var PC=null, PCseq=0, PCF=null; /* 203: PCF = 필지 경계를 못 읽은 이유(표시 전용) */
 function ringAreaSigned(ring,latC){
   var mPerLat=111132, mPerLon=111320*Math.cos(latC*Math.PI/180), s=0, n=ring.length;
   if(n<3) return 0;
@@ -991,37 +1008,78 @@ function parcelArea(rings,latC){
   var s=0; for(var i=0;i<rings.length;i++) s+=ringAreaSigned(rings[i],latC);
   return Math.abs(s);
 }
+/* 203 (2026-11-24) — 필지 경계를 못 읽었을 때의 안내. 표시·문구만 담당하며 계산·단가·무료 3건 규칙과 무관. */
+function pcOffHost(){ var h=''; try{ h=(location.hostname||'').toLowerCase() }catch(e){} return !(h==='autooneclick.com'||h==='www.autooneclick.com') }
+function pcHelp(){
+  var st=(PCF&&PCF.st)||'', h=''; try{ h=location.hostname||'' }catch(e){}
+  if(st==='nokey')  return {t:'필지 경계를 못 읽었습니다 · Vworld 키 없음', b:'필지 경계를 못 읽어 분석 범위(점선 사각형)만 표시 중 · 지번을 다시 넣어 주세요.', a:'⑥ 지도 연결에서 키 넣기', act:'key'};
+  if(st==='keybad') return {t:'필지 경계를 못 읽었습니다 · 키 인증 실패', b:'Vworld 키가 이 주소에서 인증되지 않았습니다 · 6번 카드에서 키를 확인해 주세요. 지금은 분석 범위(점선 사각형)만 표시 중입니다.', a:'⑥ 지도 연결 확인', act:'key'};
+  if(st==='domain') return {t:'필지 경계를 못 읽었습니다 · 주소 인증 불일치', b:(h?'이 주소('+h+')에서는 ':'이 주소(저장한 파일·다른 주소)에서는 ')+'Vworld 필지 층이 열리지 않습니다 · autooneclick.com 에서 열어 주세요. 지금은 분석 범위(점선 사각형)만 표시 중입니다.', a:'autooneclick.com/slope/ 로 열기', act:'url'};
+  if(st==='nodata') return {t:'필지 경계를 못 읽었습니다 · 이 지점 자료 없음', b:'이 지점의 필지 경계 자료가 없습니다 · 지번을 다시 넣거나 지도를 조금 옮겨 보세요. 지금은 분석 범위(점선 사각형)만 표시 중입니다.', a:'지번 다시 넣기', act:'q'};
+  if(st==='error')  return {t:'필지 경계를 못 읽었습니다 · 연결 실패', b:'Vworld 필지 조회가 막혔습니다 · 잠시 뒤 다시 시도해 주세요. 지금은 분석 범위(점선 사각형)만 표시 중입니다.', a:'다시 조회', act:'retry'};
+  return null;
+}
+function paintRangeNotice(){
+  var el=$('#plost'); if(!el) return;
+  var o=pcHelp();
+  if(!o||(PC&&PC.rings)){ el.classList.add('hide'); return }
+  $('#plostT').textContent=o.t; $('#plostB').textContent=o.b;
+  var b=$('#plostA'); if(b){ b.textContent=o.a; b.setAttribute('data-act',o.act) }
+  el.classList.remove('hide');
+}
 function paintParcelInfo(){
   var el=$('#pcInfo'); if(!el) return;
-  if(!PC||!PC.jibun){ el.classList.add('hide'); el.innerHTML=''; return }
+  if(!PC||!PC.jibun){
+    var o=pcHelp();
+    if(o){
+      var ah=(o.act==='key')?'#keyCard':(o.act==='url')?'https://autooneclick.com/slope/':'#q';
+      var at=(o.act==='url')?'autooneclick.com으로 열기':(o.act==='key'?'⑥ 지도 연결':'지번 다시 넣기');
+      el.classList.remove('hide');
+      el.innerHTML='<b style="color:#9FC4FF">필지 경계 없음</b> · '+esc(o.b)+' <a href="'+ah+'" style="color:#FFC98F;font-weight:900">'+at+'</a>';
+    } else { el.classList.add('hide'); el.innerHTML='' }
+    return;
+  }
   var m2=PC.area||0, py=Math.round(m2/3.3058);
   el.classList.remove('hide');
   el.innerHTML='필지 경계 <b>'+esc(PC.jibun)+'</b> · '+Math.round(m2).toLocaleString()+'㎡('+py.toLocaleString()+'평)'
     +(PC.pnu?' · PNU '+esc(PC.pnu):'')+' <span style="color:#8FA1B8">Vworld 연속지적도 · 참고용</span>';
 }
 function parcelFetch(lat,lon){
-  if(!S.key){ PC=null; paintParcelInfo(); requestRender(); return }
+  if(!S.key){ PC=null; PCF={st:'nokey'}; paintParcelInfo(); paintRangeNotice(); requestRender(); return }
   var seq=++PCseq;
+  PCF={st:'pending'}; paintRangeNotice();
   var url='https://api.vworld.kr/req/data?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
     +'&key='+encodeURIComponent(S.key)+'&domain=autooneclick.com'
     +'&format=json&size=1&page=1&geometry=true&attribute=true&crs=EPSG:4326'
     +'&geomFilter='+encodeURIComponent('POINT('+lon.toFixed(7)+' '+lat.toFixed(7)+')');
   jsonp(url).then(function(j){
     if(seq!==PCseq) return; /* 그 사이 다른 지점을 골랐으면 버린다 */
-    var fc=j&&j.response&&j.response.result&&j.response.result.featureCollection;
+    var rs=j&&j.response, code=String((rs&&rs.status)||'OK').toUpperCase();
+    if(code!=='OK'){ /* 203: 왜 못 읽었는지 구분해서 알린다 */
+      PC=null;
+      if(code==='INVALID_KEY') PCF={st:'keybad',code:code};
+      else if(code==='UNAUTHORIZED_DOMAIN'||code==='UNREGISTERED_DOMAIN') PCF={st:pcOffHost()?'domain':'keybad',code:code};
+      else if(code==='NOT_FOUND') PCF={st:'nodata',code:code};
+      else PCF={st:'error',code:code};
+      paintParcelInfo(); paintRangeNotice(); requestRender(); return;
+    }
+    var fc=rs&&rs.result&&rs.result.featureCollection;
     var ft=fc&&fc.features&&fc.features[0];
-    if(!ft||!ft.geometry){ PC=null; paintParcelInfo(); requestRender(); return }
+    if(!ft||!ft.geometry){ PC=null; PCF={st:'nodata'}; paintParcelInfo(); paintRangeNotice(); requestRender(); return }
     var gm=ft.geometry, rings=[];
     if(gm.type==='Polygon') rings=gm.coordinates.slice();
     else if(gm.type==='MultiPolygon'){
       for(var i=0;i<gm.coordinates.length;i++){ for(var q=0;q<gm.coordinates[i].length;q++) rings.push(gm.coordinates[i][q]) }
     }
     rings=rings.filter(function(r){return r&&r.length>2});
-    if(!rings.length){ PC=null; paintParcelInfo(); requestRender(); return }
+    if(!rings.length){ PC=null; PCF={st:'nodata'}; paintParcelInfo(); paintRangeNotice(); requestRender(); return }
     var pr=ft.properties||{};
     PC={rings:rings,jibun:pr.jibun||pr.bonbun||'',addr:pr.addr||'',pnu:pr.pnu||'',area:parcelArea(rings,lat)};
-    paintParcelInfo(); requestRender();
-  }).catch(function(){ /* 필지 조회가 막혀도 경사도 지도는 그대로 */ }).then(function(){ archOnPlace() });
+    PCF=null;
+    paintParcelInfo(); paintRangeNotice(); requestRender();
+  }).catch(function(){ /* 필지 조회가 막혀도 경사도 지도는 그대로 */
+    if(seq!==PCseq) return; PC=null; PCF={st:'error'}; paintParcelInfo(); paintRangeNotice(); requestRender();
+  }).then(function(){ archOnPlace() });
 }
 function drawParcelHL(g,x0,y0,w,h){
   if(!PC||!PC.rings) return;
@@ -1061,6 +1119,29 @@ function drawParcelHL(g,x0,y0,w,h){
   g.strokeStyle='rgba(255,107,0,.95)'; g.lineWidth=1.2; g.stroke();
   g.fillStyle='#FFD9A6'; g.textAlign='center'; g.textBaseline='middle';
   g.fillText(txt,lx,ly+0.5); g.textAlign='left'; g.textBaseline='alphabetic';
+  g.restore();
+}
+/* 203 (2026-11-24) — 필지 경계를 못 읽었을 때 그리는 화면 가운데 ±분석 반경 사각형은 '분석 범위'일 뿐이다.
+   필지 경계(주황 실선 + 지번 이름표)와 혼동되지 않게 점선(옅은 바탕색) + '분석 범위 · 필지 경계 아님' 이름표로 그린다. */
+function drawRangeBox(g,x0,y0,w,h){
+  if(PC&&PC.rings) return;
+  if(!PCF) return;
+  if(!(S.lay.arrow||S.lay.px)) return;
+  var W=worldSize(S.zoom), mpp=mppAt(S.zoom,S.lat);
+  var cx=lng2w(S.lon)*W-x0, cy=lat2w(S.lat)*W-y0, rad=S.radius/mpp, s=rad*2, x=cx-rad, y=cy-rad;
+  if(x>w||y>h||x+s<0||y+s<0) return;
+  g.save();
+  g.setLineDash([9,6]); g.lineWidth=1.8; g.strokeStyle='rgba(127,178,255,.95)'; g.lineJoin='miter';
+  g.beginPath(); g.rect(x+0.9,y+0.9,Math.max(0,s-1.8),Math.max(0,s-1.8)); g.stroke();
+  g.setLineDash([]);
+  var t=(PCF.st==='pending')?'분석 범위':'분석 범위 · 필지 경계 아님';
+  g.font='900 9.5px -apple-system,"Noto Sans KR",sans-serif'; g.textBaseline='middle'; g.textAlign='left';
+  var tw=g.measureText(t).width+16, lx=clamp(x+7,5,w-tw-5), ly=clamp(y+7,6,h-16);
+  g.beginPath();
+  if(g.roundRect) g.roundRect(lx,ly-9,tw,18,6); else g.rect(lx,ly-9,tw,18);
+  g.fillStyle='rgba(10,17,40,.93)'; g.fill();
+  g.strokeStyle='rgba(127,178,255,.95)'; g.lineWidth=1.2; g.stroke();
+  g.fillStyle='#CFE4FF'; g.fillText(t,lx+8,ly+0.5);
   g.restore();
 }
 function drawMarker(g,x0,y0,w,h,o){
@@ -1261,7 +1342,7 @@ function endPtr(e){
     var near=Math.sqrt(Math.pow(downPos.x-VW()/2,2)+Math.pow(downPos.y-VH()/2,2))<14;
     if(!near){
       S.lat=pt.lat; S.lon=pt.lon; S.addr='지도에서 고른 지점';
-      PC=null; paintParcelInfo();
+      PC=null; PCF=null; paintParcelInfo();
       requestRender(); commitPlace(); buildTerrain(); parcelFetch(S.lat,S.lon);
     }
   }
@@ -1506,7 +1587,7 @@ function applyPlace(p,label){
   $('#hits').classList.add('hide');
   $('#hint').classList.add('off');
   commitPlace(); requestRender(); buildTerrain();
-  PC=null; paintParcelInfo(); parcelFetch(S.lat,S.lon);
+  PC=null; PCF=null; paintParcelInfo(); parcelFetch(S.lat,S.lon);
   setTimeout(function(){buildTerrain()},1400);
 }
 function busy(on){ var b=$('#qGo'); b.textContent=on?'찾는 중':'찾기'; b.disabled=!!on }
@@ -1581,7 +1662,7 @@ function paintKey(ok,msg){
 }
 $('#vkSave').addEventListener('click',function(){
   var v=($('#vk').value||'').trim();
-  if(!v){ S.key=''; LS.set('kts_slope_vk',''); paintKey(false); tiles.clear(); vwImgs.clear(); PC=null; paintParcelInfo(); requestRender(); toast('키를 지웠습니다'); return }
+  if(!v){ S.key=''; LS.set('kts_slope_vk',''); paintKey(false); tiles.clear(); vwImgs.clear(); PC=null; PCF={st:'nokey'}; paintParcelInfo(); paintRangeNotice(); requestRender(); toast('키를 지웠습니다'); return }
   S.key=v; LS.set('kts_slope_vk',v); tiles.clear(); vwImgs.clear(); requestRender(); parcelFetch(S.lat,S.lon);
   toast('키 확인 중…');
   vwGeocode('서울특별시 중구 세종대로 110','road').then(function(a){
@@ -1601,6 +1682,15 @@ $('#keyOpen').addEventListener('click',function(){
   var box=$('#keyBox'), on=box.classList.toggle('hide');
   this.textContent=on?'키 바꾸기 (필요할 때만)':'키 입력 닫기';
   if(!on){ var v=$('#vk'); if(v&&document.activeElement!==v) v.focus() }
+});
+/* 203: 지도 위 안내 띠의 버튼 — 상태별로 ⑥ 지도 연결·지번 다시 넣기·다시 조회·정식 주소로 열기 */
+var plA=$('#plostA');
+if(plA) plA.addEventListener('click',function(){
+  var act=this.getAttribute('data-act')||'q';
+  if(act==='key'){ var kc=$('#keyCard'); if(kc&&kc.scrollIntoView) kc.scrollIntoView({behavior:'smooth',block:'center'}); var ko=$('#keyOpen'); if(ko&&$('#keyBox').classList.contains('hide')) ko.click(); }
+  else if(act==='url'){ location.href='https://autooneclick.com/slope/'+(location.hash||''); }
+  else if(act==='retry'){ toast('필지 경계를 다시 확인합니다'); parcelFetch(S.lat,S.lon); }
+  else { var q=$('#q'); if(q){ if(q.scrollIntoView) q.scrollIntoView({behavior:'smooth',block:'center'}); try{ q.focus({preventScroll:true}) }catch(e){ q.focus() } } }
 });
 
 /* ---------------- 그림 저장 ---------------- */
@@ -2255,8 +2345,9 @@ function v3open(my){
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
     v3upload(); v3texPaint();
   }catch(e){ v3fail('이 기기에서는 3D를 켤 수 없습니다 — 2D로 계속 봅니다'); return }
-  V3.st.parcel=V3.lines?(PC&&PC.jibun||'필지'):''; V3.st.center=V3.G.pIn?'parcel':'map';
+  V3.st.parcel=V3.lines?(PC&&PC.jibun||'분석 범위'):''; V3.st.center=V3.G.pIn?'parcel':'map';
   if(PC&&PC.rings&&!V3.G.pIn) v3toast('pout','필지가 화면 밖입니다 · 2D에서 필지를 가운데로 옮긴 뒤 3D로 보세요');
+  if(!(PC&&PC.rings)) v3toast('nopc','필지 경계를 못 읽어 분석 범위(사각형)만 3D로 보여 드립니다 · 지번을 다시 넣어 주세요');
   V3.on=true; v3reset(); v3draw(); v3start();
   var tip=$('#tip3d'); tip.classList.remove('off'); setTimeout(function(){ tip.classList.add('off') },3500);
   v3bind(c);
