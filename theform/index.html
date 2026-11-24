@@ -2739,7 +2739,7 @@ function guideState(){
     if (sg.length){
       const t = sg.find(x => !VALS[x.f.label]) || sg[0];
       const cv = $(`#valList canvas[data-sig="${t.k}"]`);
-      return { active: true, mode: 'cursor', label: '서명 — ' + t.f.label, pos: '서명', el: cv,
+      return { active: true, mode: 'cursor', label: (t.f.label || '서명'), pos: '서명 차례', el: cv,
         tap: function(){ GUIDE_I = -1; try{ cv.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
           cv.classList.add('fldfocus'); setTimeout(function(){ try{ cv.classList.remove('fldfocus'); }catch(e){} }, 1600); } };
     }
