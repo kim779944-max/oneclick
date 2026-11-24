@@ -1197,10 +1197,23 @@ async function sheetPageCanvas(n, sheet, sh){
   cl.querySelectorAll('.mfmark,.ppmark').forEach(m => m.remove());
   cl.style.width = sheet.offsetWidth + 'px'; cl.style.margin = '0';
   host.appendChild(cl); document.body.appendChild(host);
+  /* (2026-11-25 · #85253 고화질) A4 300dpi 기준 가로 2480px · 세로 3508px 까지 올려 찍는다.
+     인쇄·복사에서 작은 글자 획과 표 실선이 뭉개지지 않게 하는 것이 목적. 폰 화면 배율(축소 %)과는 무관하게
+     종이 원본 폭(794px 등)을 기준으로 계산하므로 화면이 작아도 해상도가 떨어지지 않는다. */
+  const scW = cl.offsetWidth || 794;
+  const MAXW = 2480, MAXH = 3508;
+  let sc = MAXW / scW;
+  if (sc > 3.2) sc = 3.2;                            /* 작은 종이를 과도하게 늘리지 않는다 */
+  if (h * sc > MAXH) sc = MAXH / h;                  /* A4 한 장 높이 상한 */
+  if (sc < 1) sc = 1;
+  const r = cl.getBoundingClientRect();
+  const shot = (s) => html2canvas(cl, {backgroundColor: '#ffffff', scale: s, x: r.left + window.scrollX, y: r.top + window.scrollY + y,
+    width: cl.offsetWidth, height: h, windowWidth: 1200, logging: false, useCORS: true});
   try{
-    const r = cl.getBoundingClientRect();
-    return await html2canvas(cl, {backgroundColor: '#ffffff', scale: 2, x: r.left + window.scrollX, y: r.top + window.scrollY + y,
-      width: cl.offsetWidth, height: h, windowWidth: 1200, logging: false, useCORS: true});
+    try{ return await shot(sc); }
+    catch(e){                                         /* 기기 메모리가 모자라면 한 단계 낮춰 한 번 더 */
+      console.warn('sheet shot retry', e); return await shot(Math.max(1.5, sc * 0.62));
+    }
   }finally{ host.remove(); }
 }
 async function sheetPageBlob(n, sheet, sh){ return ppCanvasBlob(await sheetPageCanvas(n, sheet, sh)); }
@@ -1857,7 +1870,7 @@ function ktsPdfName(list){
   return '[더뷰]_' + base + (many ? '_' + list.length + '장_' + mfToday() : '') + '.pdf';
 }
 async function ktsJpegOf(cv){
-  const blob = await new Promise(ok => cv.toBlob(ok, 'image/jpeg', 0.93));
+  const blob = await new Promise(ok => cv.toBlob(ok, 'image/jpeg', 0.98));   /* 인쇄용 — 글자 획 아티팩트 최소 */
   if (!blob) throw new Error('그림을 만들지 못했습니다');
   const bytes = new Uint8Array(await blob.arrayBuffer());
   const out = {bytes: bytes, w: cv.width, h: cv.height};
@@ -1865,7 +1878,7 @@ async function ktsJpegOf(cv){
   return out;
 }
 async function mfPdfPage(it, pi){
-  if (it.kind === 'pdf' && it.pdf) return ktsJpegOf(await pdfPageCanvas(pi, it.pdf, 2.0));
+  if (it.kind === 'pdf' && it.pdf) return ktsJpegOf(await pdfPageCanvas(pi, it.pdf, 3.1));   /* 300dpi급 */
   if (it.kind === 'img'){
     let url = it.url;
     if (!url){
