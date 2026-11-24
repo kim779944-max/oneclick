@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>폭 검사기 — 390·360 에서 넘치는지</title>
+<style>
+body{margin:0;background:#0A1224;color:#F3F6FA;font:13px/1.5 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+h1{font-size:15px;margin:10px 12px 4px}
+p{margin:0 12px 10px;font-size:11.5px;color:#9FB0C8}
+.wrap{display:flex;gap:14px;padding:0 12px 24px;align-items:flex-start}
+.cell{flex:0 0 auto}
+.res{font-size:11.5px;margin:0 0 4px;font-weight:800}
+.res.ok{color:#7CF0B0}
+.res.bad{color:#FCA5A5}
+.res b{color:#FFC98F}
+iframe{border:1px solid #2E4370;border-radius:6px;background:#fff;display:block}
+pre{margin:6px 0 0;font-size:10.5px;color:#FCA5A5;white-space:pre-wrap}
+code{color:#FFC98F}
+</style>
+</head>
+<body>
+<h1>폭 검사기 — 폰 폭에서 가로로 넘치는지</h1>
+<p>주소에 <code>?u=/missed/,/missed/make.html&amp;w=390,360</code> 처럼 넣으세요. 같은 사이트 안 페이지여야 잽니다.
+   <b>clientWidth = scrollWidth</b> 면 가로 넘침 0. 아래 <b>넘친 것</b>에 요소 이름이 뜨면 그 요소가 폭을 밀고 있는 것입니다.</p>
+<div class="wrap" id="wrap"></div>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var urls = (q.get('u') || location.pathname).split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  var ws = (q.get('w') || '390,360').split(',').map(function(s){ return parseInt(s, 10) || 390; });
+  var wait = parseInt(q.get('wait') || '1500', 10);
+  var wrap = document.getElementById('wrap');
+  var jobs = [];
+  urls.forEach(function(u){
+    ws.forEach(function(w){
+      var cell = document.createElement('div'); cell.className = 'cell';
+      var res = document.createElement('div'); res.className = 'res'; res.textContent = w + 'px · ' + u + ' — 재는 중…';
+      var f = document.createElement('iframe');
+      f.width = w; f.height = 780; f.loading = 'eager'; f.src = u;
+      var pre = document.createElement('pre'); pre.hidden = true;
+      cell.appendChild(res); cell.appendChild(f); cell.appendChild(pre);
+      wrap.appendChild(cell);
+      jobs.push({ f: f, w: w, u: u, res: res, pre: pre });
+    });
+  });
+  function name(el){
+    var s = el.tagName.toLowerCase();
+    if (el.id) s += '#' + el.id;
+    if (typeof el.className === 'string' && el.className.trim()) s += '.' + el.className.trim().split(/\s+/).slice(0,2).join('.');
+    return s;
+  }
+  function measure(job){
+    var d;
+    try { d = job.f.contentDocument; } catch (e) { job.res.className = 'res bad'; job.res.textContent = job.w + 'px · ' + job.u + ' — 다른 사이트라 잴 수 없음'; return; }
+    if (!d || !d.documentElement) return;
+    var cw = d.documentElement.clientWidth, sw = d.documentElement.scrollWidth;
+    var bsw = d.body ? d.body.scrollWidth : 0;
+    var out = [];
+    var all = d.querySelectorAll('body *');
+    for (var i = 0; i < all.length && out.length < 6; i++) {
+      var r = all[i].getBoundingClientRect();
+      if (r.width > 0 && r.right > cw + 0.5) out.push(name(all[i]) + ' right=' + Math.round(r.right));
+    }
+    var over = Math.max(sw, bsw) - cw;
+    job.res.className = 'res ' + (over <= 0 ? 'ok' : 'bad');
+    job.res.innerHTML = job.w + 'px · ' + job.u + ' — clientWidth <b>' + cw + '</b> · scrollWidth <b>' + sw + '</b>' +
+      (bsw ? ' · body <b>' + bsw + '</b>' : '') + (over <= 0 ? ' · 넘침 <b>0</b>' : ' · 넘침 <b>+' + over + '</b>');
+    if (out.length) { job.pre.hidden = false; job.pre.textContent = '넘친 것:\n' + out.join('\n'); }
+  }
+  jobs.forEach(function(j){
+    j.f.addEventListener('load', function(){ setTimeout(function(){ measure(j); }, 700); });
+  });
+  setTimeout(function(){ jobs.forEach(measure); }, wait + 2000);
+})();
+</script>
+</body>
+</html>
