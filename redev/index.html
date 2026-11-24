@@ -213,7 +213,8 @@ main{padding:12px 14px 0}
 .spin i{width:14px;height:14px;border:2px solid #2E4370;border-top-color:var(--amber2);border-radius:50%;animation:sp .8s linear infinite;font-style:normal}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(max-width:400px){.hero h1{font-size:19px}.stats b{font-size:15px}}
-</style></head>
+</style><script>function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}</script>
+</head>
 <body><div id="app">
 <header>
   <a class="back" href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭</a>
@@ -928,7 +929,7 @@ function saveCard(){
     var c=drawCard(r);
     var a=document.createElement('a');
     a.href=c.toDataURL('image/png');
-    a.download='재개발_'+(r.n||'').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,24)+'_'+new Date().toISOString().slice(0,10)+'.png';
+    a.download='재개발_'+(r.n||'').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,24)+'_'+ktsYMD()+'.png';
     document.body.appendChild(a); a.click(); a.remove();
     toast('카드로 저장했습니다');
   }catch(e){ toast('저장에 실패했습니다 · 화면 캡처를 써 주세요') }

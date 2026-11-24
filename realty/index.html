@@ -193,6 +193,8 @@
 </div>
 
 <script>
+function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+
 (function(){
   "use strict";
 
@@ -592,7 +594,7 @@
     return "\ufeff" + lines.join("\r\n");
   }
   function toMarkdown(){
-    var out = ["# 부동산 매물 정리 (" + new Date().toISOString().slice(0,10) + " · " + items.length + "건)", ""];
+    var out = ["# 부동산 매물 정리 (" + ktsYMD() + " · " + items.length + "건)", ""];
     items.forEach(function(x, i){
       out.push("### " + (i+1) + ". [" + (x.type || "매물") + "] " + [x.kind, x.region].filter(Boolean).join(" "));
       out.push("- 가격: " + (x.price || "-") + " / 면적: " + (x.area || "-") + " / 연락: " + (x.phone || "-"));

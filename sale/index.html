@@ -544,9 +544,11 @@ h1 em{font-style:normal;color:var(--or)}
     });
     var d = new Date();
     var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    /* 발주서 날짜는 '주문하는 오늘'이다 — 데이터 기준일(asOfKo)을 쓰면 새벽에 하루 전 날짜가 찍힌다 */
+    var ymd = d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + '일월화수목금토'[d.getDay()] + ')';
     var lines = [];
-    lines.push('[장보기 발주서] ' + D.asOfKo + ' ' + hh + ':' + mm);
-    lines.push('오늘의 특가 기준 · 매장 확인 후 결제');
+    lines.push('[장보기 발주서] ' + ymd + ' ' + hh + ':' + mm);
+    lines.push('오늘의 특가 기준 · 자료 ' + D.asOfKo.replace(/^\d{4}년\s*/, '') + ' · 매장 확인 후 결제');
     lines.push('────────────────────');
     var total = 0, save = 0, count = 0, orgTotal = 0, noOrg = 0;
     order.forEach(function(s){
