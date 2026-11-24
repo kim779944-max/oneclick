@@ -1,63 +1,1258 @@
 {
-  "v": "20261124c",
-  "note": "실사 사진 위에 고른 자재만 얹기 위한 영역 좌표. 좌표는 사진 원본 픽셀(1200×900) 기준이고 [x,y] 순서다. 2026-11-24 확대 실측으로 경계를 다시 맞췄다(시작값 20261123a 대비). wall=정면 벽, floor=바닥(옆벽·문·창·기둥 하단 제외), base=걸레받이 띠(기존 걸레받이 자리), mold=몰딩 띠, vp=바닥 원근 소실점(옆벽 걸레받이선 연장 교점), keep=[x,y,w,h] 자재를 얹어도 원본을 지키는 사각형(콘센트 등). 경계가 어긋나면 이 파일 값만 고친다(코드는 이 파일을 읽는다). 20261124b: 4단(부위→자재→색)용으로 자재마다 grade(견적 단가 등급)와 styles(색 3종 — tint 로 색을 곱하고 mult 로 단가 배수)를 넣고, 타일 zone 을 wall→floor 로 바로잡았다(바닥 4단: 강마루·타일). 20261124c: 티가 안 나는 '도배'를 빼고 '칠(페인트)' 4색과 '뮤럴 벽지'(실사 예술 무늬 3종, fit=cover 로 벽에 한 장 덮기)를 넣었다. 칠·뮤럴은 전용 단가 근거가 없어 각각 벽 중·벽 상 기존 단가를 그대로 쓰고 basis 에 그 사실을 적는다(계산식·단가 숫자는 그대로).",
-  "photos": {
-    "living": {
-      "file": "img/ba_living.jpg",
-      "vp":    [650,450],
-      "label": "거실",
-      "order": 1,
-      "wall":  [[170,190],[916,190],[916,661],[170,661]],
-      "floor": [[0,752],[170,674],[920,674],[1058,652],[1200,722],[1200,900],[0,900]],
-      "base":  [[170,656],[920,656],[920,674],[170,674]],
-      "mold":  [[170,190],[916,190],[916,203],[170,203]],
-      "keep":  [],
-      "wallNote": "정면 벽. 왼쪽 모서리 x≈170, 오른쪽 복도 모서리 x≈916, 천장 단차 아래 y≈190, 걸레받이 위 y≈661, 바닥 시작 y≈674. 바닥 왼쪽은 창 아래 옆벽 걸레받이선 (0,752)→(170,674), 오른쪽은 옆벽 걸레받이선 (1058,652)→(1200,722)"
-    },
-    "room": {
-      "file": "img/ba_room.jpg",
-      "vp":    [605,446],
-      "label": "원룸",
-      "order": 2,
-      "wall":  [[281,176],[957,174],[957,680],[281,680]],
-      "floor": [[0,888],[20,880],[97,826],[105,815],[200,745],[281,698],[958,698],[1200,869],[1200,900],[0,900]],
-      "base":  [[281,678],[957,678],[957,698],[281,698]],
-      "mold":  [[281,165],[957,163],[957,176],[281,176]],
-      "keep":  [[821,586,25,35]],
-      "wallNote": "왼쪽 문틀 오른쪽 x≈281, 오른쪽 창벽 모서리 x≈957, 기존 몰딩 아래 y≈176, 걸레받이 위 y≈680. 콘센트(822~846, 587~620)는 keep 으로 원본 유지"
-    },
-    "shop": {
-      "file": "img/ba_shop.jpg",
-      "vp":    [700,450],
-      "label": "매장",
-      "order": 3,
-      "wall":  [[276,256],[949,256],[949,668],[276,668]],
-      "floor": [[0,797],[100,750],[215,692],[276,679],[949,679],[978,698],[1022,698],[1022,682],[1200,682],[1200,900],[0,900]],
-      "base":  [[276,662],[949,662],[949,680],[276,680]],
-      "mold":  [[276,256],[949,256],[949,268],[276,268]],
-      "keep":  [],
-      "wallNote": "왼쪽 기둥 오른쪽 x≈276, 오른쪽 기둥 왼쪽 x≈949, 천장 아래 y≈256, 걸레받이 위 y≈668. 바닥 왼쪽은 통유리 하단 프레임선, 오른쪽 기둥 하단(978~1022, y≈698) 제외"
-    }
+ "v": "20261125a",
+ "note": "2026-11-24 트랙A 마감(190~201). 사진별 좌표는 그 사진 원본 픽셀 기준 [x,y]. scenes=공간/업종, wall=자재를 얹는 벽 폴리곤, floor=바닥, base=걸레받이 띠, mold=몰딩 띠, fg=자재를 얹은 뒤 원본 그대로 되돌리는 앞쪽 물체(소파·기계·선반 등), light=조명 기준점, furn=가구를 놓는 바닥 자리, example=결과 예시(201 샘플 세트). persp:true 인 벽은 사각형 4점을 원근으로 채운다(식당 오른쪽 벽).",
+ "scenes": [
+  {
+   "id": "living",
+   "nm": "거실",
+   "sub": "주거 · 넓은 벽 + 큰 창",
+   "order": 1,
+   "file": "img/base_living_before.jpg",
+   "w": 1200,
+   "h": 800,
+   "wall": [
+    [
+     183,
+     58
+    ],
+    [
+     1073,
+     58
+    ],
+    [
+     1073,
+     468
+    ],
+    [
+     843,
+     468
+    ],
+    [
+     843,
+     588
+    ],
+    [
+     183,
+     588
+    ]
+   ],
+   "floor": null,
+   "base": null,
+   "mold": null,
+   "fg": [
+    [
+     [
+      836,
+      464
+     ],
+     [
+      1082,
+      464
+     ],
+     [
+      1082,
+      518
+     ],
+     [
+      836,
+      518
+     ]
+    ],
+    [
+     [
+      224,
+      462
+     ],
+     [
+      238,
+      452
+     ],
+     [
+      252,
+      436
+     ],
+     [
+      268,
+      418
+     ],
+     [
+      292,
+      404
+     ],
+     [
+      318,
+      400
+     ],
+     [
+      360,
+      400
+     ],
+     [
+      400,
+      404
+     ],
+     [
+      440,
+      406
+     ],
+     [
+      470,
+      400
+     ],
+     [
+      510,
+      398
+     ],
+     [
+      560,
+      400
+     ],
+     [
+      610,
+      400
+     ],
+     [
+      660,
+      398
+     ],
+     [
+      700,
+      392
+     ],
+     [
+      735,
+      390
+     ],
+     [
+      762,
+      398
+     ],
+     [
+      780,
+      412
+     ],
+     [
+      792,
+      440
+     ],
+     [
+      794,
+      585
+     ],
+     [
+      772,
+      592
+     ],
+     [
+      252,
+      592
+     ],
+     [
+      230,
+      585
+     ],
+     [
+      224,
+      500
+     ]
+    ],
+    [
+     [
+      286,
+      556
+     ],
+     [
+      732,
+      556
+     ],
+     [
+      732,
+      602
+     ],
+     [
+      566,
+      602
+     ],
+     [
+      566,
+      652
+     ],
+     [
+      540,
+      652
+     ],
+     [
+      540,
+      610
+     ],
+     [
+      300,
+      610
+     ],
+     [
+      300,
+      650
+     ],
+     [
+      274,
+      650
+     ],
+     [
+      274,
+      600
+     ],
+     [
+      286,
+      600
+     ]
+    ]
+   ],
+   "light": {
+    "sconce": [
+     [
+      336,
+      206
+     ],
+     [
+      852,
+      208
+     ]
+    ],
+    "cove": [
+     [
+      183,
+      60
+     ],
+     [
+      1073,
+      60
+     ]
+    ],
+    "ceiling": 58
+   },
+   "furn": {
+    "center": [
+     300,
+     700,
+     620,
+     800
+    ],
+    "wall": [
+     880,
+     600,
+     1180,
+     790
+    ],
+    "anchorY": 700
+   },
+   "example": {
+    "before": "img/s_living_before.png",
+    "after": "img/s_living_after.png",
+    "cb": "img/s_living_before.webp",
+    "ca": "img/s_living_after.webp",
+    "title": "고급 거실 · 원형 슬랫 + 사각 벽등",
+    "note": "슬랫 하나만 바뀌어도 이만큼 달라집니다. 같은 구도·같은 가구의 비포/애프터입니다."
+   },
+   "fgKey": [
+    [
+     168,
+     236,
+     412,
+     604,
+     90,
+     55
+    ]
+   ]
   },
-  "materials": [
-    {"id":"denbar",    "nm":"덴바보드", "img":"img/mat_denbar.jpg",    "zone":"wall", "bundle":["걸레받이"], "grade":"l", "grp":"", "styles":[{"id":"oak","nm":"오크","mult":1.00,"tint":[1.07,0.97,0.82],"bright":0.99,"sat":1.03,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"walnut","nm":"월넛","mult":1.15,"tint":[0.84,0.66,0.47],"bright":0.84,"sat":1.08,"contrast":1,"sepia":0.12,"overlay":"","alpha":0},{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
-    {"id":"marble",    "nm":"대리석",   "img":"img/mat_marble.jpg",    "zone":"wall", "bundle":[], "grade":"h", "grp":"", "styles":[{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"beige","nm":"베이지","mult":1.08,"tint":[1.04,0.96,0.84],"bright":1.02,"sat":1.02,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"gray","nm":"그레이","mult":1.15,"tint":[0.86,0.88,0.93],"bright":0.98,"sat":0.30,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
-    {"id":"paint",     "nm":"칠(페인트)", "img":"img/mat_paint.jpg", "thumb":"img/mat_paint_sw.jpg", "zone":"wall", "bundle":["몰딩"], "grade":"m", "grp":"", "sub":"4색", "basis":"단가 기준: 벽 중(표준 포인트월·패널) 기존 단가로 계산 — 페인트 전용 단가 없음", "styles":[
-      {"id":"white","nm":"화이트","mult":1.05,"tint":[1.02,1.02,1.00],"bright":1.04,"sat":0.50,"contrast":1.02,"sepia":0,"overlay":"","alpha":0,"css":"#F6F5F1"},
-      {"id":"beige","nm":"베이지","mult":1.08,"tint":[1.00,0.93,0.79],"bright":1.00,"sat":0.85,"contrast":1,"sepia":0.04,"overlay":"","alpha":0,"css":"#EADFC6"},
-      {"id":"gray","nm":"그레이","mult":1.15,"tint":[0.80,0.82,0.86],"bright":0.99,"sat":0.22,"contrast":1,"sepia":0,"overlay":"","alpha":0,"css":"#B9BEC6"},
-      {"id":"navy","nm":"딥네이비","mult":1.15,"tint":[0.26,0.33,0.47],"bright":0.96,"sat":0.90,"contrast":1,"sepia":0,"overlay":"","alpha":0,"css":"#2B3B56"}]},
-    {"id":"mural",     "nm":"뮤럴 벽지", "img":"img/mural_forest.jpg", "zone":"wall", "bundle":["몰딩"], "grade":"h", "grp":"고급", "sub":"무늬 3종", "fit":"cover", "basis":"단가 기준: 벽 상(대리석 아트월) 기존 단가로 계산 — 뮤럴 전용 단가 없음", "styles":[
-      {"id":"forest","nm":"숲 (수채)","img":"img/mural_forest.jpg","mult":1.05,"tint":[1,1,1],"bright":1,"sat":1,"contrast":1,"sepia":0,"overlay":"","alpha":0},
-      {"id":"gold","nm":"금박 마블","img":"img/mural_gold.jpg","mult":1.08,"tint":[1,1,1],"bright":1,"sat":1,"contrast":1,"sepia":0,"overlay":"","alpha":0},
-      {"id":"bird","nm":"화조도","img":"img/mural_bird.jpg","mult":1.15,"tint":[1,1,1],"bright":1,"sat":1,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
-    {"id":"floor",     "nm":"강마루",   "img":"img/mat_floor.jpg",     "zone":"floor","bundle":["걸레받이"], "grade":"", "grp":"", "styles":[{"id":"oak","nm":"오크","mult":1.00,"tint":[1.07,0.97,0.82],"bright":0.99,"sat":1.03,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"walnut","nm":"월넛","mult":1.15,"tint":[0.84,0.66,0.47],"bright":0.84,"sat":1.08,"contrast":1,"sepia":0.12,"overlay":"","alpha":0},{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0}]},
-    {"id":"tile",      "nm":"타일",     "img":"img/mat_tile.jpg",      "bundle":["줄눈"], "grout":160, "zone":"floor", "grade":"", "grp":"", "styles":[{"id":"white","nm":"화이트","mult":1.05,"tint":[1.07,1.07,1.08],"bright":1.08,"sat":0.94,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"beige","nm":"베이지","mult":1.08,"tint":[1.04,0.96,0.84],"bright":1.02,"sat":1.02,"contrast":1,"sepia":0,"overlay":"","alpha":0},{"id":"gray","nm":"그레이","mult":1.15,"tint":[0.86,0.88,0.93],"bright":0.98,"sat":0.30,"contrast":1,"sepia":0,"overlay":"","alpha":0}]}
-  ],
-  "styleNote": "톤 차이 미리보기 · 실물 자재 사진은 준비 중",
-  "layout": {
-    "space": "living",
-    "before": {"file":"img/living_setA.jpg", "label":"배치 전 · 소파 왼쪽"},
-    "after":  {"file":"img/living_setB.jpg", "label":"배치 후 · 소파 오른쪽 + 식탁"}
+  {
+   "id": "dining",
+   "nm": "식당",
+   "sub": "업종 · 높은 천장 + 긴 벤치",
+   "order": 2,
+   "file": "img/base_dining_before.jpg",
+   "w": 1200,
+   "h": 800,
+   "persp": true,
+   "wall": [
+    [
+     600,
+     96
+    ],
+    [
+     1196,
+     10
+    ],
+    [
+     1196,
+     455
+    ],
+    [
+     600,
+     302
+    ]
+   ],
+   "floor": null,
+   "base": null,
+   "mold": null,
+   "fg": [
+    [
+     [
+      600,
+      300
+     ],
+     [
+      1196,
+      452
+     ],
+     [
+      1196,
+      760
+     ],
+     [
+      600,
+      486
+     ]
+    ],
+    [
+     [
+      548,
+      20
+     ],
+     [
+      566,
+      20
+     ],
+     [
+      570,
+      258
+     ],
+     [
+      552,
+      258
+     ]
+    ],
+    [
+     [
+      548,
+      258
+     ],
+     [
+      600,
+      258
+     ],
+     [
+      596,
+      272
+     ],
+     [
+      552,
+      272
+     ]
+    ],
+    [
+     [
+      694,
+      8
+     ],
+     [
+      712,
+      8
+     ],
+     [
+      716,
+      252
+     ],
+     [
+      698,
+      252
+     ]
+    ],
+    [
+     [
+      694,
+      252
+     ],
+     [
+      746,
+      252
+     ],
+     [
+      742,
+      266
+     ],
+     [
+      698,
+      266
+     ]
+    ],
+    [
+     [
+      1016,
+      10
+     ],
+     [
+      1034,
+      10
+     ],
+     [
+      1038,
+      262
+     ],
+     [
+      1020,
+      262
+     ]
+    ],
+    [
+     [
+      1016,
+      262
+     ],
+     [
+      1068,
+      262
+     ],
+     [
+      1064,
+      276
+     ],
+     [
+      1020,
+      276
+     ]
+    ]
+   ],
+   "light": {
+    "sconce": [
+     [
+      700,
+      232
+     ],
+     [
+      880,
+      208
+     ]
+    ],
+    "cove": [
+     [
+      600,
+      96
+     ],
+     [
+      1196,
+      10
+     ]
+    ],
+    "ceiling": 20
+   },
+   "furn": null,
+   "example": {
+    "before": "img/s_dining_before.png",
+    "after": "img/s_dining_after.png",
+    "cb": "img/s_dining_before.webp",
+    "ca": "img/s_dining_after.webp",
+    "title": "식당 · 벤치 위 원형 슬랫 + 벽등 4개",
+    "note": "벤치에 앉은 손님 눈높이에서 슬랫 결이 살아납니다."
+   }
+  },
+  {
+   "id": "cafe",
+   "nm": "카페",
+   "sub": "업종 · 카운터 뒤 벽",
+   "order": 3,
+   "file": "img/base_cafe_before.jpg",
+   "w": 1200,
+   "h": 800,
+   "wall": [
+    [
+     92,
+     100
+    ],
+    [
+     1200,
+     100
+    ],
+    [
+     1200,
+     452
+    ],
+    [
+     92,
+     452
+    ]
+   ],
+   "floor": null,
+   "base": null,
+   "mold": null,
+   "fg": [
+    [
+     [
+      160,
+      286
+     ],
+     [
+      454,
+      286
+     ],
+     [
+      454,
+      452
+     ],
+     [
+      160,
+      452
+     ]
+    ],
+    [
+     [
+      446,
+      198
+     ],
+     [
+      614,
+      198
+     ],
+     [
+      614,
+      394
+     ],
+     [
+      446,
+      394
+     ]
+    ],
+    [
+     [
+      0,
+      440
+     ],
+     [
+      1200,
+      440
+     ],
+     [
+      1200,
+      478
+     ],
+     [
+      0,
+      478
+     ]
+    ]
+   ],
+   "light": {
+    "sconce": [
+     [
+      300,
+      180
+     ],
+     [
+      980,
+      180
+     ]
+    ],
+    "cove": [
+     [
+      92,
+      108
+     ],
+     [
+      1200,
+      108
+     ]
+    ],
+    "ceiling": 100
+   },
+   "furn": null,
+   "example": {
+    "before": "img/s_cafe_before.png",
+    "after": "img/s_cafe_after.png",
+    "cb": "img/s_cafe_before.webp",
+    "ca": "img/s_cafe_after.webp",
+    "title": "카페 · 카운터 뒤 슬랫 + 라인 간접광",
+    "note": "카운터 뒤 한 면만 바꿔도 매장 전체 톤이 달라집니다."
+   },
+   "fgKey": [
+    [
+     760,
+     210,
+     1160,
+     410,
+     120,
+     50
+    ]
+   ]
+  },
+  {
+   "id": "room",
+   "nm": "원룸",
+   "sub": "주거 · 좁은 단면 + 문·창",
+   "order": 4,
+   "file": "img/ba_room.jpg",
+   "w": 1200,
+   "h": 900,
+   "wall": [
+    [
+     281,
+     176
+    ],
+    [
+     957,
+     174
+    ],
+    [
+     957,
+     676
+    ],
+    [
+     281,
+     676
+    ]
+   ],
+   "floor": [
+    [
+     0,
+     888
+    ],
+    [
+     20,
+     880
+    ],
+    [
+     97,
+     826
+    ],
+    [
+     105,
+     815
+    ],
+    [
+     200,
+     745
+    ],
+    [
+     281,
+     698
+    ],
+    [
+     958,
+     698
+    ],
+    [
+     1200,
+     869
+    ],
+    [
+     1200,
+     900
+    ],
+    [
+     0,
+     900
+    ]
+   ],
+   "base": null,
+   "mold": null,
+   "keep": [
+    [
+     821,
+     586,
+     25,
+     35
+    ]
+   ],
+   "fg": [],
+   "light": {
+    "sconce": [
+     [
+      470,
+      96
+     ],
+     [
+      700,
+      96
+     ]
+    ],
+    "cove": [
+     [
+      281,
+      170
+     ],
+     [
+      957,
+      170
+     ]
+    ],
+    "ceiling": 60
+   },
+   "furn": {
+    "center": [
+     290,
+     600,
+     780,
+     824
+    ],
+    "wall": [
+     330,
+     560,
+     880,
+     816
+    ],
+    "anchorY": 816
+   },
+   "example": null
+  },
+  {
+   "id": "shop",
+   "nm": "매장",
+   "sub": "업종 · 높은 천장 + 통유리",
+   "order": 5,
+   "file": "img/ba_shop.jpg",
+   "w": 1200,
+   "h": 900,
+   "wall": [
+    [
+     276,
+     256
+    ],
+    [
+     949,
+     256
+    ],
+    [
+     949,
+     660
+    ],
+    [
+     276,
+     660
+    ]
+   ],
+   "floor": [
+    [
+     0,
+     797
+    ],
+    [
+     100,
+     750
+    ],
+    [
+     215,
+     692
+    ],
+    [
+     276,
+     679
+    ],
+    [
+     949,
+     679
+    ],
+    [
+     978,
+     698
+    ],
+    [
+     1022,
+     698
+    ],
+    [
+     1022,
+     682
+    ],
+    [
+     1200,
+     682
+    ],
+    [
+     1200,
+     900
+    ],
+    [
+     0,
+     900
+    ]
+   ],
+   "base": null,
+   "mold": null,
+   "keep": [],
+   "fg": [],
+   "light": {
+    "sconce": [
+     [
+      420,
+      150
+     ],
+     [
+      820,
+      150
+     ]
+    ],
+    "cove": [
+     [
+      276,
+      260
+     ],
+     [
+      949,
+      260
+     ]
+    ],
+    "ceiling": 150
+   },
+   "furn": {
+    "center": [
+     300,
+     660,
+     900,
+     850
+    ],
+    "wall": [
+     320,
+     620,
+     940,
+     842
+    ],
+    "anchorY": 842
+   },
+   "example": null
   }
+ ],
+ "materials": [
+  {
+   "id": "denbar",
+   "nm": "덴바보드",
+   "img": "img/denbar_slat.jpg",
+   "thumb": "img/denbar_slat_sw.jpg",
+   "zone": "wall",
+   "bundle": [
+    "걸레받이"
+   ],
+   "grade": "l",
+   "grp": "",
+   "sub": "가는 원형 슬랫",
+   "smooth": 0.35,
+   "relight": 0.85,
+   "note": "30mm 원형 슬랫 · 50mm 간격. 결이 세로로 서서 천장이 높아 보입니다.",
+   "styles": [
+    {
+     "id": "oak",
+     "nm": "오크",
+     "mult": 1.0,
+     "tint": [
+      1.05,
+      0.99,
+      0.9
+     ],
+     "bright": 1.0,
+     "sat": 0.96,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#C9AE8E"
+    },
+    {
+     "id": "walnut",
+     "nm": "월넛",
+     "mult": 1.15,
+     "tint": [
+      0.8,
+      0.68,
+      0.58
+     ],
+     "bright": 0.9,
+     "sat": 0.98,
+     "contrast": 1,
+     "sepia": 0.05,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#6E5544"
+    },
+    {
+     "id": "white",
+     "nm": "화이트",
+     "mult": 1.05,
+     "tint": [
+      1.02,
+      1.03,
+      1.04
+     ],
+     "bright": 1.06,
+     "sat": 0.55,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#EDEBE6"
+    }
+   ]
+  },
+  {
+   "id": "marble",
+   "nm": "대리석",
+   "img": "img/mat_marble.jpg",
+   "zone": "wall",
+   "bundle": [],
+   "grade": "h",
+   "grp": "",
+   "sub": "아트월",
+   "smooth": 1,
+   "relight": 0.35,
+   "gloss": 0.04,
+   "note": "인조대리석 아트월. 부착·보강이 들어가 단가가 큽니다.",
+   "styles": [
+    {
+     "id": "white",
+     "nm": "화이트",
+     "mult": 1.05,
+     "tint": [
+      1,
+      1,
+      1
+     ],
+     "bright": 0.88,
+     "sat": 0.7,
+     "contrast": 1.32,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#F2F1EE"
+    },
+    {
+     "id": "beige",
+     "nm": "베이지",
+     "mult": 1.08,
+     "tint": [
+      1.04,
+      0.98,
+      0.9
+     ],
+     "bright": 0.88,
+     "sat": 0.85,
+     "contrast": 1.32,
+     "sepia": 0.03,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#E6DCC8"
+    },
+    {
+     "id": "gray",
+     "nm": "그레이",
+     "mult": 1.15,
+     "tint": [
+      1,
+      1,
+      1
+     ],
+     "bright": 0.88,
+     "sat": 0.45,
+     "contrast": 1.32,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#B8BDC4"
+    }
+   ],
+   "pScale": 2.4,
+   "joint": 0.16
+  },
+  {
+   "id": "paint",
+   "nm": "칠(페인트)",
+   "img": "img/mat_paint.jpg",
+   "thumb": "img/mat_paint_sw.jpg",
+   "zone": "wall",
+   "bundle": [
+    "몰딩"
+   ],
+   "grade": "m",
+   "grp": "칠",
+   "sub": "색 4종",
+   "smooth": 1,
+   "relight": 0.55,
+   "flat": true,
+   "basis": "단가 기준: 벽 중(표준 포인트월·패널) 기존 단가 — 페인트 전용 단가 없음",
+   "note": "색을 고르면 벽이 그 색으로 바뀝니다. 벽지와 달리 무광 도장면입니다.",
+   "styles": [
+    {
+     "id": "white",
+     "nm": "화이트",
+     "mult": 1.05,
+     "tint": [
+      1.02,
+      1.02,
+      1.0
+     ],
+     "bright": 1.02,
+     "sat": 0.5,
+     "contrast": 1.02,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#F4F2ED"
+    },
+    {
+     "id": "beige",
+     "nm": "베이지",
+     "mult": 1.08,
+     "tint": [
+      1.0,
+      0.94,
+      0.83
+     ],
+     "bright": 1.0,
+     "sat": 0.75,
+     "contrast": 1,
+     "sepia": 0.03,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#E3D6BE"
+    },
+    {
+     "id": "gray",
+     "nm": "그레이",
+     "mult": 1.15,
+     "tint": [
+      0.82,
+      0.84,
+      0.87
+     ],
+     "bright": 1.0,
+     "sat": 0.2,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#B0B5BD"
+    },
+    {
+     "id": "navy",
+     "nm": "딥네이비",
+     "mult": 1.15,
+     "tint": [
+      0.3,
+      0.36,
+      0.48
+     ],
+     "bright": 0.94,
+     "sat": 0.85,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#2B3B56"
+    }
+   ]
+  },
+  {
+   "id": "mural",
+   "nm": "뮤럴 벽지",
+   "img": "img/mural_forest.jpg",
+   "thumb": "img/mural_forest.jpg",
+   "zone": "wall",
+   "bundle": [
+    "몰딩"
+   ],
+   "grade": "h",
+   "grp": "고급 마감",
+   "sub": "실사 무늬 3종",
+   "fit": "cover",
+   "smooth": 1,
+   "relight": 0.45,
+   "basis": "단가 기준: 벽 상(대리석 아트월) 기존 단가 — 뮤럴 전용 단가 없음",
+   "note": "실사 사진을 벽 한 면에 그대로 덮는 고급 벽지입니다.",
+   "styles": [
+    {
+     "id": "forest",
+     "nm": "숲 (수채)",
+     "img": "img/mural_forest.jpg",
+     "mult": 1.05,
+     "tint": [
+      1,
+      1,
+      1
+     ],
+     "bright": 1,
+     "sat": 1,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#8E9C90"
+    },
+    {
+     "id": "gold",
+     "nm": "금박 마블",
+     "img": "img/mural_gold.jpg",
+     "mult": 1.08,
+     "tint": [
+      1,
+      1,
+      1
+     ],
+     "bright": 1,
+     "sat": 1,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#C6B48C"
+    },
+    {
+     "id": "bird",
+     "nm": "화조도",
+     "img": "img/mural_bird.jpg",
+     "mult": 1.15,
+     "tint": [
+      1,
+      1,
+      1
+     ],
+     "bright": 1,
+     "sat": 1,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#D9CFC0"
+    }
+   ],
+   "pScale": 1
+  },
+  {
+   "id": "floor",
+   "nm": "강마루",
+   "img": "img/mat_floor.jpg",
+   "zone": "floor",
+   "bundle": [
+    "걸레받이"
+   ],
+   "grade": "",
+   "grp": "",
+   "smooth": 0.4,
+   "relight": 0.9,
+   "styles": [
+    {
+     "id": "oak",
+     "nm": "오크",
+     "mult": 1.0,
+     "tint": [
+      1.05,
+      0.99,
+      0.9
+     ],
+     "bright": 1.0,
+     "sat": 0.96,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#C9AE8E"
+    },
+    {
+     "id": "walnut",
+     "nm": "월넛",
+     "mult": 1.15,
+     "tint": [
+      0.8,
+      0.68,
+      0.58
+     ],
+     "bright": 0.9,
+     "sat": 0.98,
+     "contrast": 1,
+     "sepia": 0.05,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#6E5544"
+    },
+    {
+     "id": "white",
+     "nm": "화이트",
+     "mult": 1.05,
+     "tint": [
+      1.02,
+      1.03,
+      1.04
+     ],
+     "bright": 1.06,
+     "sat": 0.55,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#EDEBE6"
+    }
+   ]
+  },
+  {
+   "id": "tile",
+   "nm": "타일",
+   "img": "img/mat_tile.jpg",
+   "bundle": [
+    "줄눈"
+   ],
+   "grout": 160,
+   "zone": "floor",
+   "grade": "",
+   "grp": "",
+   "smooth": 0.5,
+   "relight": 0.85,
+   "styles": [
+    {
+     "id": "white",
+     "nm": "화이트",
+     "mult": 1.05,
+     "tint": [
+      1.05,
+      1.05,
+      1.06
+     ],
+     "bright": 1.06,
+     "sat": 0.4,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#F1F0EC"
+    },
+    {
+     "id": "beige",
+     "nm": "베이지",
+     "mult": 1.08,
+     "tint": [
+      1.02,
+      0.96,
+      0.86
+     ],
+     "bright": 1.02,
+     "sat": 0.7,
+     "contrast": 1,
+     "sepia": 0.03,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#E4DAC6"
+    },
+    {
+     "id": "gray",
+     "nm": "그레이",
+     "mult": 1.15,
+     "tint": [
+      0.86,
+      0.88,
+      0.93
+     ],
+     "bright": 1.0,
+     "sat": 0.25,
+     "contrast": 1,
+     "sepia": 0,
+     "overlay": "",
+     "alpha": 0,
+     "css": "#B7BCC3"
+    }
+   ]
+  }
+ ]
 }

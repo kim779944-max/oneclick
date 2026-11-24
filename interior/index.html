@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A1128">
 <title>인테리어 견적 — 벽·바닥·조명·가구 비포/애프터 · 하·중·상 원가 비교</title>
-<meta name="description" content="공간을 고르고 벽·바닥·조명·가구에서 다시 자재와 색을 고르면 시공 전/후 사진과 원가가 바로 바뀝니다. 가로·세로를 넣으면 재료비와 인건비를 나눠 직접 시공·분리 하청·일괄 위임 3가지로 비교합니다.">
+<meta name="description" content="공간을 고르고 사진 속 벽을 누르면 자재가 입혀지고, 색을 고르면 조명까지 이어집니다. 시공 전/후 사진과 원가가 바로 바뀝니다.">
 <meta property="og:title" content="인테리어 견적 — 바꾸기 전에 얼마인지 먼저">
-<meta property="og:description" content="공간 → 부위 → 자재 → 색. 네 번 누르면 끝나고 값은 바로 나옵니다.">
+<meta property="og:description" content="공간 → 벽 → 자재 → 색. 사진을 누르면 그 자리에서 바뀝니다.">
 <link rel="icon" href="../icon.png">
 <style>
 :root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
@@ -29,47 +29,50 @@ button{font-family:inherit}
 .card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;word-break:keep-all}
 .card h2 .n{display:inline-flex;flex:0 0 auto;width:22px;height:22px;border-radius:11px;background:var(--or);color:var(--on);font-size:12px;align-items:center;justify-content:center;font-weight:800}
 .card h2 em{font-style:normal;margin-left:auto;font-size:11px;color:var(--gray);font-weight:400}
-/* ① 선택 줄 — 1·2단은 같은 자리(48px)에서 갈아 끼운다 */
-.sel{position:sticky;top:54px;z-index:19;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 0 7px;margin-top:0}
-.selrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;height:48px}
-.selrow button{min-height:48px;border:1px solid var(--line2);border-radius:11px;background:var(--card2);color:var(--ink);font-size:14px;font-weight:800;cursor:pointer;padding:4px 6px;line-height:1.2;word-break:keep-all}
-.selrow button.on{border-color:var(--or);background:rgba(255,107,0,.14);box-shadow:0 0 0 2px rgba(255,107,0,.25);color:#fff}
-.selrow button.back{font-size:17px;font-weight:900;color:var(--or2)}
-.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
-.chips.g4{grid-template-columns:repeat(4,1fr)}
-.chips button{min-height:42px;border:1px solid var(--line2);border-radius:10px;background:var(--card2);color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;padding:4px 5px;line-height:1.22;word-break:keep-all}
-.chips button.on{border-color:var(--or);background:rgba(255,107,0,.14);box-shadow:0 0 0 2px rgba(255,107,0,.25);color:#fff}
-.chips button b{display:block;font-size:14px;color:var(--or2)}
+/* ① 공간 카드 — 사진으로 고른다 */
+.spaces{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.spaces button{position:relative;padding:0;border:1px solid var(--line2);border-radius:10px;background:#0B1729;color:var(--ink);cursor:pointer;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;justify-content:flex-end}
+.spaces button img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;transition:opacity .3s,transform .5s}
+.spaces button.on{border-color:var(--or);box-shadow:0 0 0 2px rgba(255,107,0,.32)}
+.spaces button.on img{opacity:1;transform:scale(1.04)}
+.spaces button span{position:relative;z-index:2;font-size:11.5px;font-weight:900;padding:14px 3px 4px;background:linear-gradient(transparent,rgba(6,12,28,.92) 58%);line-height:1.2}
+.spaces button.on span{color:#fff}
+.spaces button .ex{position:absolute;top:3px;right:3px;z-index:3;font-size:8.5px;font-weight:900;background:rgba(255,107,0,.92);color:var(--on);border-radius:4px;padding:1px 3px;letter-spacing:-.02em}
+/* ② 사진 + 부위 표시 */
+.stage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#16264A;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize;outline:none;line-height:0}
+.stage canvas{display:block;width:100%;height:auto}
+.cvwrap{position:absolute;inset:0;will-change:clip-path,filter;line-height:0}
+.cvwrap canvas{display:block;width:100%;height:100%}
+.stage .afw{clip-path:inset(0 0 0 0);filter:brightness(1)}
+.stage .lb{position:absolute;top:8px;font-size:11.5px;font-weight:900;padding:3px 9px;border-radius:999px;background:rgba(10,17,40,.7);color:#fff;border:1px solid rgba(255,255,255,.22);pointer-events:none;z-index:4}
+.stage .lb.l{left:8px}.stage .lb.r{right:8px;background:rgba(255,107,0,.92);color:var(--on);border-color:transparent}
+.stage .dv{position:absolute;top:0;bottom:0;width:0;border-left:2px solid #fff;box-shadow:0 0 6px rgba(0,0,0,.55);pointer-events:none;z-index:3}
+.stage .kn{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:44px;height:40px;border-radius:20px;background:#fff;color:var(--on);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.42);letter-spacing:-1px;touch-action:none;cursor:grab;z-index:4}
+.stage .err{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#16264A;color:var(--ink);font-size:13.5px;font-weight:800;text-align:center;padding:12px;cursor:default;touch-action:auto;z-index:5}
+/* 부위 손잡이 — 사진 위 작은 표시(누르면 그 부위) */
+.spot{position:absolute;z-index:4;display:flex;align-items:center;gap:3px;min-height:26px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,17,40,.55);color:#fff;font-size:10.5px;font-weight:900;cursor:pointer;backdrop-filter:blur(2px);transition:background .25s,border-color .25s,opacity .4s}
+.spot:before{content:"";width:5px;height:5px;border-radius:3px;background:var(--or2)}
+.spot.on{background:rgba(255,107,0,.9);border-color:transparent;color:var(--on)}
+.spot.on:before{background:var(--on)}
+.spot.dim{opacity:.62}
+/* ③ 이어지는 선택 — 단추는 지금 단계 것만 */
+.step{margin-top:10px;min-height:52px}
+.step .lbl{font-size:11px;font-weight:900;color:var(--gray);margin:0 1px 5px;display:flex;gap:6px;align-items:center}
+.step .lbl b{color:var(--or2)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.chips.g3{grid-template-columns:repeat(3,1fr)}
+.chips.g2{grid-template-columns:repeat(2,1fr)}
+.chips button{min-height:44px;border:1px solid var(--line2);border-radius:10px;background:var(--card2);color:var(--ink);font-size:12.5px;font-weight:800;cursor:pointer;padding:5px 4px;line-height:1.2;word-break:keep-all;transition:transform .18s,border-color .2s,background .2s}
+.chips button:active{transform:scale(.97)}
+.chips button.on{border-color:var(--or);background:rgba(255,107,0,.14);box-shadow:0 0 0 2px rgba(255,107,0,.24);color:#fff}
+.chips button b{display:block;font-size:13px;color:var(--or2)}
 .chips button.on b{color:#fff}
-.chips button span{display:block;font-size:10.5px;color:var(--ink2);font-weight:700;margin-top:1px}
-.chips .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:#ccc center/cover no-repeat;border:1px solid rgba(255,255,255,.3)}
-.chips button b .sw{width:11px;height:11px;margin-right:5px}
-.chips .grp{grid-column:1/-1;font-size:10.5px;font-weight:900;color:#8FA0B8;letter-spacing:.01em;padding:7px 2px 0;line-height:1.3}
-.chips .grp:first-child{padding-top:0}
-.selnote{font-size:10.5px;color:var(--gray);margin:6px 2px 0;line-height:1.45;font-weight:700}
-.selnote b{color:#FFB070}
-.linkrow{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:12px}
-.linkrow a{font-weight:800;text-decoration:none;border-bottom:1px dashed rgba(255,162,77,.6)}
-/* 게이지 바 */
-.ba{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#16264A;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize;outline:none}
-.ba:focus-visible{box-shadow:0 0 0 3px rgba(255,162,77,.6)}
-.ba canvas{display:block;width:100%;height:auto}
-.ba canvas.af{position:absolute;left:0;top:0;width:100%;height:100%}
-.ba .lb{position:absolute;top:8px;font-size:12px;font-weight:900;padding:3px 9px;border-radius:999px;background:rgba(10,17,40,.78);color:#fff;border:1px solid rgba(255,255,255,.25);pointer-events:none}
-.ba .lb.l{left:8px}.ba .lb.r{right:8px;background:rgba(255,107,0,.9);color:var(--on);border-color:transparent}
-.ba .dv{position:absolute;top:0;bottom:0;width:0;border-left:2px solid #fff;box-shadow:0 0 6px rgba(0,0,0,.6);pointer-events:none}
-.ba .kn{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:48px;height:44px;border-radius:22px;background:#fff;color:var(--on);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:2px;box-shadow:0 2px 8px rgba(0,0,0,.45);letter-spacing:-1px;touch-action:none;cursor:grab}
-.ba .lb.s{font-size:11px;padding:3px 8px;max-width:46%;white-space:normal;line-height:1.3;word-break:keep-all;border-radius:10px}
-.ba .ex{position:absolute;left:8px;bottom:8px;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:rgba(10,17,40,.7);color:#E6ECF5;pointer-events:none}
-.ba .err{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#16264A;color:var(--ink);font-size:13.5px;font-weight:800;text-align:center;padding:12px;cursor:default;touch-action:auto}
-/* 사진은 폰에서 화면 절반 이상 */
-#baSample{min-height:46vh}
-#baSample canvas{min-height:46vh;object-fit:cover}
-.bundle{font-size:12.5px;color:var(--ink2);margin:8px 0 0;line-height:1.55;word-break:keep-all}
-.bundle b{color:var(--or2)}
-.rng{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--gray)}
-.rng input{flex:1;min-width:0;height:36px;accent-color:#FF6B00}
-.cap{font-size:12px;color:var(--gray);margin:7px 0 0;line-height:1.55;word-break:keep-all}
+.chips button span{display:block;font-size:10px;color:var(--ink2);font-weight:700;margin-top:1px}
+.chips button i.sw{display:inline-block;width:22px;height:22px;border-radius:5px;margin-bottom:2px;background:#ccc center/cover no-repeat;border:1px solid rgba(255,255,255,.28)}
+.chips button.on i.sw{border-color:rgba(255,255,255,.6)}
+.chips.row{grid-template-columns:repeat(4,1fr)}
+.hint{font-size:11px;color:var(--gray);margin:7px 2px 0;line-height:1.45;font-weight:700}
+.hint b{color:#FFB070}
 /* 견적 */
 .inrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px}
 .inrow input{width:76px;min-height:40px;background:#0B1729;border:1px solid var(--line2);border-radius:10px;color:var(--ink);font-size:16px;font-weight:800;text-align:center;padding:6px;font-family:inherit}
@@ -100,9 +103,7 @@ button{font-family:inherit}
 .acts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
 .btn{min-height:44px;border:1px solid var(--line2);border-radius:11px;background:var(--card2);color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;padding:6px 8px}
 .btn.p{background:linear-gradient(135deg,#FF6B00,#FFA24D);color:var(--on);border-color:var(--or)}
-/* ④ 화면 저장 */
 .save4{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0 0}
-.save4 .btn{min-height:50px;display:flex;align-items:center;justify-content:center;gap:6px}
 .note{font-size:12px;color:var(--gray);line-height:1.6;margin:9px 0 0;word-break:keep-all}
 details.rates{margin-top:11px;border:1px solid var(--line);border-radius:12px;background:#0B1729}
 details.rates summary{cursor:pointer;min-height:40px;display:flex;align-items:center;padding:0 11px;font-size:13px;font-weight:900;color:var(--or2);list-style:none}
@@ -115,6 +116,23 @@ details.rates[open] summary:after{content:"▴"}
 .rt .r .nm small{display:block;font-size:10.5px;color:var(--gray)}
 .rt .r input{width:94px;min-height:36px;background:#0F1B33;border:1px solid var(--line2);border-radius:8px;color:var(--ink);font-size:13.5px;font-weight:800;text-align:right;padding:4px 7px;font-family:inherit}
 .rt .r .u{flex:0 0 38px;font-size:11px;color:var(--gray)}
+/* 예시 카드(201) */
+.exgrid{display:grid;grid-template-columns:1fr;gap:10px}
+.excard{display:block;width:100%;text-align:left;padding:0;border:1px solid var(--line);border-radius:12px;background:#0B1729;color:var(--ink);cursor:pointer;overflow:hidden}
+.expair{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#0B1729}
+.expair figure{margin:0;position:relative}
+.expair img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover}
+.expair figcaption{position:absolute;left:6px;bottom:6px;font-size:10px;font-weight:900;padding:2px 6px;border-radius:6px;background:rgba(10,17,40,.72)}
+.expair figure.a figcaption{background:rgba(255,107,0,.92);color:var(--on)}
+.excard .t{padding:9px 11px 10px}
+.excard .t b{display:block;font-size:13px;line-height:1.35}
+.excard .t small{display:block;font-size:11px;color:var(--gray);margin-top:2px}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(4,8,18,.92);display:flex;align-items:center;justify-content:center;padding:14px}
+.modal .box{max-width:560px;width:100%;max-height:92vh;overflow:auto;background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:12px}
+.modal .box h3{margin:0 0 8px;font-size:15px}
+.modal .box img{width:100%;border-radius:10px;display:block;margin:6px 0}
+.modal .box .cap2{font-size:11.5px;color:var(--gray)}
+.modal .box .row{display:flex;gap:6px;margin-top:8px}
 /* 사진 */
 .pick{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:48px;border-radius:12px;border:1px dashed var(--or);background:rgba(255,107,0,.08);color:var(--or2);font-size:15px;font-weight:900;cursor:pointer}
 .pick input{display:none}
@@ -127,7 +145,6 @@ details.rates[open] summary:after{content:"▴"}
 .cnt b{color:var(--or2)}
 .kit p{margin:0 0 10px;font-size:13px;color:var(--ink2);line-height:1.6;word-break:keep-all}
 .foot{font-size:12px;color:var(--gray);line-height:1.7;margin:16px 0 24px;word-break:keep-all}
-.foot a{color:var(--or2)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:13px;font-weight:800;padding:9px 14px;border-radius:999px;max-width:90%;text-align:center;opacity:0;transition:.25s;pointer-events:none}
 .toast.on{opacity:1}
 #printArea{display:none}
@@ -140,38 +157,34 @@ details.rates[open] summary:after{content:"▴"}
   #printArea pre{white-space:pre-wrap;font-family:inherit;margin:0}
   @page{size:A4;margin:14mm}
 }
+@media (prefers-reduced-motion:reduce){.cvwrap,.spaces button img{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="hd"><div class="wrap">
   <a class="back" href="../">← 쇼룸</a>
-  <h1>인테리어 견적<small>공간 → 부위 → 자재 → 색 · 비포/애프터 · 하·중·상 원가</small></h1>
+  <h1>인테리어 견적<small>공간 → 벽 → 자재 → 색 · 사진을 누르면 그 자리에서</small></h1>
 </div></header>
 
 <main class="wrap">
-  <!-- ① 선택 줄: 1단(공간) ↔ 2단(부위)이 같은 자리에서 갈아 끼워지고, 3·4단은 그 아래로 펼친다 -->
-  <section class="sel" id="selBar" aria-label="인테리어 선택">
-    <div class="selrow" id="lvRow" role="group" aria-label="공간 또는 부위"></div>
-    <div class="chips" id="lvChips" role="group" aria-label="세부" hidden></div>
-    <p class="selnote" id="styleNote" hidden>톤 차이 미리보기 · 실물 자재 사진은 준비 중</p>
-    <p class="selnote" id="selNote">공간을 누르면 부위가 나오고, 부위 → 자재 → 색 순서로 들어갑니다.</p>
+  <!-- ① 공간(업종) -->
+  <section class="card" style="padding:11px 11px 12px">
+    <h2 style="margin-bottom:8px"><span class="n">1</span>어디를 바꾸나<em>사진으로 고르기</em></h2>
+    <div class="spaces" id="spaceRow" role="group" aria-label="공간·업종"></div>
   </section>
 
-  <!-- ② 사진 1개 -->
-  <section class="card" id="secSample">
-    <h2><span class="n">2</span>시공 전 → 후, 밀어서 보기<em>무료</em></h2>
-    <div class="ba" id="baSample" tabindex="0" role="slider" aria-label="시공 전후 비교 분할선" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
-      <canvas class="bf" width="1200" height="900"></canvas>
-      <canvas class="af" width="1200" height="900"></canvas>
+  <!-- ② 사진 + 부위 -->
+  <section class="card" id="secSample" style="padding:10px 10px 12px">
+    <div class="stage" id="stage" tabindex="0" role="slider" aria-label="시공 전후 비교 분할선" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+      <canvas class="bf" width="1200" height="800"></canvas>
+      <div class="cvwrap afw"><canvas class="af" width="1200" height="800"></canvas></div>
       <span class="lb l">시공 전</span><span class="lb r">시공 후</span>
       <i class="dv"></i><span class="kn" aria-hidden="true">◀ ▶</span>
-      <span class="ex">예시 사진</span>
+      <div id="spots"></div>
       <div class="err" id="sampleErr" hidden>사진을 불러오지 못했습니다<button class="mini" type="button" id="sampleRetry">다시 시도</button></div>
     </div>
-    <div class="rng"><span>전</span><input type="range" min="0" max="100" value="50" id="rngSample" aria-label="전후 비교 위치"><span>후</span></div>
-    <p class="cap" id="sampleCap">손가락이나 마우스로 가운데 선을 좌우로 끌어 보세요. 키보드 ← → 도 됩니다.</p>
-    <p class="bundle" id="bundleTxt"></p>
-    <p class="cap" id="matMsg">자재를 누르면 넣고, 다시 누르면 뺍니다. 자재 가격은 아래 견적에서 하·중·상으로 봅니다.</p>
+    <div class="step" id="stepBar" aria-live="polite"></div>
+    <p class="hint" id="hintLine">사진에서 <b>벽</b>을 눌러 보세요. 자재를 고르면 색이 이어서 나옵니다.</p>
   </section>
 
   <!-- ③ 견적 -->
@@ -200,27 +213,33 @@ details.rates[open] summary:after{content:"▴"}
     <button class="btn" id="prScreen" type="button">A4 인쇄 · PDF</button>
   </section>
 
+  <!-- 결과 예시(201) -->
+  <section class="card" id="secEx">
+    <h2>업종별 결과 예시<em>실사 사진</em></h2>
+    <div class="exgrid" id="exGrid"></div>
+    <p class="note" id="exNote">위 예시는 <b>톤·마감 기준을 보여 주는 견본</b>입니다. 손님이 올린 사진의 비포/애프터는 그 사진으로 따로 만듭니다(아래 “내 방 사진”).</p>
+  </section>
+
   <!-- 내 방 사진 -->
   <section class="card" id="secPhoto">
     <h2>내 방 사진에 얹어 보기</h2>
     <label class="pick"><input type="file" accept="image/*" id="photoIn">＋ 사진 고르기 · 찍기</label>
     <ul class="note" style="padding-left:16px">
       <li>고른 마감·조명·가구가 사진 위에 얹힙니다. 사진은 이 기기 안에서만 씁니다(업로드·전송 없음).</li>
-      <li>벽 마감은 사진 가운데 벽, 조명은 위쪽, 가구는 아래쪽에 대략 얹습니다.</li>
+      <li>벽 마감은 사진 가운데 벽, 조명은 위쪽, 가구는 아래쪽에 얹습니다.</li>
       <li>1장까지 무료입니다. 2장째부터는 이용권이 필요합니다.</li>
     </ul>
     <div id="photoWrap" hidden>
-      <div class="ba" id="baPhoto" tabindex="0" role="slider" aria-label="내 사진 전후 비교 분할선" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+      <div class="stage" id="stage2" tabindex="0" role="slider" aria-label="내 사진 전후 비교 분할선" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" style="min-height:0">
         <canvas class="bf" width="4" height="3"></canvas>
-        <canvas class="af" width="4" height="3"></canvas>
+        <div class="cvwrap afw"><canvas class="af" width="4" height="3"></canvas></div>
         <span class="lb l">전</span><span class="lb r">후</span>
         <i class="dv"></i><span class="kn" aria-hidden="true">◀ ▶</span>
       </div>
-      <div class="rng"><span>전</span><input type="range" min="0" max="100" value="50" id="rngPhoto" aria-label="내 사진 전후 비교 위치"><span>후</span></div>
       <div class="acts">
         <button class="btn" id="svAfter" type="button">저장(이미지)</button>
         <button class="btn" id="svBA" type="button">전후 비교 저장</button>
-        <button class="btn" id="prPhoto" type="button">견적과 함께 A4 인쇄</button>
+        <button class="btn" id="prPhoto" type="button">견적과 함께 A4</button>
       </div>
     </div>
     <div class="pass" id="passBox" hidden>
@@ -249,6 +268,7 @@ details.rates[open] summary:after{content:"▴"}
 
 <div id="printArea"></div>
 <div class="toast" id="toast"></div>
+<div class="modal" id="exModal" hidden><div class="box" id="exBox"></div></div>
 
 <script src="../slots.js?v=20261124c"></script>
 <script>
@@ -261,12 +281,12 @@ function won(n){return Math.round(n).toLocaleString('ko-KR');}
 function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 var toastT;
-function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2400);}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2600);}
 function smsHref(body){return 'sms:'+SMS+'?body='+encodeURIComponent(body);}
 $('#smsKit').href=smsHref('[KTS] 인테리어 견적 · 벽키트 문의');
 $('#smsPass').href=smsHref('[KTS] 인테리어 사진 변환 이용권 신청');
 
-/* ---------------- 단가표 (계산식·단가 불변) ---------------- */
+/* ---------------- 단가표 (계산식·단가 숫자 불변) ---------------- */
 var DEF={
   wall:{l:20100,m:32600,h:120000},
   light:{l:{set:0,unit:11000},m:{set:0,unit:45000},h:{set:0,unit:55000}},
@@ -275,28 +295,23 @@ var DEF={
 };
 var NAMES={
   wall:{l:'템바보드',m:'표준 포인트월·패널',h:'대리석(아트월)'},
-  light:{l:'매립 다운라이트',m:'라인조명',h:'우물천장 간접등'},
+  light:{l:'벽 간접조명',m:'천장 간접조명',h:'등기구(사각 벽등)'},
   furn:{l:'가성비 세트',m:'원목·우드 세트',h:'세라믹·스틸 세트'}
 };
 var DESC={
-  wall:{l:'490×2,440mm 템바보드를 벽에 붙입니다. 결이 세로로 나 천장이 높아 보입니다.',
-        m:'500×2,440mm 포인트월 패널. 줄눈이 깔끔하게 맞아 정돈된 느낌입니다.',
-        h:'인조대리석 아트월. 부착·보강이 들어가 단가가 큽니다.'},
-  light:{l:'4인치 LED 매립등. 면적 4㎡당 1개로 셉니다.',
-         m:'천장에 선으로 매립하는 라인조명. 가로 길이(m)만큼 셉니다.',
-         h:'천장을 한 단 올리고 테두리에 간접등. 양쪽 두 줄(가로×2 m)로 셉니다.'},
-  furn:{l:'가진 가구를 옮기고 가성비 세트를 더합니다.',
-        m:'원목·우드 톤 테이블·의자 세트.',
-        h:'세라믹 상판 + 스틸 다리 세트.'}
+  light:{l:'벽 상단에 숨은 선조명. 빛이 벽 위아래로 번집니다.',
+         m:'천장 코브에서 벽으로 빛이 떨어집니다.',
+         h:'기구가 보이는 사각 벽등. 위아래로 간접광을 줍니다.'}
 };
 var KIND={'wall.l':'ok','wall.m':'ok'};
 var SRC={'wall.l':'490×2,440mm 1장 24,000원(오늘의집 표시가, 2026-11-22) ÷ 1.196㎡',
          'wall.m':'500×2,440mm 1장 39,800원(10x10 표시가, 2026-11-22) ÷ 1.22㎡',
-         'wall.h':'인조대리석 패널 + 부착·보강 인건 포함 추정',
-         'light.l':'4인치 LED 매립 8,000~15,000원 범위의 중앙값',
-         'light.m':'1m 기준 추정','light.h':'천장 골조 + LED T5 포함 추정',
+         'wall.h':'인조대리석 패널 + 부착·보강 인건 포함 추정 (뮤럴 벽지도 이 기준)',
+         'light.l':'4인치 LED 매립 8,000~15,000원 범위의 중앙값 — 벽 간접조명에 그대로 사용',
+         'light.m':'1m 기준 추정 — 천장 간접조명에 그대로 사용',
+         'light.h':'천장 골조 + LED T5 포함 추정 — 사각 벽등에 그대로 사용',
          'furn.l':'배치 변경 중심','furn.m':'','furn.h':'',
-         'daily':'숨고·일당 시세는 지역·시기별 차이','margin':'일괄 위임 비교용 가정값'};
+         'daily':'숙고·일당 시세는 지역·시기별 차이','margin':'일괄 위임 비교용 가정값'};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 var R=clone(DEF);
 (function(){try{var s=JSON.parse(ls(RATE_KEY)||'null');if(s&&s.wall&&s.light&&s.furn){
@@ -318,9 +333,9 @@ function tagOf(path){
 function buildRates(){
   var rows=[
     ['wall.l','벽 하 · 템바보드','원/㎡'],['wall.m','벽 중 · 포인트월·패널','원/㎡'],['wall.h','벽 상 · 대리석(아트월)','원/㎡'],
-    ['light.l.unit','조명 하 · 다운라이트(개당)','원/개'],['light.l.set','조명 하 · 고정 세트가','원'],
-    ['light.m.unit','조명 중 · 라인조명','원/m'],['light.m.set','조명 중 · 고정 세트가','원'],
-    ['light.h.unit','조명 상 · 우물천장 간접등','원/m'],['light.h.set','조명 상 · 고정 세트가','원'],
+    ['light.l.unit','조명 1 · 벽 간접조명(개당)','원/개'],['light.l.set','조명 1 · 고정 세트가','원'],
+    ['light.m.unit','조명 2 · 천장 간접조명','원/m'],['light.m.set','조명 2 · 고정 세트가','원'],
+    ['light.h.unit','조명 3 · 등기구(사각 벽등)','원/m'],['light.h.set','조명 3 · 고정 세트가','원'],
     ['furn.l','가구 하 · 가성비 세트','원'],['furn.m','가구 중 · 원목·우드 세트','원'],['furn.h','가구 상 · 세라믹·스틸 세트','원'],
     ['daily','인건비 일당(목공)','원/인·일'],['margin','업체 이윤율','%']
   ];
@@ -334,190 +349,803 @@ function buildRates(){
       var v=Math.round(parseFloat(inp.value));
       if(!(v>=0)) return;
       setP(inp.dataset.p,v); lsSet(RATE_KEY,JSON.stringify(R));
-      $('[data-tg="'+inp.dataset.p+'"]').innerHTML=tagOf(inp.dataset.p);
+      var tg=$('[data-tg="'+inp.dataset.p+'"]'); if(tg) tg.innerHTML=tagOf(inp.dataset.p);
       calc();
     });
   });
   $('#rateReset').addEventListener('click',function(){R=clone(DEF);try{localStorage.removeItem(RATE_KEY);}catch(e){}buildRates();calc();toast('기본 단가로 되돌렸습니다');});
 }
 
-/* ---------------- 자재·색 데이터 (regions.json 이 원본) ---------------- */
-var FB={v:'fallback',photos:{},materials:[
-  {id:'denbar',nm:'덴바보드',img:'img/mat_denbar.jpg',zone:'wall',bundle:['걸레받이'],grade:'l'},
-  {id:'marble',nm:'대리석',img:'img/mat_marble.jpg',zone:'wall',bundle:[],grade:'h'},
-  {id:'paint',nm:'칠(페인트)',img:'img/mat_paint.jpg',zone:'wall',bundle:['몰딩'],grade:'m',grp:''},
-  {id:'mural',nm:'뮤럴 벽지',img:'img/mural_forest.jpg',zone:'wall',bundle:['몰딩'],grade:'h',grp:'고급',fit:'cover'},
-  {id:'floor',nm:'강마루',img:'img/mat_floor.jpg',zone:'floor',bundle:['걸레받이'],grade:''},
-  {id:'tile',nm:'타일',img:'img/mat_tile.jpg',zone:'floor',bundle:['줄눈'],grout:160,grade:''}
-]};
-var REG=null, REG_ST='loading';
-function mats(){return (REG&&REG.materials&&REG.materials.length)?REG.materials:FB.materials;}
-function matById(id){if(!id)return null;var a=mats();for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null;}
-function matsOf(zone){return mats().filter(function(m){return m.zone===zone;});}
+/* ---------------- 자료(regions.json) ---------------- */
+var REG=null, SCENES=[], MATS=[], READY=false;
+var S={space:'living',part:'wall',matWall:'denbar',styleWall:'oak',matFloor:'floor',styleFloor:'oak',light:'',furn:''};
+function scById(id){for(var i=0;i<SCENES.length;i++)if(SCENES[i].id===id)return SCENES[i];return SCENES[0];}
+function matById(id){for(var i=0;i<MATS.length;i++)if(MATS[i].id===id)return MATS[i];return null;}
+function matsOf(zone){return MATS.filter(function(m){return m.zone===zone;});}
 function stylesOf(m){return (m&&m.styles&&m.styles.length)?m.styles:[];}
 function styleById(m,sid){var a=stylesOf(m);for(var i=0;i<a.length;i++)if(a[i].id===sid)return a[i];return a[0]||null;}
-
-/* ---------------- 선택 상태 (4단) ---------------- */
-/* lvl 1=공간 · 2=부위 · 3=세부(자재/단계) · 4=색 */
-var S={scene:'living',lvl:1,part:'',matWall:'denbar',matFloor:'floor',styleWall:'oak',styleFloor:'oak',
-       wall:'l',light:'',furn:'',layout:'keep'};
-var SP=[{k:'room',nm:'원룸'},{k:'living',nm:'거실'},{k:'shop',nm:'매장'}];
-var L2=[{k:'wall',nm:'벽'},{k:'floor',nm:'바닥'},{k:'light',nm:'조명'},{k:'furn',nm:'가구'}];
-var GR=['','l','m','h'], GN={l:'하',m:'중',h:'상'};
-var TIER={light:[['0','없음'],['1','하'],['2','중'],['3','상']],furn:[['0','없음'],['1','하'],['2','중'],['3','상']]};
-var SCN={living:{nm:'거실'},room:{nm:'원룸'},shop:{nm:'매장'}};
-var MAT={wall:'',floor:''};   /* 예시 사진에 얹을 자재(견적 상태와 별개) */
-
-function saveSel(){
-  lsSet(SEL_KEY,JSON.stringify({v:1,scene:S.scene,lvl:S.lvl>2?2:S.lvl,part:S.part,
-    matWall:S.matWall,matFloor:S.matFloor,styleWall:S.styleWall,styleFloor:S.styleFloor,
-    light:S.light,furn:S.furn,wall:S.wall}));
-}
-function loadSel(){
-  try{
-    var o=JSON.parse(ls(SEL_KEY)||'null'); if(!o||!o.scene) return;
-    if(SCN[o.scene]) S.scene=o.scene;
-    S.lvl=(o.lvl===2)?2:1; S.part='';
-    if(matById(o.matWall)) S.matWall=o.matWall;
-    if(matById(o.matFloor)) S.matFloor=o.matFloor;
-    if(stylesOf(matById(S.matWall)).some(function(x){return x.id===o.styleWall;})) S.styleWall=o.styleWall;
-    if(stylesOf(matById(S.matFloor)).some(function(x){return x.id===o.styleFloor;})) S.styleFloor=o.styleFloor;
-    if(GR.indexOf(o.light)>=0) S.light=o.light;
-    if(GR.indexOf(o.furn)>=0) S.furn=o.furn;
-    normSel(); syncGrades();
-  }catch(e){}
-}
-/* 고른 자재·색이 지금 목록에 없으면(빠진 자재·옛 저장값) 안전한 기본값으로 내린다 */
-function normSel(){
-  var mw=matById(S.matWall); if(!mw) S.matWall=((matsOf('wall')[0]||{}).id)||S.matWall;
-  var mf=matById(S.matFloor); if(!mf) S.matFloor=((matsOf('floor')[0]||{}).id)||S.matFloor;
-  var lw=stylesOf(matById(S.matWall)), lf=stylesOf(matById(S.matFloor));
-  if(lw.length&&!lw.some(function(x){return x.id===S.styleWall;})) S.styleWall=lw[0].id;
-  if(lf.length&&!lf.some(function(x){return x.id===S.styleFloor;})) S.styleFloor=lf[0].id;
-}
-/* 자재·단계 → 견적 등급 */
-function syncGrades(){
-  var mw=matById(S.matWall);
-  S.wall=(mw&&mw.grade)||'l';
-  S.layout=(S.furn&&S.furn!=='')?'move':'keep';
-  MAT.wall=mw?mw.id:'';
-  MAT.floor=matById(S.matFloor)?S.matFloor:'';
-}
-function wallMult(){var st=styleById(matById(S.matWall),S.styleWall);return (st&&+st.mult>0)?+st.mult:1;}
+function curScene(){return scById(S.space);}
+function wallMat(){return matById(S.matWall);}
+function wallStyle(){return styleById(wallMat(),S.styleWall);}
+function floorMat(){return matById(S.matFloor);}
+function floorStyle(){return styleById(floorMat(),S.styleFloor);}
+function wallMult(){var st=wallStyle();return (st&&+st.mult>0)?+st.mult:1;}
 function wallLabel(short){
-  var m=matById(S.matWall), st=styleById(m,S.styleWall), nm=(m?m.nm:NAMES.wall[S.wall])||'벽';
+  var m=wallMat(), st=wallStyle(), nm=m?m.nm:'벽';
   if(!st) return nm;
   return short?(nm+' · '+st.nm):(nm+' '+st.nm);
 }
 
-/* ---------------- ① 선택 줄 그리기 ---------------- */
-function chipHTML(attr,val,on,inner,cls){
-  return '<button type="button" class="'+(cls||'')+(on?' on':'')+'" '+attr+'="'+val+'" aria-pressed="'+(on?'true':'false')+'">'+inner+'</button>';
+/* ---------------- 저장/복원 ---------------- */
+function saveSel(){
+  lsSet(SEL_KEY,JSON.stringify({v:2,space:S.space,part:S.part,matWall:S.matWall,styleWall:S.styleWall,
+    matFloor:S.matFloor,styleFloor:S.styleFloor,light:S.light,furn:S.furn}));
 }
-function styleChipsHTML(){
-  var zone=S.part, m=matById(zone==='wall'?S.matWall:S.matFloor), list=stylesOf(m), cur=zone==='wall'?S.styleWall:S.styleFloor;
-  if(!list.length) return '';
-  return list.map(function(st,i){
-    var sw=st.css?'<i class="sw" style="background-color:'+st.css+'"></i>':'';
-    return chipHTML('data-style',st.id,st.id===cur,'<b>'+sw+(i+1)+' '+st.nm+'</b>');
-  }).join('');
+function normSel(){
+  if(!matById(S.matWall)) S.matWall=(matsOf('wall')[0]||{}).id||'denbar';
+  if(!matById(S.matFloor)) S.matFloor=(matsOf('floor')[0]||{}).id||'floor';
+  var lw=stylesOf(wallMat()), lf=stylesOf(floorMat());
+  if(lw.length&&!lw.some(function(x){return x.id===S.styleWall;})) S.styleWall=lw[0].id;
+  if(lf.length&&!lf.some(function(x){return x.id===S.styleFloor;})) S.styleFloor=lf[0].id;
+  if(['','l','m','h'].indexOf(S.light)<0) S.light='';
+  if(['','l','m','h'].indexOf(S.furn)<0) S.furn='';
+  if(!scById(S.space)) S.space=(SCENES[0]||{}).id||'living';
+  if(['wall','floor','light','furn'].indexOf(S.part)<0) S.part='wall';
 }
-/* 자재 묶음 이름 — 3단에서 칠·뮤럴을 기본 마감과 구분해 보이게 */
-var GRPT={'칠':'칠(페인트) · 색으로 바꾸기','고급':'고급 마감 · 뮤럴 벽지(실사 무늬)'};
-function partChipsHTML(){
-  var zone=S.part;
-  if(zone==='light'||zone==='furn'){
-    var cur=(zone==='light')?S.light:S.furn;
-    return TIER[zone].map(function(t){
-      var g=GR[+t[0]], on=(t[0]==='0')?(!cur):(cur===g);
-      var sub=(t[0]==='0')?'그대로':NAMES[zone][g];
-      return chipHTML('data-tier',t[0],on,'<b>'+t[0]+'</b><span>'+t[1]+'</span>');
-    }).join('');
-  }
-  var list=matsOf(zone), curId=(zone==='wall')?S.matWall:S.matFloor, lastGrp='';
-  return list.map(function(m){
-    var grp=m.grp||'', head='';
-    if(grp&&grp!==lastGrp){ head='<span class="grp">'+(GRPT[grp]||grp)+'</span>'; lastGrp=grp; }
-    return head+chipHTML('data-mat',m.id,m.id===curId,'<i class="sw" style="background-image:url('+(m.thumb||m.img)+')"></i>'+m.nm+(m.sub?'<span>'+m.sub+'</span>':''));
-  }).join('');
-}
-function sumChipsHTML(){
-  var out=[], mw=matById(S.matWall), mf=matById(S.matFloor);
-  if(S.wall) out.push(chipHTML('data-open','wall',false,(mw?mw.nm:'벽')+(S.styleWall?' · '+(styleById(mw,S.styleWall)||{}).nm:''),'sum'));
-  if(S.matFloor) out.push(chipHTML('data-open','floor',false,(mf?mf.nm:'바닥')+(S.styleFloor?' · '+(styleById(mf,S.styleFloor)||{}).nm:''),'sum'));
-  if(S.light) out.push(chipHTML('data-open','light',false,'조명 '+GN[S.light],'sum'));
-  if(S.furn) out.push(chipHTML('data-open','furn',false,'가구 '+GN[S.furn],'sum'));
-  return out.join('');
-}
-function renderBar(){
-  var row=$('#lvRow'), ch=$('#lvChips'), note=$('#selNote'), st=$('#styleNote');
-  row.style.gridTemplateColumns='';
-  if(S.lvl===1){
-    row.innerHTML=SP.map(function(s){return chipHTML('data-sp',s.k,S.scene===s.k,s.nm,'');}).join('');
-    ch.hidden=true; ch.innerHTML=''; st.hidden=true;
-    note.hidden=false; note.innerHTML='공간을 누르면 부위가 나오고, 부위 → 자재 → 색 순서로 들어갑니다.';
-  }else{
-    row.style.gridTemplateColumns='.62fr 1fr 1fr 1fr 1fr';
-    row.innerHTML='<button type="button" class="back" data-act="back" aria-label="공간 다시 고르기">←</button>'+
-      L2.map(function(p){return chipHTML('data-part',p.k,S.part===p.k,p.nm,'');}).join('');
-    var html='';
-    if(S.lvl===4) html=styleChipsHTML();
-    else if(S.lvl===3&&S.part) html=partChipsHTML();
-    else html=sumChipsHTML();
-    ch.innerHTML=html;
-    ch.className='chips'+((S.lvl===3&&(S.part==='light'||S.part==='furn'))?' g4':'');
-    ch.hidden=!html;
-    st.hidden=!(S.lvl===4&&(S.part==='wall'||S.part==='floor'));
-    if(!st.hidden){
-      var sm=matById(S.part==='wall'?S.matWall:S.matFloor);
-      st.textContent=(sm&&sm.id==='paint')?'칠은 고른 색으로 벽이 바뀝니다.':(sm&&sm.id==='mural')?'무늬를 누르면 벽지가 바뀝니다.':(sm&&sm.id==='marble')?'대리석 톤 미리보기입니다.':'톤 미리보기 · 실물 자재 사진은 준비 중';
-    }
-    note.hidden=false;
-    note.innerHTML=S.lvl===4?'색·무늬를 누르면 그 자리에서 바로 바뀝니다. 여러 색을 눌러 비교해 보세요.':'부위를 누르면 자재가 펼쳐집니다.';
-    if(S.lvl===3&&S.part==='furn'){
-      note.innerHTML='가구 1·2·3은 배치를 바꾸는 값입니다. <a href="furniture.html">가구 배치 전/후 보기 →</a>';
-    }
-  }
-}
-function setLevel2(){S.lvl=2;S.part='';renderBar();saveSel();}
-function applyAll(){syncGrades();renderSelect();drawSample();if(PH.img)drawPhoto();calc();saveSel();}
-function renderSelect(){
-  paintBundle();
-  var mw=matById(S.matWall), st=styleById(mw,S.styleWall);
-  $('#sampleCap').textContent=(SCN[S.scene]||{}).nm+' · '+(mw?mw.nm:'벽 안 함')+(st?' '+st.nm:'')+
-    (S.light?' · 조명 '+GN[S.light]:'')+(S.furn?' · 가구 '+GN[S.furn]:'')+' — 손가락으로 가운데 선을 끌어 보세요.';
+function loadSel(){
+  try{
+    var o=JSON.parse(ls(SEL_KEY)||'null'); if(!o) return;
+    if(o.space&&scById(o.space)) S.space=o.space;
+    ['part','matWall','styleWall','matFloor','styleFloor','light','furn'].forEach(function(k){if(o[k]!==undefined)S[k]=o[k];});
+  }catch(e){}
 }
 
-$('#selBar').addEventListener('click',function(e){
+/* ---------------- 이미지 로딩 ---------------- */
+var imgCache={};
+function loadImg(src,cb){
+  if(!src){cb(null);return;}
+  var c=imgCache[src];
+  if(c&&c.img){cb(c.img);return;}
+  if(c&&c.wait){c.wait.push(cb);return;}
+  c=imgCache[src]={img:null,wait:[cb],bad:false};
+  var p=new Image();
+  p.onload=function(){c.img=p;var w=c.wait;c.wait=null;(w||[]).forEach(function(f){f(p);});};
+  p.onerror=function(){c.bad=true;var w=c.wait;c.wait=null;(w||[]).forEach(function(f){f(null);});};
+  p.src=src;
+}
+
+/* ---------------- 색 변형(톤·칠·무늬) ---------------- */
+var styCache={};
+function styleCanvas(img,st,flatColor){
+  if(!st) return img;
+  var key=(img&&img.src||'flat')+'|'+st.id+'|'+(st.bright||1)+'|'+(st.sat==null?1:st.sat)+'|'+(st.sepia||0)+'|'+(st.contrast||1)+'|'+(st.tint?st.tint.join(','):'-')+'|'+(flatColor||'');
+  if(styCache[key]) return styCache[key];
+  var c=document.createElement('canvas');
+  c.width=img?((img.naturalWidth||img.width)||600):240; c.height=img?((img.naturalHeight||img.height)||600):240;
+  var g=c.getContext('2d');
+  if(flatColor){ g.fillStyle=flatColor; g.fillRect(0,0,c.width,c.height); }
+  else g.drawImage(img,0,0);
+  var br=+st.bright||1, sa=(st.sat==null?1:+st.sat), sp=+st.sepia||0, ct=+st.contrast||1;
+  var tn=(st.tint&&st.tint.length===3)?st.tint.map(Number):null;
+  if(br!==1||sa!==1||sp||ct!==1||(tn&&!flatColor)){
+    try{
+      var d=g.getImageData(0,0,c.width,c.height), p=d.data, i, r, gg, b, l, sr, sg, sb;
+      for(i=0;i<p.length;i+=4){
+        r=(p[i]-128)*ct+128; gg=(p[i+1]-128)*ct+128; b=(p[i+2]-128)*ct+128;
+        l=0.299*r+0.587*gg+0.114*b;
+        r=l+(r-l)*sa; gg=l+(gg-l)*sa; b=l+(b-l)*sa;
+        if(sp){ sr=r*0.393+gg*0.769+b*0.189; sg=r*0.349+gg*0.686+b*0.168; sb=r*0.272+gg*0.534+b*0.131;
+          r=r+(sr-r)*sp; gg=gg+(sg-gg)*sp; b=b+(sb-b)*sp; }
+        r*=br; gg*=br; b*=br;
+        if(tn){ r*=tn[0]; gg*=tn[1]; b*=tn[2]; }
+        p[i]=r<0?0:r>255?255:r; p[i+1]=gg<0?0:gg>255?255:gg; p[i+2]=b<0?0:b>255?255:b;
+      }
+      g.putImageData(d,0,0);
+    }catch(e){}
+  }
+  return (styCache[key]=c);
+}
+
+/* ---------------- 도형 도우미 ---------------- */
+function polyPath(ctx,pts){ctx.beginPath();pts.forEach(function(p,i){if(i)ctx.lineTo(p[0],p[1]);else ctx.moveTo(p[0],p[1]);});ctx.closePath();}
+function bbox(pts){var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(function(p){x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return {x0:x0,y0:y0,w:x1-x0,h:y1-y0};}
+function lerp(a,b,t){return a+(b-a)*t;}
+function rr(ctx,x,y,w,h,r){
+  r=Math.min(r,Math.abs(w)/2,Math.abs(h)/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function vgrad(ctx,x,y,w,h,c1,c2){
+  var g=ctx.createLinearGradient(0,y,0,y+h); g.addColorStop(0,c1); g.addColorStop(1,c2);
+  ctx.fillStyle=g; ctx.fillRect(x,y,w,h);
+}
+function softShadow(ctx,cx,cy,rx,ry,a){
+  var g=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rx,ry));
+  g.addColorStop(0,'rgba(14,12,10,'+(a*1.5)+')'); g.addColorStop(0.7,'rgba(14,12,10,'+(a*0.7)+')'); g.addColorStop(1,'rgba(14,12,10,0)');
+  ctx.save(); ctx.translate(cx,cy); ctx.scale(1,ry/Math.max(rx,ry)); ctx.translate(-cx,-cy);
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,Math.max(rx,ry),0,Math.PI*2); ctx.fill(); ctx.restore();
+}
+
+/* ---------------- 벽 자재 채우기 ---------------- */
+var TEX={};
+function texOf(src){ return src?TEX[src]||null:null; }
+function preload(list,cb){
+  var n=0, total=list.length;
+  if(!total){cb();return;}
+  list.forEach(function(src){
+    if(!src){n++;if(n>=total)cb();return;}
+    loadImg(src,function(im){ if(im) TEX[src]=im; else TEX[src]=null; n++; if(n>=total) cb(); });
+  });
+}
+/* 원본 휘도를 흐리게(작은 캔버스로 축소) 써서 슬랫 홈·조인트 자국이 새 자재에 남지 않게 한다 */
+function softLum(src,pts,amount){
+  var b=bbox(pts), x0=Math.max(0,Math.floor(b.x0)), y0=Math.max(0,Math.floor(b.y0));
+  var x1=Math.min(src.width||1200,Math.ceil(b.x0+b.w)), y1=Math.min(src.height||800,Math.ceil(b.y0+b.h));
+  var w=x1-x0, h=y1-y0; if(w<=0||h<=0) return null;
+  var f=Math.max(2,Math.round(8*amount));
+  var sw=Math.max(2,Math.round(w/f)), sh=Math.max(2,Math.round(h/f));
+  var c=document.createElement('canvas'); c.width=sw; c.height=sh;
+  var g=c.getContext('2d'); g.drawImage(src,x0,y0,w,h,0,0,sw,sh);
+  var d; try{d=g.getImageData(0,0,sw,sh).data;}catch(e){return null;}
+  var L=new Float32Array(sw*sh);
+  for(var i=0,j=0;i<d.length;i+=4,j++) L[j]=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114);
+  var hist=new Uint32Array(256),n=0;
+  for(var k=0;k<L.length;k++){hist[Math.min(255,Math.max(0,L[k]|0))]++;n++;}
+  var acc=0,ref=255; for(var v=0;v<256;v++){acc+=hist[v];if(acc>=n*0.9){ref=Math.max(1,v);break;}}
+  return {x0:x0,y0:y0,w:w,h:h,sw:sw,sh:sh,L:L,ref:ref};
+}
+function relightSoft(ctx,lum,pts,K){
+  if(!lum||K<=0) return;
+  var cur=ctx.getImageData(lum.x0,lum.y0,lum.w,lum.h), C=cur.data;
+  var scx=lum.sw/lum.w, scy=lum.sh/lum.h;
+  for(var y=0;y<lum.h;y++){
+    var sy=Math.min(lum.sh-1,Math.max(0,Math.round(y*scy)))*lum.sw;
+    for(var x=0;x<lum.w;x++){
+      var sl=lum.L[sy+Math.min(lum.sw-1,Math.max(0,Math.round(x*scx)))];
+      var f=1+K*((sl/lum.ref)-1);
+      var i=(y*lum.w+x)*4;
+      C[i]*=f; C[i+1]*=f; C[i+2]*=f;
+      if(C[i]<0)C[i]=0; else if(C[i]>255)C[i]=255;
+      if(C[i+1]<0)C[i+1]=0; else if(C[i+1]>255)C[i+1]=255;
+      if(C[i+2]<0)C[i+2]=0; else if(C[i+2]>255)C[i+2]=255;
+    }
+  }
+  ctx.putImageData(cur,lum.x0,lum.y0);
+}
+/* 원근 사각형에 텍스처 채우기(식당 오른쪽 벽처럼 기울어진 면) */
+function fillQuadTex(ctx,tex,q){
+  var tl=q[0],tr=q[1],br=q[2],bl=q[3];
+  var N=40, topW=Math.hypot(tr[0]-tl[0],tr[1]-tl[1]);
+  var texW=tex.width||1, texH=tex.height||1;
+  var rep=Math.max(1,Math.round(topW/texW)), tileW=topW/rep;
+  var hL=Math.hypot(bl[0]-tl[0],bl[1]-tl[1]), repY=Math.max(1,Math.round(hL/texH));
+  ctx.save(); polyPath(ctx,q); ctx.clip();
+  for(var k=0;k<repY;k++){
+    var y0=k/repY, y1=(k+1)/repY;
+    for(var i=0;i<N;i++){
+      var t0=lerp(y0,y1,i/N), t1=lerp(y0,y1,(i+1)/N);
+      var a=[lerp(tl[0],bl[0],t0),lerp(tl[1],bl[1],t0)], b=[lerp(tr[0],br[0],t0),lerp(tr[1],br[1],t0)];
+      var d=[lerp(tl[0],bl[0],t1),lerp(tl[1],bl[1],t1)];
+      var sy0=texH*(i/N), sy1=texH*((i+1)/N), sy=Math.max(0.5,sy1-sy0);
+      for(var r=0;r<rep;r++){
+        var ax=[a[0]+(b[0]-a[0])*(r/rep), a[1]+(b[1]-a[1])*(r/rep)];
+        var bx=[a[0]+(b[0]-a[0])*((r+1)/rep), a[1]+(b[1]-a[1])*((r+1)/rep)];
+        ctx.save();
+        ctx.beginPath(); ctx.moveTo(ax[0],ax[1]); ctx.lineTo(bx[0],bx[1]);
+        ctx.lineTo(d[0]+(bx[0]-ax[0]),d[1]+(bx[1]-ax[1])); ctx.lineTo(d[0],d[1]); ctx.closePath(); ctx.clip();
+        ctx.setTransform((bx[0]-ax[0])/texW,(bx[1]-ax[1])/texW,(d[0]-ax[0])/sy,(d[1]-ax[1])/sy,ax[0],ax[1]);
+        ctx.drawImage(tex,0,sy0,texW,sy,0,0,texW,sy);
+        ctx.restore();
+        ctx.setTransform(1,0,0,1,0,0);
+      }
+    }
+  }
+  ctx.restore();
+}
+function fillFloorPersp(ctx,tex,b,pts,vp){
+  var TW=tex.width||1, TH=tex.height||1, dmax=Math.max(40,(pts.bottom||900)-vp[1]), A=dmax*dmax/0.62;
+  for(var y=Math.floor(b.y0); y<b.y0+b.h; y++){
+    var d=y+0.5-vp[1]; if(d<=1) continue;
+    var sx=d/dmax, v=Math.floor(((A/d)%TH+TH)%TH), tw=TW*sx, xs=vp[0]-TW/2*sx;
+    for(var k=Math.floor(-xs/tw)-1;k<=Math.ceil((1200-xs)/tw)+1;k++) ctx.drawImage(tex,0,v,TW,1,xs+k*tw,y,tw+0.6,1);
+  }
+}
+/* 벽 한 면에 자재를 입힌다 */
+function paintWall(ctx,src,sc,m,st,lum){
+  if(!m) return;
+  var flat=m.flat?st.css:'';
+  var tex=null;
+  if(!flat){
+    var useSrc=(st&&st.img)?st.img:m.img;
+    var useImg=texOf(useSrc);
+    if(!useImg) return;
+    tex=styleCanvas(useImg,st,flat);
+  }
+  var pts=sc.wall;
+  ctx.save(); polyPath(ctx,pts); ctx.clip();
+  if(flat){
+    ctx.fillStyle=flat; ctx.fillRect(0,0,src.width,src.height);
+  }else if(m.fit==='cover'){
+    var b=bbox(pts), sc2=Math.max(b.w/tex.width,b.h/tex.height), dw=tex.width*sc2, dh=tex.height*sc2;
+    ctx.drawImage(tex,b.x0+(b.w-dw)/2,b.y0+(b.h-dh)/2,dw,dh);
+  }else{
+    var ps=+m.pScale||1, p=ctx.createPattern(tex,'repeat');
+    if(p){
+      ctx.save(); if(ps!==1) ctx.scale(ps,ps);
+      ctx.fillStyle=p; ctx.fillRect(0,0,src.width/ps+2,src.height/ps+2);
+      ctx.restore();
+    }
+    if(m.joint){    /* 대리석 판 이음매 */
+      var bb2=bbox(pts), jw=bb2.w/3;
+      ctx.strokeStyle='rgba(128,124,118,'+(m.joint)+')'; ctx.lineWidth=1.6;
+      for(var j=1;j<3;j++){ ctx.beginPath(); ctx.moveTo(bb2.x0+jw*j,bb2.y0); ctx.lineTo(bb2.x0+jw*j,bb2.y0+bb2.h); ctx.stroke(); }
+    }
+  }
+  if(m.gloss){   /* 대리석 광택 — 위에서 떨어지는 부드러운 하이라이트 */
+    var bb=bbox(pts), g=ctx.createLinearGradient(bb.x0,bb.y0,bb.x0+bb.w*0.6,bb.y0+bb.h);
+    g.addColorStop(0,'rgba(255,255,255,'+(m.gloss*1.5)+')'); g.addColorStop(0.45,'rgba(255,255,255,'+(m.gloss*0.5)+')'); g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,src.width,src.height);
+  }
+  ctx.restore();
+  relightSoft(ctx,lum,pts,(m.relight==null?0.85:m.relight));
+}
+/* 바닥 자재 */
+function paintFloor(ctx,src,sc,m,st,lum){
+  if(!m||!sc.floor) return;
+  var useImg=texOf((st&&st.img)?st.img:m.img);
+  if(!useImg) return;
+  var tex=styleCanvas(useImg,st,''); if(!tex) return;
+  var pts=sc.floor, b=bbox(pts);
+  ctx.save(); polyPath(ctx,pts); ctx.clip();
+  if(m.grout){
+    var p=ctx.createPattern(tex,'repeat');
+    if(p){ctx.fillStyle=p;ctx.fillRect(b.x0,b.y0,b.w,b.h);}
+    ctx.fillStyle='rgba(150,152,156,.85)';
+    for(var x=b.x0;x<=b.x0+b.w;x+=m.grout) ctx.fillRect(x-1,b.y0,2,b.h);
+    for(var y=b.y0;y<=b.y0+b.h;y+=m.grout) ctx.fillRect(b.x0,y-1,b.w,2);
+  }else{
+    var vp=sc.vp||[(sc.w||1200)*0.55,(sc.h||800)*0.55];
+    fillFloorPersp(ctx,tex,b,{bottom:(sc.h||800)},vp);
+  }
+  ctx.restore();
+  relightSoft(ctx,lum,pts,(m.relight==null?0.9:m.relight));
+}
+
+/* ---------------- 걸레받이·몰딩 ---------------- */
+function bandBase(ctx,sc,pts){
+  var b=bbox(pts);
+  ctx.save(); polyPath(ctx,pts); ctx.clip();
+  var g=ctx.createLinearGradient(0,b.y0,0,b.y0+b.h);
+  g.addColorStop(0,'#FBFAF7'); g.addColorStop(0.55,'#ECE8E1'); g.addColorStop(1,'#D9D3C9');
+  ctx.fillStyle=g; ctx.fillRect(b.x0,b.y0,b.w,b.h);
+  ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillRect(b.x0,b.y0,b.w,2);
+  ctx.fillStyle='rgba(60,50,40,.3)'; ctx.fillRect(b.x0,b.y0+b.h-2,b.w,2);
+  ctx.restore();
+}
+
+/* ---------------- 조명 3형태 (192) ---------------- */
+function lampGlow(ctx,x,y,r,alpha,warm){
+  var g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,(warm?'rgba(255,238,208,':'rgba(240,244,255,')+alpha+')');
+  g.addColorStop(0.45,(warm?'rgba(255,232,196,':'rgba(238,242,252,')+(alpha*0.42)+')');
+  g.addColorStop(1,'rgba(255,236,200,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+}
+function drawLight(ctx,sc,g){
+  if(!g) return;
+  var L=sc.light||{}, wall=sc.wall, bb=bbox(wall);
+  ctx.save();
+  if(g==='l'){                       /* ① 벽 간접 — 벽 상단에서 위아래로 번지는 빛 */
+    var yTop=bb.y0, yBot=bb.y0+bb.h;
+    var gd=ctx.createLinearGradient(0,yTop-8,0,yTop+Math.min(260,bb.h*0.62));
+    gd.addColorStop(0,'rgba(255,236,198,.0)');
+    gd.addColorStop(0.12,'rgba(255,238,205,.42)');
+    gd.addColorStop(0.55,'rgba(255,238,205,.12)');
+    gd.addColorStop(1,'rgba(255,238,205,0)');
+    ctx.save(); polyPath(ctx,wall); ctx.clip(); ctx.fillStyle=gd; ctx.fillRect(bb.x0,bb.y0-20,bb.w,bb.h+40); ctx.restore();
+    var gu=ctx.createLinearGradient(0,yTop+6,0,yTop-70);
+    gu.addColorStop(0,'rgba(255,240,210,.34)'); gu.addColorStop(1,'rgba(255,240,210,0)');
+    ctx.fillStyle=gu; ctx.fillRect(bb.x0,yTop-70,bb.w,78);
+    /* 숨은 선조명 몸체(알루미늄 띠) + 위아래 번짐 */
+    ctx.fillStyle='#E9E7E2'; ctx.fillRect(bb.x0+6,yTop-9,bb.w-12,7);
+    ctx.fillStyle='rgba(255,250,238,.98)'; ctx.fillRect(bb.x0+8,yTop-4,bb.w-16,3);
+    ctx.fillStyle='rgba(120,112,100,.35)'; ctx.fillRect(bb.x0+6,yTop-10,bb.w-12,1.5);
+    ctx.strokeStyle='rgba(255,248,232,.95)'; ctx.lineWidth=2.5; ctx.beginPath();
+    ctx.moveTo(bb.x0+6,yTop-3); ctx.lineTo(bb.x0+bb.w-6,yTop-3); ctx.stroke();
+    (L.sconce||[]).forEach(function(p){ lampGlow(ctx,p[0],bb.y0+20,150,.22,1); });
+  }else if(g==='m'){                 /* ② 천장 간접 — 코브에서 벽으로 떨어지는 빛 */
+    var top=bb.y0;
+    ctx.save(); polyPath(ctx,wall); ctx.clip();
+    var gm=ctx.createLinearGradient(0,top-4,0,top+bb.h*0.95);
+    gm.addColorStop(0,'rgba(255,240,212,.55)');
+    gm.addColorStop(0.35,'rgba(255,238,206,.26)');
+    gm.addColorStop(1,'rgba(255,236,200,0)');
+    ctx.fillStyle=gm; ctx.fillRect(bb.x0,top-10,bb.w,bb.h+20);
+    ctx.restore();
+    var gc=ctx.createLinearGradient(0,top-90,0,top+10);
+    gc.addColorStop(0,'rgba(255,244,220,0)'); gc.addColorStop(0.7,'rgba(255,244,220,.5)'); gc.addColorStop(1,'rgba(255,248,232,.75)');
+    ctx.fillStyle=gc; ctx.fillRect(bb.x0,top-90,bb.w,100);
+    /* 천장 코브 단면 + 세기 강화 */
+    ctx.fillStyle='#F0EDE6'; ctx.fillRect(bb.x0+2,top-16,bb.w-4,12);
+    ctx.fillStyle='rgba(255,252,242,.99)'; ctx.fillRect(bb.x0+4,top-6,bb.w-8,4);
+    ctx.fillStyle='rgba(90,84,74,.30)'; ctx.fillRect(bb.x0+2,top-17,bb.w-4,1.5);
+    ctx.strokeStyle='rgba(255,250,236,.95)'; ctx.lineWidth=3; ctx.beginPath();
+    ctx.moveTo(bb.x0+3,top-2); ctx.lineTo(bb.x0+bb.w-3,top-2); ctx.stroke();
+    lampGlow(ctx,bb.x0+bb.w*0.3,top-30,Math.max(160,bb.w*0.35),.20,1);
+    lampGlow(ctx,bb.x0+bb.w*0.72,top-30,Math.max(160,bb.w*0.35),.20,1);
+  }else if(g==='h'){                 /* ③ 등기구 자체 — 사각 벽등 + 상하 간접광 */
+    var pts=(L.sconce&&L.sconce.length)?L.sconce:[[bb.x0+bb.w*0.28,bb.y0+bb.h*0.22],[bb.x0+bb.w*0.72,bb.y0+bb.h*0.22]];
+    var cw=Math.max(26,bb.w*0.034), ch=cw*1.5;
+    pts.forEach(function(p){
+      var x=p[0], y=p[1];
+      var up=ctx.createLinearGradient(0,y-ch,0,y-ch*4.6);
+      up.addColorStop(0,'rgba(255,236,196,.42)'); up.addColorStop(1,'rgba(255,236,196,0)');
+      ctx.fillStyle=up; ctx.beginPath();
+      ctx.moveTo(x-cw*0.5,y-ch*0.5); ctx.lineTo(x+cw*0.5,y-ch*0.5);
+      ctx.lineTo(x+cw*1.5,y-ch*4.6); ctx.lineTo(x-cw*1.5,y-ch*4.6); ctx.closePath(); ctx.fill();
+      var dn=ctx.createLinearGradient(0,y+ch*0.5,0,y+ch*4.8);
+      dn.addColorStop(0,'rgba(255,236,196,.38)'); dn.addColorStop(1,'rgba(255,236,196,0)');
+      ctx.fillStyle=dn; ctx.beginPath();
+      ctx.moveTo(x-cw*0.5,y+ch*0.5); ctx.lineTo(x+cw*0.5,y+ch*0.5);
+      ctx.lineTo(x+cw*1.4,y+ch*4.8); ctx.lineTo(x-cw*1.4,y+ch*4.8); ctx.closePath(); ctx.fill();
+      lampGlow(ctx,x,y-ch*1.6,cw*3.2,.20,1); lampGlow(ctx,x,y+ch*1.8,cw*3.4,.18,1);
+      ctx.fillStyle='#232427'; rr(ctx,x-cw/2,y-ch/2,cw,ch,3); ctx.fill();
+      ctx.fillStyle='#3A3B3E'; rr(ctx,x-cw/2+2,y-ch/2+2,cw-4,ch-4,2); ctx.fill();
+    });
+  }
+  ctx.restore();
+}
+
+/* ---------------- 가구 (196·197) ---------------- */
+var FC={fabric:['#E4DACA','#CBBFA9'],fabric2:['#D8CFC0','#BEB4A2'],wood:['#CBAA84','#A9865F'],
+        wood2:['#8E6B49','#6A4E33'],dark:['#43464A','#2A2C2F'],black:['#2A2B2E','#191A1C'],
+        white:['#F6F4EF','#E2DED5'],stone:['#3E3F42','#2B2C2E']};
+function edge(ctx){ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1.2;ctx.stroke();}
+function sofa(ctx,x,y,w,h,pal){
+  var seatH=h*0.40, backH=h*0.60, armW=Math.min(w*0.11,42);
+  softShadow(ctx,x+w/2,y+4,w*0.60,h*0.11,.30);
+  /* 팔걸이(뒤) */
+  ctx.fillStyle=pal[1]; rr(ctx,x,y-backH-armW*0.2,armW,backH*0.92,10); ctx.fill(); edge(ctx);
+  rr(ctx,x+w-armW,y-backH-armW*0.2,armW,backH*0.92,10); ctx.fill(); edge(ctx);
+  /* 등판 */
+  vgrad(ctx,x+armW*0.7,y-backH,w-armW*1.4,backH*0.9,pal[0],pal[1]);
+  rr(ctx,x+armW*0.7,y-backH,w-armW*1.4,backH*0.9,9); ctx.fill(); edge(ctx);
+  ctx.strokeStyle='rgba(0,0,0,.07)';
+  var n=Math.max(2,Math.round(w/170));
+  for(var i=1;i<n;i++){ctx.beginPath();ctx.moveTo(x+armW*0.7+(w-armW*1.4)*i/n,y-backH+8);ctx.lineTo(x+armW*0.7+(w-armW*1.4)*i/n,y-seatH*0.55);ctx.stroke();}
+  /* 좌방석 */
+  vgrad(ctx,x+armW*0.5,y-seatH,w-armW,seatH*0.92,pal[0],pal[1]);
+  rr(ctx,x+armW*0.5,y-seatH,w-armW,seatH*0.92,7); ctx.fill(); edge(ctx);
+  ctx.fillStyle='rgba(255,255,255,.22)'; ctx.fillRect(x+armW*0.6,y-seatH+3,w-armW*1.2,2);
+  /* 다리 */
+  ctx.fillStyle=FC.dark[1];
+  ctx.fillRect(x+armW*0.5,y-7,7,7); ctx.fillRect(x+w-armW*0.5-7,y-7,7,7);
+}
+function chair(ctx,x,y,w,h,pal,back){
+  var seatH=h*0.50, lw=Math.max(4,w*0.07);
+  softShadow(ctx,x+w/2,y+3,w*0.55,h*0.07,.26);
+  ctx.fillStyle=FC.wood2[1];
+  ctx.fillRect(x+w*0.16,y-seatH,lw,seatH);
+  ctx.fillRect(x+w*0.84-lw,y-seatH,lw,seatH);
+  ctx.fillStyle=pal[1]; rr(ctx,x+w*0.06,y-seatH,w*0.88,seatH*0.20,4); ctx.fill(); edge(ctx);
+  if(back!==false){
+    vgrad(ctx,x+w*0.10,y-h,w*0.80,h-seatH*0.72,pal[0],pal[1]);
+    rr(ctx,x+w*0.10,y-h,w*0.80,h-seatH*0.72,6); ctx.fill(); edge(ctx);
+    ctx.fillStyle='rgba(255,255,255,.16)'; ctx.fillRect(x+w*0.14,y-h+3,w*0.72,2);
+  }
+}
+function stool(ctx,x,y,w,h,pal){
+  softShadow(ctx,x+w/2,y+3,w*0.5,h*0.06,.22);
+  ctx.strokeStyle=FC.wood2[1]; ctx.lineWidth=Math.max(3,w*0.055);
+  ctx.beginPath(); ctx.moveTo(x+w*0.2,y-h*0.26); ctx.lineTo(x+w*0.14,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w*0.8,y-h*0.26); ctx.lineTo(x+w*0.86,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w*0.14,y); ctx.lineTo(x+w*0.86,y); ctx.stroke();
+  ctx.fillStyle=pal[0]; rr(ctx,x+w*0.04,y-h,w*0.92,h*0.24,7); ctx.fill(); edge(ctx);
+}
+function table(ctx,x,y,w,h,pal){
+  var top=h*0.14, lw=Math.max(6,w*0.05);
+  softShadow(ctx,x+w/2,y+4,w*0.56,h*0.08,.26);
+  ctx.fillStyle=FC.wood[1];
+  ctx.fillRect(x+w*0.07,y-top,lw,top); ctx.fillRect(x+w*0.93-lw,y-top,lw,top);
+  ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(x+w*0.07,y-top*0.35,lw,top*0.35);
+  ctx.fillRect(x+w*0.93-lw,y-top*0.35,lw,top*0.35);
+  vgrad(ctx,x,y-h-top,w,top,pal[0],pal[1]); ctx.fillRect(x,y-h-top,w,top);
+  ctx.fillStyle='rgba(255,255,255,.30)'; ctx.fillRect(x,y-h-top,w,1.6);
+  ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(x,y-h-top+top-1.6,w,1.6);
+}
+function bench(ctx,x,y,w,h,pal){
+  softShadow(ctx,x+w/2,y+5,w*0.58,h*0.11,.28);
+  vgrad(ctx,x,y-h*0.92,w,h*0.92,pal[0],pal[1]); rr(ctx,x,y-h*0.92,w,h*0.92,8); ctx.fill(); edge(ctx);
+  ctx.strokeStyle='rgba(0,0,0,.07)';
+  var n=Math.max(3,Math.round(w/120));
+  for(var i=1;i<n;i++){ctx.beginPath();ctx.moveTo(x+w*i/n,y-h*0.9+3);ctx.lineTo(x+w*i/n,y-4);ctx.stroke();}
+  ctx.fillStyle=FC.wood2[1]; ctx.fillRect(x+6,y-h*0.09,w-12,h*0.09);
+}
+function counter(ctx,x,y,w,h){
+  softShadow(ctx,x+w/2,y+6,w*0.6,h*0.09,.3);
+  vgrad(ctx,x,y-h*0.84,w,h*0.80,FC.wood[0],FC.wood[1]); ctx.fillRect(x,y-h*0.84,w,h*0.80);
+  ctx.strokeStyle='rgba(0,0,0,.10)';
+  for(var i=1;i<Math.max(2,Math.round(w/130));i++){ctx.beginPath();ctx.moveTo(x+w*i/Math.max(2,Math.round(w/130)),y-h*0.82);ctx.lineTo(x+w*i/Math.max(2,Math.round(w/130)),y-4);ctx.stroke();}
+  ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(x,y-5,w,5);
+  vgrad(ctx,x-5,y-h,w+10,h*0.17,FC.stone[0],FC.stone[1]); ctx.fillRect(x-5,y-h,w+10,h*0.17);
+  ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(x-5,y-h,w+10,2.2);
+}
+function bed(ctx,x,y,w,h,pal){
+  var matH=h*0.30;
+  softShadow(ctx,x+w/2,y+5,w*0.58,h*0.1,.3);
+  ctx.fillStyle=FC.wood[1]; ctx.fillRect(x,y-h*0.30,w,h*0.30);
+  ctx.fillStyle='rgba(0,0,0,.14)'; ctx.fillRect(x,y-4,w,4);
+  vgrad(ctx,x+4,y-h*0.30-matH,w-8,matH,pal[0],pal[1]); rr(ctx,x+4,y-h*0.30-matH,w-8,matH,9); ctx.fill(); edge(ctx);
+  ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fillRect(x+12,y-h*0.30-matH+5,w*0.28,h*0.06);
+  ctx.fillStyle='rgba(255,255,255,.42)'; ctx.fillRect(x+w*0.56,y-h*0.30-matH+5,w*0.28,h*0.06);
+  vgrad(ctx,x,y-h*0.30-matH-h*0.24,w,h*0.24,FC.wood[0],FC.wood[1]); ctx.fillRect(x,y-h*0.30-matH-h*0.24,w,h*0.24);
+  ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(x,y-h*0.30-matH-2,w,2);
+}
+function rug(ctx,x,y,w,h,pal){
+  ctx.save(); ctx.globalAlpha=.92;
+  ctx.fillStyle=pal[0]; rr(ctx,x,y-h,w,h,7); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=1.6; rr(ctx,x+6,y-h+6,w-12,h-12,5); ctx.stroke();
+  ctx.restore();
+}
+/* 공간·단계별 배치 — 큰 가구는 벽에 붙이고, 작은 가구는 가운데로 */
+function drawFurn(ctx,sc,lvl){
+  if(!lvl) return;
+  var F=sc.furn||{}, W=sc.w||1200;
+  var c=F.center||[W*0.3,700,W*0.7,880], wl=F.wall||[W*0.3,600,W*0.8,860];
+  var cw=c[2]-c[0], ch=c[3]-c[1], ww=wl[2]-wl[0];
+  /* 가구 전체를 받치는 바닥 그림자 */
+  softShadow(ctx,(c[0]+c[2])/2,c[3]-ch*0.06,cw*0.62,ch*0.12,.22);
+  var id=sc.id;
+  if(id==='living'){
+    if(lvl==='l'){
+      table(ctx,c[0]+cw*0.22,c[3]-10,cw*0.26,ch*0.40,FC.wood);
+      chair(ctx,c[0]+cw*0.56,c[3]-6,cw*0.15,ch*0.62,FC.fabric2);
+    }else if(lvl==='m'){
+      chair(ctx,c[0]+cw*0.06,c[3]-4,cw*0.15,ch*0.64,FC.fabric2);
+      table(ctx,c[0]+cw*0.28,c[3]-8,cw*0.24,ch*0.36,FC.wood);
+      chair(ctx,c[0]+cw*0.60,c[3]-4,cw*0.15,ch*0.64,FC.fabric2);
+    }else{
+      bench(ctx,wl[0]+ww*0.04,wl[3]-6,ww*0.56,ch*0.34,FC.dark);
+      table(ctx,wl[0]+ww*0.24,wl[3]+ch*0.30,ww*0.28,ch*0.26,FC.wood2);
+      chair(ctx,wl[0]+ww*0.62,wl[3]+ch*0.24,ww*0.11,ch*0.52,FC.fabric2);
+    }
+  }else if(id==='room'){
+    if(lvl==='l'){                        /* 작은 침대는 가운데 */
+      bed(ctx,c[0]+cw*0.26,c[3]-8,cw*0.40,ch*0.62,FC.fabric);
+    }else if(lvl==='m'){
+      bed(ctx,wl[0]+ww*0.16,wl[3]-4,ww*0.56,ch*0.66,FC.fabric);
+      table(ctx,wl[0]+ww*0.02,wl[3]+ch*0.02,ww*0.16,ch*0.24,FC.wood);
+    }else{
+      bed(ctx,wl[0]+ww*0.10,wl[3]-2,ww*0.60,ch*0.70,FC.fabric);
+      chair(ctx,wl[0]+ww*0.76,wl[3]+ch*0.02,ww*0.11,ch*0.46,FC.fabric2);
+      table(ctx,wl[0]+ww*0.70,wl[3]+ch*0.16,ww*0.16,ch*0.22,FC.wood);
+    }
+  }else if(id==='shop'){
+    if(lvl==='l'){
+      table(ctx,c[0]+cw*0.16,c[3]-8,cw*0.24,ch*0.26,FC.wood);
+      table(ctx,c[0]+cw*0.50,c[3]-8,cw*0.24,ch*0.26,FC.wood);
+    }else if(lvl==='m'){
+      counter(ctx,wl[0]+ww*0.04,wl[3]-4,ww*0.44,ch*0.52);
+      table(ctx,c[0]+cw*0.52,c[3]-6,cw*0.26,ch*0.26,FC.wood);
+      chair(ctx,c[0]+cw*0.46,c[3]-2,cw*0.10,ch*0.46,FC.fabric2);
+    }else{
+      counter(ctx,wl[0]+ww*0.04,wl[3]-2,ww*0.48,ch*0.56);
+      bed(ctx,wl[0]+ww*0.58,wl[3]+ch*0.02,ww*0.32,ch*0.40,FC.white);
+      chair(ctx,c[0]+cw*0.12,c[3]-4,cw*0.10,ch*0.48,FC.fabric2);
+      chair(ctx,c[0]+cw*0.34,c[3]-4,cw*0.10,ch*0.48,FC.fabric2);
+    }
+  }else if(id==='dining'){
+    if(lvl==='l'){
+      table(ctx,c[0]+cw*0.26,c[3]-10,cw*0.30,ch*0.32,FC.wood);
+      chair(ctx,c[0]+cw*0.22,c[3]-4,cw*0.11,ch*0.54,FC.dark);
+      chair(ctx,c[0]+cw*0.50,c[3]-4,cw*0.11,ch*0.54,FC.dark);
+    }else if(lvl==='m'){
+      [[0.10,0.34],[0.48,0.72]].forEach(function(p){
+        table(ctx,c[0]+cw*p[0],c[3]-8,cw*(p[1]-p[0]),ch*0.30,FC.wood);
+        chair(ctx,c[0]+cw*p[0]+cw*0.02,c[3]-2,cw*0.10,ch*0.52,FC.dark);
+      });
+    }else{
+      bench(ctx,wl[0]+ww*0.04,wl[3]-2,ww*0.62,ch*0.28,FC.dark);
+      table(ctx,wl[0]+ww*0.10,wl[3]+ch*0.14,ww*0.34,ch*0.26,FC.wood2);
+    }
+  }
+}
+
+/* ---------------- 장면 그리기 ---------------- */
+var SCENE_CACHE={};
+function paintScene(ctx,sc,base){
+  var W=sc.w, H=sc.h;
+  ctx.clearRect(0,0,W,H); ctx.drawImage(base,0,0,W,H);
+  var lum=paintWallLum(sc,base);
+  var m=wallMat(), st=wallStyle();
+  /* 벽 */
+  paintWall(ctx,base,sc,m,st,lum.wall);
+  /* 몰딩/걸레받이 */
+  if(sc.mold) bandBase(ctx,sc,sc.mold);
+  if(sc.base) bandBase(ctx,sc,sc.base);
+  /* 바닥 */
+  if(sc.floor&&floorMat()) paintFloor(ctx,base,sc,floorMat(),floorStyle(),lum.floor);
+  /* 앞쪽 물체 되돌리기 — 새 자재에 가려지면 안 되는 것 */
+  (sc.fg||[]).forEach(function(poly){
+    ctx.save(); polyPath(ctx,poly); ctx.clip();
+    ctx.drawImage(base,0,0,W,H);
+    ctx.restore();
+  });
+  (sc.fgKey||[]).forEach(function(k){
+    var x0=Math.max(0,k[0]),y0=Math.max(0,k[1]),w=Math.min(W-k[0],k[2]),h=Math.min(H-k[1],k[3]);
+    if(w<=0||h<=0) return;
+    var tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
+    var tc=tmp.getContext('2d');
+    tc.drawImage(ctx.canvas,x0,y0,w,h,0,0,w,h);          /* 지금(자재 덮인) 상태 */
+    tc.drawImage(base,x0,y0,w,h,0,0,w,h);                  /* 원본을 위에 얹고 알파로 깎기 */
+    try{
+      var d=tc.getImageData(0,0,w,h), p2=d.data;            /* base 원본으로만 다시 그려 마스크 */
+      var t2=document.createElement('canvas'); t2.width=w; t2.height=h;
+      var g2=t2.getContext('2d'); g2.drawImage(base,x0,y0,w,h,0,0,w,h);
+      var src=g2.getImageData(0,0,w,h).data;
+      var thr=(k[4]==null?95:k[4]), soft=(k[5]==null?45:k[5]);
+      for(var i=0;i<src.length;i+=4){
+        var l=src[i]*0.299+src[i+1]*0.587+src[i+2]*0.114;
+        var a=l<=thr?255:(l>=thr+soft?0:Math.round((1-(l-thr)/soft)*255));
+        p2[i+3]=a;
+      }
+      tc.putImageData(d,0,0);
+      ctx.drawImage(tmp,x0,y0);
+    }catch(e){}
+  });
+  (sc.keep||[]).forEach(function(q){ctx.drawImage(base,q[0],q[1],q[2],q[3],q[0],q[1],q[2],q[3]);});
+  /* 조명 → 가구 */
+  drawLight(ctx,sc,S.light);
+  drawFurn(ctx,sc,S.furn);
+}
+function paintWallLum(sc,base){
+  var k=sc.id+'|'+base.src;
+  if(SCENE_CACHE[k]) return SCENE_CACHE[k];
+  var o={wall:softLum(base,sc.wall,wallMat()&&(+wallMat().smooth>0.6?2.2:1)),floor:null};
+  if(sc.floor) o.floor=softLum(base,sc.floor,1.6);
+  SCENE_CACHE[k]=o; return o;
+}
+
+/* ---------------- 전환(입혀지는 느낌) ---------------- */
+var curKind='';
+function reveal(kind){
+  var wrap=$('#stage .afw'); if(!wrap) return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(reduce){ wrap.style.transition='none'; wrap.style.clipPath='inset(0 0 0 0)'; wrap.style.filter='brightness(1)'; return; }
+  wrap.style.transition='none';
+  if(kind==='light'){                     /* 빛이 먼저 켜지고 → 자재가 따라 밝아짐 */
+    wrap.style.clipPath='inset(0 0 0 0)';
+    wrap.style.filter='brightness(.92)';
+    wrap.style.opacity='0';
+    void wrap.offsetWidth;
+    wrap.style.transition='opacity 300ms ease-out, filter 620ms cubic-bezier(.22,.61,.36,1)';
+    wrap.style.opacity='1'; wrap.style.filter='brightness(1)';
+  }else if(kind==='style'){               /* 색·무늬 — 왼쪽에서 차오름 */
+    wrap.style.clipPath='inset(0 100% 0 0)';
+    wrap.style.filter='brightness(.9)';
+    wrap.style.opacity='1';
+    void wrap.offsetWidth;
+    wrap.style.transition='clip-path 420ms cubic-bezier(.22,.61,.36,1), filter 520ms ease-out';
+    wrap.style.clipPath='inset(0 0 0 0)'; wrap.style.filter='brightness(1)';
+  }else{                                  /* 자재 — 바닥에서 위로 입혀지고 밝아짐 */
+    wrap.style.clipPath='inset(100% 0 0 0)';
+    wrap.style.filter='brightness(.86)';
+    wrap.style.opacity='1';
+    void wrap.offsetWidth;
+    wrap.style.transition='clip-path 560ms cubic-bezier(.22,.61,.36,1), filter 660ms ease-out';
+    wrap.style.clipPath='inset(0 0 0 0)'; wrap.style.filter='brightness(1)';
+  }
+  curKind=kind;
+}
+
+/* ---------------- 그리기 실행(순서 지켜 한 번에) ---------------- */
+var drawSeq=0, sampleOk=false, CUR=null;
+function redraw(kind){
+  var sc=curScene(); if(!sc||!READY) return;
+  var seq=++drawSeq;
+  var wm0=wallMat(), ws0=wallStyle(), fm0=floorMat(), fs0=floorStyle();
+  var need=[];
+  if(wm0&&!(wm0.flat)) need.push((ws0&&ws0.img)?ws0.img:wm0.img);
+  if(fm0&&sc.floor) need.push((fs0&&fs0.img)?fs0.img:fm0.img);
+  preload(need,function(){
+  loadImg(sc.file,function(base){
+    if(seq!==drawSeq) return;
+    sampleOk=!!base; $('#sampleErr').hidden=!!base;
+    if(!base) return;
+    CUR=base;
+    var stage=$('#stage'), bf=$('canvas.bf',stage), af=$('canvas.af',stage);
+    if(bf.width!==sc.w||bf.height!==sc.h){bf.width=af.width=sc.w; bf.height=af.height=sc.h;}
+    var b=bf.getContext('2d'); b.clearRect(0,0,sc.w,sc.h); b.drawImage(base,0,0,sc.w,sc.h);
+    var a=af.getContext('2d');
+    paintScene(a,sc,base);
+    if(kind) reveal(kind);
+    placeSpots(sc);
+    if(PH.img) drawPhoto();
+  });
+  });
+}
+/* 부위 손잡이(사진 위) */
+function placeSpots(sc){
+  var host=$('#spots'); if(!host) return;
+  var W=sc.w, H=sc.h;
+  function at(sel,pt){ return {left:(sel[0]/W*100)+'%',top:(sel[1]/H*100)+'%'}; }
+  var defs=[
+    ['wall','벽',at([ (bbox(sc.wall).x0+bbox(sc.wall).w*0.5), bbox(sc.wall).y0+bbox(sc.wall).h*0.28 ])],
+    ['floor','바닥',sc.floor?at([(bbox(sc.floor).x0+bbox(sc.floor).w*0.5), bbox(sc.floor).y1-((bbox(sc.floor).h)*0.28)]):null],
+    ['light','조명',at([(sc.light&&sc.light.sconce&&sc.light.sconce[0])?sc.light.sconce[0][0]:W*0.5, (sc.light&&sc.light.sconce&&sc.light.sconce[0])?sc.light.sconce[0][1]-40:H*0.12])],
+    ['furn','가구',sc.furn?at([sc.furn.center[0]+(sc.furn.center[2]-sc.furn.center[0])*0.5, sc.furn.center[3]-20]):null]
+  ];
+  host.innerHTML=defs.map(function(d){
+    if(!d[2]) return '';
+    return '<button type="button" class="spot'+(S.part===d[0]?' on':'')+'" data-part="'+d[0]+'" style="left:'+d[2].left+';top:'+d[2].top+';transform:translate(-50%,-50%)">'+d[1]+'</button>';
+  }).join('');
+}
+
+/* ---------------- ① 공간 카드 ---------------- */
+function renderSpaces(){
+  $('#spaceRow').innerHTML=SCENES.map(function(s){
+    var th=s.file;
+    return '<button type="button" data-space="'+s.id+'" class="'+(S.space===s.id?'on':'')+'" aria-pressed="'+(S.space===s.id?'true':'false')+'">'+
+      (s.example?'<i class="ex">예시</i>':'')+
+      '<img src="'+th+'" alt="'+s.nm+'" loading="lazy"><span>'+s.nm+'</span></button>';
+  }).join('');
+}
+
+/* ---------------- ② 단계별 단추(지금 단계 것만) ---------------- */
+var TIERLAB={l:'하',m:'중',h:'상'};
+function stepHTML(){
+  var part=S.part, html='';
+  if(part==='wall'||part==='floor'){
+    var list=matsOf(part), cur=(part==='wall')?S.matWall:S.matFloor;
+    html+='<p class="lbl"><b>'+(part==='wall'?'벽':'바닥')+' 마감'+(part==='wall'?'을':'을')+'</b> 고르면 '+(part==='wall'?'색까지 이어집니다':'그 자리에서 바뀝니다')+'</p>';
+    html+='<div class="chips '+(list.length<=2?'g2':(list.length===3?'g3':'row'))+'">'+list.map(function(m){
+      var thumb=m.thumb||m.img;
+      return '<button type="button" data-mat="'+m.id+'" class="'+(m.id===cur?'on':'')+'">'+
+        '<i class="sw" style="background-image:url('+thumb+')"></i>'+m.nm+(m.sub?'<span>'+m.sub+'</span>':'')+'</button>';
+    }).join('')+'</div>';
+  }else if(part==='light'){
+    html+='<p class="lbl"><b>조명</b>은 빛의 형태까지 바뀝니다</p><div class="chips g3">';
+    html+='<button type="button" data-tier="0" class="'+(!S.light?'on':'')+'"><b>0</b><span>그대로</span></button>';
+    [['l','벽 간접'],['m','천장 간접'],['h','등기구']].forEach(function(t){
+      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.light===t[0]?'on':'')+'"><b>'+t[0].toUpperCase()+'</b><span>'+t[1]+'</span></button>';
+    });
+    html+='</div>';
+  }else{
+    html+='<p class="lbl"><b>가구</b>는 크기에 따라 놓는 자리가 달라집니다</p><div class="chips row">';
+    html+='<button type="button" data-tier="0" class="'+(!S.furn?'on':'')+'"><b>0</b><span>그대로</span></button>';
+    [['l','작은 가구·가운데'],['m','중간·반반'],['h','큰 가구·벽면']].forEach(function(t){
+      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.furn===t[0]?'on':'')+'"><b>'+t[0].toUpperCase()+'</b><span>'+t[1]+'</span></button>';
+    });
+    html+='</div>';
+  }
+  /* 4단 — 자재를 고르면 색이 이어서 */
+  if((part==='wall'||part==='floor')){
+    var m2=(part==='wall')?wallMat():floorMat(), st=(part==='wall')?wallStyle():floorStyle();
+    var list2=stylesOf(m2);
+    if(list2.length){
+      html+='<p class="lbl" style="margin-top:11px"><b>'+(m2.id==='mural'?'무늬':'색')+'</b>'+
+        (m2.id==='paint'?'를 고르면 벽이 그 색으로 바뀝니다':(m2.id==='mural'?'를 고르면 실사 무늬가 벽에 덮입니다':' — 톤을 누르면 바로 바뀝니다'))+'</p>';
+      html+='<div class="chips row">'+list2.map(function(s2){
+        var sw=s2.css?'background-color:'+s2.css:'background-image:url('+(s2.img||m2.thumb||m2.img)+')';
+        return '<button type="button" data-style="'+s2.id+'" class="'+(s2.id===(st||{}).id?'on':'')+'" aria-pressed="'+(s2.id===(st||{}).id?'true':'false')+'">'+
+          '<i class="sw" style="'+sw+'"></i>'+s2.nm+'</button>';
+      }).join('')+'</div>';
+    }
+  }
+  return html;
+}
+function renderStep(){
+  var box=$('#stepBar'); if(!box||!READY) return;
+  box.innerHTML=stepHTML();
+  var m=(S.part==='wall')?wallMat():floorMat();
+  var hint='';
+  if(S.part==='wall'&&m){
+    hint=(m.note||'')+(S.light?' · 조명 '+(NAMES.light[S.light]||''):'');
+  }else if(S.part==='light'){
+    hint=(S.light?'빛의 형태가 바뀌었습니다. ':'')+'빛은 벽 위아래로 번지거나, 천장에서 떨어지거나, 기구가 보이는 세 가지입니다.';
+  }else if(S.part==='furn'){
+    hint=(S.furn?'배치가 바뀌었습니다. ':'')+'큰 가구는 벽에 붙고, 작은 가구는 가운데로 갑니다.';
+  }else if(S.part==='floor'){
+    hint=scWithFloor()?'바닥재를 누르면 그 자리에서 바뀝니다.':'';
+  }
+  $('#hintLine').innerHTML=hint||'사진에서 <b>부위</b>를 눌러 바꿉니다.';
+  $$('#stepBar button').forEach(function(b){
+    b.setAttribute('aria-pressed',b.classList.contains('on')?'true':'false');
+  });
+}
+function scWithFloor(){var sc=curScene();return !!(sc&&sc.floor);}
+
+/* ---------------- 이벤트 ---------------- */
+$('#spaceRow').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-space]'); if(!b) return;
+  if(S.space===b.dataset.space){ if(curScene().example) openExample(curScene()); return; }
+  S.space=b.dataset.space; S.part='wall';
+  renderSpaces(); renderStep(); saveSel();
+  redraw('mat');
+});
+$('#spots').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-part]'); if(!b) return;
+  S.part=b.dataset.part; renderStep(); placeSpots(curScene()); saveSel();
+});
+$('#stepBar').addEventListener('click',function(e){
   var b=e.target.closest('button'); if(!b) return;
-  if(b.dataset.sp){ var sc=b.dataset.sp; if(SCN[sc]) S.scene=sc; setLevel2(); renderSelect(); drawSample(); if(PH.img)drawPhoto(); return; }
-  if(b.dataset.act==='back'){ S.lvl=1; S.part=''; renderBar(); saveSel(); return; }
-  if(b.dataset.part){ S.part=b.dataset.part; S.lvl=3; renderBar(); return; }
-  if(b.dataset.open){ S.part=b.dataset.open; S.lvl=3; renderBar(); return; }
-  if(b.dataset.mat!==undefined&&b.dataset.mat!==''){
+  if(b.dataset.mat){
     var id=b.dataset.mat, m=matById(id); if(!m) return;
     var zone=m.zone, curId=(zone==='wall')?S.matWall:S.matFloor, haveId=(zone==='wall')?S.styleWall:S.styleFloor;
     if(zone==='wall') S.matWall=id; else S.matFloor=id;
-    var list=stylesOf(m), sameAsCur=(curId===id), keepId;
-    keepId=(sameAsCur&&list.some(function(x){return x.id===haveId;}))?haveId:((list[0]||{}).id||'');
-    if(zone==='wall') S.styleWall=keepId; else S.styleFloor=keepId;
-    S.part=zone; S.lvl=list.length?4:2; applyAll(); renderBar(); return;
+    var list=stylesOf(m), keep=(curId===id&&list.some(function(x){return x.id===haveId;}))?haveId:((list[0]||{}).id||'');
+    if(zone==='wall') S.styleWall=keep; else S.styleFloor=keep;
+    S.part=zone;
+    SCENE_CACHE={};
+    renderStep(); saveSel(); redraw('mat'); calc(); return;
   }
-  if(b.dataset.style!==undefined&&b.dataset.style!==''){
+  if(b.dataset.style){
     if(S.part==='wall') S.styleWall=b.dataset.style; else S.styleFloor=b.dataset.style;
-    applyAll(); renderBar(); return;   /* 4단을 유지한다 — 누른 칩의 선택 표시가 그대로 남아 바로 비교된다 */
+    renderStep(); saveSel(); redraw('style'); return;
   }
-  if(b.dataset.tier!==undefined&&b.dataset.tier!==''){
-    var n=+b.dataset.tier, g=GR[n]||'';
-    if(S.part==='light') S.light=g;
-    else if(S.part==='furn'){ S.furn=g; S.layout=g?'move':'keep'; }
-    S.lvl=2; applyAll(); renderBar(); return;
+  if(b.dataset.tier!==undefined){
+    var tv=b.dataset.tier, g=(tv==='l'||tv==='m'||tv==='h')?tv:(['','l','m','h'][+tv]||'');
+    if(S.part==='light') S.light=g; else if(S.part==='furn') S.furn=g;
+    renderStep(); saveSel(); redraw('light'); calc(); return;
   }
 });
 
-/* ---------------- 계산 (계산식 불변 · 색 배수만 반영) ---------------- */
+/* ---------------- 비교 슬라이더(게이지) ---------------- */
+function Gauge(el,rng){
+  var dv=$('.dv',el), kn=$('.kn',el), af=$('canvas.af',el), pos=50, drag=false, pend=null;
+  function set(p){p=parseFloat(p);if(!isFinite(p))p=50;pos=Math.max(0,Math.min(100,Math.round(p*10)/10));
+    af.style.clipPath='inset(0 0 0 '+pos+'%)'; af.style.webkitClipPath='inset(0 0 0 '+pos+'%)';
+    dv.style.left=pos+'%'; kn.style.left='clamp(22px,'+pos+'%,calc(100% - 22px))'; if(rng) rng.value=pos; el.setAttribute('aria-valuenow',Math.round(pos));}
+  function fromX(cx){var r=el.getBoundingClientRect();set((cx-r.left)/r.width*100);}
+  function cap(e){try{el.setPointerCapture(e.pointerId);}catch(x){}}
+  el.addEventListener('pointerdown',function(e){
+    if(e.target.closest('.err')||e.target.closest('.spot')) return;
+    if(e.pointerType==='mouse'||e.target.closest('.kn')){drag=true;pend=null;cap(e);fromX(e.clientX);e.preventDefault();return;}
+    pend={x:e.clientX,y:e.clientY};
+  });
+  el.addEventListener('pointermove',function(e){
+    if(!drag&&pend){var dx=e.clientX-pend.x, dy=e.clientY-pend.y;
+      if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag=true;cap(e);} else if(Math.abs(dy)>8) pend=null;}
+    if(drag){fromX(e.clientX);e.preventDefault();}
+  });
+  function end(e){
+    if(!drag&&pend&&el.id==='stage') tapZone(e.clientX,e.clientY);
+    drag=false;pend=null;try{el.releasePointerCapture(e.pointerId);}catch(x){}
+  }
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',function(e){drag=false;pend=null;});
+  el.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){set(pos-5);e.preventDefault();} else if(e.key==='ArrowRight'){set(pos+5);e.preventDefault();}
+    else if(e.key==='Home'){set(0);e.preventDefault();} else if(e.key==='End'){set(100);e.preventDefault();}
+  });
+  if(rng) rng.addEventListener('input',function(){set(rng.value);});
+  this.set=set; this.pos=function(){return pos;};
+  set(50);
+}
+/* 사진을 그냥 눌렀을 때 — 그 자리에 해당하는 부위를 고른다(단추보다 직접 누르기) */
+function tapZone(cx,cy){
+  var sc=curScene(); if(!sc) return;
+  var el=$('#stage'), r=el.getBoundingClientRect();
+  var x=(cx-r.left)/r.width*sc.w, y=(cy-r.top)/r.height*sc.h;
+  function inside(poly){var c=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c;}return c;}
+  var pick='';
+  var lw=sc.light&&sc.light.sconce;
+  if(lw&&lw.some(function(p){return Math.hypot(p[0]-x,p[1]-y)<Math.max(90,sc.w*0.09);})) pick='light';
+  if(!pick&&sc.wall&&inside(sc.wall)) pick='wall';
+  if(!pick&&sc.floor&&inside(sc.floor)) pick=(y>(bbox(sc.floor).y1-bbox(sc.floor).h*0.42))?'furn':'floor';
+  if(!pick) pick='wall';
+  if(pick==='furn'&&!sc.furn) pick='floor';
+  if(S.part!==pick){S.part=pick; saveSel();}
+  renderStep(); placeSpots(sc);
+}
+var gS=new Gauge($('#stage'),null), gP=null;
+
+/* ---------------- 견적(계산식·단가 불변) ---------------- */
 var PY=3.3058, mode='m', LAST=null;
 function num(id){var v=parseFloat($(id).value);return (isFinite(v)&&v>0)?v:0;}
+function gradeOf(){var m=wallMat();return (m&&m.grade)||'l';}
 function calc(){
   var area,len;
   if(mode==='m'){var w=num('#inW'),h=num('#inH');area=w*h;len=w;}
@@ -526,14 +1154,13 @@ function calc(){
   $('#areaTxt').textContent=area>0?('( = '+area.toLocaleString('ko-KR')+'㎡ · 약 '+(Math.round(area/PY*10)/10).toLocaleString('ko-KR')+'평 )'):'';
   var out=$('#calcOut');
   if(!(area>0)){out.innerHTML='<div class="warn">가로·세로(또는 평수)를 0보다 크게 넣어 주세요. 면적이 0이면 계산하지 않습니다.</div>';LAST=null;return null;}
-  var lines=[],mat=0,md=0,mdTxt=[];
-  if(S.wall){
-    var mult=wallMult(), wr=Math.round(R.wall[S.wall]*mult), wm=Math.round(wr*area); mat+=wm;
-    var mw0=matById(S.matWall), btxt=(mw0&&mw0.basis)?mw0.basis:((mw0&&NAMES.wall[S.wall]&&mw0.nm!==NAMES.wall[S.wall])?('단가 기준: 벽 '+GN[S.wall]+' '+NAMES.wall[S.wall]):'');
-    var basis=btxt?'<small>'+btxt+'</small>':'';
-    lines.push(['재료비',wallLabel()+(mult!==1?' ×'+mult:'')+' '+won(wr)+'원/㎡ × '+area.toLocaleString('ko-KR')+'㎡ = <b>'+won(wm)+'원</b>'+tagOf('wall.'+S.wall)+basis]);
-    var wd=Math.ceil(area/10); md+=wd; mdTxt.push('벽 '+wd+'인·일');
-  }
+  var lines=[],mat=0,md=0,mdTxt=[],GR=gradeOf();
+  var mult=wallMult(), wr=Math.round(R.wall[GR]*mult), wm=Math.round(wr*area);
+  mat+=wm;
+  var mw0=wallMat(), btxt=(mw0&&mw0.basis)?mw0.basis:((mw0&&NAMES.wall[GR]&&mw0.nm!==NAMES.wall[GR])?('단가 기준: 벽 '+({l:'하',m:'중',h:'상'}[GR])+' '+NAMES.wall[GR]):'');
+  var basis=btxt?'<small>'+btxt+'</small>':'';
+  lines.push(['재료비',wallLabel()+(mult!==1?' ×'+mult:'')+' '+won(wr)+'원/㎡ × '+area.toLocaleString('ko-KR')+'㎡ = <b>'+won(wm)+'원</b>'+tagOf('wall.'+GR)+basis]);
+  var wd=Math.ceil(area/10); md+=wd; mdTxt.push('벽 '+wd+'인·일');
   if(S.light){
     var L=R.light[S.light], q, qu;
     if(S.light==='l'){q=Math.ceil(area/4);qu='개';}else if(S.light==='m'){q=len;qu='m';}else{q=Math.round(len*2*10)/10;qu='m';}
@@ -541,19 +1168,18 @@ function calc(){
     lines.push(['조명',NAMES.light[S.light]+' '+(L.set?won(L.set)+'원 + ':'')+q.toLocaleString('ko-KR')+qu+' × '+won(L.unit)+'원 = <b>'+won(lm)+'원</b>'+tagOf('light.'+S.light+'.unit')]);
     md+=0.5; mdTxt.push('조명 0.5인·일');
   }
-  if(S.layout==='move'){
-    var fm=S.furn?R.furn[S.furn]:0; mat+=fm;
-    lines.push(['가구',S.furn?(NAMES.furn[S.furn]+' 참고가 <b>'+won(fm)+'원</b>'+tagOf('furn.'+S.furn)):'새 가구 없음 · 옮기기만 <b>0원</b>']);
+  if(S.furn){
+    var fm=R.furn[S.furn]; mat+=fm;
+    lines.push(['가구',NAMES.furn[S.furn]+' 참고가 <b>'+won(fm)+'원</b>'+tagOf('furn.'+S.furn)]);
     md+=0.5; mdTxt.push('철거·이동 0.5인·일');
   }
-  if(!lines.length){out.innerHTML='<div class="warn">위에서 벽·바닥·조명·가구 중 하나 이상 고르세요. (바닥재는 사진에만 얹히고 견적에는 들어가지 않습니다)</div>';LAST=null;return null;}
   var labor=Math.round(md*R.daily), days=Math.ceil(md);
   lines.push(['인건비',md.toLocaleString('ko-KR')+'인·일('+mdTxt.join(' + ')+') × '+won(R.daily)+'원 = <b>'+won(labor)+'원</b>'+tagOf('daily')]);
   lines.push(['공사기간',days+'일 (1인 기준 · 벽 10㎡/인·일 기준)']);
   var c1=mat, c2=mat+labor, c3=Math.round(c2*(1+R.margin/100)/1000)*1000;
   var d32=c3-c2, d31=c3-c1;
   LAST={area:area,lines:lines,c1:c1,c2:c2,c3:c3,d32:d32,d31:d31,mat:mat,labor:labor,days:days,
-        space:(SCN[S.scene]||{}).nm||'',wall:wallLabel(),light:S.light?NAMES.light[S.light]:'',furn:S.furn?NAMES.furn[S.furn]:''};
+        space:(curScene()||{}).nm||'',wall:wallLabel(),light:S.light?NAMES.light[S.light]:'',furn:S.furn?NAMES.furn[S.furn]:''};
   out.innerHTML='<div class="lines">'+lines.map(function(l){return '<div class="ln"><span class="k">'+l[0]+'</span><span class="v">'+l[1]+'</span></div>';}).join('')+'</div>'+
     '<div class="three">'+
     '<div class="opt c1" id="o1"><span class="no">①</span><span class="nm">직접 시공<small>재료비만</small></span><span class="won">'+won(c1)+'원</span></div>'+
@@ -569,7 +1195,7 @@ function calc(){
 function strip(h){return String(h).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function estText(){
   if(!LAST) return '';
-  var t=['[KTS 인테리어 견적 · 참고 계산]','공간: '+LAST.space+' · 벽 '+(S.wall?LAST.wall:'안 함')+' · 조명 '+(S.light?GN[S.light]+'('+NAMES.light[S.light]+')':'안 함')+' · 가구 '+(S.furn?GN[S.furn]+'('+NAMES.furn[S.furn]+')':'안 함'),
+  var t=['[KTS 인테리어 견적 · 참고 계산]','공간: '+LAST.space+' · 벽 '+LAST.wall+' · 조명 '+(S.light?LAST.light:'안 함')+' · 가구 '+(S.furn?LAST.furn:'안 함'),
     '면적 '+LAST.area.toLocaleString('ko-KR')+'㎡'];
   LAST.lines.forEach(function(l){t.push(l[0]+': '+strip(l[1]));});
   t.push('① 직접 시공(재료비만) '+won(LAST.c1)+'원','② 분리·하청(재료+일당) '+won(LAST.c2)+'원','③ 일괄 위임(이윤 '+R.margin+'%) '+won(LAST.c3)+'원',
@@ -599,328 +1225,6 @@ $('#modeBtn').addEventListener('click',function(){
 });
 ['#inW','#inH','#inPy'].forEach(function(id){$(id).addEventListener('input',calc);});
 
-/* ---------------- 그림(캔버스) ---------------- */
-/* 내 방 사진 얹기용 기준 좌표 1200×900 — 가운데 벽 330..870 × 200..590, 소실점(600,395) */
-var BW={x0:330,y0:200,x1:870,y1:590}, VP={x:600,y:395};
-var PHOTO_READY=true;
-var imgCache={};
-function loadImg(src,cb){
-  var c=imgCache[src];
-  if(c&&c.img){cb(c.img);return;}
-  if(c&&c.wait){c.wait.push(cb);return;}
-  c=imgCache[src]={img:null,wait:[cb]};
-  var p=new Image();
-  p.onload=function(){c.img=p;var w=c.wait;c.wait=null;w.forEach(function(f){f(p);});};
-  p.onerror=function(){var w=c.wait;delete imgCache[src];w.forEach(function(f){f(null);});};
-  p.src=src;
-}
-function photoOf(k){return (REG&&REG.photos&&REG.photos[k]&&REG.photos[k].file)||('img/ba_'+k+'.jpg');}
-function shell(k,cb){loadImg(photoOf(k),cb);}
-/* ---- 고른 자재 영역만 덮기 ---- */
-var RELIGHT_K=0.85, FLOOR_SY=0.62;
-function polyPath(ctx,pts){ctx.beginPath();pts.forEach(function(p,i){if(i)ctx.lineTo(p[0],p[1]);else ctx.moveTo(p[0],p[1]);});ctx.closePath();}
-function bbox(pts){var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(function(p){x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return {x0:x0,y0:y0,w:x1-x0,h:y1-y0};}
-var srcPix={};
-function srcData(src){var k=src.src;if(srcPix[k])return srcPix[k];var c=document.createElement('canvas');c.width=1200;c.height=900;var g=c.getContext('2d');g.drawImage(src,0,0,1200,900);return (srcPix[k]=g.getImageData(0,0,1200,900).data);}
-function relight(ctx,src,pts){
-  var b=bbox(pts), x0=Math.max(0,Math.floor(b.x0)), y0=Math.max(0,Math.floor(b.y0)), x1=Math.min(1200,Math.ceil(b.x0+b.w)), y1=Math.min(900,Math.ceil(b.y0+b.h)), w=x1-x0, h=y1-y0;
-  if(w<=0||h<=0) return;
-  var mk=document.createElement('canvas'); mk.width=w; mk.height=h; var mc=mk.getContext('2d'); mc.translate(-x0,-y0); polyPath(mc,pts); mc.fillStyle='#fff'; mc.fill();
-  var M=mc.getImageData(0,0,w,h).data, O=srcData(src), cur=ctx.getImageData(x0,y0,w,h), C=cur.data, hist=new Uint32Array(256), n=0, x, y, i, oi, L;
-  for(y=0;y<h;y++)for(x=0;x<w;x++){i=(y*w+x)*4;if(M[i+3]<128)continue;oi=((y0+y)*1200+x0+x)*4;hist[(O[oi]*0.299+O[oi+1]*0.587+O[oi+2]*0.114)|0]++;n++;}
-  if(!n) return;
-  var acc=0, ref=255; for(L=0;L<256;L++){acc+=hist[L];if(acc>=n*0.92){ref=Math.max(1,L);break;}}
-  for(y=0;y<h;y++)for(x=0;x<w;x++){i=(y*w+x)*4;var al=M[i+3]/255;if(!al)continue;oi=((y0+y)*1200+x0+x)*4;
-    L=O[oi]*0.299+O[oi+1]*0.587+O[oi+2]*0.114; var f=Math.min(1.12,L/ref); f=1+(RELIGHT_K*(f-1))*al;
-    C[i]*=f;C[i+1]*=f;C[i+2]*=f;}
-  ctx.putImageData(cur,x0,y0);
-}
-function fillFloor(ctx,tex,b,vp){
-  var TW=tex.width, TH=tex.height, dmax=900-vp[1], A=dmax*dmax/FLOOR_SY;
-  for(var y=Math.floor(b.y0); y<b.y0+b.h; y++){
-    var d=y+0.5-vp[1]; if(d<=1) continue;
-    var sx=d/dmax, v=Math.floor(((A/d)%TH+TH)%TH), tw=TW*sx, xs=vp[0]-TW/2*sx;
-    for(var k=Math.floor(-xs/tw)-1;k<=Math.ceil((1200-xs)/tw)+1;k++) ctx.drawImage(tex,0,v,TW,1,xs+k*tw,y,tw+0.6,1);
-  }
-}
-function fillTex(ctx,src,pts,tex,zone,grout,vp,fit){
-  var b=bbox(pts);
-  ctx.save(); polyPath(ctx,pts); ctx.clip();
-  if(zone==='floor'){
-    if(vp) fillFloor(ctx,tex,b,vp);
-    else { ctx.translate(b.x0,b.y0); ctx.scale(1,FLOOR_SY); ctx.fillStyle=ctx.createPattern(tex,'repeat'); ctx.fillRect(0,0,b.w,b.h/FLOOR_SY+2); }
-  } else if(fit==='cover'){
-    var sc=Math.max(b.w/tex.width,b.h/tex.height), dw=tex.width*sc, dh=tex.height*sc;
-    ctx.drawImage(tex,b.x0+(b.w-dw)/2,b.y0+(b.h-dh)/2,dw,dh);
-  } else {
-    ctx.translate(b.x0,b.y0); ctx.fillStyle=ctx.createPattern(tex,'repeat'); ctx.fillRect(0,0,b.w,b.h);
-    if(grout){
-      ctx.fillStyle='rgba(150,152,156,.85)';
-      for(var x=0;x<=b.w;x+=grout) ctx.fillRect(x-1,0,2,b.h);
-      for(var y=0;y<=b.h;y+=grout) ctx.fillRect(0,y-1,b.w,2);
-    }
-  }
-  ctx.restore();
-  relight(ctx,src,pts);
-}
-var BUNDLE={
-  '걸레받이':{key:'base', draw:function(ctx,src,pts){var b=bbox(pts);ctx.save();polyPath(ctx,pts);ctx.clip();
-    var g=ctx.createLinearGradient(0,b.y0,0,b.y0+b.h);g.addColorStop(0,'#FBFAF7');g.addColorStop(0.55,'#ECE8E1');g.addColorStop(1,'#D9D3C9');
-    ctx.fillStyle=g;ctx.fillRect(b.x0,b.y0,b.w,b.h);
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillRect(b.x0,b.y0,b.w,2);
-    ctx.fillStyle='rgba(60,50,40,.35)';ctx.fillRect(b.x0,b.y0+b.h-2,b.w,2);
-    ctx.restore();relight(ctx,src,pts);}},
-  '몰딩':{key:'mold', draw:function(ctx,src,pts){var b=bbox(pts);ctx.save();polyPath(ctx,pts);ctx.clip();
-    var g=ctx.createLinearGradient(0,b.y0,0,b.y0+b.h);g.addColorStop(0,'#FFFFFF');g.addColorStop(0.6,'#F1EEE8');g.addColorStop(1,'#D8D2C8');
-    ctx.fillStyle=g;ctx.fillRect(b.x0,b.y0,b.w,b.h);
-    ctx.fillStyle='rgba(60,50,40,.32)';ctx.fillRect(b.x0,b.y0+b.h-2,b.w,2);
-    ctx.restore();relight(ctx,src,pts);}},
-  '줄눈':{key:'wall', draw:null}
-};
-function canBundle(nm,k){var B=BUNDLE[nm],r=REG&&REG.photos[k];return !!(B&&r&&r[B.key]&&r[B.key].length);}
-function bundleNames(m,k){return (m&&m.bundle||[]).filter(function(nm){return canBundle(nm,k);});}
-/* 톤 변형 — 자재 사진 1장에 밝기·채도·세피아·덧칠을 입힌다(조판·계산 불변) */
-var styCache={};
-function styleCanvas(img,st){
-  if(!st) return img;
-  var key=(img.src||'')+'|'+st.id+'|'+(st.bright||1)+'|'+(st.sat||1)+'|'+(st.sepia||0)+'|'+(st.contrast||1)+'|'+(st.overlay||'')+'|'+(st.alpha||0)+'|'+(st.tint?st.tint.join(','):'-');
-  if(styCache[key]) return styCache[key];
-  var c=document.createElement('canvas'); c.width=img.width||1200; c.height=img.height||900;
-  var g=c.getContext('2d'); g.drawImage(img,0,0);
-  var br=+st.bright||1, sa=(st.sat==null?1:+st.sat), sp=+st.sepia||0, ct=+st.contrast||1;
-  var tn=(st.tint&&st.tint.length===3)?st.tint.map(Number):null;   /* 색을 채널별로 곱한다(회색 자재 사진도 색이 읽히게) */
-  if(br!==1||sa!==1||sp||ct!==1||tn){
-    try{
-      var d=g.getImageData(0,0,c.width,c.height), p=d.data, i, r, gg, b, l, sr, sg, sb;
-      for(i=0;i<p.length;i+=4){
-        r=(p[i]-128)*ct+128; gg=(p[i+1]-128)*ct+128; b=(p[i+2]-128)*ct+128;
-        l=0.299*r+0.587*gg+0.114*b;
-        r=l+(r-l)*sa; gg=l+(gg-l)*sa; b=l+(b-l)*sa;
-        if(sp){ sr=r*0.393+gg*0.769+b*0.189; sg=r*0.349+gg*0.686+b*0.168; sb=r*0.272+gg*0.534+b*0.131;
-          r=r+(sr-r)*sp; gg=gg+(sg-gg)*sp; b=b+(sb-b)*sp; }
-        r*=br; gg*=br; b*=br;
-        if(tn){ r*=tn[0]; gg*=tn[1]; b*=tn[2]; }
-        p[i]=r<0?0:r>255?255:r; p[i+1]=gg<0?0:gg>255?255:gg; p[i+2]=b<0?0:b>255?255:b;
-      }
-      g.putImageData(d,0,0);
-    }catch(e){}
-  }
-  if(st.overlay&&+st.alpha>0){ g.globalAlpha=+st.alpha; g.fillStyle=st.overlay; g.fillRect(0,0,c.width,c.height); g.globalAlpha=1; }
-  return (styCache[key]=c);
-}
-function applyMats(ctx,src,k,texs){
-  var r=REG&&REG.photos[k]; if(!r) return;
-  var done={};
-  ['wall','floor'].forEach(function(z){
-    var m=matById(MAT[z]); if(!m||!texs[m.id]||!r[z]) return;
-    fillTex(ctx,src,r[z],texs[m.id],z,(m.bundle.indexOf('줄눈')>=0&&canBundle('줄눈',k))?(m.grout||160):0,r.vp,m.fit);
-  });
-  ['wall','floor'].forEach(function(z){
-    var m=matById(MAT[z]); if(!m||!texs[m.id]) return;
-    bundleNames(m,k).forEach(function(nm){var B=BUNDLE[nm]; if(!B.draw||done[nm]) return; done[nm]=1; B.draw(ctx,src,r[B.key]);});
-  });
-  (r.keep||[]).forEach(function(q){ctx.drawImage(src,q[0],q[1],q[2],q[3],q[0],q[1],q[2],q[3]);});
-}
-/* 가구 — 화면 좌표(바닥 앞모서리 기준) 상자 */
-function lerp(a,b,t){return a+(b-a)*t;}
-function toVP(x,y,t){return [lerp(x,VP.x,t),lerp(y,VP.y,t)];}
-function box(ctx,x,y,w,h,d,col){
-  var tl=[x,y-h], tr=[x+w,y-h], btl=toVP(tl[0],tl[1],d), btr=toVP(tr[0],tr[1],d);
-  var br=[x+w,y], bbr=toVP(br[0],br[1],d), bl=[x,y], bbl=toVP(bl[0],bl[1],d);
-  ctx.fillStyle=col.side;
-  ctx.beginPath(); if(x+w<VP.x){ctx.moveTo(tr[0],tr[1]);ctx.lineTo(btr[0],btr[1]);ctx.lineTo(bbr[0],bbr[1]);ctx.lineTo(br[0],br[1]);}
-  else if(x>VP.x){ctx.moveTo(tl[0],tl[1]);ctx.lineTo(btl[0],btl[1]);ctx.lineTo(bbl[0],bbl[1]);ctx.lineTo(bl[0],bl[1]);}
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle=col.top; ctx.beginPath(); ctx.moveTo(tl[0],tl[1]); ctx.lineTo(tr[0],tr[1]); ctx.lineTo(btr[0],btr[1]); ctx.lineTo(btl[0],btl[1]); ctx.closePath(); ctx.fill();
-  ctx.fillStyle=col.body; ctx.fillRect(x,y-h,w,h);
-  ctx.strokeStyle='rgba(0,0,0,.18)'; ctx.lineWidth=2; ctx.strokeRect(x,y-h,w,h);
-}
-function shadow(ctx,x,y,w){ctx.fillStyle='rgba(0,0,0,.16)';ctx.beginPath();ctx.ellipse(x+w/2,y+4,w*0.56,12,0,0,Math.PI*2);ctx.fill();}
-function table(ctx,x,y,w,h,d,col,veins){
-  shadow(ctx,x,y,w);
-  ctx.fillStyle=col.leg; var lw=Math.max(8,w*0.05);
-  ctx.fillRect(x+6,y-h,lw,h); ctx.fillRect(x+w-6-lw,y-h,lw,h);
-  var b=toVP(x+6,y,d*0.9), b2=toVP(x+w-6-lw,y,d*0.9);
-  ctx.fillRect(b[0],b[1]-h*0.95,lw*0.8,h*0.95); ctx.fillRect(b2[0],b2[1]-h*0.95,lw*0.8,h*0.95);
-  box(ctx,x-6,y-h+14,w+12,14,d,col);
-  if(veins){ctx.strokeStyle='rgba(120,120,125,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+w*0.1,y-h);ctx.bezierCurveTo(x+w*0.4,y-h-14,x+w*0.6,y-h+4,x+w*0.95,y-h-10);ctx.stroke();}
-}
-function chair(ctx,x,y,s,col){
-  shadow(ctx,x,y,40*s);
-  ctx.fillStyle=col.leg; ctx.fillRect(x+3*s,y-45*s,6*s,45*s); ctx.fillRect(x+31*s,y-45*s,6*s,45*s);
-  box(ctx,x,y-40*s,40*s,9*s,0.05,col);
-  ctx.fillStyle=col.body; ctx.fillRect(x+2*s,y-95*s,36*s,10*s); ctx.fillStyle=col.leg; ctx.fillRect(x+3*s,y-90*s,5*s,42*s); ctx.fillRect(x+32*s,y-90*s,5*s,42*s);
-}
-function sofa(ctx,x,y,w,col){
-  shadow(ctx,x,y,w);
-  box(ctx,x,y-8,w,60,0.1,col); box(ctx,x,y-62,w,62,0.03,{top:col.top,body:col.side,side:col.side});
-  box(ctx,x-18,y-8,26,82,0.1,col); box(ctx,x+w-8,y-8,26,82,0.1,col);
-}
-function bed(ctx,x,y,w,col){
-  shadow(ctx,x,y,w);
-  box(ctx,x,y,w,50,0.2,col);
-  box(ctx,x+8,y-50,w-16,24,0.19,{top:'#F4F2EE',body:'#E6E2DA',side:'#D6D1C6'});
-  var hb=toVP(x,y,0.2); box(ctx,hb[0]-4,hb[1]-48,(toVP(x+w,y,0.2)[0]-hb[0])+8,72,0.01,{top:col.top,body:col.side,side:col.side});
-}
-var STY={
-  old:{top:'#A39787',body:'#857a6c',side:'#6d6458',leg:'#5b5249',cush:'#8f8a83'},
-  l:{top:'#E4E1DA',body:'#CBC6BB',side:'#B3AEA3',leg:'#8A8680',cush:'#B9C2C9'},
-  m:{top:'#B98352',body:'#93603A',side:'#7A4E2E',leg:'#5E3B20',cush:'#C9A47A'},
-  h:{top:'#F4F3EF',body:'#2C2C30',side:'#1F1F23',leg:'#18181B',cush:'#D9D7D1'}
-};
-var LAYOUT={
-  room:{keep:function(c,st){bed(c,640,830,380,st);table(c,170,790,200,120,0.12,st);chair(c,250,820,1.2,st);},
-        move:function(c,st,g){bed(c,420,640,330,st);table(c,860,840,230,125,0.12,st,g==='h');chair(c,930,880,1.25,st);table(c,140,860,150,80,0.1,st,g==='h');}},
-  living:{keep:function(c,st){box(c,470,585,260,70,0.03,st);sofa(c,250,850,420,{top:st.cush,body:st.body,side:st.side});table(c,760,820,190,70,0.12,st);},
-        move:function(c,st,g){box(c,410,585,380,62,0.03,st);sofa(c,130,830,360,{top:st.cush,body:st.body,side:st.side});table(c,560,800,230,70,0.12,st,g==='h');chair(c,880,830,1.3,st);}},
-  shop:{keep:function(c,st){box(c,700,700,380,140,0.12,st);table(c,180,830,200,115,0.12,st);chair(c,230,870,1.2,st);table(c,450,760,150,105,0.1,st);},
-        move:function(c,st,g){box(c,430,600,340,120,0.04,st);[[110,860],[440,850],[780,860]].forEach(function(p){table(c,p[0],p[1],210,118,0.12,st,g==='h');chair(c,p[0]+22,p[1]+40,1.15,st);chair(c,p[0]+140,p[1]+40,1.15,st);});}}
-};
-function rnd(seed){var s=seed>>>0;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
-function drawWall(ctx,g){
-  var x0=BW.x0,y0=BW.y0,w=BW.x1-BW.x0,h=BW.y1-BW.y0;
-  ctx.save(); ctx.beginPath(); ctx.rect(x0,y0,w,h-12); ctx.clip();
-  if(g==='l'){
-    ctx.fillStyle='#C9A47A'; ctx.fillRect(x0,y0,w,h);
-    for(var x=x0;x<x0+w;x+=15){var gr=ctx.createLinearGradient(x,0,x+15,0);gr.addColorStop(0,'#A9814F');gr.addColorStop(0.35,'#D9B98E');gr.addColorStop(0.7,'#C29A6A');gr.addColorStop(1,'#8E6A3F');ctx.fillStyle=gr;ctx.fillRect(x,y0,15,h);}
-  } else if(g==='m'){
-    ctx.fillStyle='#5F6E68'; ctx.fillRect(x0,y0,w,h);
-    var gg=ctx.createLinearGradient(x0,y0,x0+w,y0+h); gg.addColorStop(0,'rgba(255,255,255,.10)'); gg.addColorStop(1,'rgba(0,0,0,.12)'); ctx.fillStyle=gg; ctx.fillRect(x0,y0,w,h);
-    ctx.strokeStyle='rgba(20,28,26,.55)'; ctx.lineWidth=3;
-    for(var i=1;i<6;i++){ctx.beginPath();ctx.moveTo(x0+i*w/6,y0);ctx.lineTo(x0+i*w/6,y0+h);ctx.stroke();}
-    ctx.beginPath();ctx.moveTo(x0,y0+h*0.62);ctx.lineTo(x0+w,y0+h*0.62);ctx.stroke();
-  } else if(g==='h'){
-    var mg=ctx.createLinearGradient(x0,y0,x0+w,y0+h); mg.addColorStop(0,'#F4F2ED'); mg.addColorStop(1,'#DCD7CE'); ctx.fillStyle=mg; ctx.fillRect(x0,y0,w,h);
-    var r=rnd(7); ctx.lineCap='round';
-    for(var k=0;k<26;k++){ctx.strokeStyle='rgba(110,105,100,'+(0.12+r()*0.3)+')';ctx.lineWidth=0.8+r()*2.2;ctx.beginPath();var sx=x0+r()*w,sy=y0+r()*h;ctx.moveTo(sx,sy);ctx.bezierCurveTo(sx+r()*160-40,sy+r()*120-60,sx+r()*220-60,sy+r()*160-40,sx+r()*300-80,sy+r()*200-50);ctx.stroke();}
-    ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=2; for(var j=1;j<3;j++){ctx.beginPath();ctx.moveTo(x0+j*w/3,y0);ctx.lineTo(x0+j*w/3,y0+h);ctx.stroke();}
-    ctx.strokeStyle='#A68A5B'; ctx.lineWidth=8; ctx.strokeRect(x0+4,y0+4,w-8,h-20);
-  }
-  ctx.restore();
-}
-function glow(ctx,x,y,r,a){var g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(255,236,200,'+a+')');g.addColorStop(1,'rgba(255,236,200,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);}
-function drawLight(ctx,g){
-  ctx.save();
-  if(g==='l'){
-    var pts=[[380,60],[600,60],[820,60],[440,150],[600,150],[760,150]];
-    pts.forEach(function(p){
-      ctx.fillStyle='#FFFDF4';ctx.strokeStyle='#C9C3B4';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p[0],p[1],20,6,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-      var c=ctx.createLinearGradient(0,p[1],0,p[1]+420);c.addColorStop(0,'rgba(255,240,205,.45)');c.addColorStop(1,'rgba(255,240,205,0)');
-      ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(p[0]-16,p[1]);ctx.lineTo(p[0]+16,p[1]);ctx.lineTo(p[0]+110,p[1]+420);ctx.lineTo(p[0]-110,p[1]+420);ctx.closePath();ctx.fill();
-    });
-  } else if(g==='m'){
-    ctx.shadowColor='rgba(255,248,230,1)';ctx.shadowBlur=26;ctx.strokeStyle='#FFFFFF';ctx.lineCap='round';
-    [[[150,30],[450,180]],[[600,10],[600,190]],[[1050,30],[750,180]]].forEach(function(l){ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(l[0][0],l[0][1]);ctx.lineTo(l[1][0],l[1][1]);ctx.stroke();});
-    ctx.shadowBlur=0; glow(ctx,600,240,360,.18);
-  } else if(g==='h'){
-    ctx.fillStyle='rgba(255,255,255,.65)';ctx.beginPath();ctx.moveTo(250,40);ctx.lineTo(950,40);ctx.lineTo(800,150);ctx.lineTo(400,150);ctx.closePath();ctx.fill();
-    ctx.shadowColor='rgba(255,214,150,1)';ctx.shadowBlur=34;ctx.strokeStyle='#FFE2B0';ctx.lineWidth=8;
-    ctx.beginPath();ctx.moveTo(250,40);ctx.lineTo(950,40);ctx.lineTo(800,150);ctx.lineTo(400,150);ctx.closePath();ctx.stroke();
-    ctx.shadowBlur=0; glow(ctx,600,110,420,.30); glow(ctx,600,330,380,.10);
-  }
-  ctx.restore();
-}
-function watermark(ctx,W,H){
-  ctx.save(); ctx.globalAlpha=0.32; ctx.fillStyle='#FFFFFF'; ctx.strokeStyle='rgba(0,0,0,.6)';
-  var fs=Math.max(18,Math.round(W/16)); ctx.font='900 '+fs+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.translate(W/2,H/2); ctx.rotate(-Math.PI/7);
-  for(var y=-H;y<=H;y+=fs*3){for(var x=-W;x<=W;x+=fs*9){ctx.lineWidth=Math.max(1,fs/14);ctx.strokeText('KTS 인테리어 견적',x+((y/(fs*3))%2?fs*4.5:0),y);ctx.fillText('KTS 인테리어 견적',x+((y/(fs*3))%2?fs*4.5:0),y);}}
-  ctx.restore();
-}
-function render(bf,af,src,wm){
-  var W=bf.width,H=bf.height;
-  var b=bf.getContext('2d'), a=af.getContext('2d');
-  b.clearRect(0,0,W,H); b.drawImage(src,0,0,W,H);
-  a.clearRect(0,0,W,H); a.drawImage(src,0,0,W,H);
-  a.save(); a.scale(W/1200,H/900);
-  a.globalAlpha=0.82;
-  if(S.wall) drawWall(a,S.wall);
-  a.globalAlpha=1;
-  if(S.light) drawLight(a,S.light);
-  if(S.layout==='move') LAYOUT[S.scene].move(a,STY[S.furn||'l'],S.furn||'l');
-  a.restore();
-  if(wm){watermark(b,W,H);watermark(a,W,H);}
-}
-
-/* ---------------- 게이지 바 ---------------- */
-function Gauge(el,rng){
-  var dv=$('.dv',el), kn=$('.kn',el), af=$('canvas.af',el), pos=50, drag=false, pend=null;
-  function set(p){p=parseFloat(p);if(!isFinite(p))p=50;pos=Math.max(0,Math.min(100,Math.round(p*10)/10));
-    af.style.clipPath='inset(0 0 0 '+pos+'%)'; af.style.webkitClipPath='inset(0 0 0 '+pos+'%)';
-    dv.style.left=pos+'%'; kn.style.left='clamp(24px,'+pos+'%,calc(100% - 24px))'; rng.value=pos; el.setAttribute('aria-valuenow',Math.round(pos));}
-  function fromX(cx){var r=el.getBoundingClientRect();set((cx-r.left)/r.width*100);}
-  function cap(e){try{el.setPointerCapture(e.pointerId);}catch(x){}}
-  el.addEventListener('pointerdown',function(e){
-    if(e.target.closest('.err')) return;
-    if(e.pointerType==='mouse'||e.target.closest('.kn')){drag=true;pend=null;cap(e);fromX(e.clientX);e.preventDefault();return;}
-    pend={x:e.clientX,y:e.clientY};
-  });
-  el.addEventListener('pointermove',function(e){
-    if(!drag&&pend){var dx=e.clientX-pend.x, dy=e.clientY-pend.y;
-      if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag=true;cap(e);} else if(Math.abs(dy)>8) pend=null;}
-    if(drag){fromX(e.clientX);e.preventDefault();}
-  });
-  function end(e){drag=false;pend=null;try{el.releasePointerCapture(e.pointerId);}catch(x){}}
-  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
-  el.addEventListener('keydown',function(e){
-    if(e.key==='ArrowLeft'){set(pos-5);e.preventDefault();} else if(e.key==='ArrowRight'){set(pos+5);e.preventDefault();}
-    else if(e.key==='Home'){set(0);e.preventDefault();} else if(e.key==='End'){set(100);e.preventDefault();}
-  });
-  rng.addEventListener('input',function(){set(rng.value);});
-  this.set=set; this.pos=function(){return pos;};
-  set(50);
-}
-var gS=new Gauge($('#baSample'),$('#rngSample')), gP=new Gauge($('#baPhoto'),$('#rngPhoto'));
-
-/* ---------------- 예시 사진(실사) ---------------- */
-var drawSeq=0, sampleOk=false;
-function drawSample(){
-  var seq=++drawSeq, el=$('#baSample'), k=S.scene;
-  shell(k,function(img){
-    if(seq!==drawSeq) return;
-    sampleOk=!!img; $('#sampleErr').hidden=!!img;
-    if(!img) return;
-    var need=0, got=0, texs={};
-    function paint(){
-      if(seq!==drawSeq) return;
-      var bf=$('canvas.bf',el), af=$('canvas.af',el), b=bf.getContext('2d'), a=af.getContext('2d');
-      b.clearRect(0,0,1200,900); b.drawImage(img,0,0,1200,900);
-      a.clearRect(0,0,1200,900); a.drawImage(img,0,0,1200,900);
-      applyMats(a,img,k,texs);
-    }
-    function load(){
-      got++;
-      if(got>=need) paint();
-    }
-    ['wall','floor'].forEach(function(z){
-      var m=matById(MAT[z]); if(!m) return;
-      var st=styleById(m,(z==='wall')?S.styleWall:S.styleFloor);
-      need++;
-      loadImg((st&&st.img)?st.img:m.img,function(t){ if(t) texs[m.id]=styleCanvas(t,st); else toast(m.nm+' 사진을 불러오지 못했습니다 · 다시 눌러 주세요'); load(); });
-    });
-    if(!need) paint();
-  });
-}
-$('#sampleRetry').addEventListener('click',drawSample);
-function paintBundle(){
-  var picked=['wall','floor'].map(function(z){return matById(MAT[z]);}).filter(Boolean), extra=[];
-  picked.forEach(function(m){bundleNames(m,S.scene).forEach(function(nm){if(extra.indexOf(nm)<0)extra.push(nm);});});
-  if(!picked.length){$('#bundleTxt').innerHTML='아직 고른 자재가 없습니다 · 지금 사진은 시공 전과 같습니다.';return;}
-  var names=picked.map(function(m){
-    var st=styleById(m,(m.zone==='wall')?S.styleWall:S.styleFloor);
-    return m.nm+(st?' '+st.nm:'');
-  });
-  $('#bundleTxt').innerHTML=(extra.length?'고른 자재와 함께 바뀌는 항목: <b>'+names.join(' + ')+' + '+extra.join(' + ')+'</b>':'고른 자재: <b>'+names.join(' + ')+'</b> · 함께 바뀌는 항목 없음');
-}
-function loadRegions(){
-  fetch('regions.json?v=20261124c',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
-    if(!j||!j.photos||!j.materials) throw 0;
-    REG=j; REG_ST='ok';
-  }).catch(function(){REG=null;REG_ST='fail';}).then(function(){
-    normSel(); loadSel(); normSel(); syncGrades(); renderBar(); renderSelect(); drawSample(); calc();
-  });
-}
-
 /* ---------------- 내 방 사진 ---------------- */
 var PH={img:null,wm:false};
 function yymm(){var t=new Date();return String(t.getFullYear()).slice(2)+('0'+(t.getMonth()+1)).slice(-2);}
@@ -945,11 +1249,40 @@ function paintCnt(){
   var u=used();
   $('#photoCnt').innerHTML=unlocked()?'이용권이 열려 있습니다 · 이번 달 사진 제한 없음':('무료 맛보기 <b>'+Math.max(0,1-u)+'장</b> 남음'+(window.KTS_KEYS?' (이 기기 · 하루 1장)':' (이 기기 기준)'));
 }
+/* 손님 사진 위에 얹기 — 사진 크기에 맞춰 부위를 잡는다(가운데 벽·위쪽 조명·아래쪽 가구) */
+function photoLayout(img){
+  var W=img.naturalWidth||1200, H=img.naturalHeight||900;
+  return {w:W,h:H,
+    wall:[[W*0.10,H*0.07],[W*0.90,H*0.07],[W*0.90,H*0.60],[W*0.10,H*0.60]],
+    floor:[[W*0.02,H*0.72],[W*0.98,H*0.72],[W*0.98,H*0.99],[W*0.02,H*0.99]],
+    base:[[W*0.10,H*0.585],[W*0.90,H*0.585],[W*0.90,H*0.615],[W*0.10,H*0.615]],
+    mold:[[W*0.10,H*0.07],[W*0.90,H*0.07],[W*0.90,H*0.085],[W*0.10,H*0.085]],
+    light:{sconce:[[W*0.36,H*0.22],[W*0.64,H*0.22]]},furn:{center:[W*0.28,H*0.72,W*0.78,H*0.95],wall:[W*0.24,H*0.66,W*0.84,H*0.92]},id:'photo'};
+}
 function drawPhoto(){
   if(!PH.img) return;
-  var el=$('#baPhoto'), bf=$('canvas.bf',el), af=$('canvas.af',el);
-  if(bf.width!==PH.img.naturalWidth||bf.height!==PH.img.naturalHeight){bf.width=af.width=PH.img.naturalWidth;bf.height=af.height=PH.img.naturalHeight;}
-  render(bf,af,PH.img,PH.wm);
+  var wm1=wallMat(), ws1=wallStyle(), fm1=floorMat(), fs1=floorStyle(), nd=[];
+  if(wm1&&!wm1.flat) nd.push((ws1&&ws1.img)?ws1.img:wm1.img);
+  if(fm1) nd.push((fs1&&fs1.img)?fs1.img:fm1.img);
+  preload(nd,function(){});
+  var el=$('#stage2'), bf=$('canvas.bf',el), af=$('canvas.af',el);
+  var W=PH.img.naturalWidth, H=PH.img.naturalHeight;
+  if(bf.width!==W||bf.height!==H){bf.width=af.width=W; bf.height=af.height=H;}
+  var b=bf.getContext('2d'); b.clearRect(0,0,W,H); b.drawImage(PH.img,0,0);
+  if(PH.wm) watermark(b,W,H);
+  var sc=photoLayout(PH.img); sc.w=W; sc.h=H; sc.fg=[]; sc.keep=[];
+  var a=af.getContext('2d'); a.clearRect(0,0,W,H); a.drawImage(PH.img,0,0);
+  SCENE_CACHE={};
+  paintScene(a,sc,PH.img);
+  if(PH.wm) watermark(a,W,H);
+  var wrap=$('#stage2 .afw'); if(wrap){wrap.style.transition='none';wrap.style.clipPath='inset(0 0 0 '+(gP?gP.pos():50)+'%)';wrap.style.filter='brightness(1)';}
+}
+function watermark(ctx,W,H){
+  ctx.save(); ctx.globalAlpha=0.30; ctx.fillStyle='#FFFFFF'; ctx.strokeStyle='rgba(0,0,0,.55)';
+  var fs=Math.max(16,Math.round(W/17)); ctx.font='900 '+fs+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.translate(W/2,H/2); ctx.rotate(-Math.PI/7);
+  for(var y=-H;y<=H;y+=fs*3){for(var x=-W;x<=W;x+=fs*10){ctx.lineWidth=Math.max(1,fs/14);ctx.strokeText('KTS 인테리어 견적',x+((y/(fs*3))%2?fs*5:0),y);ctx.fillText('KTS 인테리어 견적',x+((y/(fs*3))%2?fs*5:0),y);}}
+  ctx.restore();
 }
 $('#photoIn').addEventListener('change',function(e){
   var f=e.target.files&&e.target.files[0]; e.target.value='';
@@ -963,6 +1296,7 @@ $('#photoIn').addEventListener('change',function(e){
       if(!unlocked()&&free) markUsed();
       PH.img=im; PH.wm=!free;
       $('#photoWrap').hidden=false; $('#passBox').hidden=free;
+      if(!gP) gP=new Gauge($('#stage2'),null);
       gP.set(50); drawPhoto(); paintCnt();
       toast(free?'사진 위에 고른 마감을 얹었습니다':'2장째부터는 이용권이 필요합니다 · 워터마크 미리보기');
     };
@@ -982,7 +1316,7 @@ function dlPNG(canvas,name){
   canvas.toBlob(function(b){if(!b){toast('저장하지 못했습니다');return;}var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},800);toast('이미지를 저장했습니다');},'image/png');
 }
 function composite(el,pos){
-  el=el||$('#baPhoto'); if(pos==null) pos=gP.pos();
+  el=el||$('#stage2'); if(pos==null) pos=(gP?gP.pos():50);
   var bf=$('canvas.bf',el), af=$('canvas.af',el), W=bf.width, H=bf.height, x=Math.round(W*pos/100);
   var c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
   g.drawImage(bf,0,0); g.drawImage(af,x,0,W-x,H,x,0,W-x,H);
@@ -992,59 +1326,110 @@ function composite(el,pos){
   g.fillStyle='rgba(255,107,0,.92)'; g.fillRect(W-fs*2.1,fs*0.5,fs*1.6,fs*1.3); g.fillStyle='#0A1224'; g.fillText('후',W-fs*1.8,fs*0.65);
   return c;
 }
-$('#svAfter').addEventListener('click',function(){dl($('#baPhoto canvas.af'),'interior_after.jpg');});
+function stageComposite(){        /* 메인 화면 비포/애프터 합성 */
+  var el=$('#stage'), bf=$('canvas.bf',el), af=$('canvas.af',el), W=bf.width,H=bf.height,x=Math.round(W*gS.pos()/100);
+  var c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
+  g.drawImage(bf,0,0); g.drawImage(af,x,0,W-x,H,x,0,W-x,H);
+  g.fillStyle='#fff'; g.fillRect(x-Math.max(2,W/400),0,Math.max(4,W/200),H);
+  return c;
+}
+$('#svAfter').addEventListener('click',function(){dl($('#stage2 canvas.af'),'interior_after.jpg');});
 $('#svBA').addEventListener('click',function(){dl(composite(),'interior_before_after.jpg');});
 $('#prPhoto').addEventListener('click',function(){
   var c=composite(), s=Math.min(1,1600/c.width), t=document.createElement('canvas'); t.width=Math.round(c.width*s); t.height=Math.round(c.height*s);
   t.getContext('2d').drawImage(c,0,0,t.width,t.height); printEst(t.toDataURL('image/jpeg',0.85));
 });
 
-/* ---------------- ④ 화면 저장: 고른 사진 + 견적 요약 한 장 ---------------- */
+/* ---------------- 화면 저장: 고른 사진 + 견적 요약 한 장 ---------------- */
 function shotCanvas(){
-  var ph=composite($('#baSample'),gS.pos());
+  var ph=stageComposite();
   var q=LAST||calc();
-  var W=1200, BH=340, H=900+BH;
-  var c=document.createElement('canvas'); c.width=W; c.height=H;
-  var g=c.getContext('2d');
+  var W=ph.width, PHH=ph.height, BH=Math.round(W*0.28), H=PHH+BH;
+  var c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
   g.drawImage(ph,0,0);
-  g.fillStyle='#0A1128'; g.fillRect(0,900,W,BH);
-  g.fillStyle='#FF6B00'; g.fillRect(0,900,W,6);
-  g.textBaseline='top'; g.fillStyle='#F3F6FA';
-  g.font='900 40px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillText('KTS 인테리어 견적 (참고 계산)',40,940);
-  g.font='800 30px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#FFA24D';
-  g.fillText(((LAST&&LAST.space)||'')+' · '+wallLabel()+(q?(' · '+q.area.toLocaleString('ko-KR')+'㎡'):''),40,1002);
-  g.font='700 28px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#AFBDD0';
-  var y=1052;
+  g.fillStyle='#0A1128'; g.fillRect(0,PHH,W,BH);
+  g.fillStyle='#FF6B00'; g.fillRect(0,PHH,W,Math.round(W*0.005));
+  var k=W/1200; g.textBaseline='top'; g.fillStyle='#F3F6FA';
+  g.font='900 '+Math.round(40*k)+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillText('KTS 인테리어 견적 (참고 계산)',Math.round(36*k),PHH+Math.round(30*k));
+  g.font='800 '+Math.round(28*k)+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#FFA24D';
+  g.fillText(((LAST&&LAST.space)||'')+' · '+wallLabel()+(q?(' · '+q.area.toLocaleString('ko-KR')+'㎡'):''),Math.round(36*k),PHH+Math.round(86*k));
+  g.font='700 '+Math.round(26*k)+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#AFBDD0';
+  var y=PHH+Math.round(132*k);
   if(q){
-    g.fillText('① 직접 시공 '+won(q.c1)+'원   ② 분리·하청 '+won(q.c2)+'원   ③ 일괄 위임 '+won(q.c3)+'원',40,y); y+=44;
-    g.fillText('조명 '+(LAST.light||'안 함')+' · 가구 '+(LAST.furn||'안 함')+' · 공사 '+q.days+'일(1인)',40,y); y+=44;
+    g.fillText('① 직접 시공 '+won(q.c1)+'원   ② 분리·하청 '+won(q.c2)+'원   ③ 일괄 위임 '+won(q.c3)+'원',Math.round(36*k),y); y+=Math.round(40*k);
+    g.fillText('조명 '+(LAST.light||'안 함')+' · 가구 '+(LAST.furn||'안 함')+' · 공사 '+q.days+'일(1인)',Math.round(36*k),y); y+=Math.round(40*k);
   }
-  g.font='600 22px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#8FA0B8';
-  g.fillText('태수 님의 원클릭 · 이 화면은 참고 계산입니다. 실제 견적은 현장·업체에 따라 다릅니다.',40,y);
+  g.font='600 '+Math.round(21*k)+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif'; g.fillStyle='#8FA0B8';
+  g.fillText('태수 님의 원클릭 · 참고 계산입니다. 실제 견적은 현장·업체에 따라 다릅니다.',Math.round(36*k),y);
   return c;
 }
 $('#svScreen').addEventListener('click',function(){
   if(!sampleOk){toast('사진을 불러오지 못해 저장할 수 없습니다');return;}
-  var mw=matById(S.matWall), st=styleById(mw,S.styleWall);
   var d=new Date(), ymd=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
-  var nm='KTS_인테리어_'+((SCN[S.scene]||{}).nm||'')+'_'+(mw?mw.nm:'')+(st?'-'+st.nm:'')+'_'+ymd+'.png';
+  var nm='KTS_인테리어_'+((curScene()||{}).nm||'')+'_'+wallLabel(true).replace(/[\s·]/g,'-')+'_'+ymd+'.png';
   dlPNG(shotCanvas(),nm);
 });
 $('#prScreen').addEventListener('click',function(){
   var c=shotCanvas(), s=Math.min(1,1600/c.width), t=document.createElement('canvas'); t.width=Math.round(c.width*s); t.height=Math.round(c.height*s);
-  t.getContext('2d').drawImage(c,0,0,t.width,t.height);
-  printEst(t.toDataURL('image/jpeg',0.85));
+  t.getContext('2d').drawImage(c,0,0,t.width,t.height); printEst(t.toDataURL('image/jpeg',0.85));
 });
 
+/* ---------------- 결과 예시(201) ---------------- */
+function renderExamples(){
+  var list=SCENES.filter(function(s){return !!s.example;});
+  if(!list.length){$('#secEx').hidden=true;return;}
+  $('#exGrid').innerHTML=list.map(function(s){
+    var e=s.example;
+    return '<button type="button" class="excard" data-ex="'+s.id+'">'+
+      '<div class="expair">'+
+        '<figure><img src="'+e.cb+'" alt="'+s.nm+' 전" loading="lazy"><figcaption>전</figcaption></figure>'+
+        '<figure class="a"><img src="'+e.ca+'" alt="'+s.nm+' 후" loading="lazy"><figcaption>후</figcaption></figure>'+
+      '</div><div class="t"><b>'+e.title+'</b><small>'+s.nm+' · '+(e.note||'')+'</small></div></button>';
+  }).join('');
+}
+function openExample(sc){
+  if(!sc||!sc.example) return;
+  var e=sc.example;
+  $('#exBox').innerHTML='<h3>'+e.title+'</h3>'+
+    '<p class="cap2">같은 구도·같은 가구의 비포/애프터입니다. 아래는 인쇄·상세용 원본 PNG입니다.</p>'+
+    '<img src="'+e.before+'" alt="비포"><p class="cap2">시공 전</p>'+
+    '<img src="'+e.after+'" alt="애프터"><p class="cap2">시공 후</p>'+
+    '<p class="cap2">'+e.note+'</p>'+
+    '<div class="row"><button class="btn" type="button" id="exClose">닫기</button>'+
+    '<a class="btn p" href="'+e.after+'?print=1" target="_blank" rel="noopener">원본 크게 보기</a></div>'+
+    '<p class="cap2" style="margin-top:8px">※ 이 예시는 톤 기준을 보여 주는 <b>견본</b>이고, 손님이 올린 사진의 비포/애프터는 그 사진으로 따로 만듭니다.</p>';
+  $('#exModal').hidden=false;
+  $('#exClose').onclick=function(){$('#exModal').hidden=true;};
+}
+$('#exGrid').addEventListener('click',function(e){
+  var b=e.target.closest('[data-ex]'); if(!b) return;
+  openExample(scById(b.dataset.ex));
+});
+$('#exModal').addEventListener('click',function(e){ if(e.target.id==='exModal') $('#exModal').hidden=true; });
+
 /* ---------------- 시작 ---------------- */
-buildRates();
-syncGrades(); renderBar(); renderSelect(); calc(); paintCnt();
-loadRegions();
-/* 검수용 읽기 전용 훅 */
-window.__KTS_INTERIOR=function(){return {state:JSON.parse(JSON.stringify(S)),lvl:S.lvl,part:S.part,mat:JSON.parse(JSON.stringify(MAT)),
-  styleWall:S.styleWall,styleFloor:S.styleFloor,last:LAST,gauge:gS.pos(),photoGauge:gP.pos(),used:used(),unlocked:unlocked(),
-  photo:!!PH.img,wm:PH.wm,regions:REG_ST,sampleOk:sampleOk,photoReady:PHOTO_READY,
-  mats:mats().map(function(m){return {id:m.id,nm:m.nm,zone:m.zone,grade:m.grade,styles:stylesOf(m).map(function(s){return s.id+':'+s.nm+':'+s.mult;})};})};};
+function init(){
+  buildRates();
+  loadSel();
+  fetch('regions.json?v=20261125a',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+    if(!j||!j.scenes||!j.materials) throw 0;
+    REG=j; SCENES=j.scenes.slice().sort(function(a,b){return (a.order||0)-(b.order||0);}); MATS=j.materials; READY=true;
+  }).catch(function(){
+    REG=null; READY=false;
+    $('#sampleErr').hidden=false;
+  }).then(function(){
+    normSel();
+    if(!READY){ $('#stepBar').innerHTML='<p class="hint">자재 목록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.</p>'; return; }
+    renderSpaces(); renderStep(); renderExamples(); calc(); paintCnt();
+    redraw('mat');
+  });
+}
+init();
+window.__KTS_INTERIOR=function(){return {state:JSON.parse(JSON.stringify(S)),scene:(curScene()||{}).id,lvl:S.part,
+  mat:wallMat()?wallMat().id:null,styleWall:S.styleWall,styleFloor:S.styleFloor,last:LAST,gauge:gS.pos(),
+  used:used(),unlocked:unlocked(),photo:!!PH.img,wm:PH.wm,regions:READY?'ok':'fail',sampleOk:sampleOk,
+  mats:MATS.map(function(m){return {id:m.id,nm:m.nm,zone:m.zone,grade:m.grade,styles:stylesOf(m).map(function(s){return s.id+':'+s.nm+':'+s.mult;})};}),
+  scenes:SCENES.map(function(s){return {id:s.id,nm:s.nm,w:s.w,h:s.h,example:!!s.example};})};};
 })();
 </script>
 <script src="../helper.js?v=20261122a"></script>
