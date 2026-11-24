@@ -420,23 +420,14 @@
   var PHOTO_TAG = /^(IMG|CANVAS|VIDEO|PICTURE)$/;
   function overText() {
     if (!btn || btn.classList.contains('kh-guide')) return false;
-    var r = btn.getBoundingClientRect();
-    var x = r.left + r.width / 2, y = r.top + r.height / 2;
-    var list = [];
-    try { list = (d.elementsFromPoint ? d.elementsFromPoint(x, y) : []) || []; } catch (e) { list = []; }
-    for (var i = 0; i < list.length; i++) {
-      var el = list[i];
-      if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
-      if (el === d.body || el === d.documentElement) return false;
-      if (PHOTO_TAG.test((el.tagName || '').toUpperCase())) return true;   /* 사진 위 — 흐리게 */
-      var t = (el.textContent || '').replace(/\s+/g, '');
-      if (TEXT_RE.test(el.tagName) && t.length > 1) return true;
-      var st = w.getComputedStyle(el);
-      if (/url\(/i.test(st.backgroundImage || '')) return true;           /* 사진 타일 위 — 흐리게 */
-      if ((st.backgroundColor && st.backgroundColor !== 'rgba(0, 0, 0, 0)') || st.backgroundImage !== 'none') return false;   /* 카드·바탕이면 글자가 아니다 */
-      var par = el.parentElement;
-      if (par && TEXT_RE.test(par.tagName) && (par.textContent || '').replace(/\s+/g, '').length > 1) return true;
-      return false;
+    var r = btn.getBoundingClientRect(), bh = btn.offsetHeight || 38;
+    var xs = [r.left + 7, r.left + r.width / 2, r.right - 7];
+    var ys = [r.top + 6, r.top + bh / 2, r.bottom - 6];
+    for (var i = 0; i < xs.length; i++) {
+      for (var k = 0; k < ys.length; k++) {
+        var x = Math.min(w.innerWidth - 2, Math.max(2, xs[i])), y = Math.min(w.innerHeight - 2, Math.max(2, ys[k]));
+        if (pointPenalty(x, y) > 0) return true;      /* 글자·사진·버튼에 걸치면 흐리게 */
+      }
     }
     return false;
   }
@@ -497,20 +488,27 @@
     if (TEXT_RE.test(tg) && t.length > 0 && t.length <= 120) return 2;
     return 0;
   }
+  /* 211: 그 점에 가장 위로 깔린 것 하나만 본다 — 사진 3 · 제목/글자/버튼 2 · 카드 바탕 0 */
+  function pointPenalty(x, y) {
+    var list = [];
+    try { list = (d.elementsFromPoint ? d.elementsFromPoint(x, y) : []) || []; } catch (e) { list = []; }
+    for (var j = 0; j < list.length; j++) {
+      var el = list[j];
+      if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
+      if (el === d.body || el === d.documentElement) return 0;      /* 바탕까지 내려왔으면 깔린 것이 없다 */
+      return elPenalty(el);
+    }
+    return 0;
+  }
   function coverScore(top) {
     if (!btn) return 0;
     var r = btn.getBoundingClientRect(), bh = btn.offsetHeight || 38;
-    var x = Math.min(w.innerWidth - 2, Math.max(2, r.left + r.width / 2));
-    var pts = [top + 5, top + bh / 2, top + bh - 5], sum = 0;
-    for (var i = 0; i < pts.length; i++) {
-      var y = Math.min(w.innerHeight - 2, Math.max(2, pts[i])), list = [];
-      try { list = (d.elementsFromPoint ? d.elementsFromPoint(x, y) : []) || []; } catch (e) { list = []; }
-      for (var j = 0; j < list.length; j++) {
-        var el = list[j];
-        if (!el || el === btn || btn.contains(el) || el === root || (root && root.contains(el)) || el === q60 || (q60 && q60.contains(el))) continue;
-        if (el === d.body || el === d.documentElement) break;      /* 바탕까지 내려왔으면 깔린 것이 없다 */
-        sum += elPenalty(el);
-        break;                                                     /* 가장 위에 깔린 요소 하나만 */
+    var xs = [r.left + 7, r.left + r.width / 2, r.right - 7];
+    var ys = [top + 6, top + bh / 2, top + bh - 6], sum = 0;
+    for (var i = 0; i < xs.length; i++) {
+      for (var k = 0; k < ys.length; k++) {
+        var x = Math.min(w.innerWidth - 2, Math.max(2, xs[i])), y = Math.min(w.innerHeight - 2, Math.max(2, ys[k]));
+        sum += pointPenalty(x, y);
       }
     }
     return sum;
