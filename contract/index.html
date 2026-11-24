@@ -1051,6 +1051,8 @@ window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, s
     refresh();
   };
   refresh();
+  window.addEventListener('load', refresh);
+  setTimeout(refresh, 300); setTimeout(refresh, 1200);
 })();
 </script>
 </body></html>
