@@ -2462,9 +2462,9 @@ function renderInputs(){
     const v = VALS[f.label] == null ? '' : VALS[f.label];
     const hd = f.sec ? `<div class="sechd">${escH(f.sec)}</div>` : '';
     if (f.type === 'sign') return hd + `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
-    /* 날짜 묶음 — 달력 하나로 년·월·일 세 칸을 채운다 */
+    /* 날짜 묶음 — '년·월·일' 세 칸이 함께 있을 때만 달력 하나로 (한 칸짜리 '작성일'은 그대로) */
     const dp = datePart(f.label);
-    if (dp && (DATE_GROUPS[dp.base].y || DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
+    if (dp && DATE_GROUPS[dp.base] && DATE_GROUPS[dp.base].y && (DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
       if (done['d:' + dp.base]) return ''; done['d:' + dp.base] = 1;
       const g = DATE_GROUPS[dp.base], val = dateVal(dp.base);
       const parts = ['y', 'm', 'd'].filter(k2 => g[k2]).map(k2 => ({ y: '년', m: '월', d: '일' })[k2]).join(' · ');
