@@ -2987,8 +2987,19 @@ $('#keySave').onclick = () => { const k = $('#keyIn').value.trim(); if (!/^(AIza
 $('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catch(e){} $('#keyIn').value = ''; updKey(); toast('열쇠를 지웠습니다'); };
 
 /* ---------- ④ 미리보기(배경 + 값 얹기) ---------- */
+/* 명조 글꼴은 캔버스에서만 쓰므로, 그리기 전에 미리 받아 둔다(안 받으면 고딕으로 찍힘) */
+let OVFONT_P = null;
+function ensureOvFont(){
+  if (!OVFONT_P){
+    OVFONT_P = (document.fonts && document.fonts.load)
+      ? document.fonts.load('400 20px "KTSMyeongjo"').catch(() => {})
+      : Promise.resolve();
+  }
+  return OVFONT_P;
+}
 async function composite(maxW, pg){
   pg = pg || 1;
+  try{ await ensureOvFont(); }catch(e){}
   const IM = await tfBgImg(pg);
   const W = IM ? (IM.naturalWidth || IM.width) : bgW(), H = IM ? (IM.naturalHeight || IM.height) : bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
   const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
