@@ -149,6 +149,15 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 body.cv #cvPane{display:block}
 body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.cv .kux-flow,body.cv .kuxguide,body.cv .kux-morebar{display:none!important}
 #cvFrame{display:block;width:100%;border:0;background:#0A1128}
+.sealrow{display:flex;gap:8px;overflow-x:auto;padding:6px 0 2px}
+.sealit{position:relative;flex:0 0 auto;width:78px;padding:6px 4px;border-radius:12px;border:1px solid var(--line2);background:#fff;text-align:center}
+.sealit img{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto}
+.sealit em{display:block;font-style:normal;font-size:10.5px;font-weight:900;color:#33415C;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sealit.on{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.35)}
+.sealit .sdel{position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#DC2626;color:#fff;font-size:11px;font-weight:900;font-style:normal;display:grid;place-items:center;cursor:pointer}
+#valList input.has:not(:focus),#valList textarea.has:not(:focus){border-color:transparent;background:rgba(255,255,255,.035)}
+.fld.done{border-color:transparent;background:transparent}
+.fld.done .lbl2{position:absolute;left:2px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:900;color:#0B1A3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 </style>
 </head><body>
 <div id="app">
@@ -277,6 +286,22 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
   <p class="sub">파일은 이 기기 안에서 만들어집니다. 서버로 올라가지 않습니다.</p>
   <label class="lb">파일 이름</label>
   <input id="outName">
+  <div class="card" id="sealCard">
+   <h2><span class="n">✎</span>사인 · 도장 · 간인</h2>
+   <p class="sub">한 번 만든 사인·도장은 이 기기에 담아 두고 다시 꺼내 씁니다. 간인은 쪽과 쪽이 맞닿는 자리에 반씩 걸쳐 찍힙니다.</p>
+   <div class="row"><button class="btn sec sm" id="sealPhoto">도장 사진 올리기</button><button class="btn sec sm" id="sealName">이름 도장 만들기</button></div>
+   <input type="file" id="sealIn" accept="image/*" hidden>
+   <div id="sealBox" class="sealbox"></div>
+   <div id="sealPick" hidden>
+    <label class="lb">고른 도장을 어디에 찍을까요<em>서명 칸</em></label>
+    <div class="row" id="sealSlots"></div>
+    <p class="kv" id="sealNoSign" hidden>서명 칸이 없습니다 — [빈칸 지정]에서 [칸 추가] → 종류 [서명]으로 자리를 먼저 만들어 주세요.</p>
+   </div>
+   <label class="lb">간인 — 쪽 경계에 반씩<em>도장으로 찍습니다</em></label>
+   <div class="seg" id="ganSeg"><button type="button" data-cp="0">안 함</button><button type="button" data-cp="2">2부</button><button type="button" data-cp="3">3부</button></div>
+   <p class="kv" id="sealInfo">간인은 2쪽 이상 문서에서만 찍힙니다 · 2부·3부는 같은 자리에 되풀이해 찍습니다.</p>
+  </div>
+  <div class="row"><button class="btn pri" id="exPng">사진(PNG)으로 저장</button><button class="btn pri" id="exPdf">PDF 파일로 저장</button></div>
   <div class="flist">
    <button class="btn pri" id="exHwpx">한글 파일(.hwpx) 저장</button>
    <button class="btn pri" id="exXlsx">엑셀 파일(.xlsx) 저장</button>
@@ -329,6 +354,8 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
 <div id="printArea"></div>
 <script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
 <script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
+<script src="../shared/kts-handoff.js?v=20261124b"></script>
+<script src="../shared/kts-seal.js?v=20261124b"></script>
 <script>
 /* ===== 아래 엔진은 oneclick/converter.html 에서 그대로 가져온 복사본입니다(수정 금지·동기화 대상) ===== */
 const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
@@ -1730,9 +1757,17 @@ const bgH = () => BG ? (BG.naturalHeight || BG.height) : PH;
 const THEMES = [{id:'mono', nm:'흑백', c:'#FFFFFF'}, {id:'sky', nm:'하늘색', c:'#DCEAF7'}, {id:'green', nm:'연두색', c:'#DFF0D8'}, {id:'gray', nm:'회색', c:'#E6E8EB'}];
 function curTheme(){ const f = CUR || {}; if (!f.themes) return ''; return (f._theme && f.themes.indexOf(f._theme) >= 0) ? f._theme : (f.themes.indexOf(f.theme) >= 0 ? f.theme : (f.themes[1] || f.themes[0])); }
 function themed(base, th){ return (!base || !th || th === 'sky') ? base : base.replace(/\.png$/, '_' + th + '.png'); }
-function tfPageCount(){ return (CUR && CUR.bgUrls && CUR.bgUrls.length) ? CUR.bgUrls.length : 1; }
+function tfPageCount(){ return (CUR && CUR.bgUrls && CUR.bgUrls.length) ? CUR.bgUrls.length : Math.max(1, (CUR && +CUR.pages) || 1); }
 function tfBgBase(pg){ return (CUR.bgUrls && CUR.bgUrls[(pg || 1) - 1]) ? CUR.bgUrls[(pg || 1) - 1] : CUR.bgUrl; }
-async function tfBgImg(pg){ const base = tfBgBase(pg); if (!base) return BG; const im = await loadUrlImg(themed(base, curTheme())); return im || BG; }
+async function tfBgImg(pg){
+  const base = tfBgBase(pg);
+  if (!base){
+    /* 더뷰에서 넘어온 여러 장(188) — 2장부터는 이 기기 저장소에서 꺼낸다 */
+    if (pg && pg > 1 && CUR && CUR.id){ const d = await imgGet(CUR.id + ':' + pg); if (d) return await loadUrlImg(d); }
+    return BG;
+  }
+  const im = await loadUrlImg(themed(base, curTheme())); return im || BG;
+}
 let PENDING_THEME = '';
 
 /* ---------- ① 등록: 사진 → 자동 기울기·테두리 보정 ---------- */
@@ -1960,9 +1995,17 @@ function drawEditor(){
   st.classList.toggle('ro', ro());
   const c = document.createElement('canvas'); c.width = bgW(); c.height = bgH(); c.getContext('2d').drawImage(BG, 0, 0); st.appendChild(c);
   CUR.fields.forEach((f, i) => {
-    const d = document.createElement('div'); d.className = 'fld' + (i === SEL ? ' sel' : '') + ((f.type === 'erase' || f.erase) ? ' ez' : ''); d.dataset.i = i;
+    const d = document.createElement('div');
+    /* 169: 값이 들어간 칸은 테두리를 없애 종이에 인쇄된 것처럼 보여 준다 — 탭하면 박스가 돌아온다 */
+    const val = (f.type !== 'erase' && f.type !== 'sign') ? String(VALS[f.label] == null ? '' : VALS[f.label]) : '';
+    const done = !!val && i !== SEL;
+    d.className = 'fld' + (i === SEL ? ' sel' : '') + ((f.type === 'erase' || f.erase) ? ' ez' : '') + (done ? ' done' : '');
+    d.dataset.i = i;
     d.style.cssText = `left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%`;
-    d.innerHTML = (ro() && !f._add ? '' : `<span>${escH(f.type === 'erase' ? '지운 자리' : f.label + ' · ' + TYPE_NM[f.type])}</span>`) + '<i class="hd2"></i>' + (f._auto && !ro() ? `<button type="button" class="xauto" data-x="${i}" title="이 칸 지우기">✕</button>` : '');
+    const xa = (f._auto && !ro()) ? `<button type="button" class="xauto" data-x="${i}" title="이 칸 지우기">✕</button>` : '';
+    const tag = (ro() && !f._add) ? '' : `<span>${escH(f.type === 'erase' ? '지운 자리' : f.label + ' · ' + TYPE_NM[f.type])}</span>`;
+    d.innerHTML = done ? `<span class="lbl2">${escH(val)}</span>` + xa
+                       : tag + '<i class="hd2"></i>' + xa;
     st.appendChild(d);
   });
   /* 잘못 만든 칸을 누르면 박스 바로 위에 [삭제] 버튼이 즉시 뜬다 */
@@ -2190,15 +2233,18 @@ function runAutoDetect(){
   if (!CUR) return toast('먼저 양식을 열어 주세요');
   if (ro()) return toast('기본 양식은 이미 빈칸이 잡혀 있습니다 · 내 양식에서 쓰세요');
   if (!BG || BG instanceof HTMLCanvasElement) return toast('사진으로 등록한 양식에서 씁니다');
-  const b = $('#autoF'); b.disabled = true; b.textContent = '자동으로 찾는 중…';
+  const b = $('#autoF'); if (b.disabled) return;                       /* 168: 연타로 겹쳐 도는 것을 막는다 */
+  b.disabled = true; b.textContent = '자동으로 찾는 중…';
   setTimeout(() => {
     let r = null;
     try{ r = autoDetectFields(); }catch(e){ toast('자동으로 찾지 못했습니다'); }
-    b.disabled = false; b.textContent = '⚡ 1클릭 자동 빈칸';
+    b.disabled = false; b.textContent = '자동 빈칸 찾기';
     if (!r) return;
     window.TF_AUTO_LAST = {ms:r.ms, n:r.fields.length, SW:r.SW, SH:r.SH, nH:r.nH, nV:r.nV, kinds:r.kinds};
     if (!r.fields.length){ drawEditor(); return toast('찾은 빈칸이 없습니다 · 빈 곳을 눌러 손으로 찍어 주세요'); }
     snap();
+    /* 168: 다시 누르면 지난번 자동 칸은 지우고 새로 잡는다(겹침 방지). 손으로 만든 칸은 그대로 */
+    CUR.fields = CUR.fields.filter(f => !f._auto);
     let n = CUR.fields.filter(f => f.type !== 'erase').length;
     r.fields.forEach(f => CUR.fields.push({id:uid(), label:'칸' + (++n), type:'text', x:f.x, y:f.y, w:f.w, h:f.h, _auto:1}));
     SEL = -1; drawEditor();
@@ -2289,10 +2335,10 @@ function renderInputs(){
     const v = VALS[f.label] == null ? '' : VALS[f.label];
     const hd = f.sec ? `<div class="sechd">${escH(f.sec)}</div>` : '';
     if (f.type === 'sign') return hd + `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
-    if (f.multi) return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label><textarea data-f="${i}" rows="5" placeholder="여러 줄로 적으세요">${escH(v)}</textarea>`;
+    if (f.multi) return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label><textarea class="${v ? 'has' : ''}" data-f="${i}" rows="5" placeholder="여러 줄로 적으세요">${escH(v)}</textarea>`;
     const tp = f.type === 'date' ? 'date' : 'text', im = f.type === 'number' ? ' inputmode="decimal"' : '';
     const auto = CUR.calc && CUR.calc[f.label] ? '<em>자동 계산</em>' : '';
-    return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
+    return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" class="${v ? 'has' : ''}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
   }).join('');
   $('#valList').innerHTML = h;
   $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
@@ -2302,6 +2348,7 @@ $('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null)
 $('#valList').addEventListener('input', e => {
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
   VALS[f.label] = f.type === 'number' ? e.target.value.replace(/[^\d.-]/g, '') : e.target.value;
+  e.target.classList.toggle('has', !!e.target.value);
   runCalc(f.label); saveVals();
 });
 $('#valList').addEventListener('change', e => { const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i]; if (f.type === 'number') e.target.value = fmtNum(VALS[f.label]); });
@@ -2459,11 +2506,10 @@ $('#aiFind').onclick = async () => {
     const b64 = bgB64();
     const o = await gemini('이미지는 빈 종이 양식입니다. 사람이 값을 적어 넣어야 하는 빈칸을 모두 찾아 JSON만 출력하세요. 형식: {"fields":[{"label":"이름표(양식에 인쇄된 항목 이름)","type":"text|number|date|sign","box":[왼쪽%,위%,너비%,높이%]}]} 좌표는 이미지 전체 너비·높이를 100으로 본 값. 금액·수량은 number, 날짜는 date, 서명·인 자리는 sign.', b64);
     const add = (o.fields || []).filter(f => f && Array.isArray(f.box) && f.box.length === 4).map(f => ({id:uid(), label:String(f.label || '칸').slice(0, 30), type:TYPE_NM[f.type] ? f.type : 'text',
-      x:+f.box[0] || 0, y:+f.box[1] || 0, w:Math.max(3, +f.box[2] || 20), h:Math.max(1.5, +f.box[3] || 3)}));
-    if (add.length){ snap(); CUR.fields = CUR.fields.concat(add); }
-    busyOn('AI가 한글·엑셀용 문서 틀을 읽는 중…');
-    try{ const raw = await gemini(PROMPT, b64); if (raw && Array.isArray(raw.blocks)) CUR.raw = raw; }catch(e){}
-    drawEditor(); toast(`빈칸 ${add.length}개를 찾았습니다` + (CUR.raw ? ' · 문서 틀도 읽었습니다' : ''));
+      x:+f.box[0] || 0, y:+f.box[1] || 0, w:Math.max(3, +f.box[2] || 20), h:Math.max(1.5, +f.box[3] || 3), _auto:1}));
+    if (add.length){ snap(); CUR.fields = CUR.fields.filter(f => !f._auto).concat(add); }   /* 168: 다시 돌리면 지난 자동 칸은 지우고 새로 */
+    /* 168: 문서 틀 읽기(PROMPT)는 여기서 부르지 않는다 — 한글·엑셀 내보내기 때 한 번만(대기 시간 반으로) */
+    drawEditor(); toast(`빈칸 ${add.length}개를 찾았습니다`);
   }catch(e){ toast(aiErr(e)); }
   busyOff();
 };
@@ -2662,7 +2708,7 @@ $('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catc
 /* ---------- ④ 미리보기(배경 + 값 얹기) ---------- */
 async function composite(maxW, pg){
   pg = pg || 1;
-  const IM = (CUR.bgUrls || CUR.themes || CUR._theme) ? await tfBgImg(pg) : BG;
+  const IM = await tfBgImg(pg);
   const W = IM ? (IM.naturalWidth || IM.width) : bgW(), H = IM ? (IM.naturalHeight || IM.height) : bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
   const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
   const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
@@ -2699,6 +2745,12 @@ async function composite(maxW, pg){
       g.textAlign = cent ? 'center' : (f.type === 'number' ? 'right' : 'left');
       g.fillText(t, cent ? x + w / 2 : (f.type === 'number' ? x + w - pad : x + pad), y + h / 2);
     }
+  }
+  /* 188 간인 — 쪽과 쪽이 맞닿는 가장자리에 도장을 정확히 반씩 */
+  if (window.SEAL && SEAL.cp && SEAL.img){
+    const np = tfPageCount(), size = Math.round(cv.width * 18 / 210);
+    if (pg < np) KTSSeal.ganinHalf(g, SEAL.img, cv.width, cv.height, size, 'r');
+    if (pg > 1) KTSSeal.ganinHalf(g, SEAL.img, cv.width, cv.height, size, 'l');
   }
   return cv;
 }
@@ -2750,7 +2802,10 @@ function outBase(){ const d = new Date(), p = n => String(n).padStart(2, '0'); r
 function download(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
 async function doExport(kind){
   busyOn(kind === 'hwpx' ? '한글 파일을 만드는 중…' : '엑셀 파일을 만드는 중…');
-  try{ const b = await exportBlob(kind); const nm = outBase() + '.' + kind; download(b, nm); $('#exInfo').innerHTML = `<span class="dot"></span>${escH(nm)} 저장 (${Math.max(1, Math.round(b.size / 1024))}KB). 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`; toast('저장했습니다'); }
+  try{
+    /* 168: 문서 틀 읽기는 내보낼 때 한 번만 — AI 열쇠가 있을 때만 */
+    if (!CUR.raw && myKey()){ try{ busyOn('문서 틀을 읽는 중…'); const raw = await gemini(PROMPT, bgB64()); if (raw && Array.isArray(raw.blocks)) CUR.raw = raw; }catch(e){} }
+    const b = await exportBlob(kind); const nm = outBase() + '.' + kind; download(b, nm); $('#exInfo').innerHTML = `<span class="dot"></span>${escH(nm)} 저장 (${Math.max(1, Math.round(b.size / 1024))}KB). 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`; toast('저장했습니다'); }
   catch(e){ toast('파일을 만들지 못했습니다: ' + (e.message || '')); }
   busyOff();
 }
@@ -2789,6 +2844,7 @@ function go(n, noPush){
   if (n === 2) drawEditor();
   if (n === 3) renderInputs();
   if (n === 4) renderPreview();
+  if (n === 5 && window.sealBoxPaint) sealBoxPaint();
   if (n === 5 && !$('#outName').value) $('#outName').value = (CUR.name || '양식') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
   if (n === 1) renderList();
   window.scrollTo(0, 0);
@@ -2824,10 +2880,145 @@ $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').s
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGet(LS_Q, []); a.push(q); lsSet(LS_Q, a);
   $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
 
+/* ============================================================================
+   188 (2026-11-24) 사인 · 도장 · 간인
+   · 도장함은 공통 모듈 shared/kts-seal.js — 더싸인·계약서와 같은 도장을 쓴다.
+   · 서명 칸에 도장을 찍고, 쪽 경계에는 간인(2부·3부)을 반씩 걸쳐 찍는다.
+   ========================================================================== */
+var SEAL = {cur:null, img:null, cp:0};   /* cp: 0 = 간인 없음 · 2 = 2부 · 3 = 3부 */
+function sealSlots(){
+  return CUR ? CUR.fields.map(function(f, i){ return {f:f, i:i}; }).filter(function(x){ return x.f.type === 'sign'; }) : [];
+}
+function sealBoxPaint(){
+  var b = $('#sealBox'); if (!b) return;
+  var items = window.KTSSeal ? KTSSeal.box() : [];
+  b.innerHTML = items.length
+    ? '<div class="sealrow">' + items.map(function(x){
+        return '<button type="button" class="sealit' + (SEAL.cur && SEAL.cur.id === x.id ? ' on' : '') + '" data-seal="' + escH(x.id) + '">' +
+          '<img src="' + x.src + '" alt=""><em>' + escH(x.nm) + '</em>' +
+          '<i class="sdel" data-sealdel="' + escH(x.id) + '" role="button" aria-label="' + escH(x.nm) + ' 지우기">✕</i></button>';
+      }).join('') + '</div>'
+    : '<p class="kv">담긴 도장이 없습니다 — [도장 사진 올리기]나 [이름 도장 만들기]로 하나 만들어 두세요. 더싸인에서 만든 사인·도장도 여기 함께 나옵니다.</p>';
+  var pk = $('#sealPick'); if (pk) pk.hidden = !SEAL.cur;
+  var box = $('#sealSlots'); if (box){
+    var sg = sealSlots();
+    $('#sealNoSign').hidden = !!sg.length;
+    box.innerHTML = sg.map(function(x, k){ return '<button class="btn sec sm" type="button" data-slot="' + k + '">' + escH(x.f.label || ('서명' + (k + 1))) + '</button>'; }).join('');
+  }
+  var seg = $('#ganSeg');
+  if (seg) Array.prototype.forEach.call(seg.querySelectorAll('button'), function(bt){ bt.classList.toggle('on', (+bt.getAttribute('data-cp')) === (+SEAL.cp || 0)); });
+  var inf = $('#sealInfo');
+  if (inf) inf.textContent = (SEAL.cp ? ('간인 ' + SEAL.cp + '부 — 쪽마다 경계에 반씩 찍습니다. ') : '간인은 2쪽 이상 문서에서만 찍힙니다 · 2부·3부는 같은 자리에 되풀이해 찍습니다.');
+}
+async function sealPick(id){
+  var it = (window.KTSSeal ? KTSSeal.box() : []).filter(function(x){ return x.id === id; })[0];
+  if (!it) return;
+  SEAL.cur = it; SEAL.img = await KTSSeal.load(it.src);
+  sealBoxPaint();
+  toast('도장을 골랐습니다 · 찍을 자리를 누르세요');
+}
+function sealStampSlot(k){
+  var sg = sealSlots(), it = sg[k];
+  if (!it || !SEAL.cur) return;
+  VALS[it.f.label] = SEAL.cur.src; saveVals(); renderInputs();
+  if (STEP === 4) renderPreview();
+  toast('"' + (it.f.label || '서명') + '" 자리에 도장을 찍었습니다');
+}
+if ($('#sealBox')){
+  $('#sealBox').addEventListener('click', function(e){
+    var d = e.target.closest('[data-sealdel]');
+    if (d){ e.preventDefault(); e.stopPropagation(); var id = d.getAttribute('data-sealdel'); KTSSeal.remove(id);
+      if (SEAL.cur && SEAL.cur.id === id){ SEAL.cur = null; SEAL.img = null; } sealBoxPaint(); return; }
+    var b = e.target.closest('[data-seal]'); if (b) sealPick(b.getAttribute('data-seal'));
+  });
+  $('#sealSlots').addEventListener('click', function(e){ var b = e.target.closest('[data-slot]'); if (b) sealStampSlot(+b.getAttribute('data-slot')); });
+  $('#sealPhoto').onclick = function(){ $('#sealIn').click(); };
+  $('#sealIn').onchange = async function(e){
+    var fl = e.target.files && e.target.files[0]; e.target.value = ''; if (!fl) return;
+    busyOn('도장 바탕을 지우는 중…');
+    try{ var src = await KTSSeal.fromPhoto(fl); KTSSeal.save({nm:'도장 사진', src:src}); toast('도장을 담았습니다'); }
+    catch(err){ toast('도장 사진을 읽지 못했습니다'); }
+    busyOff(); sealBoxPaint();
+  };
+  $('#sealName').onclick = function(){
+    var nm = window.prompt('도장에 새길 이름 (2~4자)', '');
+    if (!nm) return;
+    KTSSeal.save({nm: nm.slice(0, 4), src: KTSSeal.fromName(nm, 'circle')});
+    sealBoxPaint(); toast('이름 도장을 만들었습니다 · 골라서 자리에 찍으세요');
+  };
+  $('#ganSeg').onclick = function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    SEAL.cp = +b.getAttribute('data-cp') || 0;
+    if (SEAL.cp && !SEAL.img) toast('먼저 간인에 쓸 도장을 골라 주세요');
+    if (SEAL.cp && tfPageCount() < 2) toast('이 문서는 1쪽입니다 — 간인은 2쪽 이상에서 찍힙니다');
+    sealBoxPaint(); if (STEP === 4) renderPreview();
+  };
+}
+/* 사진(PNG) 저장 · PDF 파일 저장 — 부수(2부·3부)만큼 되풀이 */
+async function tfJpegPages(){
+  var n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), out = [];
+  for (var c = 0; c < cp; c++) for (var p = 1; p <= n; p++){
+    var cv = await composite(1600, p);
+    out.push({ dataUrl: cv.toDataURL('image/jpeg', 0.92), p: p, c: c + 1 });
+  }
+  return out;
+}
+$('#exPdf').onclick = async function(){
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  busyOn('PDF를 만드는 중…');
+  try{
+    var pages = await tfJpegPages();
+    var blob = await KTSSeal.pdf(pages.map(function(x){ return { dataUrl: x.dataUrl }; }));
+    var nm = outBase() + '.pdf';
+    download(blob, nm);
+    busyOff(); toast('PDF를 저장했습니다');
+    $('#exInfo').innerHTML = '<span class="dot"></span>' + escH(nm) + ' 저장 (' + Math.max(1, Math.round(blob.size / 1024)) + 'KB · ' + pages.length + '쪽)';
+  }catch(e){ busyOff(); console.warn('pdf fail', e); toast('PDF를 만들지 못했습니다'); }
+};
+$('#exPng').onclick = async function(){
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  busyOn('사진으로 만드는 중…');
+  try{
+    var n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), base = outBase(), k = 0;
+    for (var c = 1; c <= cp; c++) for (var p = 1; p <= n; p++){
+      var cv = await composite(1600, p);
+      var blob = await new Promise(function(r){ cv.toBlob(r, 'image/png'); });
+      download(blob, base + (cp > 1 ? '_' + c + '부' : '') + (n > 1 ? '_' + p + 'p' : '') + '.png');
+      k++; await new Promise(function(r){ setTimeout(r, 300); });
+    }
+    busyOff(); toast(k + '장을 사진으로 저장했습니다');
+    $('#exInfo').innerHTML = '<span class="dot"></span>' + escH(base) + ' 사진 ' + k + '장 저장';
+  }catch(e){ busyOff(); toast('사진으로 저장하지 못했습니다'); }
+};
+sealBoxPaint();
+
 /* 시험·설명서용 손잡이 */
 window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, onPhoto, addField, addErase, undo, redo, saveCurrent, myForms, BUILT, mapRecord, personFamily, fieldKind, personOptions,
   get CUR(){ return CUR; }, get VALS(){ return VALS; }, set VALS(v){ VALS = v; }, get SEL(){ return SEL; }, set SEL(v){ SEL = v; }, get UNDO(){ return UNDO; }, drawEditor, runCalc, saveVals, renderInputs,
-  autoDetectFields, runAutoDetect, nextField, prevField, navIdx, savePreset, loadPreset, myPresets, get BG(){ return BG; }, set BG(v){ BG = v; }, set CUR(v){ CUR = v; }};
+  autoDetectFields, runAutoDetect, nextField, prevField, navIdx, savePreset, loadPreset, myPresets, get BG(){ return BG; }, set BG(v){ BG = v; }, set CUR(v){ CUR = v; }, sealBoxPaint,
+  get SEAL(){ return SEAL; }};
+
+/* ============================================================================
+   188 (2026-11-24) 더뷰 → 더양식 — "더양식에서 편집하기"로 넘어온 문서를 그 자리에서 연다
+   그림은 이 브라우저 저장소(IndexedDB)에서 꺼내고, 꺼낸 즉시 지운다.
+   ========================================================================== */
+(async function fromViewer(){
+  if (!/[?&]from=viewer/.test(location.search)) return;
+  if (!window.KTSHandoff) return;
+  busyOn('더뷰에서 보낸 문서를 받는 중…');
+  try{
+    const h = await KTSHandoff.take();
+    if (!h || !h.pages || !h.pages.length){ busyOff(); toast('넘어온 문서가 없습니다 · 더뷰에서 [더양식에서 편집하기]를 다시 눌러 주세요'); return; }
+    const pages = h.pages.slice(0, 20), id = uid();
+    await imgPut(id, pages[0]);
+    for (let p = 2; p <= pages.length; p++) await imgPut(id + ':' + p, pages[p - 1]);
+    const f = {id: id, name: String(h.name || '더뷰 문서').slice(0, 30) + ' (더뷰)', fields: [], pages: pages.length, fromViewer: 1};
+    const list = myForms(); list.unshift(f); saveMyForms(list);
+    await openForm(id, 2);
+    busyOff();
+    toast('더뷰에서 ' + pages.length + '쪽을 받았습니다 · [자동 빈칸 찾기]를 눌러 칸을 잡으세요');
+  }catch(e){ busyOff(); console.warn('from viewer fail', e); toast('더뷰 문서를 열지 못했습니다 · 더뷰에서 [PDF 저장] 후 [양식 사진 찍기]로 올려 주세요'); }
+})();
 updKey(); go(1);
 </script>
 

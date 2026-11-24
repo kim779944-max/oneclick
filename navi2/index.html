@@ -381,9 +381,9 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
 <script src="js/data.subs.js?v=8"></script>
 <script src="js/data.pool.js?v=3"></script>
 <script src="js/data.pool.v3.js?v=1"></script>
-<script src="js/data.voice.js?v=1"></script>
-<script src="js/data.fate.js?v=2"></script>
-<script src="js/engine.js?v=9"></script>
+<script src="js/data.voice.js?v=2"></script>
+<script src="js/data.fate.js?v=3"></script>
+<script src="js/engine.js?v=10"></script>
 <script>
 (function(){
   var $ = function(s){ return document.querySelector(s); };
@@ -844,8 +844,9 @@ h2{font-size:20px;line-height:1.4;letter-spacing:-.8px;margin:8px 0 0;font-weigh
     var r = ST.res, v = r.view;
     return '독심술 · ' + r.modeNm + '\n'
       + r.cardName + ' (제' + r.tno + ' / 64 유형)\n'
-      + '① ' + v.teaser + '\n'
-      + '② ' + (v.inner || v.read) + '\n'
+      + v.teaser + '\n'
+      + (v.ex ? v.ex + '\n' : '')
+      + (v.inner && v.inner !== v.teaser ? v.inner + '\n' : '')
       + '→ ' + shareUrl() + '\n'
       + '— 그림 16장 · ' + APP.TOTAL + '문항 1분: ' + SHOP;
   }

@@ -613,6 +613,25 @@ function dealHTML(r){
 }
 function isMember(){ var m=store(MEM_KEY); return !!(m&&m.phone); }
 
+/* ---------- 176 (2026-11-24) 조합·기사·공식 출처 — 확인된 것만 쓰고, 나머지는 검색으로 연결 ---------- */
+function zoneName(r){
+  var n = String(r.n || '').replace(/\s*(주택)?(재건축|재개발|도시정비|정비사업)\s*(정비사업)?\s*$/,'').replace(/\s*(조합|추진위원회)\s*$/,'').trim();
+  return n || String(r.n || '');
+}
+function civicLinks(r){
+  var z = zoneName(r), q = encodeURIComponent(z);
+  var role = r.im || r.os || '';
+  var tel = r.tel ? ' · <b>' + esc(r.tel) + '</b>' : '';
+  var roleLine = (role || r.tel)
+    ? '<div class="note"><b>지금 단계 주체</b> ' + (role ? esc(role) : '공개 자료에 미기재') + tel +
+      '<br>조합·추진위 <b>이름·연락처</b>는 공개 자료에 있는 것만 적습니다. 비어 있으면 아래 사업장 원문에서 확인하세요.</div>'
+    : '<div class="note"><b>조합·추진위 이름과 연락처는 공개 자료에 없습니다.</b> 아래 사업장 원문이나 기사 검색으로 바로 확인하세요.</div>';
+  return roleLine +
+    '<a href="https://search.naver.com/search.naver?where=news&amp;sort=1&amp;query=' + q + '" target="_blank" rel="noopener"><i>📰</i>「' + esc(z.slice(0, 16)) + '」 관련 기사<em>네이버 뉴스 실시간</em></a>' +
+    '<a href="https://search.naver.com/search.naver?where=article&amp;query=' + encodeURIComponent(z + ' 조합 추진위') + '" target="_blank" rel="noopener"><i>💬</i>카페·블로그 — 조합·추진위 소식<em>검색</em></a>' +
+    '<a href="https://www.eum.go.kr/web/ar/lu/luLandDetailPop.jsp" target="_blank" rel="noopener"><i>🗺</i>토지이움 — 용도지역·공부 확인<em>국가 공식</em></a>';
+}
+
 function sheetHTML(r){
   if(r.__tab==='moa') return moaSheetHTML(r);
   var t=r.__tab, tags='';
@@ -670,7 +689,7 @@ function sheetHTML(r){
     '</div>'+
     dealHTML(r)+
     alertHTML(r)+
-    '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+srcLinks+'</div>'+
+    '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+srcLinks+civicLinks(r)+'</div>'+
       '<div class="note"><b>도면</b> 정비구역 도면·고시문은 정보몽땅 원문의 공개자료에서 내려받습니다. (공개자료가 없는 구역은 구청 도시정비과로 문의)<br><b>기준일</b> '+(r.__tab==='seoul'?'서울 26.6 (정보몽땅은 수시 갱신)':r.__tab==='gyeonggi'?'경기 25.9 — 원본이 2025-09-30 기준이라 최근 1년 변경분이 빠져 있습니다':'전국 26.5 — 연 1회 갱신')+'<br>공개 데이터를 그대로 모은 참고 자료이며 <b>법적 효력이 없습니다.</b></div>'+
     '</div>'+
     '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
@@ -720,7 +739,7 @@ function moaSheetHTML(r){
     '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+
       (r.lk?'<a href="'+esc(r.lk)+'" target="_blank" rel="noopener"><i>📄</i>서울시 모아타운 아카이브 원문<em>변경 전·후 도면</em></a>':'')+
       '<a href="https://news.seoul.go.kr/citybuild/moa-housing-town/archive" target="_blank" rel="noopener"><i>📚</i>모아주택·모아타운 아카이브 전체<em>권역별</em></a>'+
-      '<a href="https://housing.seoul.go.kr/site/main/content/sh_080003" target="_blank" rel="noopener"><i>🏠</i>서울주거포털 모아주택·모아타운<em>정책·현황</em></a></div>'+
+      '<a href="https://housing.seoul.go.kr/site/main/content/sh_080003" target="_blank" rel="noopener"><i>🏠</i>서울주거포털 모아주택·모아타운<em>정책·현황</em></a>'+civicLinks(r)+'</div>'+
       '<div class="note"><b>기준일</b> 서울시 온라인 아카이브(관리계획 승인·고시분) · 26.11 수집<br>아카이브에 없는 대상지(선정·계획 수립 중)는 이 화면에 없습니다. 공개 자료를 모은 <b>참고용</b>이고 법적 효력은 없습니다.</div></div>'+
     '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
   '</div>';

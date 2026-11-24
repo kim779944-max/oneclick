@@ -198,16 +198,18 @@
       return { lv:k.lv, l:k.l, p:k.p || '', t:k.t };
     });
 
-    /* 153번: ① 문항에서 직접 물어본 영역의 단정 한 줄 + ② 반전 한 줄 (뜻풀이 없음) */
+    /* 153번: ① 문항에서 직접 물어본 영역의 단정 한 줄 + ② 그 결의 생활 예시 한 줄(EX)
+       겉/속 반전(TURN)은 화면에 내보내지 않는다 — 두 줄로 끝낸다(188). */
     var V = NAV.VOICE || { DECL:{}, TURN:{} };
     var secAxis = sc.rank[1] && sc.rank[1].v > 0 ? sc.rank[1].t : OPP[primary];
-    var turn = (V.TURN[primary] || {})[groupOf(secAxis)] || '';
+    var turn = '';
+    var exLine = ((NAV.EX || {})[primary] || {})[groupOf(secAxis)] || '';
     var ordered = picks.slice().sort(function(a, b){ return (a.lv - b.lv) || 0; });
     var mainPick = ordered.filter(function(k){ return k.t === primary && k.s; })[0] || null;
     var subj = isSelf ? '당신은 ' : '그 사람은 ';
     var decl = String(V.DECL[primary] || '').replace(/^당신은 /, subj);
     var said = mainPick ? subj + mainPick.s : decl;
-    var declare = (said + ' ' + turn).trim();
+    var declare = said;
     var more = [], usedLv = {};
     if (mainPick) usedLv[mainPick.lv] = 1;
     ordered.filter(function(k){ return k.s && k !== mainPick && (k.t === secAxis || k.t2 === primary); })
@@ -247,7 +249,7 @@
     view.turn = turn;
     view.inner = voiceInner || decl;
     view.read = '';
-    view.ex = '';
+    view.ex = exLine;
     if (!isSelf){
       view.keep = card.rel[mode].keep;
       view.avoid = card.rel[mode].avoid;

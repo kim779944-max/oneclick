@@ -35,7 +35,7 @@ header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg,var(--
 .hd .kbtn,.hd .mkey{flex:0 0 auto;font-family:inherit;font-size:11px;font-weight:900;border-radius:999px;padding:6px 10px;cursor:pointer;
   border:1px solid rgba(255,107,0,.5);background:rgba(255,107,0,.1);color:#FFA24D;white-space:nowrap}
 .hd .mkey{width:30px;height:30px;padding:0;border-radius:9px;background:rgba(255,255,255,.03);border-color:var(--line2);color:#9DAEC5;font-size:13px}
-.hd .mkey.on{width:auto;padding:0 8px;font-size:9px;letter-spacing:.06em;color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber)}
+.hd .mkey.on{width:auto;padding:0 8px;font-size:10.5px;letter-spacing:-.2px;color:var(--on);background:linear-gradient(180deg,#FF8A2B,var(--amber));border-color:var(--amber);white-space:nowrap}
 .hd a.tel{flex:0 0 auto;font-size:11px;font-weight:800;color:#C7D3E3;text-decoration:none;border:1px solid var(--line2);
   border-radius:999px;padding:6px 9px;background:rgba(255,255,255,.03);white-space:nowrap}
 
@@ -268,6 +268,25 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 .sec .empty button{margin-top:8px;min-height:44px;padding:0 14px;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer;border-radius:10px;
   border:1px solid var(--k-accent);background:rgba(255,107,0,.1);color:var(--k-tog-on)}
 @media (max-width:400px){.hd .ebtn{padding:0 8px;font-size:11.5px}}
+
+/* ===== 185 (2026-11-24): 부동산 구역 — 아이콘 중심 정사각 타일 ===== */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tl{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;aspect-ratio:1/1;
+  min-height:104px;padding:8px 5px;font-family:inherit;color:var(--k-ink);cursor:pointer;text-align:center;
+  background:var(--k-panel);border:1px solid var(--k-line);border-radius:16px;overflow:hidden}
+.tl:active{border-color:var(--k-accent)}
+.tl.soon{opacity:.55;filter:grayscale(.3);cursor:default}
+.tl .ti{position:relative;display:grid;place-items:center;width:56%;max-width:74px;aspect-ratio:1/1;border-radius:14px;overflow:hidden;
+  background:var(--k-panel-2);border:1px solid var(--k-line-2)}
+.tl .ti img{width:100%;height:100%;object-fit:cover;display:block}
+.tl .ti b{font-size:24px;color:var(--k-accent);line-height:1}
+.tl .tn{display:block;width:100%;font-size:11px;font-weight:900;line-height:1.18;letter-spacing:-.4px;
+  word-break:keep-all;overflow-wrap:anywhere;white-space:normal}
+.tl .tbd,.tl .tbox{position:absolute;font-style:normal;font-size:10px;font-weight:900;line-height:1.35;border-radius:999px;padding:1px 5px;letter-spacing:-.2px}
+.tl .tbd{top:2px;right:2px;color:#0A1224;background:linear-gradient(90deg,#FF8A2B,#FFA24D)}
+.tl .tbd.soon{background:#FCD34D}
+.tl .tbox{bottom:2px;left:2px;color:#0B2C1B;background:#4ADE80}
+@media (min-width:480px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 <link rel="stylesheet" href="shared/kts-print.css?v=20261124a">
 <script src="shared/kts-ui.js?v=20261124a" defer></script>
@@ -400,21 +419,26 @@ window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
 var LOCAL = {
   thescan:{nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', ico:'▣', badge:'NEW'},
   theeraser:{nm:'더지우개', sub:'사진 글씨·얼룩 지우기', link:'theeraser/', ico:'⌫', badge:'NEW'},
-  seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'}
+  seller:{nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', ico:'▦', badge:'NEW'},
+  homepage:{nm:'홈페이지', sub:'사장님 단독 홈페이지 — 준비 중', link:'', ico:'🌐', badge:'', status:'soon'}
 };
 /* 2026-11-23 쇼룸 제외: 답글생성기 ad_magnet(내부용 · 165) · 번개알바 bungee_*(별도 플랫폼 · 156) — 폴더는 그대로 */
 var UNIT = {theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:'장', theeraser:'장',
   seller:'회', commerce:'회', keyword:'회'};
 
 /* 마인드맵(2026-11-23 확정 · 쓰는 순서 축)과 1:1 — K0612766940K-/output/서비스_마인드맵_20261123/쇼룸_버튼구조.md */
+/* 2026-11-24 대표님 최종 분류표(188번) — 01 부동산 중개 · 02 부동산 2 · 03 사업장 · 04 생활기록 (+준비 중 선반) */
 var GROUPS = [
-  {no:'01', cat:'realty', t:'부동산·중개', s:'경사도 → 매물수집 → 매물장 → 물건 포스터', ks:['slope','realty','listing','redev','exchange']},
-  {no:'02', cat:'biz',    t:'사업자·매장', s:'상품·판매·자금·인테리어',                    ks:['thedetail','seller','commerce','keyword','sale','gagebu','tongyeok','loan','interior']},
-  {no:'03', cat:'doc',    t:'서류·계약',   s:'스캔 → 열람 → 양식 → 서명 → 계약',            ks:['thescan','viewer','theform','theeraser','sign','contract']},
-  {no:'04', cat:'life',   t:'생활·기록',   s:'정리·사진·휴대폰·취미',                       ks:['organizer','saycap','navi','hogang','golf','petmind']},
-  {no:'05', cat:'soon',   t:'준비 중',     s:'나오면 맨 위에 알려 드립니다 (보기만)',        ks:['append','youtube','travel']}
+  {no:'01', cat:'realty',  t:'부동산 중개', s:'더뷰 → 더양식 → 계약서 → 매물 → 재개발',       ks:['viewer','theform','contract','realty','listing','redev','sign']},
+  {no:'02', cat:'realty2', t:'부동산 2',    s:'경사도 토지정보 · 교환급매물',                 ks:['slope','exchange']},
+  {no:'03', cat:'biz',     t:'사업장',      s:'상품·판매·자금·인테리어',                      ks:['thedetail','seller','commerce','keyword','sale','gagebu','loan','interior','homepage','thescan','theeraser']},
+  {no:'04', cat:'life',    t:'생활기록',    s:'정리·사진·휴대폰·취미',                        ks:['organizer','saycap','navi','hogang','golf','petmind','tongyeok']},
+  {no:'05', cat:'soon',    t:'준비 중',     s:'나오면 맨 위에 알려 드립니다 (보기만)',        ks:['append','youtube','travel']}
 ];
-var CHIPS = [{c:'all', t:'전체'},{c:'realty', t:'부동산·중개'},{c:'biz', t:'사업자·매장'},{c:'doc', t:'서류·계약'},{c:'life', t:'생활·기록'},{c:'soon', t:'준비 중'}];
+var CHIPS = [{c:'all', t:'전체'},{c:'realty', t:'부동산 중개'},{c:'realty2', t:'부동산 2'},{c:'biz', t:'사업장'},{c:'life', t:'생활기록'},{c:'soon', t:'준비 중'}];
+/* 185: 부동산 구역은 아이콘 중심 정사각 타일 — 타일 이름은 390px 에서 잘리지 않는 짧은 이름 */
+var TILE_NM = {viewer:'더뷰', theform:'더양식', contract:'계약서', realty:'매물수집기', listing:'매물장 뷰어', redev:'재개발 조회', sign:'더싸인', slope:'경사도·토지정보', exchange:'교환급매물'};
+var TILE_CAT = {realty:1, realty2:1};
 var CHIP_KEY = 'kts_cat_chip';
 /* 대표 3종 — 강조용 복제(목록 완전성 검사에서 제외) */
 var FEATURED = [
@@ -429,7 +453,7 @@ function byK(k){
   if (p) return {k:k, nm:String(p.nm).split(' — ')[0], sub:p.sub||'', link:p.link||('detail.html?k='+k),
                  icon:p.icon||'', badge:p.badge||'', cat:p.cat||'', status:p.status||'live', price:p.price||''};
   var e = LOCAL[k];
-  if (e) return {k:k, nm:e.nm, sub:e.sub, link:e.link, icon:e.icon||'', ico:e.ico||'', badge:e.badge||'', status:'live', price:'', local:true};
+  if (e) return {k:k, nm:e.nm, sub:e.sub, link:e.link, icon:e.icon||'', ico:e.ico||'', badge:e.badge||'', status:(e.status||'live'), price:'', local:true};
   return {k:k, nm:k, sub:'', link:'', icon:'', ico:'·', badge:'', status:'soon', price:''};
 }
 function limLine(k){
@@ -460,36 +484,47 @@ function groupKs(g, menu){
              .sort(function(a, b){ return (pos[a] == null ? 1e6 : pos[a]) - (pos[b] == null ? 1e6 : pos[b]); });
 }
 
+/* 185: 부동산 구역 타일 하나 — 큰 아이콘 + 아래 이름(390px 에서 말줄임·잘림 0) */
+function tileOf(k){
+  var t = byK(k);
+  var soon = (t.status==='soon') || !t.link;
+  var nm = TILE_NM[k] || String(t.nm).split(' — ')[0];
+  var mine = (!soon && window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<i class="tbox">내 박스</i>' : '';
+  var bd = soon ? '<i class="tbd soon">준비중</i>' : (t.badge ? '<i class="tbd">' + t.badge + '</i>' : '');
+  var icon = '<span class="ti">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : '<b>' + (t.ico || '·') + '</b>') + bd + mine + '</span>';
+  return soon
+    ? '<button type="button" class="tl soon" data-k="' + k + '" disabled aria-disabled="true">' + icon + '<span class="tn">' + nm + '</span></button>'
+    : '<button type="button" class="tl" data-k="' + k + '" data-open="' + k + '" aria-label="' + nm + ' 열기">' + icon + '<span class="tn">' + nm + '</span></button>';
+}
+function rowOf(k){
+  var t = byK(k);
+  var soon = (t.status==='soon') || !t.link;
+  var mine = (!soon && window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
+  var bd = soon ? '<span class="bd soon">준비 중</span>'
+                : (t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '');
+  var lim = soon ? '' : limLine(k);
+  var inner = '<div class="nm"><span>' + t.nm + '</span>' + bd + '</div>' +
+      '<div class="sub">' + (t.sub || '') + '</div>' + lim;
+  var main = soon ? '<div class="main" role="presentation">' + inner + '</div>'
+           : (t.local ? '<div class="main" data-open="' + k + '" style="cursor:pointer">' + inner + '</div>'
+                      : '<a class="main" href="detail.html?k=' + encodeURIComponent(k) + '">' + inner + '</a>');
+  return '<div class="row' + (soon ? ' soon' : '') + '" data-k="' + k + '"' + (soon ? ' aria-disabled="true"' : '') + '>' +
+    '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
+    main +
+    '<div class="act">' + mine +
+      (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
+            : '<button class="go" type="button" data-open="' + k + '">열기</button>') +
+    '</div></div>';
+}
 function render(){
   var html = '', menu = menuNow();
   GROUPS.forEach(function(g){
-    var rows = '';
-    var ks = groupKs(g, menu);
-    if (!ks.length) rows = '<p class="empty">이 구역 도구를 모두 뺐습니다.<br>[편집] → [+ 추가하기]로 다시 꺼낼 수 있습니다.<br><button type="button" data-edit>편집 열기</button></p>';
-    ks.forEach(function(k){
-      var t = byK(k);
-      var soon = (t.status==='soon') || !t.link;
-      var mine = (!soon && window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<div class="mine">내 박스</div>' : '';
-      /* 준비 중: '준비 중' 배지만(NEW·무료 배지 없음) */
-      var bd = soon ? '<span class="bd soon">준비 중</span>'
-                    : (t.badge ? '<span class="bd ' + (BADGE[t.badge]||'new') + '">' + t.badge + '</span>' : '');
-      var lim = soon ? '' : limLine(k);
-      var inner = '<div class="nm"><span>' + t.nm + '</span>' + bd + '</div>' +
-          '<div class="sub">' + (t.sub || '') + '</div>' + lim;
-      /* 151: 준비 중 = 보이기만(링크·tabindex·클릭 0) · 상세 페이지가 없는 LOCAL = [열기]와 같은 동작 */
-      var main = soon ? '<div class="main" role="presentation">' + inner + '</div>'
-               : (t.local ? '<div class="main" data-open="' + k + '" style="cursor:pointer">' + inner + '</div>'
-                          : '<a class="main" href="detail.html?k=' + encodeURIComponent(k) + '">' + inner + '</a>');
-      rows += '<div class="row' + (soon ? ' soon' : '') + '" data-k="' + k + '"' + (soon ? ' aria-disabled="true"' : '') + '>' +
-        '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
-        main +
-        '<div class="act">' + mine +
-          (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
-                : '<button class="go" type="button" data-open="' + k + '">열기</button>') +
-        '</div></div>';
-    });
+    var ks = groupKs(g, menu), body = '';
+    if (!ks.length) body = '<p class="empty">이 구역 도구를 모두 뺐습니다.<br>[편집] → [+ 추가하기]로 다시 꺼낼 수 있습니다.<br><button type="button" data-edit>편집 열기</button></p>';
+    else if (TILE_CAT[g.cat]) body = '<div class="tiles">' + ks.map(tileOf).join('') + '</div>';
+    else body = '<div class="rows">' + ks.map(rowOf).join('') + '</div>';
     html += '<section class="sec" id="sec' + g.no + '" data-cat="' + g.cat + '"><div class="secH"><span class="no">' + g.no + '</span><h2>' + g.t + '</h2><p>' + g.s + '</p></div>' +
-      '<div class="rows">' + rows + '</div></section>';
+      body + '</section>';
   });
   $('#sections').innerHTML = html;
   renderGates(menu);
@@ -713,25 +748,32 @@ function masterGrid(){
       setTimeout(function(){ toastMsg('마스터 모드 — 열쇠·잠금 없이 전부 열립니다'); }, 60);
     }
   }catch(e){}
+  /* 182: 마스터 PIN 이 저장된 기기라도 첫 화면은 손님과 같다 — 마스터 박스는 [마스터] 를 눌러야 펼친다 */
+  var MST_OPEN = false;
   function paint(){
     var on = !!(window.KTS && window.KTS.isMaster());
-    mst.hidden = !on; key.classList.toggle('on', on);
-    key.textContent = on ? 'MASTER' : '⚙';
-    key.setAttribute('aria-label', on ? '마스터 모드 사용 중 — 눌러 해제' : '대표님 마스터 모드 열기');
+    mst.hidden = !(on && MST_OPEN); key.classList.toggle('on', on);
+    key.textContent = on ? (MST_OPEN ? '닫기' : '마스터') : '⚙';
+    key.setAttribute('aria-expanded', (on && MST_OPEN) ? 'true' : 'false');
+    key.setAttribute('aria-label', on ? (MST_OPEN ? '마스터 메뉴 접기' : '마스터 메뉴 열기 — 대표님 전용') : '대표님 마스터 모드 열기');
     if (on) masterGrid();
   }
   function closeSheet(){ sheet.hidden = true; scrim.hidden = true; }
   key.onclick = function(){
-    if (window.KTS && window.KTS.isMaster()){ window.KTS.clearMaster(); paint(); toastMsg('마스터 모드를 껐습니다'); return; }
+    if (window.KTS && window.KTS.isMaster()){
+      MST_OPEN = !MST_OPEN; paint();
+      if (MST_OPEN) { try{ mst.scrollIntoView({block:'nearest', behavior:'smooth'}); }catch(e){} }
+      return;
+    }
     err.hidden = true; pin.value=''; sheet.hidden=false; scrim.hidden=false; setTimeout(function(){ pin.focus(); },60);
   };
   $('#mCancel').onclick = closeSheet; scrim.onclick = closeSheet;
   $('#mGo').onclick = function(){
-    if (window.KTS && window.KTS.setMaster(pin.value)){ closeSheet(); paint(); toastMsg('마스터 모드 — 열쇠·잠금 없이 전부 열립니다'); }
+    if (window.KTS && window.KTS.setMaster(pin.value)){ closeSheet(); MST_OPEN = true; paint(); toastMsg('마스터 모드 — 열쇠·잠금 없이 전부 열립니다'); }
     else { err.hidden=false; pin.value=''; pin.focus(); }
   };
   pin.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); $('#mGo').click(); } });
-  $('#mstOff').onclick = function(){ window.KTS.clearMaster(); paint(); toastMsg('마스터 모드를 껐습니다'); };
+  $('#mstOff').onclick = function(){ window.KTS.clearMaster(); MST_OPEN = false; paint(); toastMsg('마스터 모드를 껐습니다'); };
   document.addEventListener('kts:master', function(){ try{ paint(); render(); }catch(e){} });
   paint();
 })();
@@ -746,8 +788,13 @@ try {
 
 document.body.setAttribute('data-gate', 'home');
 render();
-/* 첫 화면 = 5대 대문. 주소가 #cat-… 이면 그 구역(새로고침 유지) · #coupon(다른 도구의 이용권 링크)이면 이용권까지 펼쳐 내려감 */
-showGate(gateFromHash(), false);
+/* 첫 화면 = 5대 대문. 주소가 #cat-… 이면 그 구역(새로고침 유지) · ?g=realty|realty2|biz|life|soon 이면 그 구역(184 — 경사도 결과 하단 링크) · #coupon 이면 이용권까지 펼쳐 내려감 */
+function gateFromQuery(){
+  var g = ''; try{ g = String(new URLSearchParams(location.search).get('g') || ''); }catch(e){}
+  g = g.replace(/[^a-z0-9]/gi, '');
+  return GROUPS.some(function(x){ return x.cat === g; }) ? g : '';
+}
+showGate(gateFromQuery() || gateFromHash(), false);
 if (location.hash === '#coupon') setTimeout(showCoupon, 80);
 window.addEventListener('hashchange', function(){ if (location.hash === '#coupon') showCoupon(); });
 

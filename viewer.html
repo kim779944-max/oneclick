@@ -293,6 +293,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
 <div class="mfmenu" id="mfMenu">
   <button type="button" id="mfSaveCur">지금 장 PNG</button>
   <button type="button" id="mfSaveZip">전체 장 PNG(ZIP)</button>
+  <button type="button" id="mfToForm">더양식에서 편집하기 →</button>
 </div>
 <div class="mfsheet" id="mfList">
   <div class="pane">
@@ -1844,6 +1845,7 @@ function mfMenu(on){ const m = document.getElementById('mfMenu'); if (m) m.class
   q('mfSaveCur').onclick = () => { mfMenu(false); MF.multi ? mfSaveCur() : saveImage(); };
   q('mfSaveZip').onclick = () => { mfMenu(false); mfSaveZip(); };
   q('mfPdfBtn').onclick = () => { mfMenu(false); mfSavePdf(); };
+  q('mfToForm').onclick = () => { mfMenu(false); sendToForm(); };
   q('mfAddBtn').onclick = () => mfPick(true);
   q('mfListAdd').onclick = () => { mfListShow(false); mfPick(true); };
   q('mfListBtn').onclick = () => { mfMenu(false); mfListRender(); mfListShow(true); };
@@ -2265,6 +2267,36 @@ body.edcap .xlwrap{overflow:visible!important}
 
 <!-- 공통 UX (1트랙 2026-11-21) -->
 <script>window.KTS_UX_CFG={tool:"viewer",wm:["#doc"],flow:1};</script>
+<script src="shared/kts-handoff.js?v=20261124b"></script>
+<script>
+/* ===== 188번: 더뷰 → 더양식 =====
+   지금 보고 있는 문서(여러 장이면 전부)를 그림으로 넘겨 더양식이 그 자리에서 양식으로 만들어 준다.
+   넘긴 그림은 이 브라우저 안 IndexedDB 에만 잠시 담기고, 더양식이 꺼내면 지운다. */
+async function sendToForm(){
+  if (!PP.kind) return showToast('먼저 문서를 열어 주세요');
+  if (!window.KTSHandoff) return showToast('더양식 연동을 불러오지 못했습니다 — 새로고침 후 다시 해 주세요');
+  const list = mfSaveList().filter(c => mfCanSave(c.it));
+  if (!list.length) return showToast('이 형식은 더양식으로 넘길 수 없습니다 · PDF나 사진으로 열어 주세요');
+  if (list.length > 20) return showToast('한 번에 20장까지 넘길 수 있습니다');
+  if (MF.busy) return;
+  MF.busy = true;
+  const pages = [];
+  try{
+    for (let i = 0; i < list.length; i++){
+      mfProg(true, list[i].it.name, '더양식으로 넘기는 중… ' + (i + 1) + ' / ' + list.length, Math.round((i + 1) / list.length * 95));
+      const r = await mfJpeg(list[i].it, list[i].pi);
+      if (r && r.data) pages.push(r.data);
+    }
+    if (!pages.length) throw new Error('no page');
+    await KTSHandoff.put({name: ppBase(), pages: pages, from: 'viewer'});
+    location.href = 'theform/?from=viewer';
+  }catch(e){
+    console.warn('send to theform fail', e);
+    mfProg(false); MF.busy = false;
+    showToast('더양식으로 넘기지 못했습니다 · [PDF 저장] 후 더양식에서 [양식 사진 찍기]로 올려 주세요');
+  }
+}
+</script>
 <script src="ux.js?v=20261121k"></script>
 <script src="helper.js?v=20261122a"></script>
 </body></html>
