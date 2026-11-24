@@ -391,6 +391,7 @@ function normSel(){
   if(['','l','m','h'].indexOf(S.furn)<0) S.furn='';
   if(!scById(S.space)) S.space=(SCENES[0]||{}).id||'living';
   if(['wall','floor','light','furn'].indexOf(S.part)<0) S.part='wall';
+  if(S.part==='furn'&&curScene().furnished) S.part='wall';
 }
 function loadSel(){
   try{
@@ -515,36 +516,356 @@ function relightSoft(ctx,lum,pts,K){
   }
   ctx.putImageData(cur,lum.x0,lum.y0);
 }
-/* 원근 사각형에 텍스처 채우기(식당 오른쪽 벽처럼 기울어진 면) */
-function fillQuadTex(ctx,tex,q){
-  var tl=q[0],tr=q[1],br=q[2],bl=q[3];
-  var N=40, topW=Math.hypot(tr[0]-tl[0],tr[1]-tl[1]);
-  var texW=tex.width||1, texH=tex.height||1;
-  var rep=Math.max(1,Math.round(topW/texW)), tileW=topW/rep;
-  var hL=Math.hypot(bl[0]-tl[0],bl[1]-tl[1]), repY=Math.max(1,Math.round(hL/texH));
-  ctx.save(); polyPath(ctx,q); ctx.clip();
-  for(var k=0;k<repY;k++){
-    var y0=k/repY, y1=(k+1)/repY;
-    for(var i=0;i<N;i++){
-      var t0=lerp(y0,y1,i/N), t1=lerp(y0,y1,(i+1)/N);
-      var a=[lerp(tl[0],bl[0],t0),lerp(tl[1],bl[1],t0)], b=[lerp(tr[0],br[0],t0),lerp(tr[1],br[1],t0)];
-      var d=[lerp(tl[0],bl[0],t1),lerp(tl[1],bl[1],t1)];
-      var sy0=texH*(i/N), sy1=texH*((i+1)/N), sy=Math.max(0.5,sy1-sy0);
-      for(var r=0;r<rep;r++){
-        var ax=[a[0]+(b[0]-a[0])*(r/rep), a[1]+(b[1]-a[1])*(r/rep)];
-        var bx=[a[0]+(b[0]-a[0])*((r+1)/rep), a[1]+(b[1]-a[1])*((r+1)/rep)];
-        ctx.save();
-        ctx.beginPath(); ctx.moveTo(ax[0],ax[1]); ctx.lineTo(bx[0],bx[1]);
-        ctx.lineTo(d[0]+(bx[0]-ax[0]),d[1]+(bx[1]-ax[1])); ctx.lineTo(d[0],d[1]); ctx.closePath(); ctx.clip();
-        ctx.setTransform((bx[0]-ax[0])/texW,(bx[1]-ax[1])/texW,(d[0]-ax[0])/sy,(d[1]-ax[1])/sy,ax[0],ax[1]);
-        ctx.drawImage(tex,0,sy0,texW,sy,0,0,texW,sy);
-        ctx.restore();
-        ctx.setTransform(1,0,0,1,0,0);
-      }
+/* ================= 벽: 한 면을 통째로 원근 합성 =================
+   벽면을 정면(직사각) 좌표계에 먼저 그린다 — 자재 + 벽에 붙는 조명(코브 띠·벽등·빛 콘).
+   그 판을 벽 네 꼭짓점이 만드는 사다리꼴로 한 번에 투시 변환해 얹는다.
+   → 벽지·덴바보드·대리석·간접조명·등기구가 같은 기울기와 원근을 따라간다. */
+var GEOM={}, WLAYER={}, LUMS={}, BLURS={};
+function d2(a,b){var dx=b[0]-a[0],dy=b[1]-a[1];return Math.sqrt(dx*dx+dy*dy);}
+function sqH(q){
+  var x0=q[0][0],y0=q[0][1],x1=q[1][0],y1=q[1][1],x2=q[2][0],y2=q[2][1],x3=q[3][0],y3=q[3][1];
+  var sx=x0-x1+x2-x3, sy=y0-y1+y2-y3, a,b,c,d,e,f,g,h;
+  if(Math.abs(sx)<1e-6&&Math.abs(sy)<1e-6){
+    a=x1-x0; b=x3-x0; c=x0; d=y1-y0; e=y3-y0; f=y0; g=0; h=0;
+  }else{
+    var dx1=x1-x2, dx2=x3-x2, dy1=y1-y2, dy2=y3-y2, det=dx1*dy2-dx2*dy1;
+    if(!det) det=1e-6;
+    g=(sx*dy2-dx2*sy)/det; h=(dx1*sy-sx*dy1)/det;
+    a=x1-x0+g*x1; b=x3-x0+h*x3; c=x0;
+    d=y1-y0+g*y1; e=y3-y0+h*y3; f=y0;
+  }
+  return [a,b,c,d,e,f,g,h,1];
+}
+function inv3(M){
+  var a=M[0],b=M[1],c=M[2],d=M[3],e=M[4],f=M[5],g=M[6],h=M[7],i=M[8];
+  var c00=e*i-f*h, c01=-(d*i-f*g), c02=d*h-e*g;
+  var c10=-(b*i-c*h), c11=a*i-c*g, c12=-(a*h-b*g);
+  var c20=b*f-c*e, c21=-(a*f-c*d), c22=a*e-b*d;
+  var det=a*c00+b*c01+c*c02; if(!det) return null;
+  return [c00/det, c10/det, c20/det, c01/det, c11/det, c21/det, c02/det, c12/det, c22/det];
+}
+function mapH(M,x,y){
+  var d=M[6]*x+M[7]*y+M[8]; if(!d) d=1e-6;
+  return [(M[0]*x+M[1]*y+M[2])/d,(M[3]*x+M[4]*y+M[5])/d];
+}
+/* 벽면 기하 — 원근이면 4점 사다리꼴, 정면이면 외곽 사각형 */
+function wallGeom(sc){
+  var w=sc.wall, key=sc.id+'|'+JSON.stringify(w);
+  if(GEOM[key]) return GEOM[key];
+  var bb=bbox(w), quad;
+  if(w.length===4&&(Math.abs(w[0][1]-w[1][1])>2||Math.abs(w[2][1]-w[3][1])>2||Math.abs(w[0][0]-w[3][0])>2)){
+    quad=[w[0],w[1],w[2],w[3]];
+  }else{
+    quad=[[bb.x0,bb.y0],[bb.x0+bb.w,bb.y0],[bb.x0+bb.w,bb.y0+bb.h],[bb.x0,bb.y0+bb.h]];
+  }
+  var RW=Math.max(16,Math.round(Math.max(d2(quad[0],quad[1]),d2(quad[3],quad[2]))));
+  var RH=Math.max(16,Math.round(Math.max(d2(quad[0],quad[3]),d2(quad[1],quad[2]))));
+  var PADV=Math.round(Math.min(110,Math.max(22,RH*0.15)));
+  var t=PADV/RH;
+  var tl=[quad[0][0]+(quad[0][0]-quad[3][0])*t, quad[0][1]+(quad[0][1]-quad[3][1])*t];
+  var tr=[quad[1][0]+(quad[1][0]-quad[2][0])*t, quad[1][1]+(quad[1][1]-quad[2][1])*t];
+  var ext=[tl,tr,quad[2],quad[3]];
+  var H0=sqH(quad), Hi0=inv3(H0), He=sqH(ext), Hie=inv3(He);
+  var bbw=Math.round(bb.w), bbh=Math.round(bb.h);
+  var g={quad:quad,ext:ext,RW:RW,RH:RH,PADV:PADV,H0:H0,Hi0:Hi0,He:He,Hie:Hie,bb:bbox(ext),
+    flat:(Math.abs(quad[0][1]-quad[1][1])<0.5&&Math.abs(quad[3][0]-quad[0][0])<0.5&&RW===bbw&&RH===bbh),
+    toRect:function(x,y){var uv=mapH(Hi0,x,y);return [uv[0]*RW, PADV+uv[1]*RH];}};
+  GEOM[key]=g; return g;
+}
+/* 원본 사진의 밝기 결(창빛·그림자) — 8분의 1 축소본 */
+function lumSmall(base){
+  var key=base.src||('w'+base.width);
+  if(LUMS[key]) return LUMS[key];
+  var f=8, sw=Math.max(8,Math.round(base.width/f)), sh=Math.max(8,Math.round(base.height/f));
+  var c=document.createElement('canvas'); c.width=sw; c.height=sh;
+  var g=c.getContext('2d'); g.drawImage(base,0,0,sw,sh);
+  var dat; try{ dat=g.getImageData(0,0,sw,sh).data; }catch(e){ return null; }
+  var L=new Uint8Array(sw*sh), hist=new Uint32Array(256), n=0;
+  for(var i=0,j=0;i<dat.length;i+=4,j++){
+    var v=(dat[i]*0.299+dat[i+1]*0.587+dat[i+2]*0.114)|0;
+    L[j]=v; hist[v]++; n++;
+  }
+  var acc=0, ref=255;
+  for(var v2=0;v2<256;v2++){ acc+=hist[v2]; if(acc>=n*0.9){ ref=Math.max(1,v2); break; } }
+  var o={sw:sw,sh:sh,L:L,ref:ref,kx:sw/base.width,ky:sh/base.height};
+  LUMS[key]=o; return o;
+}
+/* 벽 폴리곤으로 알파를 깎는다(가장자리 페더) */
+function maskPolyRect(ctx,sc,G,blur){
+  var RW=G.RW, SH=G.PADV+G.RH;
+  var mk=document.createElement('canvas'); mk.width=RW; mk.height=SH;
+  var mg=mk.getContext('2d'); mg.fillStyle='#fff'; mg.beginPath();
+  sc.wall.forEach(function(p,i){ var q=G.toRect(p[0],p[1]); if(i) mg.lineTo(q[0],q[1]); else mg.moveTo(q[0],q[1]); });
+  mg.closePath(); mg.fill();
+  var m2=document.createElement('canvas'); m2.width=RW; m2.height=SH;
+  var g2=m2.getContext('2d');
+  try{ if(typeof g2.filter==='string') g2.filter='blur('+(blur||1.4)+'px)'; }catch(e){}
+  g2.drawImage(mk,0,0);
+  ctx.save(); ctx.globalCompositeOperation='destination-in'; ctx.drawImage(m2,0,0); ctx.restore();
+}
+/* 자재를 벽면 정면 좌표계에 그린다 */
+function paintWallRect(ctx,sc,m,st,G){
+  var RW=G.RW, RH=G.RH, T=G.PADV;
+  var flat=m.flat?st.css:'', tex=null;
+  if(!flat){
+    var im=texOf((st&&st.img)?st.img:m.img);
+    if(!im) return false;
+    tex=styleCanvas(im,st,flat);
+    if(!tex) return false;
+  }
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0,T,RW,RH); ctx.clip();
+  if(flat){ ctx.fillStyle=flat; ctx.fillRect(0,T,RW,RH); }
+  else if(m.fit==='cover'){
+    var s2=Math.max(RW/tex.width,RH/tex.height), dw=tex.width*s2, dh=tex.height*s2;
+    ctx.drawImage(tex,(RW-dw)/2,T+(RH-dh)/2,dw,dh);
+  }else{
+    var ps=+m.pScale||1, pat=ctx.createPattern(tex,'repeat');
+    if(pat){
+      ctx.save(); ctx.translate(0,T); if(ps!==1) ctx.scale(ps,ps);
+      ctx.fillStyle=pat; ctx.fillRect(0,0,RW/ps+2,RH/ps+2); ctx.restore();
     }
+    if(m.joint){
+      ctx.strokeStyle='rgba(128,124,118,'+m.joint+')'; ctx.lineWidth=1.6;
+      for(var j=1;j<3;j++){ ctx.beginPath(); ctx.moveTo(RW*j/3,T); ctx.lineTo(RW*j/3,T+RH); ctx.stroke(); }
+    }
+  }
+  if(m.gloss){
+    var gg=ctx.createLinearGradient(0,T,RW*0.6,T+RH);
+    gg.addColorStop(0,'rgba(255,255,255,'+(m.gloss*1.5)+')');
+    gg.addColorStop(0.45,'rgba(255,255,255,'+(m.gloss*0.5)+')');
+    gg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=gg; ctx.fillRect(0,T,RW,RH);
+  }
+  ctx.restore();
+  maskPolyRect(ctx,sc,G,1.4);
+  return true;
+}
+/* 벽에 붙는 조명 — 자재와 같은 정면 좌표계에서 그려 함께 투시된다 */
+function drawWallLights(ctx,sc,sel,G){
+  if(!sel) return;
+  var W=G.RW, H=G.RH, T=G.PADV, L=sc.light||{};
+  var sp=(L.sconce||[]).map(function(p){ return G.toRect(p[0],p[1]); });
+  ctx.save();
+  if(sel==='l'){
+    var d1=Math.min(260,H*0.62);
+    var gd=ctx.createLinearGradient(0,T-8,0,T+d1);
+    gd.addColorStop(0,'rgba(255,236,198,0)');
+    gd.addColorStop(0.12,'rgba(255,238,205,.42)');
+    gd.addColorStop(0.55,'rgba(255,238,205,.12)');
+    gd.addColorStop(1,'rgba(255,238,205,0)');
+    ctx.fillStyle=gd; ctx.fillRect(0,T-8,W,d1+8);
+    var gu=ctx.createLinearGradient(0,T+6,0,T-70);
+    gu.addColorStop(0,'rgba(255,240,210,.34)');
+    gu.addColorStop(1,'rgba(255,240,210,0)');
+    ctx.fillStyle=gu; ctx.fillRect(0,Math.max(0,T-70),W,78);
+    ctx.fillStyle='#E9E7E2'; ctx.fillRect(6,Math.max(0,T-9),W-12,7);
+    ctx.fillStyle='rgba(255,250,238,.98)'; ctx.fillRect(8,Math.max(0,T-4),W-16,3);
+    ctx.fillStyle='rgba(120,112,100,.35)'; ctx.fillRect(6,Math.max(0,T-10),W-12,1.5);
+    ctx.strokeStyle='rgba(255,248,232,.95)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(6,T-3); ctx.lineTo(W-6,T-3); ctx.stroke();
+    sp.forEach(function(p){ lampGlow(ctx,p[0],T+20,Math.max(110,H*0.33),.22,1); });
+  }else if(sel==='m'){
+    var gm=ctx.createLinearGradient(0,T-4,0,T+H*0.95);
+    gm.addColorStop(0,'rgba(255,240,212,.55)');
+    gm.addColorStop(0.35,'rgba(255,238,206,.26)');
+    gm.addColorStop(1,'rgba(255,236,200,0)');
+    ctx.fillStyle=gm; ctx.fillRect(0,T-4,W,H*0.95+4);
+    var gc=ctx.createLinearGradient(0,T-90,0,T+10);
+    gc.addColorStop(0,'rgba(255,244,220,0)');
+    gc.addColorStop(0.7,'rgba(255,244,220,.5)');
+    gc.addColorStop(1,'rgba(255,248,232,.75)');
+    ctx.fillStyle=gc; ctx.fillRect(0,Math.max(0,T-90),W,Math.min(100,T+10-Math.max(0,T-90)));
+    var yb=Math.max(0,T-16);
+    ctx.fillStyle='#F0EDE6'; ctx.fillRect(2,yb,W-4,12);
+    ctx.fillStyle='rgba(255,252,242,.99)'; ctx.fillRect(4,Math.max(0,T-6),W-8,4);
+    ctx.fillStyle='rgba(90,84,74,.30)'; ctx.fillRect(2,yb,W-4,1.5);
+    ctx.strokeStyle='rgba(255,250,236,.95)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(3,T-2); ctx.lineTo(W-3,T-2); ctx.stroke();
+    lampGlow(ctx,W*0.30,T-30,Math.max(150,W*0.33),.20,1);
+    lampGlow(ctx,W*0.72,T-30,Math.max(150,W*0.33),.20,1);
+  }else{
+    var pts=sp.length?sp:[[W*0.28,T+H*0.16],[W*0.72,T+H*0.16]];
+    var cw=Math.max(20,W*0.032), ch=cw*1.5;
+    pts.forEach(function(p){
+      var x=p[0], y=p[1];
+      var up=ctx.createLinearGradient(0,y-ch,0,y-ch*4.6);
+      up.addColorStop(0,'rgba(255,236,196,.42)'); up.addColorStop(1,'rgba(255,236,196,0)');
+      ctx.fillStyle=up; ctx.beginPath();
+      ctx.moveTo(x-cw*0.5,y-ch*0.5); ctx.lineTo(x+cw*0.5,y-ch*0.5);
+      ctx.lineTo(x+cw*1.5,y-ch*4.6); ctx.lineTo(x-cw*1.5,y-ch*4.6); ctx.closePath(); ctx.fill();
+      var dn=ctx.createLinearGradient(0,y+ch*0.5,0,y+ch*4.8);
+      dn.addColorStop(0,'rgba(255,236,196,.38)'); dn.addColorStop(1,'rgba(255,236,196,0)');
+      ctx.fillStyle=dn; ctx.beginPath();
+      ctx.moveTo(x-cw*0.5,y+ch*0.5); ctx.lineTo(x+cw*0.5,y+ch*0.5);
+      ctx.lineTo(x+cw*1.4,y+ch*4.8); ctx.lineTo(x-cw*1.4,y+ch*4.8); ctx.closePath(); ctx.fill();
+      lampGlow(ctx,x,y-ch*1.6,cw*3.2,.20,1); lampGlow(ctx,x,y+ch*1.8,cw*3.4,.18,1);
+      ctx.fillStyle='#232427'; rr(ctx,x-cw/2,y-ch/2,cw,ch,3); ctx.fill();
+      ctx.fillStyle='#3A3B3E'; rr(ctx,x-cw/2+2,y-ch/2+2,cw-4,ch-4,2); ctx.fill();
+    });
   }
   ctx.restore();
 }
+/* 정면 좌표계 판을 사다리꼴로 투시 변환해 화면에 얹는다(원본 밝기 결 반영) */
+function warpWall(ctx,layer,G,base,K){
+  var bb=G.bb, W=ctx.canvas.width, H=ctx.canvas.height;
+  var x0=Math.max(0,Math.floor(bb.x0)), y0=Math.max(0,Math.floor(bb.y0));
+  var x1=Math.min(W,Math.ceil(bb.x0+bb.w)), y1=Math.min(H,Math.ceil(bb.y0+bb.h));
+  var w=x1-x0, h=y1-y0; if(w<=0||h<=0) return;
+  var lm0=lumSmall(base);
+  /* 정면 벽(사각형)은 그대로 얹고 밝기 결만 입힌다 — 큰 사진에서도 메모리를 아낀다 */
+  if(G.flat){
+    var dx0=Math.floor(bb.x0), dy0=Math.floor(bb.y0), topY=dy0+G.PADV;
+    ctx.drawImage(layer,dx0,dy0);
+    var rx=Math.max(0,dx0), ry=Math.max(0,topY);
+    var rw2=Math.min(W-rx,G.RW-(rx-dx0)), rh2=Math.min(H-ry,G.RH-(ry-topY));
+    if(lm0&&rw2>2&&rh2>2){
+      try{
+        var dd=ctx.getImageData(rx,ry,rw2,rh2), pp=dd.data;
+        var kx0=lm0.kx, ky0=lm0.ky, lsw0=lm0.sw, lsh0=lm0.sh, LL=lm0.L, rf0=lm0.ref, kk0=(K==null?0.45:K);
+        for(var yy0=0; yy0<rh2; yy0++){
+          var ly0=((ry+yy0)*ky0)|0; if(ly0<0)ly0=0; else if(ly0>=lsh0)ly0=lsh0-1;
+          for(var xx0=0; xx0<rw2; xx0++){
+            var i0=(yy0*rw2+xx0)*4; if(pp[i0+3]<2) continue;
+            var lx0=((rx+xx0)*kx0)|0; if(lx0<0)lx0=0; else if(lx0>=lsw0)lx0=lsw0-1;
+            var f0=1+kk0*((LL[ly0*lsw0+lx0]/rf0)-1); if(f0<0.15) f0=0.15;
+            pp[i0]*=f0; pp[i0+1]*=f0; pp[i0+2]*=f0;
+          }
+        }
+        ctx.putImageData(dd,rx,ry);
+      }catch(e){}
+    }
+    return;
+  }
+  var out=document.createElement('canvas'); out.width=w; out.height=h;
+  var og=out.getContext('2d');
+  var img; try{ img=og.createImageData(w,h); }catch(e){ return; }
+  var SW=layer.width, SH=layer.height;
+  /* 축소되는(먼 쪽) 구간은 반씩 줄인 판에서 표본해 계단·무아레를 막는다 */
+  var lv=[{cv:layer,sw:SW,sh:SH}];
+  [2,4].forEach(function(f){
+    var cw=Math.max(2,Math.round(SW/f)), ch=Math.max(2,Math.round(SH/f));
+    var c=document.createElement('canvas'); c.width=cw; c.height=ch;
+    c.getContext('2d').drawImage(layer,0,0,cw,ch);
+    lv.push({cv:c,sw:cw,sh:ch});
+  });
+  var ld=[]; lv.forEach(function(L){ ld.push(L.cv.getContext('2d').getImageData(0,0,L.sw,L.sh).data); });
+  var od=img.data, Hi=G.Hie;
+  var lm=lumSmall(base), lum=lm?lm.L:null, lref=lm?lm.ref:128;
+  var kx=lm?lm.kx:0, ky=lm?lm.ky:0, lsw=lm?lm.sw:0, lsh=lm?lm.sh:0;
+  var kk=(K==null?0.45:K);
+  function uvAt(dx,dy){
+    var den=Hi[6]*dx+Hi[7]*dy+Hi[8]; if(!den) den=1e-6;
+    return [(Hi[0]*dx+Hi[1]*dy+Hi[2])/den,(Hi[3]*dx+Hi[4]*dy+Hi[5])/den];
+  }
+  for(var yy=0; yy<h; yy++){
+    var dy=y0+yy+0.5, row=yy*w*4;
+    /* 이 줄에서 자재가 얼마나 줄어드는지 보고 축소 단계(밉맵)를 고른다 */
+    var uA=uvAt(x0+0.5,dy), uB=uvAt(x0+1.5,dy), vB=uvAt(x0+0.5,dy+1);
+    var step=Math.max(Math.abs(uB[0]-uA[0])*SW, Math.abs(vB[1]-uA[1])*SH, Math.abs(uB[1]-uA[1])*SH);
+    var li=step>=2.6?2:(step>=1.35?1:0);
+    var lv0=lv[li], sp=ld[li], SWL=lv0.sw, SHL=lv0.sh;
+    for(var xx=0; xx<w; xx++){
+      var dx=x0+xx+0.5, ii=row+xx*4;
+      var uv=uvAt(dx,dy), u=uv[0], v=uv[1];
+      if(u<0||u>1||v<0||v>1) continue;
+      var fx=u*SWL-0.5, fy=v*SHL-0.5;
+      if(fx<0) fx=0; else if(fx>SWL-1) fx=SWL-1;
+      if(fy<0) fy=0; else if(fy>SHL-1) fy=SHL-1;
+      var ix=fx|0, iy=fy|0, ix2=ix+1<SWL?ix+1:ix, iy2=iy+1<SHL?iy+1:iy;
+      var tx=fx-ix, ty=fy-iy, w00=(1-tx)*(1-ty), w10=tx*(1-ty), w01=(1-tx)*ty, w11=tx*ty;
+      var p00=(iy*SWL+ix)*4, p10=(iy*SWL+ix2)*4, p01=(iy2*SWL+ix)*4, p11=(iy2*SWL+ix2)*4;
+      var al=sp[p00+3]*w00+sp[p10+3]*w10+sp[p01+3]*w01+sp[p11+3]*w11;
+      if(al<2) continue;
+      var r=sp[p00]*w00+sp[p10]*w10+sp[p01]*w01+sp[p11]*w11;
+      var gg=sp[p00+1]*w00+sp[p10+1]*w10+sp[p01+1]*w01+sp[p11+1]*w11;
+      var bl=sp[p00+2]*w00+sp[p10+2]*w10+sp[p01+2]*w01+sp[p11+2]*w11;
+      if(lum){
+        var lx=(dx*kx)|0, ly=(dy*ky)|0;
+        if(lx<0) lx=0; else if(lx>=lsw) lx=lsw-1;
+        if(ly<0) ly=0; else if(ly>=lsh) ly=lsh-1;
+        var ff=1+kk*((lum[ly*lsw+lx]/lref)-1);
+        if(ff<0.15) ff=0.15;
+        r*=ff; gg*=ff; bl*=ff;
+      }
+      od[ii]=r<0?0:r>255?255:r;
+      od[ii+1]=gg<0?0:gg>255?255:gg;
+      od[ii+2]=bl<0?0:bl>255?255:bl;
+      od[ii+3]=al;
+    }
+  }
+  og.putImageData(img,0,0);
+  ctx.drawImage(out,x0,y0);
+}
+/* 벽 한 면 = 자재 + 조명을 정면 좌표계에 그린 뒤 투시 변환한 결과(캐시) */
+function wallLayer(sc,base,m,st){
+  if(!m) return null;
+  var key=[sc.id,base.src||'',m.id,st?st.id:'',S.light||'-',JSON.stringify(sc.wall),sc.w,sc.h].join('|');
+  if(WLAYER[key]) return WLAYER[key];
+  var G=wallGeom(sc);
+  var lay=document.createElement('canvas'); lay.width=G.RW; lay.height=G.PADV+G.RH;
+  var lc=lay.getContext('2d');
+  if(!paintWallRect(lc,sc,m,st,G)) return null;
+  drawWallLights(lc,sc,S.light,G);
+  var full=document.createElement('canvas'); full.width=sc.w; full.height=sc.h;
+  warpWall(full.getContext('2d'),lay,G,base,(m.relight==null?0.85:m.relight));
+  var ks=Object.keys(WLAYER); if(ks.length>1) delete WLAYER[ks[0]];
+  WLAYER[key]=full; return full;
+}
+/* 앞쪽 물체 한 덩이를 원본에서 되살린다(경계 페더) */
+function restorePoly(ctx,base,poly,W,H,blur){
+  var b=bbox(poly);
+  var x0=Math.max(0,Math.floor(b.x0)), y0=Math.max(0,Math.floor(b.y0));
+  var x1=Math.min(W,Math.ceil(b.x0+b.w)), y1=Math.min(H,Math.ceil(b.y0+b.h));
+  var w=x1-x0, h=y1-y0; if(w<=0||h<=0) return;
+  var t=document.createElement('canvas'); t.width=w; t.height=h;
+  var g=t.getContext('2d'); g.drawImage(base,x0,y0,w,h,0,0,w,h);
+  var mk=document.createElement('canvas'); mk.width=w; mk.height=h;
+  var mg=mk.getContext('2d'); mg.fillStyle='#fff'; mg.beginPath();
+  poly.forEach(function(p,i){ if(i) mg.lineTo(p[0]-x0,p[1]-y0); else mg.moveTo(p[0]-x0,p[1]-y0); });
+  mg.closePath(); mg.fill();
+  var m2=document.createElement('canvas'); m2.width=w; m2.height=h;
+  var g2=m2.getContext('2d');
+  try{ if(typeof g2.filter==='string') g2.filter='blur('+(blur||1.6)+'px)'; }catch(e){}
+  g2.drawImage(mk,0,0);
+  g.save(); g.globalCompositeOperation='destination-in'; g.drawImage(m2,0,0); g.restore();
+  ctx.drawImage(t,x0,y0);
+}
+/* 원본을 흐린 판과 비교해 '튀어나온 물체'만 되살린다 — 뮤럴·칠을 덮어도 펜던트 줄·선반·스탠드가 남는다 */
+function blurOf(base){
+  var key=base.src||('w'+base.width);
+  if(BLURS[key]) return BLURS[key];
+  var c=document.createElement('canvas'); c.width=base.width; c.height=base.height;
+  var g=c.getContext('2d');
+  try{ if(typeof g.filter==='string') g.filter='blur(7px)'; }catch(e){}
+  g.drawImage(base,0,0);
+  var ks=Object.keys(BLURS);
+  if(ks.length>2) delete BLURS[ks[0]];
+  BLURS[key]=c; return c;
+}
+function restoreDetail(ctx,base,k,W,H){
+  var x0=Math.max(0,Math.floor(k[0])), y0=Math.max(0,Math.floor(k[1]));
+  var w=Math.min(W-x0,Math.round(k[2])), h=Math.min(H-y0,Math.round(k[3]));
+  if(w<=0||h<=0) return;
+  var t0=(k[4]==null?14:k[4]), t1=(k[5]==null?34:k[5]);
+  var bl=blurOf(base);
+  var bimg;
+  try{ bimg=bl.getContext('2d').getImageData(x0,y0,w,h); }catch(e){ return; }
+  var c=document.createElement('canvas'); c.width=w; c.height=h;
+  var cg=c.getContext('2d'); cg.drawImage(base,x0,y0,w,h,0,0,w,h);
+  var simg;
+  try{ simg=cg.getImageData(0,0,w,h); }catch(e){ return; }
+  var bd=bimg.data, d=simg.data;
+  for(var i=0;i<d.length;i+=4){
+    var dr=d[i]-bd[i], dg=d[i+1]-bd[i+1], db=d[i+2]-bd[i+2];
+    if(dr<0) dr=-dr; if(dg<0) dg=-dg; if(db<0) db=-db;
+    var m=dr>dg?(dr>db?dr:db):(dg>db?dg:db);
+    d[i+3]=m<=t0?0:(m>=t1?255:Math.round((m-t0)/(t1-t0)*255));
+  }
+  cg.putImageData(simg,0,0);
+  ctx.drawImage(c,x0,y0);
+}
+/* 바닥 원근 채우기 */
 function fillFloorPersp(ctx,tex,b,pts,vp){
   var TW=tex.width||1, TH=tex.height||1, dmax=Math.max(40,(pts.bottom||900)-vp[1]), A=dmax*dmax/0.62;
   for(var y=Math.floor(b.y0); y<b.y0+b.h; y++){
@@ -552,45 +873,6 @@ function fillFloorPersp(ctx,tex,b,pts,vp){
     var sx=d/dmax, v=Math.floor(((A/d)%TH+TH)%TH), tw=TW*sx, xs=vp[0]-TW/2*sx;
     for(var k=Math.floor(-xs/tw)-1;k<=Math.ceil((1200-xs)/tw)+1;k++) ctx.drawImage(tex,0,v,TW,1,xs+k*tw,y,tw+0.6,1);
   }
-}
-/* 벽 한 면에 자재를 입힌다 */
-function paintWall(ctx,src,sc,m,st,lum){
-  if(!m) return;
-  var flat=m.flat?st.css:'';
-  var tex=null;
-  if(!flat){
-    var useSrc=(st&&st.img)?st.img:m.img;
-    var useImg=texOf(useSrc);
-    if(!useImg) return;
-    tex=styleCanvas(useImg,st,flat);
-  }
-  var pts=sc.wall;
-  ctx.save(); polyPath(ctx,pts); ctx.clip();
-  if(flat){
-    ctx.fillStyle=flat; ctx.fillRect(0,0,src.width,src.height);
-  }else if(m.fit==='cover'){
-    var b=bbox(pts), sc2=Math.max(b.w/tex.width,b.h/tex.height), dw=tex.width*sc2, dh=tex.height*sc2;
-    ctx.drawImage(tex,b.x0+(b.w-dw)/2,b.y0+(b.h-dh)/2,dw,dh);
-  }else{
-    var ps=+m.pScale||1, p=ctx.createPattern(tex,'repeat');
-    if(p){
-      ctx.save(); if(ps!==1) ctx.scale(ps,ps);
-      ctx.fillStyle=p; ctx.fillRect(0,0,src.width/ps+2,src.height/ps+2);
-      ctx.restore();
-    }
-    if(m.joint){    /* 대리석 판 이음매 */
-      var bb2=bbox(pts), jw=bb2.w/3;
-      ctx.strokeStyle='rgba(128,124,118,'+(m.joint)+')'; ctx.lineWidth=1.6;
-      for(var j=1;j<3;j++){ ctx.beginPath(); ctx.moveTo(bb2.x0+jw*j,bb2.y0); ctx.lineTo(bb2.x0+jw*j,bb2.y0+bb2.h); ctx.stroke(); }
-    }
-  }
-  if(m.gloss){   /* 대리석 광택 — 위에서 떨어지는 부드러운 하이라이트 */
-    var bb=bbox(pts), g=ctx.createLinearGradient(bb.x0,bb.y0,bb.x0+bb.w*0.6,bb.y0+bb.h);
-    g.addColorStop(0,'rgba(255,255,255,'+(m.gloss*1.5)+')'); g.addColorStop(0.45,'rgba(255,255,255,'+(m.gloss*0.5)+')'); g.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=g; ctx.fillRect(0,0,src.width,src.height);
-  }
-  ctx.restore();
-  relightSoft(ctx,lum,pts,(m.relight==null?0.85:m.relight));
 }
 /* 바닥 자재 */
 function paintFloor(ctx,src,sc,m,st,lum){
@@ -634,71 +916,6 @@ function lampGlow(ctx,x,y,r,alpha,warm){
   g.addColorStop(1,'rgba(255,236,200,0)');
   ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
 }
-function drawLight(ctx,sc,g){
-  if(!g) return;
-  var L=sc.light||{}, wall=sc.wall, bb=bbox(wall);
-  ctx.save();
-  if(g==='l'){                       /* ① 벽 간접 — 벽 상단에서 위아래로 번지는 빛 */
-    var yTop=bb.y0, yBot=bb.y0+bb.h;
-    var gd=ctx.createLinearGradient(0,yTop-8,0,yTop+Math.min(260,bb.h*0.62));
-    gd.addColorStop(0,'rgba(255,236,198,.0)');
-    gd.addColorStop(0.12,'rgba(255,238,205,.42)');
-    gd.addColorStop(0.55,'rgba(255,238,205,.12)');
-    gd.addColorStop(1,'rgba(255,238,205,0)');
-    ctx.save(); polyPath(ctx,wall); ctx.clip(); ctx.fillStyle=gd; ctx.fillRect(bb.x0,bb.y0-20,bb.w,bb.h+40); ctx.restore();
-    var gu=ctx.createLinearGradient(0,yTop+6,0,yTop-70);
-    gu.addColorStop(0,'rgba(255,240,210,.34)'); gu.addColorStop(1,'rgba(255,240,210,0)');
-    ctx.fillStyle=gu; ctx.fillRect(bb.x0,yTop-70,bb.w,78);
-    /* 숨은 선조명 몸체(알루미늄 띠) + 위아래 번짐 */
-    ctx.fillStyle='#E9E7E2'; ctx.fillRect(bb.x0+6,yTop-9,bb.w-12,7);
-    ctx.fillStyle='rgba(255,250,238,.98)'; ctx.fillRect(bb.x0+8,yTop-4,bb.w-16,3);
-    ctx.fillStyle='rgba(120,112,100,.35)'; ctx.fillRect(bb.x0+6,yTop-10,bb.w-12,1.5);
-    ctx.strokeStyle='rgba(255,248,232,.95)'; ctx.lineWidth=2.5; ctx.beginPath();
-    ctx.moveTo(bb.x0+6,yTop-3); ctx.lineTo(bb.x0+bb.w-6,yTop-3); ctx.stroke();
-    (L.sconce||[]).forEach(function(p){ lampGlow(ctx,p[0],bb.y0+20,150,.22,1); });
-  }else if(g==='m'){                 /* ② 천장 간접 — 코브에서 벽으로 떨어지는 빛 */
-    var top=bb.y0;
-    ctx.save(); polyPath(ctx,wall); ctx.clip();
-    var gm=ctx.createLinearGradient(0,top-4,0,top+bb.h*0.95);
-    gm.addColorStop(0,'rgba(255,240,212,.55)');
-    gm.addColorStop(0.35,'rgba(255,238,206,.26)');
-    gm.addColorStop(1,'rgba(255,236,200,0)');
-    ctx.fillStyle=gm; ctx.fillRect(bb.x0,top-10,bb.w,bb.h+20);
-    ctx.restore();
-    var gc=ctx.createLinearGradient(0,top-90,0,top+10);
-    gc.addColorStop(0,'rgba(255,244,220,0)'); gc.addColorStop(0.7,'rgba(255,244,220,.5)'); gc.addColorStop(1,'rgba(255,248,232,.75)');
-    ctx.fillStyle=gc; ctx.fillRect(bb.x0,top-90,bb.w,100);
-    /* 천장 코브 단면 + 세기 강화 */
-    ctx.fillStyle='#F0EDE6'; ctx.fillRect(bb.x0+2,top-16,bb.w-4,12);
-    ctx.fillStyle='rgba(255,252,242,.99)'; ctx.fillRect(bb.x0+4,top-6,bb.w-8,4);
-    ctx.fillStyle='rgba(90,84,74,.30)'; ctx.fillRect(bb.x0+2,top-17,bb.w-4,1.5);
-    ctx.strokeStyle='rgba(255,250,236,.95)'; ctx.lineWidth=3; ctx.beginPath();
-    ctx.moveTo(bb.x0+3,top-2); ctx.lineTo(bb.x0+bb.w-3,top-2); ctx.stroke();
-    lampGlow(ctx,bb.x0+bb.w*0.3,top-30,Math.max(160,bb.w*0.35),.20,1);
-    lampGlow(ctx,bb.x0+bb.w*0.72,top-30,Math.max(160,bb.w*0.35),.20,1);
-  }else if(g==='h'){                 /* ③ 등기구 자체 — 사각 벽등 + 상하 간접광 */
-    var pts=(L.sconce&&L.sconce.length)?L.sconce:[[bb.x0+bb.w*0.28,bb.y0+bb.h*0.22],[bb.x0+bb.w*0.72,bb.y0+bb.h*0.22]];
-    var cw=Math.max(26,bb.w*0.034), ch=cw*1.5;
-    pts.forEach(function(p){
-      var x=p[0], y=p[1];
-      var up=ctx.createLinearGradient(0,y-ch,0,y-ch*4.6);
-      up.addColorStop(0,'rgba(255,236,196,.42)'); up.addColorStop(1,'rgba(255,236,196,0)');
-      ctx.fillStyle=up; ctx.beginPath();
-      ctx.moveTo(x-cw*0.5,y-ch*0.5); ctx.lineTo(x+cw*0.5,y-ch*0.5);
-      ctx.lineTo(x+cw*1.5,y-ch*4.6); ctx.lineTo(x-cw*1.5,y-ch*4.6); ctx.closePath(); ctx.fill();
-      var dn=ctx.createLinearGradient(0,y+ch*0.5,0,y+ch*4.8);
-      dn.addColorStop(0,'rgba(255,236,196,.38)'); dn.addColorStop(1,'rgba(255,236,196,0)');
-      ctx.fillStyle=dn; ctx.beginPath();
-      ctx.moveTo(x-cw*0.5,y+ch*0.5); ctx.lineTo(x+cw*0.5,y+ch*0.5);
-      ctx.lineTo(x+cw*1.4,y+ch*4.8); ctx.lineTo(x-cw*1.4,y+ch*4.8); ctx.closePath(); ctx.fill();
-      lampGlow(ctx,x,y-ch*1.6,cw*3.2,.20,1); lampGlow(ctx,x,y+ch*1.8,cw*3.4,.18,1);
-      ctx.fillStyle='#232427'; rr(ctx,x-cw/2,y-ch/2,cw,ch,3); ctx.fill();
-      ctx.fillStyle='#3A3B3E'; rr(ctx,x-cw/2+2,y-ch/2+2,cw-4,ch-4,2); ctx.fill();
-    });
-  }
-  ctx.restore();
-}
-
 /* ---------------- 가구 (196·197) ---------------- */
 var FC={fabric:['#E4DACA','#CBBFA9'],fabric2:['#D8CFC0','#BEB4A2'],wood:['#CBAA84','#A9865F'],
         wood2:['#8E6B49','#6A4E33'],dark:['#43464A','#2A2C2F'],black:['#2A2B2E','#191A1C'],
@@ -792,10 +1009,12 @@ function rug(ctx,x,y,w,h,pal){
 }
 /* 공간·단계별 배치 — 큰 가구는 벽에 붙이고, 작은 가구는 가운데로 */
 function drawFurn(ctx,sc,lvl){
-  if(!lvl) return;
-  var F=sc.furn||{}, W=sc.w||1200;
+  if(!lvl||sc.furnished||!sc.furn) return;   /* 사진에 이미 가구가 있는 공간은 그대로 둔다 */
+  var F=sc.furn, W=sc.w||1200, H=sc.h||800;
   var c=F.center||[W*0.3,700,W*0.7,880], wl=F.wall||[W*0.3,600,W*0.8,860];
-  var cw=c[2]-c[0], ch=c[3]-c[1], ww=wl[2]-wl[0];
+  var gY=Math.min(H-6,(F.anchorY||c[3]));    /* 바닥에 닿는 선 — 화면 밖으로 잘리지 않게 */
+  c=[c[0],c[1],c[2],Math.min(c[3],gY)]; wl=[wl[0],wl[1],wl[2],Math.min(wl[3],gY)];
+  var cw=c[2]-c[0], ch=gY-c[1], ww=wl[2]-wl[0];
   /* 가구 전체를 받치는 바닥 그림자 */
   softShadow(ctx,(c[0]+c[2])/2,c[3]-ch*0.06,cw*0.62,ch*0.12,.22);
   var id=sc.id;
@@ -861,50 +1080,26 @@ function paintScene(ctx,sc,base){
   ctx.clearRect(0,0,W,H); ctx.drawImage(base,0,0,W,H);
   var lum=paintWallLum(sc,base);
   var m=wallMat(), st=wallStyle();
-  /* 벽 */
-  paintWall(ctx,base,sc,m,st,lum.wall);
+  /* 벽 — 자재 + 벽 조명을 한 판에 그려 사다리꼴로 투시 변환해 얹는다 */
+  var wl=wallLayer(sc,base,m,st);
+  if(wl){ ctx.drawImage(wl,0,0); }
+  else if(m){ restorePoly(ctx,base,sc.wall,W,H,0); }
   /* 몰딩/걸레받이 */
   if(sc.mold) bandBase(ctx,sc,sc.mold);
   if(sc.base) bandBase(ctx,sc,sc.base);
   /* 바닥 */
   if(sc.floor&&floorMat()) paintFloor(ctx,base,sc,floorMat(),floorStyle(),lum.floor);
-  /* 앞쪽 물체 되돌리기 — 새 자재에 가려지면 안 되는 것 */
-  (sc.fg||[]).forEach(function(poly){
-    ctx.save(); polyPath(ctx,poly); ctx.clip();
-    ctx.drawImage(base,0,0,W,H);
-    ctx.restore();
-  });
-  (sc.fgKey||[]).forEach(function(k){
-    var x0=Math.max(0,k[0]),y0=Math.max(0,k[1]),w=Math.min(W-k[0],k[2]),h=Math.min(H-k[1],k[3]);
-    if(w<=0||h<=0) return;
-    var tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
-    var tc=tmp.getContext('2d');
-    tc.drawImage(ctx.canvas,x0,y0,w,h,0,0,w,h);          /* 지금(자재 덮인) 상태 */
-    tc.drawImage(base,x0,y0,w,h,0,0,w,h);                  /* 원본을 위에 얹고 알파로 깎기 */
-    try{
-      var d=tc.getImageData(0,0,w,h), p2=d.data;            /* base 원본으로만 다시 그려 마스크 */
-      var t2=document.createElement('canvas'); t2.width=w; t2.height=h;
-      var g2=t2.getContext('2d'); g2.drawImage(base,x0,y0,w,h,0,0,w,h);
-      var src=g2.getImageData(0,0,w,h).data;
-      var thr=(k[4]==null?95:k[4]), soft=(k[5]==null?45:k[5]);
-      for(var i=0;i<src.length;i+=4){
-        var l=src[i]*0.299+src[i+1]*0.587+src[i+2]*0.114;
-        var a=l<=thr?255:(l>=thr+soft?0:Math.round((1-(l-thr)/soft)*255));
-        p2[i+3]=a;
-      }
-      tc.putImageData(d,0,0);
-      ctx.drawImage(tmp,x0,y0);
-    }catch(e){}
-  });
+  /* 앞쪽 물체 되돌리기 — 새 자재에 가려지면 안 되는 것(경계는 부드럽게) */
+  (sc.fg||[]).forEach(function(poly){ restorePoly(ctx,base,poly,W,H,1.0); });
+  (sc.fgDet||[]).forEach(function(k){ restoreDetail(ctx,base,k,W,H); });
   (sc.keep||[]).forEach(function(q){ctx.drawImage(base,q[0],q[1],q[2],q[3],q[0],q[1],q[2],q[3]);});
-  /* 조명 → 가구 */
-  drawLight(ctx,sc,S.light);
+  /* 가구 — 실사 가구가 이미 있는 공간에는 도형을 얹지 않는다 */
   drawFurn(ctx,sc,S.furn);
 }
 function paintWallLum(sc,base){
   var k=sc.id+'|'+base.src;
   if(SCENE_CACHE[k]) return SCENE_CACHE[k];
-  var o={wall:softLum(base,sc.wall,wallMat()&&(+wallMat().smooth>0.6?2.2:1)),floor:null};
+  var o={floor:null};
   if(sc.floor) o.floor=softLum(base,sc.floor,1.6);
   SCENE_CACHE[k]=o; return o;
 }
@@ -976,7 +1171,7 @@ function placeSpots(sc){
     ['wall','벽',at([ (bbox(sc.wall).x0+bbox(sc.wall).w*0.5), bbox(sc.wall).y0+bbox(sc.wall).h*0.28 ])],
     ['floor','바닥',sc.floor?at([(bbox(sc.floor).x0+bbox(sc.floor).w*0.5), bbox(sc.floor).y1-((bbox(sc.floor).h)*0.28)]):null],
     ['light','조명',at([(sc.light&&sc.light.sconce&&sc.light.sconce[0])?sc.light.sconce[0][0]:W*0.5, (sc.light&&sc.light.sconce&&sc.light.sconce[0])?sc.light.sconce[0][1]-40:H*0.12])],
-    ['furn','가구',sc.furn?at([sc.furn.center[0]+(sc.furn.center[2]-sc.furn.center[0])*0.5, sc.furn.center[3]-20]):null]
+    ['furn','가구',(sc.furn&&!sc.furnished)?at([sc.furn.center[0]+(sc.furn.center[2]-sc.furn.center[0])*0.5, sc.furn.center[3]-20]):null]
   ];
   host.innerHTML=defs.map(function(d){
     if(!d[2]) return '';
@@ -1008,16 +1203,20 @@ function stepHTML(){
     }).join('')+'</div>';
   }else if(part==='light'){
     html+='<p class="lbl"><b>조명</b>은 빛의 형태까지 바뀝니다</p><div class="chips g3">';
-    html+='<button type="button" data-tier="0" class="'+(!S.light?'on':'')+'"><b>0</b><span>그대로</span></button>';
+    html+='<button type="button" data-tier="0" class="'+(!S.light?'on':'')+'">그대로</button>';
     [['l','벽 간접'],['m','천장 간접'],['h','등기구']].forEach(function(t){
-      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.light===t[0]?'on':'')+'"><b>'+t[0].toUpperCase()+'</b><span>'+t[1]+'</span></button>';
+      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.light===t[0]?'on':'')+'">'+t[1]+'</button>';
     });
+    html+='</div>';
+  }else if(curScene().furnished){
+    html+='<p class="lbl"><b>가구</b> — 이 공간은 사진의 가구를 그대로 씁니다</p><div class="chips g2">';
+    html+='<button type="button" data-tier="0" class="'+(!S.furn?'on':'')+'">사진 가구 그대로</button>';
     html+='</div>';
   }else{
     html+='<p class="lbl"><b>가구</b>는 크기에 따라 놓는 자리가 달라집니다</p><div class="chips row">';
-    html+='<button type="button" data-tier="0" class="'+(!S.furn?'on':'')+'"><b>0</b><span>그대로</span></button>';
-    [['l','작은 가구·가운데'],['m','중간·반반'],['h','큰 가구·벽면']].forEach(function(t){
-      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.furn===t[0]?'on':'')+'"><b>'+t[0].toUpperCase()+'</b><span>'+t[1]+'</span></button>';
+    html+='<button type="button" data-tier="0" class="'+(!S.furn?'on':'')+'">그대로</button>';
+    [['l','작은 가구'],['m','중간 가구'],['h','큰 가구']].forEach(function(t){
+      html+='<button type="button" data-tier="'+t[0]+'" class="'+(S.furn===t[0]?'on':'')+'">'+t[1]+'</button>';
     });
     html+='</div>';
   }
@@ -1047,7 +1246,8 @@ function renderStep(){
   }else if(S.part==='light'){
     hint=(S.light?'빛의 형태가 바뀌었습니다. ':'')+'빛은 벽 위아래로 번지거나, 천장에서 떨어지거나, 기구가 보이는 세 가지입니다.';
   }else if(S.part==='furn'){
-    hint=(S.furn?'배치가 바뀌었습니다. ':'')+'큰 가구는 벽에 붙고, 작은 가구는 가운데로 갑니다.';
+    hint=curScene().furnished?'이 공간은 실사 사진의 가구를 그대로 둡니다 — 다른 배치는 원룸·매장에서 보세요.'
+      :((S.furn?'배치가 바뀌었습니다. ':'')+'큰 가구는 벽에 붙고, 작은 가구는 가운데로 갑니다.');
   }else if(S.part==='floor'){
     hint=scWithFloor()?'바닥재를 누르면 그 자리에서 바뀝니다.':'';
   }
@@ -1136,7 +1336,7 @@ function tapZone(cx,cy){
   if(!pick&&sc.wall&&inside(sc.wall)) pick='wall';
   if(!pick&&sc.floor&&inside(sc.floor)) pick=(y>(bbox(sc.floor).y1-bbox(sc.floor).h*0.42))?'furn':'floor';
   if(!pick) pick='wall';
-  if(pick==='furn'&&!sc.furn) pick='floor';
+  if(pick==='furn'&&(!sc.furn||sc.furnished)) pick='floor';
   if(S.part!==pick){S.part=pick; saveSel();}
   renderStep(); placeSpots(sc);
 }
@@ -1411,7 +1611,7 @@ $('#exModal').addEventListener('click',function(e){ if(e.target.id==='exModal') 
 function init(){
   buildRates();
   loadSel();
-  fetch('regions.json?v=20261125a',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+  fetch('regions.json?v=20261125b',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
     if(!j||!j.scenes||!j.materials) throw 0;
     REG=j; SCENES=j.scenes.slice().sort(function(a,b){return (a.order||0)-(b.order||0);}); MATS=j.materials; READY=true;
   }).catch(function(){
