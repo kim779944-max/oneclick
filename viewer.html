@@ -1895,6 +1895,7 @@ async function mfSavePdf(){
     return;
   }
   if (MF.busy) return;
+  if (!mfGuard(list)) return;                          /* 한 번에 60장·300MB 까지 */
   MF.busy = true;
   try{
     /* PDF 한 개를 그대로 저장할 때는 다시 그리지 않고 원본 그대로 (글자·서명이 살아 있는 원본) */
