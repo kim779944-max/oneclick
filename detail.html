@@ -216,7 +216,7 @@ if (!p){
       </div>
       ${pkgs.slice(1).map(t => `<div class="pkgrow"><div class="n"><b>${t.split(' ')[0]}</b><span>${t}</span></div><div class="p">${t.split(' ')[0]}</div></div>`).join('')}
     </div>
-    <div class="note-block"><p>이 사이트에서는 결제하지 않고, 구매·문의는 문자로 안내드립니다. 결제는 ① 크롬·스마트스토어 ② 계좌이체 ③ 이용권 코드 셋 중 하나입니다.</p>
+    <div class="note-block"><p>이 사이트에서는 결제하지 않고, 구매·문의는 문자로 안내드립니다. 결제는 ① 크몽·스마트스토어 ② 계좌이체 ③ 이용권 코드 셋 중 하나입니다.</p>
       <button type="button" class="paygo" data-nm="${p.nm}" data-amt="${(String(p.price).match(/([\d,]{3,})\s*원/)||[,''])[1]}" style="margin-top:7px;border:1px solid rgba(255,162,77,.5);background:rgba(255,107,0,.12);color:#FFC98F;border-radius:9px;padding:7px 11px;font-family:inherit;font-size:11.5px;font-weight:900;cursor:pointer">계좌이체 · 이용권 코드 안내</button></div>
 
     ${p.shot ? `<h2 class="sec">실제 화면</h2><div class="shot"><img src="${p.shot}" alt="${p.nm} 화면" loading="lazy"></div>` : ''}
