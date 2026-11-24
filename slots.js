@@ -698,7 +698,7 @@
       '<button type="button" class="kk-b g" style="margin-top:6px" data-a="pay">결제 안내 자세히 (부가세·입금액)</button>' +
       '<div class="kk-row"><input data-a="code" placeholder="이용권 코드  예: KS2611-XXXX" autocomplete="off"><button class="kk-b p w" data-a="usecode">열쇠 받기</button></div></div>' +
       '<button class="kk-b g" data-a="tab" data-t="box">← 내 박스로</button>' +
-      '<p class="kk-note">열쇠 코드는 그 달에만 열립니다. 금액은 부가세 별도이며 문자로만 안내합니다.</p>';
+      '<p class="kk-note">열쇠 코드는 그 달에만 열립니다. 금액은 문자로 안내하고, 입금하실 때 부가세가 함께 붙습니다.</p>';
   }
 
   function panelVerify(s) {
