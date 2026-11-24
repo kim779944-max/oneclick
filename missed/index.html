@@ -167,12 +167,14 @@ h1 small{display:block;font-size:13px;font-weight:800;color:var(--amber2);letter
     return true;
   }
 
+  function shortBody(){
+    return '안녕하세요, 방금 ' + shop + '에 전화드린 손님입니다.\n' +
+           (hours ? '영업시간(' + hours + ')에 다시 연락드리겠습니다.\n' : '') +
+           '통화가 어려우시면 문자로 답 주세요.';
+  }
   var smsBtn = document.getElementById('smsBtn');
   smsBtn.addEventListener('click', function(){
-    var body = '안녕하세요, ' + shop + '입니다.\n방금 전화드렸는데 받지 못하셨네요.\n\n' +
-               '▶ ' + shop + '\n' + (hours ? '▶ 영업시간 ' + hours + '\n' : '') +
-               (phone ? '▶ ' + phone + '\n' : '');
-    if(openSms(body)) document.getElementById('smsOk').classList.add('on');
+    if(openSms(shortBody())) document.getElementById('smsOk').classList.add('on');
   });
 
   // 예약 폼 → 문자
@@ -181,7 +183,7 @@ h1 small{display:block;font-size:13px;font-weight:800;color:var(--amber2);letter
 
   var sendBtn = document.getElementById('sendBtn');
   if(!tel) sendBtn.setAttribute('disabled','');
-  sendBtn.addEventListener('click', function(){
+  function formBody(){
     var when = '';
     if(dEl.value){ var p=dEl.value.split('-'); when = p[0]+'/'+p[1]+'/'+p[2]; }
     if(tEl.value) when += (when ? ' ' : '') + tEl.value;
@@ -193,8 +195,15 @@ h1 small{display:block;font-size:13px;font-weight:800;color:var(--amber2);letter
     if(memoEl.value.trim()) lines.push('남길 말: ' + memoEl.value.trim());
     if(lines.length <= 2){ lines.push('(남기실 내용을 적어 주세요.)'); }
     lines.push('', '부재중 안내 문자에서 보냈습니다.');
-    if(openSms(lines.join('\n'))) document.getElementById('formOk').classList.add('on');
+    return lines.join('\n');
+  }
+  sendBtn.addEventListener('click', function(){
+    if(openSms(formBody())) document.getElementById('formOk').classList.add('on');
   });
+
+  // 화면·문자 문구를 그대로 쓰거나 검사할 수 있게 열어 둡니다 (업무폰 문자 자동화에서 재사용)
+  window.KTSMISSED = { shop: shop, phone: phone, hours: hours,
+    smsBody: shortBody, formBody: formBody, smsHref: function(body){ return tel ? ('sms:' + tel + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body)) : ''; } };
 })();
 </script>
 </body></html>
