@@ -43,6 +43,9 @@ button{font-family:inherit}
 .chips button.on b{color:#fff}
 .chips button span{display:block;font-size:10.5px;color:var(--ink2);font-weight:700;margin-top:1px}
 .chips .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:#ccc center/cover no-repeat;border:1px solid rgba(255,255,255,.3)}
+.chips button b .sw{width:11px;height:11px;margin-right:5px}
+.chips .grp{grid-column:1/-1;font-size:10.5px;font-weight:900;color:#8FA0B8;letter-spacing:.01em;padding:7px 2px 0;line-height:1.3}
+.chips .grp:first-child{padding-top:0}
 .selnote{font-size:10.5px;color:var(--gray);margin:6px 2px 0;line-height:1.45;font-weight:700}
 .selnote b{color:#FFB070}
 .linkrow{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:12px}
@@ -342,7 +345,8 @@ function buildRates(){
 var FB={v:'fallback',photos:{},materials:[
   {id:'denbar',nm:'덴바보드',img:'img/mat_denbar.jpg',zone:'wall',bundle:['걸레받이'],grade:'l'},
   {id:'marble',nm:'대리석',img:'img/mat_marble.jpg',zone:'wall',bundle:[],grade:'h'},
-  {id:'wallpaper',nm:'도배',img:'img/mat_wallpaper.jpg',zone:'wall',bundle:['몰딩'],grade:'m'},
+  {id:'paint',nm:'칠(페인트)',img:'img/mat_paint.jpg',zone:'wall',bundle:['몰딩'],grade:'m',grp:''},
+  {id:'mural',nm:'뮤럴 벽지',img:'img/mural_forest.jpg',zone:'wall',bundle:['몰딩'],grade:'h',grp:'고급',fit:'cover'},
   {id:'floor',nm:'강마루',img:'img/mat_floor.jpg',zone:'floor',bundle:['걸레받이'],grade:''},
   {id:'tile',nm:'타일',img:'img/mat_tile.jpg',zone:'floor',bundle:['줄눈'],grout:160,grade:''}
 ]};
@@ -380,8 +384,16 @@ function loadSel(){
     if(stylesOf(matById(S.matFloor)).some(function(x){return x.id===o.styleFloor;})) S.styleFloor=o.styleFloor;
     if(GR.indexOf(o.light)>=0) S.light=o.light;
     if(GR.indexOf(o.furn)>=0) S.furn=o.furn;
-    syncGrades();
+    normSel(); syncGrades();
   }catch(e){}
+}
+/* 고른 자재·색이 지금 목록에 없으면(빠진 자재·옛 저장값) 안전한 기본값으로 내린다 */
+function normSel(){
+  var mw=matById(S.matWall); if(!mw) S.matWall=((matsOf('wall')[0]||{}).id)||S.matWall;
+  var mf=matById(S.matFloor); if(!mf) S.matFloor=((matsOf('floor')[0]||{}).id)||S.matFloor;
+  var lw=stylesOf(matById(S.matWall)), lf=stylesOf(matById(S.matFloor));
+  if(lw.length&&!lw.some(function(x){return x.id===S.styleWall;})) S.styleWall=lw[0].id;
+  if(lf.length&&!lf.some(function(x){return x.id===S.styleFloor;})) S.styleFloor=lf[0].id;
 }
 /* 자재·단계 → 견적 등급 */
 function syncGrades(){
@@ -406,9 +418,12 @@ function styleChipsHTML(){
   var zone=S.part, m=matById(zone==='wall'?S.matWall:S.matFloor), list=stylesOf(m), cur=zone==='wall'?S.styleWall:S.styleFloor;
   if(!list.length) return '';
   return list.map(function(st,i){
-    return chipHTML('data-style',st.id,st.id===cur,'<b>'+(i+1)+' '+st.nm+'</b>');
+    var sw=st.css?'<i class="sw" style="background-color:'+st.css+'"></i>':'';
+    return chipHTML('data-style',st.id,st.id===cur,'<b>'+sw+(i+1)+' '+st.nm+'</b>');
   }).join('');
 }
+/* 자재 묶음 이름 — 3단에서 칠·뮤럴을 기본 마감과 구분해 보이게 */
+var GRPT={'칠':'칠(페인트) · 색으로 바꾸기','고급':'고급 마감 · 뮤럴 벽지(실사 무늬)'};
 function partChipsHTML(){
   var zone=S.part;
   if(zone==='light'||zone==='furn'){
@@ -419,9 +434,11 @@ function partChipsHTML(){
       return chipHTML('data-tier',t[0],on,'<b>'+t[0]+'</b><span>'+t[1]+'</span>');
     }).join('');
   }
-  var list=matsOf(zone), curId=(zone==='wall')?S.matWall:S.matFloor;
+  var list=matsOf(zone), curId=(zone==='wall')?S.matWall:S.matFloor, lastGrp='';
   return list.map(function(m){
-    return chipHTML('data-mat',m.id,m.id===curId,'<i class="sw" style="background-image:url('+m.img+')"></i>'+m.nm);
+    var grp=m.grp||'', head='';
+    if(grp&&grp!==lastGrp){ head='<span class="grp">'+(GRPT[grp]||grp)+'</span>'; lastGrp=grp; }
+    return head+chipHTML('data-mat',m.id,m.id===curId,'<i class="sw" style="background-image:url('+(m.thumb||m.img)+')"></i>'+m.nm+(m.sub?'<span>'+m.sub+'</span>':''));
   }).join('');
 }
 function sumChipsHTML(){
@@ -451,8 +468,12 @@ function renderBar(){
     ch.className='chips'+((S.lvl===3&&(S.part==='light'||S.part==='furn'))?' g4':'');
     ch.hidden=!html;
     st.hidden=!(S.lvl===4&&(S.part==='wall'||S.part==='floor'));
+    if(!st.hidden){
+      var sm=matById(S.part==='wall'?S.matWall:S.matFloor);
+      st.textContent=(sm&&sm.id==='paint')?'칠은 고른 색으로 벽이 바뀝니다.':(sm&&sm.id==='mural')?'무늬를 누르면 벽지가 바뀝니다.':(sm&&sm.id==='marble')?'대리석 톤 미리보기입니다.':'톤 미리보기 · 실물 자재 사진은 준비 중';
+    }
     note.hidden=false;
-    note.innerHTML=S.lvl===4?'색을 고르면 접히고, 고른 것 하나만 남습니다.':'부위를 누르면 자재가 펼쳐집니다.';
+    note.innerHTML=S.lvl===4?'색·무늬를 누르면 그 자리에서 바로 바뀝니다. 여러 색을 눌러 비교해 보세요.':'부위를 누르면 자재가 펼쳐집니다.';
     if(S.lvl===3&&S.part==='furn'){
       note.innerHTML='가구 1·2·3은 배치를 바꾸는 값입니다. <a href="furniture.html">가구 배치 전/후 보기 →</a>';
     }
@@ -475,13 +496,16 @@ $('#selBar').addEventListener('click',function(e){
   if(b.dataset.open){ S.part=b.dataset.open; S.lvl=3; renderBar(); return; }
   if(b.dataset.mat!==undefined&&b.dataset.mat!==''){
     var id=b.dataset.mat, m=matById(id); if(!m) return;
-    if(m.zone==='wall'){ S.matWall=id; S.styleWall=(stylesOf(m)[0]||{}).id||''; }
-    else { S.matFloor=id; S.styleFloor=(stylesOf(m)[0]||{}).id||''; }
-    S.part=m.zone; S.lvl=4; applyAll(); renderBar(); return;
+    var zone=m.zone, curId=(zone==='wall')?S.matWall:S.matFloor, haveId=(zone==='wall')?S.styleWall:S.styleFloor;
+    if(zone==='wall') S.matWall=id; else S.matFloor=id;
+    var list=stylesOf(m), sameAsCur=(curId===id), keepId;
+    keepId=(sameAsCur&&list.some(function(x){return x.id===haveId;}))?haveId:((list[0]||{}).id||'');
+    if(zone==='wall') S.styleWall=keepId; else S.styleFloor=keepId;
+    S.part=zone; S.lvl=list.length?4:2; applyAll(); renderBar(); return;
   }
   if(b.dataset.style!==undefined&&b.dataset.style!==''){
     if(S.part==='wall') S.styleWall=b.dataset.style; else S.styleFloor=b.dataset.style;
-    S.lvl=2; applyAll(); renderBar(); return;
+    applyAll(); renderBar(); return;   /* 4단을 유지한다 — 누른 칩의 선택 표시가 그대로 남아 바로 비교된다 */
   }
   if(b.dataset.tier!==undefined&&b.dataset.tier!==''){
     var n=+b.dataset.tier, g=GR[n]||'';
@@ -505,7 +529,8 @@ function calc(){
   var lines=[],mat=0,md=0,mdTxt=[];
   if(S.wall){
     var mult=wallMult(), wr=Math.round(R.wall[S.wall]*mult), wm=Math.round(wr*area); mat+=wm;
-    var basis=(matById(S.matWall)&&NAMES.wall[S.wall]&&matById(S.matWall).nm!==NAMES.wall[S.wall])?'<small>단가 기준: 벽 '+GN[S.wall]+' '+NAMES.wall[S.wall]+'</small>':'';
+    var mw0=matById(S.matWall), btxt=(mw0&&mw0.basis)?mw0.basis:((mw0&&NAMES.wall[S.wall]&&mw0.nm!==NAMES.wall[S.wall])?('단가 기준: 벽 '+GN[S.wall]+' '+NAMES.wall[S.wall]):'');
+    var basis=btxt?'<small>'+btxt+'</small>':'';
     lines.push(['재료비',wallLabel()+(mult!==1?' ×'+mult:'')+' '+won(wr)+'원/㎡ × '+area.toLocaleString('ko-KR')+'㎡ = <b>'+won(wm)+'원</b>'+tagOf('wall.'+S.wall)+basis]);
     var wd=Math.ceil(area/10); md+=wd; mdTxt.push('벽 '+wd+'인·일');
   }
@@ -618,12 +643,15 @@ function fillFloor(ctx,tex,b,vp){
     for(var k=Math.floor(-xs/tw)-1;k<=Math.ceil((1200-xs)/tw)+1;k++) ctx.drawImage(tex,0,v,TW,1,xs+k*tw,y,tw+0.6,1);
   }
 }
-function fillTex(ctx,src,pts,tex,zone,grout,vp){
+function fillTex(ctx,src,pts,tex,zone,grout,vp,fit){
   var b=bbox(pts);
   ctx.save(); polyPath(ctx,pts); ctx.clip();
   if(zone==='floor'){
     if(vp) fillFloor(ctx,tex,b,vp);
     else { ctx.translate(b.x0,b.y0); ctx.scale(1,FLOOR_SY); ctx.fillStyle=ctx.createPattern(tex,'repeat'); ctx.fillRect(0,0,b.w,b.h/FLOOR_SY+2); }
+  } else if(fit==='cover'){
+    var sc=Math.max(b.w/tex.width,b.h/tex.height), dw=tex.width*sc, dh=tex.height*sc;
+    ctx.drawImage(tex,b.x0+(b.w-dw)/2,b.y0+(b.h-dh)/2,dw,dh);
   } else {
     ctx.translate(b.x0,b.y0); ctx.fillStyle=ctx.createPattern(tex,'repeat'); ctx.fillRect(0,0,b.w,b.h);
     if(grout){
@@ -685,7 +713,7 @@ function applyMats(ctx,src,k,texs){
   var done={};
   ['wall','floor'].forEach(function(z){
     var m=matById(MAT[z]); if(!m||!texs[m.id]||!r[z]) return;
-    fillTex(ctx,src,r[z],texs[m.id],z,(m.bundle.indexOf('줄눈')>=0&&canBundle('줄눈',k))?(m.grout||160):0,r.vp);
+    fillTex(ctx,src,r[z],texs[m.id],z,(m.bundle.indexOf('줄눈')>=0&&canBundle('줄눈',k))?(m.grout||160):0,r.vp,m.fit);
   });
   ['wall','floor'].forEach(function(z){
     var m=matById(MAT[z]); if(!m||!texs[m.id]) return;
@@ -868,7 +896,7 @@ function drawSample(){
       var m=matById(MAT[z]); if(!m) return;
       var st=styleById(m,(z==='wall')?S.styleWall:S.styleFloor);
       need++;
-      loadImg(m.img,function(t){ if(t) texs[m.id]=styleCanvas(t,st); else toast(m.nm+' 사진을 불러오지 못했습니다 · 다시 눌러 주세요'); load(); });
+      loadImg((st&&st.img)?st.img:m.img,function(t){ if(t) texs[m.id]=styleCanvas(t,st); else toast(m.nm+' 사진을 불러오지 못했습니다 · 다시 눌러 주세요'); load(); });
     });
     if(!need) paint();
   });
@@ -885,11 +913,11 @@ function paintBundle(){
   $('#bundleTxt').innerHTML=(extra.length?'고른 자재와 함께 바뀌는 항목: <b>'+names.join(' + ')+' + '+extra.join(' + ')+'</b>':'고른 자재: <b>'+names.join(' + ')+'</b> · 함께 바뀌는 항목 없음');
 }
 function loadRegions(){
-  fetch('regions.json?v=20261124b',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+  fetch('regions.json?v=20261124c',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
     if(!j||!j.photos||!j.materials) throw 0;
     REG=j; REG_ST='ok';
   }).catch(function(){REG=null;REG_ST='fail';}).then(function(){
-    loadSel(); syncGrades(); renderBar(); renderSelect(); drawSample(); calc();
+    normSel(); loadSel(); normSel(); syncGrades(); renderBar(); renderSelect(); drawSample(); calc();
   });
 }
 
