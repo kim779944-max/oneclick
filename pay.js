@@ -150,7 +150,7 @@
       accountHtml({ label: label }) +
       '<div class="kpay-sec"><b class="t"><em>③</em>이용권 코드 넣기</b>' +
       '<div class="ln">문자로 받은 코드(KS+연월-4자리)를 넣으면 이번 달 이용권이 열립니다. 지난달 코드는 열리지 않습니다.</div>' +
-      '<div class="kpay-row"><input data-a="code" placeholder="예: ' + codeOf() + '" autocomplete="off" aria-label="이용권 코드"><button type="button" class="kpay-b p" style="width:auto;padding:10px 14px" data-a="go">확인</button></div>' +
+      '<div class="kpay-row"><input data-a="code" placeholder="예: KS2611-XXXX" autocomplete="off" aria-label="이용권 코드"><button type="button" class="kpay-b p" style="width:auto;padding:10px 14px" data-a="go">확인</button></div>' +
       '<div class="ln" data-a="ok" hidden style="margin-top:6px;color:#9BE7A8"></div></div>' +
       '<p class="kpay-note">이용권 코드는 그 달에만 열립니다. 이 사이트는 카드번호·계좌번호를 저장하지 않고, 결제도 이 화면에서 하지 않습니다.</p>' +
       (master() ? '<p class="kpay-note" style="color:#FFA24D">마스터 · 계좌 칸: ' + (full() ? '입력됨' : '비어 있음(pay.js ACCOUNT)') + ' · 이번 달 코드 ' + codeOf() + '</p>' : '');

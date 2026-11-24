@@ -124,7 +124,9 @@
       pb.setAttribute('data-paygo', '1');
       pb.textContent = '계좌이체 · 이용권 코드 안내 ▾';
       pb.onclick = function () {
-        payOpen({ label: CFG.toolTitle || CFG.tool || '이용권', amount: CFG.amount || priceOf(CFG.more) });
+        var nm = '';
+        try { nm = String(d.title || '').split(/[—|·]/)[0].replace(/^KTS\s*/, '').trim(); } catch (e) { nm = ''; }
+        payOpen({ label: CFG.toolTitle || nm || CFG.tool || '이용권', amount: CFG.amount || priceOf(CFG.more) });
       };
       mbox.appendChild(pb);
     }
