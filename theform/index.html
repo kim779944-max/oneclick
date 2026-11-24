@@ -2097,7 +2097,7 @@ $("#fType").onclick = e => { const b = e.target.closest('button'); const f = CUR
 /* ---------- ⚡ 1클릭 자동 빈칸 (적립 146번) — 캔버스 픽셀 분석만 · 외부 요청 0 ----------
    조명 정규화 → 잉크 마스크 → 가로·세로 괘선 → (가) 밑줄 위 빈칸 · (나) 표 빈 칸 · (다) 글자 칸 안 넓은 여백 → 겹침 정리 */
 const AUTO_CFG = {ink:170, lineInk:215, hRun:40, vRun:20, lineT:4, ulInk:.025, cellInk:.015};
-function autoDetectFields(){
+function autoDetectFields(ignoreAuto){
   const t0 = performance.now();
   const W0 = bgW(), H0 = bgH(), SW = Math.min(1000, W0), SH = Math.round(SW * H0 / W0), N = SW * SH, sc = SW / 1000;
   const cv = document.createElement('canvas'); cv.width = SW; cv.height = SH;
@@ -2224,7 +2224,8 @@ function autoDetectFields(){
     .filter(f => f.w >= 3 && f.h >= 1.2).sort((p, q) => q.w * q.h - p.w * p.h);
   const keep = [];
   P.forEach(f => { if (!keep.some(q => iou(f, q) > .45)) keep.push(f); });
-  const old = CUR.fields.slice();
+  /* 168: 다시 돌릴 때는 지난번 자동 칸을 빈 자리로 본다(손으로 찍은 칸만 지킨다) */
+  const old = (ignoreAuto ? CUR.fields.filter(f => !f._auto) : CUR.fields).slice();
   const fin = keep.filter(f => !old.some(o => iou(f, o) > .3)).sort((p, q) => (Math.abs(p.y - q.y) < 1 ? p.x - q.x : p.y - q.y)).slice(0, 200);
   const ms = Math.round(performance.now() - t0);
   return {fields:fin, ms, SW, SH, nH:HL.length, nV:VL.length, kinds:fin.reduce((o, f) => (o[f.k] = (o[f.k] || 0) + 1, o), {})};
@@ -2237,7 +2238,7 @@ function runAutoDetect(){
   b.disabled = true; b.textContent = '자동으로 찾는 중…';
   setTimeout(() => {
     let r = null;
-    try{ r = autoDetectFields(); }catch(e){ toast('자동으로 찾지 못했습니다'); }
+    try{ r = autoDetectFields(true); }catch(e){ toast('자동으로 찾지 못했습니다'); }
     b.disabled = false; b.textContent = '자동 빈칸 찾기';
     if (!r) return;
     window.TF_AUTO_LAST = {ms:r.ms, n:r.fields.length, SW:r.SW, SH:r.SH, nH:r.nH, nV:r.nV, kinds:r.kinds};
