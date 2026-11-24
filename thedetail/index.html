@@ -49,6 +49,17 @@
   .sw button.on{background:var(--orange);color:#141414}
   .sw button.on i{opacity:1;background:#141414;box-shadow:none}
 
+  /* 2026-11-24 폰 390 점검: 360·375 폰에서 머리글(브랜드+쇼룸+상품/부동산) 합이 화면보다 넓어
+     페이지가 382px로 밀리며 가로 스크롤·스위치 잘림이 생기던 것 — 좁은 폰에서만 글자·여백을 줄인다 */
+  @media (max-width:383px){
+    .topin{padding:11px 10px 9px;gap:6px}
+    .brand{font-size:13px;gap:6px}
+    .brand small{font-size:8px;letter-spacing:.1em}
+    .topin>a{font-size:10px !important;padding:4px 7px !important}
+    .sw{padding:2px}
+    .sw button{font-size:11.5px;padding:8px 10px;gap:4px}
+  }
+
   /* ---------- intro ---------- */
   .intro{padding:20px 0 4px}
   .intro h1{font-size:23px;line-height:1.32;margin:0 0 7px;font-weight:800;letter-spacing:-.025em}
