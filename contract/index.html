@@ -996,7 +996,12 @@ window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, s
     }
     if (S.step === 3) return '특약';
     var lab = el.previousElementSibling;
-    return (lab && lab.textContent ? lab.textContent.trim() : '서명').slice(0, 20);
+    if (lab){
+      var c = lab.cloneNode(true), em = c.querySelector('em'); if (em) em.remove();
+      var t2 = (c.textContent || '').replace(/\s+/g, ' ').trim();
+      if (t2) return t2.slice(0, 20);
+    }
+    return '서명';
   }
   function refresh(){ try{ KTS_HELPER.guideRefresh(); }catch(e){} }
   /* 인쇄·저장을 누르면 작성이 끝난 것으로 본다 → [?]는 60초 문의로 돌아간다 */
