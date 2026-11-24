@@ -999,7 +999,19 @@ window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, s
     return (lab && lab.textContent ? lab.textContent.trim() : '서명').slice(0, 20);
   }
   function refresh(){ try{ KTS_HELPER.guideRefresh(); }catch(e){} }
+  /* 인쇄·저장을 누르면 작성이 끝난 것으로 본다 → [?]는 60초 문의로 돌아간다 */
+  ['printBtn', 'pngBtn'].forEach(function(id){
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', function(){ CW.done = true; setTimeout(refresh, 300); });
+  });
+  if (document.getElementById('plbls')) document.getElementById('plbls').addEventListener('click', function(){ CW.done = false; setTimeout(refresh, 120); });
+  if (document.getElementById('newBtn')) document.getElementById('newBtn').addEventListener('click', function(){ CW.done = false; });
+  ['startBtn', 'otherForm'].forEach(function(id){
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', function(){ CW.done = false; setTimeout(refresh, 200); });
+  });
   KTS_HELPER.writing(function(){
+    if (CW.done) return null;
     if (!(S.step >= 1 && S.step <= 4)) return null;
     var els = scrEls(); if (!els.length) return null;
     var a = document.activeElement, focused = els.indexOf(a) >= 0;

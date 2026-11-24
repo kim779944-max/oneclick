@@ -2731,6 +2731,19 @@ function guideState(){
   if (i == null) i = L[L.length - 1];
   const el = navEl(i), mic = inList || GUIDE_I === i;
   if (!inList) updNavPos(i);
+  /* 글자 칸을 다 채웠으면 사인(서명) 칸으로 이어서 안내 — 사인·도장도 같이 다닌다 */
+  const emptyLeft = L.filter(k => { const e2 = navEl(k); return e2 && !String(e2.value || '').trim(); });
+  if (!inList && !emptyLeft.length){
+    const sg = CUR.fields.map((f, k) => ({ f: f, k: k }))
+      .filter(x => x.f.type === 'sign' && $(`#valList canvas[data-sig="${x.k}"]`));
+    if (sg.length){
+      const t = sg.find(x => !VALS[x.f.label]) || sg[0];
+      const cv = $(`#valList canvas[data-sig="${t.k}"]`);
+      return { active: true, mode: 'cursor', label: '서명 — ' + t.f.label, pos: '서명', el: cv,
+        tap: function(){ GUIDE_I = -1; try{ cv.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
+          cv.classList.add('fldfocus'); setTimeout(function(){ try{ cv.classList.remove('fldfocus'); }catch(e){} }, 1600); } };
+    }
+  }
   return {
     active: true, mode: mic ? 'mic' : 'cursor',
     label: CUR.fields[i].label, pos: (L.indexOf(i) + 1) + ' / ' + L.length, el: el,
