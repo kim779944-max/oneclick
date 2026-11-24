@@ -153,7 +153,7 @@ body.docopen .kipfoot{display:none}
 .banner .t{flex:1;font-size:12px;line-height:1.4;color:#AFBDD0}
 .banner .t b{font-size:13.5px;color:var(--amber2)}
 .banner a{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber);font-weight:900;font-size:12.5px;padding:10px 13px;border-radius:10px;white-space:nowrap}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;opacity:0;transition:.25s;z-index:60}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:10px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:60;max-width:calc(100vw - 36px);text-align:center;line-height:1.5;letter-spacing:-.2px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .toast.on{opacity:1}
 body.has-badge .banner{bottom:58px}
 body.has-badge .toast{bottom:150px}
@@ -1906,7 +1906,7 @@ async function mfSavePdf(){
       ppDl(blob, name);
       MF.last = {type: 'pdf-copy', name: name, count: 1, bytes: blob.size};
       mfProg(false);
-      showToast('PDF 저장 완료 · ' + name + ' — 휴대폰 [내 파일 → 다운로드] 폴더', 3800);
+      showToast('PDF 저장 완료 · 휴대폰 [내 파일 → 다운로드] 폴더', 3400);
       return;
     }
     await ktsLoadPdf();
@@ -1928,7 +1928,7 @@ async function mfSavePdf(){
     ppDl(blob, name);
     MF.last = {type: 'pdf', name: name, count: pages.length, bytes: blob.size};
     mfProg(false);
-    showToast('PDF 저장 완료 · ' + name + ' — 휴대폰 [내 파일 → 다운로드] 폴더', 3800);
+    showToast('PDF 저장 완료 · 휴대폰 [내 파일 → 다운로드] 폴더', 3400);
   }catch(e){
     console.warn('pdf fail', e);
     mfProg(false);
