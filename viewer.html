@@ -106,7 +106,7 @@ body.docopen .doc .bar #backb{display:none}
  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);
  padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
 body.docopen #pbar{display:block}
-body.docopen.ppnoticemode #pbar{display:none}
+/* (2026-11-25 · 212번) 열지 못한 파일 안내 화면에서도 저장 줄은 그대로 둔다 — 저장 기능이 사라져 보이지 않게 */
 #pbar .in{max-width:460px;margin:0 auto;display:flex;align-items:center;gap:6px}
 #pbar button{font-family:inherit;font-size:12.5px;font-weight:900;color:#DCE6F2;background:#12203C;border:1px solid var(--line2);
  border-radius:10px;padding:11px 11px;white-space:nowrap;flex:0 0 auto}
@@ -122,6 +122,8 @@ body.docopen #out{position:relative;height:100%;overflow:auto;-webkit-overflow-s
 body.docopen.ppnoticemode #out{padding:18px 12px}
 body.docopen .banner{display:none!important}
 body.docopen .kipfoot{display:none}
+/* 공통 UX 가 문서 상자(#out) 안에 넣는 4버튼 줄은 종이 위에 올리지 않는다 */
+#out .kux-flow{display:none!important}
 @media print{
   header,#vtool,#pbar,.drop,#loader,.kipfoot,.banner,.toast,.ktsRsv{display:none!important}
   body{background:#fff!important;display:block;padding:0!important;overflow:visible!important}
@@ -138,6 +140,10 @@ body.docopen .kipfoot{display:none}
   .ppsheet{width:auto!important;padding:0!important}
   .ppno,.ppmark{display:none!important}
   .doc.paper,.doc{background:#fff}
+  .ppspace,.ppscale{overflow:visible!important;height:auto!important}
+  #pbar .svhint{display:none!important}
+  .kux-flow,.kux-free,.kux-morebar,.kuxguide,.kux-full{display:none!important}
+  table.xl tr{page-break-inside:avoid}
   table.xl td,table.xl th{color:#000!important;border-color:#333!important;background:#fff!important}
   .hw p,.hw h4{color:#000!important}
   @page{size:A4;margin:10mm}
@@ -147,7 +153,7 @@ body.docopen .kipfoot{display:none}
 .banner .t{flex:1;font-size:12px;line-height:1.4;color:#AFBDD0}
 .banner .t b{font-size:13.5px;color:var(--amber2)}
 .banner a{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber);font-weight:900;font-size:12.5px;padding:10px 13px;border-radius:10px;white-space:nowrap}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;opacity:0;transition:.25s;z-index:60}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:10px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:60;max-width:calc(100vw - 36px);text-align:center;line-height:1.5;letter-spacing:-.2px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .toast.on{opacity:1}
 body.has-badge .banner{bottom:58px}
 body.has-badge .toast{bottom:150px}
@@ -220,6 +226,8 @@ table.xl td.b{font-weight:900}
 .mfmark{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,107,0,.75);pointer-events:none;z-index:2}
 .mfmark em{position:absolute;right:4px;top:-15px;font-style:normal;font-size:9px;font-weight:800;color:#FFA24D}
 #pbar .in.r2{margin-top:6px}
+#pbar .svhint{max-width:460px;margin:5px auto 0;text-align:center;font-size:9.5px;font-weight:700;color:#7C8DA6;line-height:1.35;letter-spacing:-.1px}
+#pbar .svhint b{color:#9FB0C8;font-weight:900}
 #pbar .split{flex:1.25;display:flex;min-width:0}
 #pbar .split #vtSaveImg{flex:1;padding:11px 6px;border-radius:10px 0 0 10px}
 #pbar .split #mfSaveMore{flex:0 0 auto;padding:11px 10px;border-radius:0 10px 10px 0;border-left:1px solid rgba(10,17,40,.35);
@@ -289,7 +297,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
   <span class="split"><button type="button" id="vtSaveImg">그림 저장</button><button type="button" id="mfSaveMore" aria-label="그림 저장 더보기">▾</button></span>
   <button type="button" id="mfPdfBtn">PDF 저장</button>
   <button type="button" id="pgEdit">더편집</button>
-</div></div>
+</div><div class="svhint" id="svHint">저장한 파일은 휴대폰 <b>[내 파일 → 다운로드]</b> 폴더로 들어갑니다</div></div>
 <div class="mfmenu" id="mfMenu">
   <button type="button" id="mfSaveCur">지금 장 PNG</button>
   <button type="button" id="mfSaveZip">전체 장 PNG(ZIP)</button>
@@ -365,6 +373,9 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="window.pdfjsLib=undefined"></script>
+<!-- 구형 한글(.hwp) 브라우저 자체 해석기 · PDF 직접 만들기 — CDN 없이 이 저장소에서 바로 (212·213번) -->
+<script src="v/hwp5.js?v=20261125a"></script>
+<script src="v/ktspdf.js?v=20261125a"></script>
 <script>
 if (typeof pdfjsLib !== 'undefined'){
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -663,6 +674,40 @@ async function openHwpx(buf){
     note: '한글(hwpx) · ' + nRowsSeen + '행 × ' + nColsSeen + '열' + (merged ? ' · 병합 ' + merged + '개' : '')};
 }
 
+/* ---------- 구형 한글(.hwp) — 사무실 PC·변환 서버 없이 이 기기에서 바로 읽는다 (212·213번) ----------
+   v/hwp5.js 가 CFB 컨테이너를 열고 zlib 를 풀어 본문 문단·표를 세운다.
+   PC 변환 서버가 꺼져 있어도 안내 모달로 막지 않는다. 해석이 안 되는 파일만 (연결돼 있으면) PC 변환으로 넘긴다. */
+function ktsLoadHwp(){
+  return new Promise((ok, no) => {
+    if (window.KTS_HWP5) return ok();
+    const s = document.createElement('script');
+    s.src = 'v/hwp5.js?v=20261125a';
+    s.onload = () => (window.KTS_HWP5 ? ok() : no(new Error('한글 문서 해석기를 불러오지 못했습니다')));
+    s.onerror = () => no(new Error('한글 문서 해석기를 불러오지 못했습니다'));
+    document.head.appendChild(s);
+  });
+}
+async function openHwp(buf){
+  await ktsLoadHwp();
+  const doc = await window.KTS_HWP5.parse(buf);
+  const st = doc.stats || {};
+  return {kind: 'html', html: window.KTS_HWP5.toHtml(doc), paper: true,
+    note: '구형 한글' + (doc.version && doc.version !== '5.0.0.0' ? ' v' + doc.version : '') +
+      ' · ' + (st.paras || 0) + '문단' + (st.tables ? ' · 표 ' + st.tables + '개' : '') +
+      (st.images ? ' · 그림 ' + st.images + '개' : '')};
+}
+async function openHwpOrPc(file){
+  try{ return await openHwp(await file.arrayBuffer()); }
+  catch(e){
+    const why = (e && e.message) ? e.message : '이 한글 문서는 읽지 못했습니다';
+    const pb = await hwpViaPc(file);                    /* 연결돼 있을 때만 (없으면 곧바로 null) */
+    if (pb) return (typeof pdfjsLib !== 'undefined')
+      ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF(사무실 PC)'}
+      : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF(사무실 PC)'};
+    return {kind: 'notice', note: '구형 한글', why: why};
+  }
+}
+
 /* ---------- DOCX (워드 · mammoth 없이 word/document.xml 직접 해석) ---------- */
 async function openDocx(buf){
   const z = await readZip(buf);
@@ -713,10 +758,11 @@ const PP = {kind:'', w:794, h:1123, zoom:1, cur:0, pages:[], tops:[], pageH:1123
   sheet:null, pdf:null, file:null, name:'문서', space:null, scale:null, io:null, hiT:null, notice:false};
 
 let toastT;
-function showToast(m){
+function showToast(m, ms){
   let t = document.querySelector('.toast');
   if (!t){ t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
-  t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1900);
+  t.textContent = m; t.classList.add('on'); clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('on'), Math.max(1600, ms || 1900));
 }
 function ppDpr(){ return Math.max(1, Math.min(2.5, window.devicePixelRatio || 1)); }
 function ppClamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
@@ -726,7 +772,7 @@ function ppBase(){ return String(PP.name || '문서').replace(/\.[^.]+$/, ''); }
 function fitStage(){
   const vt = document.getElementById('vtool'), pb = document.getElementById('pbar');
   const t = (vt && vt.offsetHeight) || 84;
-  const b = document.body.classList.contains('ppnoticemode') ? 0 : ((pb && pb.offsetHeight) || 64);
+  const b = (pb && pb.offsetHeight) || 64;
   document.documentElement.style.setProperty('--vt', t + 'px');
   document.documentElement.style.setProperty('--pb', Math.round(b) + 'px');
   document.body.style.paddingTop = t + 'px';
@@ -1035,17 +1081,18 @@ function buildFrame(url){
   PP.pages = [{el: el, w: w, h: h}]; PP.tops = [0];
 }
 
-/* ---------- 구형 .hwp — 어설프게 깨뜨리지 않고 안내만 ---------- */
+/* ---------- 구형 .hwp — 자체 해석이 안 될 때만 안내 (안내 화면에서도 저장 줄은 남긴다) ---------- */
 function buildNotice(){
   PP.kind = 'notice';
   const card = document.createElement('div');
   card.className = 'ppnotice';
   card.style.width = '340px';
+  const why = PP.noticeWhy ? '<p><b>' + esc(PP.noticeWhy) + '</b></p>' : '';
   card.innerHTML = '<div class="ic">!</div>'
-    + '<h3>원본 1:1 표시를 위해<br>PDF 또는 사진으로 저장해 열어 주세요</h3>'
-    + '<p>구형 <b>.hwp</b>는 폰 브라우저에서 종이 그대로 그릴 수 없습니다.</p>'
-    + '<p>한글에서 <b>[인쇄 → PDF로 저장]</b>을 하거나, 종이를 <b>사진으로 찍어</b> 올리면 원본 비율 그대로 1:1로 보입니다.</p>'
-    + '<p class="pppriv">구형 .hwp는 사무실 PC에서 PDF로 바꿉니다. 파일은 그 PC를 거쳐 이 기기로 돌아오고 저장되지 않습니다.</p>'
+    + '<h3>이 파일은 이 기기에서<br>바로 열지 못했습니다</h3>'
+    + why
+    + '<p>한글에서 <b>[파일 → PDF로 저장]</b>을 하거나, 종이를 <b>사진으로 찍어</b> 올리면 원본 비율 그대로 1:1로 보입니다.</p>'
+    + '<p class="pppriv">파일은 서버로 올라가지 않고 이 기기 안에서만 처리됩니다.</p>'
     + '<button type="button" id="ppPick">PDF·사진으로 열기</button>'
     + '<button type="button" class="ppretry" id="ppRetry">사무실 PC로 변환 다시 시도</button>';
   (PP.blk || PP.scale).appendChild(card);
@@ -1084,6 +1131,7 @@ async function paintDoc(r, file, nm){
   space.appendChild(scale); out.appendChild(space);
   PP.space = space; PP.scale = scale;
   PP.zoom = 1;
+  PP.noticeWhy = r.why || '';
   if (r.kind === 'pdf') await buildPdf(r.buf);
   else if (r.kind === 'img') await buildImage(r.url);
   else if (r.kind === 'html' || r.kind === 'table') buildSheet(r);   /* openXlsx/openText 는 'table' */
@@ -1124,14 +1172,14 @@ async function ppCanvasBlob(cv){
 }
 async function pdfPageBlob(n, pdf){ return ppCanvasBlob(await pdfPageCanvas(n, pdf)); }
 async function savePdfPage(n){
-  ppDl(await pdfPageBlob(n), ppBase() + '_' + (n + 1) + 'p.png');
+  ppDl(await pdfPageBlob(n), '[더뷰]_' + ppBase() + '_' + (n + 1) + 'p.png');
 }
 function ppLoadH2C(){
   return new Promise((ok, no) => {
     if (window.html2canvas) return ok();
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload = ok; s.onerror = no; document.head.appendChild(s);
+    const load = (src, next) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = next; document.head.appendChild(s); };
+    load('v/lib/html2canvas.min.js?v=20261125a',                      /* 기기 안 저장본 먼저 (CDN 없이도 저장) */
+      () => load('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', no));
   });
 }
 async function sheetPageCanvas(n, sheet, sh){
@@ -1157,7 +1205,7 @@ async function sheetPageCanvas(n, sheet, sh){
 }
 async function sheetPageBlob(n, sheet, sh){ return ppCanvasBlob(await sheetPageCanvas(n, sheet, sh)); }
 async function saveSheetPage(n){
-  ppDl(await sheetPageBlob(n), ppBase() + '_' + (n + 1) + 'p.png');
+  ppDl(await sheetPageBlob(n), '[더뷰]_' + ppBase() + '_' + (n + 1) + 'p.png');
 }
 async function saveImage(){
   if (!PP.kind || PP.kind === 'frame'){ showToast('이 형식은 이미지로 저장할 수 없습니다 · [출력]에서 PDF로 저장하세요'); return; }
@@ -1166,9 +1214,9 @@ async function saveImage(){
   showToast('이미지로 저장하는 중…');
   try{
     if (PP.kind === 'pdf') await savePdfPage(PP.cur);
-    else if (PP.kind === 'img') ppDl(PP.file, PP.name || '사진.png');
+    else if (PP.kind === 'img') ppDl(PP.file, '[더뷰]_' + (PP.name || '사진'));
     else await saveSheetPage(PP.cur);
-    showToast('저장했습니다 · 다운로드 폴더를 확인하세요');
+    showToast('저장했습니다 · 휴대폰 [내 파일 → 다운로드] 폴더', 3200);
   }catch(e){
     showToast('이미지 저장 실패 — [출력]에서 PDF로 저장해 주세요');
     console.warn('save image fail', e);
@@ -1241,11 +1289,8 @@ async function showFile(file){
     } else if (/\.(csv|txt)$/.test(name)){
       r = openText(await file.text(), name);
     } else if (/\.hwp$/.test(name)){
-      loader(true, nm, '구형 한글 → PDF로 바꾸는 중… (사무실 PC)', 40);
-      const pb = await hwpViaPc(file);                  /* 사무실 PC가 꺼져 있으면 null → 지금의 안내 카드 */
-      r = !pb ? {kind: 'notice', note: '구형 한글'}
-        : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
-        : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
+      loader(true, nm, '한글 문서를 이 기기에서 읽는 중…', 44);
+      r = await openHwpOrPc(file);                      /* 기본은 브라우저 자체 해석 — PC 서버가 꺼져 있어도 바로 */
     } else {
       r = {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''}
     }
@@ -1342,7 +1387,7 @@ window.addEventListener('popstate', e => {
   q('vtIn').onclick = () => zoomBy(1.25);
   q('vtOne').onclick = () => { applyZoom(1); ppHiRes(); showToast('원본크기 100%'); };
   q('vtFit').onclick = () => { applyZoom(fitZoom()); ppHiRes(); showToast('폭에 맞췄습니다 · 두 손가락으로 확대'); };
-  q('vtPrint').onclick = () => { showToast('인쇄 창에서 [PDF로 저장]을 고르면 종이로 나갑니다'); setTimeout(() => window.print(), 140); };
+  q('vtPrint').onclick = () => { showToast('인쇄 창이 열립니다 · 파일로 받으려면 [PDF 저장]을 누르세요', 2600); setTimeout(() => window.print(), 140); };
   q('vtConv').onclick = () => { location.href = 'converter.html'; };
   q('vtView').onclick = () => showToast('지금 더뷰입니다');
   q('vtBack').onclick = () => {
@@ -1419,11 +1464,8 @@ async function mfRead(file, step){
   if (/\.hwpx$/.test(name)) return openHwpx(await file.arrayBuffer());
   if (/\.(csv|txt)$/.test(name)) return openText(await file.text(), name);
   if (/\.hwp$/.test(name)){
-    if (step) step('구형 한글 → PDF로 바꾸는 중… (사무실 PC)');
-    const pb = await hwpViaPc(file);
-    return !pb ? {kind: 'notice', note: '구형 한글'}
-      : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
-      : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
+    if (step) step('한글 문서를 이 기기에서 읽는 중…');
+    return await openHwpOrPc(file);
   }
   return {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''};
 }
@@ -1748,9 +1790,9 @@ async function mfSaveCur(){
   showToast('그림으로 저장하는 중…');
   try{
     const r = await mfPng(g.it, g.pi);
-    ppDl(r.blob, '더뷰_' + mfBase(g.it.name) + '_' + (PP.cur + 1) + 'p.' + r.ext);
-    MF.last = {type: 'png', name: '더뷰_' + mfBase(g.it.name) + '_' + (PP.cur + 1) + 'p.' + r.ext};
-    showToast('저장했습니다 · 다운로드 폴더를 확인하세요');
+    ppDl(r.blob, '[더뷰]_' + mfBase(g.it.name) + '_' + (PP.cur + 1) + 'p.' + r.ext);
+    MF.last = {type: 'png', name: '[더뷰]_' + mfBase(g.it.name) + '_' + (PP.cur + 1) + 'p.' + r.ext};
+    showToast('저장했습니다 · 휴대폰 [내 파일 → 다운로드] 폴더', 3200);
   }catch(e){ console.warn('save cur fail', e); showToast('그림 저장 실패 — [출력]에서 PDF로 저장해 주세요'); }
 }
 async function mfSaveZip(){
@@ -1775,11 +1817,11 @@ async function mfSaveZip(){
     if (zip){
       mfProg(true, '더뷰_전체_' + cnt + '장', 'ZIP 묶는 중…', 100);
       const blob = await zip.generateAsync({type: 'blob', compression: 'STORE'});
-      const name = '더뷰_전체_' + cnt + '장_' + mfToday() + '.zip';
+      const name = '[더뷰]_전체_' + cnt + '장_' + mfToday() + '.zip';
       ppDl(blob, name);
       MF.last = {type: 'zip', name: name, count: cnt, bytes: blob.size};
     } else MF.last = {type: 'zip-fallback', count: cnt};
-    mfProg(false); showToast(zip ? 'ZIP을 저장했습니다 · ' + cnt + '장' : '한 장씩 저장했습니다 · ' + cnt + '장');
+    mfProg(false); showToast(zip ? 'ZIP 저장 완료 · 휴대폰 [내 파일 → 다운로드] 폴더 · ' + cnt + '장' : '한 장씩 저장했습니다 · ' + cnt + '장', 3200);
   }catch(e){
     console.warn('zip fail', e); mfProg(false); showToast('ZIP 저장 실패 — 30장씩 나눠 저장해 주세요');
   }finally{ MF.busy = false; mfProg(false); }
@@ -1795,44 +1837,103 @@ async function mfPrintPrep(){
   }
 }
 window.addEventListener('afterprint', () => { if (MF.printing){ MF.printing = false; setTimeout(mfVis, 300); } });
+/* ---------- [PDF 저장] — 브라우저 안에서 PDF 파일을 만들어 그대로 내려받는다 (212·213번) ----------
+   window.print() 를 쓰지 않는다: 안드로이드 크롬이 "내 파일 어디에 저장할까요" 창을 띄우고 미리보기 확대도 안 되던 원인.
+   PDF·사진·표·한글 어느 것이든 화면에 그린 장을 JPEG 로 떠서 직접 .pdf 로 엮는다. 파일 이름은 [더뷰]_원본파일명.pdf */
+function ktsLoadPdf(){
+  return new Promise((ok, no) => {
+    if (window.KTS_PDF) return ok();
+    const s = document.createElement('script');
+    s.src = 'v/ktspdf.js?v=20261125a';
+    s.onload = () => (window.KTS_PDF ? ok() : no(new Error('PDF 도구를 불러오지 못했습니다')));
+    s.onerror = () => no(new Error('PDF 도구를 불러오지 못했습니다'));
+    document.head.appendChild(s);
+  });
+}
+function ktsPdfName(list){
+  const first = (list && list[0] && list[0].it && list[0].it.name) || PP.name || '문서';
+  const base = mfBase(first);
+  const many = (typeof MF !== 'undefined' && MF.multi && MF.items.length > 1) || (list && list.length > 1 && list.some(c => c.it !== list[0].it));
+  return '[더뷰]_' + base + (many ? '_' + list.length + '장_' + mfToday() : '') + '.pdf';
+}
+async function ktsJpegOf(cv){
+  const blob = await new Promise(ok => cv.toBlob(ok, 'image/jpeg', 0.93));
+  if (!blob) throw new Error('그림을 만들지 못했습니다');
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const out = {bytes: bytes, w: cv.width, h: cv.height};
+  cv.width = 0; cv.height = 0;
+  return out;
+}
+async function mfPdfPage(it, pi){
+  if (it.kind === 'pdf' && it.pdf) return ktsJpegOf(await pdfPageCanvas(pi, it.pdf, 2.0));
+  if (it.kind === 'img'){
+    let url = it.url;
+    if (!url){
+      const el = it.pages && it.pages[0] && it.pages[0].el;
+      const im0 = el && el.querySelector('img');
+      url = (im0 && im0.src) || (it.file ? URL.createObjectURL(it.file) : '');
+    }
+    if (!url) return null;
+    const im = await loadImg(url);
+    /* 사진은 이미 JPEG 이면 다시 압축하지 않고 원본 그대로 담는다 */
+    if (it.file && /\.jpe?g$/i.test(it.name || '')){
+      return {bytes: new Uint8Array(await it.file.arrayBuffer()), w: im.naturalWidth || im.width, h: im.naturalHeight || im.height};
+    }
+    const cv = document.createElement('canvas');
+    cv.width = im.naturalWidth || im.width; cv.height = im.naturalHeight || im.height;
+    const g2 = cv.getContext('2d'); g2.fillStyle = '#ffffff'; g2.fillRect(0, 0, cv.width, cv.height); g2.drawImage(im, 0, 0);
+    return ktsJpegOf(cv);
+  }
+  if (it.sheet) return ktsJpegOf(await sheetPageCanvas(pi, it.sheet, it.h));
+  return null;
+}
 async function mfSavePdf(){
   const list = mfSaveList().filter(c => mfCanSave(c.it));
-  if (!list.length){ showToast('PDF로 저장할 장이 없습니다 · [출력]을 써 주세요'); return; }
-  if (!mfGuard(list) || MF.busy) return;
-  MF.busy = true;
-  let J = null;
-  try{ await mfLoad('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf', 8000); J = window.jspdf && window.jspdf.jsPDF; }catch(e){ J = null; }
-  if (!J){
-    MF.busy = false;
-    showToast('PDF 도구를 못 불러와 인쇄 창으로 엽니다 · [PDF로 저장]을 고르세요');
-    await mfPrintPrep(); setTimeout(() => window.print(), 140);
-    MF.last = {type: 'pdf-print'};
+  if (!list.length){
+    showToast(PP.kind === 'notice' ? '이 파일은 열지 못해 담을 내용이 없습니다 · [PDF·사진으로 열기]를 눌러 주세요'
+      : 'PDF로 저장할 내용이 없습니다');
     return;
   }
-  let doc = null, cnt = 0;
-  const orient = [];
+  if (MF.busy) return;
+  if (!mfGuard(list)) return;                          /* 한 번에 60장·300MB 까지 */
+  MF.busy = true;
   try{
+    /* PDF 한 개를 그대로 저장할 때는 다시 그리지 않고 원본 그대로 (글자·서명이 살아 있는 원본) */
+    const one = list.length === 1 ? list[0].it : null;
+    if (one && one.kind === 'pdf' && one.file && (one.pages || []).every(p => !p.frozen)){
+      const bytes = new Uint8Array(await one.file.arrayBuffer());
+      const blob = new Blob([bytes], {type: 'application/pdf'});
+      const name = '[더뷰]_' + mfBase(one.name) + '.pdf';
+      ppDl(blob, name);
+      MF.last = {type: 'pdf-copy', name: name, count: 1, bytes: blob.size};
+      mfProg(false);
+      showToast('PDF 저장 완료 · 휴대폰 [내 파일 → 다운로드] 폴더', 3400);
+      return;
+    }
+    await ktsLoadPdf();
+    const pages = [];
     for (let i = 0; i < list.length; i++){
       const c = list[i];
-      mfProg(true, c.it.name, 'PDF ' + (i + 1) + ' / ' + list.length, Math.round((i + 1) / list.length * 100));
-      const im = await mfJpeg(c.it, c.pi); if (!im) continue;
-      const land = im.w / im.h > 1.15, o = land ? 'l' : 'p';
-      const PW = land ? 297 : 210, PH = land ? 210 : 297, BW = PW - 20, BH = PH - 20;   /* 여백 10mm · 비율 그대로 폭 맞춤 */
-      let w = BW, h = BW * im.h / im.w;
-      if (h > BH){ h = BH; w = BH * im.w / im.h; }
-      if (!doc) doc = new J({orientation: o, unit: 'mm', format: 'a4', compress: true});
-      else doc.addPage('a4', o);
-      doc.addImage(im.data, 'JPEG', (PW - w) / 2, 10, w, h, undefined, 'FAST');
-      orient.push(o); cnt++;
+      mfProg(true, c.it.name || '문서', 'PDF ' + (i + 1) + ' / ' + list.length + '장 만드는 중…', Math.round((i + 1) / list.length * 90));
+      await mfSleep(10);                                /* 로딩 그림이 먼저 그려지게 */
+      const pg = await mfPdfPage(c.it, c.pi);
+      if (!pg || !pg.w || !pg.h) continue;
+      const land = pg.w / pg.h > 1.15;                  /* 가로 문서는 용지를 눕혀서 */
+      pg.ptW = land ? KTS_PDF.A4H : KTS_PDF.A4W;
+      pg.ptH = land ? KTS_PDF.A4W : KTS_PDF.A4H;
+      pages.push(pg);
     }
-    const first = list[0].it.name;
-    const name = '더뷰_' + mfBase(first) + '_' + cnt + '장_' + mfToday() + '.pdf';
-    const blob = doc.output('blob');
+    if (!pages.length) throw new Error('담을 장을 만들지 못했습니다');
+    const blob = KTS_PDF.build(pages, {});
+    const name = ktsPdfName(list);
     ppDl(blob, name);
-    MF.last = {type: 'pdf', name: name, count: cnt, bytes: blob.size, orient: orient};
-    mfProg(false); showToast('PDF를 저장했습니다 · ' + cnt + '쪽');
+    MF.last = {type: 'pdf', name: name, count: pages.length, bytes: blob.size};
+    mfProg(false);
+    showToast('PDF 저장 완료 · 휴대폰 [내 파일 → 다운로드] 폴더', 3400);
   }catch(e){
-    console.warn('pdf fail', e); mfProg(false); showToast('PDF 저장 실패 — [출력]에서 PDF로 저장해 주세요');
+    console.warn('pdf fail', e);
+    mfProg(false);
+    showToast('PDF 저장 실패 — [출력]으로 인쇄 창을 열어 주세요', 3000);
   }finally{ MF.busy = false; mfProg(false); }
 }
 
