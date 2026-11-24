@@ -373,8 +373,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="window.pdfjsLib=undefined"></script>
-<!-- 구형 한글(.hwp) 브라우저 자체 해석기 · PDF 직접 만들기 — CDN 없이 이 저장소에서 바로 (212·213번) -->
-<script src="v/hwp5.js?v=20261125a"></script>
+<!-- PDF 직접 만들기 — CDN 없이 이 저장소에서 바로 (213번) · 구형 한글(.hwp)은 사무실 PC 변환 서버에서만 PDF로 (212번 이전 방식으로 복원) -->
 <script src="v/ktspdf.js?v=20261125a"></script>
 <script>
 if (typeof pdfjsLib !== 'undefined'){
@@ -672,40 +671,6 @@ async function openHwpx(buf){
   walk(doc.documentElement);
   return {kind: 'html', html: '<div class="hw">' + outA.join('') + '</div>', paper: hasStyle,
     note: '한글(hwpx) · ' + nRowsSeen + '행 × ' + nColsSeen + '열' + (merged ? ' · 병합 ' + merged + '개' : '')};
-}
-
-/* ---------- 구형 한글(.hwp) — 사무실 PC·변환 서버 없이 이 기기에서 바로 읽는다 (212·213번) ----------
-   v/hwp5.js 가 CFB 컨테이너를 열고 zlib 를 풀어 본문 문단·표를 세운다.
-   PC 변환 서버가 꺼져 있어도 안내 모달로 막지 않는다. 해석이 안 되는 파일만 (연결돼 있으면) PC 변환으로 넘긴다. */
-function ktsLoadHwp(){
-  return new Promise((ok, no) => {
-    if (window.KTS_HWP5) return ok();
-    const s = document.createElement('script');
-    s.src = 'v/hwp5.js?v=20261125a';
-    s.onload = () => (window.KTS_HWP5 ? ok() : no(new Error('한글 문서 해석기를 불러오지 못했습니다')));
-    s.onerror = () => no(new Error('한글 문서 해석기를 불러오지 못했습니다'));
-    document.head.appendChild(s);
-  });
-}
-async function openHwp(buf){
-  await ktsLoadHwp();
-  const doc = await window.KTS_HWP5.parse(buf);
-  const st = doc.stats || {};
-  return {kind: 'html', html: window.KTS_HWP5.toHtml(doc), paper: true,
-    note: '구형 한글' + (doc.version && doc.version !== '5.0.0.0' ? ' v' + doc.version : '') +
-      ' · ' + (st.paras || 0) + '문단' + (st.tables ? ' · 표 ' + st.tables + '개' : '') +
-      (st.images ? ' · 그림 ' + st.images + '개' : '')};
-}
-async function openHwpOrPc(file){
-  try{ return await openHwp(await file.arrayBuffer()); }
-  catch(e){
-    const why = (e && e.message) ? e.message : '이 한글 문서는 읽지 못했습니다';
-    const pb = await hwpViaPc(file);                    /* 연결돼 있을 때만 (없으면 곧바로 null) */
-    if (pb) return (typeof pdfjsLib !== 'undefined')
-      ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF(사무실 PC)'}
-      : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF(사무실 PC)'};
-    return {kind: 'notice', note: '구형 한글', why: why};
-  }
 }
 
 /* ---------- DOCX (워드 · mammoth 없이 word/document.xml 직접 해석) ---------- */
@@ -1081,18 +1046,17 @@ function buildFrame(url){
   PP.pages = [{el: el, w: w, h: h}]; PP.tops = [0];
 }
 
-/* ---------- 구형 .hwp — 자체 해석이 안 될 때만 안내 (안내 화면에서도 저장 줄은 남긴다) ---------- */
+/* ---------- 구형 .hwp — 어설프게 깨뜨리지 않고 안내만 (안내 화면에서도 저장 줄은 남긴다) ---------- */
 function buildNotice(){
   PP.kind = 'notice';
   const card = document.createElement('div');
   card.className = 'ppnotice';
   card.style.width = '340px';
-  const why = PP.noticeWhy ? '<p><b>' + esc(PP.noticeWhy) + '</b></p>' : '';
   card.innerHTML = '<div class="ic">!</div>'
-    + '<h3>이 파일은 이 기기에서<br>바로 열지 못했습니다</h3>'
-    + why
-    + '<p>한글에서 <b>[파일 → PDF로 저장]</b>을 하거나, 종이를 <b>사진으로 찍어</b> 올리면 원본 비율 그대로 1:1로 보입니다.</p>'
-    + '<p class="pppriv">파일은 서버로 올라가지 않고 이 기기 안에서만 처리됩니다.</p>'
+    + '<h3>원본 1:1 표시를 위해<br>PDF 또는 사진으로 저장해 열어 주세요</h3>'
+    + '<p>구형 <b>.hwp</b>는 폰 브라우저에서 종이 그대로 그릴 수 없습니다.</p>'
+    + '<p>한글에서 <b>[인쇄 → PDF로 저장]</b>을 하거나, 종이를 <b>사진으로 찍어</b> 올리면 원본 비율 그대로 1:1로 보입니다.</p>'
+    + '<p class="pppriv">구형 .hwp는 사무실 PC에서 PDF로 바꿉니다. 파일은 그 PC를 거쳐 이 기기로 돌아오고 저장되지 않습니다.</p>'
     + '<button type="button" id="ppPick">PDF·사진으로 열기</button>'
     + '<button type="button" class="ppretry" id="ppRetry">사무실 PC로 변환 다시 시도</button>';
   (PP.blk || PP.scale).appendChild(card);
@@ -1131,7 +1095,6 @@ async function paintDoc(r, file, nm){
   space.appendChild(scale); out.appendChild(space);
   PP.space = space; PP.scale = scale;
   PP.zoom = 1;
-  PP.noticeWhy = r.why || '';
   if (r.kind === 'pdf') await buildPdf(r.buf);
   else if (r.kind === 'img') await buildImage(r.url);
   else if (r.kind === 'html' || r.kind === 'table') buildSheet(r);   /* openXlsx/openText 는 'table' */
@@ -1302,8 +1265,11 @@ async function showFile(file){
     } else if (/\.(csv|txt)$/.test(name)){
       r = openText(await file.text(), name);
     } else if (/\.hwp$/.test(name)){
-      loader(true, nm, '한글 문서를 이 기기에서 읽는 중…', 44);
-      r = await openHwpOrPc(file);                      /* 기본은 브라우저 자체 해석 — PC 서버가 꺼져 있어도 바로 */
+      loader(true, nm, '구형 한글 → PDF로 바꾸는 중… (사무실 PC)', 40);
+      const pb = await hwpViaPc(file);                  /* 사무실 PC가 꺼져 있으면 null → 지금의 안내 카드 */
+      r = !pb ? {kind: 'notice', note: '구형 한글'}
+        : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
+        : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
     } else {
       r = {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''}
     }
@@ -1477,8 +1443,11 @@ async function mfRead(file, step){
   if (/\.hwpx$/.test(name)) return openHwpx(await file.arrayBuffer());
   if (/\.(csv|txt)$/.test(name)) return openText(await file.text(), name);
   if (/\.hwp$/.test(name)){
-    if (step) step('한글 문서를 이 기기에서 읽는 중…');
-    return await openHwpOrPc(file);
+    if (step) step('구형 한글 → PDF로 바꾸는 중… (사무실 PC)');
+    const pb = await hwpViaPc(file);
+    return !pb ? {kind: 'notice', note: '구형 한글'}
+      : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
+      : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
   }
   return {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''};
 }
