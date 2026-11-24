@@ -1025,6 +1025,10 @@ function paintRangeNotice(){
   if(!o||(PC&&PC.rings)){ el.classList.add('hide'); return }
   $('#plostT').textContent=o.t; $('#plostB').textContent=o.b;
   var b=$('#plostA'); if(b){ b.textContent=o.a; b.setAttribute('data-act',o.act) }
+  /* 좌우 폭이 좁아 윗줄 배지가 두 줄로 접혀도 안내 띠가 배지를 가리지 않게 바로 아래에 붙인다 */
+  try{ var mw=el.parentNode, bd=mw&&mw.querySelector('.mapbadge'), top=36;
+    if(bd){ top=Math.max(36, Math.round(bd.getBoundingClientRect().bottom - mw.getBoundingClientRect().top + 6)) }
+    el.style.top=top+'px'; }catch(e){}
   el.classList.remove('hide');
 }
 function paintParcelInfo(){
@@ -3167,7 +3171,7 @@ if(S.key){
 requestRender(); buildTerrain(); drawProfile(); parcelFetch(S.lat,S.lon);
 $('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
 setTimeout(function(){ $('#hint').classList.add('off') },6000);
-window.addEventListener('resize',function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain() });
+window.addEventListener('resize',function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain(); paintRangeNotice() });
 window.addEventListener('orientationchange',function(){ setTimeout(function(){ fitCanvas(); requestRender(); drawProfile(); nudgeTerrain() },300) });
 })();
 </script>
