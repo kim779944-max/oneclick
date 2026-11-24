@@ -159,10 +159,11 @@
   function smsHref(body) { return 'sms:' + SMS + '?body=' + encodeURIComponent(body); }
 
   /* 계좌이체 안내 HTML — slots.js(내 박스·열쇠)에서도 같은 글을 씁니다 */
+  /* opt.acct 를 넘기면 그 값으로 그립니다(관리자 화면의 입력 미리보기) */
   function accountHtml(opt) {
     opt = opt || {};
     css();
-    var a = acct(), ok = has3(a);
+    var a = opt.acct ? pick(opt.acct) : acct(), ok = has3(a);
     var who = ok ? '' :
       '<div class="ln">입금 계좌는 <b>아직 등록 전</b>입니다. 아래 [문자로 계좌 받기]를 누르시면 답장으로 은행·계좌번호·예금주를 보내 드립니다.</div>' +
       '<a class="kpay-b g" style="margin-top:7px" href="' + smsHref('[KTS 원클릭] ' + (opt.label || '이용권') + ' 계좌 안내 부탁드립니다. 이름: ') + '">문자로 계좌 받기</a>' +
@@ -202,7 +203,7 @@
       '<div class="kpay-row"><input data-a="code" placeholder="예: KS2611-XXXX" autocomplete="off" aria-label="이용권 코드"><button type="button" class="kpay-b p" style="width:auto;padding:10px 14px" data-a="go">확인</button></div>' +
       '<div class="ln" data-a="ok" hidden style="margin-top:6px;color:#9BE7A8"></div></div>' +
       '<p class="kpay-note">이용권 코드는 그 달에만 열립니다. 손님의 카드번호·계좌번호는 저장하지 않고, 결제도 이 화면에서 하지 않습니다.</p>' +
-      (master() ? '<p class="kpay-note" style="color:#FFA24D">마스터 · 계좌 ' + (full() ? '입력됨' : '미설정') + ' · ' + SRC_NAME[acct().src] + ' · 이번 달 코드 ' + codeOf() + '</p>' : '');
+      (master() ? '<p class="kpay-note" style="color:#FFA24D">마스터 · ' + (full() ? '계좌 입력됨 · ' + SRC_NAME[acct().src] : '계좌 미설정 — admin.html 에서 3칸') + ' · 이번 달 코드 ' + codeOf() + '</p>' : '');
 
     sheet(html, function (el, close) {
       var inp = el.querySelector('[data-a="code"]');

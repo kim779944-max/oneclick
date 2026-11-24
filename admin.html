@@ -170,9 +170,10 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
     };
   }
   function paintPreview(){
-    var box = document.getElementById('prev');
-    if (box) box.innerHTML = KTSPay.accountHtml({ label: '이용권' });
     var v = values();
+    var box = document.getElementById('prev');
+    /* 입력하는 그대로 보이게 — 저장 전에도 ② 계좌이체가 어떻게 나갈지 확인 */
+    if (box) box.innerHTML = KTSPay.accountHtml({ label: '이용권', acct: v });
     var line = "window.KTS_PAY_ACCOUNT = { bank: '" + String(v.bank||'').replace(/'/g,'') + "', no: '" +
       String(v.no||'').replace(/'/g,'') + "', holder: '" + String(v.holder||'').replace(/'/g,'') + "' };";
     var c = document.getElementById('code'); if (c) c.textContent = line;
