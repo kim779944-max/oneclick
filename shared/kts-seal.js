@@ -85,12 +85,12 @@
     if (shape === 'square') { g.strokeRect(pad, pad, S - pad * 2, S - pad * 2); }
     else if (shape === 'oval') { g.beginPath(); g.ellipse(S / 2, S / 2, S / 2 - pad, S / 2 - pad * .82, 0, 0, Math.PI * 2); g.stroke(); }
     else { g.beginPath(); g.arc(S / 2, S / 2, S / 2 - pad, 0, Math.PI * 2); g.stroke(); }
-    var chars = nm.split(''), cols = chars.length <= 2 ? 1 : 2, rows = Math.ceil(chars.length / cols);
-    var fs = Math.min(S * .42 / rows, S * .44 / cols) * (chars.length === 1 ? 1.35 : 1.05);
+    var chars = nm.split(''), cols = chars.length <= 3 ? 1 : 2, rows = Math.ceil(chars.length / cols);
+    var fs = Math.min(S * 0.72 / rows, S * 0.62 / cols);
     g.font = '900 ' + Math.round(fs) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle';
     chars.forEach(function (ch, i) {
       var r = Math.floor(i / cols), c = i - r * cols, inRow = Math.min(cols, chars.length - r * cols);
-      var x = S / 2 + (c - (inRow - 1) / 2) * (fs * 1.02), y = S / 2 + (r - (rows - 1) / 2) * (fs * 1.06);
+      var x = S / 2 + (c - (inRow - 1) / 2) * (fs * 1.04), y = S / 2 + (r - (rows - 1) / 2) * (fs * 1.06);
       g.fillText(ch, x, y);
     });
     /* 도장 느낌 — 살짝 거친 테두리 */
