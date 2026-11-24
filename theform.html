@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <script src="master.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 더양식 — 내 종이 양식, 한 번 등록하면 값만 채워 바로 출력</title>
+<title>KTS 양식만들기 — 내 종이 양식, 한 번 등록하면 값만 채워 바로 출력</title>
 <meta name="description" content="거래명세서·견적서·근로계약서·동의서·신청서 같은 종이 양식을 사진 한 장으로 등록하고, 다음부터는 값만 채워 한글(.hwpx)·엑셀(.xlsx)·PDF로 바로 뽑습니다. 모든 처리는 이 기기 안에서만.">
 <meta name="theme-color" content="#0A1128">
 <link rel="icon" href="icon.png">
@@ -105,7 +105,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 <div id="app">
 <header class="top">
  <div class="hd">
-  <div class="brand"><span class="mark">양</span>더양식 <small>KTS 원클릭</small></div>
+  <div class="brand"><span class="mark">양</span>양식만들기 <small>KTS 원클릭</small></div>
   <span class="sp"></span>
   <button class="keyb" id="keyBtn">AI 열쇠 · 없음</button>
  </div>
@@ -215,7 +215,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  <div class="draft" id="qDraft"></div>
  <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
 </section>
-<p class="foot">더양식 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
+<p class="foot">양식만들기 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
 </main>
 <div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
 </div>
@@ -1150,7 +1150,7 @@ async function buildHwpxDoc(st){
 }
 /* ===== converter.html 엔진 복사본 끝 ===== */
 
-/* ===================== 더양식 앱 ===================== */
+/* ===================== 양식만들기 앱 ===================== */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let tT; function toast(m){ const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => e.classList.remove('on'), 2600); }
 function busyOn(t){ $('#busyT').textContent = t; $('#busy').classList.add('on'); }
@@ -1846,8 +1846,8 @@ function qDraft(){
   const n = $('#qName').value.trim(), t = $('#qTel').value.trim(), m = $('#qMsg').value.trim();
   let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).style.borderColor = v ? '' : 'var(--red)'; if (!v) bad = true; });
   if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
-  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더양식',
-    draft:`${n}님, 안녕하세요. KTS 원클릭 더양식입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 5종은 지금 바로 무료로 쓰실 수 있습니다.`};
+  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'양식만들기',
+    draft:`${n}님, 안녕하세요. KTS 원클릭 양식만들기입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 5종은 지금 바로 무료로 쓰실 수 있습니다.`};
 }
 $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGet(LS_Q, []); a.push(q); lsSet(LS_Q, a);

@@ -645,7 +645,7 @@ function buildPDF(pages){
   const out=new Uint8Array(off); let o=0; chunks.forEach(c=>{ out.set(c,o); o+=c.length; }); return out;
 }
 
-/* ---------- 더양식에서 넘어온 계약서 자동 열기 (④에서 [도장 찍으러 가기]) ---------- */
+/* ---------- 양식만들기에서 넘어온 계약서 자동 열기 (④에서 [도장 찍으러 가기]) ---------- */
 function seedFromForm(){
   let raw=null; try{ raw=sessionStorage.getItem('kts_sign_seed'); }catch(e){}
   if(!raw) return;
@@ -663,7 +663,7 @@ function seedFromForm(){
     list=list.filter(Boolean); if(!list.length) return;
     docs=list.map(c=>({c, thumb:thumbOf(c), place:null})); cur=0;
     $('#docArea').classList.remove('hide'); renderDoc(); szPaint();
-    toast(urls.length>cap ? '무료는 1쪽만 열었습니다 · 여러 쪽은 월 4,900원' : ((d.name? d.name+' — ':'')+'더양식에서 넘어온 계약서를 열었습니다'));
+    toast(urls.length>cap ? '무료는 1쪽만 열었습니다 · 여러 쪽은 월 4,900원' : ((d.name? d.name+' — ':'')+'양식만들기에서 넘어온 계약서를 열었습니다'));
     try{ $('#docArea').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
   });
 }

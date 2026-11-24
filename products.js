@@ -48,7 +48,7 @@ window.PRODUCTS = [
  },
  {
   "k": "theform",
-  "nm": "더양식",
+  "nm": "양식만들기",
   "sub": "종이 양식 빈칸 채우기 · 표 사진 → 한글·엑셀",
   "cat": "doc",
   "badge": "NEW",
@@ -94,7 +94,7 @@ window.PRODUCTS = [
  },
  {
   "k": "contract",
-  "nm": "계약서 1초 생성기",
+  "nm": "표준계약서",
   "sub": "매매·주택 임대차·상가 임대차 3부 인쇄",
   "cat": "doc",
   "badge": "NEW",

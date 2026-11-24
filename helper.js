@@ -1,6 +1,10 @@
 /* =====================================================================
-   KTS_HELPER — 전 상품 [? 도우미] (사용법 1→2→3 · 자주 묻는 질문 · 불편 신고 · 1:1 문의)
-   v20261122a
+   KTS_HELPER — 전 상품 [? 도우미] (사용법 1→2→3 · 자주 묻는 질문 · 불편 신고 · 60초 문의)
+   v20261125a
+   · 작성 모드(양식만들기 · 표준계약서 등): 도우미가 지금 넣을 칸을 가리키고(👆),
+     그 칸을 누르면 마이크(🎤)로 바뀌어 음성으로 넣고, 다음 칸을 다시 가리킨다.
+     작성이 끝나면(또는 작성 모드가 아니면) [?]를 누를 때 바로 [60초 문의]가 열린다.
+     페이지는 KTS_HELPER.writing(fn) 한 줄로 붙인다 — fn 은 {active, mode, label, pos, el, tap} 를 돌려준다.
    · 인터넷 요청 0건: 이 파일은 서버·외부 주소로 아무것도 보내거나 받지 않습니다.
      답은 전부 이 파일 안의 사전 + 이 기기 안 규칙으로만 만듭니다(API 비용 0원).
    · 본문 글자는 바꾸지 않습니다 — 버튼 1개 + 시트 1개를 덧붙이기만 합니다.
@@ -27,8 +31,8 @@
     thescan: { nm: '더스캔', k: 'thescan' },
     theeraser: { nm: '더지우개', k: 'theeraser' },
     thedetail: { nm: '설명서 제작기', k: 'thedetail' },
-    theform: { nm: '더양식 (양식 채우기 · 표 변환 탭)', k: 'theform' },
-    contract: { nm: '더계약서', k: 'contract' },
+    theform: { nm: '양식만들기 (양식 채우기 · 표 변환 탭)', k: 'theform' },
+    contract: { nm: '표준계약서', k: 'contract' },
     sale: { nm: '오늘의 특가', k: 'sale' },
     viewer: { nm: '만능 뷰어', k: 'viewer' },
     ad_magnet: { nm: '답글생성기', k: 'ad_magnet' },
@@ -259,9 +263,35 @@
     '#kts-helper .kh-ok{margin-top:9px;border:1px solid rgba(46,212,122,.4);background:rgba(46,212,122,.1);color:#8DE7B8;border-radius:10px;padding:9px 10px;font-size:12px}' +
     '#kts-helper .kh-ok b{color:#fff}' +
     '#kts-helper .kh-lbl{font-size:12px;font-weight:900;color:#C9D6E6;margin:0 0 6px}' +
+    /* ---- 2026-11-25 작성 모드 안내(커서 → 마이크) ---- */
+    '#kts-helper-btn.kh-guide{opacity:1;background:linear-gradient(160deg,#FFB067,#FF6B00);box-shadow:0 0 0 4px rgba(255,107,0,.20),0 6px 18px rgba(255,107,0,.45);animation:khpulse 1.9s ease-in-out infinite}' +
+    '#kts-helper-btn.kh-guide.kh-mic{background:linear-gradient(160deg,#FF8A2B,#E24800);animation:khpulse 1.1s ease-in-out infinite}' +
+    '#kts-helper-btn.kh-guide b{font-size:19px;line-height:1}' +
+    '@keyframes khpulse{0%,100%{box-shadow:0 0 0 3px rgba(255,107,0,.16),0 6px 16px rgba(255,107,0,.34)}50%{box-shadow:0 0 0 9px rgba(255,107,0,.04),0 8px 22px rgba(255,107,0,.5)}}' +
+    '#kts-helper-btn .kh-tip{position:absolute;right:calc(100% + 7px);top:50%;transform:translateY(-50%);width:auto;height:auto;max-width:190px;clip:auto;background:rgba(10,17,40,.97);border:1px solid rgba(255,162,77,.6);color:#FFD9A6;border-radius:10px;padding:5px 9px;font-size:11px;font-weight:900;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;display:none}' +
+    '#kts-helper-btn[data-pos="left"] .kh-tip{right:auto;left:calc(100% + 7px)}' +
+    '#kts-helper-btn.kh-guide .kh-tip{display:block}' +
+    '#kts-helper-btn .kh-tip small{display:block;font-size:9.5px;font-weight:800;color:#9FB0C8}' +
+    '.kts-guidefld{outline:2px solid #FF8A2B!important;outline-offset:2px!important;box-shadow:0 0 0 5px rgba(255,107,0,.16)!important;border-radius:10px!important;transition:outline-color .15s}' +
+    /* ---- 2026-11-25 60초 문의 시트 ---- */
+    '#kts-q60{position:fixed;inset:0;z-index:250;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.6)}' +
+    '#kts-q60.on{display:flex}' +
+    '#kts-q60 .q6-sh{width:100%;max-width:460px;background:#0F1B33;color:#F3F6FA;border:1px solid #2E4370;border-bottom:0;border-radius:18px 18px 0 0;padding:14px 14px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 30px rgba(0,0,0,.5);box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;letter-spacing:-.2px}' +
+    '#kts-q60 .q6-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px}' +
+    '#kts-q60 .q6-hd b{flex:1;min-width:0;font-size:15px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '#kts-q60 .q6-hd b i{font-style:normal;color:#FFA24D}' +
+    '#kts-q60 .q6-x{flex:0 0 auto;width:32px;height:32px;border-radius:10px;border:1px solid #2E4370;background:#0B1729;color:#CBD8E8;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit}' +
+    '#kts-q60 .q6-sub{font-size:11.5px;color:#AFBDD0;line-height:1.5;margin:0 0 8px}' +
+    '#kts-q60 .q6-lb{display:block;font-size:11.5px;font-weight:800;color:#C9D6E6;margin:8px 0 4px}' +
+    '#kts-q60 input,#kts-q60 textarea{width:100%;box-sizing:border-box;border:1px solid #2E4370;background:#0B1729;color:#F3F6FA;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;outline:0}' +
+    '#kts-q60 .q6-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}' +
+    '#kts-q60 .q6-b{border:0;border-radius:10px;padding:11px 8px;font-size:13px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,#FF6B00,#FFA24D);color:#0A1224;font-family:inherit;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}' +
+    '#kts-q60 .q6-b.gh{background:#12203C;color:#DCE6F2;border:1px solid #2E4370}' +
+    '#kts-q60 .q6-note{font-size:10.5px;color:#8FA1B8;line-height:1.5;margin:8px 0 0}' +
+    '#kts-q60 .q6-more{width:100%;margin-top:9px;border:0;background:none;color:#FFA24D;font-family:inherit;font-size:11.5px;font-weight:900;cursor:pointer;padding:4px}' +
     '#kts-helper-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:260;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.55);color:#FFD9A6;font-size:12px;font-weight:800;border-radius:999px;padding:8px 14px;max-width:88%;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none;font-family:-apple-system,"Malgun Gothic",sans-serif}' +
     '#kts-helper-toast.on{opacity:1}' +
-    '@media print{#kts-helper-btn,#kts-helper,#kts-helper-toast{display:none!important}}';
+    '@media print{#kts-helper-btn,#kts-helper,#kts-q60,#kts-helper-toast{display:none!important}}';
 
   var btn, root, toastEl, built = false, curTab = 0;
 
@@ -274,15 +304,17 @@
   function build() {
     var st = d.createElement('style'); st.id = 'kts-helper-css'; st.textContent = CSS; d.head.appendChild(st);
     btn = d.createElement('button');
-    btn.type = 'button'; btn.id = 'kts-helper-btn'; btn.setAttribute('aria-label', '도우미 열기 — 사용법·자주 묻는 질문·문의');
-    btn.innerHTML = '<b>?</b><span>도우미</span>';
+    btn.type = 'button'; btn.id = 'kts-helper-btn'; btn.setAttribute('aria-label', '도우미 — 60초 문의');
+    btn.innerHTML = '<b>?</b><span class="kh-tip"></span><span class="sr">도우미</span>';
     btn.onclick = function (e) {
       if (Date.now() < drag.noClick) { e.preventDefault(); e.stopPropagation(); return; }   /* 6px 넘게 끌었으면 창 안 열림 */
-      open(0);
+      if (G.st) { guideTap(); return; }        /* 작성 중 — 커서/마이크 안내 */
+      openAsk();                              /* 작성 전·작성 끝 — 바로 60초 문의 */
     };
     d.body.appendChild(btn);
     bindDrag();
     bindDim();
+    bindGuide();
     autoTop.until = Date.now() + 4000;                     /* 늦게 그려지는 본문(소개 접힘 3초 등)까지 보고 고정 */
     place();
     setTimeout(place, 3700);
@@ -469,7 +501,7 @@
         '<div class="kh-hd"><b><i>?</i> 도우미 · ' + esc(nm) + '</b><button type="button" class="kh-x" data-kh="close" aria-label="닫기">✕</button></div>' +
         '<div class="kh-tabs">' +
           '<button type="button" data-kh-t="0">① 사용법</button><button type="button" data-kh-t="1">② 자주 묻는 질문</button>' +
-          '<button type="button" data-kh-t="2">③ 불편 신고</button><button type="button" data-kh-t="3">④ 1:1 문의</button>' +
+          '<button type="button" data-kh-t="2">③ 불편 신고</button><button type="button" data-kh-t="3">④ 60초 문의</button>' +
         '</div>' +
         '<div class="kh-bd">' +
           '<div class="kh-pn" data-kh-p="0"></div>' +
@@ -576,7 +608,117 @@
   function close() { if (root) root.classList.remove('on'); }
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root && root.classList.contains('on')) close(); });
 
-  w.KTS_HELPER = { v: '20261124a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY };
+  /* ---------- 작성 중 안내 — 페이지가 KTS_HELPER.writing(fn) 으로 붙인다 ---------- */
+  var G = { api: null, st: null, el: null, t: 0 };
+  function guideState() {
+    var st = null;
+    try { st = G.api ? G.api() : null; } catch (e) { st = null; }
+    return (st && st.active) ? st : null;
+  }
+  function guidePaint() {
+    if (!btn) return;
+    var st = G.st, on = !!st, mic = !!(on && st.mode === 'mic');
+    btn.classList.toggle('kh-guide', on);
+    btn.classList.toggle('kh-mic', mic);
+    var b = btn.querySelector('b'), tip = btn.querySelector('.kh-tip');
+    if (b) b.textContent = on ? (mic ? '🎤' : '👆') : '?';
+    if (tip) tip.innerHTML = on
+      ? esc(st.label || '이 칸') + (st.pos ? '<small>' + esc(st.pos) + (mic ? ' · 말해서 넣기' : ' · 눌러서 쓰기') + '</small>' : '')
+      : '';
+    btn.setAttribute('aria-label', on
+      ? ('도우미 — ' + (mic ? '말해서 넣기' : ((st.label || '이 칸') + ' 가리키기')))
+      : '도우미 — 60초 문의');
+    if (G.el && G.el !== (st && st.el)) { try { G.el.classList.remove('kts-guidefld'); } catch (e) { } G.el = null; }
+    if (st && st.el && st.el.nodeType === 1) { try { st.el.classList.add('kts-guidefld'); G.el = st.el; } catch (e) { } }
+  }
+  function guideSync() { G.st = guideState(); guidePaint(); }
+  function guideSoon() { clearTimeout(G.t); G.t = setTimeout(guideSync, 40); }
+  function bindGuide() {
+    ['focusin', 'focusout', 'input', 'change'].forEach(function (k) {
+      d.addEventListener(k, function (e) { if (root && root.contains(e.target)) return; guideSoon(); }, true);
+    });
+    d.addEventListener('click', function (e) { if ((btn && e.target === btn) || (root && root.contains(e.target)) || (q60 && q60.contains(e.target))) return; guideSoon(); }, true);
+    setInterval(guideSync, 1200);   /* 단계 이동·자동 채움처럼 이벤트가 없는 변화까지 따라간다 */
+  }
+  function guideTap() {
+    var st = G.st;
+    if (!st) { openAsk(); return; }
+    try { st.tap && st.tap(); } catch (e) { }
+    setTimeout(guideSync, 140);
+  }
+
+  /* ---------- 60초 문의 — [?] 한 번에 바로 열린다 ---------- */
+  var q60 = null;
+  function q60Mem(k, v) {
+    try {
+      if (v === undefined) return localStorage.getItem(k) || '';
+      if (v) localStorage.setItem(k, v);
+    } catch (e) { }
+    return '';
+  }
+  function buildAsk() {
+    if (q60) return;
+    q60 = d.createElement('div'); q60.id = 'kts-q60'; q60.setAttribute('role', 'dialog'); q60.setAttribute('aria-modal', 'true');
+    q60.innerHTML =
+      '<div class="q6-sh">' +
+        '<div class="q6-hd"><b>60초 문의 · <i>' + esc(toolName()) + '</i></b><button type="button" class="q6-x" data-q6="close" aria-label="닫기">✕</button></div>' +
+        '<p class="q6-sub">필요한 양식·기능을 한 줄로 적어 주세요. 되는 것은 다음 판에 넣고, 남기신 연락처로 순서대로 답해 드립니다.</p>' +
+        '<label class="q6-lb" for="q6n">이름</label><input id="q6n" maxlength="20" autocomplete="name">' +
+        '<label class="q6-lb" for="q6t">연락처</label><input id="q6t" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000">' +
+        '<label class="q6-lb" for="q6m">문의 내용</label><textarea id="q6m" rows="3" maxlength="400" placeholder="예: 우리 업종 납품확인서 양식도 넣어 주세요"></textarea>' +
+        '<div class="q6-row"><a class="q6-b" id="q6sms" href="' + esc(smsHref('[KTS] ' + toolName() + ' 문의')) + '">문자로 보내기</a>' +
+        '<button type="button" class="q6-b gh" data-q6="save">기기에 담기</button></div>' +
+        '<p class="q6-note" id="q6note">문자 앱이 열리고, 보내기는 손님이 직접 누릅니다. 이 화면에서 자동으로 보내지 않습니다.</p>' +
+        '<button type="button" class="q6-more" data-q6="more">사용법 · 자주 묻는 질문 보기 →</button>' +
+      '</div>';
+    d.body.appendChild(q60);
+    var n = q60.querySelector('#q6n'), t = q60.querySelector('#q6t'), m = q60.querySelector('#q6m');
+    n.value = q60Mem('kts_q60_name'); t.value = q60Mem('kts_q60_tel');
+    function body() {
+      return '[KTS 60초 문의] ' + toolName() + '\n' +
+        (n.value.trim() ? '이름: ' + n.value.trim() + '\n' : '') +
+        (t.value.trim() ? '연락처: ' + t.value.trim() + '\n' : '') +
+        '화면: ' + path + '\n' + (m.value.trim() || '(내용 없음)');
+    }
+    q60.addEventListener('input', function () {
+      var a = q60.querySelector('#q6sms'); if (a) a.setAttribute('href', smsHref(body()));
+    });
+    q60.addEventListener('click', function (e) {
+      if (e.target === q60) { closeAsk(); return; }
+      var sms = e.target.closest('#q6sms');
+      if (sms) {
+        if (!m.value.trim()) { e.preventDefault(); toast('문의 내용을 한 줄이라도 적어 주세요'); m.focus(); return; }
+        q60Mem('kts_q60_name', n.value.trim()); q60Mem('kts_q60_tel', t.value.trim());
+        return;
+      }
+      var a = e.target.closest('[data-q6]'); if (!a) return;
+      var act = a.getAttribute('data-q6');
+      if (act === 'close') closeAsk();
+      if (act === 'more') { closeAsk(); open(0); }
+      if (act === 'save') {
+        if (!m.value.trim()) { toast('문의 내용을 한 줄이라도 적어 주세요'); m.focus(); return; }
+        q60Mem('kts_q60_name', n.value.trim()); q60Mem('kts_q60_tel', t.value.trim());
+        var ok = saveReport('60초 문의 · ' + body());
+        q60.querySelector('#q6note').textContent = ok
+          ? '이 기기에 담았습니다. 바로 닿게 하려면 [문자로 보내기]를 눌러 주세요.'
+          : '이 브라우저는 저장을 막아 두었습니다. [문자로 보내기]를 눌러 주세요.';
+      }
+    });
+  }
+  function openAsk() {
+    buildAsk();
+    if (root) root.classList.remove('on');
+    q60.classList.add('on');
+    var m = q60.querySelector('#q6m');
+    if (m) setTimeout(function () { try { m.focus(); } catch (e) { } }, 120);
+  }
+  function closeAsk() { if (q60) q60.classList.remove('on'); }
+  d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && q60 && q60.classList.contains('on')) closeAsk(); });
+
+  w.KTS_HELPER = { v: '20261125a', key: KEY, tool: toolName, open: open, close: close, steps: steps, answer: answer, faq: FAQ, place: place, reportKey: REPORT_KEY,
+    ask: openAsk, closeAsk: closeAsk,
+    writing: function (fn) { G.api = (typeof fn === 'function') ? fn : null; guideSync(); },
+    guideRefresh: guideSync };
 
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', build); else build();
 })(window, document);

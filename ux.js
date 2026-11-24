@@ -254,6 +254,7 @@
   /* ④ 결과물 순서 — [확인하기] → 전체뷰 → [저장]/[공유하기] */
   function guide() {
     if (!CFG.flow) return;
+    if (CFG.guide === 0) return;        /* 도구가 안내줄을 직접 쓰는 화면(양식만들기 등) */
     var p = d.createElement('p');
     p.className = 'kuxguide';
     p.innerHTML = '결과물은 <b>[확인하기] → 전체뷰 → [저장] · [공유하기]</b> 순서로 받으세요.' +

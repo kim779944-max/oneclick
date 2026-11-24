@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <script src="../master.js?v=20261121k"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 더양식 · 표 사진 → 한글·엑셀 — 사진 한 장이 원본 그대로 한글·엑셀이 됩니다</title>
+<title>KTS 양식만들기 · 표 사진 → 한글·엑셀 — 사진 한 장이 원본 그대로 한글·엑셀이 됩니다</title>
 <meta name="description" content="카톡·문자로 받은 견적서·거래명세표 사진을 원본 양식(병합 칸·열 너비·배경색·정렬) 그대로 한글(.hwpx)·엑셀(.xlsx)로 복제합니다. 설치 없이 브라우저에서.">
 <meta name="theme-color" content="#0A1128">
 <link rel="manifest" href="../manifest.webmanifest">
@@ -160,6 +160,7 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 .wtools{display:flex;gap:6px;align-items:center;padding:0 12px 8px}
 .wtools button{flex:1;font-size:11.5px;font-weight:900;color:#DCE6F2;background:#12203C;border:1px solid var(--line2);border-radius:9px;padding:8px 2px;cursor:pointer;white-space:nowrap}
 .wtools button:active{transform:scale(.98)}
+.wtools #btnRetry{flex:0 0 auto;font-size:10.5px;padding:7px 8px;border-color:rgba(255,107,0,.55);color:#FFC08A}
 .wtools .zt{flex:0 0 auto;font-size:10.5px;font-weight:900;color:var(--amber2);min-width:34px;text-align:right}
 .pvblank{border:0;background:transparent;position:relative}
 #work .pvblank{outline:1px dashed #E3E9F2;outline-offset:-1px}
@@ -215,7 +216,7 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
 <div id="app">
 
 <header class="top"><div class="hd">
-  <span class="brand"><span class="mark"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 9.3l-5.2 4.4L17.6 21 12 17.2 6.4 21l1.8-7.3L3 9.3l6.6-.4z"/></svg></span>KTS <small>더양식 · 표 사진 → 한글·엑셀</small></span>
+  <span class="brand"><span class="mark"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 9.3l-5.2 4.4L17.6 21 12 17.2 6.4 21l1.8-7.3L3 9.3l6.6-.4z"/></svg></span>KTS <small>양식만들기 · 표 사진 → 한글·엑셀</small></span>
   <span class="sp"></span>
   <a class="tel" href="../index.html" target="_top">← 원클릭</a>
 </div></header>
@@ -325,6 +326,7 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
       <button type="button" id="btnZoomIn">확대</button>
       <button type="button" id="btnFit">전체폭 맞춤</button>
       <button type="button" id="btnPrintOut">출력 · 저장</button>
+      <button type="button" id="btnRetry">다른 사진</button>
       <span class="zt" id="zoomTag">100%</span>
     </div>
   </div>

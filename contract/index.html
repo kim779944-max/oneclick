@@ -4,8 +4,8 @@
 <script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
 <script src="../shared/kts-seal.js?v=20261124b"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 더계약서 — 표준계약서 원본 그대로, 빈칸만 채워 서명까지</title>
-<meta name="description" content="부동산 매매·교환·임대차·등기위임장·근로·차용·용역·동업 표준계약서를 원본 양식 그대로 띄우고 빈칸만 채워 인쇄·PDF로 뽑습니다. 마지막 (인) 자리에 손가락 서명. 모든 처리는 이 기기 안에서만.">
+<title>KTS 표준계약서 — 원본 계약서 그대로, 빈칸만 채워 서명까지</title>
+<meta name="description" content="부동산 매매·교환·임대차·등기위임장·근로·차용·용역·동업 계약서를 원본 양식 그대로 띄우고 빈칸만 채워 인쇄·PDF로 뽑습니다. 마지막 (인) 자리에 손가락 서명. 모든 처리는 이 기기 안에서만.">
 <meta name="theme-color" content="#0A1128">
 <link rel="icon" href="../icon.png">
 <style>
@@ -113,7 +113,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <div id="app">
 <header class="top">
  <div class="hd">
-  <div class="brand"><span class="mark">계</span>더계약서 <small>KTS 원클릭</small></div>
+  <div class="brand"><span class="mark">계</span>표준계약서 <small>KTS 원클릭</small></div>
   <span class="sp"></span>
   <a href="https://autooneclick.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font-size:11px;font-weight:800;color:#FFA24D;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;letter-spacing:-.2px;">← 원클릭 쇼룸</a>
   <button class="newb" id="newBtn">새로 쓰기</button>
@@ -203,7 +203,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
  <div class="draft" id="qDraft"></div>
  <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
 </section>
-<p class="foot">더계약서 · KTS 원클릭 · 서버 0 · 유료 API 0<br>입력값·서명은 이 기기 브라우저 안에만 저장됩니다.</p>
+<p class="foot">표준계약서 · KTS 원클릭 · 서버 0 · 유료 API 0<br>입력값·서명은 이 기기 브라우저 안에만 저장됩니다.</p>
 </main>
 <div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
 </div>
@@ -213,7 +213,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <script src="forms.js"></script>
 <script src="forms_consult.js"></script>
 <script>
-/* ===================== 더계약서 (표준계약서 원본 사진식) ===================== */
+/* ===================== 표준계약서 (표준계약서 원본 사진식) ===================== */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const escH = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 let tT; function toast(m){ const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => e.classList.remove('on'), 2800); }
@@ -806,6 +806,9 @@ function bindVoice(btnSel){
       el.value = el.value && el.value.trim() ? el.value + ' ' + t : t;
       el.dispatchEvent(new Event('input', { bubbles: true }));
       toast('"' + t + '" 넣었습니다');
+      /* 넣은 뒤 다음 칸을 가리킨다 — 사인·도장 단계까지 같이 간다 (2026-11-25) */
+      LASTEL = el;
+      if (typeof window.KTS_NEXT_AFTER_VOICE === 'function') setTimeout(function(){ try{ window.KTS_NEXT_AFTER_VOICE(); }catch(e){} }, 120);
     };
     r.onerror = ev => toast(ev.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : '음성을 알아듣지 못했습니다');
     r.onend = () => btn.classList.remove('listening');
@@ -945,8 +948,8 @@ function qDraft(){
   const n = $('#qName').value.trim(), t = $('#qTel').value.trim(), m = $('#qMsg').value.trim();
   let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).classList.toggle('miss', !v); if (!v) bad = true; });
   if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
-  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더계약서',
-    draft:`${n}님, 안녕하세요. KTS 원클릭 더계약서입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 서식·특약을 확인해 다음 판에 넣고, ${t} 으로 하루 안에 연락드리겠습니다.\n지금 있는 표준계약서 12종(매매·교환 당사자용·교환 중개사용·주택·상가 임대차·부동산 임대차·등기위임장·근로·차용·용역·동업·컨설팅 약정서)은 바로 무료로 쓰실 수 있습니다.`};
+  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'표준계약서',
+    draft:`${n}님, 안녕하세요. KTS 원클릭 표준계약서입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 서식·특약을 확인해 다음 판에 넣고, ${t} 으로 하루 안에 연락드리겠습니다.\n지금 있는 표준계약서 12종(매매·교환 당사자용·교환 중개사용·주택·상가 임대차·부동산 임대차·등기위임장·근로·차용·용역·동업·컨설팅 약정서)은 바로 무료로 쓰실 수 있습니다.`};
 }
 $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; try{ a = JSON.parse(localStorage.getItem(LS_Q) || '[]'); }catch(e){} a.push(q); try{ localStorage.setItem(LS_Q, JSON.stringify(a)); }catch(e){}
@@ -968,5 +971,75 @@ window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, s
 <!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
 <script>window.KTS_UX_CFG={tool:"contract",free:"서식 3종 무료",wm:["#printArea"],flow:1};</script>
 <script src="../ux.js?v=20261124b"></script>
-<script src="../helper.js?v=20261122a"></script>
+<script src="../helper.js?v=20261125a"></script>
+<script>
+/* ===== 2026-11-25 작성 도우미 — 커서(👆) → 마이크(🎤) → 다음 칸 / 작성 끝엔 [?]=60초 문의 ===== */
+(function(){
+  if (!window.KTS_HELPER || !KTS_HELPER.writing) return;
+  var CW = { i: -1, armed: false };
+  function scrEls(){
+    var scr = document.getElementById('s' + S.step); if (!scr) return [];
+    var list = [].slice.call(scr.querySelectorAll('input[data-f],textarea[data-f]'));
+    if (S.step === 3){ var ta = document.getElementById('spFree'); if (ta) list.push(ta); }
+    if (S.step === 4) list = [].slice.call(scr.querySelectorAll('canvas[data-sig]'));
+    return list.filter(function(e){ return e.getClientRects().length; });
+  }
+  function labelOf(el){
+    if (S.step === 1 || S.step === 2) {
+      var host = el.closest('.dd') || el;
+      var prev = host.previousElementSibling, guard = 0;
+      while (prev && guard++ < 4){
+        var t = (prev.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/^(LABEL)$/.test(prev.tagName) && t) return t.replace(/<[^>]+>/g, '').slice(0, 20);
+        prev = prev.previousElementSibling;
+      }
+      return '이 칸';
+    }
+    if (S.step === 3) return '특약';
+    var lab = el.previousElementSibling;
+    return (lab && lab.textContent ? lab.textContent.trim() : '서명').slice(0, 20);
+  }
+  function refresh(){ try{ KTS_HELPER.guideRefresh(); }catch(e){} }
+  KTS_HELPER.writing(function(){
+    if (!(S.step >= 1 && S.step <= 4)) return null;
+    var els = scrEls(); if (!els.length) return null;
+    var a = document.activeElement, focused = els.indexOf(a) >= 0;
+    var idx = focused ? els.indexOf(a) : (CW.armed && els[CW.i] ? CW.i : -1);
+    if (idx < 0) idx = Math.max(0, els.findIndex(function(e){ return !String(e.value || '').trim(); }));
+    if (idx < 0) idx = els.length - 1;
+    var el = els[idx], mic = focused || (CW.armed && CW.i === idx);
+    return {
+      active: true, mode: mic ? 'mic' : 'cursor', el: el,
+      label: labelOf(el), pos: (idx + 1) + ' / ' + els.length + (S.step === 4 ? ' · 서명' : (S.step === 3 ? ' · 특약' : '')),
+      tap: function(){
+        CW.i = idx; CW.armed = true;
+        if (mic){
+          LASTEL = el;
+          var b = document.getElementById(S.step === 2 ? 'vFill2' : 'vFill');
+          if (b) b.click(); else { try{ el.focus(); }catch(e){} }
+        } else {
+          try{ el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
+          if (el.tagName === 'CANVAS'){ el.classList.add('kts-guidefld'); setTimeout(function(){ try{ el.classList.remove('kts-guidefld'); }catch(e){} }, 1600); }
+        }
+        setTimeout(refresh, 160);
+      }
+    };
+  });
+  /* 단계를 옮기면 안내도 새 단계로 */
+  var _go = window.go;
+  window.addEventListener('click', function(){ setTimeout(refresh, 60); }, true);
+  window.addEventListener('scroll', function(){ }, { passive: true });
+  /* 말로 채운 뒤 다음 칸으로 */
+  window.KTS_NEXT_AFTER_VOICE = function(){
+    var els = scrEls(); if (!els.length) return;
+    var cur = els.indexOf(LASTEL);
+    var nx = cur + 1; if (nx >= els.length) { CW.armed = false; CW.i = -1; refresh(); return; }
+    CW.i = nx; CW.armed = true;
+    try{ if (LASTEL && LASTEL.blur) LASTEL.blur(); }catch(e){}
+    try{ els[nx].scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
+    refresh();
+  };
+  refresh();
+})();
+</script>
 </body></html>

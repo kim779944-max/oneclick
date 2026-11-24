@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <script src="../master.js?v=20261121k"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KTS 더양식 — 내 종이 양식, 한 번 등록하면 값만 채워 바로 출력</title>
+<title>KTS 양식만들기 — 내 종이 양식, 한 번 등록하면 값만 채워 바로 출력</title>
 <meta name="description" content="거래명세서·견적서·근로계약서·동의서·신청서 같은 종이 양식을 사진 한 장으로 등록하고, 다음부터는 값만 채워 한글(.hwpx)·엑셀(.xlsx)·PDF로 바로 뽑습니다. 모든 처리는 이 기기 안에서만.">
 <meta name="theme-color" content="#0A1128">
 <link rel="icon" href="../icon.png">
@@ -138,7 +138,39 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
  #printArea img{width:100%;display:block;page-break-after:always}
  @page{size:A4;margin:0}
 }
-/* ── 더양식 탭 2개 (158 · 2026-11-23) ── */
+/* ── 2026-11-25 대문 개편 · 값 입력 고정 바 · 도우미 ── */
+.start .big{font-size:16px;padding:15px 12px}
+.start .stdttl{display:flex;align-items:baseline;gap:6px;margin:12px 0 0;font-size:13px;font-weight:900;color:#fff}
+.start .stdttl em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--amber2)}
+.stdgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}
+.stdgrid button{min-height:46px;font-size:12.5px;font-weight:900;color:#E6EDF7;background:#12203C;border:1px solid var(--line2);border-radius:11px;padding:8px 6px;line-height:1.25;letter-spacing:-.3px}
+.stdgrid button:active{transform:scale(.98);border-color:var(--amber)}
+.stdgrid button b{display:block;font-size:10px;font-weight:800;color:#8FA1B8;margin-top:2px}
+.start .kv.sm{font-size:10.5px;margin-top:6px}
+/* 값 입력 — 화면에 늘 붙어 있는 [이전 칸][다음 칸] + [말해서 넣기][신분증] */
+#fillDock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom));width:100%;max-width:460px;z-index:49;display:none;padding:7px 14px 8px;background:linear-gradient(180deg,rgba(10,17,40,0),rgba(10,17,40,.97) 26%)}
+body.fill #fillDock{display:block}
+body.fill main{padding-bottom:250px}
+#fillDock .fd1{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}
+#fillDock .fd1 button{min-height:44px;font-size:13px;font-weight:900;border-radius:11px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7;padding:0 8px}
+#fillDock #nfNext{color:var(--on-amber);background:var(--amber2);border-color:var(--amber2)}
+#fillDock #nfPos{font-size:12px;font-weight:900;color:#FFC08A;white-space:nowrap;padding:0 2px}
+#fillDock .fd2{display:flex;gap:6px;margin-top:6px}
+#fillDock .fd2 button{min-height:46px;font-size:13px;font-weight:900;border-radius:11px;border:1px solid var(--line2);background:#12203C;color:#E6EDF7;padding:0 10px;flex:1}
+#fillDock .fd2 #voiceBtn{flex:1.5;color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber);font-size:13.5px}
+#fillDock .fd2 #voiceBtn.on{background:linear-gradient(145deg,#FF9A3D,#E24800);color:#fff}
+#fillDock .fd2 #handBtn{flex:0 0 52px;font-size:16px;color:#FFC08A}
+#valList input,#valList textarea{scroll-margin-top:80px;scroll-margin-bottom:210px}
+.fldfocus{outline:2px solid var(--amber);outline-offset:2px;box-shadow:0 0 0 5px rgba(255,107,0,.14)}
+.spchips{display:flex;gap:5px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch}
+.spchips button{flex:0 0 auto;font-size:11.5px;font-weight:800;color:#FFD9A6;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.5);border-radius:999px;padding:7px 10px;white-space:nowrap}
+.dline{font-size:10.5px;font-weight:800;color:var(--amber2);margin-top:3px}
+.dwrap{display:flex;gap:6px;align-items:center}
+.dwrap input{flex:1;min-width:0}
+.dwrap .dm{flex:0 0 auto;font-size:11px;font-weight:900;color:#9FB0C8}
+/* 원본 계약서와 같은 명조 글꼴(값이 종이 위에 찍힐 때) */
+@font-face{font-family:'KTSMyeongjo';src:url('fonts/NanumMyeongjo.woff2') format('woff2');font-display:swap;font-weight:400}
+/* ── 양식만들기 탭 2개 (158 · 2026-11-23) ── */
 .ftabs{display:flex;gap:6px;padding:0 14px 10px}
 .ftabs button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--line2);background:#0F1B33;color:#AFBDD0;
  font-size:12.5px;font-weight:900;letter-spacing:-.3px;line-height:1.2;padding:6px 8px}
@@ -147,7 +179,7 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 .ftabs button.on b{color:#3A1A00}
 #cvPane{display:none}
 body.cv #cvPane{display:block}
-body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.cv .kux-flow,body.cv .kuxguide,body.cv .kux-morebar{display:none!important}
+body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.cv .kux-flow,body.cv .kuxguide,body.cv .kux-morebar{display:none!important}
 #cvFrame{display:block;width:100%;border:0;background:#0A1128}
 .sealrow{display:flex;gap:8px;overflow-x:auto;padding:6px 0 2px}
 .sealit{position:relative;flex:0 0 auto;width:78px;padding:6px 4px;border-radius:12px;border:1px solid var(--line2);background:#fff;text-align:center}
@@ -163,12 +195,12 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
 <div id="app">
 <header class="top">
  <div class="hd">
-  <div class="brand"><span class="mark">양</span>더양식 <small>KTS 원클릭</small></div>
+  <div class="brand"><span class="mark">양</span>양식만들기 <small>KTS 원클릭</small></div>
   <span class="sp"></span>
   <a href="https://autooneclick.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font-size:11px;font-weight:800;color:#FFA24D;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;letter-spacing:-.2px;">← 원클릭 쇼룸</a>
   <button class="keyb" id="keyBtn">AI 열쇠 · 없음</button>
  </div>
- <nav class="ftabs" id="ftabs" aria-label="더양식 기능">
+ <nav class="ftabs" id="ftabs" aria-label="양식만들기 기능">
   <button type="button" data-tab="form" aria-pressed="true">① 종이 양식 채우기<b>사진 위 빈칸 → 한글·엑셀·PDF</b></button>
   <button type="button" data-tab="convert" aria-pressed="false">② 표 사진 → 한글·엑셀<b>구 문서변환기 · 원본 서식 유지</b></button>
  </nav>
@@ -176,32 +208,24 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
   <button data-s="1"><i></i>등록</button><button data-s="2"><i></i>빈칸 지정</button><button data-s="3"><i></i>값 입력</button><button data-s="4"><i></i>미리보기</button><button data-s="5"><i></i>내보내기</button>
  </nav>
 </header>
-<a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:9px;margin:10px 12px 0;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,107,0,.5);background:linear-gradient(100deg,rgba(255,107,0,.15),rgba(255,255,255,.02) 70%);text-decoration:none;color:#F3F6FA;line-height:1.35;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:9px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:3px 7px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:-.2px">현재 지역 <span style="color:#FFA24D">무료 세팅</span> 사전예약 중</b><i style="display:block;font-style:normal;font-size:10px;font-weight:700;color:#9FB0C8;margin-top:2px;letter-spacing:-.1px">업종·연락처 10초</i></span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:15px">→</span></a>
 
 <section id="cvPane" aria-label="표 사진 → 한글·엑셀"><iframe id="cvFrame" title="표 사진 → 한글·엑셀 변환" loading="lazy"></iframe></section>
 <main>
-<!-- ① 등록 -->
+<!-- ① 등록 — 대문: 사진 올리기 · 표준 양식 바로 쓰기 (2026-11-25 개편) -->
 <section class="scr" id="s1">
- <div class="hero" data-kts-intro="theform">
-  <span class="tag">한 번 등록 · 계속 재사용</span>
-  <h1>종이 양식 사진 한 장,<br><b>다음부터는 값만 채우면 끝</b></h1>
-  <p>거래명세서·견적서·계약서처럼 매번 처음부터 만들던 양식을 내 전용 양식으로 등록해 두세요. 사진과 값은 이 기기 안에만 저장됩니다.</p>
- </div>
- <div class="card">
-  <h2><span class="n">★</span>표준 양식 바로 쓰기 <small style="font-size:10.5px;color:var(--gray);font-weight:700">빈칸 지정 끝 · 열쇠 필요 없음</small></h2>
-  <p class="sub">버튼을 누르면 A4 원본 양식이 먼저 크게 뜹니다. [이 양식으로 작성하기]를 누르면 값 입력이 시작되고, 비워 둔 칸은 원본 그대로 빈칸으로 나옵니다.</p>
-  <div class="row"><button class="btn pri" id="psSale">📄 매매계약서</button></div>
-  <div class="row"><button class="btn pri" id="psPower">📄 등기위임장</button></div>
-  <div class="row"><button class="btn pri" id="psExchange">📄 교환계약서(당사자용)</button></div>
-  <div class="row"><button class="btn pri" id="psExbroker">📄 교환계약서(중개사용)</button></div>
-  <div class="row"><button class="btn pri" id="psLease">📄 부동산 임대차계약서</button></div>
-  <div class="row"><button class="btn pri" id="psConsult">📄 컨설팅 전속거래 약정서</button></div>
-  <p class="kv">매매 62칸(서명 6) · 위임장 12칸(서명 1) · 교환 당사자용 32칸(서명 2) · 교환 중개사용 35칸(서명 3) · 임대차 43칸(서명 3) · 약정서 41칸(서명 2·A4 2쪽) — 색감은 흑백·하늘색·연두색·회색 중에 고릅니다.</p>
- </div>
- <div class="card">
-  <h2><span class="n">1</span>새 양식 사진 등록</h2>
-  <p class="sub">종이를 어두운 바닥에 놓고 찍으면 기울기와 테두리를 자동으로 바로잡아 배경으로 깝니다.</p>
-  <div class="row"><button class="btn pri" id="pickBtn">양식 사진 찍기 · 고르기</button></div>
+ <div class="card start">
+  <div class="row"><button class="btn pri big" id="pickBtn">📷 사진으로 양식 올리기</button></div>
+  <p class="kv sm">종이 양식을 찍으면 기울기를 바로잡고 빈칸을 잡아 내 양식으로 저장합니다.</p>
+  <div class="stdttl">📄 표준 양식 바로 쓰기 <em>누르면 바로 값 입력</em></div>
+  <div class="stdgrid" id="stdGrid">
+   <button type="button" data-std="p_sale">부동산 매매계약서</button>
+   <button type="button" data-std="p_lease">부동산 임대차계약서</button>
+   <button type="button" data-std="p_exchange">교환계약서(당사자)</button>
+   <button type="button" data-std="p_exbroker">교환계약서(중개사)</button>
+   <button type="button" data-std="p_power">등기 위임장</button>
+   <button type="button" data-std="p_consult">컨설팅 전속약정서</button>
+  </div>
+  <p class="kv sm">비워 둔 칸은 원본 빈칸 그대로 나옵니다 · 표준 양식은 열쇠 없이 무료</p>
   <input type="file" id="photoIn" accept="image/*" hidden>
   <div id="regBox" style="display:none">
    <div class="stage" id="regStage"><canvas id="regCv"></canvas></div>
@@ -211,7 +235,7 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
  </div>
  <div class="card">
   <h2><span class="n">2</span>내 양식 목록</h2>
-  <p class="sub">기본 양식 7종(표준 매매계약서·등기위임장 포함)은 열쇠 없이 바로 씁니다. 복제하면 내 전용 양식으로 고쳐 쓸 수 있습니다.</p>
+  <p class="sub">기본 양식·내가 등록한 양식이 모두 여기 있습니다. 복제하면 내 전용 양식으로 고쳐 쓸 수 있습니다.</p>
   <div class="flist" id="formList"></div>
  </div>
 </section>
@@ -257,17 +281,20 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
 <section class="scr" id="s3">
  <div class="card">
   <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
-  <p class="sub">칸을 누르고 <b style="color:#FFC08A">마이크</b>에 대고 말하면 그 칸에 그대로 들어갑니다. 명함·사업자등록증·신분증·메모지 사진으로 한 번에 채울 수도 있습니다.</p>
-  <div class="microw"><button class="btn sec sm" id="voiceBtn">🎤 말해서 넣기</button><button class="btn sec sm" id="photoFill">📷 신분증·명함 읽어오기</button></div>
-  <div class="microw"><button class="btn sec sm" id="handBtn">손글씨 사진 읽기</button></div>
-  <input type="file" id="handIn" accept="image/*" hidden>
-  <input type="file" id="photoIn2" accept="image/*" hidden>
+  <p class="sub">아래에 늘 붙어 있는 <b style="color:#FFC08A">[🎤 말해서 넣기]</b>로 지금 칸에 말해 넣고 <b style="color:#FFC08A">[다음 칸]</b>으로 넘어갑니다. 옆의 <b style="color:#FFC08A">[?]</b> 도우미가 넣을 칸을 가리킵니다.</p>
   <div id="fillInfo">사진 자동 채우기: AI 열쇠가 있으면 정확하게, 없으면 기기 안 무료 글자 인식으로 읽습니다.</div>
-  <div class="nfrow" id="nfRow"><button type="button" id="nfPrev">◀ 이전 칸</button><div id="nfPos">- / -</div><button type="button" id="nfNext">다음 칸 →</button></div>
   <div id="valList"></div>
   <div class="row"><button class="btn sec sm" id="clearVals">값 모두 지우기</button><button class="btn sec sm" id="sampleVals">예시 값 넣기</button></div>
  </div>
 </section>
+
+<!-- 값 입력 고정 바 — 화면 아래에 늘 붙어 있다(2026-11-25) -->
+<div id="fillDock" aria-label="값 입력 도구">
+ <div class="fd1"><button type="button" id="nfPrev">◀ 이전 칸</button><div id="nfPos">- / -</div><button type="button" id="nfNext">다음 칸 ▶</button></div>
+ <div class="fd2"><button type="button" id="voiceBtn">🎤 말해서 넣기</button><button type="button" id="photoFill">📷 신분증·명함</button><button type="button" id="handBtn" title="손글씨 사진 읽기" aria-label="손글씨 사진 읽기">✎</button></div>
+</div>
+<input type="file" id="handIn" accept="image/*" hidden>
+<input type="file" id="photoIn2" accept="image/*" hidden>
 
 <!-- ④ 미리보기 -->
 <section class="scr" id="s4">
@@ -313,18 +340,7 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
  </div>
 </section>
 
-<!-- 60초 문의 -->
-<section class="card qa" id="qa">
- <h2><span class="n">?</span>60초 문의</h2>
- <p class="sub">원하는 양식을 알려 주시면 기본 양식으로 넣어 드립니다. 남긴 내용은 이 기기에 보관되고, 담당자가 확인한 뒤 연락드립니다.</p>
- <label class="lb">이름</label><input id="qName" maxlength="20">
- <label class="lb">연락처</label><input id="qTel" maxlength="30" inputmode="tel" placeholder="010-0000-0000">
- <label class="lb">문의 내용</label><textarea id="qMsg" rows="3" maxlength="500" placeholder="예: 우리 업종 납품확인서 양식도 넣어 주세요"></textarea>
- <div class="row"><button class="btn sec sm" id="qMake">답장 초안 만들기</button><button class="btn sec sm" id="qSave">승인 대기에 담기</button></div>
- <div class="draft" id="qDraft"></div>
- <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
-</section>
-<p class="foot">더양식 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
+<p class="foot">양식만들기 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
 </main>
 <div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
 </div>
@@ -361,36 +377,41 @@ body.cv main,body.cv .bar,body.cv #steps,body.cv .ktsRsv,body.cv .kux-free,body.
 const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
 /* ================= 사진 → 구조(JSON) ================= */
 /* 문서 전체 1:1 복제 — 표 하나가 아니라 사진 속 종이 한 장의 모든 요소를 위→아래 순서로 읽는다 */
-const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
-사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
+const PROMPT = `이미지는 한국 사업용 문서(계약서·약정서·안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
+사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 조항, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
 아래 형식의 JSON만 출력하세요. 다른 말은 절대 쓰지 마세요.
 
 {"blocks":[블록, 블록, ...]}
 
-블록은 두 종류입니다.
+블록은 세 종류입니다.
 1) 표 블록
-{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
+ "rowHeights":[각 행 높이 %, 정수, 합 100],
  "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
-2) 글 블록(제목 배너·문단·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
-{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,
+2) 글 블록(제목 배너·문단·조항·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
+{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,"y":쪽위치%,"h":높이%,
  "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
+3) 빈 자리 블록(직인·도장·QR·로고·사진처럼 글자가 아닌 것)
+{"t":"blank","y":위쪽위치%,"h":높이%,"label":"직인 또는 로고"}
 
 규칙:
-- x, w는 종이(문서 본문) 전체 너비를 100으로 본 가로 위치·너비입니다. 가운데 놓인 것은 좌우 여백이 같게.
-- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0.
+- x, w, y, h는 종이(문서 본문) 전체를 100으로 본 비율입니다. y는 종이 맨 위에서부터의 위치입니다. 가운데 놓인 것은 좌우 여백이 같게.
+- 위→아래 순서대로 블록을 적으세요. y·h를 적으면 그 위치와 크기 그대로 A4 한 장에 되살립니다.
+- **조항이 있는 문서(계약서·약정서)는 조항 하나도 빠뜨리지 마세요.** "제1조 (제목)" 같은 조항 제목은 글 블록 하나, 그 아래 본문 문단은 각각 따로 글 블록으로 적고, ①·②·③ 번호가 붙은 줄도 각각 글 블록으로 나누세요. 조항 제목만 적고 본문을 빠뜨리는 일이 없도록, 종이 맨 마지막 줄까지 읽으세요.
+- 표와 문단이 번갈아 나오면(예: 제1조 다음 표, 제2조 다음 문단, 제3조 다음 표) 그 순서를 y 위치로 정확히 지키세요.
+- 표의 h는 그 표 전체 높이(%), rowHeights는 표 안에서 각 행이 차지하는 비율입니다. 사진에서 줄 간격을 보고 적으세요.
+- 표 칸은 비어 있어도 cells에 넣으세요(글자 ""). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
+- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸).
+- 직인·도장·QR·로고는 글자로 지어내지 말고 3) blank 자리 블록으로 높이만 남기세요.
+- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0. 표가 없으면 표 블록을 만들지 마세요.
 - 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
 - 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
 - 문단 안에서 색이 바뀌는 부분(빨간 글씨 등)은 runs를 나눠 color를 적으세요. 검정 글씨는 color 빈칸.
 - 노란 형광펜이 칠해진 글은 형광펜에 그 색(#FFFF00 등)을, 밑줄 친 글은 밑줄에 밑줄 색을 적으세요.
 - 본문 글자 크기는 10을 기준으로 상대 크기를 적으세요(작은 글 9, 큰 제목 22 등).
-- '- 아 래 -' 같은 가운데 한 줄, 하단 날짜, 회사명·직인 문구도 각각 글 블록으로 넣으세요. 로고 그림은 그 안의 글자만 적으세요.
 - 문단은 원본의 줄바꿈이 아니라 문단 단위로 한 블록에 이어 적으세요(띄어쓰기는 원본대로).
-- 표: nRows/nCols는 병합을 포함한 전체 격자. colWidths 길이 = nCols. cells는 병합 안 된 칸마다 하나씩(빈 칸 포함). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
-- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸). 칸 전체가 색 글씨면 color에 적으세요.
-- 한 칸 안에서 일부 글자만 색이 다르면(예: "…, 화물 1호기"의 '화물 1호기'만 빨강) 그 칸 배열 끝(12번째)에 runs를 붙이세요: [["인승 1~4호기, 비상 1호기, ",0,"","",""],["화물 1호기",0,"#C00000","",""]]. runs 글자를 이으면 5번째 "글자"와 같아야 합니다.
-- 숫자만 든 칸은 align "C". 긴 목록·설명 칸은 align "L". num은 금액·수량처럼 계산하는 숫자면 1(날짜·전화번호는 0).
-- 글자는 사진에 보이는 그대로. 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로. 없는 글자 절대 지어내지 마세요.
-- 사진 밖 배경(벽지·액자·게시판)은 무시하세요.
+- **글자는 사진에 보이는 그대로.** 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로 적고, 없는 글자·숫자를 지어내지 마세요. 알아보기 어려운 글자는 그럴듯한 글자로 채우지 말고 가장 비슷하게 보이는 글자로 적으세요.
+- 사진 밖 배경(벽지·액자·게시판·검은 여백)은 무시하세요.
 - 압축된 JSON(줄바꿈/공백 없이)으로 출력하세요.`;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -1274,7 +1295,7 @@ async function buildHwpxDoc(st){
 }
 /* ===== converter.html 엔진 복사본 끝 ===== */
 
-/* ===================== 더양식 앱 ===================== */
+/* ===================== 양식만들기 앱 ===================== */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let tT; function toast(m){ const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => e.classList.remove('on'), 2600); }
 function busyOn(t){ $('#busyT').textContent = t; $('#busy').classList.add('on'); }
@@ -1943,12 +1964,14 @@ $('#pvStart').onclick = async () => { const f = PVF; if (!f) return; $('#pvModal
   PENDING_THEME = f._theme || '';
   busyOn('양식을 여는 중…'); try{ await openForm(f.id, 3); }catch(e){ toast('양식을 열지 못했습니다'); } busyOff(); };
 
-$('#psSale').onclick  = () => showPreview('p_sale');
-$('#psPower').onclick = () => showPreview('p_power');
-$('#psExchange').onclick = () => showPreview('p_exchange');
-$('#psExbroker').onclick = () => showPreview('p_exbroker');
-$('#psLease').onclick = () => showPreview('p_lease');
-$('#psConsult').onclick = () => showPreview('p_consult');
+/* 대문의 표준 양식 — 한 번에 바로 값 입력으로 (2026-11-25) */
+$('#stdGrid').onclick = async e => {
+  const b = e.target.closest('[data-std]'); if (!b) return;
+  const id = b.dataset.std;
+  busyOn('양식을 여는 중…'); 
+  try{ await openForm(id, 3); }catch(err){ toast('양식을 열지 못했습니다'); }
+  busyOff();
+};
 $('#formList').onclick = async e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.open){ const f = findForm(b.dataset.open); if (f && f.builtin) showPreview(b.dataset.open); else openForm(b.dataset.open, 3); }
@@ -2326,34 +2349,196 @@ async function saveCurrent(){
 /* ---------- ③ 값 입력 ---------- */
 const fmtNum = v => { const s = String(v == null ? '' : v).replace(/[^\d.-]/g, ''); if (s === '' || isNaN(+s)) return ''; const n = Math.round(+s * 100) / 100; return n.toLocaleString('ko-KR'); };
 const fmtDate = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? `${+m[1]}년 ${+m[2]}월 ${+m[3]}일` : (v || ''); };
+
+/* ---- 금액: 한글(이십억) ↔ 숫자(2,000,000,000) 자동 ---- */
+const KD = {'영':0,'일':1,'이':2,'삼':3,'사':4,'오':5,'육':6,'칠':7,'팔':8,'구':9};
+const KU = {'십':10,'백':100,'천':1000};
+const KB = {'만':10000,'억':100000000,'조':1000000000000,'경':10000000000000000};
+function korAmount(num){
+  let n = Math.round(Math.abs(Number(num) || 0));
+  if (!n) return '영';
+  const D = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'], U = ['', '십', '백', '천'];
+  const B = ['', '만', '억', '조', '경'];
+  const gs = []; while (n > 0){ gs.push(n % 10000); n = Math.floor(n / 10000); }
+  let out = '';
+  for (let gi = gs.length - 1; gi >= 0; gi--){
+    const g = gs[gi]; if (!g) continue;
+    const ds = String(g).split('').map(Number); let s2 = '';
+    for (let k = 0; k < ds.length; k++){
+      const d = ds[k], u = ds.length - 1 - k; if (!d) continue;
+      s2 += (d === 1 && u > 0 ? '' : D[d]) + U[u];
+    }
+    out += s2 + (B[gi] || '');
+  }
+  return out;
+}
+function parseKorAmount(str){
+  const raw = String(str == null ? '' : str).replace(/[\s,]/g, '');
+  if (!raw) return NaN;
+  if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw);
+  const s = raw.replace(/[^가-힣\d.]/g, '');
+  let total = 0, cur = 0, num = 0, seen = false;
+  for (const ch of s){
+    if (/\d/.test(ch)){ num = num * 10 + Number(ch); seen = true; continue; }
+    if (KD[ch] != null){ num = KD[ch]; seen = true; continue; }
+    if (KU[ch]){ cur += (num || 1) * KU[ch]; num = 0; seen = true; continue; }
+    if (KB[ch]){ total += (cur + num) * KB[ch]; cur = 0; num = 0; seen = true; continue; }
+  }
+  if (!seen) return NaN;
+  return total + cur + num;
+}
+/* 종이의 '금 ___ 원정' 자리에 들어가는 한글 금액 칸 / 숫자 칸 */
+const isKorMoney = l => /\(한글\)/.test(l) || (/^(계약금|융자금|중도금\d*|잔금|임대보증금|교환대금)/.test(l) && /금액|총액|\(한글\)/.test(l));
+const isNumMoney = f => f.type === 'number' || /\(숫자\)/.test(f.label || '');
+const MONEY_PAIR = {'매매대금(한글)':'매매대금(숫자)', '매매대금(숫자)':'매매대금(한글)'};
+function moneyTwinIdx(label){ const tw = MONEY_PAIR[label]; return tw ? CUR.fields.findIndex(x => x.label === tw) : -1; }
+function syncMoney(i){
+  const f = CUR.fields[i]; if (!f) return;
+  const j = moneyTwinIdx(f.label); if (j < 0) return;
+  const v = String(VALS[f.label] == null ? '' : VALS[f.label]);
+  let out = '';
+  if (isNumMoney(f)) out = v ? korAmount(v) : '';
+  else { const n = parseKorAmount(v); out = isFinite(n) ? String(n) : ''; }
+  VALS[CUR.fields[j].label] = out;
+  const el = navEl(j); if (el) el.value = isNumMoney(CUR.fields[j]) ? fmtNum(out) : out;
+}
+function updMoneyHint(i){
+  const f = CUR.fields[i], el = $(`#valList [data-hint="${i}"]`); if (!el) return;
+  const v = String(VALS[f.label] == null ? '' : VALS[f.label]).trim();
+  const n = parseKorAmount(v);
+  if (!v){ el.textContent = ''; return; }
+  el.textContent = isFinite(n) && /^\d|^[가-힣]+$/.test(v) ? ('종이에 ' + korAmount(n) + ' 원으로 찍힙니다') : '';
+}
+/* ---- 날짜: 년·월·일 세 칸 → 달력 하나 ---- */
+let DATE_GROUPS = {};
+function datePart(label){
+  const m = /^(.*?)\s*(년|월|일)(\s*\([^)]*\))?$/.exec(String(label || ''));
+  return m ? { base: m[1].trim(), part: m[2] === '년' ? 'y' : (m[2] === '월' ? 'm' : 'd') } : null;
+}
+function dateVal(base){
+  const g = DATE_GROUPS[base]; if (!g) return '';
+  const y = g.y ? String(VALS[g.y.lab] || '').trim() : '';
+  const m = g.m ? String(VALS[g.m.lab] || '').trim() : '';
+  const d = g.d ? String(VALS[g.d.lab] || '').trim() : '';
+  if (!/^\d{4}$/.test(y) || !/^\d{1,2}$/.test(m) || !/^\d{1,2}$/.test(d)) return '';
+  return y + '-' + String(+m).padStart(2, '0') + '-' + String(+d).padStart(2, '0');
+}
+function setDateGroup(base, val){
+  const g = DATE_GROUPS[base]; if (!g || !val) return;
+  const p = val.split('-');
+  if (g.y) VALS[g.y.lab] = p[0];
+  if (g.m) VALS[g.m.lab] = String(+p[1]);
+  if (g.d) VALS[g.d.lab] = String(+p[2]);
+  saveVals();
+  const el = $$('#valList input[data-dg]').find(x => x.dataset.dg === base);
+  const dm = el && el.parentNode ? el.parentNode.querySelector('.dm') : null;
+  if (dm) dm.textContent = fmtDate(val);
+  toast(base + ' — ' + fmtDate(val));
+}
+/* ---- 특약 추천 (터치로 넣고 그 자리에서 고친다) ---- */
+const SPECIAL_PRESETS = [
+  ['권리 말소', '매도인은 잔금일까지 근저당·가압류 등 권리 제한을 모두 말소하고 완전한 소유권을 넘깁니다.'],
+  ['현 상태 인도', '시설물과 비품은 현 상태 그대로 인도하며, 잔금일 이후 관리비·공과금은 매수인이 부담합니다.'],
+  ['면적 정산 없음', '토지·건물의 면적은 공부상 면적으로 하며, 측량 결과와의 차이는 정산하지 않습니다.'],
+  ['해약 시 계약금', '매수인 사정으로 해약할 때 계약금은 반환하지 않고, 매도인 사정으로 해약할 때는 계약금을 배로 반환합니다.'],
+  ['세금·관리비', '중도금 지급일 이전에 발생한 세금·관리비는 매도인이, 이후는 매수인이 부담합니다.'],
+  ['법령 따름', '이 계약에 정하지 않은 사항은 관계 법령과 관례에 따릅니다.']
+];
+
 function shown(f){ const v = VALS[f.label]; if (v == null || v === '') return '';
-  if (f.type === 'number') return fmtNum(v); if (f.type === 'date') return fmtDate(v); if (f.type === 'sign') return '(서명)'; return String(v); }
+  if (f.type === 'number') return fmtNum(v); if (f.type === 'date') return fmtDate(v); if (f.type === 'sign') return '(서명)';
+  return String(v).replace(/\s*㎡\s*$/, ''); }
 let LAST_INPUT = null;
 function renderInputs(){
   $('#s3name').textContent = CUR.name + ' · 값 입력';
+  DATE_GROUPS = {};
+  /* 년·월·일 묶음을 먼저 모은다 */
+  CUR.fields.forEach((x, k) => { const p = datePart(x.label); if (!p) return;
+    (DATE_GROUPS[p.base] = DATE_GROUPS[p.base] || {})[p.part] = { i: k, lab: x.label }; });
+  const done = {};
   const h = CUR.fields.map((f, i) => {
     if (f.type === 'erase') return '';
     const v = VALS[f.label] == null ? '' : VALS[f.label];
     const hd = f.sec ? `<div class="sechd">${escH(f.sec)}</div>` : '';
     if (f.type === 'sign') return hd + `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
-    if (f.multi) return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label><textarea class="${v ? 'has' : ''}" data-f="${i}" rows="5" placeholder="여러 줄로 적으세요">${escH(v)}</textarea>`;
-    const tp = f.type === 'date' ? 'date' : 'text', im = f.type === 'number' ? ' inputmode="decimal"' : '';
+    /* 날짜 묶음 — 달력 하나로 년·월·일 세 칸을 채운다 */
+    const dp = datePart(f.label);
+    if (dp && (DATE_GROUPS[dp.base].y || DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
+      if (done['d:' + dp.base]) return ''; done['d:' + dp.base] = 1;
+      const g = DATE_GROUPS[dp.base], val = dateVal(dp.base);
+      const parts = ['y', 'm', 'd'].filter(k2 => g[k2]).map(k2 => ({ y: '년', m: '월', d: '일' })[k2]).join(' · ');
+      return hd + `<label class="lb">${escH(dp.base)}<em>달력에서 고르면 ${parts} 칸에 나뉘어 들어갑니다</em></label>`
+        + `<div class="dwrap"><input data-dg="${escH(dp.base)}" type="date" value="${val}"><span class="dm">${val ? fmtDate(val) : parts}</span></div>`;
+    }
+    if (f.multi){
+      const chips = /특약/.test(f.label)
+        ? `<div class="spchips">${SPECIAL_PRESETS.map((p, k) => `<button type="button" data-sp="${k}">＋ ${escH(p[0])}</button>`).join('')}</div>` : '';
+      return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label>` + chips
+        + `<textarea class="${v ? 'has' : ''}" data-f="${i}" rows="5" placeholder="여러 줄로 적으세요">${escH(v)}</textarea>`;
+    }
+    const korM = isKorMoney(f.label), numM = isNumMoney(f);
+    const tp = f.type === 'date' ? 'date' : 'text';
+    const im = numM ? ' inputmode="numeric"' : '';
     const auto = CUR.calc && CUR.calc[f.label] ? '<em>자동 계산</em>' : '';
-    return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label><input data-f="${i}" class="${v ? 'has' : ''}" type="${tp}"${im} value="${escH(f.type === 'number' ? fmtNum(v) : v)}">`;
+    const unit = /면적/.test(f.label) ? '<span class="dm">㎡</span>' : '';
+    const vv = numM && f.type === 'number' ? fmtNum(v) : v;
+    return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label>`
+      + `<div class="dwrap"><input data-f="${i}" class="${v ? 'has' : ''}" type="${tp}"${im} value="${escH(vv)}">${unit}</div>`
+      + (f.type === 'date' ? `<div class="dline">${v ? fmtDate(v) : ''}</div>` : '')
+      + (korM ? `<div class="dline" data-hint="${i}"></div>` : '');
   }).join('');
   $('#valList').innerHTML = h;
   $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
+  CUR.fields.forEach((f, i) => { if (isKorMoney(f.label)) updMoneyHint(i); });
   updNavPos(-1);
+  guideSyncSoon();
 }
 $('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) LAST_INPUT = e.target; });
 $('#valList').addEventListener('input', e => {
+  const dg = e.target.dataset.dg; if (dg){ return; }              /* 달력은 change 에서 */
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
-  VALS[f.label] = f.type === 'number' ? e.target.value.replace(/[^\d.-]/g, '') : e.target.value;
+  if (f.type === 'date'){ VALS[f.label] = e.target.value; e.target.classList.toggle('has', !!e.target.value); saveVals(); return; }
+  if (isNumMoney(f)){
+    VALS[f.label] = e.target.value.replace(/[^\d.-]/g, '');
+    e.target.classList.toggle('has', !!e.target.value);
+    syncMoney(+i); runCalc(f.label); saveVals(); updNavPos(+i); return;
+  }
+  VALS[f.label] = e.target.value;
   e.target.classList.toggle('has', !!e.target.value);
-  runCalc(f.label); saveVals();
+  if (isKorMoney(f.label)) updMoneyHint(+i);
+  runCalc(f.label); saveVals(); updNavPos(+i);
 });
-$('#valList').addEventListener('change', e => { const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i]; if (f.type === 'number') e.target.value = fmtNum(VALS[f.label]); });
-$('#valList').addEventListener('click', e => { const b = e.target.closest('[data-sigclr]'); if (!b) return; const f = CUR.fields[+b.dataset.sigclr]; delete VALS[f.label]; saveVals(); renderInputs(); });
+$('#valList').addEventListener('change', e => {
+  const dg = e.target.dataset.dg; if (dg){ setDateGroup(dg, e.target.value); return; }
+  const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
+  if (f.type === 'number' || isNumMoney(f)){ e.target.value = fmtNum(VALS[f.label]); return; }
+  if (isKorMoney(f.label)){
+    const raw = String(VALS[f.label] == null ? '' : VALS[f.label]).trim();
+    const n = parseKorAmount(raw);
+    if (raw && isFinite(n)){
+      if (/^[\d.,\s]+$/.test(raw)){ VALS[f.label] = korAmount(n); e.target.value = VALS[f.label]; }
+      const j = moneyTwinIdx(f.label);
+      if (j >= 0){ VALS[CUR.fields[j].label] = String(n); const el = navEl(j); if (el) el.value = fmtNum(n); }
+    }
+    updMoneyHint(+i); saveVals();
+  }
+});
+$('#valList').addEventListener('click', e => {
+  const sp = e.target.closest('[data-sp]');
+  if (sp && CUR){
+    const ta = sp.parentNode.parentNode.querySelector('textarea[data-f]');
+    if (ta){
+      const f = CUR.fields[+ta.dataset.f], add = SPECIAL_PRESETS[+sp.dataset.sp][1];
+      const cur = String(VALS[f.label] || '').trim();
+      VALS[f.label] = cur ? cur + '\n' + add : add;
+      ta.value = VALS[f.label]; ta.classList.add('has'); saveVals();
+      ta.scrollTop = ta.scrollHeight;
+      toast('특약을 넣었습니다 · 그 자리에서 고칠 수 있습니다');
+    }
+    return;
+  }
+  const b = e.target.closest('[data-sigclr]'); if (!b) return; const f = CUR.fields[+b.dataset.sigclr]; delete VALS[f.label]; saveVals(); renderInputs();
+});
 /* ---------- 다음 칸 연속 입력 (적립 146번) — 배열 순서 · 지운 자리·서명·자동 계산 칸은 건너뜀 ---------- */
 function navIdx(){
   if (!CUR) return [];
@@ -2361,12 +2546,36 @@ function navIdx(){
     return f.type !== 'erase' && f.type !== 'sign' && !(CUR.calc && CUR.calc[f.label]) && $(`#valList [data-f="${i}"]`); });
 }
 function navEl(i){ return $(`#valList [data-f="${i}"]`); }
+/* 넣을 칸이 고정 바·자판에 가리지 않게 화면 위쪽으로 끌어올린다 (2026-11-25) */
+function dockSpace(){
+  const a = $('#fillDock'), b = $('.bar');
+  return (a ? a.offsetHeight : 0) + (b ? b.offsetHeight : 0) + 12;
+}
+function keepVisible(el, smooth){
+  if (!el || !el.getBoundingClientRect) return;
+  const r = el.getBoundingClientRect(), top = 74, bottom = window.innerHeight - dockSpace();
+  if (r.top >= top && r.bottom <= bottom) return;
+  const y = window.scrollY + r.top - Math.max(top + 6, Math.min(150, window.innerHeight * 0.24));
+  try{ window.scrollTo({top: Math.max(0, y), behavior: smooth === false ? 'auto' : 'smooth'}); }catch(e){ window.scrollTo(0, Math.max(0, y)); }
+}
+let GUIDE_I = -1;                 /* 도우미가 지금 가리키는 칸 */
+function navScroll(i){            /* 초점은 주지 않고 자리만 보여 준다(자판이 올라오지 않게) */
+  const el = navEl(i); if (!el) return;
+  GUIDE_I = i;
+  keepVisible(el);
+  updNavPos(i);
+  guideSyncSoon();
+}
 function navFocus(i){
   const el = navEl(i); if (!el) return;
+  GUIDE_I = i;
   el.focus({preventScroll:true});
   try{ if (el.value && el.select) el.select(); }catch(e){}
-  el.scrollIntoView({block:'center', behavior:'smooth'});
+  keepVisible(el);
   updNavPos(i);
+  el.classList.add('fldfocus');
+  setTimeout(() => { try{ el.classList.remove('fldfocus'); }catch(e){} }, 1400);
+  guideSyncSoon();
 }
 function updNavPos(i){
   const L = navIdx(), k = L.indexOf(i), el = $('#nfPos'); if (!el) return;
@@ -2374,7 +2583,7 @@ function updNavPos(i){
 }
 function nextField(i){
   const L = navIdx(), nx = L.find(k => k > i);
-  if (nx == null){ toast('마지막 칸입니다 · [미리보기]로 넘어가세요'); const nb = $('#nextBtn'); if (nb){ nb.focus(); nb.scrollIntoView({block:'center', behavior:'smooth'}); } return; }
+  if (nx == null){ toast('마지막 칸입니다 · [미리보기]로 넘어가세요'); const nb = $('#nextBtn'); if (nb){ nb.focus(); keepVisible(nb); } return; }
   navFocus(nx);
 }
 function prevField(i){
@@ -2448,32 +2657,88 @@ $('#sampleVals').onclick = () => { CUR.fields.forEach(f => { if (f.type === 'sig
   VALS[f.label] = SAMPLE_BY[f.label] != null ? SAMPLE_BY[f.label] : (f.type === 'number' ? SAMPLE.number : (f.type === 'date' ? SAMPLE.date : (f.label.indexOf('이름') >= 0 || f.label.indexOf('성명') >= 0 ? '홍길동' : f.label + ' 예시'))); });
   runCalc(''); saveVals(); renderInputs(); toast('예시 값을 넣었습니다'); };
 
-/* 음성 메모 — 브라우저 내장 음성 인식(무료) */
-function pickVoiceTarget(){
-  if (LAST_INPUT && document.body.contains(LAST_INPUT)) return LAST_INPUT;
-  const empty = $$('#valList input[data-f]').find(el => !el.value);
-  return empty || $('#valList input[data-f]') || null;
+/* 음성 입력 — 지금 칸(또는 도우미가 가리키는 칸)에 대고 말하면 그 칸에 들어가고, 다음 칸을 가리킨다 */
+function pickVoiceIdx(){
+  const a = document.activeElement;
+  if (a && a.closest && a.closest('#valList') && a.dataset.f != null) return +a.dataset.f;
+  const L = navIdx();
+  if (GUIDE_I >= 0 && L.includes(GUIDE_I)) return GUIDE_I;
+  const empty = L.find(k => { const el = navEl(k); return el && !String(el.value || '').trim(); });
+  return empty != null ? empty : (L[0] != null ? L[0] : -1);
 }
-$('#voiceBtn').onclick = () => {
+let VOICE_BUSY = false;
+function startVoice(idx){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다. 키보드의 마이크를 써 주세요');
-  const tgt = pickVoiceTarget(); if (!tgt) return toast('먼저 값을 넣을 칸을 눌러 주세요');
-  const f = CUR.fields[+tgt.dataset.f];
+  if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다 · 키보드의 마이크를 써 주세요');
+  if (VOICE_BUSY) return toast('앞서 말한 내용을 받고 있습니다');
+  const i = (idx == null) ? pickVoiceIdx() : idx;
+  if (i < 0) return toast('먼저 값을 넣을 칸을 눌러 주세요');
+  const tgt = navEl(i); if (!tgt){ navScroll(i); return toast('이 칸은 달력에서 골라 주세요'); }
+  const f = CUR.fields[i];
   const r = new SR(); r.lang = 'ko-KR'; r.interimResults = false; r.continuous = false; r.maxAlternatives = 1;
-  const btn = $('#voiceBtn'); btn.classList.add('on');
+  const btn = $('#voiceBtn'); if (btn){ btn.classList.add('on'); btn.textContent = '● 듣는 중…'; }
+  VOICE_BUSY = true;
+  const done = () => { VOICE_BUSY = false; if (btn){ btn.classList.remove('on'); btn.textContent = '🎤 말해서 넣기'; } };
   r.onresult = e => {
-    const t = e.results[0][0].transcript.trim();
-    tgt.value = f.type === 'number' ? fmtNum(t) : (tgt.value && tgt.value.trim() ? tgt.value + ' ' + t : t);
-    tgt.dispatchEvent(new Event('input', {bubbles: true}));
-    tgt.focus();
-    toast('"' + f.label + '" 칸에 넣었습니다: ' + t);
+    const t = (e.results[0][0].transcript || '').trim();
+    if (!t) return;
+    if (isNumMoney(f) || f.type === 'number'){
+      const n = parseKorAmount(t);
+      delete VALS[f.label];
+      VALS[f.label] = isFinite(n) ? String(n) : t.replace(/[^\d.-]/g, '');
+      tgt.value = f.type === 'number' ? fmtNum(VALS[f.label]) : VALS[f.label];
+      if (isKorMoney(f.label)) updMoneyHint(i);
+    } else {
+      VALS[f.label] = (tgt.value && tgt.value.trim()) ? tgt.value + ' ' + t : t;
+      tgt.value = VALS[f.label];
+    }
+    tgt.classList.add('has');
+    tgt.dispatchEvent(new Event('input', { bubbles: true }));
+    saveVals();
+    toast('"' + f.label + '" — ' + VALS[f.label]);
+    /* 다음 칸을 가리킨다(초점을 옮겨 자판을 올리지 않는다) */
+    const L = navIdx(), nx = L.find(k => k > i);
+    try{ tgt.blur(); }catch(e){}
+    if (nx != null){ GUIDE_I = nx; setTimeout(() => { navScroll(nx); flashField(nx); }, 60); }
+    else { GUIDE_I = -1; toast('마지막 칸까지 넣었습니다 · [미리보기]로 넘어가세요'); }
+    guideSyncSoon();
   };
-  r.onerror = ev => toast(ev.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : '음성을 알아듣지 못했습니다');
-  r.onend = () => btn.classList.remove('on');
-  try{ r.start(); }catch(err){ btn.classList.remove('on'); }
-  tgt.focus(); tgt.select();
+  r.onerror = ev => { done(); toast(ev.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : '음성을 알아듣지 못했습니다'); };
+  r.onend = done;
+  try{ r.start(); }catch(err){ done(); return toast('음성 입력을 시작하지 못했습니다'); }
+  GUIDE_I = i;
   toast('"' + f.label + '" 칸에 대고 말씀하세요');
-};
+}
+function flashField(i){ const el = navEl(i); if (!el) return;
+  el.classList.add('fldfocus'); setTimeout(() => { try{ el.classList.remove('fldfocus'); }catch(e){} }, 1500); }
+$('#voiceBtn').onclick = () => startVoice(null);
+
+/* ---------- 도우미(?) — 작성 중에는 커서(👆) → 마이크(🎤) ---------- */
+function guideTargets(){
+  if (!CUR) return [];
+  return CUR.fields.map((f, i) => ({ f, i })).filter(x => x.f.type !== 'erase' && x.f.type !== 'sign' && navEl(x.i));
+}
+function guideState(){
+  if (STEP !== 3 || !CUR) return null;
+  const L = navIdx(); if (!L.length) return null;
+  const a = document.activeElement;
+  const inList = !!(a && a.closest && a.closest('#valList') && a.dataset.f != null);
+  let i;
+  if (inList) i = +a.dataset.f;
+  else if (GUIDE_I >= 0 && L.includes(GUIDE_I)) i = GUIDE_I;
+  else i = L.find(k => { const el = navEl(k); return el && !String(el.value || '').trim(); });
+  if (i == null) i = L[L.length - 1];
+  const el = navEl(i), mic = inList || GUIDE_I === i;
+  return {
+    active: true, mode: mic ? 'mic' : 'cursor',
+    label: CUR.fields[i].label, pos: (L.indexOf(i) + 1) + ' / ' + L.length, el: el,
+    tap: function(){
+      if (mic) startVoice(i);
+      else { GUIDE_I = i; navScroll(i); flashField(i); }
+    }
+  };
+}
+function guideSyncSoon(){ try{ if (window.KTS_HELPER && KTS_HELPER.guideRefresh) KTS_HELPER.guideRefresh(); }catch(e){} }
 
 /* ---------- AI (손님 자기 제미나이 무료 열쇠 · 그 기기에만 보관) ---------- */
 function myKey(){ let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){}
@@ -2720,9 +2985,11 @@ async function composite(maxW, pg){
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     g.fillStyle = '#fff'; g.fillRect(x, y, w, h);
   }
-  /* 글자 크기: 칸 높이(중간값)에 맞추고, 종이 너비의 3.5%를 넘지 않게 */
+  /* 값 글꼴 — 원본 계약서와 같은 명조. 내가 만든 서식(그림 배경 없음)은 화면과 같은 고딕 */
+  const OVF = (CUR && (CUR.bgUrl || CUR.bgUrls)) ? '"KTSMyeongjo","바탕","Batang","HY신명조","Apple SD Gothic Neo",serif' : FONT;
+  /* 글자 크기: 종이의 줄 높이에 맞춰 크게(칸 높이의 0.78배), 종이 너비의 4.6%를 넘지 않게 */
   const hs = CUR.fields.filter(f => f.type !== 'erase').map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
-  const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.55, cv.width * 0.035);
+  const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.78, cv.width * 0.046);
   for (const f of CUR.fields){
     if (f.type === 'erase') continue;
     if (f.page && f.page !== pg) continue;
@@ -2732,19 +2999,21 @@ async function composite(maxW, pg){
       const im = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = v; }); if (!im) continue;
       const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
     }
-    const t = shown(f); const fsz = f.fs ? f.fs * (cv.width / 1489) : 0;
-    let fs = fsz || Math.min(h * 0.62, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(4, fs * 0.35);
-    g.fillStyle = '#10204A'; g.textBaseline = 'middle';
-    g.font = `${fw} ${fs}px ${FONT}`;
-    while (fs > 6 && g.measureText(t).width > w - pad * 2 && (f.fit || (h < fs * 2.6)) && !f.top){ fs -= .5; g.font = `${fw} ${fs}px ${FONT}`; }
+    const t = shown(f); const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
+    let fs = fsz || Math.min(h * 0.78, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(3, fs * 0.28);
+    g.fillStyle = '#111111'; g.textBaseline = 'middle';
+    g.font = `${fw} ${fs}px ${OVF}`;
+    while (fs > 6 && g.measureText(t).width > w - pad * 2 && (f.fit || (h < fs * 2.6)) && !f.top){ fs -= .5; g.font = `${fw} ${fs}px ${OVF}`; }
     if (f.top || (!f.fit && g.measureText(t).width > w - pad * 2 && h >= fs * 2.6)){   /* 높은 칸·특약란은 줄바꿈, 위에서부터 */
       const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.3;
       let yy = f.top ? y + pad + fs * 0.55 : y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
       g.textAlign = 'left'; lines.forEach(l => { if (yy < y + h) g.fillText(l, x + pad, yy); yy += lh; });
     } else {
       const cent = f.al === 'c';
-      g.textAlign = cent ? 'center' : (f.type === 'number' ? 'right' : 'left');
-      g.fillText(t, cent ? x + w / 2 : (f.type === 'number' ? x + w - pad : x + pad), y + h / 2);
+      /* 면적은 뒤의 ㎡ 기호에 붙게 오른쪽 정렬 */
+      const right = f.type === 'number' || /면적/.test(f.label || '');
+      g.textAlign = cent ? 'center' : (right ? 'right' : 'left');
+      g.fillText(t, cent ? x + w / 2 : (right ? x + w - pad : x + pad), y + h / 2);
     }
   }
   /* 188 간인 — 쪽과 쪽이 맞닿는 가장자리에 도장을 정확히 반씩 */
@@ -2842,9 +3111,12 @@ function go(n, noPush){
   $$('#steps button').forEach(b => { const k = +b.dataset.s; b.classList.toggle('on', k === n); b.classList.toggle('done', k < n); });
   $('#backBtn').style.display = n === 1 ? 'none' : '';
   $('#nextBtn').textContent = ['', '빈칸 지정으로', ro() ? '값 입력으로' : '내 양식으로 저장', '미리보기', '내보내기', '처음으로'][n];
+  document.body.classList.toggle('fill', n === 3);
+  if (n !== 3) GUIDE_I = -1;
   if (n === 2) drawEditor();
   if (n === 3) renderInputs();
   if (n === 4) renderPreview();
+  guideSyncSoon();
   if (n === 5 && window.sealBoxPaint) sealBoxPaint();
   if (n === 5 && !$('#outName').value) $('#outName').value = (CUR.name || '양식') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
   if (n === 1) renderList();
@@ -2868,18 +3140,6 @@ $('#steps').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.
 $('#pickBtn').onclick = () => $('#photoIn').click();
 $('#photoIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; onPhoto(f); };
 $('#regSeg').onclick = e => { const b = e.target.closest('button'); if (b) showReg(b.dataset.v); };
-
-/* ---------- 60초 문의 (발송 없음 · 사람 승인 후) ---------- */
-function qDraft(){
-  const n = $('#qName').value.trim(), t = $('#qTel').value.trim(), m = $('#qMsg').value.trim();
-  let bad = false; [['#qName', n], ['#qTel', t], ['#qMsg', m]].forEach(([s, v]) => { $(s).style.borderColor = v ? '' : 'var(--red)'; if (!v) bad = true; });
-  if (bad){ toast('빨간 칸을 채워 주세요'); return null; }
-  return {name:n, tel:t, msg:m, at:new Date().toISOString(), app:'더양식',
-    draft:`${n}님, 안녕하세요. KTS 원클릭 더양식입니다.\n남겨 주신 문의 "${m.slice(0, 60)}${m.length > 60 ? '…' : ''}" 잘 받았습니다.\n말씀하신 양식을 확인해 기본 양식으로 넣을 수 있는지 살펴보고, ${t} 으로 하루 안에 연락드리겠습니다.\n기다리시는 동안 기본 양식 7종(매매계약서·등기위임장 포함)은 지금 바로 무료로 쓰실 수 있습니다.`};
-}
-$('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
-$('#qSave').onclick = () => { const q = qDraft(); if (!q) return; const a = lsGet(LS_Q, []); a.push(q); lsSet(LS_Q, a);
-  $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
 
 /* ============================================================================
    188 (2026-11-24) 사인 · 도장 · 간인
@@ -3000,7 +3260,7 @@ window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, o
   get SEAL(){ return SEAL; }};
 
 /* ============================================================================
-   188 (2026-11-24) 더뷰 → 더양식 — "더양식에서 편집하기"로 넘어온 문서를 그 자리에서 연다
+   188 (2026-11-24) 더뷰 → 양식만들기 — "양식만들기에서 편집하기"로 넘어온 문서를 그 자리에서 연다
    그림은 이 브라우저 저장소(IndexedDB)에서 꺼내고, 꺼낸 즉시 지운다.
    ========================================================================== */
 (async function fromViewer(){
@@ -3009,7 +3269,7 @@ window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, o
   busyOn('더뷰에서 보낸 문서를 받는 중…');
   try{
     const h = await KTSHandoff.take();
-    if (!h || !h.pages || !h.pages.length){ busyOff(); toast('넘어온 문서가 없습니다 · 더뷰에서 [더양식에서 편집하기]를 다시 눌러 주세요'); return; }
+    if (!h || !h.pages || !h.pages.length){ busyOff(); toast('넘어온 문서가 없습니다 · 더뷰에서 [양식만들기에서 편집하기]를 다시 눌러 주세요'); return; }
     const pages = h.pages.slice(0, 20), id = uid();
     await imgPut(id, pages[0]);
     for (let p = 2; p <= pages.length; p++) await imgPut(id + ':' + p, pages[p - 1]);
@@ -3024,10 +3284,10 @@ updKey(); go(1);
 </script>
 
 <!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
-<script>window.KTS_UX_CFG={tool:"theform",free:"기본 양식 5종 무료",wm:["#printArea"],flow:1};</script>
+<script>window.KTS_UX_CFG={tool:"theform",wm:["#printArea"],flow:1,guide:0};</script>
 <script src="../ux.js?v=20261124b"></script>
 <script>
-/* 더양식 탭 — ?tab=convert 이면 ② 탭으로 연다. ② 는 구 문서변환기 엔진(js/converter.js)을 convert.html 로 그대로 띄운다. */
+/* 양식만들기 탭 — ?tab=convert 이면 ② 탭으로 연다. ② 는 구 문서변환기 엔진(js/converter.js)을 convert.html 로 그대로 띄운다. */
 (function(){
   var frame = document.getElementById('cvFrame'), head = document.querySelector('header.top');
   function fit(){ if (frame) frame.style.height = Math.max(480, (window.innerHeight || 700) - (head ? head.offsetHeight : 0)) + 'px'; }
@@ -3052,5 +3312,9 @@ updKey(); go(1);
   show(t);
 })();
 </script>
-<script src="../helper.js?v=20261124a"></script>
+<script src="../helper.js?v=20261125a"></script>
+<script>
+/* 도우미 작성 모드 연결 — helper.js 가 올라온 뒤에 붙인다 */
+(function(){ try{ if (window.KTS_HELPER && KTS_HELPER.writing) KTS_HELPER.writing(guideState); }catch(e){ console.warn('guide off', e); } })();
+</script>
 </body></html>

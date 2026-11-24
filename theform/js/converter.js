@@ -1,4 +1,4 @@
-/* KTS 더양식 ② 표 사진 → 한글·엑셀 (구 문서변환기 converter.html 엔진 · 2026-11-23 이관 · 158번)
+/* KTS 양식만들기 ② 표 사진 → 한글·엑셀 (구 문서변환기 converter.html 엔진 · 2026-11-23 이관 · 158번)
    변환 로직은 converter.html(fc16cda) 그대로이고, 파일 경로만 theform/ 기준(../)으로 바꿨다. */
 function KTS_TOP(){ try { return (window.top && window.top.location.host === location.host) ? window.top : window; } catch (e) { return window; } }
 const $ = s => document.querySelector(s);
@@ -9,8 +9,8 @@ const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
 
 /* ================= 사진 → 구조(JSON) ================= */
 /* 문서 전체 1:1 복제 — 표 하나가 아니라 사진 속 종이 한 장의 모든 요소를 위→아래 순서로 읽는다 */
-const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
-사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
+const PROMPT = `이미지는 한국 사업용 문서(계약서·약정서·안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
+사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 조항, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
 아래 형식의 JSON만 출력하세요. 다른 말은 절대 쓰지 마세요.
 
 {"blocks":[블록, 블록, ...]}
@@ -20,31 +20,30 @@ const PROMPT = `이미지는 한국 사업용 문서(안내문·공고문·견�
 {"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
  "rowHeights":[각 행 높이 %, 정수, 합 100],
  "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
-2) 글 블록(제목 배너·문단·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
-{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,
+2) 글 블록(제목 배너·문단·조항·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
+{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,"y":쪽위치%,"h":높이%,
  "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
 3) 빈 자리 블록(직인·도장·QR·로고·사진처럼 글자가 아닌 것)
 {"t":"blank","y":위쪽위치%,"h":높이%,"label":"직인 또는 로고"}
 
 규칙:
 - x, w, y, h는 종이(문서 본문) 전체를 100으로 본 비율입니다. y는 종이 맨 위에서부터의 위치입니다. 가운데 놓인 것은 좌우 여백이 같게.
-- 위→아래 순서대로 블록을 적으세요. y·h를 적으면 그 위치와 크기 그대로 A4 한 장에 되살립니다(사진 편집기처럼).
-- 표의 h는 그 표 전체 높이(%), rowHeights는 표 안에서 각 행이 차지하는 비율입니다. 사진에서줄 간격을 보고 적으세요.
-- 직인·도장·QR·로고는 글자로 지어내지 말고 3) empty 자리 블록으로 높이만 남기세요(원래 위치 그대로).
-- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0.
+- 위→아래 순서대로 블록을 적으세요. y·h를 적으면 그 위치와 크기 그대로 A4 한 장에 되살립니다.
+- **조항이 있는 문서(계약서·약정서)는 조항 하나도 빠뜨리지 마세요.** "제1조 (제목)" 같은 조항 제목은 글 블록 하나, 그 아래 본문 문단은 각각 따로 글 블록으로 적고, ①·②·③ 번호가 붙은 줄도 각각 글 블록으로 나누세요. 조항 제목만 적고 본문을 빠뜨리는 일이 없도록, 종이 맨 마지막 줄까지 읽으세요.
+- 표와 문단이 번갈아 나오면(예: 제1조 다음 표, 제2조 다음 문단, 제3조 다음 표) 그 순서를 y 위치로 정확히 지키세요.
+- 표의 h는 그 표 전체 높이(%), rowHeights는 표 안에서 각 행이 차지하는 비율입니다. 사진에서 줄 간격을 보고 적으세요.
+- 표 칸은 비어 있어도 cells에 넣으세요(글자 ""). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
+- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸).
+- 직인·도장·QR·로고는 글자로 지어내지 말고 3) blank 자리 블록으로 높이만 남기세요.
+- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0. 표가 없으면 표 블록을 만들지 마세요.
 - 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
 - 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
 - 문단 안에서 색이 바뀌는 부분(빨간 글씨 등)은 runs를 나눠 color를 적으세요. 검정 글씨는 color 빈칸.
 - 노란 형광펜이 칠해진 글은 형광펜에 그 색(#FFFF00 등)을, 밑줄 친 글은 밑줄에 밑줄 색을 적으세요.
 - 본문 글자 크기는 10을 기준으로 상대 크기를 적으세요(작은 글 9, 큰 제목 22 등).
-- '- 아 래 -' 같은 가운데 한 줄, 하단 날짜, 회사명·직인 문구도 각각 글 블록으로 넣으세요. 로고 그림은 그 안의 글자만 적으세요.
 - 문단은 원본의 줄바꿈이 아니라 문단 단위로 한 블록에 이어 적으세요(띄어쓰기는 원본대로).
-- 표: nRows/nCols는 병합을 포함한 전체 격자. colWidths 길이 = nCols. cells는 병합 안 된 칸마다 하나씩(빈 칸 포함). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
-- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸). 칸 전체가 색 글씨면 color에 적으세요.
-- 한 칸 안에서 일부 글자만 색이 다르면(예: "…, 화물 1호기"의 '화물 1호기'만 빨강) 그 칸 배열 끝(12번째)에 runs를 붙이세요: [["인승 1~4호기, 비상 1호기, ",0,"","",""],["화물 1호기",0,"#C00000","",""]]. runs 글자를 이으면 5번째 "글자"와 같아야 합니다.
-- 숫자만 든 칸은 align "C". 긴 목록·설명 칸은 align "L". num은 금액·수량처럼 계산하는 숫자면 1(날짜·전화번호는 0).
-- 글자는 사진에 보이는 그대로. 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로. 없는 글자 절대 지어내지 마세요.
-- 사진 밖 배경(벽지·액자·게시판)은 무시하세요.
+- **글자는 사진에 보이는 그대로.** 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로 적고, 없는 글자·숫자를 지어내지 마세요. 알아보기 어려운 글자는 그럴듯한 글자로 채우지 말고 가장 비슷하게 보이는 글자로 적으세요.
+- 사진 밖 배경(벽지·액자·게시판·검은 여백)은 무시하세요.
 - 압축된 JSON(줄바꿈/공백 없이)으로 출력하세요.`;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -94,11 +93,27 @@ async function visionStruct(file, onStep){
       if (!st0) { lastErr = new Error('AI가 표를 찾지 못했습니다'); continue; }
       onStep && onStep('문서 전체 구조를 정리하는 중…', 78);
       return st0;
-    }catch(e){ lastErr = e; }
+    }catch(e){ lastErr = (e && (e.name === 'AbortError' || /abort/i.test(e.message || ''))) ? new Error('AI_TIME') : e; }
     }
   }
   if (quotaHit) throw new Error('QUOTA');
   throw lastErr || new Error('AI 변환에 실패했습니다');
+}
+/* 읽은 양의 품질 — 글자 수로 본다(조항 본문이 통째로 빠지면 확연히 줄어든다) */
+function docChars(st){
+  if (!st) return 0;
+  const doc = st.doc || []; let n = 0;
+  const cnt = c => String(c && c.text || '').replace(/\s/g, '').length;
+  if (doc.length){
+    doc.forEach(b => {
+      if (b.t === 'text') (b.runs || []).forEach(r => { n += String(r.text || '').replace(/\s/g, '').length; });
+      else if (b.t === 'table'){
+        if (b.main) (st.cells || []).forEach(c => { n += cnt(c); });
+        else ((b.tbl && b.tbl.cells) || []).forEach(c => { n += cnt(c); });
+      }
+    });
+  } else (st.cells || []).forEach(c => { n += cnt(c); });
+  return n;
 }
 function parseJsonLoose(txt){
   let t = String(txt || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
@@ -1314,6 +1329,15 @@ $('#dockBuy').onclick = () => {
 $('#dockCustom').onclick = () => {
   KTS_TOP().location.href = 'sms:01020022899?&body=' + encodeURIComponent('[원클릭] 변환기 커스텀 의뢰');
 };
+/* 다른 사진 — 상태를 지우고 바로 사진 고르기 (같은 사진도 다시 읽힌다) */
+const btnRetry = $('#btnRetry');
+if (btnRetry) btnRetry.onclick = () => {
+  CUR = null; CUR_NAME = ''; UNDO = []; ZOOM = 1; setZoom(1);
+  $('#work').style.display = 'none'; $('#res').style.display = 'none'; $('#home').style.display = 'block';
+  $('#blurBox').style.display = 'none';
+  window.scrollTo(0, 0);
+  const f = $('#file'); if (f){ f.value = ''; f.click(); }
+};
 /* 흐림 안내 — 다시 찍기 / 붙여넣기 두 가지만 */
 $('#btnRetake').onclick = () => { $('#blurBox').style.display = 'none'; $('#file').value = ''; $('#file').click(); };
 $('#btnPaste2').onclick = () => {
@@ -1344,8 +1368,13 @@ function weakRead(st){
   const filled = cells.filter(c => String(c.text || '').trim()).length;
   return filled / cells.length < 0.25;
 }
+/* 사진 넣기 — 같은 사진을 다시 골라도 또 읽히도록 값을 비우고, 앞선 상태를 초기화한다(2026-11-25 수정) */
+let RUNNING = false;
 $('#file').onchange = async e => {
-  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const f = e.target.files && e.target.files[0];
+  try{ e.target.value = ''; }catch(err){}
+  if (!f) return;
+  if (RUNNING){ toast('지금 사진을 읽고 있습니다 · 조금만 기다려 주세요'); return; }
   await runPhoto(f);
 };
 (function(){
@@ -1372,9 +1401,21 @@ $('#btnPaste').onclick = () => {
 };
 
 async function runPhoto(file){
+  if (RUNNING) { toast('지금 사진을 읽고 있습니다 · 조금만 기다려 주세요'); return; }
+  RUNNING = true;
+  /* 새 사진 — 지난 결과·화면 상태를 먼저 깨끗이 지운다 */
+  CUR = null; CUR_NAME = ''; UNDO = []; ZOOM = 1;
+  try{
+    $('#home').style.display = 'block';
+    $('#work').style.display = 'none';
+    $('#res').style.display = 'none';
+    $('#blurBox').style.display = 'none';
+    $('#rNote').textContent = '';
+    setZoom(1);
+  }catch(e){}
   CUR_NAME = (file.name || '표사진').replace(/\.[^.]+$/, '');
   const cap = quotaLeft();
-  if (cap <= 0){ toast('오늘 체험 횟수를 다 쓰셨습니다. 내일 다시 시도해 주세요.'); return; }
+  if (cap <= 0){ RUNNING = false; toast('오늘 체험 횟수를 다 쓰셨습니다. 내일 다시 시도해 주세요.'); return; }
   busy(true, file.name || '표 사진', '표를 읽는 중…', 12);
   let phase = 'build';
   const step = (msg, pct) => {
@@ -1387,6 +1428,14 @@ async function runPhoto(file){
     if (aiKey()){
       try { st = await visionStruct(file, step); engine = 'ai'; }
       catch(e){ st = null; }
+      /* 조항 본문이 통째로 빠지는 등 읽은 양이 적으면 한 번 더 읽어 더 나은 쪽을 쓴다 */
+      if (st && docChars(st) < 40){
+        try{
+          step('빠진 글자를 한 번 더 읽는 중…', 62);
+          const st2 = await visionStruct(file, step);
+          if (docChars(st2) > docChars(st)) st = st2;
+        }catch(e){}
+      }
     }
     /* 2) AI 키가 없어도 사진 한 장으로 여기까지 온다 — 기기 안 무료 인식(칸은 즉시, 글자는 뒤에서) */
     if (!st){
@@ -1422,8 +1471,10 @@ async function runPhoto(file){
       openWork();
       $('#blurBox').style.display = '';
     }
+    RUNNING = false;
   }catch(err){
     busy(false);
+    RUNNING = false;
     if (err.message === 'NO_TABLE'){
       toast('표를 찾지 못했습니다 · 다시 찍기 / 붙여넣기');
       $('#blurBox').style.display = 'none';
@@ -1433,6 +1484,10 @@ async function runPhoto(file){
       document.querySelector('details.paste').open = true;
     } else if (err.message === 'QUOTA'){
       toast('지금은 요청이 몰려 잠시 못 씁니다. 1분 뒤 다시 시도해 주세요.');
+    } else if (err.message === 'AI_BUSY' || err.message === 'AI 503'){
+      toast('AI가 잠시 붐빕니다 · 20~30초 뒤 [표 사진 고르기]를 다시 눌러 주세요');
+    } else if (err.message === 'AI_TIME'){
+      toast('AI 응답이 늦어 멈췄습니다 · 잠시 뒤 다시 눌러 주세요');
     } else {
       toast('변환에 실패했습니다(' + (err.message || err) + '). 다시 시도하거나 붙여넣기를 써 주세요.');
     }

@@ -451,7 +451,7 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
     var slots = ''; for (var i = 0; i < 4; i++) slots += photos[i] ? '<button type="button" data-ph="' + i + '" aria-label="사진 ' + (i + 1) + ' 보기"' + (i === 0 ? ' aria-current="true"' : '') + '><img src="' + esc(thumbOf(photos[i])) + '" alt="" loading="lazy"></button>' : '<span aria-hidden="true">빈 칸</span>';
 
     var others = EMB ? [] : DB.listings.filter(function (x) { return !x.private && x.id !== l.id; }).slice(0, 3);
-    var tools = [['eye', '더뷰', ROOT + 'viewer.html'], ['pen', '더싸인', ROOT + 'sign/'], ['form', '더양식', ROOT + 'theform/'], ['stamp', '더계약서', ROOT + 'contract/'], ['mount', '경사도', ROOT + 'slope/']];
+    var tools = [['eye', '더뷰', ROOT + 'viewer.html'], ['pen', '더싸인', ROOT + 'sign/'], ['form', '양식만들기', ROOT + 'theform/'], ['stamp', '표준계약서', ROOT + 'contract/'], ['mount', '경사도', ROOT + 'slope/']];
 
     var S = document.getElementById('sheet');
     S.className = 'sheet' + (multi ? ' multi' : '');
