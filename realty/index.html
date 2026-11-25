@@ -678,7 +678,8 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
       render();
       say(fixed ? "AI가 " + fixed + "개 항목을 보완했습니다." : "보완할 항목이 없었습니다.");
     }).catch(function(e){
-      say("AI 보정 실패: " + (e && e.message ? e.message : e) + " — 키와 네트워크를 확인해 주세요.", true);
+      /* 231·개선 7: 키·네트워크를 확인하라는 개발자 말투 → 지금 할 수 있는 두 가지 */
+      say("AI 보정을 마치지 못했습니다. 화면의 정리 결과는 그대로입니다 — [AI 보정]을 한 번 더 누르거나, 열쇠를 바꾸지 않고 그대로 내려받아도 됩니다.", true);
     });
   }
 
@@ -749,7 +750,8 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     }).then(function(t){
       consume(t, "시트");
     }).catch(function(e){
-      say("시트를 못 불러왔습니다(" + (e.message || e) + "). 시트에서 CSV로 내려받아 파일 탭에 올리면 됩니다.", true);
+      /* 231·개선 7: HTTP 코드·오류문 노출 대신 공유 설정을 바꾸는 방법 안내 */
+      say("시트 주소를 열지 못했습니다. 시트 공유를 [링크가 있는 사람 · 보기]로 바꾼 뒤 다시 눌러 주세요. 그래도 안 되면 시트에서 CSV로 내려받아 [파일] 탭에 올리면 정리됩니다.", true);
     });
   };
 

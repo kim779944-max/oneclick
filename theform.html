@@ -1711,7 +1711,7 @@ async function gemini(prompt, b64){
   }
   throw last || new Error('AI 실패');
 }
-const aiErr = e => e.message === 'NO_KEY' ? '오른쪽 위 [AI 열쇠]에 내 제미나이 무료 열쇠를 넣어 주세요' : (e.message === 'QUOTA' ? '오늘 무료 사용량을 다 썼습니다. 내일 다시 해 주세요' : 'AI 처리에 실패했습니다');
+const aiErr = e => e.message === 'NO_KEY' ? '오른쪽 위 [AI 열쇠]에 내 제미나이 무료 열쇠를 넣어 주세요' : (e.message === 'QUOTA' ? '오늘 무료 사용량을 다 썼습니다. 내일 다시 해 주세요' : '표 글자를 읽지 못했습니다 — 표가 화면에 꽉 차게 밝은 곳에서 다시 찍거나, [직접 입력]으로 빈칸을 채워 주세요');
 const bgB64 = () => { const c = document.createElement('canvas'), s = Math.min(1, 1600 / Math.max(bgW(), bgH())); c.width = Math.round(bgW() * s); c.height = Math.round(bgH() * s);
   const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(BG, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.9).split(',')[1]; };
 $('#aiFind').onclick = async () => {

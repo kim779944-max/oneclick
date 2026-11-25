@@ -450,8 +450,8 @@ function paintBld(){
     return;
   }
   if(b.st==='KEYERR'||b.st==='KEYERR2'){ el.innerHTML=state('err','인증키가 승인되지 않았습니다 · '+esc(b.msg||''))+keyHint(); return }
-  if(b.st==='ERR'){ el.innerHTML=state('err','건축물대장 조회 오류 '+esc(b.code||'')+' '+esc(b.msg||''))+keyHint(); return }
-  if(b.st==='NET'||b.st==='BADJSON'){ el.innerHTML=state('err','건축물대장 서버에 연결하지 못했습니다 · '+esc(b.msg||'')); return }
+  if(b.st==='ERR'){ el.innerHTML=state('err','건축물대장에서 이 지번을 찾지 못했습니다 — 번지까지 넣어 다시 조회하거나, 위의 [키 다시 넣기]로 인증키를 확인해 주세요.')+keyHint(); return }
+  if(b.st==='NET'||b.st==='BADJSON'){ el.innerHTML=state('err','건축물대장 서버에 연결하지 못했습니다 — 잰시 뒤 다시 누르거나, 전자지도에서 지번을 다시 골라 주세요.'); return }
   if(b.st==='EMPTY'||!b.items||!b.items.length){
     el.innerHTML=state('ok','이 필지에 <b>건축물대장이 없습니다</b> (건물 미등재 — 나대지·임야 등)')
       +'<p class="note">건물이 있는데도 안 나오면 지번(산 여부·부번)을 확인하거나 정부24에서 원본을 보세요.</p>';

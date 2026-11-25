@@ -662,7 +662,7 @@ if ($('#ganSeg')){
     busyOn('도장 바탕을 지우는 중…');
     try{ const src = await KTSSeal.fromPhoto(fl); const a = KTSSeal.save({nm:'도장', src:src});
       if (a[0]){ S.seal = a[0].id; save(); } toast('도장을 담았습니다'); }
-    catch(err){ toast('도장 사진을 읽지 못했습니다'); }
+    catch(err){ toast('도장 사진에서 도장을 찾지 못했습니다 — 도장만 흰 종이에 찍어 다시 찍어 주세요'); }
     busyOff(); renderSeal();
   };
   $('#cSealName').onclick = () => {
@@ -1615,7 +1615,7 @@ $('#pIn').onchange = async e => {
     busyOff();
     const m = err.message === 'NO_KEY' ? 'AI 열쇠가 없어 기기 인식도 쓰지 못했습니다(인터넷 필요)'
       : err.message === 'NO_READ' ? '사진에서 글자를 읽지 못했습니다. 밝은 곳에서 다시 찍어 주세요'
-      : err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진을 읽지 못했습니다';
+      : err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진에서 칸을 찾지 못했습니다 — 문서가 화면에 꽉 차게 밝은 곳에서 다시 찍어 주세요';
     $('#fillInfo').textContent = m; toast(m);
   }
 };
