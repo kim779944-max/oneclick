@@ -524,30 +524,33 @@ function tileUrl(mode,z,x,y){
   if(mode==='base') return WMTS+'/'+encodeURIComponent(S.key)+'/Base/'+z+'/'+y+'/'+x+'.png';
   return WMTS+'/'+encodeURIComponent(S.key)+'/Satellite/'+z+'/'+y+'/'+x+'.jpeg';
 }
-/* 화면에 맞는 줌 고르기 — 필지 bbox 가 캔버스의 62% 안에 들어오는 가장 큰 줌 */
+/* 화면에 맞는 줌 고르기 — 필지 bbox 가 캔버스의 62% 를 채우는 줌(소수 허용)
+   브이월드 WMTS 는 19까지만 타일이 있다 → 그 위는 19 타일을 늘려 그리는 디지털 확대(경사도 지도와 같은 방식) */
+var TILE_MAXZ=19;
 function pickZoom(b){
-  for(var z=19;z>=13;z--){
+  for(var z=21.5; z>13; z-=0.25){
     var px=(lon2x(b.maxx,z)-lon2x(b.minx,z)), py=(lat2y(b.miny,z)-lat2y(b.maxy,z));
-    if(Math.max(px,py)<Math.max(W,H)*0.55 && px<W*0.72 && py<H*0.72) return z;
+    if(px<W*0.62 && py<H*0.62) return z;
   }
   return 14;
 }
 function drawMap(cv){
   var ctx=cv.getContext('2d');
   ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
-  var b=S.box||(S.rings?bboxOf(S.rings):null);
+  var b=(S.rings?bboxOf(S.rings):S.box)||null;   /* 줌은 필지 기준 — 필지가 화면을 채운다 */
   if(!b){ ctx.fillStyle='#0B1729'; ctx.fillRect(0,0,W,H); return Promise.resolve(false) }
   var z=pickZoom(b), cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
   var wx=lon2x(cx,z), wy=lat2y(cy,z);
   var x0=wx-W/2, y0=wy-H/2;               /* 캔버스 좌상단의 월드 픽셀 */
-  var t=256, x1=Math.floor((x0+H*0)/t), tx0=Math.floor(x0/t), tx1=Math.floor((x0+W)/t),
-      ty0=Math.floor(y0/t), ty1=Math.floor((y0+H)/t), n=Math.pow(2,z);
+  var tz=Math.min(TILE_MAXZ,Math.floor(z)), ts=Math.pow(2,z-tz), t=256*ts;
+  var tx0=Math.floor(x0/t), tx1=Math.floor((x0+W)/t),
+      ty0=Math.floor(y0/t), ty1=Math.floor((y0+H)/t), n=Math.pow(2,tz);
   var jobs=[];
   if(S.mode!=='line'){
     for(var tx=tx0;tx<=tx1;tx++) for(var ty=ty0;ty<=ty1;ty++){
       var mx=((tx%n)+n)%n, my=ty;
       if(my<0||my>=n) continue;
-      (function(tx,ty,mx,my){ jobs.push(loadImg(tileUrl(S.mode,z,mx,my)).then(function(im){ if(im) ctx.drawImage(im,tx*t-x0,ty*t-y0,t,t) })) })(tx,ty,mx,my);
+      (function(tx,ty,mx,my){ jobs.push(loadImg(tileUrl(S.mode,tz,mx,my)).then(function(im){ if(im) ctx.drawImage(im,tx*t-x0,ty*t-y0,t,t) })) })(tx,ty,mx,my);
     }
   } else {
     ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,W,H);
