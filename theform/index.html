@@ -3253,19 +3253,43 @@ function inkSeal(name){
     if (!q) g.moveTo(ptx, pty); else g.lineTo(ptx, pty);
   }
   g.closePath(); g.stroke();
-  /* 이름 — 안쪽을 꽉 채우게 세로로, 획을 살짝 두껍게 */
-  var chars = nm.split(''), n = chars.length;
-  var inW = (rx - lw * 0.62) * 2, inH = (ry - lw * 0.62) * 2;
-  var step = inH / n;
-  var fs = Math.min(inW * 0.86, step * 0.80);
+  /* 이름 (224: 타원 안을 꽉 채우게 확대) — 글자의 실제 잉크 상자로 재서
+     줄마다 그 높이의 타원 폭 안에 최대한 크게 앉힌다. 1~3자 세로 한 줄, 4자 2×2(오른쪽 줄부터) */
   var font = '"KTSMyeongjo","바탕","Batang","HY신명조",serif';
-  g.font = '400 ' + Math.round(fs) + 'px ' + font; g.textAlign = 'center'; g.textBaseline = 'middle';
-  chars.forEach(function(ch, i){
-    var cy = H / 2 + (i - (n - 1) / 2) * step;
-    var cx = W / 2 + (i % 2 ? 1 : -1) * W * 0.004;
-    g.save(); g.translate(cx, cy); g.rotate((i % 2 ? 1 : -1) * 0.012);
-    g.fillText(ch, 0, 0);
-    g.lineWidth = Math.max(1.5, fs * 0.09); g.strokeText(ch, 0, 0);   /* 인장처럼 획을 두껍게 */
+  var inRx = rx - lw * 0.65, inRy = ry - lw * 0.65;
+  var chars = nm.split(''), n = chars.length;
+  var rows = n <= 3 ? n : 2, cols = n <= 3 ? 1 : 2;
+  var cellH = (inRy * 2 * 0.82) / rows, cellW = (inRx * 2 * 0.96) / cols;
+  function halfWAt(yy){ var t = Math.min(1, Math.abs(yy - H / 2) / inRy); return inRx * Math.sqrt(Math.max(0, 1 - t * t)); }
+  function inkBox(ch, size){
+    g.font = '400 ' + size + 'px ' + font;
+    var m = g.measureText(ch);
+    return { w: (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || 0) || size * .92,
+             h: (m.actualBoundingBoxAscent || 0) + (m.actualBoundingBoxDescent || 0) || size * .92 };
+  }
+  function fitGlyph(ch, y){
+    var base = 200, m0 = inkBox(ch, base), maxH = cellH * 0.99, maxW = cellW * 1.02;
+    var fs = Math.min(maxH * base / m0.h, maxW * base / m0.w);
+    for (var it = 0; it < 3; it++){
+      var ih = m0.h * fs / base;
+      var lim = 2 * halfWAt(Math.abs(y - H / 2) + ih / 2) * 0.95;
+      if (lim >= maxW) break;
+      maxW = lim; fs = Math.min(fs, maxW * base / m0.w);
+    }
+    var gw = m0.w * fs / base, room = 2 * halfWAt(y) * 0.94;
+    return { fs: fs, sx: Math.min(1.15, Math.max(1, room / gw)) };
+  }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  var idx = n === 4 ? [0, 1, 2, 3] : chars.map(function(c, i){ return i; });
+  idx.forEach(function(i2){
+    var r = n === 4 ? (i2 % 2) : i2, c = n === 4 ? (i2 < 2 ? 1 : 0) : 0;
+    var cy2 = H / 2 + (r - (rows - 1) / 2) * cellH;
+    var cx2 = W / 2 + (c - (cols - 1) / 2) * cellW;
+    var fit2 = fitGlyph(chars[i2], cy2), fs2 = fit2.fs;
+    g.save(); g.translate(cx2, cy2); g.rotate((i2 % 2 ? 1 : -1) * 0.012); g.scale(fit2.sx, 1);
+    g.font = '400 ' + fs2.toFixed(1) + 'px ' + font;
+    g.fillText(chars[i2], 0, 0);
+    g.lineWidth = Math.max(1.5, fs2 * 0.10 / fit2.sx); g.strokeText(chars[i2], 0, 0);   /* 인장처럼 획을 두껍게 */
     g.restore();
   });
   /* 인주 번짐 — 살짝 번진 밑그림을 만든 뒤, 테두리·글자를 군데군데 깎아 거칠게 */
@@ -3275,15 +3299,15 @@ function inkSeal(name){
   s.drawImage(cv, 0, 0);
   g.globalCompositeOperation = 'destination-out';
   var k, a2, rr, px, py, r;
-  for (k = 0; k < 420; k++){                     /* 테두리 안팎을 오돌도돌하게 — 인주가 묻은 결 */
+  for (k = 0; k < 300; k++){                     /* 테두리 안팎을 오돌도돌하게 — 인주가 묻은 결 */
     a2 = Math.random() * Math.PI * 2; rr = 1 + (Math.random() - 0.5) * 0.10;
     px = W / 2 + Math.cos(a2) * rx * rr; py = H / 2 + Math.sin(a2) * ry * rr;
-    r = 1.5 + Math.random() * 7;
-    g.globalAlpha = 0.3 + Math.random() * 0.6;
+    r = 1.2 + Math.random() * 5.2;
+    g.globalAlpha = 0.2 + Math.random() * 0.42;
     g.beginPath(); g.arc(px, py, r, 0, Math.PI * 2); g.fill();
   }
-  for (k = 0; k < 240; k++){                     /* 알맹이 결 — 작은 구멍 */
-    g.globalAlpha = 0.22 + Math.random() * 0.38;
+  for (k = 0; k < 170; k++){                     /* 알맹이 결 — 작은 구멍 */
+    g.globalAlpha = 0.16 + Math.random() * 0.30;
     g.beginPath(); g.arc(Math.random() * W, Math.random() * H, 0.7 + Math.random() * 2.6, 0, Math.PI * 2); g.fill();
   }
   for (k = 0; k < 8; k++){                       /* 가는 긁힌 결 */

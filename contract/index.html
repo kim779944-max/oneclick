@@ -102,6 +102,17 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 .sealit em{display:block;font-style:normal;font-size:10.5px;font-weight:900;color:#33415C;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sealit.on{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.35)}
 .sealit .sdel{position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#DC2626;color:#fff;font-size:11px;font-weight:900;font-style:normal;display:grid;place-items:center;cursor:pointer}
+.s5 textarea{min-height:92px;resize:vertical;line-height:1.55}
+.s5 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.s5 .chips button{font-size:11.5px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:999px;padding:7px 10px;line-height:1.3;max-width:100%;text-align:left}
+.s5 .chips button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
+.s5sum{margin-top:8px;font-size:11.5px;line-height:1.6;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 10px;white-space:pre-wrap;word-break:break-all}
+.s5sum b{color:var(--amber2)}
+.s5sum i{font-style:normal;color:#7C8DA6}
+.area2{display:flex;align-items:center;gap:5px}
+.area2 input{flex:1 1 auto;min-width:0}
+.area2 .unit{font-size:10.5px;font-weight:800;color:#7C8DA6;flex:0 0 auto}
+.area2 input.py{flex:0 0 34%}
 /* 결과 전체뷰(공용 ux.js)가 A4 원본 크기로 그려지지 않도록 — 이 화면 안에서만 */
 .kux-full .body img{width:100%;max-width:100%;height:auto;display:block}
 @media print{
@@ -131,6 +142,20 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <main>
 <!-- 0 양식 고르기 · A4 원본 미리보기 -->
 <section class="scr" id="s0">
+ <div class="card s5">
+  <h2><span class="n">⚡</span>5초 계약서<button type="button" class="mini" id="s5help">어떻게?</button></h2>
+  <p class="sub">문자·카톡으로 받은 매물 글을 <b>통째로 붙여넣고</b> 한 번만 누르면 주소·금액·면적·당사자·날짜가 계약서 빈칸에 들어갑니다. 오타는 자동으로 고치고, 평↔㎡는 같이 환산합니다.</p>
+  <textarea id="s5txt" rows="4" placeholder="예) [매매] 경기 가평군 청평면 신하리 123-4 대지 330㎡(100평) 매매 3억5천 / 매도인 김태수 010-2002-2899 / 매수인 이영희 / 잔금 2026년 12월 20일"></textarea>
+  <div class="chips" id="s5form">
+   <button type="button" data-s5f="auto" class="on">자동 판별</button>
+   <button type="button" data-s5f="sale">매매</button>
+   <button type="button" data-s5f="house">전세·임대차</button>
+   <button type="button" data-s5f="exchange">교환</button>
+  </div>
+  <div class="row"><button class="btn pri" id="s5go">⚡ 5초 계약서 만들기</button></div>
+  <p class="kv" id="s5info">붙여넣은 글은 이 기기 안에서만 처리합니다. 서버로 보내지 않습니다.</p>
+  <div class="s5sum" id="s5sum" hidden></div>
+ </div>
  <div class="card">
   <h2><span class="n">★</span>표준계약서 고르기</h2>
   <p class="sub">서식을 고르면 A4 원본 양식이 크게 뜹니다. [이 양식으로 작성하기]를 누르면 1단계 입력이 시작됩니다.</p>
@@ -168,6 +193,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <section class="scr" id="s3">
  <div class="card"><h2><span class="n">3</span>특약사항</h2>
   <p class="sub">자주 쓰는 특약을 고르면 양식의 특약 칸에 번호를 붙여 그대로 들어갑니다.</p>
+  <div id="spChips"></div>
   <div class="sp-list" id="spList"></div>
   <label class="lb">직접 적는 특약<i>줄마다 한 항목</i></label><textarea id="spFree" rows="3"></textarea>
   <div class="draft" id="spPrev"></div>
@@ -327,6 +353,14 @@ function themeColorOf(){ return ''; }
 function inputHtml(f){
   const v = getV(f.id);
   if (f.multi) return `<label class="lb">${escH(f.label)}</label><textarea data-f="${escH(f.id)}" rows="${f.grp === 's' ? 5 : 3}">${escH(v)}</textarea>`;
+  /* 면적 칸 — ㎡와 평을 같이 보여 주고 어느 쪽에 넣어도 함께 환산 (223-①) */
+  if (!f.money && /면적/.test(String(f.label || ''))){
+    const m2 = v ? s5num(v) : 0;
+    const py = m2 ? s5fmtNum(s5cut(m2ToPy(m2), 2)) : '';
+    return `<label class="lb">${escH(String(f.label).replace(/\s*\(㎡\)/, ''))}<i>평↔㎡ 같이</i></label>`
+      + `<div class="area2"><input data-f="${escH(f.id)}" inputmode="decimal" value="${escH(m2 ? s5fmtNum(m2) : '')}" placeholder="㎡"><span class="unit">㎡</span>`
+      + `<input class="py" data-py="${escH(f.id)}" inputmode="decimal" value="${escH(py)}" placeholder="평"><span class="unit">평</span></div>`;
+  }
   return `<label class="lb">${escH(f.label)}${f.money ? '<em>숫자만</em>' : ''}</label>`
     + `<input data-f="${escH(f.id)}" value="${escH(f.money ? (v ? comma(v) : '') : v)}"${f.money ? ' inputmode="numeric"' : ''}>`
     + (f.money ? `<div class="kor">${escH(korWon(v))}</div>` : '');
@@ -424,6 +458,7 @@ function renderSpecial(){
   $('#spList').innerHTML = (f.specials || []).map((t, i) => `<label><input type="checkbox" data-sp="${i}"${S.sp.indexOf(i) >= 0 ? ' checked' : ''}><span>${escH(t)}</span></label>`).join('')
     || '<p class="sub">이 양식에 자주 쓰는 특약 목록이 없습니다. 아래에 직접 적으세요.</p>';
   $('#spFree').value = S.free || '';
+  renderChips();
   syncSpecial();
 }
 
@@ -499,26 +534,49 @@ function inkStamp(name){
   ring(34, 0.013, 0.34);
   ring(25, 0.011, 1);
   ring(11, 0.020, 0.30);
-  /* 글자 배치 — 타원 안쪽 칸(칸 크기 ÷ 글자 실제 크기)에 맞춰 넘치지 않게 앉힌다
-     1~3자 세로 한 줄, 4자 2×2 (오른쪽 줄부터) */
+  /* 글자 배치 (224: 타원 안을 꽉 채우게 확대) — 글자의 실제 잉크 상자(measureText)로 재서
+     줄마다 그 높이의 타원 폭 안에 최대한 크게 앉힌다. 1~3자 세로 한 줄, 4자 2×2(오른쪽 줄부터) */
   const chars = nm.split(''), n = chars.length;
-  const innerRx = rx * 0.66, innerRy = ry * 0.72;
+  const FONT_SEAL = '"Noto Serif KR","Nanum Myeongjo","Batang","Malgun Gothic",serif';
+  const ringIn = 25 * 0.62;                             /* 테두리 본선(25) 안쪽 여유 */
+  const inRx = rx - ringIn, inRy = ry - ringIn;
   const rows = n <= 3 ? n : 2, cols = n <= 3 ? 1 : 2;
-  const cellH = (innerRy * 2) / rows, cellW = (innerRx * 2) / cols;
-  const fs = Math.min(cellH / 1.14, cellW / 1.05);     /* 한글 획 높이≈0.94em + 획 굵기 여유 */
+  const cellH = (inRy * 2 * 0.82) / rows, cellW = (inRx * 2 * 0.96) / cols;
+  const halfWAt = yy => { const t = Math.min(1, Math.abs(yy - cy) / inRy); return inRx * Math.sqrt(Math.max(0, 1 - t * t)); };
+  const inkBox = (ch, size) => {                          /* 폰트·굵기 그대로 잰 잉크 상자 */
+    g.font = '900 ' + size + 'px ' + FONT_SEAL;
+    const m = g.measureText(ch);
+    return { w: (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || 0) || size * .92,
+             h: (m.actualBoundingBoxAscent || 0) + (m.actualBoundingBoxDescent || 0) || size * .92 };
+  };
+  const fitGlyph = (ch, y) => {
+    const base = 200, m0 = inkBox(ch, base);
+    const maxH = cellH * 0.99;                 /* 줄 높이를 거의 다 쓴다 */
+    let maxW = cellW * 1.02;
+    let fs = Math.min(maxH * base / m0.h, maxW * base / m0.w);
+    for (let it = 0; it < 3; it++){            /* 위·아래 끝에서 타원이 좁아지는 만큼 다시 줄인다 */
+      const ih = m0.h * fs / base;
+      const lim = 2 * halfWAt(Math.abs(y - cy) + ih / 2) * 0.95;
+      if (lim >= maxW) break;
+      maxW = lim; fs = Math.min(fs, maxW * base / m0.w);
+    }
+    /* 가로 여유가 남으면 살짝 넓혀 인장처럼 꽉 차게(찌그러지지 않는 선에서) */
+    const gw = m0.w * fs / base, room = 2 * halfWAt(y) * 0.94;
+    return { fs: fs, sx: Math.min(1.15, Math.max(1, room / gw)) };
+  };
   const idx = n === 4 ? [0, 1, 2, 3] : chars.map((c, i) => i);
   const slots = idx.map(i => {
     const r = n === 4 ? (i % 2) : i;                    /* 4자: 0·2가 웃줄, 1·3이 아랫줄 */
     const c = n === 4 ? (i < 2 ? 1 : 0) : 0;            /* 오른쪽 줄부터 */
     return { c: chars[i], x: (c - (cols - 1) / 2) * cellW, y: (r - (rows - 1) / 2) * cellH };
   });
-  const FONT_SEAL = '"Noto Serif KR","Nanum Myeongjo","Batang","Malgun Gothic",serif';
   g.textAlign = 'center'; g.textBaseline = 'middle';
   slots.forEach(s => {
-    g.save(); g.translate(cx + s.x, cy + s.y); g.rotate((rnd() - 0.5) * 0.03);
-    g.font = '900 ' + Math.round(fs) + 'px ' + FONT_SEAL;
+    const by = cy + s.y, fit = fitGlyph(s.c, by), fs = fit.fs;
+    g.save(); g.translate(cx + s.x, by); g.rotate((rnd() - 0.5) * 0.03); g.scale(fit.sx, 1);
+    g.font = '900 ' + fs.toFixed(1) + 'px ' + FONT_SEAL;
     g.fillText(s.c, 0, 0);
-    g.lineWidth = fs * 0.07; g.strokeText(s.c, 0, 0);   /* 획을 덧그어 인장처럼 두껍게 */
+    g.lineWidth = fs * 0.07 / fit.sx; g.strokeText(s.c, 0, 0);   /* 획을 덧그어 인장처럼 두껍게 */
     g.restore();
   });
   /* 인주 결 — 픽셀마다 농담을 흔들고 곳곳에 작은 빈틈(안 찍힌 자리)을 낸다 */
@@ -817,6 +875,446 @@ async function doPng(){
   }catch(e){ busyOff(); toast('저장하지 못했습니다'); }
 }
 
+/* ============================================================================
+   223-① 5초 계약서 (2026-11-25)
+   · 문자·카톡 매물 글 → 오타 보정 → 주소·금액·면적·당사자·날짜 자동 채움
+   · 평 ↔ ㎡ 동시 환산 (1평 = 3.305785㎡)
+   · 기본/고정 특약 원터치 칩
+   · A4 1장 인쇄 · PNG · PDF
+   ========================================================================== */
+const M2_PER_PYEONG = 3.305785;
+const m2ToPy = m2 => m2 / M2_PER_PYEONG;
+const pyToM2 = py => py * M2_PER_PYEONG;
+const s5num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
+const s5cut = (n, d) => { const k = Math.pow(10, d == null ? 2 : d); return Math.round(n * k) / k; };
+const s5fmtNum = n => (Math.round(n * 100) / 100).toString();
+
+/* 오타 사전 — 매물 문자에 자주 섞이는 표기 */
+const S5_TYPO = [
+  ['메매가', '매매가'], ['메매', '매매'], ['매메', '매매'], ['맴매', '매매'], ['매마', '매매'],
+  ['전새', '전세'], ['전쉐', '전세'], ['전세가', '전세가'], ['월새', '월세'], ['월쉐', '월세'],
+  ['보증그미', '보증금'], ['보증그', '보증금'],
+  ['게약금', '계약금'], ['계약그미', '계약금'], ['계야금', '계약금'],
+  ['중도그미', '중도금'], ['중두금', '중도금'],
+  ['잔그미', '잔금'], ['잔그마', '잔금'],
+  ['융쟈', '융자'], ['융짜', '융자'],
+  ['근저당', '근저당'], ['근저당권', '근저당권'],
+  ['확정일짜', '확정일자'], ['전입신구', '전입신고'],
+  ['중계사', '중개사'], ['중개수수료', '중개보수'],
+  ['매도자', '매도인'], ['매수자', '매수인'],
+  ['임대자', '임대인'], ['임차자', '임차인'],
+  ['대저', '대지'], ['임아', '임야'], ['답아', '답'],
+  ['평수', '평'], ['제곱미터', '㎡'], ['평방미터', '㎡']
+];
+function s5fix(raw) {
+  let s = String(raw || ''), log = [];
+  s = s.replace(/[\u00a0\u200b-\u200d\ufeff]/g, ' ');
+  s = s.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  s = s.replace(/[．]/g, '.').replace(/[，]/g, ',').replace(/[：]/g, ':').replace(/[～]/g, '~');
+  s = s.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ');
+  S5_TYPO.forEach(p => {
+    if (p[0] !== p[1] && s.indexOf(p[0]) >= 0) { s = s.split(p[0]).join(p[1]); log.push(p[0] + ' → ' + p[1]); }
+  });
+  s = s.replace(/(\d)\s*(?:평방미터|제곱미터|m2|m²|M2|m\^2)/g, '$1㎡');
+  s = s.replace(/\b(01\d)[-.\s]?(\d{3,4})[-.\s]?(\d{4})\b/g, '$1-$2-$3');
+  s = s.replace(/\b(\d{6})[-–\s]?(\d{7})\b/g, '$1-$2');
+  return { text: s, log };
+}
+
+/* 금액 — 3억5천 / 3억 5,000만원 / 5,000(만원 생략) 모두 */
+function s5won(v) {
+  if (v == null || v === '') return 0;
+  let s = String(v).replace(/[,\s원₩]/g, '');
+  let total = 0, used = false, m;
+  if ((m = s.match(/(\d+(?:\.\d+)?)억/))) { total += parseFloat(m[1]) * 1e8; used = true; s = s.replace(m[0], ''); }
+  if ((m = s.match(/(\d+(?:\.\d+)?)천/))) { total += parseFloat(m[1]) * 1e7; used = true; s = s.replace(m[0], ''); }
+  if ((m = s.match(/(\d+(?:\.\d+)?)만/))) { total += parseFloat(m[1]) * 1e4; used = true; s = s.replace(m[0], ''); }
+  if (!used) {
+    const n0 = s.match(/\d+(?:\.\d+)?/);
+    if (!n0) return 0;
+    const n = parseFloat(n0[0]);
+    return Math.round(n >= 100 && n < 1000000 ? n * 1e4 : n);   /* 단위 없는 '5,000'은 5,000만원 */
+  }
+  const tail = s.match(/^(\d{1,2})$/);
+  if (tail && !/천|만/.test(String(v).replace(/[,\s]/g, ''))) total += parseFloat(tail[1]) * 1e7;   /* 3억5 = 3억 5천만 */
+  return Math.round(total);
+}
+const S5_LAB = {
+  price: ['매매대금', '매매가', '매매금액', '교환대금', '교환가', '교환차액', '매매'],
+  evalA: ['평가액', '평가'],
+  deposit: ['보증금', '전세금', '전세가', '보증액', '전세'],
+  rent: ['월세', '차임', '월임대료'],
+  mgmt: ['관리비'],
+  earnest: ['계약금'],
+  mid: ['중도금'],
+  balance: ['잔금'],
+  loan: ['융자금', '융자', '승계채무', '근저당']
+};
+function s5amtAll(t, labels) {
+  const out = [];
+  for (let i = 0; i < labels.length; i++) {
+    const re = new RegExp('(?:' + labels[i] + ')\\s*[:：]?\\s*([0-9][0-9,.\\.]*(?:\\s*(?:억|천|만)\\s*[0-9,]*)*\\s*(?:원|만원|억원)?)', 'gi');
+    let m;
+    while ((m = re.exec(t))) {
+      const end = m.index + m[0].length;
+      if (!/[억만천원]/.test(m[1]) && /^\s*(월|일|년)(?![가-힣])/.test(t.slice(end, end + 3))) continue;   /* '잔금 12월 20일' 같은 날짜는 금액이 아니다 */
+      const v = s5won(m[1]);
+      if (v >= 1000) out.push({ raw: m[1].trim(), v: v, at: m.index });
+    }
+  }
+  out.sort((a, b) => a.at - b.at);
+  return out;
+}
+function s5amt(t, labels) {
+  const a = s5amtAll(t, labels);
+  return a.length ? a[0] : null;
+}
+
+/* 주소 — '시·군·구 … 동·읍·면·리 … 번지' 를 토큰으로 따라간다 */
+const S5_SIDO = /^(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|경기도|강원도|충청북도|충청남도|전라북도|전라남도|경상북도|경상남도|제주도)$/;
+function s5addr(t) {
+  const toks = String(t).split(/\s+/);
+  let best = '';
+  for (let i = 0; i < toks.length; i++) {
+    if (!/(시|군|구|도)$/.test(toks[i])) continue;
+    const parts = [];
+    if (i > 0 && S5_SIDO.test(toks[i - 1])) parts.push(toks[i - 1]);
+    parts.push(toks[i]);
+    for (let j = i + 1; j < Math.min(toks.length, i + 7); j++) {
+      const tk = toks[j].replace(/^[,.(\[]+|[,.\)\]]+$/g, '');
+      let mm;
+      if ((mm = tk.match(/^(\d+(?:-\d+)?)(?:번지|필지)?$/))) { parts.push(mm[1]); break; }
+      if (/(동|읍|면|리|가|로|길|구|군|시)\d*$/.test(tk)) parts.push(tk);
+      else break;
+    }
+    const cand = parts.join(' ');
+    if (/\d/.test(cand) && cand.length > best.length) best = cand;
+  }
+  if (!best) {                       /* '가평 신하리 15' 처럼 시·군·구가 빠진 매물 */
+    for (let i = 0; i < toks.length; i++) {
+      const tk = toks[i].replace(/^[,.()\[]+|[,.()\]]+$/g, '');
+      if (!/(읍|면|동|리)$/.test(tk)) continue;
+      const nx = (toks[i + 1] || '').replace(/^[,.()\[]+|[,.()\]]+$/g, '');
+      const mm2 = nx.match(/^(\d+(?:-\d+)?)(?:번지|필지)?$/);
+      if (!mm2) continue;
+      const pv = (toks[i - 1] || '').replace(/^[,.()\[]+|[,.()\]]+$/g, '');
+      best = (pv && !/\d/.test(pv) && pv.length <= 6 && !/^(평|대지|매매|전세|월세|보증금|계약|잔금)$/.test(pv) ? pv + ' ' : '') + tk + ' ' + mm2[1];
+      break;
+    }
+  }
+  return best;
+}
+
+/* 면적 — 대지/건물 구분 + 평 환산 */
+function s5areas(t) {
+  const out = { land: 0, bldg: 0, any: 0, py: 0 };
+  const re = /(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(㎡|평)/g; let m;
+  while ((m = re.exec(t))) {
+    const v = parseFloat(String(m[1]).replace(/,/g, ''));
+    const m2 = m[2] === '㎡' ? v : pyToM2(v);
+    const pre = t.slice(Math.max(0, m.index - 14), m.index);
+    if (/(건물|전용|공급|계약면적|아파트|상가|오피스텔|주택|빌라)/.test(pre)) { if (!out.bldg) out.bldg = m2; }
+    else if (/(대지|토지|임야|답|지목|필지|전\s)/.test(pre)) { if (!out.land) out.land = m2; }
+    else if (!out.any) out.any = m2;
+    if (m[2] === '평' && !out.py) out.py = v;
+  }
+  return out;
+}
+const S5_JIMOK = ['대지', '임야', '잡종지', '도로', '하천', '구거', '유지', '공장용지', '학교용지', '주차장', '창고용지', '목장용지', '광천지', '염전', '양어장', '수도용지', '체육용지', '유원지', '종교용지', '사적지', '묘지', '과수원', '답', '전', '대'];
+function s5jimok(t) {
+  const m1 = t.match(/지목\s*[:：]?\s*([가-힣]{1,6})/);
+  if (m1) return m1[1].replace(/(\d|㎡|평).*$/, '');
+  for (let i = 0; i < S5_JIMOK.length; i++) {
+    const w = S5_JIMOK[i];
+    if (w.length > 1 ? t.indexOf(w) >= 0 : new RegExp('(?:^|\\s)' + w + '(?=\\s|\\d|:)').test(t)) return w;
+  }
+  return '';
+}
+function s5structure(t) {
+  const m = t.match(/(철근[·]?콘크리트조?\s*)?(단독주택|다가구주택|다세대주택|아파트|오피스텔|근린생활시설|제1종근린생활시설|제2종근린생활시설|상가|창고|공장|축사|숙박시설|빌라|연립주택|토지)/);
+  let out = m ? m[0] : '';
+  const fl = t.match(/(\d+)\s*층/);
+  if (out && fl) out += ' ' + fl[1] + '층';
+  return out;
+}
+
+/* 날짜 — 계약/중도금/잔금/기간, 2자리 연도 보정 */
+function s5near(t, idx, words) {
+  const pre = t.slice(Math.max(0, idx - 16), idx);
+  for (let i = 0; i < words.length; i++) if (new RegExp(words[i]).test(pre)) return true;
+  return false;
+}
+function s5dates(t) {
+  const out = {}, now = new Date();
+  const list = [];
+  const re = /(\d{2,4})\s*[.\-\/년]\s*(\d{1,2})\s*[.\-\/월]\s*(\d{1,2})\s*일?/g; let m;
+  while ((m = re.exec(t))) {
+    let y = +m[1]; if (y < 100) y += (y > 50 ? 1900 : 2000);
+    list.push({ at: m.index, y: y, mo: +m[2], d: +m[3] });
+  }
+  const re2 = /(\d{1,2})\s*월\s*(\d{1,2})\s*일/g;
+  while ((m = re2.exec(t))) {
+    if (/(\d{2,4})\s*[.\-\/년]\s*$/.test(t.slice(Math.max(0, m.index - 6), m.index))) continue;
+    list.push({ at: m.index, y: now.getFullYear(), mo: +m[1], d: +m[2] });
+  }
+  list.sort((a, b) => a.at - b.at);
+  const ym = d => ({ y: String(d.y), m: String(d.mo), d: String(d.d) });
+  list.forEach(d => {
+    if (!(d.mo >= 1 && d.mo <= 12 && d.d >= 1 && d.d <= 31)) return;
+    if (s5near(t, d.at, ['잔금'])) out.balance = out.balance || ym(d);
+    else if (s5near(t, d.at, ['중도금'])) out.mid = out.mid || ym(d);
+    else if (s5near(t, d.at, ['계약일', '작성일', '교부일', '인도일', '계약'])) out.deal = out.deal || ym(d);
+    else if (s5near(t, d.at, ['만기', '종료', '까지'])) out.to = out.to || ym(d);
+    else if (s5near(t, d.at, ['시작', '부터', '입주'])) out.from = out.from || ym(d);
+    else out.deal = out.deal || ym(d);
+  });
+  /* 2026.12.1 ~ 2027.11.30 처럼 물결표로 이어진 기간 */
+  const per = t.match(/(\d{2,4})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})\s*~\s*(\d{2,4})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})/);
+  if (per) {
+    const fy = +per[1] < 100 ? +per[1] + 2000 : +per[1], ty = +per[4] < 100 ? +per[4] + 2000 : +per[4];
+    out.from = { y: String(fy), m: String(+per[2]), d: String(+per[3]) };
+    out.to = { y: String(ty), m: String(+per[5]), d: String(+per[6]) };
+  }
+  return out;
+}
+
+/* 당사자 — 역할어 뒤 이름·전화·주민번호 */
+function s5parties(t) {
+  const out = { a: {}, b: {} }, roleAt = [];
+  const R = [['a', /(매도인|매도자|소유자|임대인|집주인|교환인\s*갑|갑\s*[:：])/g], ['b', /(매수인|매수자|임차인|세입자|교환인\s*을|을\s*[:：])/g]];
+  R.forEach(r => { let m; r[1].lastIndex = 0; while ((m = r[1].exec(t))) roleAt.push({ g: r[0], at: m.index, len: m[0].length }); });
+  roleAt.sort((x, y) => x.at - y.at);
+  const near = pos => { let r = null; roleAt.forEach(x => { if (x.at <= pos + 2) r = x; }); return r; };
+  const S5_BADNAME = /^(연락|전화|주소|소재|매매|전세|월세|계약|보증|잔금|중도|평|대지|건물|아파트|단독|오피스텔|상가|충남|충북|전남|전북|경남|경북|경기|강원|제주|서울|부산|대구|인천|광주|대전|울산|세종|갑|을|물건|매물)/;
+  roleAt.forEach(x => {
+    let seg = t.slice(x.at + x.len, x.at + x.len + 22);
+    seg = seg.replace(/^[\s:：,]+/, '').replace(/^(은|는|이|가|께서)\s+/, '');
+    const m = seg.match(/^([가-힣]{2,10})/);
+    if (!m || out[x.g].name) return;
+    let nm = m[1].replace(/(입니다|입니다만|이고|이며|님|씨|은|는)$/, '');
+    if (nm.length > 4) nm = nm.slice(0, 4);
+    if (nm.length >= 2 && !S5_BADNAME.test(nm)) out[x.g].name = nm;
+  });
+  const pre = /01\d[-.\s]?\d{3,4}[-.\s]?\d{4}/g; let pm;
+  while ((pm = pre.exec(t))) {
+    const r = near(pm.index);
+    const tel = pm[0].replace(/\D/g, '').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    if (r && !out[r.g].tel) out[r.g].tel = tel;
+  }
+  const rr = /(\d{6})\s*[-–]\s*(\d{7})/g; let rm;
+  while ((rm = rr.exec(t))) { const r = near(rm.index); if (r && !out[r.g].rrn) out[r.g].rrn = rm[1] + '-' + rm[2]; }
+  return out;
+}
+
+function s5detectForm(t) {
+  if (/교환/.test(t)) return 'exchange';
+  if (/(전세|보증금|월세|임대차|임차|전입신고|확정일자)/.test(t)) return 'house';
+  return 'sale';
+}
+function s5parse(raw) {
+  const fx = s5fix(raw), t = fx.text, A = { log: fx.log, text: t };
+  A.parties = s5parties(t);
+  A.addr = s5addr(t);
+  A.areas = s5areas(t);
+  A.jimok = s5jimok(t);
+  A.structure = s5structure(t);
+  A.price = s5amt(t, S5_LAB.price); A.eval = s5amt(t, S5_LAB.evalA);
+  A.evalList = s5amtAll(t, S5_LAB.evalA);
+  A.deposit = s5amt(t, S5_LAB.deposit); A.rent = s5amt(t, S5_LAB.rent);
+  A.mgmt = s5amt(t, S5_LAB.mgmt); A.earnest = s5amt(t, S5_LAB.earnest);
+  A.mid = s5amt(t, S5_LAB.mid); A.balance = s5amt(t, S5_LAB.balance);
+  A.loan = s5amt(t, S5_LAB.loan);
+  A.dates = s5dates(t);
+  A.form = s5detectForm(t);
+  /* 교환은 갑·을 물건이 따로 — '을' 앞뒤로 나눠 각각 주소·면적을 읽는다 */
+  if (/교환/.test(t)) {
+    const mi = t.search(/(교환인\s*을|[^가-힣]을\s*[:：])/);
+    const ta = mi > 0 ? t.slice(0, mi) : t;
+    const tb = mi > 0 ? t.slice(mi) : '';
+    A.propA = s5addr(ta) || s5addr(t);
+    A.propB = tb ? (s5addr(tb) || '') : '';
+    A.areasA = s5areas(ta);
+    A.areasB = tb ? s5areas(tb) : { land: 0, bldg: 0, any: 0, py: 0 };
+  }
+  return A;
+}
+
+/* 고정 특약 칩 — 누르면 특약 칸에 바로 */
+const S5_CHIPS = {
+  sale: [
+    '현 시설 상태 그대로 매매하며, 매수인은 현장을 직접 확인하였다.',
+    '매도인은 잔금일까지 근저당권·가압류 등 제한 물권을 말소한다.',
+    '잔금일까지 발생한 재산세·관리비·공과금은 매도인이, 이후는 매수인이 부담한다.',
+    '매매대금에 포함되지 않는 시설·집기는 인도일까지 매도인이 철거한다.',
+    '계약금 수령과 동시에 등기권리증·인감증명서를 매수인에게 교부한다.'
+  ],
+  rent: [
+    '임차인은 잔금일에 전입신고와 확정일자를 받는다.',
+    '임대인은 임대차 종료 시 보증금을 즉시 반환한다.',
+    '반려동물 사육은 임대인의 사전 동의를 받는다.',
+    '원상복구 범위는 통상적인 마모를 제외한다.',
+    '전세보증금 반환보증 가입에 임대인은 협조한다.'
+  ],
+  exchange: [
+    '교환 목적물의 감정평가는 양쪽이 함께 정한 감정평가사에게 맡긴다.',
+    '교환 후 임대차 승계 여부는 별도로 정한다.',
+    '세무상 교환은 매매로 보아 신고한다.',
+    '잔금일에 등기사항증명서를 다시 확인한다.'
+  ],
+  common: [
+    '본 계약에 정하지 않은 사항은 관계 법령과 상관례에 따른다.',
+    '계약 당사자는 상대방의 동의 없이 계약 내용을 제3자에게 알리지 않는다.'
+  ]
+};
+function chipKind() {
+  const id = curForm().id;
+  if (id === 'sale') return 'sale';
+  if (id === 'exchange' || id === 'exbroker') return 'exchange';
+  if (id === 'house' || id === 'shop' || id === 'lease') return 'rent';
+  return 'common';
+}
+function chipLines() { return S5_CHIPS[chipKind()] || S5_CHIPS.common; }
+function freeLines() { return String(S.free || '').split('\n').map(x => x.trim()).filter(Boolean); }
+function toggleChip(txt) {
+  let ls = freeLines();
+  if (ls.indexOf(txt) >= 0) ls = ls.filter(x => x !== txt);
+  else ls.push(txt);
+  S.free = ls.join('\n'); save();
+  const ta = $('#spFree'); if (ta) ta.value = S.free;
+  syncSpecial(); renderChips();
+  if (S.step === 4) renderPreview();
+}
+function renderChips() {
+  const box = $('#spChips'); if (!box) return;
+  const ls = freeLines(), list = chipLines();
+  box.innerHTML = '<div class="tlabel">고정 특약 — 누르면 바로 들어갑니다<i>다시 누르면 빠집니다</i></div>'
+    + '<div class="chips">' + list.map((t, i) =>
+      '<button type="button" data-chip="' + i + '" class="' + (ls.indexOf(t) >= 0 ? 'on' : '') + '" title="' + escH(t) + '">'
+      + escH(t.length > 26 ? t.slice(0, 25) + '…' : t) + '</button>').join('') + '</div>';
+}
+
+/* 채운 값 → 계약서 칸 */
+function s5fill(A, formId, opts) {
+  S.form = formId;
+  const F = curForm(), done = [];
+  const put = (f, v) => { if (v == null || v === '') return; setV(f.id, String(v)); done.push(f.label || f.id); };
+  const putMoney = (f, v) => {
+    if (!v) return;
+    const val = Math.round(v);
+    if (/한글/.test(f.label || '')) put(f, korNum(val));
+    else { setV(f.id, String(val)); if (f.kor) setV(f.kor, korNum(val)); done.push(f.label || f.id); }
+  };
+  const areaVal = (f) => {
+    const L = String(f.label || '');
+    if (/토지|대지/.test(L)) return A.areas.land || A.areas.any;
+    if (/건물|전용/.test(L)) return A.areas.bldg || A.areas.any;
+    return A.areas.any || A.areas.bldg || A.areas.land;
+  };
+  const dateOf = (L) => {
+    const d = A.dates;
+    if (/기간\s*시작|시작일|입주/.test(L)) return d.from || d.deal;
+    if (/기간\s*끝|만기|종료/.test(L)) return d.to;
+    if (/잔금/.test(L)) return d.balance || d.deal;
+    if (/중도금/.test(L)) return d.mid || d.deal;
+    return d.deal;
+  };
+  const today = new Date();
+  const T = { y: String(today.getFullYear()), m: String(today.getMonth() + 1), d: String(today.getDate()) };
+  let midUsed = false;
+  F.fields.forEach(f => {
+    if (f.type === 'sign') return;
+    const L = String(f.label || '');
+    /* 날짜 */
+    if (f.dp || /(년|월|일)/.test(L) && /(작성일|계약일|잔금|중도금|기간|인도일|교부일)/.test(L)) {
+      const d = dateOf(L) || (/작성일|계약일/.test(L) || f.dg === '작성일' ? T : null);
+      if (d) {
+        if (f.dp === 'y' || /년/.test(L)) put(f, d.y);
+        else if (f.dp === 'm' || /월/.test(L)) put(f, d.m);
+        else if (f.dp === 'd' || /일/.test(L)) put(f, d.d);
+      }
+      return;
+    }
+    if (!f.dp && /기간\s*(시작|끝)|입주일|만기일/.test(L)) {
+      const d = dateOf(L); if (d) put(f, d.y + '.' + String(d.m).padStart(2, '0') + '.' + String(d.d).padStart(2, '0'));
+      return;
+    }
+    /* 특약 */
+    if (f.grp === 's' || /특약/.test(L)) return;
+    /* 당사자 */
+    if (f.grp === 'a' || f.grp === 'b' || f.grp === 'c') {
+      if (/대상물건/.test(L)) { put(f, (f.grp === 'b' ? (A.propB || A.addr) : (A.propA || A.addr))); return; }
+      if (/평가액/.test(L)) { const el = A.evalList || []; const v2 = f.grp === 'b' ? (el[1] || el[0]) : el[0]; putMoney(f, v2 && v2.v); return; }
+      if (/승계채무/.test(L)) { putMoney(f, f.grp === 'b' ? A.loanB : A.loanA); return; }
+      if (/순가액/.test(L)) return;
+      if (/공동명의|대리인|사무소|등록번호|소속/.test(L)) return;
+      const P = A.parties[f.grp] || {};
+      const k = kindOf(L);
+      if (k === 'name') put(f, P.name);
+      else if (k === 'tel') put(f, P.tel);
+      else if (k === 'rrn') put(f, P.rrn);
+      else if (k === 'addr') put(f, P.addr || (f.grp === 'b' ? '' : ''));
+      else if (/대상물건/.test(L)) put(f, A.addr);
+      return;
+    }
+    /* 물건 */
+    if (/소재지|^주소$/.test(L)) { put(f, A.addr); return; }
+    if (/지목/.test(L)) { put(f, A.jimok); return; }
+    if (/면적/.test(L)) { const m2 = areaVal(f); if (m2) put(f, /㎡/.test(L) ? s5fmtNum(m2) : (s5fmtNum(m2) + '㎡(' + s5fmtNum(s5cut(m2ToPy(m2), 2)) + '평)')); return; }
+    if (/구조|용도|주택\s*종류/.test(L)) { put(f, A.structure); return; }
+    if (/임대할\s*부분/.test(L)) { put(f, (opts.part || '')); return; }
+    /* 금액 */
+    if (/매매대금|교환대금/.test(L)) { putMoney(f, A.price && A.price.v); return; }
+    if (/보증금/.test(L)) { putMoney(f, A.deposit && A.deposit.v); return; }
+    if (/차임|월세/.test(L)) { putMoney(f, A.rent && A.rent.v); return; }
+    if (/관리비/.test(L)) { putMoney(f, A.mgmt && A.mgmt.v); return; }
+    if (/계약금/.test(L)) { if (/영수자|수령자|받는/.test(L)) { put(f, A.parties.a && A.parties.a.name); return; } putMoney(f, A.earnest && A.earnest.v); return; }
+    if (/중도금/.test(L)) { if (midUsed) return; midUsed = true; putMoney(f, A.mid && A.mid.v); return; }
+    if (/잔금/.test(L)) { putMoney(f, (A.balance && A.balance.v) || (A.price && A.earnest && A.mid ? A.price.v - A.earnest.v - A.mid.v : 0)); return; }
+    if (/융자|승계채무/.test(L)) { putMoney(f, A.loan && A.loan.v); return; }
+  });
+  return done;
+}
+
+/* 5초 화면 동작 */
+let S5FORM = 'auto';
+function s5summary(A, formId, done, log) {
+  const f = FORMS.find(x => x.id === formId) || {};
+  const L = [];
+  L.push('<b>⚡ ' + escH(f.name || '계약서') + '</b> 로 ' + done.length + '칸을 채웠습니다.');
+  if (A.addr) L.push('주소 · ' + escH(A.addr));
+  if (A.price) L.push('금액 · ' + comma(A.price.v) + '원' + (A.price.raw && A.price.raw !== String(A.price.v) ? ' <i>(' + escH(A.price.raw) + ')</i>' : ''));
+  if (A.deposit) L.push('보증금 · ' + comma(A.deposit.v) + '원');
+  if (A.rent && A.rent.v) L.push('월세 · ' + comma(A.rent.v) + '원');
+  if (A.areas.land || A.areas.bldg || A.areas.any) {
+    const m2 = A.areas.land || A.areas.any || A.areas.bldg;
+    L.push('면적 · ' + s5fmtNum(m2) + '㎡ = ' + s5fmtNum(s5cut(m2ToPy(m2), 2)) + '평');
+  }
+  if (A.parties.a.name) L.push('갑 · ' + escH(A.parties.a.name) + (A.parties.a.tel ? ' ' + escH(A.parties.a.tel) : ''));
+  if (A.parties.b.name) L.push('을 · ' + escH(A.parties.b.name) + (A.parties.b.tel ? ' ' + escH(A.parties.b.tel) : ''));
+  if (A.dates.balance) L.push('잔금 · ' + A.dates.balance.y + '.' + A.dates.balance.m + '.' + A.dates.balance.d);
+  if (log && log.length) L.push('<i>오타 보정 · ' + escH(log.slice(0, 6).join(', ')) + '</i>');
+  return L.join('\n');
+}
+function s5run() {
+  const raw = ($('#s5txt') && $('#s5txt').value || '').trim();
+  if (!raw) { toast('매물 문자·카톡 내용을 붙여넣어 주세요'); $('#s5txt').focus(); return; }
+  const A = s5parse(raw);
+  let formId = S5FORM === 'auto' ? A.form : S5FORM;
+  if (!FORMS.some(x => x.id === formId)) formId = 'sale';
+  /* 특약은 고정 칩 한 줄만 기본으로 */
+  S.free = ''; S.sp = [];
+  const done = s5fill(A, formId, { propB: '' });
+  const chips = S5_CHIPS[chipKind()] || [];
+  if (chips[0]) { S.free = chips[0]; }
+  save();
+  $('#s5sum').hidden = false;
+  $('#s5sum').innerHTML = s5summary(A, formId, done, A.log);
+  $('#s5info').textContent = '빈칸은 화면에서 채우면 됩니다 · 평↔㎡ 칸은 어느 쪽에 넣어도 같이 바뀝니다.';
+  BG = null; BG_SRC = null;
+  go(2, true);                       /* 물건 · 계약 내용부터 확인 */
+  toast('5초 만에 ' + done.length + '칸을 채웠습니다');
+}
+
 /* ---------- 화면 이동 ---------- */
 let GO_INIT = false;
 function go(n, noPush){
@@ -850,8 +1348,25 @@ function renderCp(){
 let LASTEL = null;
 document.addEventListener('focusin', e => { if (e.target && e.target.dataset && e.target.dataset.f) LASTEL = e.target; });
 document.addEventListener('input', e => {
-  const el = e.target, fid = el.dataset && el.dataset.f; if (!fid) return;
+  const el = e.target;
+  /* 평 → ㎡ */
+  const pyf = el.dataset && el.dataset.py;
+  if (pyf){
+    const py = s5num(el.value);
+    const m2 = py > 0 ? s5fmtNum(s5cut(pyToM2(py), 2)) : '';
+    setV(pyf, m2);
+    const mi = document.querySelector(`input[data-f="${pyf}"]`); if (mi && mi !== el) mi.value = m2;
+    if (S.step === 4) renderPreview();
+    return;
+  }
+  const fid = el.dataset && el.dataset.f; if (!fid) return;
   const f = byId(fid); if (!f) return;
+  /* ㎡ → 평 */
+  if (!f.money && /면적/.test(String(f.label || ''))){
+    const m2 = s5num(el.value);
+    const pi = document.querySelector(`input[data-py="${fid}"]`);
+    if (pi) pi.value = m2 > 0 ? s5fmtNum(s5cut(m2ToPy(m2), 2)) : '';
+  }
   let v = el.value;
   if (f.money){
     const raw = String(v).trim();
@@ -904,8 +1419,18 @@ document.addEventListener('click', e => {
   if (ph){ PHOTO_G = ph.dataset.photo; $('#pIn').click(); return; }
   const th = e.target.closest('[data-thm]');
   if (th){ setTheme(th.dataset.thm); return; }
+  const ch = e.target.closest('[data-chip]');
+  if (ch){ const t = chipLines()[+ch.dataset.chip]; if (t) toggleChip(t); return; }
+  const sf = e.target.closest('[data-s5f]');
+  if (sf){
+    S5FORM = sf.dataset.s5f;
+    $$('#s5form button').forEach(b => b.classList.toggle('on', b === sf));
+    return;
+  }
 });
 $('#startBtn').onclick = () => go(1);
+if ($('#s5go')) $('#s5go').onclick = s5run;
+if ($('#s5help')) $('#s5help').onclick = () => toast('매물 글을 그대로 붙여넣고 [⚡ 5초 계약서]만 누르세요 · 주소·금액·면적·당사자·날짜를 찾아 넣고, 오타는 고칩니다');
 $('#otherForm').onclick = () => go(0);
 $('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 4) renderPreview(); });
 $('#cpSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.cp = +b.dataset.cp; save(); renderCp(); };
@@ -1094,7 +1619,7 @@ $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; tr
 
 /* ---------- 시작 ---------- */
 window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, set BG(v){ BG = v; },
-  curForm, getV, setV, composeSpecial, syncSpecial, composite, compositeAll, pageCount, renderSheet, setTheme, themeId, go, mapPhoto, parseCText, kindOf, empties, renderPreview, stepList, setForm, FORMS};
+  curForm, getV, setV, composeSpecial, syncSpecial, composite, compositeAll, pageCount, renderSheet, setTheme, themeId, go, mapPhoto, parseCText, kindOf, empties, renderPreview, stepList, setForm, FORMS, s5parse, s5fill, s5run, chipLines, toggleChip};
 (async function start(){
   if (!FORMS.length){ toast('표준 양식 데이터를 읽지 못했습니다'); return; }
   if (!FORMS.some(f => f.id === S.form)) S.form = FORMS[0].id;
