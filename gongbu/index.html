@@ -324,18 +324,28 @@ function nedPrice(pnu){                /* 개별공시지가 — 최신 연도 1
     }).catch(function(){return null});
 }
 function nedUse(pnu){                  /* 토지이용계획 — 용도지역·지구·구역 */
+  var last=null;
   return jsonp(NED+'/getLandUseAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=200&pageNo=1')
     .then(function(r){
+      last=r;
       var f=arr(r&&r.landUses&&r.landUses.field);
       if(!f.length) return [];
+      /* 같은 규제가 관리번호만 달리해 여러 줄로 온다 — 이름+코드로 묶고 건수를 센다 */
       var seen={}, out=[];
       f.forEach(function(x){
         var k=(x.cnflcAtNm||'')+'|'+x.prposAreaDstrcCodeNm+'|'+(x.prposAreaDstrcCode||'');
-        if(seen[k]){ seen[k].n++; return }
-        seen[k]=1; out.push({cnflc:(x.cnflcAtNm||''),nm:x.prposAreaDstrcCodeNm||'',code:x.prposAreaDstrcCode||'',n:1,dt:x.lastUpdtDt||''});
+        if(seen[k]){ seen[k].n+=1; return }
+        var o={cnflc:(x.cnflcAtNm||''),nm:x.prposAreaDstrcCodeNm||'',code:x.prposAreaDstrcCode||'',n:1,dt:x.lastUpdtDt||''};
+        seen[k]=o; out.push(o);
       });
       return out;
-    }).catch(function(){return []});
+    }).catch(function(){
+      try{
+        return arr(last&&last.landUses&&last.landUses.field).map(function(x){
+          return {cnflc:x.cnflcAtNm||'',nm:x.prposAreaDstrcCodeNm||'',code:x.prposAreaDstrcCode||'',n:1};
+        });
+      }catch(e2){ return [] }
+    });
 }
 
 /* ---------- 4) 건축물대장 (공공데이터포털 키 필요) ---------- */
