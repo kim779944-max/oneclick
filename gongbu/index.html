@@ -483,10 +483,16 @@ function paintUse(){
   var order={'저촉':1,'포함':2,'접함':3};
   u.sort(function(a,b){ return (order[a.cnflc]||9)-(order[b.cnflc]||9) });
   var h=[];
-  var area=[], zone=[], dist=[], etc=[];
+  var YONGDO=['도시지역','관리지역','농림지역','자연환경보전지역',
+    '제1종전용주거지역','제2종전용주거지역','제1종일반주거지역','제2종일반주거지역','제3종일반주거지역','준주거지역',
+    '중심상업지역','일반상업지역','근린상업지역','유통상업지역',
+    '전용공업지역','일반공업지역','준공업지역',
+    '보전녹지지역','생산녹지지역','자연녹지지역',
+    '계획관리지역','생산관리지역','보전관리지역'];
+  var area=[], dist=[], etc=[];
   u.forEach(function(x){
-    var nm=x.nm;
-    if(/지역$/.test(nm)) area.push(x);
+    var nm=String(x.nm||'').replace(/\s+/g,'');
+    if(YONGDO.indexOf(nm)>=0) area.push(x);
     else if(/지구$/.test(nm)) dist.push(x);
     else etc.push(x);
   });
