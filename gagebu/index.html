@@ -135,6 +135,15 @@ details .in{padding-top:8px}
 .pl{font-size:12px;border:1px solid var(--line2);border-radius:999px;padding:5px 10px;background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit}
 .pl.far{border-color:var(--warn);color:var(--warn)}
 .mon{font-size:12px;color:var(--gray);margin:8px 0 0}
+/* 231·개선(캐시노트): 첫 화면 맨 위에 '이번 달 얼마' 한 숫자 */
+.month{margin:12px 0 0;padding:14px 16px 13px;border-radius:16px;border:1.5px solid var(--or);
+  background:linear-gradient(140deg,rgba(255,107,0,.20),rgba(15,27,51,.96) 66%)}
+.month .mLab{margin:0;display:flex;align-items:baseline;gap:6px;font-size:12.5px;font-weight:800;color:#FFD9A6;letter-spacing:-.2px}
+.month .mLab em{font-style:normal;margin-left:auto;color:var(--gray);font-weight:700;font-size:11.5px}
+.month .mNum{margin:4px 0 0;font-size:34px;line-height:1.12;font-weight:900;letter-spacing:-1.4px;color:#fff}
+.month .mNum i{font-style:normal;font-size:19px;font-weight:800;color:var(--or2);margin-left:3px}
+.month .mSub{margin:6px 0 0;font-size:12px;color:var(--ink2);line-height:1.5;word-break:keep-all}
+.month .mSub b{color:#fff}
 </style>
 </head>
 <body>
@@ -144,6 +153,13 @@ details .in{padding-top:8px}
 </div></header>
 
 <main class="wrap">
+  <!-- 231·개선(캐시노트): 첫 화면 핵심 숫자 하나 — 이번 달 얼마 -->
+  <section class="month" id="monthBox" aria-label="이번 달 쓴 돈">
+    <p class="mLab"><span>이번 달 <b>쓴 돈</b></span><em id="mMonth"></em></p>
+    <p class="mNum" id="mTotal">0<i>원</i></p>
+    <p class="mSub" id="mSub">결제 문자를 붙여넣으면 여기에 한 달 합계가 바로 나옵니다</p>
+  </section>
+
   <!-- ① 기본은 한 줄: 오늘 품목 수 + 오늘 쓴 돈 + 한 줄 비교 -->
   <section class="one" id="oneBox" aria-live="polite">
     <div class="hd1"><b id="oneHead">오늘 <em>0품목</em> · 0원</b><small id="oneDate"></small></div>
@@ -322,6 +338,12 @@ function render(){
   var ym=dkey().slice(0,7), ms=0, mc=0;
   Object.keys(DB.days).forEach(function(d){ if(d.slice(0,7)===ym) DB.days[d].forEach(function(x){ ms+=x.price; mc++; }); });
   $('#monLine').textContent='이번 달 지금까지 '+mc+'건 · '+won(ms);
+  /* 231·개선(캐시노트): 첫 화면 맨 위 한 숫자 — 이번 달 얼마(누르면 상세로) */
+  $('#mMonth').textContent=(new Date().getMonth()+1)+'월';
+  $('#mTotal').innerHTML=fmt(ms)+'<i>원</i>';
+  $('#mSub').innerHTML = mc
+    ? ('<b>'+mc+'건</b> · 하루 평균 <b>'+won(Math.round(ms/(new Date().getDate())))+'</b>' + (T.length ? ' · 오늘 '+won(sum) : ''))
+    : '결제 문자를 붙여넣으면 여기에 한 달 합계가 바로 나옵니다';
   /* 자세히 표 */
   var tb=J.map(function(r){
     var x=r.it, o=r.other;
