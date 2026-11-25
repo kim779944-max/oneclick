@@ -10,6 +10,25 @@
 details.top{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
 details.top summary{cursor:pointer;color:var(--ink2);font-size:14px;min-height:28px}
 details.top textarea{margin-top:8px;min-height:70px;font-size:13px}
+/* ── 229 표준틀 미리보기 — 손님 블로그 화면 그대로(흰 종이) ── */
+.ms.paper{background:#fff;color:#222;border-color:#E3E7ED;padding:20px 18px 26px}
+.ms.paper .ptitle{font-weight:700;letter-spacing:-.5px;margin:0 0 14px;color:#111;word-break:keep-all}
+.ms.paper h3{margin:26px 0 8px;font-weight:700;word-break:keep-all}
+.ms.paper p{margin:0 0 14px;word-break:keep-all}
+.ms.paper blockquote{margin:0 0 16px;padding:10px 14px;background:#F6F7F9;font-size:14px;color:#555;border-left:4px solid #777}
+.ms.paper ol{margin:0 0 16px;padding-left:22px}
+.ms.paper ol li{margin:0 0 7px;word-break:keep-all}
+.ms.paper .ph{display:block;border:1px solid #E3E7ED;border-radius:10px;padding:14px 12px;text-align:center;color:#9AA3AF;font-size:12px;margin:6px 0 6px;background:#FAFBFC}
+.ms.paper .ph img{max-width:100%;border-radius:6px;display:block;margin:0 auto 6px}
+.ms.paper figcaption{display:block;text-align:center;color:#999;font-size:12px;margin:0 0 16px}
+.ms.paper .bar{border:0;border-top:1px solid #E3E7ED;margin:22px 0}
+.ms.paper .tag{display:inline-block;font-size:12px;color:#8A94A3;margin-top:18px}
+.fmtRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.fmtRow label{flex:1;min-width:0;display:block;border:1px solid var(--line2);background:var(--card2);border-radius:10px;padding:9px 10px;font-size:12.5px;line-height:1.45;cursor:pointer}
+.fmtRow label b{display:block;font-size:13px;color:var(--ink)}
+.fmtRow label small{display:block;font-size:11px;color:var(--ink2);margin-top:2px}
+.fmtRow input{position:absolute;opacity:0;pointer-events:none}
+.fmtRow label.on{border-color:var(--amber);background:rgba(255,107,0,.1)}
 </style>
 </head>
 <body>
@@ -29,6 +48,13 @@ details.top textarea{margin-top:8px;min-height:70px;font-size:13px}
     <label class="f"><span>톤</span><select id="tone"><option value="t1">① 사용기 후기 (제가 직접 써 보니)</option><option value="t2">② 알아본 경험담 (알아보다가·문의해 보니)</option></select></label>
     <label class="f"><span>직접 찍은 사진 (여러 장 · 고른 순서대로 글에 들어갑니다)</span><input id="inPhoto" type="file" accept="image/*" multiple></label>
     <div class="thumbs" id="thumbs"></div>
+    <div class="f"><span>서식 틀 <em>표본 10편에서 뽑은 A·B·C</em></span>
+      <div class="fmtRow" id="fmtRow">
+        <label class="on" data-fmt="A"><b>A 정보형</b><small>인용구 소제목 · 번호 목록 · 사진 5~8장</small></label>
+        <label data-fmt="B"><b>B 후기형</b><small>짧은 문단 · 사진 캡션 · 줄간격 2.0</small></label>
+        <label data-fmt="C"><b>C 체크리스트형</b><small>구분선 · 체크 목록 · 캡션 많은 사진</small></label>
+      </div>
+    </div>
   </section>
 
   <section class="card">
@@ -100,9 +126,22 @@ details.top textarea{margin-top:8px;min-height:70px;font-size:13px}
 <script>
 (function(){
 var K = KTS, $ = K.$;
-var S = { photos: [], res: null };
+var S = { photos: [], res: null, fmt: 'A' };
 window.__res = null; window.__done = false;
 var BAN = ['최고', '1위', '완벽', '무조건', '100%'];
+
+/* ---------- 229 표준틀 — 표본 10편에서 확인된 값만 쓴다 ----------
+   표본 확인값: 글꼴은 10편 모두 나눔고딕 계열(네이버 기본), 본문 색 검정(#000)· #333,
+   캐션·회색 #999, 인용구는 왼쪽 테두리 박스, 줄간격 약 1.65, 표 0건, 사진 5~23장.
+   → 세트마다 글꼴은 바꾸지 않고 크기·색·줄간격·인용구·목록·캡션·구분선으로만 변주한다. */
+var FONT = "'NanumGothic','나눔고딕','Malgun Gothic','Apple SD Gothic Neo',sans-serif";
+var FMT = {
+  A: { id: 'A', nm: 'A 정보형', title: 27, h3: 20, h3c: '#1B2A4A', body: 16, bodyc: '#222', lh: 1.8, accent: '#FF6B00', cap: 0, list: 1, quote: 1, div: 0, tag: 0, pmin: 5, tpl: '{kw} 방법 — 순서대로 확인하는 5가지' },
+  B: { id: 'B', nm: 'B 후기형', title: 26, h3: 19, h3c: '#FF6B00', body: 16, bodyc: '#222', lh: 2.0, accent: '#FF6B00', cap: 1, list: 0, quote: 1, div: 0, tag: 1, pmin: 4, tpl: '{kw} 방법, 사진으로 순서대로 정리' },
+  C: { id: 'C', nm: 'C 체크리스트형', title: 25, h3: 20, h3c: '#111', body: 15, bodyc: '#333', lh: 1.6, accent: '#FF6B00', cap: 1, list: 1, quote: 2, div: 1, tag: 1, pmin: 4, tpl: '{kw} 체크리스트 — 이것만 확인하면 됩니다' }
+};
+function fmtOf(){ return FMT[S.fmt] || FMT.A; }
+function titleOf(kw, f){ return String(f.tpl).replace('{kw}', kw); }
 
 /* ---------- 뼈대 추출 (구조만, 문장 0) ---------- */
 function isSub(line){ var l = line.trim(); return /^(#{1,4}\s|■|▶|●|\[.+\]$|\d+[.)]\s)/.test(l) || (l.length <= 22 && !/[.?!요다]$/.test(l) && l.length >= 2); }
@@ -142,8 +181,15 @@ function compose(o){
   var BB = K.D.blog_bones, bank = BB[o.tone], subs = BB.subtitles[o.tone], bone = o.bone;
   var memos = o.memo.split('\n').map(function(x){ return x.trim().replace(/[.。]+$/, ''); }).filter(Boolean).slice(0, 3);
   var vars = { kw: o.kw, it: bone.it, region: o.region };
+  /* 229: 글마다 문장 순서를 키워드에 따라 다르게 둘어 유사문서 위험을 낮춘다(문장 은행은 그대로) */
+  var seed = 0; for (var si = 0; si < String(o.kw).length; si++) seed += String(o.kw).charCodeAt(si);
+  function rot(list){
+    if (!list || !list.length) return list || [];
+    var n = seed % list.length;
+    return list.slice(n).concat(list.slice(0, n));
+  }
   function memoLine(i){ var m = memos[i]; if (!m) return ''; return o.tone === 't1' ? '그날 제 메모에는 "' + m + '"라고 적혀 있어요.' : '확인하면서 적어 둔 메모는 "' + m + '"였습니다.'; }
-  function use(list){
+  function use(list){ list = rot(list);
     return list.map(function(s){
       var mm = s.match(/^\{m(\d)\}$/); if (mm) return memoLine(Number(mm[1]) - 1);
       if (/\{region\}/.test(s) && !o.region) return '';
@@ -195,19 +241,114 @@ function compose(o){
   });
   while (pi < maxPh){ items.push({ t: 'ph', s: slot() }); }
   items.push({ t: 'p', s: doc.close[0] });
-  return { items: items, tone: o.tone, direct: o.direct };
+  return { items: items, secs: doc.secs, kw: o.kw, tone: o.tone, direct: o.direct, title: titleOf(o.kw, FMT[o.fmt] || FMT.A) };
 }
-function draftText(d){ return d.items.map(function(it){ return it.t === 'h' ? it.s : it.t === 'p' ? it.s.join(' ') : '[사진 ' + it.s.n + ' — ' + it.s.cap + ']'; }).join('\n\n'); }
-function bodyText(d){ return d.items.filter(function(it){ return it.t !== 'ph'; }).map(function(it){ return it.t === 'h' ? it.s : it.s.join(' '); }).join('\n'); }
-function draftHtml(d, withImg){
-  var e = K.esc;
-  return d.items.map(function(it){
-    if (it.t === 'h') return '<h3>' + e(it.s) + '</h3>';
-    if (it.t === 'p') return '<p>' + e(it.s.join(' ')) + '</p>';
-    return withImg ? '<span class="ph">' + (it.s.url ? '<img src="' + it.s.url + '" alt="' + e(it.s.cap) + '">' : '') + '[사진 ' + it.s.n + ' — ' + e(it.s.cap) + ']</span>' : '<p>[사진 ' + it.s.n + ' — ' + e(it.s.cap) + ']</p>';
-  }).join('');
+/* ---------- 표준틀 적용: 인용구·번호록록·캐션·구분선·해시태그를 끼워 넣는다 ---------- */
+function josaFix(s, kw){
+  if (!kw) return s;
+  var last = String(kw).charCodeAt(String(kw).length - 1), has = (last >= 0xAC00 && last <= 0xD7A3) ? ((last - 0xAC00) % 28 !== 0) : false;
+  var map = { '를': has ? '을' : '를', '을': has ? '을' : '를', '가': has ? '이' : '가', '이': has ? '이' : '가', '는': has ? '은' : '는', '은': has ? '은' : '는' };
+  var t = String(kw).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(s).replace(new RegExp('(' + t + ')([를을가이는은])', 'g'), function(m, k, j){ return k + (map[j] || j); });
 }
-function sentList(d){ var a = []; d.items.forEach(function(it){ if (it.t === 'h') a.push(it.s); if (it.t === 'p') a = a.concat(it.s); }); return a; }
+function applyFmt(d, f){
+  var out = [], introDone = false, firstH = true, listDone = false;
+  var kw = d.kw || '';
+  function H(s){ return josaFix(s, kw); }
+  function quoteLine(paras){
+    var cand = [];
+    (paras || []).forEach(function(p){ p.forEach(function(s){ cand.push(s); }); });
+    cand = cand.filter(function(s){ return s.length >= 18 && s.length <= 62; });
+    cand.sort(function(a, b){
+      var sc = function(t){ return (/결국|무엇보다|가장|제일|중요/.test(t) ? 0 : 1) * 100 - t.length; };
+      return sc(a) - sc(b);
+    });
+    return cand[0] || '';
+  }
+  /* 번호 목록에 쓸 단계 섹션: use → tip → point → 두 번째 */
+  var listSec = null, pref = ['use', 'tip', 'point', 'compare'];
+  (d.secs || []).forEach(function(s){ if (!listSec || pref.indexOf(s.role) < pref.indexOf(listSec.role)) { if (pref.indexOf(s.role) >= 0) listSec = s; } });
+  d.items.forEach(function(it){
+    if (it.t === 'h'){
+      if (f.div && !firstH) out.push({ t: 'hr' });
+      firstH = false;
+      out.push({ t: 'h', s: H(it.s) });
+      return;
+    }
+    if (it.t === 'p' && !introDone){
+      out.push({ t: 'p', s: it.s.map(H) }); introDone = true;
+      if (f.quote >= 1 && d.secs && d.secs[0]){
+        var q = quoteLine(d.secs[0].paras);
+        if (q) out.push({ t: 'q', s: H(q) });
+      }
+      return;
+    }
+    if (it.t === 'p' && f.list && !listDone && listSec && listSec.paras.indexOf(it.s) >= 0){
+      if (listSec.paras[0] === it.s){
+        var steps = [];
+        listSec.paras.forEach(function(p){ p.forEach(function(s){ if (s.length > 8 && s.length < 90 && steps.length < 4) steps.push(H(s)); }); });
+        if (steps.length >= 2){ out.push({ t: 'ol', s: steps }); listDone = true; return; }
+      } else { listDone = true; }
+    }
+    if (it.t === 'ph'){
+      out.push({ t: 'ph', s: { n: it.s.n, cap: f.cap ? it.s.cap : '', url: it.s.url } });
+      return;
+    }
+    if (it.t === 'p'){ out.push({ t: 'p', s: it.s.map(H) }); return; }
+    out.push(it);
+  });
+  /* C(체크리스트형): 구역을 대표하는 문장을 정의 인용구로 한 번 더 */
+  if (f.quote >= 2 && d.secs && d.secs[1]){
+    var q2 = quoteLine(d.secs[1].paras);
+    if (q2){
+      var hi = -1;
+      out.forEach(function(it, i){ if (it.t === 'h' && i > 2) { hi = hi < 0 ? i : hi; } });
+      if (hi > 0) out.splice(hi + 1, 0, { t: 'q', s: H(q2) }); else out.push({ t: 'q', s: H(q2) });
+    }
+  }
+  if (f.tag) out.push({ t: 'tag', s: '#' + String(kw).replace(/\s+/g, '') });
+  var o = {}; for (var k in d) if (Object.prototype.hasOwnProperty.call(d, k)) o[k] = d[k];
+  o.items = out;
+  return o;
+}
+function plainOf(it){
+  if (it.t === 'h' || it.t === 'q') return it.s;
+  if (it.t === 'p') return it.s.join(' ');
+  if (it.t === 'ol') return it.s.join(' / ');
+  if (it.t === 'tag') return it.s;
+  if (it.t === 'hr') return '———';
+  if (it.t === 'ph') return '[사진 ' + it.s.n + (it.s.cap ? ' — ' + it.s.cap : '') + ']';
+  return '';
+}
+function draftText(d){ var a = [d.title || '']; d.items.forEach(function(it){ a.push(plainOf(it)); }); return a.filter(Boolean).join('\n\n'); }
+function bodyText(d){ return d.items.filter(function(it){ return it.t !== 'ph' && it.t !== 'hr'; }).map(plainOf).filter(Boolean).join('\n'); }
+/* 브로그 화면과 복사본이 같은 HTML을 쓰게 한 벌로 만든다(인라인 서식 = 네이버에 붙여도 그대로) */
+function postHtml(d, f, withImg){
+  var e = K.esc, out = [];
+  function strong(t){
+    var s = e(t), kw = String(d.kw || '');
+    if (!kw) return s;
+    var i = s.indexOf(e(kw));
+    if (i < 0) return s;
+    return s.slice(0, i) + '<strong style="color:' + f.accent + '">' + e(kw) + '</strong>' + s.slice(i + e(kw).length);
+  }
+  out.push('<p class="ptitle" style="font-family:' + FONT + ';font-size:' + f.title + 'px;font-weight:700;line-height:1.35;color:#111;margin:0 0 18px;word-break:keep-all">' + e(d.title || '') + '</p>');
+  d.items.forEach(function(it){
+    if (it.t === 'h') out.push('<h3 style="font-family:' + FONT + ';font-size:' + f.h3 + 'px;font-weight:700;line-height:1.5;color:' + f.h3c + ';margin:28px 0 10px;word-break:keep-all">' + e(it.s) + '</h3>');
+    else if (it.t === 'hr') out.push('<hr style="border:0;border-top:1px solid #E3E7ED;margin:22px 0" class="bar">');
+    else if (it.t === 'p') out.push('<p style="font-family:' + FONT + ';font-size:' + f.body + 'px;line-height:' + f.lh + ';color:' + f.bodyc + ';margin:0 0 14px;word-break:keep-all">' + strong(it.s.join(' ')) + '</p>');
+    else if (it.t === 'q') out.push('<blockquote style="font-family:' + FONT + ';font-size:14px;line-height:1.7;color:#555;background:#F6F7F9;border-left:4px solid ' + (f.id === 'B' ? '#FF6B00' : '#777') + ';margin:0 0 18px;padding:11px 14px">' + e(it.s) + '</blockquote>');
+    else if (it.t === 'ol') out.push('<ol style="font-family:' + FONT + ';font-size:' + f.body + 'px;line-height:' + f.lh + ';color:' + f.bodyc + ';margin:0 0 16px;padding-left:22px">' + it.s.map(function(x){ return '<li style="margin:0 0 7px;word-break:keep-all">' + e(x) + '</li>'; }).join('') + '</ol>');
+    else if (it.t === 'tag') out.push('<p style="font-family:' + FONT + ';font-size:12px;color:#8A94A3;margin:20px 0 0">' + e(it.s) + '</p>');
+    else if (it.t === 'ph'){
+      out.push('<figure style="margin:8px 0 0"><span class="ph">' + (withImg && it.s.url ? '<img src="' + it.s.url + '" alt="' + e(it.s.cap || '사진 ' + it.s.n) + '">' : '') + '[사진 ' + it.s.n + ']</span>' +
+        (it.s.cap ? '<figcaption style="font-family:' + FONT + ';font-size:12px;color:#999;text-align:center;margin:6px 0 16px">' + e(it.s.cap) + '</figcaption>' : '<div style="height:12px"></div>') + '</figure>');
+    }
+  });
+  return out.join('');
+}
+function draftHtml(d, withImg){ return postHtml(d, fmtOf(), withImg); }
+function sentList(d){ var a = []; d.items.forEach(function(it){ if (it.t === 'h' || it.t === 'q') a.push(it.s); if (it.t === 'p') a = a.concat(it.s); if (it.t === 'ol') a = a.concat(it.s); }); return a; }
 function norm(s){ return String(s).replace(/[^가-힣A-Za-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim(); }
 function plagiarism(text, tops){
   var set = {}, N = 6;
@@ -219,9 +360,13 @@ function plagiarism(text, tops){
 function stats(d, kw){
   var body = bodyText(d), heads = d.items.filter(function(it){ return it.t === 'h'; }).length;
   var paras = d.items.filter(function(it){ return it.t === 'p'; });
+  var lens = paras.map(function(p){ return p.s.length; });
+  var first = paras[0] ? paras[0].s.join(' ') : '';
   return { chars: body.replace(/\n/g, '').length, kw: body.split(kw).length - 1, ban: K.banFind(body, BAN).length, heads: heads, paras: paras.length,
-    paraMin: Math.min.apply(null, paras.map(function(p){ return p.s.length; })), paraMax: Math.max.apply(null, paras.map(function(p){ return p.s.length; })),
-    firstKw: paras[0].s.join(' ').indexOf(kw) >= 0, photos: d.items.filter(function(it){ return it.t === 'ph'; }).length, cust: K.customerCheck(body) };
+    paraMin: lens.length ? Math.min.apply(null, lens) : 0, paraMax: lens.length ? Math.max.apply(null, lens) : 0,
+    firstKw: first.indexOf(kw) >= 0, photos: d.items.filter(function(it){ return it.t === 'ph'; }).length,
+    quotes: d.items.filter(function(it){ return it.t === 'q'; }).length, lists: d.items.filter(function(it){ return it.t === 'ol'; }).length,
+    cust: K.customerCheck(body) };
 }
 
 /* ---------- 화면 ---------- */
@@ -237,15 +382,16 @@ function drawAll(r){
     '<tr><td class="l">6) 키워드</td><td class="l">' + x.kw + '회</td></tr>' +
     '<tr><td class="l">7) 마무리</td><td class="l">' + e(x.close) + '</td></tr></table>' +
     (r.ext ? '<p class="note">글별: ' + r.ext.rows.map(function(q, i){ return (i + 1) + '편 소제목' + q.subs + '·문단' + q.paras + '·' + q.avg + '자·사진' + q.photos + '·키워드' + q.kw; }).join(' / ') + '</p>' : '');
-  var st = r.stats;
-  $('#tabDraft').innerHTML = '<p class="okline">' + (r.draft.direct ? '[직접 넣기] 사진 ' + st.photos + '장 반영' : '[완전 자동] 사진 자리 ' + st.photos + '곳 표시') + ' · ' + (r.draft.tone === 't1' ? '사용기 후기' : '알아본 경험담') + ' · ' + st.chars + '자</p>' +
-    '<div class="ms" id="draft">' + draftHtml(r.draft, true) + '</div>' + (r.draft.direct ? '' : '<p class="warnline" id="photoHint">' + e(K.D.blog_bones.photoHint) + '</p>') +
+  var st = r.stats, ff = r.fmt || fmtOf();
+  $('#tabDraft').innerHTML = '<p class="okline">' + ff.nm + ' · ' + (r.draft.direct ? '[직접 넣기] 사진 ' + st.photos + '장 반영' : '[완전 자동] 사진 자리 ' + st.photos + '곳 표시') + ' · ' + (r.draft.tone === 't1' ? '사용기 후기' : '알아본 경험담') + ' · ' + st.chars + '자 · 인용구 ' + st.quotes + ' · 목록 ' + st.lists + '</p>' +
+    '<div class="ms paper" id="draft">' + postHtml(r.draft, ff, true) + '</div>' + (r.draft.direct ? '' : '<p class="warnline" id="photoHint">' + e(K.D.blog_bones.photoHint) + '</p>') +
     '<div class="btns"><button class="btn pri" id="btnFmt" type="button">서식 그대로 복사</button><button class="btn" id="btnAi" type="button" data-ai>AI로 문장 다듬기</button></div><p class="warnline">올리기 전에 제가 직접 겪은 내용으로 고쳐 주세요 — 실제와 다른 경험담·수치는 표시·광고에 문제가 될 수 있습니다.</p><p class="note" id="aiMsg"></p>';
   $('#btnFmt').onclick = copyFmt; $('#btnAi').onclick = aiPolish;
   $('#tabCheck').innerHTML = '<table class="t" id="checkTable"><colgroup><col style="width:52%"><col></colgroup><tr><th>검사</th><th>결과</th></tr>' +
     '<tr><td class="l">글자수 (1,200~1,800)</td><td>' + st.chars + '</td></tr><tr><td class="l">키워드 "' + e(r.kw) + '" (3~5회)</td><td>' + st.kw + '</td></tr>' +
     '<tr><td class="l">첫 문단 키워드</td><td>' + (st.firstKw ? '있음' : '없음') + '</td></tr><tr><td class="l">소제목 (3~5)</td><td>' + st.heads + '</td></tr>' +
     '<tr><td class="l">문단 문장 수 (2~4)</td><td>' + st.paraMin + '~' + st.paraMax + '</td></tr><tr><td class="l">금지어</td><td>' + st.ban + '</td></tr>' +
+    '<tr><td class="l">인용구 / 번호 목록 (표본: 인용구 평균 5.8 · 표 0)</td><td id="qList">' + st.quotes + ' / ' + st.lists + '</td></tr>' +
     '<tr><td class="l">6어절 연속 일치 (상위 글)</td><td id="plagHit">' + r.plag.hit + '건 / ' + r.plag.grams + '묶음 검사</td></tr>' +
     '<tr><td class="l">두 톤 같은 문장</td><td id="toneSame">' + r.toneSame + '건</td></tr>' +
     '<tr><td class="l">원가·마진·전화번호</td><td>' + (st.cust.ban.length + st.cust.phone) + '건</td></tr></table>';
@@ -259,19 +405,20 @@ function readOpts(direct){
   return { kw: kw, region: $('#inRegion').value.trim(), memo: $('#inMemo').value, tone: $('#tone').value, direct: direct, photos: direct ? S.photos : bone.photos, every: bone.every, subs: bone.subs, bone: def, boneView: bone, ext: ext, tops: tops };
 }
 function run(direct){
-  var o = readOpts(direct);
-  var d = compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone, direct: direct, photos: o.photos, every: o.every, subs: o.subs, bone: o.bone });
-  var other = compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone === 't1' ? 't2' : 't1', direct: direct, photos: o.photos, every: o.every, subs: o.subs, bone: o.bone });
+  var o = readOpts(direct), f = FMT[S.fmt] || FMT.A;
+  var photos = Math.max(f.pmin || 4, o.photos);
+  var d = applyFmt(compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone, direct: direct, photos: photos, every: o.every, subs: o.subs, bone: o.bone, fmt: S.fmt }), f);
+  var other = applyFmt(compose({ kw: o.kw, region: o.region, memo: o.memo, tone: o.tone === 't1' ? 't2' : 't1', direct: direct, photos: photos, every: o.every, subs: o.subs, bone: o.bone, fmt: S.fmt }), f);
   var a = sentList(d), b = {}; sentList(other).forEach(function(x){ b[x] = 1; });
-  var r = { kw: o.kw, bone: o.boneView, boneDef: o.bone, ext: o.ext, draft: d, other: other, stats: stats(d, o.kw), otherStats: stats(other, o.kw),
+  var r = { kw: o.kw, fmt: f, bone: o.boneView, boneDef: o.bone, ext: o.ext, draft: d, other: other, stats: stats(d, o.kw), otherStats: stats(other, o.kw),
     plag: plagiarism(bodyText(d), o.tops), plagOther: plagiarism(bodyText(other), o.tops), toneSame: a.filter(function(x){ return b[x]; }).length };
   S.res = r; drawAll(r);
-  window.__res = { kw: o.kw, direct: direct, tone: d.tone, bone: { first: r.bone.first, subs: r.bone.subs, paras: r.bone.paras, avgLen: r.bone.avgLen, photos: r.bone.photos, kw: r.bone.kw, close: r.bone.close }, extN: o.ext ? o.ext.n : 0,
+  window.__res = { kw: o.kw, fmt: f.id, title: d.title, direct: direct, tone: d.tone, bone: { first: r.bone.first, subs: r.bone.subs, paras: r.bone.paras, avgLen: r.bone.avgLen, photos: r.bone.photos, kw: r.bone.kw, close: r.bone.close }, extN: o.ext ? o.ext.n : 0,
     stats: r.stats, otherStats: r.otherStats, plag: r.plag, plagOther: r.plagOther, toneSame: r.toneSame, sentences: a.length };
-  window.__done = true; K.goTab('tabDraft'); K.toast((direct ? '[직접 넣기]' : '[완전 자동]') + ' 원고를 만들었습니다 (' + r.stats.chars + '자)');
+  window.__done = true; K.goTab('tabDraft'); K.toast((direct ? '[직접 넣기]' : '[완전 자동]') + ' · ' + f.nm + ' 원고를 만들었습니다 (' + r.stats.chars + '자)');
 }
 window.blogRun = run;
-function copyFmt(){ if (!S.res){ K.toast('먼저 원고를 만들어 주세요'); return; } var h = draftHtml(S.res.draft, false); window.__fmt = { h3: (h.match(/<h3>/g) || []).length, lines: draftText(S.res.draft).split('\n').length }; K.copy(draftText(S.res.draft), h); }
+function copyFmt(){ if (!S.res){ K.toast('먼저 원고를 만들어 주세요'); return; } var h = postHtml(S.res.draft, S.res.fmt, false); window.__fmt = { h3: (h.match(/<h3/g) || []).length, quote: (h.match(/<blockquote/g) || []).length, list: (h.match(/<ol/g) || []).length, lines: draftText(S.res.draft).split('\n').length, fmt: S.res.fmt.id }; K.copy(draftText(S.res.draft), h); }
 async function aiPolish(){
   try {
     var o = await aiJson('다음 블로그 원고의 문장을 사람 구어체 존댓말로 자연스럽게 다듬되 소제목·문단·사진 자리 순서는 그대로 두고 JSON {"paras":["문단1","문단2",...]} (사진 자리·소제목 제외 문단만, 같은 개수)로만 답하세요. 금지: 최고·1위·완벽·무조건·100%, 실명·연락처.\n' + S.res.draft.items.filter(function(i){ return i.t === 'p'; }).map(function(i){ return i.s.join(' '); }).join('\n'));
@@ -289,6 +436,15 @@ function updLock(){
 async function boot(){
   await K.loadData(['blog_bones', 'sample_products']);
   K.shell(); K.tabs('#tabs');
+  /* 229 표준틀 선택 — 주소에 ?fmt=A|B|C 로도 고정할 수 있다 */
+  var fq = String(K.qs('fmt') || '').toUpperCase(); if (FMT[fq]) S.fmt = fq;
+  function paintFmt(){ Array.prototype.forEach.call(document.querySelectorAll('#fmtRow label'), function(l){ l.classList.toggle('on', l.getAttribute('data-fmt') === S.fmt); }); }
+  document.addEventListener('click', function(e){
+    var l = e.target.closest ? e.target.closest('#fmtRow label') : null; if (!l) return;
+    S.fmt = l.getAttribute('data-fmt'); paintFmt();
+    if (S.res) run(S.res.draft.direct);
+  });
+  paintFmt();
   K.gate('#btnGo', '#need', function(){ return $('#inKeyword').value.trim() ? '' : '목표 키워드를 넣어 주세요'; });
   document.addEventListener('input', updLock); updLock();
   $('#inPhoto').addEventListener('change', async function(){ S.photos = await K.readPhotos(this.files, 12); $('#thumbs').innerHTML = S.photos.map(function(p, i){ return '<img src="' + p.url + '" alt="사진 ' + (i + 1) + '">'; }).join(''); updLock(); K.toast('사진 ' + S.photos.length + '장 — 고른 순서대로 글에 들어갑니다'); });
