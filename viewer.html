@@ -101,6 +101,11 @@ body.docopen .doc .bar #backb{display:none}
  border-radius:9px;padding:8px 10px;white-space:nowrap;font-family:inherit}
 #vtool .r2 button.wide{flex:1;padding:8px 2px}
 #vtool .r2 .pct{flex:0 0 auto;font-size:10.5px;font-weight:900;color:var(--amber2);min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+/* (232번) 내용을 읽어 보여줄 때만 — 원본이 아니라는 사실을 항상 위에 */
+#vtool .psnote{display:none;margin:0 12px 7px;padding:6px 9px;border:1px solid rgba(255,107,0,.45);border-radius:9px;
+ background:rgba(255,107,0,.12);color:#FFD9A6;font-size:10.5px;font-weight:800;line-height:1.45}
+#vtool .psnote b{color:#fff}
+body.parsed #vtool .psnote{display:block}
 /* 하단 고정 바 — 페이지 이동 · 더편집 · 이미지로 저장 */
 #pbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:39;background:rgba(10,17,40,.97);
  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);
@@ -121,6 +126,8 @@ body.docopen #out{position:relative;height:100%;overflow:auto;-webkit-overflow-s
  touch-action:none;background:#070D1E;padding:10px 0 18px}
 body.docopen.ppnoticemode #out{padding:18px 12px}
 body.docopen .banner{display:none!important}
+/* (232번) 보는 동안에는 공용 도우미 동그라미도 종이 위에 올리지 않는다 */
+body.docopen #kts-helper-btn{display:none!important}
 body.docopen .kipfoot{display:none}
 /* 공통 UX 가 문서 상자(#out) 안에 넣는 4버튼 줄은 종이 위에 올리지 않는다 */
 #out .kux-flow{display:none!important}
@@ -286,6 +293,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
     <button type="button" class="wide" id="vtFit">폭 맞춤</button>
     <button type="button" id="vtPrint">출력</button>
   </div>
+  <div id="psnote" class="psnote">원본 배치가 아닙니다 — 내용을 읽어 보여줍니다. 원본 그대로는 <b>PDF·사진</b>으로 열어 주세요.</div>
 </div>
 <div id="pbar"><div class="in">
   <button type="button" id="pgPrev" aria-label="이전 페이지">‹</button>
@@ -310,7 +318,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
     <div class="ft"><button type="button" id="mfListAdd">＋ 파일 추가</button><button type="button" class="all" id="mfCloseAll">모두 닫기</button></div>
   </div>
 </div>
-<a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:6px;margin:8px 12px 0;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,107,0,.38);background:rgba(255,107,0,.08);text-decoration:none;color:#C7D3E3;line-height:1.25;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:8.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0;font-size:10.5px;font-weight:800;color:#AFBDD0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">현재 지역 <b style="color:#FFA24D;font-weight:900">무료 세팅</b> 사전예약 중</span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:12px">→</span></a>
+<!-- (2026-11-25 · 232번) 사전예약 홍보 띠 제거 — 뷰어는 광고·배너 0 -->
 
 
 <div class="drop" id="drop">
@@ -320,7 +328,8 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
     <button class="x" onclick="resetView()" title="닫기">✕</button>
   </div>
   <h1>파일을 고르면 바로 열립니다</h1>
-  <p>한글(.hwp·.hwpx) · 엑셀(.xlsx·.csv) · <b style="color:#FFA24D">워드(.docx)</b> · PDF · 사진 · 텍스트<br>파일은 서버로 올라가지 않고 이 기기 안에서만 처리됩니다.</p>
+  <p>한글(.hwp·.hwpx) · 엑셀(.xlsx·.csv) · <b style="color:#FFA24D">워드(.docx)</b> · PDF · 사진 · 텍스트<br>
+  <b>PDF·사진은 원본 그대로</b> 페이지 그림으로, 한글·엑셀·워드는 내용을 읽어 보여줍니다.<br>파일은 이 기기 안에서 처리되고, 구형 .hwp만 사무실 PC에서 PDF로 바꿉니다.</p>
   <button class="big" onclick="document.getElementById('f').click()">파일 열기</button>
   <input type="file" id="f" hidden multiple accept=".hwp,.hwpx,.xlsx,.xlsm,.docx,.csv,.txt,.pdf,image/*">
   <div class="hint">파일을 고르면 표·문서가 화면 전체로 바로 펼쳐집니다</div>
@@ -751,7 +760,7 @@ function ppReset(){
   out.innerHTML = '';
   PP.kind = ''; PP.pages = []; PP.tops = []; PP.cur = 0; PP.sheet = null;
   PP.space = null; PP.scale = null; PP.notice = false;
-  document.body.classList.remove('ppnoticemode');
+  document.body.classList.remove('ppnoticemode', 'parsed');
 }
 
 /* ---------- 페이지 배치 · 확대/축소(핀치·버튼 공통) ---------- */
@@ -1046,7 +1055,8 @@ function buildFrame(url){
   PP.pages = [{el: el, w: w, h: h}]; PP.tops = [0];
 }
 
-/* ---------- 구형 .hwp — 어설프게 깨뜨리지 않고 안내만 (안내 화면에서도 저장 줄은 남긴다) ---------- */
+/* ---------- 구형 .hwp — 폰에서 원본 그대로 그릴 수 없다. 사무실 PC가 켜져 있으면 PDF(원본)로 받아 끼운다 ----------
+   (232번) 기다리지 않는다 — 열자마자 안내 카드를 먼저 보여 주고, PC가 응답하면 그때 원본 페이지로 바꾼다. */
 function buildNotice(){
   PP.kind = 'notice';
   const card = document.createElement('div');
@@ -1072,10 +1082,10 @@ function buildNotice(){
 async function hwpViaPc(file){
   const wait = (ms) => { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
   try{
-    const hj = await (await fetch('../hwp-host.json?t=' + Date.now(), {cache: 'no-store', signal: wait(10000)})).json();
+    const hj = await (await fetch('../hwp-host.json?t=' + Date.now(), {cache: 'no-store', signal: wait(4000)})).json();
     const url = String(hj && hj.url || '').replace(/\/+$/, '');
     if (!/^https:\/\//.test(url)) return null;
-    const hc = await fetch(url + '/health', {cache: 'no-store', signal: wait(10000)});
+    const hc = await fetch(url + '/health', {cache: 'no-store', signal: wait(4000)});
     if (!hc.ok) return null;
     const res = await fetch(url + '/convert', {method: 'POST', body: file, signal: wait(50000),
       headers: {'Content-Type': 'application/octet-stream', 'X-KTS-Name': encodeURIComponent(file.name || 'doc.hwp')}});
@@ -1084,6 +1094,19 @@ async function hwpViaPc(file){
     const h = new Uint8Array(buf, 0, Math.min(5, buf.byteLength));
     return (h.length === 5 && String.fromCharCode.apply(null, h) === '%PDF-') ? buf : null;
   }catch(e){ return null; }
+}
+/* (232번) 안내 카드를 먼저 띄운 뒤, 사무실 PC가 응답하면 원본 PDF 페이지로 조용히 바꿔 끼운다 — 첫 화면을 기다리게 하지 않는다 */
+async function hwpUpgrade(file, nm){
+  const pb = await hwpViaPc(file);
+  if (!pb) return;
+  if (PP.file !== file) return;                       /* 그새 다른 파일을 열었으면 버린다 */
+  if (typeof pdfjsLib === 'undefined') return;
+  try{
+    await paintDoc({kind: 'pdf', buf: pb, note: '구형 한글 → PDF(원본)'}, file, PP.name || nm);
+    const fm = document.getElementById('fmeta');
+    if (fm) fm.textContent = Math.round(file.size / 1024) + 'KB · 구형 한글 → 원본 PDF';
+    showToast('사무실 PC에서 원본 그대로 열었습니다');
+  }catch(e){ console.warn('hwp upgrade fail', e); }
 }
 
 /* ---------- 조립 ---------- */
@@ -1095,6 +1118,9 @@ async function paintDoc(r, file, nm){
   space.appendChild(scale); out.appendChild(space);
   PP.space = space; PP.scale = scale;
   PP.zoom = 1;
+  /* (232번) 엑셀·한글(hwpx)·워드는 브라우저가 원본 그대로 그릴 수 없어 내용을 읽어 보여준다 —
+     원본인 척 하지 않고 위 막대에 그 사실을 항상 띄운다. */
+  document.body.classList.toggle('parsed', !!(r.kind === 'html' || r.kind === 'table'));
   if (r.kind === 'pdf') await buildPdf(r.buf);
   else if (r.kind === 'img') await buildImage(r.url);
   else if (r.kind === 'html' || r.kind === 'table') buildSheet(r);   /* openXlsx/openText 는 'table' */
@@ -1102,6 +1128,7 @@ async function paintDoc(r, file, nm){
   else buildNotice();
   applyZoom(fitZoom());
   PP.cur = 0; ppPageLabel();
+  fitStage();                                  /* (232번) 위 막대에 원본 여부 줄이 생기거나 사라지면 높이가 바뀐다 */
   if (PP.notice){ document.body.classList.add('ppnoticemode'); fitStage(); applyZoom(1); }
 }
 
@@ -1240,54 +1267,46 @@ async function showFile(file){
   dropEl.classList.add('mini');
   document.getElementById('mName').textContent = nm;
   document.getElementById('mMeta').textContent = Math.round(file.size / 1024) + 'KB';
-  docEl.style.display = 'none';
   window.scrollTo(0, 0);
-  loader(true, nm, '파일을 여는 중…', 22);
+  /* (232번) 중간 단계 0 — 마스코트 로딩 카드 없이 곧바로 종이 화면을 연다.
+     첫 장이 그려지는 동안에도 화면은 이미 문서 상태이고, 상태는 위 막대의 파일 정보 줄에만 짧게 쓴다. */
+  docEl.style.display = 'block';
+  docEl.classList.add('paper');
+  document.body.classList.add('docopen');
+  document.getElementById('fname').textContent = nm;
+  document.getElementById('fmeta').textContent = Math.round(file.size / 1024) + 'KB · 여는 중…';
+  fitStage();
   const name = nm.toLowerCase();
   try{
     let r = null;
     if (/\.(jpe?g|png|gif|webp|bmp)$/.test(name)){
       r = {kind: 'img', url: URL.createObjectURL(file), note: '사진'}
     } else if (/\.pdf$/.test(name)){
-      loader(true, nm, 'PDF 페이지를 그리는 중…', 55);
       r = (typeof pdfjsLib !== 'undefined')
         ? {kind: 'pdf', buf: await file.arrayBuffer(), note: 'PDF'}
         : {kind: 'frame', url: URL.createObjectURL(file), note: 'PDF'};
     } else if (/\.(xlsx|xlsm)$/.test(name)){
-      loader(true, nm, '엑셀 표를 읽는 중…', 48);
       r = await openXlsx(await file.arrayBuffer());
     } else if (/\.docx$/.test(name)){
-      loader(true, nm, '워드 문서를 읽는 중…', 48);
       r = await openDocx(await file.arrayBuffer());
     } else if (/\.hwpx$/.test(name)){
-      loader(true, nm, '한글 문서를 읽는 중…', 48);
       r = await openHwpx(await file.arrayBuffer());
     } else if (/\.(csv|txt)$/.test(name)){
       r = openText(await file.text(), name);
     } else if (/\.hwp$/.test(name)){
-      loader(true, nm, '구형 한글 → PDF로 바꾸는 중… (사무실 PC)', 40);
-      const pb = await hwpViaPc(file);                  /* 사무실 PC가 꺼져 있으면 null → 지금의 안내 카드 */
-      r = !pb ? {kind: 'notice', note: '구형 한글'}
-        : (typeof pdfjsLib !== 'undefined') ? {kind: 'pdf', buf: pb, note: '구형 한글 → PDF'}
-        : {kind: 'frame', url: URL.createObjectURL(new Blob([pb], {type: 'application/pdf'})), note: '구형 한글 → PDF'};
+      /* 구형 한글 — 사무실 PC를 기다리지 않고 안내 카드를 먼저 띄운다(PC가 응답하면 hwpUpgrade가 원본으로 바꿈) */
+      r = {kind: 'notice', note: '구형 한글'};
+      setTimeout(() => { hwpUpgrade(file, nm); }, 120);
     } else {
       r = {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''}
     }
-    loader(true, nm, '종이 1:1로 펴는 중…', 92);
-    docEl.style.display = 'block';
-    docEl.classList.toggle('paper', true);
-    document.body.classList.add('docopen');
-    document.getElementById('fname').textContent = nm;
     document.getElementById('fmeta').textContent = Math.round(file.size / 1024) + 'KB' + (r.note ? ' · ' + r.note : '');
-    fitStage();
     await paintDoc(r, file, nm);
-    document.getElementById('banner').classList.add('hide');
+    const bn = document.getElementById('banner'); if (bn) bn.classList.add('hide');
     if (typeof vOpen === 'function') vOpen();
-    loader(false);
     window.scrollTo(0, 0);
     if (r.kind !== 'notice') showToast('두 손가락으로 확대 · 끌어서 이동');
   }catch(err){
-    loader(false);
     document.body.classList.remove('docopen');
     docEl.style.display = 'block';
     docEl.classList.remove('paper');
@@ -1305,7 +1324,6 @@ document.getElementById('f').addEventListener('change', e => {
 (async function(){
   const q = new URLSearchParams(location.search);
   const id = q.get('f'); if (!id) return;
-  loader(true, q.get('n') || '변환한 파일', '변환한 파일을 여는 중…', 30);
   try{
     const rec = await new Promise((res, rej) => {
       const rq = indexedDB.open('kts', 1);
