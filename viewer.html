@@ -376,10 +376,7 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
   </a>
 </div>
 
-<div class="banner" id="banner">
-  <div class="t"><b>5장 4,900원</b><br>변환·날인이 필요할 때만</div>
-  <a href="https://autooneclick.com/?from=viewer-banner" rel="noopener">신청</a>
-</div>
+<div class="banner" id="banner" hidden style="display:none"></div><!-- (2026-11-25 · 232번) 가격 배너는 띄우지 않는다 — 뷰어는 광고·배너 0 -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="window.pdfjsLib=undefined"></script>
 <!-- PDF 직접 만들기 — CDN 없이 이 저장소에서 바로 (213번) · 구형 한글(.hwp)은 사무실 PC 변환 서버에서만 PDF로 (212번 이전 방식으로 복원) -->
@@ -1253,7 +1250,7 @@ function resetView(){
   document.body.style.paddingTop = '';
   document.documentElement.style.removeProperty('--vt');
   document.documentElement.style.removeProperty('--pb');
-  document.getElementById('banner').classList.remove('hide');
+  const bn0 = document.getElementById('banner'); if (bn0) bn0.classList.remove('hide');
   dropEl.classList.remove('mini'); loaderEl.classList.remove('on');
   out.innerHTML = ''; document.getElementById('f').value = '';
   if (location.search) history.replaceState(null, '', location.pathname);
@@ -1667,7 +1664,7 @@ async function mfOpen(list, append){
       space.appendChild(scale); out.appendChild(space);
       PP.space = space; PP.scale = scale; PP.zoom = 1; PP.cur = 0; PP.kind = 'multi';
       PP.name = files[0].name || '문서'; PP.file = null;
-      document.getElementById('banner').classList.add('hide');
+      const bn1 = document.getElementById('banner'); if (bn1) bn1.classList.add('hide');
       if (typeof vOpen === 'function') vOpen();
       window.scrollTo(0, 0);
     }
@@ -1975,7 +1972,7 @@ let hidden = false;
 document.addEventListener('click', e => {
   if (e.target.closest('a,button,input')) return;
   hidden = !hidden;
-  document.getElementById('banner').classList.toggle('hide', hidden);
+  const bn2 = document.getElementById('banner'); if (bn2) bn2.classList.toggle('hide', hidden);
 });
 </script>
 </div>
