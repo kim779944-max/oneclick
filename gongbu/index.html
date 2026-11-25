@@ -1,0 +1,851 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<script src="../master.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KTS 4대 공부 — 주소 하나로 토지대장·건축물대장·지적도·토지이용계획</title>
+<meta name="description" content="주소나 지번을 한 번 넣으면 4대 공부(토지대장·건축물대장·지적도·토지이용계획)를 한 화면에 모아 보여 주고, 지적도와 4대 공부 요약을 PNG 그림으로 저장합니다.">
+<meta name="theme-color" content="#0A1128">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="../icon.png">
+<style>
+:root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
+ --amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--green:#2ED47A;--red:#E23A2E;--blue:#7FB2FF}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:#070D1E;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+ line-height:1.55;word-break:keep-all;letter-spacing:-.2px;display:flex;justify-content:center}
+#app{width:100%;max-width:460px;min-height:100vh;padding-bottom:26px;overflow-x:hidden;
+ background:radial-gradient(120% 40% at 50% -8%,rgba(255,107,0,.10),rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A,#0B1428 46%,#0A1128)}
+button{font-family:inherit}
+header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+ border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px}
+header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px;white-space:nowrap}
+.brand{font-weight:900;font-size:14.5px;color:#fff;letter-spacing:-.4px;white-space:nowrap}.brand i{font-style:normal;color:var(--amber2)}
+header .sp{flex:1}
+header .st{font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:999px;padding:3px 8px;white-space:nowrap}
+main{padding:12px 14px 0}
+.hero h1{margin:2px 0 5px;font-size:20px;font-weight:900;letter-spacing:-.8px;line-height:1.32}
+.hero h1 b{color:var(--amber2)}
+.hero p{margin:0;font-size:12px;color:var(--ink2)}
+.card{background:linear-gradient(180deg,#12203C,#0F1B33);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:11px}
+.card h2{display:flex;align-items:center;gap:7px;margin:0 0 9px;font-size:13.5px;font-weight:900;letter-spacing:-.4px}
+.card h2 i{width:19px;height:19px;border-radius:6px;background:var(--amber);color:var(--on);font-size:10.5px;font-weight:900;display:grid;place-items:center;font-style:normal;flex:0 0 auto}
+.card h2 small{margin-left:auto;font-size:10.5px;color:var(--gray);font-weight:700;white-space:nowrap}
+.srch{display:flex;gap:6px}
+.srch input{flex:1;min-width:0;background:#0B1729;border:1px solid var(--line);border-radius:11px;color:var(--ink);font-size:14.5px;padding:11px 12px;outline:0;font-family:inherit}
+.srch input:focus{border-color:rgba(255,107,0,.65)}
+.srch input::placeholder{color:#6D7E97}
+.srch button{flex:0 0 auto;min-height:44px;border:0;border-radius:11px;padding:0 15px;font-size:13.5px;font-weight:900;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on);cursor:pointer}
+.srch button[disabled]{opacity:.6}
+.chips{display:flex;gap:5px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;border:1px solid var(--line);background:#0B1729;color:var(--ink2);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.chips button b{color:var(--amber2)}
+.hide{display:none!important}
+.rows{display:grid;gap:0}
+.row{display:flex;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px dashed rgba(46,67,112,.7);font-size:12.5px}
+.row:last-child{border-bottom:0}
+.row .k{flex:0 0 84px;color:var(--gray);font-weight:800;font-size:11.5px}
+.row .v{flex:1;min-width:0;font-weight:800;color:var(--ink);overflow-wrap:anywhere}
+.row .v em{font-style:normal;color:var(--amber2)}
+.row .v small{display:block;color:var(--gray);font-weight:700;font-size:10.5px}
+.pbig{display:flex;align-items:flex-end;gap:8px;margin:0 0 8px}
+.pbig b{font-size:19px;font-weight:900;letter-spacing:-.6px}
+.pbig span{font-size:11.5px;color:var(--gray);font-weight:800;padding-bottom:3px}
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 8px;font-size:10.5px;font-weight:900;border:1px solid var(--line2);color:var(--ink2);background:#0B1729;margin:0 4px 4px 0}
+.tag.on{border-color:rgba(255,107,0,.5);background:rgba(255,107,0,.12);color:var(--amber2)}
+.tag.blue{border-color:rgba(127,178,255,.45);background:rgba(127,178,255,.1);color:var(--blue)}
+.tag.warn{border-color:rgba(226,58,46,.45);background:rgba(226,58,46,.1);color:#FF8A80}
+.note{font-size:11px;color:var(--gray);margin:8px 0 0;line-height:1.5}
+.note b{color:var(--ink2)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:11px;border:1px solid var(--line2);
+ background:#0B1729;color:var(--ink);font-size:12.5px;font-weight:900;padding:0 13px;cursor:pointer;text-decoration:none;flex:1 1 auto}
+.btn.main{border:0;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.btn:active{transform:translateY(1px)}
+.state{display:flex;gap:7px;align-items:center;font-size:11.5px;font-weight:800;color:var(--ink2);padding:7px 9px;border-radius:10px;background:rgba(11,23,41,.8);border:1px solid var(--line)}
+.state .dot{width:7px;height:7px;border-radius:50%;background:var(--gray);flex:0 0 auto}
+.state.ok .dot{background:var(--green)}.state.ing .dot{background:var(--amber2);animation:bl 1s infinite}
+.state.err .dot{background:var(--red)}
+@keyframes bl{50%{opacity:.25}}
+.state b{color:var(--ink)}
+canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0B1729;border:1px solid var(--line)}
+.maptogs{display:flex;gap:5px;margin:0 0 8px}
+.maptogs button{flex:1;min-height:36px;border:1px solid var(--line);background:#0B1729;color:var(--ink2);border-radius:9px;font-size:11.5px;font-weight:900;cursor:pointer}
+.maptogs button.on{border-color:rgba(255,107,0,.55);background:rgba(255,107,0,.14);color:var(--amber2)}
+.keybox{display:flex;gap:6px;margin-top:8px}
+.keybox input{flex:1;min-width:0;background:#0B1729;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:12px;padding:10px;outline:0;font-family:inherit}
+.keybox button{min-height:40px;border:1px solid var(--line2);background:#0B1729;color:var(--ink);border-radius:10px;font-size:12px;font-weight:900;padding:0 12px;cursor:pointer}
+.foot{margin:14px 2px 0;font-size:10.5px;color:#6D7E97;line-height:1.6}
+.foot a{color:#8FA1B8}
+.grp{margin:6px 0 0;font-size:11px;font-weight:900;color:var(--ink2)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;transition:.2s;
+ background:#12203C;border:1px solid var(--line2);color:var(--ink);font-size:12px;font-weight:800;padding:9px 14px;border-radius:999px;z-index:99;max-width:90vw}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.bld{border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:8px;background:rgba(11,23,41,.55)}
+.bld b.nm{display:block;font-size:12.5px;font-weight:900;color:#fff;margin-bottom:2px}
+</style>
+</head><body><div id="app">
+<header>
+  <a class="back" href="../">← 원클릭</a>
+  <span class="brand">KTS <i>4대 공부</i></span>
+  <span class="sp"></span>
+  <span class="st" id="hdSt">주소 넣기</span>
+</header>
+<main>
+  <section class="hero">
+    <h1>주소 하나로 <b>4대 공부</b>를 한 장에</h1>
+    <p>토지대장 · 건축물대장 · 지적도 · 토지이용계획 — 한 화면에서 보고, 그림(PNG)으로 저장합니다.</p>
+  </section>
+
+  <section class="card">
+    <h2><i>1</i>주소·지번으로 찾기<small id="qSt">대기</small></h2>
+    <form class="srch" id="sf" autocomplete="off">
+      <input id="q" type="search" inputmode="search" placeholder="예: 가평군 조종면 신하리 162-9" aria-label="주소 또는 지번" autocomplete="off" spellcheck="false">
+      <button id="go" type="submit">조회</button>
+    </form>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="card hide" id="cSum">
+    <h2><i>✓</i>필지 확인<small id="sumSt"></small></h2>
+    <div class="pbig"><b id="sumJibun">—</b><span id="sumArea"></span></div>
+    <div class="rows" id="sumRows"></div>
+    <div class="btnrow">
+      <button class="btn main" id="bSheet" type="button">4대 공부 한 장 PNG</button>
+      <button class="btn" id="bMapPng" type="button">지적도 PNG</button>
+    </div>
+  </section>
+
+  <section class="card" id="cToji">
+    <h2><i>①</i>토지대장 <small>지목·면적·소유·공시지가</small></h2>
+    <div id="tojiBody"><div class="state"><span class="dot"></span><span>주소를 넣으면 여기에 표시됩니다</span></div></div>
+  </section>
+
+  <section class="card" id="cBld">
+    <h2><i>②</i>건축물대장 <small>건물·용도·연면적·층수</small></h2>
+    <div id="bldBody"><div class="state"><span class="dot"></span><span>주소를 넣으면 여기에 표시됩니다</span></div></div>
+  </section>
+
+  <section class="card" id="cMap">
+    <h2><i>③</i>지적도 <small>필지 경계·지번</small></h2>
+    <div class="maptogs" id="mapTogs">
+      <button type="button" data-m="sat" class="on">위성 위에</button>
+      <button type="button" data-m="base">일반지도 위에</button>
+      <button type="button" data-m="line">지적도만</button>
+    </div>
+    <canvas class="map" id="map" width="760" height="520" aria-label="지적도"></canvas>
+    <div class="btnrow"><button class="btn" id="bMapPng2" type="button">이 지적도 PNG로 저장</button></div>
+    <p class="note">경계는 브이월드 연속지적도(참고용)입니다. 법적 경계·면적은 지적공부 원본과 담당 관청 확인이 기준입니다.</p>
+  </section>
+
+  <section class="card" id="cUse">
+    <h2><i>④</i>토지이용계획 <small>용도지역·지구·구역</small></h2>
+    <div id="useBody"><div class="state"><span class="dot"></span><span>주소를 넣으면 여기에 표시됩니다</span></div></div>
+  </section>
+
+  <section class="card" id="cKey">
+    <h2><i>⚙</i>연결 설정<small>이 기기에만 저장</small></h2>
+    <div id="keyState"></div>
+    <div class="keybox">
+      <input id="dgk" type="text" placeholder="공공데이터포털 인증키(건축물대장)" aria-label="공공데이터포털 인증키" autocomplete="off" spellcheck="false">
+      <button id="dgSave" type="button">저장</button>
+    </div>
+    <p class="note">② 건축물대장만 공공데이터포털 인증키가 필요합니다. <b>국토교통부_건축HUB_건축물대장정보 서비스</b> 활용신청(무료·자동승인) 후 받은 키를 붙여 넣으면 이 기기에서 바로 조회됩니다. ①③④는 키 없이 지금도 열립니다.</p>
+    <p class="note" id="vkNote"></p>
+  </section>
+
+  <p class="foot">자료 · 토지임야정보·토지특성·개별공시지가·토지이용계획·연속지적도 © <a href="https://www.vworld.kr/" target="_blank" rel="noopener">브이월드(Vworld)</a> · 건축물대장 © <a href="https://www.data.go.kr/" target="_blank" rel="noopener">공공데이터포털</a> / 국토교통부 건축HUB<br>
+  이 화면은 <b>참고용 요약</b>입니다. 공부 원본(법적 효력)은 정부24·세움터·토지이음에서 발급받아 확인하세요.</p>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+/* =====================================================================
+   KTS 4대 공부 — 주소 1회 입력 → 토지대장·건축물대장·지적도·토지이용계획
+   · ①③④는 브이월드 오픈API 만으로 동작(키는 경사도 지도와 같은 대표님 키)
+     - api.vworld.kr 은 CORS 헤더를 주지 않는다 → JSONP(callback=)로 받는다(실측)
+     - WMTS 타일은 crossOrigin 을 걸면 캔버스가 오염되지 않는다 → PNG 저장 가능(실측)
+   · ② 건축물대장은 공공데이터포털 인증키가 있어야 한다(무료·자동승인)
+     - apis.data.go.kr 은 CORS 를 허용한다 → 키만 있으면 브라우저에서 바로 호출(실측)
+   ===================================================================== */
+var $=function(s){return document.querySelector(s)};
+var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},
+        set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var VW_DEF='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';       /* 대표님 발급 키(서비스 URL https://autooneclick.com) */
+var DOMAIN='autooneclick.com';
+var VW='https://api.vworld.kr', DATA=VW+'/req/data', NED=VW+'/ned/data', API=VW+'/req/address',
+    WMTS=VW+'/req/wmts/1.0.0', DG='https://apis.data.go.kr/1613000/BldRgstHubService';
+
+var S={key:(function(){var v=LS.get('kts_gongbu_vk',null);return v==null?VW_DEF:v})(),
+       dgk:LS.get('kts_gongbu_dg','')||'',
+       mode:'sat', lat:0,lon:0,addr:'',pnu:'',jibun:'',area:0,rings:null,
+       toji:null,ch:null,price:null,use:null,bld:null,box:null,zoomed:false,busy:false};
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var toT=0; function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toT);toT=setTimeout(function(){t.classList.remove('on')},2800)}
+function num(n,d){ if(n==null||n===''||!isFinite(+n)) return '—'; var v=+n; return v.toLocaleString('ko-KR',{maximumFractionDigits:(d==null?0:d)}) }
+function pyeong(m2){ return m2?Math.round(+m2/3.305785):0 }
+
+/* ---------- JSONP (api.vworld.kr 은 CORS 미허용 — 실측 2026-11-25) ---------- */
+function jsonp(url,ms){
+  return new Promise(function(res){
+    var cb='__ktsgb'+Math.floor(Math.random()*1e7), s=document.createElement('script'), done=false;
+    function fin(v){ if(done)return; done=true; try{delete window[cb]}catch(e){window[cb]=null} if(s.parentNode)s.parentNode.removeChild(s); res(v) }
+    var tm=setTimeout(function(){fin({__err:'timeout'})},ms||11000);
+    window[cb]=function(d){clearTimeout(tm);fin(d)};
+    s.onerror=function(){clearTimeout(tm);fin({__err:'network'})};
+    s.src=url+(url.indexOf('?')<0?'?':'&')+'callback='+cb;
+    document.head.appendChild(s);
+  });
+}
+function vwErr(r){ return !r||r.__err||!r.response?({st:'error'}):({st:String(r.response.status||'')}) }
+
+/* ---------- 상태 표시 ---------- */
+function state(kind,txt){ return '<div class="state '+kind+'"><span class="dot"></span><span>'+txt+'</span></div>' }
+
+/* ---------- 1) 주소 → 좌표 ---------- */
+function geocode(q){
+  var types=['parcel','road'], i=0;
+  function step(){
+    if(i>=types.length) return Promise.resolve(null);
+    var t=types[i++];
+    var url=API+'?service=address&request=getcoord&version=2.0&crs=EPSG:4326&format=json&type='+t
+      +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&address='+encodeURIComponent(q);
+    return jsonp(url,9000).then(function(r){
+      if(r&&r.response&&r.response.status==='OK'&&r.response.result&&r.response.result.point){
+        var p=r.response.result.point;
+        return {lat:+p.y,lon:+p.x,text:(r.response.result.refined&&r.response.result.refined.text)||q};
+      }
+      return step();
+    }).catch(function(){ return step() });
+  }
+  return step();
+}
+
+/* ---------- 2) 좌표 → 필지(PNU·경계) ---------- */
+function parcelAt(lat,lon){
+  var url=DATA+'?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
+    +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&size=1&page=1&geometry=true&attribute=true&crs=EPSG:4326'
+    +'&geomFilter='+encodeURIComponent('POINT('+lon.toFixed(7)+' '+lat.toFixed(7)+')');
+  return jsonp(url).then(function(r){
+    var e=vwErr(r); if(e.st!=='OK') return {st:e.st};
+    var ft=r.response.result&&r.response.result.featureCollection&&r.response.result.featureCollection.features[0];
+    if(!ft||!ft.geometry) return {st:'NOT_FOUND'};
+    var gm=ft.geometry, rings=[];
+    if(gm.type==='Polygon') rings=gm.coordinates.slice();
+    else if(gm.type==='MultiPolygon'){ for(var i=0;i<gm.coordinates.length;i++){ for(var q=0;q<gm.coordinates[i].length;q++) rings.push(gm.coordinates[i][q]) } }
+    rings=rings.filter(function(rr){return rr&&rr.length>2});
+    if(!rings.length) return {st:'NOT_FOUND'};
+    var pr=ft.properties||{};
+    return {st:'OK',rings:rings,pnu:pr.pnu||'',jibun:pr.jibun||'',addr:pr.addr||'',jiga:pr.jiga||0,area:ringAreaAbs(rings,lat)};
+  });
+}
+function ringAreaAbs(rings,latC){
+  var mPerLat=111132, mPerLon=111320*Math.cos(latC*Math.PI/180), s=0;
+  for(var i=0;i<rings.length;i++){
+    var r=rings[i]; if(r.length<3) continue;
+    for(var j=0;j<r.length;j++){
+      var a=r[j], b=r[(j+1)%r.length];
+      s+=(a[0]*mPerLon)*(b[1]*mPerLat)-(b[0]*mPerLon)*(a[1]*mPerLat);
+    }
+  }
+  return Math.abs(s/2);
+}
+function bboxOf(rings){
+  var b={minx:1e9,miny:1e9,maxx:-1e9,maxy:-1e9};
+  for(var i=0;i<rings.length;i++) for(var j=0;j<rings[i].length;j++){
+    var p=rings[i][j]; if(!p||!isFinite(p[0])||!isFinite(p[1])) continue;
+    if(p[0]<b.minx)b.minx=p[0]; if(p[0]>b.maxx)b.maxx=p[0];
+    if(p[1]<b.miny)b.miny=p[1]; if(p[1]>b.maxy)b.maxy=p[1];
+  }
+  return b;
+}
+/* 같은 화면에 담을 주변 필지들 — BOX 범위조회(실측 OK, box= 파라미터는 응답 없음) */
+function parcelRange(b){
+  var url=DATA+'?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
+    +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&size=300&page=1&geometry=true&attribute=true&crs=EPSG:4326'
+    +'&geomFilter='+encodeURIComponent('BOX('+b.minx.toFixed(6)+','+b.miny.toFixed(6)+','+b.maxx.toFixed(6)+','+b.maxy.toFixed(6)+')');
+  return jsonp(url,14000).then(function(r){
+    var e=vwErr(r); if(e.st!=='OK') return [];
+    var fs=(r.response.result&&r.response.result.featureCollection&&r.response.result.featureCollection.features)||[];
+    return fs.map(function(f){
+      var gm=f.geometry, rings=[];
+      if(!gm) return null;
+      if(gm.type==='Polygon') rings=gm.coordinates.slice();
+      else if(gm.type==='MultiPolygon'){ for(var i=0;i<gm.coordinates.length;i++){ for(var q=0;q<gm.coordinates[i].length;q++) rings.push(gm.coordinates[i][q]) } }
+      var pr=f.properties||{};
+      return {rings:rings,pnu:pr.pnu||'',jibun:pr.jibun||'',jiga:pr.jiga||0};
+    }).filter(Boolean);
+  }).catch(function(){ return [] });
+}
+
+/* ---------- 3) NED (토지임야·토지특성·공시지가·토지이용계획) ---------- */
+function nedLand(pnu){                 /* 토지임야정보 = 토지대장/임야대장 요약 */
+  return jsonp(NED+'/ladfrlList?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=3&pageNo=1')
+    .then(function(r){
+      if(!r||r.__err||!r.ladfrlVOList) return null;
+      var v=r.ladfrlVOList; var arr=v.ladfrlVOList; if(!Array.isArray(arr)) arr=arr?[arr]:[];
+      return arr[0]||null;
+    }).catch(function(){return null});
+}
+function nedChar(pnu){                 /* 토지특성 — 기준연도 넣어 최신 1건 */
+  var y=new Date().getFullYear(), i=0;
+  function step(){
+    if(i>2) return Promise.resolve(null);
+    var yr=y-i; i++;
+    return jsonp(NED+'/getLandCharacteristics?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=30&pageNo=1&stdrYear='+yr)
+      .then(function(r){
+        var f=r&&r.landCharacteristicss&&r.landCharacteristicss.field;
+        if(!Array.isArray(f)||!f.length) return step();
+        f.sort(function(a,b){return String(b.lastUpdtDt||'').localeCompare(String(a.lastUpdtDt||''))});
+        return f[0];
+      }).catch(function(){ return step() });
+  }
+  return step();
+}
+function nedPrice(pnu){                /* 개별공시지가 — 최신 연도 1건 */
+  return jsonp(NED+'/getIndvdLandPriceAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=40&pageNo=1')
+    .then(function(r){
+      var f=r&&r.indvdLandPrices&&r.indvdLandPrices.field;
+      if(!Array.isArray(f)||!f.length) return null;
+      f.sort(function(a,b){
+        var da=String(b.stdrYear||''), db=String(a.stdrYear||'');
+        if(da!==db) return da.localeCompare(db);
+        return String(b.pblntfDe||'').localeCompare(String(a.pblntfDe||''));
+      });
+      return f[0];
+    }).catch(function(){return null});
+}
+function nedUse(pnu){                  /* 토지이용계획 — 용도지역·지구·구역 */
+  return jsonp(NED+'/getLandUseAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=200&pageNo=1')
+    .then(function(r){
+      var f=r&&r.landUses&&r.landUses.field;
+      if(!Array.isArray(f)) return [];
+      var seen={}, out=[];
+      f.forEach(function(x){
+        var k=(x.cnflcAtNm||'')+'|'+x.prposAreaDstrcCodeNm+'|'+(x.prposAreaDstrcCode||'');
+        if(seen[k]){ seen[k].n++; return }
+        seen[k]=1; out.push({cnflc:(x.cnflcAtNm||''),nm:x.prposAreaDstrcCodeNm||'',code:x.prposAreaDstrcCode||'',n:1,dt:x.lastUpdtDt||''});
+      });
+      return out;
+    }).catch(function(){return []});
+}
+
+/* ---------- 4) 건축물대장 (공공데이터포털 키 필요) ---------- */
+function bldKeyParam(k){
+  /* data.go.kr 인증키는 'Encoding' 키에 %가 들어 있다 — 그대로 쓰고, 아니면 인코딩한다 */
+  return (k.indexOf('%')>=0)?k:encodeURIComponent(k);
+}
+function bldFetch(pnu){
+  if(!S.dgk) return Promise.resolve({st:'NOKEY'});
+  var sg=pnu.slice(0,5), bd=pnu.slice(5,10), pg=(pnu.charAt(10)==='2'?'1':'0'),
+      bun=pnu.slice(11,15), ji=pnu.slice(15,19);
+  var q='?serviceKey='+bldKeyParam(S.dgk)+'&sigunguCd='+sg+'&bjdongCd='+bd+'&platGbCd='+pg+'&bun='+bun+'&ji='+ji;
+  var url1=DG+'/getBrTitleInfo'+q+'&_type=json&numOfRows=20&pageNo=1';
+  var url2=DG+'/getBrBasisOulnInfo'+q+'&_type=json&numOfRows=20&pageNo=1';
+  return fetch(url1,{headers:{'Accept':'application/json'}}).then(function(r){return r.text()}).then(function(t){
+    var j=null; try{j=JSON.parse(t)}catch(e){}
+    if(!j) return {st:'BADJSON',raw:String(t).slice(0,200)};
+    if(j.OpenAPI_ServiceResponse){
+      var m=(j.OpenAPI_ServiceResponse.cmmMsgHeader||{}).errMsg||'';
+      return {st:'KEYERR',msg:m};
+    }
+    var code=((j.response&&j.response.header)||{}).resultCode;
+    var msg=((j.response&&j.response.header)||{}).resultMsg||'';
+    if(code&&code!=='00'&&code!=='0') return {st:'ERR',code:code,msg:msg};
+    var body=(j.response&&j.response.body)||{};
+    var it=(body.items&&body.items.item)||[];
+    if(!Array.isArray(it)) it=it?[it]:[];
+    return {st:it.length?'OK':'EMPTY',items:it,total:body.totalCount||it.length};
+  }).catch(function(e){
+    return {st:'NET',msg:String(e&&e.message||e).slice(0,120)};
+  });
+}
+
+/* ---------- 화면 그리기 ---------- */
+var EX=[
+  {t:'가평 신하리 162-9',d:'산·임야'},
+  {t:'서울 구로구 신도림동 400-3',d:'대지'},
+  {t:'가평 조종면 신하리 102',d:'임야대장'},
+  {t:'서울 종로구 청운동 2-1',d:'도심'}
+];
+function buildChips(){
+  $('#chips').innerHTML=EX.map(function(e,i){return '<button type="button" data-i="'+i+'">'+esc(e.t)+' <b>'+esc(e.d)+'</b></button>'}).join('');
+  Array.prototype.forEach.call($('#chips').querySelectorAll('button'),function(b){
+    b.addEventListener('click',function(){$('#q').value=EX[+b.getAttribute('data-i')].t;run()});
+  });
+}
+function setHead(t){ $('#hdSt').textContent=t }
+function setQ(t){ $('#qSt').textContent=t }
+
+function paintSum(){
+  $('#cSum').classList.remove('hide');
+  var j=S.jibun||'—';
+  $('#sumJibun').textContent=j;
+  $('#sumArea').textContent=(S.area?num(S.area)+'㎡ · '+num(pyeong(S.area))+'평':'');
+  var rows=[
+    ['주소', S.addr||''],
+    ['PNU', S.pnu||''],
+    ['좌표', (S.lat?S.lat.toFixed(6)+', '+S.lon.toFixed(6):'')],
+    ['지목', (S.toji&&S.toji.lndcgrCodeNm)||'']
+  ];
+  $('#sumRows').innerHTML=rows.filter(function(r){return r[1]}).map(function(r){
+    return '<div class="row"><div class="k">'+r[0]+'</div><div class="v">'+esc(r[1])+'</div></div>'}).join('');
+  $('#sumSt').textContent='필지 확인됨';
+}
+
+function paintToji(){
+  var el=$('#tojiBody');
+  if(!S.toji&&!S.ch){ el.innerHTML=state('err','토지 정보를 받지 못했습니다. 잠시 뒤 다시 조회해 주세요.'); return }
+  var t=S.toji||{}, c=S.ch||{}, p=S.price||{}, h=[];
+  var jibunName=(t.regstrSeCodeNm||'');
+  h.push('<div class="rows">');
+  function row(k,v,sub,em){ if(v==null||v==='')return; h.push('<div class="row"><div class="k">'+k+'</div><div class="v">'+(em?'<em>'+esc(v)+'</em>':esc(v))+(sub?'<small>'+esc(sub)+'</small>':'')+'</div></div>') }
+  row('지번', ((t.regstrSeCodeNm==='임야대장'?'산 ':'')+(t.mnnmSlno||S.jibun||'')), t.ldCodeNm||'');
+  row('지목', t.lndcgrCodeNm||c.lndcgrCodeNm||'', (c.ladUseSittnNm?('이용상황 '+c.ladUseSittnNm):''));
+  row('면적', (t.lndpclAr?num(t.lndpclAr)+'㎡ ('+num(pyeong(t.lndpclAr))+'평)':(S.area?num(S.area)+'㎡':'')), '');
+  row('대장', jibunName||'', (t.ladFrtlScNm?('축척 '+t.ladFrtlScNm):''));
+  row('소유구분', t.posesnSeCodeNm||'', (t.cnrsPsnCo!=null?('공유인수 '+t.cnrsPsnCo):''));
+  row('공시지가', (p.pblntfPclnd?num(p.pblntfPclnd)+'원/㎡':(c.pblntfPclnd?num(c.pblntfPclnd)+'원/㎡':'')), (p.stdrYear?(p.stdrYear+'년 기준 · 공시 '+(p.pblntfDe||'')):''));
+  var unit=+(p.pblntfPclnd||c.pblntfPclnd||0), ar=+(t.lndpclAr||S.area||0);
+  if(unit&&ar) row('공시지가 총액', num(Math.round(unit*ar))+'원', '면적 × ㎡당 공시지가(참고)');
+  row('지형', [c.tpgrphHgCodeNm,c.tpgrphFrmCodeNm].filter(Boolean).join(' · '), (c.roadSideCodeNm?('도로 '+c.roadSideCodeNm):''));
+  row('갱신', t.lastUpdtDt||'', '브이월드 토지임야정보');
+  h.push('</div>');
+  h.push('<p class="note">소유자 개인정보(성명·주민번호)는 공개 API에 없습니다. 소유자 확인은 토지대장 원본(정부24) 또는 <b>인터넷등기소</b>에서 하세요.</p>');
+  h.push('<div class="btnrow"><a class="btn" href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A09001&CappBizCD=13110000017" target="_blank" rel="noopener">정부24 토지대장 발급</a></div>');
+  el.innerHTML=h.join('');
+}
+
+function paintBld(){
+  var el=$('#bldBody'), b=S.bld;
+  if(!b){ el.innerHTML=state('','주소를 넣으면 여기에 표시됩니다'); return }
+  if(b.st==='NOKEY'){
+    el.innerHTML=state('err','공공데이터포털 인증키가 없어 건축물대장만 조회하지 못했습니다.')
+      +'<p class="note">아래 <b>연결 설정</b>에 인증키를 넣으면 이 화면에서 바로 조회됩니다. (무료·자동승인 · 하루 1만 회)</p>'
+      +'<div class="btnrow"><a class="btn main" href="https://www.data.go.kr/data/15134735/openapi.do" target="_blank" rel="noopener">건축물대장 API 활용신청</a></div>'
+      +'<p class="note">신청 화면에서 <b>활용신청</b> → 승인 후 <b>일반 인증키(Encoding)</b>를 복사해 붙여 넣으세요.</p>';
+    return;
+  }
+  if(b.st==='KEYERR'||b.st==='KEYERR2'){ el.innerHTML=state('err','인증키가 승인되지 않았습니다 · '+esc(b.msg||''))+keyHint(); return }
+  if(b.st==='ERR'){ el.innerHTML=state('err','건축물대장 조회 오류 '+esc(b.code||'')+' '+esc(b.msg||''))+keyHint(); return }
+  if(b.st==='NET'||b.st==='BADJSON'){ el.innerHTML=state('err','건축물대장 서버에 연결하지 못했습니다 · '+esc(b.msg||'')); return }
+  if(b.st==='EMPTY'||!b.items||!b.items.length){
+    el.innerHTML=state('ok','이 필지에 <b>건축물대장이 없습니다</b> (건물 미등재 — 나대지·임야 등)')
+      +'<p class="note">건물이 있는데도 안 나오면 지번(산 여부·부번)을 확인하거나 정부24에서 원본을 보세요.</p>';
+    return;
+  }
+  var NM={platPlc:'대지위치',newPlatPlc:'도로명주소',bldNm:'건물명',mainPurpsCdNm:'주용도',etcPurps:'기타용도',
+    strctCdNm:'구조',roofCdNm:'지붕',grndFlrCnt:'지상층',ugrndFlrCnt:'지하층',platArea:'대지면적',
+    archArea:'건축면적',totArea:'연면적',bcRat:'건폐율',vlRat:'용적률',useAprDay:'사용승인일',
+    hhldCnt:'세대수',fmlyCnt:'가구수',mainBldCnt:'주건축물',atchBldCnt:'부속건축물',totPkngCnt:'주차대수',
+    regstrGbCdNm:'대장구분',regstrKindCdNm:'대장종류',mgmBldrgstPk:'관리번호',dongNm:'동명',hoNm:'호명'};
+  var h=['<div class="pbig" style="margin-bottom:6px"><b style="font-size:15px">'+
+        esc(b.items.length+(+b.total>b.items.length?('/'+b.total):''))+'동</b><span>건축물대장 표제부</span></div>'];
+  b.items.slice(0,5).forEach(function(it,i){
+    var nm=it.bldNm||it.platPlc||('건물 '+(i+1));
+    h.push('<div class="bld"><b class="nm">'+esc(nm)+'</b><div class="rows">');
+    ['mainPurpsCdNm','strctCdNm','totArea','platArea','bcRat','vlRat','grndFlrCnt','ugrndFlrCnt','useAprDay','hhldCnt','totPkngCnt','newPlatPlc'].forEach(function(k){
+      var v=it[k]; if(v==null||v===''||v==='0'&&(k==='hhldCnt')) return;
+      var label=NM[k]||k, val=v;
+      if(k==='totArea'||k==='platArea'||k==='archArea') val=num(v,2)+'㎡';
+      if(k==='bcRat'||k==='vlRat') val=num(v,2)+'%';
+      h.push('<div class="row"><div class="k">'+label+'</div><div class="v">'+esc(val)+'</div></div>');
+    });
+    h.push('</div></div>');
+  });
+  h.push('<p class="note">위반건축물·층별 상세는 대장 원문에서 확인하세요. 표제부 요약은 <b>국토교통부 건축HUB</b> 자료입니다.</p>');
+  h.push('<div class="btnrow"><a class="btn" href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A09001&CappBizCD=16110000072" target="_blank" rel="noopener">정부24 건축물대장 발급</a></div>');
+  el.innerHTML=h.join('');
+}
+function keyHint(){ return '<p class="note">연결 설정에서 <b>일반 인증키(Encoding)</b>를 다시 확인해 주세요. 활용신청 승인 직후에는 반영에 몇 분 걸릴 수 있습니다.</p>' }
+
+function paintUse(){
+  var el=$('#useBody'), u=S.use;
+  if(!u){ el.innerHTML=state('err','토지이용계획을 받지 못했습니다.'); return }
+  if(!u.length){ el.innerHTML=state('ok','토지이용계획 자료가 없습니다 · 토지이음에서 확인하세요.'); return }
+  var order={'저촉':1,'포함':2,'접함':3};
+  u.sort(function(a,b){ return (order[a.cnflc]||9)-(order[b.cnflc]||9) });
+  var h=[];
+  var area=[], zone=[], dist=[], etc=[];
+  u.forEach(function(x){
+    var nm=x.nm;
+    if(/지역$/.test(nm)) area.push(x);
+    else if(/지구$/.test(nm)) dist.push(x);
+    else etc.push(x);
+  });
+  function chip(x){
+    var cls=(x.cnflc==='저촉')?'warn':(x.cnflc==='포함'?'blue':'on');
+    return '<span class="tag '+cls+'">'+esc(x.cnflc)+' · '+esc(x.nm)+(x.n>1?(' ×'+x.n):'')+'</span>';
+  }
+  h.push('<div class="rows"><div class="row"><div class="k">총 항목</div><div class="v">'+u.length+'건 <small>저촉 '+u.filter(function(x){return x.cnflc==='저촉'}).length+' · 포함 '+u.filter(function(x){return x.cnflc==='포함'}).length+' · 접함 '+u.filter(function(x){return x.cnflc==='접함'}).length+'</small></div></div></div>');
+  if(area.length){ h.push('<p class="grp">용도지역 · 지역</p><div>'+area.map(chip).join('')+'</div>') }
+  if(dist.length){ h.push('<p class="grp">용도지구</p><div>'+dist.map(chip).join('')+'</div>') }
+  if(etc.length){ h.push('<p class="grp">구역 · 권역 · 제한</p><div>'+etc.map(chip).join('')+'</div>') }
+  h.push('<p class="note"><b>저촉</b>은 그 구역 안에 들어 있다는 뜻(건축·행위 제한), <b>포함</b>·<b>접함</b>은 경계·일부 해당입니다. 최종 판단은 토지이음 확인원과 담당 관청 몫입니다.</p>');
+  h.push('<div class="btnrow"><a class="btn" href="https://www.eum.go.kr/web/am/amMain.jsp" target="_blank" rel="noopener">토지이음에서 확인원 발급</a></div>');
+  el.innerHTML=h.join('');
+}
+
+/* ---------- 지적도 캔버스 ---------- */
+var W=760,H=520;
+function lon2x(lon,z){ return (lon+180)/360*256*Math.pow(2,z) }
+function lat2y(lat,z){ var s=Math.sin(lat*Math.PI/180); return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*256*Math.pow(2,z) }
+function loadImg(url){
+  return new Promise(function(res){
+    var im=new Image(); im.crossOrigin='anonymous';
+    im.onload=function(){res(im)}; im.onerror=function(){res(null)};
+    im.src=url;
+  });
+}
+function tileUrl(mode,z,x,y){
+  if(mode==='base') return WMTS+'/'+encodeURIComponent(S.key)+'/Base/'+z+'/'+y+'/'+x+'.png';
+  return WMTS+'/'+encodeURIComponent(S.key)+'/Satellite/'+z+'/'+y+'/'+x+'.jpeg';
+}
+/* 화면에 맞는 줌 고르기 — 필지 bbox 가 캔버스의 62% 안에 들어오는 가장 큰 줌 */
+function pickZoom(b){
+  for(var z=19;z>=13;z--){
+    var px=(lon2x(b.maxx,z)-lon2x(b.minx,z)), py=(lat2y(b.miny,z)-lat2y(b.maxy,z));
+    if(Math.max(px,py)<Math.max(W,H)*0.55 && px<W*0.72 && py<H*0.72) return z;
+  }
+  return 14;
+}
+function drawMap(cv){
+  var ctx=cv.getContext('2d');
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
+  var b=S.box||(S.rings?bboxOf(S.rings):null);
+  if(!b){ ctx.fillStyle='#0B1729'; ctx.fillRect(0,0,W,H); return Promise.resolve(false) }
+  var z=pickZoom(b), cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
+  var wx=lon2x(cx,z), wy=lat2y(cy,z);
+  var x0=wx-W/2, y0=wy-H/2;               /* 캔버스 좌상단의 월드 픽셀 */
+  var t=256, x1=Math.floor((x0+H*0)/t), tx0=Math.floor(x0/t), tx1=Math.floor((x0+W)/t),
+      ty0=Math.floor(y0/t), ty1=Math.floor((y0+H)/t), n=Math.pow(2,z);
+  var jobs=[];
+  if(S.mode!=='line'){
+    for(var tx=tx0;tx<=tx1;tx++) for(var ty=ty0;ty<=ty1;ty++){
+      var mx=((tx%n)+n)%n, my=ty;
+      if(my<0||my>=n) continue;
+      (function(tx,ty,mx,my){ jobs.push(loadImg(tileUrl(S.mode,z,mx,my)).then(function(im){ if(im) ctx.drawImage(im,tx*t-x0,ty*t-y0,t,t) })) })(tx,ty,mx,my);
+    }
+  } else {
+    ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,W,H);
+  }
+  return Promise.all(jobs).then(function(){
+    /* 경계 그리기 */
+    var dark=(S.mode!=='line');
+    var fs=S.range||[];
+    function path(rings){
+      ctx.beginPath();
+      for(var i=0;i<rings.length;i++){
+        var r=rings[i], st=false;
+        for(var j=0;j<r.length;j++){
+          var p=r[j]; if(!p||!isFinite(p[0])||!isFinite(p[1])) continue;
+          var X=lon2x(p[0],z)-x0, Y=lat2y(p[1],z)-y0;
+          if(!st){ctx.moveTo(X,Y);st=true} else ctx.lineTo(X,Y);
+        }
+        if(st) ctx.closePath();
+      }
+    }
+    /* 남의 땅 먼저 */
+    fs.forEach(function(f){
+      if(S.pnu&&f.pnu===S.pnu) return;
+      path(f.rings);
+      ctx.fillStyle=dark?'rgba(6,14,30,.30)':'rgba(255,107,0,.05)';
+      ctx.fill();
+      ctx.strokeStyle=dark?'rgba(255,255,255,.8)':'rgba(30,42,66,.55)';
+      ctx.lineWidth=1.1; ctx.stroke();
+    });
+    /* 지번 라벨 — 화면에서 큰 필지만 */
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    fs.forEach(function(f){
+      if(!f.jibun) return;
+      var bb=bboxOf(f.rings), w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hgt=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
+      if(w<34||hgt<14) return;
+      var mx=(lon2x(bb.minx,z)+lon2x(bb.maxx,z))/2-x0, my=(lat2y(bb.miny,z)+lat2y(bb.maxy,z))/2-y0;
+      ctx.font='900 10px system-ui,sans-serif';
+      var tw=ctx.measureText(f.jibun).width;
+      ctx.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.85)';
+      ctx.fillRect(mx-tw/2-2.5,my-6.5,tw+5,13);
+      ctx.fillStyle=dark?'#E8EEF8':'#1A2745';
+      ctx.fillText(f.jibun,mx,my);
+    });
+    /* 우리 필지 — 오렌지 굵게 */
+    if(S.rings){
+      path(S.rings);
+      ctx.fillStyle='rgba(255,107,0,.16)'; ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=6; ctx.stroke();
+      ctx.strokeStyle='#FF6B00'; ctx.lineWidth=3.4; ctx.stroke();
+      var tb=bboxOf(S.rings);
+      var lx=(lon2x(tb.minx,z)+lon2x(tb.maxx,z))/2-x0, ly=(lat2y(tb.miny,z)+lat2y(tb.maxy,z))/2-y0;
+      var lab=(S.jibun||'').trim();
+      if(lab){
+        ctx.font='900 13px system-ui,sans-serif';
+        var w2=ctx.measureText(lab).width;
+        ctx.fillStyle='#FF6B00'; ctx.fillRect(lx-w2/2-5,ly-9,w2+10,18);
+        ctx.fillStyle='#0A1124'; ctx.fillText(lab,lx,ly);
+      }
+    }
+    /* 방위·축척·출처 */
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.font='900 11px system-ui,sans-serif';
+    ctx.fillStyle=dark?'rgba(255,255,255,.9)':'rgba(26,39,69,.9)';
+    ctx.beginPath(); ctx.arc(24,26,11,0,Math.PI*2); ctx.fillStyle='rgba(10,17,40,.55)'; ctx.fill();
+    ctx.fillStyle='#FF6B00'; ctx.fillText('N',20,30.5);
+    /* 축척 막대 — 위도 기준 1px 거리 */
+    var mPerPx=156543.03392*Math.cos(cy*Math.PI/180)/Math.pow(2,z);
+    var barM=[1000,500,200,100,50,20,10].filter(function(m){return m/mPerPx>60 && m/mPerPx<200})[0]||50;
+    var barPx=barM/mPerPx;
+    ctx.fillStyle='rgba(10,17,40,.6)'; ctx.fillRect(16,H-38,barPx+16,24);
+    ctx.fillStyle='#FF6B00'; ctx.fillRect(24,H-30,barPx,3);
+    ctx.fillStyle=dark?'#E8EEF8':'#1A2745'; ctx.font='700 10px system-ui,sans-serif';
+    ctx.fillText((barM>=1000?(barM/1000)+'km':barM+'m'),24,H-14);
+    ctx.textAlign='right';
+    ctx.font='700 9.5px system-ui,sans-serif';
+    ctx.fillStyle=dark?'rgba(255,255,255,.62)':'rgba(26,39,69,.65)';
+    ctx.fillText('연속지적도 © Vworld · 참고용',W-10,H-10);
+    return true;
+  });
+}
+
+/* ---------- PNG 저장 ---------- */
+function saveCanvas(cv,name){
+  try{
+    var url=cv.toDataURL('image/png');
+    var a=document.createElement('a'); a.href=url; a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('PNG 저장 · 다운로드 폴더를 보세요');
+  }catch(e){ toast('그림 저장이 막혔습니다 · 화면을 캡처해 주세요') }
+}
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
+function fileName(base){ return 'KTS_'+base+'_'+(S.jibun||'필지').replace(/[^\w가-힣]+/g,'')+'_'+todayStr().replace(/-/g,'')+'.png' }
+
+/* 4대 공부 한 장 — A4 비율 세로 1장 */
+function buildSheet(){
+  var SC=2, w=620*SC, pad=28*SC, y=0, ops=[];
+  function T(text,x,yy,size,color,weight,align){
+    ops.push({t:text,x:x,y:yy,s:size*SC,c:color||'#1A2745',w:weight||'400',a:align||'left'});
+  }
+  function wrap(text,maxW,size,weight){
+    var out=[], line='', words=String(text).split(' ');
+    for(var i=0;i<words.length;i++){
+      var tt=line?line+' '+words[i]:words[i];
+      /* 폭 계산은 대략 — 한글 1자=size, 영문 0.55size */
+      var wid=0; for(var k=0;k<tt.length;k++){ var ch=tt.charCodeAt(k); wid+= (ch>127?1:0.56)*size }
+      if(wid>maxW && line){ out.push(line); line=words[i] } else line=tt;
+    }
+    if(line) out.push(line);
+    return out;
+  }
+  var innerW=w-pad*2;
+  /* 헤더 띠 */
+  var headH=92*SC;
+  /* 본문 블록 수집 */
+  var blocks=[];
+  function sec(title,rows){
+    if(!rows||!rows.length) return;
+    blocks.push({kind:'sec',title:title,rows:rows});
+  }
+  var t=S.toji||{}, c=S.ch||{}, p=S.price||{}, b=S.bld||{};
+  var rows1=[];
+  if(t.mnnmSlno) rows1.push(['지번',(t.regstrSeCodeNm==='임야대장'?'산 ':'')+t.mnnmSlno+(t.ldCodeNm?' · '+t.ldCodeNm:'')]);
+  if(c.lndcgrCodeNm) rows1.push(['지목',c.lndcgrCodeNm+(c.ladUseSittnNm?' · '+c.ladUseSittnNm:'')]);
+  if(t.lndpclAr) rows1.push(['면적',num(t.lndpclAr)+'㎡ ('+num(pyeong(t.lndpclAr))+'평)']);
+  if(t.regstrSeCodeNm) rows1.push(['대장',t.regstrSeCodeNm+(t.ladFrtlScNm?' · 축척 '+t.ladFrtlScNm:'')]);
+  if(t.posesnSeCodeNm) rows1.push(['소유구분',t.posesnSeCodeNm]);
+  var unit=+(p.pblntfPclnd||c.pblntfPclnd||0);
+  if(unit) rows1.push(['공시지가',num(unit)+'원/㎡'+(p.stdrYear?' ('+p.stdrYear+'년)':'')+(t.lndpclAr?' · 총액 '+num(Math.round(unit*+t.lndpclAr))+'원':'')]);
+  if(c.tpgrphHgCodeNm||c.roadSideCodeNm) rows1.push(['지형·도로',[c.tpgrphHgCodeNm,c.tpgrphFrmCodeNm,'도로 '+(c.roadSideCodeNm||'')].filter(Boolean).join(' · ')]);
+  sec('① 토지대장', rows1);
+
+  var rows2=[];
+  if(b.st==='OK'&&b.items&&b.items.length){
+    b.items.slice(0,3).forEach(function(it,i){
+      if(i) rows2.push(['',(it.bldNm||'')+' (건물 '+(i+1)+')']);
+      else rows2.push(['건물',it.bldNm||'—']);
+      if(it.mainPurpsCdNm) rows2.push(['용도',it.mainPurpsCdNm+(it.strctCdNm?' · '+it.strctCdNm:'')]);
+      if(it.totArea) rows2.push(['연면적',num(it.totArea,2)+'㎡']);
+      if(it.grndFlrCnt||it.ugrndFlrCnt) rows2.push(['층수','지상 '+(it.grndFlrCnt||0)+' / 지하 '+(it.ugrndFlrCnt||0)]);
+      if(it.useAprDay) rows2.push(['사용승인',it.useAprDay]);
+    });
+  } else if(b.st==='EMPTY') rows2.push(['건축물','이 필지에 건축물대장 없음']);
+  else rows2.push(['건축물','인증키 미설정 — 조회 안 됨(정부24 원본 확인)']);
+  sec('② 건축물대장', rows2);
+
+  var rows4=[];
+  if(S.use&&S.use.length){
+    S.use.slice(0,10).forEach(function(x){ rows4.push([x.cnflc,x.nm+(x.n>1?' ×'+x.n:'')]) });
+    if(S.use.length>10) rows4.push(['외',(S.use.length-10)+'건 더']);
+  } else rows4.push(['자료','토지이용계획 자료 없음']);
+  sec('④ 토지이용계획', rows4);
+
+  /* 높이 계산 — 본문과 같은 단위(캔버스 px)로 줄을 미리 접는다 */
+  var mapW=innerW, mapH=Math.round(mapW*H/W);
+  var lineSize=11.5*SC, lineAdv=15*SC, labelW=88*SC;
+  blocks.forEach(function(bl){
+    bl.rows.forEach(function(r){ r._lines=wrap(r[1],innerW-labelW,lineSize) });
+  });
+  var yCur=headH+22*SC;
+  blocks.forEach(function(bl){
+    yCur+=26*SC;                     /* 제목 */
+    bl.rows.forEach(function(r){
+      yCur+=Math.max(r._lines.length*lineAdv,lineAdv)+3*SC;
+    });
+    yCur+=14*SC;
+  });
+  yCur+=mapH+30*SC+70*SC;            /* 지적도 + 꼬리말 */
+  var hgt=Math.ceil(yCur);
+  var cv=document.createElement('canvas'); cv.width=w; cv.height=hgt;
+  var g=cv.getContext('2d');
+  g.fillStyle='#FFFFFF'; g.fillRect(0,0,w,hgt);
+  /* 헤더 */
+  g.fillStyle='#0A1128'; g.fillRect(0,0,w,headH);
+  g.fillStyle='#FF6B00'; g.fillRect(0,headH-5*SC,w,5*SC);
+  g.fillStyle='#FFFFFF'; g.font='900 '+(21*SC)+'px system-ui,sans-serif';
+  g.fillText('4대 공부 확인 요약',pad,34*SC);
+  g.fillStyle='#FFA24D'; g.font='900 '+(11*SC)+'px system-ui,sans-serif';
+  g.fillText('토지대장 · 건축물대장 · 지적도 · 토지이용계획',pad,52*SC);
+  g.fillStyle='#AFBDD0'; g.font='700 '+(11*SC)+'px system-ui,sans-serif';
+  g.fillText((S.addr||'')+(S.pnu?'   PNU '+S.pnu:''),pad,70*SC);
+  g.textAlign='right'; g.fillStyle='#7D8BA3';
+  g.fillText('조회 '+todayStr(),w-pad,34*SC);
+  g.textAlign='left';
+  /* 본문 */
+  var yy=headH+14*SC;
+  blocks.forEach(function(bl){
+    yy+=20*SC;
+    g.fillStyle='#FF6B00'; g.fillRect(pad,yy-13*SC,4*SC,15*SC);
+    g.fillStyle='#0A1128'; g.font='900 '+(13.5*SC)+'px system-ui,sans-serif';
+    g.fillText(bl.title,pad+12*SC,yy);
+    yy+=8*SC;
+    bl.rows.forEach(function(r){
+      var lines=r._lines;
+      g.font='800 '+(10.5*SC)+'px system-ui,sans-serif'; g.fillStyle='#7D8BA3';
+      g.fillText(r[0],pad,yy+11*SC);
+      g.font='800 '+(11.5*SC)+'px system-ui,sans-serif'; g.fillStyle='#1A2745';
+      lines.forEach(function(ln,i){ g.fillText(ln,pad+labelW,yy+11*SC+i*lineAdv) });
+      var adv=Math.max(lines.length*lineAdv,lineAdv)+3*SC;
+      yy+=adv;
+      g.strokeStyle='#EDEFF3'; g.lineWidth=1; g.beginPath(); g.moveTo(pad,yy-3*SC); g.lineTo(w-pad,yy-3*SC); g.stroke();
+    });
+    yy+=10*SC;
+  });
+  /* ③ 지적도 */
+  yy+=16*SC;
+  g.fillStyle='#FF6B00'; g.fillRect(pad,yy-13*SC,4*SC,15*SC);
+  g.fillStyle='#0A1128'; g.font='900 '+(13.5*SC)+'px system-ui,sans-serif';
+  g.fillText('③ 지적도',pad+12*SC,yy);
+  yy+=10*SC;
+  try{ g.drawImage($('#map'),pad,yy,mapW,mapH); }catch(e){
+    g.fillStyle='#F1F3F7'; g.fillRect(pad,yy,mapW,mapH);
+    g.fillStyle='#7D8BA3'; g.font='800 '+(12*SC)+'px system-ui,sans-serif'; g.fillText('지적도를 그리지 못했습니다',pad+16,yy+30*SC);
+  }
+  yy+=mapH+18*SC;
+  g.fillStyle='#7D8BA3'; g.font='700 '+(9.5*SC)+'px system-ui,sans-serif';
+  var foot=wrap('자료 · 토지임야정보·토지특성·개별공시지가·토지이용계획·연속지적도 © Vworld(브이월드) · 건축물대장 © 국토교통부 건축HUB / 공공데이터포털. 이 요약은 참고용이며 법적 효력이 없습니다. 공부 원본은 정부24·세움터·토지이음에서 발급받아 확인하세요.',innerW,9.5*SC);
+  foot.forEach(function(ln,i){ g.fillText(ln,pad,yy+i*13*SC) });
+  return cv;
+}
+
+/* ---------- 실행 흐름 ---------- */
+function busy(on){
+  S.busy=on; var b=$('#go'); b.disabled=on; b.textContent=on?'조회 중':'조회';
+}
+function run(){
+  var q=($('#q').value||'').trim();
+  if(!q){ toast('주소나 지번을 한 줄 넣어 주세요'); return }
+  if(S.busy) return;
+  busy(true); setHead('조회 중'); setQ('주소 찾는 중');
+  ['#cSum'].forEach(function(s){ $(s).classList.add('hide') });
+  $('#tojiBody').innerHTML=state('ing','토지대장 조회 중…');
+  $('#bldBody').innerHTML=state('ing','건축물대장 조회 중…');
+  $('#useBody').innerHTML=state('ing','토지이용계획 조회 중…');
+  S.pnu='';S.jibun='';S.rings=null;S.range=null;S.toji=null;S.ch=null;S.price=null;S.use=null;S.bld=null;S.box=null;
+  geocode(q).then(function(g){
+    if(!g) throw new Error('주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 다시 넣어 보세요');
+    S.lat=g.lat; S.lon=g.lon; S.addr=g.text||q;
+    setQ('필지 찾는 중');
+    return parcelAt(g.lat,g.lon);
+  }).then(function(pc){
+    if(!pc||pc.st!=='OK') throw new Error(pc&&pc.st==='NOT_FOUND'?'이 지점의 필지 자료가 없습니다 — 지번을 확인해 주세요':'필지 경계를 읽지 못했습니다 — 잠시 뒤 다시');
+    S.pnu=pc.pnu; S.jibun=pc.jibun; S.rings=pc.rings; S.area=pc.area; if(pc.addr) S.addr=pc.addr;
+    S.box=expand(bboxOf(pc.rings),2.4);
+    paintSum();
+    var jd=+(pc.jiga||0);
+    if(jd) $('#sumRows').insertAdjacentHTML('beforeend','<div class="row"><div class="k">공시지가</div><div class="v">'+num(jd)+'원/㎡ <small>연속지적도 속성</small></div></div>');
+    setQ('4대 공부 받는 중');
+    if(!S.pnu) return null;
+    return Promise.all([
+      nedLand(S.pnu).then(function(v){S.toji=v}),
+      nedChar(S.pnu).then(function(v){S.ch=v}),
+      nedPrice(S.pnu).then(function(v){S.price=v}),
+      nedUse(S.pnu).then(function(v){S.use=v}),
+      bldFetch(S.pnu).then(function(v){S.bld=v}),
+      parcelRange(S.box).then(function(v){S.range=v})
+    ]);
+  }).then(function(){
+    if(!S.toji&&!S.ch) throw new Error('토지 정보를 받지 못했습니다 — 잠시 뒤 다시');
+    paintToji(); paintBld(); paintUse();
+    $('#cSum').classList.remove('hide');
+    setQ('완료'); setHead(S.jibun||'완료');
+    busy(false);
+    return drawMap($('#map')).then(function(){ toast('4대 공부를 받았습니다 · PNG로 저장할 수 있습니다') });
+  }).catch(function(e){
+    busy(false); setQ('실패'); setHead('다시');
+    var m=(e&&e.message)||'조회에 실패했습니다';
+    $('#sumSt').textContent='';
+    if(!S.pnu){ $('#cSum').classList.add('hide') }
+    $('#tojiBody').innerHTML=state('err',esc(m));
+    $('#bldBody').innerHTML=state('err','위 항목에서 멈춰 건축물대장은 조회하지 않았습니다.');
+    $('#useBody').innerHTML=state('err','위 항목에서 멈춰 조회하지 않았습니다.');
+    toast(m);
+  });
+}
+function expand(b,f){
+  var cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2, w=(b.maxx-b.minx)*f, h=(b.maxy-b.miny)*f;
+  var ww=Math.max(w,h*1.3), hh=Math.max(h,w/1.46);
+  return {minx:cx-ww/2,maxx:cx+ww/2,miny:cy-hh/2,maxy:cy+hh/2};
+}
+
+/* ---------- 이벤트 연결 ---------- */
+$('#sf').addEventListener('submit',function(e){e.preventDefault();run()});
+Array.prototype.forEach.call($('#mapTogs').querySelectorAll('button'),function(b){
+  b.addEventListener('click',function(){
+    Array.prototype.forEach.call($('#mapTogs').querySelectorAll('button'),function(x){x.classList.remove('on')});
+    b.classList.add('on'); S.mode=b.getAttribute('data-m');
+    if(S.rings) drawMap($('#map'));
+  });
+});
+$('#bMapPng').addEventListener('click',function(){ if(!S.rings){toast('먼저 주소로 필지를 찾아 주세요');return} saveCanvas($('#map'),fileName('지적도')) });
+$('#bMapPng2').addEventListener('click',function(){ if(!S.rings){toast('먼저 주소로 필지를 찾아 주세요');return} saveCanvas($('#map'),fileName('지적도')) });
+$('#bSheet').addEventListener('click',function(){
+  if(!S.rings){toast('먼저 주소로 필지를 찾아 주세요');return}
+  toast('한 장으로 묶는 중…');
+  setTimeout(function(){ saveCanvas(buildSheet(),fileName('4대공부')) },60);
+});
+$('#dgSave').addEventListener('click',function(){
+  var v=($('#dgk').value||'').trim();
+  if(!v){ toast('인증키를 붙여 넣어 주세요'); return }
+  S.dgk=v; LS.set('kts_gongbu_dg',v); paintKeyState(); toast('인증키를 이 기기에 저장했습니다');
+  if(S.pnu) bldFetch(S.pnu).then(function(r){ S.bld=r; paintBld() });
+});
+function paintKeyState(){
+  var el=$('#keyState');
+  if(!S.dgk){ el.innerHTML=state('err','건축물대장 인증키 <b>없음</b> — ①③④만 조회됩니다'); return }
+  el.innerHTML=state('ok','건축물대장 인증키 <b>저장됨</b> · '+esc(S.dgk.slice(0,6))+'…'+esc(S.dgk.slice(-4)));
+}
+$('#vkNote').innerHTML='지도·토지 자료는 브이월드 키로 연결됩니다 · 서비스 주소 '+DOMAIN+' 전용 키를 씁니다.';
+
+/* 시작 */
+buildChips(); paintKeyState();
+$('#dgk').value=S.dgk||'';
+/* 주소 파라미터 지원: ?q=... */
+var pq=(location.search.match(/[?&]q=([^&]*)/)||[])[1];
+if(pq){ try{ $('#q').value=decodeURIComponent(pq.replace(/\+/g,' ')); run() }catch(e){} }
+window.__KTS_GB=function(){ return {pnu:S.pnu,jibun:S.jibun,area:S.area,
+  toji:!!S.toji,ch:!!S.ch,price:!!S.price,use:(S.use||[]).length,bld:(S.bld&&S.bld.st)||'',range:(S.range||[]).length,mode:S.mode} };
+})();
+</script>
+</body></html>
