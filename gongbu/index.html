@@ -185,7 +185,7 @@ var VW='https://api.vworld.kr', DATA=VW+'/req/data', NED=VW+'/ned/data', API=VW+
     WMTS=VW+'/req/wmts/1.0.0', DG='https://apis.data.go.kr/1613000/BldRgstHubService';
 
 var S={key:(function(){var v=LS.get('kts_gongbu_vk',null);return v==null?VW_DEF:v})(),
-       dgk:(function(){var v=LS.get('kts_gongbu_dg',null);return v==null?DG_DEF:v})(),
+       dgk:(function(){var v=LS.get('kts_gongbu_dg',null);return (v==null||v==='')?DG_DEF:v})(),
        mode:'sat', lat:0,lon:0,addr:'',pnu:'',jibun:'',area:0,rings:null,
        toji:null,ch:null,price:null,use:null,bld:null,box:null,zoomed:false,busy:false};
 
