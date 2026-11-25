@@ -367,15 +367,15 @@ function bldFetch(pnu){
 
 /* ---------- 화면 그리기 ---------- */
 var EX=[
-  {t:'가평 신하리 162-9',d:'산·임야'},
-  {t:'서울 구로구 신도림동 400-3',d:'대지'},
-  {t:'가평 조종면 신하리 102',d:'임야대장'},
-  {t:'서울 종로구 청운동 2-1',d:'도심'}
+  {t:'가평 신하리 162-9',q:'경기도 가평군 조종면 신하리 162-9',d:'전·359㎡'},
+  {t:'가평 신하리 102',q:'경기도 가평군 조종면 신하리 102',d:'임야 2.8만㎡'},
+  {t:'신도림동 400-3',q:'서울특별시 구로구 신도림동 400-3',d:'대지'},
+  {t:'청운동 2-1',q:'서울특별시 종로구 청운동 2-1',d:'도심'}
 ];
 function buildChips(){
   $('#chips').innerHTML=EX.map(function(e,i){return '<button type="button" data-i="'+i+'">'+esc(e.t)+' <b>'+esc(e.d)+'</b></button>'}).join('');
   Array.prototype.forEach.call($('#chips').querySelectorAll('button'),function(b){
-    b.addEventListener('click',function(){$('#q').value=EX[+b.getAttribute('data-i')].t;run()});
+    b.addEventListener('click',function(){var e=EX[+b.getAttribute('data-i')];$('#q').value=e.q||e.t;run()});
   });
 }
 function setHead(t){ $('#hdSt').textContent=t }
@@ -622,43 +622,32 @@ function saveCanvas(cv,name){
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
 function fileName(base){ return 'KTS_'+base+'_'+(S.jibun||'필지').replace(/[^\w가-힣]+/g,'')+'_'+todayStr().replace(/-/g,'')+'.png' }
 
-/* 4대 공부 한 장 — A4 비율 세로 1장 */
+/* 4대 공부 한 장 — 세로 1장(인쇄·전송용) */
 function buildSheet(){
-  var SC=2, w=620*SC, pad=28*SC, y=0, ops=[];
-  function T(text,x,yy,size,color,weight,align){
-    ops.push({t:text,x:x,y:yy,s:size*SC,c:color||'#1A2745',w:weight||'400',a:align||'left'});
-  }
-  function wrap(text,maxW,size,weight){
+  var SC=2, w=620*SC, pad=28*SC;
+  function wrap(text,maxW,size){
     var out=[], line='', words=String(text).split(' ');
     for(var i=0;i<words.length;i++){
-      var tt=line?line+' '+words[i]:words[i];
-      /* 폭 계산은 대략 — 한글 1자=size, 영문 0.55size */
-      var wid=0; for(var k=0;k<tt.length;k++){ var ch=tt.charCodeAt(k); wid+= (ch>127?1:0.56)*size }
+      var tt=line?line+' '+words[i]:words[i], wid=0;
+      for(var k=0;k<tt.length;k++){ var ch=tt.charCodeAt(k); wid+=(ch>127?1:0.56)*size }
       if(wid>maxW && line){ out.push(line); line=words[i] } else line=tt;
     }
     if(line) out.push(line);
     return out;
   }
-  var innerW=w-pad*2;
-  /* 헤더 띠 */
-  var headH=92*SC;
-  /* 본문 블록 수집 */
-  var blocks=[];
-  function sec(title,rows){
-    if(!rows||!rows.length) return;
-    blocks.push({kind:'sec',title:title,rows:rows});
-  }
+  var innerW=w-pad*2, headH=92*SC;
+  var lineSize=11.5*SC, lineAdv=15*SC, labelW=88*SC;
   var t=S.toji||{}, c=S.ch||{}, p=S.price||{}, b=S.bld||{};
+
   var rows1=[];
   if(t.mnnmSlno) rows1.push(['지번',(t.regstrSeCodeNm==='임야대장'?'산 ':'')+t.mnnmSlno+(t.ldCodeNm?' · '+t.ldCodeNm:'')]);
-  if(c.lndcgrCodeNm) rows1.push(['지목',c.lndcgrCodeNm+(c.ladUseSittnNm?' · '+c.ladUseSittnNm:'')]);
+  if(c.lndcgrCodeNm) rows1.push(['지목',c.lndcgrCodeNm+(c.ladUseSittnNm&&c.ladUseSittnNm!==c.lndcgrCodeNm?' · '+c.ladUseSittnNm:'')]);
   if(t.lndpclAr) rows1.push(['면적',num(t.lndpclAr)+'㎡ ('+num(pyeong(t.lndpclAr))+'평)']);
   if(t.regstrSeCodeNm) rows1.push(['대장',t.regstrSeCodeNm+(t.ladFrtlScNm?' · 축척 '+t.ladFrtlScNm:'')]);
   if(t.posesnSeCodeNm) rows1.push(['소유구분',t.posesnSeCodeNm]);
   var unit=+(p.pblntfPclnd||c.pblntfPclnd||0);
   if(unit) rows1.push(['공시지가',num(unit)+'원/㎡'+(p.stdrYear?' ('+p.stdrYear+'년)':'')+(t.lndpclAr?' · 총액 '+num(Math.round(unit*+t.lndpclAr))+'원':'')]);
-  if(c.tpgrphHgCodeNm||c.roadSideCodeNm) rows1.push(['지형·도로',[c.tpgrphHgCodeNm,c.tpgrphFrmCodeNm,'도로 '+(c.roadSideCodeNm||'')].filter(Boolean).join(' · ')]);
-  sec('① 토지대장', rows1);
+  if(c.tpgrphHgCodeNm||c.roadSideCodeNm) rows1.push(['지형·도로',[c.tpgrphHgCodeNm,c.tpgrphFrmCodeNm,c.roadSideCodeNm?('도로 '+c.roadSideCodeNm):''].filter(Boolean).join(' · ')]);
 
   var rows2=[];
   if(b.st==='OK'&&b.items&&b.items.length){
@@ -672,35 +661,37 @@ function buildSheet(){
     });
   } else if(b.st==='EMPTY') rows2.push(['건축물','이 필지에 건축물대장 없음']);
   else rows2.push(['건축물','인증키 미설정 — 조회 안 됨(정부24 원본 확인)']);
-  sec('② 건축물대장', rows2);
 
   var rows4=[];
   if(S.use&&S.use.length){
     S.use.slice(0,10).forEach(function(x){ rows4.push([x.cnflc,x.nm+(x.n>1?' ×'+x.n:'')]) });
     if(S.use.length>10) rows4.push(['외',(S.use.length-10)+'건 더']);
   } else rows4.push(['자료','토지이용계획 자료 없음']);
-  sec('④ 토지이용계획', rows4);
 
-  /* 높이 계산 — 본문과 같은 단위(캔버스 px)로 줄을 미리 접는다 */
+  var A=[], B=[];
+  function sec(arr,title,rows){
+    if(!rows||!rows.length) return;
+    rows.forEach(function(r){ r._lines=wrap(r[1],innerW-labelW,lineSize) });
+    arr.push({title:title,rows:rows});
+  }
+  sec(A,'① 토지대장',rows1);
+  sec(A,'② 건축물대장',rows2);
+  sec(B,'④ 토지이용계획',rows4);
+
   var mapW=innerW, mapH=Math.round(mapW*H/W);
-  var lineSize=11.5*SC, lineAdv=15*SC, labelW=88*SC;
-  blocks.forEach(function(bl){
-    bl.rows.forEach(function(r){ r._lines=wrap(r[1],innerW-labelW,lineSize) });
-  });
-  var yCur=headH+22*SC;
-  blocks.forEach(function(bl){
-    yCur+=26*SC;                     /* 제목 */
-    bl.rows.forEach(function(r){
-      yCur+=Math.max(r._lines.length*lineAdv,lineAdv)+3*SC;
-    });
-    yCur+=14*SC;
-  });
-  yCur+=mapH+30*SC+70*SC;            /* 지적도 + 꼬리말 */
-  var hgt=Math.ceil(yCur);
+  function blockH(bl){
+    var h=28*SC;
+    bl.rows.forEach(function(r){ h+=Math.max(r._lines.length*lineAdv,lineAdv)+3*SC });
+    return h+10*SC;
+  }
+  function sumH(list){ var s=0; list.forEach(function(bl){ s+=blockH(bl) }); return s }
+  var mapBlockH=28*SC+mapH+18*SC, footH=64*SC;
+  var hgt=Math.ceil(headH+22*SC+sumH(A)+mapBlockH+sumH(B)+footH);
+
   var cv=document.createElement('canvas'); cv.width=w; cv.height=hgt;
   var g=cv.getContext('2d');
   g.fillStyle='#FFFFFF'; g.fillRect(0,0,w,hgt);
-  /* 헤더 */
+  /* 헤더 띠 */
   g.fillStyle='#0A1128'; g.fillRect(0,0,w,headH);
   g.fillStyle='#FF6B00'; g.fillRect(0,headH-5*SC,w,5*SC);
   g.fillStyle='#FFFFFF'; g.font='900 '+(21*SC)+'px system-ui,sans-serif';
@@ -709,40 +700,44 @@ function buildSheet(){
   g.fillText('토지대장 · 건축물대장 · 지적도 · 토지이용계획',pad,52*SC);
   g.fillStyle='#AFBDD0'; g.font='700 '+(11*SC)+'px system-ui,sans-serif';
   g.fillText((S.addr||'')+(S.pnu?'   PNU '+S.pnu:''),pad,70*SC);
-  g.textAlign='right'; g.fillStyle='#7D8BA3';
+  g.textAlign='right'; g.fillStyle='#7D8BA3'; g.font='700 '+(11*SC)+'px system-ui,sans-serif';
   g.fillText('조회 '+todayStr(),w-pad,34*SC);
   g.textAlign='left';
-  /* 본문 */
+
   var yy=headH+14*SC;
-  blocks.forEach(function(bl){
+  function title(txt){
     yy+=20*SC;
     g.fillStyle='#FF6B00'; g.fillRect(pad,yy-13*SC,4*SC,15*SC);
     g.fillStyle='#0A1128'; g.font='900 '+(13.5*SC)+'px system-ui,sans-serif';
-    g.fillText(bl.title,pad+12*SC,yy);
+    g.fillText(txt,pad+12*SC,yy);
     yy+=8*SC;
+  }
+  function drawSec(bl){
+    title(bl.title);
     bl.rows.forEach(function(r){
       var lines=r._lines;
       g.font='800 '+(10.5*SC)+'px system-ui,sans-serif'; g.fillStyle='#7D8BA3';
       g.fillText(r[0],pad,yy+11*SC);
       g.font='800 '+(11.5*SC)+'px system-ui,sans-serif'; g.fillStyle='#1A2745';
       lines.forEach(function(ln,i){ g.fillText(ln,pad+labelW,yy+11*SC+i*lineAdv) });
-      var adv=Math.max(lines.length*lineAdv,lineAdv)+3*SC;
-      yy+=adv;
+      yy+=Math.max(lines.length*lineAdv,lineAdv)+3*SC;
       g.strokeStyle='#EDEFF3'; g.lineWidth=1; g.beginPath(); g.moveTo(pad,yy-3*SC); g.lineTo(w-pad,yy-3*SC); g.stroke();
     });
     yy+=10*SC;
-  });
-  /* ③ 지적도 */
-  yy+=16*SC;
-  g.fillStyle='#FF6B00'; g.fillRect(pad,yy-13*SC,4*SC,15*SC);
-  g.fillStyle='#0A1128'; g.font='900 '+(13.5*SC)+'px system-ui,sans-serif';
-  g.fillText('③ 지적도',pad+12*SC,yy);
-  yy+=10*SC;
+  }
+  A.forEach(drawSec);
+  /* ③ 지적도 — ②와 ④ 사이 */
+  yy+=6*SC;
+  title('③ 지적도');
   try{ g.drawImage($('#map'),pad,yy,mapW,mapH); }catch(e){
     g.fillStyle='#F1F3F7'; g.fillRect(pad,yy,mapW,mapH);
-    g.fillStyle='#7D8BA3'; g.font='800 '+(12*SC)+'px system-ui,sans-serif'; g.fillText('지적도를 그리지 못했습니다',pad+16,yy+30*SC);
+    g.fillStyle='#7D8BA3'; g.font='800 '+(12*SC)+'px system-ui,sans-serif';
+    g.fillText('지적도를 그리지 못했습니다',pad+16,yy+30*SC);
   }
   yy+=mapH+18*SC;
+  B.forEach(drawSec);
+  /* 꼬리말 */
+  yy+=6*SC;
   g.fillStyle='#7D8BA3'; g.font='700 '+(9.5*SC)+'px system-ui,sans-serif';
   var foot=wrap('자료 · 토지임야정보·토지특성·개별공시지가·토지이용계획·연속지적도 © Vworld(브이월드) · 건축물대장 © 국토교통부 건축HUB / 공공데이터포털. 이 요약은 참고용이며 법적 효력이 없습니다. 공부 원본은 정부24·세움터·토지이음에서 발급받아 확인하세요.',innerW,9.5*SC);
   foot.forEach(function(ln,i){ g.fillText(ln,pad,yy+i*13*SC) });
@@ -840,6 +835,15 @@ $('#vkNote').innerHTML='지도·토지 자료는 브이월드 키로 연결됩�
 
 /* 시작 */
 buildChips(); paintKeyState();
+(function placeholder(){
+  var cv=$('#map'), g=cv.getContext('2d');
+  g.fillStyle='#0B1729'; g.fillRect(0,0,W,H);
+  g.fillStyle='#4A5C7A'; g.font='800 14px system-ui,sans-serif'; g.textAlign='center';
+  g.fillText('주소를 넣으면 지적도가 그려집니다',W/2,H/2-6);
+  g.font='700 11.5px system-ui,sans-serif'; g.fillStyle='#3B4C68';
+  g.fillText('필지 경계 · 지번 · 위성사진 위에 겹쳐서',W/2,H/2+18);
+  g.textAlign='left';
+})();
 $('#dgk').value=S.dgk||'';
 /* 주소 파라미터 지원: ?q=... */
 var pq=(location.search.match(/[?&]q=([^&]*)/)||[])[1];
