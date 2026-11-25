@@ -418,7 +418,8 @@ function paintToji(){
   h.push('<div class="rows">');
   function row(k,v,sub,em){ if(v==null||v==='')return; h.push('<div class="row"><div class="k">'+k+'</div><div class="v">'+(em?'<em>'+esc(v)+'</em>':esc(v))+(sub?'<small>'+esc(sub)+'</small>':'')+'</div></div>') }
   row('지번', ((t.regstrSeCodeNm==='임야대장'?'산 ':'')+(t.mnnmSlno||S.jibun||'')), t.ldCodeNm||'');
-  row('지목', t.lndcgrCodeNm||c.lndcgrCodeNm||'', (c.ladUseSittnNm?('이용상황 '+c.ladUseSittnNm):''));
+  var jmok=t.lndcgrCodeNm||c.lndcgrCodeNm||'';
+  row('지목', jmok, (c.ladUseSittnNm&&c.ladUseSittnNm!==jmok?('이용상황 '+c.ladUseSittnNm):''));
   row('면적', (t.lndpclAr?num(t.lndpclAr)+'㎡ ('+num(pyeong(t.lndpclAr))+'평)':(S.area?num(S.area)+'㎡':'')), '');
   row('대장', jibunName||'', (t.ladFrtlScNm?('축척 '+t.ladFrtlScNm):''));
   row('소유구분', t.posesnSeCodeNm||'', (t.cnrsPsnCo!=null?('공유인수 '+t.cnrsPsnCo):''));
