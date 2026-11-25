@@ -634,12 +634,22 @@ function drawMap(cv){
 
 /* ---------- PNG 저장 ---------- */
 function saveCanvas(cv,name){
-  try{
-    var url=cv.toDataURL('image/png');
-    var a=document.createElement('a'); a.href=url; a.download=name;
-    document.body.appendChild(a); a.click(); a.remove();
-    toast('PNG 저장 · 다운로드 폴더를 보세요');
-  }catch(e){ toast('그림 저장이 막혔습니다 · 화면을 캡처해 주세요') }
+  function dl(url,revoke){
+    try{
+      var a=document.createElement('a'); a.href=url; a.download=name; a.rel='noopener';
+      document.body.appendChild(a); a.click(); a.remove();
+      if(revoke) setTimeout(function(){ try{URL.revokeObjectURL(url)}catch(e){} },5000);
+      toast('PNG 저장 · 다운로드 폴더를 보세요');
+    }catch(e){ toast('그림 저장이 막혔습니다 · 화면을 캡처해 주세요') }
+  }
+  function dataUrl(){
+    try{ dl(cv.toDataURL('image/png'),false) }catch(e){ toast('그림 저장이 막혔습니다 · 화면을 캡처해 주세요') }
+  }
+  /* 폰 크롬은 blob 쪽이 큰 그림(1MB 넘음)에서 더 안전하다 — 안 되면 data URL 로 */
+  if(cv.toBlob){
+    try{ cv.toBlob(function(b){ if(b){ try{ dl(URL.createObjectURL(b),true) }catch(e){ dataUrl() } } else dataUrl() },'image/png') }
+    catch(e){ dataUrl() }
+  } else dataUrl();
 }
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
 function fileName(base){ return 'KTS_'+base+'_'+(S.jibun||'필지').replace(/[^\w가-힣]+/g,'')+'_'+todayStr().replace(/-/g,'')+'.png' }
