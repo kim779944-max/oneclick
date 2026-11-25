@@ -14,8 +14,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
- background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:flex;justify-content:center;min-height:100vh;word-break:keep-all}
-#app{width:100%;max-width:460px;min-height:100vh;position:relative;overflow-x:hidden;
+ background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:block;min-height:100vh;word-break:keep-all}
+#app{width:100%;max-width:460px;min-height:100vh;position:relative;overflow-x:hidden;margin:0 auto;
  background:radial-gradient(120% 50% at 50% -6%,rgba(255,107,0,.10) 0%,rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A 0%,#0C1730 46%,#0A1128 100%)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:-.2px}
 input,select,textarea{font:inherit;color:var(--ink);background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 11px;width:100%;font-size:14px}
@@ -46,6 +46,8 @@ main{padding:12px 14px 120px}
 .picks button{font-size:12px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:10px 6px;line-height:1.3}
 .picks button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
 .mini{font-size:10.5px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:4px 9px;margin-left:auto}
+.prow{display:flex;gap:6px;align-items:center;margin:7px 0 2px}
+.prow .mini{margin-left:0;font-size:11px;padding:8px 12px;border-radius:10px;min-height:34px}
 .thm{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .thm button{flex:1;min-width:68px;font-size:12px;font-weight:900;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 6px;display:flex;align-items:center;gap:6px;justify-content:center}
 .thm button.on{color:var(--on-amber);border-color:var(--amber);background:linear-gradient(135deg,var(--amber),var(--amber2))}
@@ -100,12 +102,15 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 .sealit em{display:block;font-style:normal;font-size:10.5px;font-weight:900;color:#33415C;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sealit.on{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,107,0,.35)}
 .sealit .sdel{position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#DC2626;color:#fff;font-size:11px;font-weight:900;font-style:normal;display:grid;place-items:center;cursor:pointer}
+/* 결과 전체뷰(공용 ux.js)가 A4 원본 크기로 그려지지 않도록 — 이 화면 안에서만 */
+.kux-full .body img{width:100%;max-width:100%;height:auto;display:block}
 @media print{
- body{background:#fff;display:block}
- #app,.bar,#toast,#busy{display:none!important}
- #printArea{display:block}
- #printArea img{width:100%;display:block;page-break-after:always}
- #printArea img:last-child{page-break-after:auto}
+ html,body{background:#fff;display:block;height:auto}
+ body>*{display:none!important}          /* 확인하기·전체뷰·저장·공유 막대, 워터마크, 안내까지 모두 종이에서 뺀다 */
+ #printArea{display:block!important}
+ #printArea .kuxwm,#printArea .kuxguide,#printArea .kux-flow{display:none!important}   /* 종이에는 계약서만 */
+ #printArea img{width:100%;display:block;page-break-after:always;break-after:page}
+ #printArea img:last-child{page-break-after:auto;break-after:auto}
  @page{size:A4;margin:0}
 }
 </style>
@@ -144,11 +149,11 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 <section class="scr" id="s1">
  <div class="card">
   <h2><span class="n">1</span><span id="s1t">당사자 정보</span><button type="button" class="newb" id="otherForm">다른 양식</button></h2>
-  <p class="sub">카드 위 [📷 신분증]을 누르면 그 사람 칸(성명·주민번호·주소·전화)만 채웁니다. 물건 소재지는 건드리지 않습니다.</p>
+  <p class="sub">카드마다 있는 [📷 신분증으로 채우기]를 누르면 그 사람 칸(성명·주민번호·주소·전화)만 채웁니다. 물건 소재지는 건드리지 않습니다.</p>
  </div>
  <div id="partyWrap"></div>
  <div class="fillrow"><button type="button" id="vFill">🎤 말로 채우기</button></div>
- <p class="fillinfo" id="fillInfo">칸을 누른 뒤 마이크에 대고 말하면 그 칸에 들어갑니다. 카드 위 [📷 신분증]은 그 사람 칸(성명·주민번호·주소·전화)만 채우고 물건 소재지는 건드리지 않습니다.</p>
+ <p class="fillinfo" id="fillInfo">칸을 누른 뒤 마이크에 대고 말하면 그 칸에 들어갑니다. 카드의 [📷 신분증으로 채우기]는 그 사람 칸(성명·주민번호·주소·전화)만 채우고 물건 소재지는 건드리지 않습니다.</p>
  <input type="file" id="pIn" accept="image/*" hidden>
 </section>
 <!-- 2 내용 -->
@@ -178,7 +183,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
   <canvas class="pv" id="pvCv"></canvas>
   <div id="thmBox2"></div>
   <div class="missbox" id="missBox"></div>
-  <label class="lb">인쇄 부수</label>
+  <label class="lb">인쇄 · 사진 부수<em>인쇄와 사진 저장에 같이 적용</em></label>
   <div class="seg" id="cpSeg"><button data-cp="1">1부</button><button data-cp="2">2부</button><button data-cp="3">3부</button></div>
   <label class="lb">간인 — 쪽 경계에 반씩<em>2쪽 이상 계약서</em></label>
   <div class="seg" id="ganSeg"><button data-v="0">안 함</button><button data-v="seal">도장 간인</button><button data-v="sign">사인 간인</button></div>
@@ -188,7 +193,7 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
   <p class="kv" id="ganInfo">간인을 켜면 도장을 고르거나 서명을 해 두어야 합니다 · 부수(2부·3부)는 같은 자리에 되풀이해 찍힙니다.</p>
   <div class="row"><button class="btn pri" id="printBtn">인쇄 · PDF 저장</button></div>
   <div class="row"><button class="btn sec" id="pngBtn">사진(PNG)으로 저장</button></div>
-  <p class="kv" id="outInfo">A4 한 장 그대로 나갑니다. 화면에 보이는 그대로 인쇄되어 틀림이 없습니다.</p>
+  <p class="kv" id="outInfo">A4 한 장 그대로 나갑니다. 부수를 2부·3부로 고르면 인쇄와 사진 저장 모두 그 수만큼 나옵니다.</p>
  </div>
 </section>
 
@@ -354,11 +359,15 @@ function renderParty(){
   let h = '';
   const ORD = {name:0, rrn:1, addr:2, tel:3, office_addr:4, office:5, bizno:6, rep:7, thing:8};
   const okind = x => { const k = kindOf(x.label); return ORD[k] == null ? 9 : ORD[k]; };
+  /* 공동명의·대리인 칸은 그 사람(본인) 뒤에 따로 모아 — 같은 이름 라벨이 붙어 보이지 않게 */
+  const sub = x => /(공동명의|대리인)/.test(String(x.label || '')) ? 1 : 0;
   ['a', 'b', 'c'].forEach(g => {
     const list = f.fields.filter(x => x.grp === g && x.type !== 'sign')
-      .map((x, i) => ({x, i})).sort((p, q) => (okind(p.x) - okind(q.x)) || (p.i - q.i)).map(o => o.x);
+      .map((x, i) => ({x, i})).sort((p, q) => (sub(p.x) - sub(q.x)) || (sub(p.x) ? (p.i - q.i) : ((okind(p.x) - okind(q.x)) || (p.i - q.i)))).map(o => o.x);
     if (!list.length) return;
-    h += `<div class="card"><h2><span class="n">${tag[g]}</span>${escH(role[g] || '')}<button type="button" class="mini" data-photo="${g}">📷 신분증</button></h2><div>${fieldsHtml(list)}</div></div>`;
+    h += `<div class="card"><h2><span class="n">${tag[g]}</span>${escH(role[g] || '')}</h2>`
+      + `<div class="prow"><button type="button" class="mini" data-photo="${g}">📷 신분증으로 채우기</button></div>`
+      + `<div>${fieldsHtml(list)}</div></div>`;
   });
   if (!h) h = `<div class="card"><p class="sub">이 양식은 당사자 칸이 없습니다. [다음]으로 넘어가세요.</p></div>`;
   $('#partyWrap').innerHTML = h;
@@ -461,6 +470,77 @@ function bindSig(cv, f){
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
 }
 
+/* ---------- 222 이름 도장 — 종이에 찍은 실물 같은 세로 타원 인주 도장 ----------
+   · 세로 타원 테두리(가장자리가 살짝 일그러진 인주 선)
+   · 안을 꽉 채우는 두꺼운 인장 글씨(획을 덧그려 굵게)
+   · 빨간 인주 번짐·번진 테두리·군데군데 묻은 결 ---------- */
+function inkStamp(name){
+  const nm = String(name || '').replace(/\s+/g, '').slice(0, 4) || '도장';
+  const W = 420, H = 560, cx = W / 2, cy = H / 2, rx = W * 0.445, ry = H * 0.455;
+  const RED = '#BF1F26';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = RED; g.strokeStyle = RED; g.lineJoin = 'round'; g.lineCap = 'round';
+  let seed = 99173;
+  const rnd = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
+  /* 테두리 — 찍힌 도장처럼 살짝 일그러진 선을 세 겹(바깥 번짐 · 본선 · 안쪽 번짐) */
+  const ring = (lw, wob, alpha) => {
+    g.save(); g.globalAlpha = alpha; g.lineWidth = lw; g.beginPath();
+    const N = 240;
+    for (let i = 0; i <= N; i++){
+      const a = i / N * Math.PI * 2;
+      const k = 1 + wob * Math.sin(a * 3 + 1.1) + wob * 0.6 * Math.sin(a * 7 + 2.3) + wob * 0.35 * Math.sin(a * 13 + 0.4);
+      const x = cx + Math.cos(a) * rx * k, y = cy + Math.sin(a) * ry * k;
+      if (i) g.lineTo(x, y); else g.moveTo(x, y);
+    }
+    g.closePath(); g.stroke(); g.restore();
+  };
+  ring(34, 0.013, 0.34);
+  ring(25, 0.011, 1);
+  ring(11, 0.020, 0.30);
+  /* 글자 배치 — 타원 안쪽 칸(칸 크기 ÷ 글자 실제 크기)에 맞춰 넘치지 않게 앉힌다
+     1~3자 세로 한 줄, 4자 2×2 (오른쪽 줄부터) */
+  const chars = nm.split(''), n = chars.length;
+  const innerRx = rx * 0.66, innerRy = ry * 0.72;
+  const rows = n <= 3 ? n : 2, cols = n <= 3 ? 1 : 2;
+  const cellH = (innerRy * 2) / rows, cellW = (innerRx * 2) / cols;
+  const fs = Math.min(cellH / 1.14, cellW / 1.05);     /* 한글 획 높이≈0.94em + 획 굵기 여유 */
+  const idx = n === 4 ? [0, 1, 2, 3] : chars.map((c, i) => i);
+  const slots = idx.map(i => {
+    const r = n === 4 ? (i % 2) : i;                    /* 4자: 0·2가 웃줄, 1·3이 아랫줄 */
+    const c = n === 4 ? (i < 2 ? 1 : 0) : 0;            /* 오른쪽 줄부터 */
+    return { c: chars[i], x: (c - (cols - 1) / 2) * cellW, y: (r - (rows - 1) / 2) * cellH };
+  });
+  const FONT_SEAL = '"Noto Serif KR","Nanum Myeongjo","Batang","Malgun Gothic",serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  slots.forEach(s => {
+    g.save(); g.translate(cx + s.x, cy + s.y); g.rotate((rnd() - 0.5) * 0.03);
+    g.font = '900 ' + Math.round(fs) + 'px ' + FONT_SEAL;
+    g.fillText(s.c, 0, 0);
+    g.lineWidth = fs * 0.07; g.strokeText(s.c, 0, 0);   /* 획을 덧그어 인장처럼 두껍게 */
+    g.restore();
+  });
+  /* 인주 결 — 픽셀마다 농담을 흔들고 곳곳에 작은 빈틈(안 찍힌 자리)을 낸다 */
+  const id = g.getImageData(0, 0, W, H), d = id.data;
+  for (let i = 0; i < d.length; i += 4){
+    if (!d[i + 3]) continue;
+    const r = rnd();
+    d[i + 3] = Math.round(d[i + 3] * (0.80 + r * 0.28));
+    if (r > 0.9955) d[i + 3] = 0;
+    d[i] = Math.min(255, Math.round(d[i] * (0.94 + rnd() * 0.12)));
+  }
+  g.putImageData(id, 0, 0);
+  /* 바깥에 튄 인주 방울 */
+  for (let i = 0; i < 26; i++){
+    const a = rnd() * Math.PI * 2, k = 1.02 + rnd() * 0.06;
+    g.globalAlpha = 0.25 + rnd() * 0.45;
+    g.beginPath(); g.arc(cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k, 0.8 + rnd() * 2.4, 0, Math.PI * 2); g.fill();
+  }
+  g.globalAlpha = 1;
+  return cv.toDataURL('image/png');
+}
+
 /* ---------- 188 간인 · 도장 (2부·3부) — 도장함은 공통 모듈 shared/kts-seal.js ---------- */
 let GANC = {src:'', img:null};
 function firstSign(){
@@ -515,7 +595,7 @@ if ($('#ganSeg')){
   };
   $('#cSealName').onclick = () => {
     const nm = prompt('도장에 새길 이름 (2~4자)', ''); if (!nm) return;
-    const a = KTSSeal.save({nm: nm.slice(0, 4), src: KTSSeal.fromName(nm, 'circle')});
+    const a = KTSSeal.save({nm: nm.slice(0, 4), src: inkStamp(nm)});
     if (a[0]){ S.seal = a[0].id; save(); }
     renderSeal(); toast('이름 도장을 만들었습니다 · 미리보기에 나옵니다');
   };
@@ -537,6 +617,39 @@ function wrapText(g, text, maxW){
     out.push(line);
   });
   return out;
+}
+/* 종이에 찍혀 있는 점선(밑줄)의 위치 — 양식 그림에서 직접 읽어 캐시한다(%-좌표)
+   특약 글자가 원본 점선을 관통하지 않게, 한 줄씩 이 선 위에 앉힌다. */
+const RULE_CACHE = {};
+function ruleLinesOf(IM, pg, f){
+  const key = curForm().id + '|' + pg + '|' + f.id;
+  if (RULE_CACHE[key] !== undefined) return RULE_CACHE[key];
+  RULE_CACHE[key] = [];
+  try{
+    if (!IM) return RULE_CACHE[key];
+    const W = IM.naturalWidth || IM.width, H = IM.naturalHeight || IM.height;
+    const x0 = Math.max(0, Math.round(f.x / 100 * W)), y0 = Math.max(0, Math.round(f.y / 100 * H));
+    const w = Math.min(W - x0, Math.round(f.w / 100 * W)), h = Math.min(H - y0, Math.round(f.h / 100 * H));
+    if (w < 12 || h < 12) return RULE_CACHE[key];
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const cg = cv.getContext('2d'); cg.drawImage(IM, x0, y0, w, h, 0, 0, w, h);
+    const d = cg.getImageData(0, 0, w, h).data;
+    const rows = [];
+    for (let ry = 0; ry < h; ry++){
+      let n = 0;
+      for (let rx = 0; rx < w; rx++){ const i = (ry * w + rx) * 4;
+        if (d[i + 3] > 40 && (d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114) < 175) n++; }
+      rows.push(n / w);
+    }
+    const out = []; let s = -1;
+    for (let ry = 0; ry <= h; ry++){
+      const on = ry < h && rows[ry] > 0.12;
+      if (on && s < 0) s = ry;
+      if (!on && s >= 0){ if (ry - s <= 3) out.push((s + ry - 1) / 2); s = -1; }   /* 3px 이하 얇은 줄만 = 점선 */
+    }
+    if (out.length >= 2) RULE_CACHE[key] = out.map(y => (y0 + y) / H * 100);
+  }catch(e){ RULE_CACHE[key] = []; }
+  return RULE_CACHE[key];
 }
 async function composite(maxW, pg){
   pg = pg || 1;
@@ -561,28 +674,45 @@ async function composite(maxW, pg){
       continue;
     }
     const t = f.money ? (/^\d+$/.test(String(v)) ? comma(v) : String(v)) : String(v);
+    const fw = f.money ? 600 : 500;
+    const MINFS = Math.max(7, 9 * cv.width / 1489);          /* 더 줄이면 읽을 수 없다 → 가로로만 살짝 눌러 넣는다 */
     let fs = f.fs ? f.fs * (cv.width / 1489) : Math.min(h * 0.62, FS0);
-    const fw = f.money ? 600 : 500, pad = Math.max(3, fs * 0.3);
-    g.fillStyle = '#10204A'; g.textBaseline = 'middle';
+    let pad = Math.max(2, fs * 0.22);
+    g.fillStyle = '#10204A';
     g.font = fw + ' ' + fs + 'px ' + FONT;
-    while (fs > 6 && g.measureText(t).width > w - pad * 2 && (f.fit || h < fs * 2.6) && !f.top && !f.multi){ fs -= .5; g.font = fw + ' ' + fs + 'px ' + FONT; }
-    if (f.top || f.multi || (!f.fit && g.measureText(t).width > w - pad * 2 && h >= fs * 2.6)){
-      let lines = wrapText(g, t, w - pad * 2), lh = fs * 1.32;
-      if (f.shrink){
-        const fmin = 11 * (cv.width / 1489);
-        while (lines.length * lh + pad > h && fs > fmin){ fs = Math.max(fmin, fs - .5 * (cv.width / 1489)); g.font = fw + ' ' + fs + 'px ' + FONT; lines = wrapText(g, t, w - pad * 2); lh = fs * 1.32; }
-        if (lines.length * lh + pad > h) toast('특약이 너무 깁니다 — 줄이거나 글자를 줄여 주세요');
+    const para = !!(f.top || f.multi);
+    const rules = para ? ruleLinesOf(IM, pg, f).map(p => p / 100 * cv.height) : [];
+    if (para){
+      /* ---- 여러 줄(특약 등): 종이의 점선에 한 줄씩 앉힌다 ---- */
+      const avail = w - pad * 2;
+      let step = 0;
+      if (rules.length >= 2){
+        const gaps = []; for (let i = 1; i < rules.length; i++) gaps.push(rules[i] - rules[i - 1]);
+        gaps.sort((a, b) => a - b); step = gaps[gaps.length >> 1];
+        if (step > 0 && fs > step * 0.8){ fs = step * 0.8; g.font = fw + ' ' + fs + 'px ' + FONT; }
       }
-      let yy = y + pad + fs * 0.55;
-      g.textAlign = 'left';
-      lines.forEach(l => {
-        if (yy > y + h + lh * 0.6) return;
-        if (yy + lh > y + h + 2){ /* 마지막 줄이 넘치면 조금 위로 */ }
-        g.fillText(l, x + pad, yy); yy += lh;
+      let lh = step || fs * 1.32, lines = wrapText(g, t, avail);
+      const room = rules.length ? rules.length : Math.max(1, Math.floor((h - pad) / lh));
+      while (lines.length > room && fs > MINFS){ fs = Math.max(MINFS, fs - .5); g.font = fw + ' ' + fs + 'px ' + FONT; lines = wrapText(g, t, avail); if (!step) lh = fs * 1.32; }
+      if (lines.length > room) toast('특약이 너무 깁니다 — 항목을 줄이거나 다음 장에 이어 쓰세요');
+      g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+      const gap = Math.max(3, fs * 0.3);          /* 글자를 점선 위에 살짝 띄워 앉힌다 */
+      let yy = rules.length ? rules[0] - gap : y + pad + fs * 0.95;
+      lines.forEach((l, i) => {
+        if (yy > y + h + lh * 0.7) return;
+        g.fillText(l, x + pad, yy);
+        yy = (rules[i + 1] != null) ? rules[i + 1] - gap : yy + lh;
       });
     } else {
+      /* ---- 한 줄 칸: 읽을 수 있는 크기 밑으로는 줄이지 않고 가로로만 눌러 넣는다 ---- */
+      const avail = w - pad * 2;
+      while (fs > MINFS && g.measureText(t).width > avail / 0.85){ fs = Math.max(MINFS, fs - .5); g.font = fw + ' ' + fs + 'px ' + FONT; }
+      const tw = g.measureText(t).width, sc = tw > avail ? Math.max(0.45, avail / tw) : 1;
+      g.textBaseline = 'middle';
       g.textAlign = (f.al === 'c') ? 'center' : (f.al === 'r' ? 'right' : 'left');
-      g.fillText(t, f.al === 'c' ? x + w / 2 : (f.al === 'r' ? x + w - pad : x + pad), y + h / 2);
+      const bx = (f.al === 'c') ? x + w / 2 : (f.al === 'r' ? x + w - pad : x + pad);
+      if (sc < 1){ g.save(); g.translate(bx, y + h / 2); g.scale(sc, 1); g.fillText(t, 0, 0); g.restore(); }
+      else g.fillText(t, bx, y + h / 2);
     }
   }
   /* 188 간인 — 쪽과 쪽이 맞닿는 자리에 도장 또는 사인을 반씩 */
@@ -666,19 +796,24 @@ async function doPrint(){
   }catch(e){ busyOff(); toast('출력을 만들지 못했습니다'); }
 }
 async function doPng(){
-  busyOn('사진으로 만드는 중…');
+  const n = Math.max(1, +S.cp || 1);
+  busyOn(n > 1 ? '사진 ' + n + '부를 만드는 중…' : '사진으로 만드는 중…');
   try{
     const pages = await compositeAll(2480);
     const base = (curForm().name || '계약서').replace(/\s/g, '') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const names = [];
-    for (let i = 0; i < pages.length; i++){
-      const nm = pages.length > 1 ? base + '_' + (i + 1) + 'p.png' : base + '.png';
-      const a = document.createElement('a'); a.href = pages[i].toDataURL('image/png'); a.download = nm;
-      document.body.appendChild(a); a.click(); a.remove(); names.push(nm);
-      await new Promise(r => setTimeout(r, 380));
+    for (let k = 1; k <= n; k++){
+      for (let i = 0; i < pages.length; i++){
+        const pgTag = pages.length > 1 ? ((n > 1 ? '_' : '') + (i + 1) + 'p') : '';
+        const nm = base + (n > 1 ? '_' + k + '부' + pgTag : pgTag) + '.png';
+        const a = document.createElement('a'); a.href = pages[i].toDataURL('image/png'); a.download = nm;
+        document.body.appendChild(a); a.click(); a.remove(); names.push(nm);
+        await new Promise(r => setTimeout(r, 380));
+      }
     }
-    busyOff(); toast(pages.length > 1 ? pages.length + '장을 사진으로 저장했습니다' : '사진으로 저장했습니다');
-    $('#outInfo').innerHTML = `<span class="dot"></span>${escH(names.join(', '))} 저장 — 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`;
+    busyOff();
+    toast(n > 1 ? ('A4 ' + pages.length + '쪽 × ' + n + '부 — 사진 ' + names.length + '장을 저장했습니다') : (pages.length > 1 ? pages.length + '장을 사진으로 저장했습니다' : '사진으로 저장했습니다'));
+    $('#outInfo').innerHTML = `<span class="dot"></span>A4 ${pages.length}쪽 × ${n}부 · 사진 ${names.length}장 저장 — ${escH(names.slice(0, 2).join(', '))}${names.length > 2 ? ' …' : ''} · 더뷰(<a href="../viewer.html">viewer.html</a>)로 열어 확인할 수 있습니다.`;
   }catch(e){ busyOff(); toast('저장하지 못했습니다'); }
 }
 
@@ -901,8 +1036,11 @@ function kindOf(label){
 }
 let PHOTO_G = 'a';
 function mapPhoto(rec, grp){
-  let n = 0;
+  let n = 0; const seen = {};
   curForm().fields.filter(f => f.grp === grp && f.type !== 'sign').forEach(f => {
+    const k = kindOf(f.label);
+    /* 사진은 한 사람 것이므로 같은 종류(성명·주민번호 등)는 첫 칸만 채운다 — 공동명의·대리인 칸은 비워 둔다 */
+    if (seen[k]) return; seen[k] = 1;
     const g = k => (rec[k] == null ? '' : String(rec[k]).trim());
     let v = '';
     switch (kindOf(f.label)){
