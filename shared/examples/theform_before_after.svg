@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="230" viewBox="0 0 390 230" role="img" aria-label="전: 종이 표 사진, 후: 엑셀 표 파일">
+  <rect width="390" height="230" rx="14" fill="#0F1B33"/>
+  <text x="16" y="26" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="13" font-weight="700" fill="#FFA24D">표 사진 한 장이면 끝</text>
+  <text x="16" y="44" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" fill="#8FA0B8">전 → 후, 병합·열 너비·배경색 그대로</text>
+
+  <text x="16" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">전 · 종이 표</text>
+  <text x="208" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">후 · 엑셀 표</text>
+  <path d="M176 76h18" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M189 71l6 5-6 5" fill="none" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="180" y="100" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10" font-weight="700" fill="#FFA24D">1초</text>
+
+  <g transform="rotate(-3 100 140)">
+    <rect x="24" y="80" width="148" height="86" rx="4" fill="#F3EFE6"/>
+    <rect x="36" y="90" width="124" height="12" fill="#D9D2C3"/>
+    <rect x="36" y="108" width="40" height="10" fill="#E6DFD1"/><rect x="78" y="108" width="40" height="10" fill="#E6DFD1"/><rect x="120" y="108" width="40" height="10" fill="#E6DFD1"/>
+    <rect x="36" y="122" width="40" height="10" fill="#EDE7DA"/><rect x="78" y="122" width="40" height="10" fill="#EDE7DA"/><rect x="120" y="122" width="40" height="10" fill="#EDE7DA"/>
+    <rect x="36" y="136" width="40" height="10" fill="#E6DFD1"/><rect x="78" y="136" width="40" height="10" fill="#E6DFD1"/><rect x="120" y="136" width="40" height="10" fill="#E6DFD1"/>
+    <path d="M36 152h100" stroke="#CFC7B6" stroke-width="2"/>
+  </g>
+
+  <g>
+    <rect x="208" y="80" width="166" height="112" rx="8" fill="#12203C" stroke="#2E4370"/>
+    <rect x="208" y="80" width="166" height="20" rx="8" fill="#1B2E52"/>
+    <circle cx="219" cy="90" r="3" fill="#FF6B00"/><circle cx="229" cy="90" r="3" fill="#2E4370"/><circle cx="239" cy="90" r="3" fill="#2E4370"/>
+    <text x="248" y="93" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#8FA0B8">거래명세서.xlsx</text>
+    <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9">
+      <rect x="216" y="108" width="44" height="17" fill="#1B2E52"/><text x="221" y="120" fill="#8FA0B8">품목</text>
+      <rect x="260" y="108" width="34" height="17" fill="#1B2E52"/><text x="265" y="120" fill="#8FA0B8">수량</text>
+      <rect x="294" y="108" width="40" height="17" fill="#1B2E52"/><text x="299" y="120" fill="#8FA0B8">단가</text>
+      <rect x="334" y="108" width="34" height="17" fill="#1B2E52"/><text x="339" y="120" fill="#8FA0B8">금액</text>
+      <rect x="216" y="125" width="44" height="17" fill="#0F1B33"/><text x="221" y="137" fill="#DCE5F1">양파</text>
+      <rect x="260" y="125" width="34" height="17" fill="#0F1B33"/><text x="267" y="137" fill="#DCE5F1">1</text>
+      <rect x="294" y="125" width="40" height="17" fill="#0F1B33"/><text x="299" y="137" fill="#DCE5F1">3,900</text>
+      <rect x="334" y="125" width="34" height="17" fill="#0F1B33"/><text x="339" y="137" fill="#DCE5F1">3,900</text>
+      <rect x="216" y="142" width="44" height="17" fill="#0F1B33"/><text x="221" y="154" fill="#DCE5F1">두부</text>
+      <rect x="260" y="142" width="34" height="17" fill="#0F1B33"/><text x="267" y="154" fill="#DCE5F1">2</text>
+      <rect x="294" y="142" width="40" height="17" fill="#0F1B33"/><text x="299" y="154" fill="#DCE5F1">1,200</text>
+      <rect x="334" y="142" width="34" height="17" fill="#0F1B33"/><text x="339" y="154" fill="#DCE5F1">2,400</text>
+      <rect x="216" y="159" width="44" height="17" fill="#0F1B33"/><text x="221" y="171" fill="#DCE5F1">계란</text>
+      <rect x="260" y="159" width="34" height="17" fill="#0F1B33"/><text x="267" y="171" fill="#DCE5F1">1</text>
+      <rect x="294" y="159" width="40" height="17" fill="#0F1B33"/><text x="299" y="171" fill="#DCE5F1">3,200</text>
+      <rect x="334" y="159" width="34" height="17" fill="#0F1B33"/><text x="339" y="171" fill="#DCE5F1">3,200</text>
+    </g>
+    <rect x="216" y="108" width="152" height="68" fill="none" stroke="#2E4370"/>
+    <text x="216" y="186" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#8FA0B8">병합 칸 · 열 너비 그대로</text>
+  </g>
+  <text x="16" y="214" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#5C6B84">예시 그림입니다. 실제 화면은 내 사진으로 만들어집니다.</text>
+</svg>

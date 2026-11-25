@@ -247,6 +247,11 @@
   .tips li:before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--orange)}
   .mini{font-size:11px;color:#93A3C2;margin-top:8px;line-height:1.55}
   .mini b{color:#FFC79B}
+
+/* 231·개선 2: 결과물 전/후 예시 1장 — 첫 화면 미리보기 */
+.baEx{margin:12px 0 0;padding:0;border:0;border-radius:14px;overflow:hidden;background:transparent}
+.baEx img{display:block;width:100%;height:auto}
+.baEx figcaption{padding:8px 12px;font-size:11.5px;line-height:1.5;color:#9DAEC5;background:#12203C;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -275,6 +280,11 @@
       <span class="tick"><i></i>블로그급 서사</span>
       <span class="tick"><i></i>전체 · 브리핑 · 한 장</span>
     </div>
+    <!-- 231·개선 2: 결과물 전/후 예시 1장 -->
+    <figure class="baEx" style="margin:14px 0 0">
+      <img src="../shared/examples/thedetail_before_after.svg" alt="전: 상품 사진 다섯 장, 후: 세로 긴 상세페이지 한 장" loading="lazy" width="390" height="230">
+      <figcaption>예시 · 사진 5장과 제원을 넣으면 세로 긴 상세페이지 한 장이 나옵니다</figcaption>
+    </figure>
   </div>
 
   <!-- ══════════════════ 상품 모드 ══════════════════ -->

@@ -128,6 +128,11 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
  #printArea img:last-child{page-break-after:auto;break-after:auto}
  @page{size:A4;margin:0}
 }
+
+/* 231·개선 2: 결과물 전/후 예시 1장 — 첫 화면 미리보기 */
+.baEx{margin:12px 0 0;padding:0;border:0;border-radius:14px;overflow:hidden;background:transparent}
+.baEx img{display:block;width:100%;height:auto}
+.baEx figcaption{padding:8px 12px;font-size:11.5px;line-height:1.5;color:#9DAEC5;background:#12203C;word-break:keep-all}
 </style>
 </head><body>
 <div id="app">
@@ -160,6 +165,11 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
   <p class="kv" id="s5info">붙여넣은 글은 이 기기 안에서만 처리합니다. 서버로 보내지 않습니다.</p>
   <div class="s5sum" id="s5sum" hidden></div>
  </div>
+ <!-- 231·개선 2: 결과물 전/후 예시 1장 -->
+ <figure class="baEx">
+  <img src="../shared/examples/contract_before_after.svg" alt="전: 빈 A4 서식, 후: 3부로 인쇄된 계약서" loading="lazy" width="390" height="230">
+  <figcaption>예시 · 서식 고르고 조건만 넣으면 갑·을·중개사 3부 인쇄까지 나옵니다</figcaption>
+ </figure>
  <div class="card">
   <h2><span class="n">★</span>표준계약서 고르기</h2>
   <p class="sub">서식을 고르면 A4 원본 양식이 크게 뜹니다. [이 양식으로 작성하기]를 누르면 1단계 입력이 시작됩니다.</p>

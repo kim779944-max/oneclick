@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="230" viewBox="0 0 390 230" role="img" aria-label="전: 상품 사진 다섯 장, 후: 세로 긴 상세페이지 한 장">
+  <rect width="390" height="230" rx="14" fill="#0F1B33"/>
+  <text x="16" y="26" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="13" font-weight="700" fill="#FFA24D">사진 5장 → 상세페이지 1장</text>
+  <text x="16" y="44" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" fill="#8FA0B8">쿠팡·스마트스토어에 바로 올리는 세로 긴 통이미지</text>
+
+  <text x="16" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">전 · 사진 5장</text>
+  <text x="196" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">후 · 상세페이지 1장</text>
+  <path d="M160 76h18" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M173 71l6 5-6 5" fill="none" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="156" y="96" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10" font-weight="700" fill="#FFA24D">1초</text>
+
+  <g>
+    <rect x="20" y="80" width="60" height="50" rx="4" fill="#1B2E52" stroke="#2E4370"/>
+    <rect x="86" y="80" width="60" height="50" rx="4" fill="#1B2E52" stroke="#2E4370"/>
+    <rect x="20" y="136" width="60" height="50" rx="4" fill="#1B2E52" stroke="#2E4370"/>
+    <rect x="86" y="136" width="60" height="50" rx="4" fill="#1B2E52" stroke="#2E4370"/>
+    <g fill="#3A4C6E">
+      <circle cx="50" cy="100" r="9"/><path d="M26 124l14-16 11 12 8-7 11 11z"/>
+      <circle cx="116" cy="100" r="9"/><path d="M92 124l14-16 11 12 8-7 11 11z"/>
+      <circle cx="50" cy="156" r="9"/><path d="M26 180l14-16 11 12 8-7 11 11z"/>
+      <circle cx="116" cy="156" r="9"/><path d="M92 180l14-16 11 12 8-7 11 11z"/>
+    </g>
+    <g>
+      <circle cx="140" cy="180" r="9" fill="#FF6B00"/><text x="135" y="184" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" font-weight="700" fill="#0A1224">+1</text>
+    </g>
+  </g>
+
+  <g>
+    <rect x="196" y="80" width="118" height="118" rx="8" fill="#F7F8FA" stroke="#2E4370"/>
+    <rect x="196" y="80" width="118" height="42" rx="8" fill="#DDE6F5"/>
+    <circle cx="220" cy="101" r="9" fill="#B9C9E6"/><path d="M200 122l14-16 11 12 8-7 11 11z" fill="#B9C9E6"/>
+    <text x="206" y="138" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" font-weight="700" fill="#1B2A4A">원목 도마 (중)</text>
+    <text x="206" y="150" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="8" fill="#5C6B84">두께 2cm · 34×24cm</text>
+    <rect x="206" y="158" width="98" height="6" rx="3" fill="#E3E7ED"/>
+    <rect x="206" y="170" width="80" height="6" rx="3" fill="#E3E7ED"/>
+    <rect x="206" y="182" width="90" height="6" rx="3" fill="#E3E7ED"/>
+  </g>
+  <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#8FA0B8">
+    <rect x="322" y="86" width="54" height="20" rx="10" fill="#12203C" stroke="#2E4370"/><text x="331" y="99">PNG</text>
+    <rect x="322" y="112" width="54" height="20" rx="10" fill="#12203C" stroke="#2E4370"/><text x="328" y="125">HTML</text>
+    <rect x="322" y="138" width="54" height="20" rx="10" fill="#12203C" stroke="#2E4370"/><text x="327" y="151">기기 안</text>
+  </g>
+  <text x="16" y="214" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#5C6B84">예시 그림입니다. 가격·제원은 내 상품 값으로 채워집니다.</text>
+</svg>

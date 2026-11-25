@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="230" viewBox="0 0 390 230" role="img" aria-label="전: 빈 A4 서식, 후: 3부로 인쇄된 계약서">
+  <rect width="390" height="230" rx="14" fill="#0F1B33"/>
+  <text x="16" y="26" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="13" font-weight="700" fill="#FFA24D">빈 서식 → 3부 계약서</text>
+  <text x="16" y="44" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" fill="#8FA0B8">조건만 넣으면 조문 계약서 · 갑·을·중개사 3부</text>
+
+  <text x="16" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">전 · 빈 서식</text>
+  <text x="196" y="70" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10.5" font-weight="700" fill="#8FA0B8">후 · 3부 인쇄</text>
+  <path d="M164 76h18" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M177 71l6 5-6 5" fill="none" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="142" y="112" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="10" font-weight="700" fill="#FFA24D">3분</text>
+
+  <g>
+    <rect x="20" y="80" width="112" height="118" rx="6" fill="#E9E4D8"/>
+    <rect x="31" y="90" width="90" height="8" fill="#C9C1AE"/>
+    <rect x="31" y="106" width="76" height="4" fill="#D9D2C1"/>
+    <rect x="31" y="116" width="88" height="4" fill="#D9D2C1"/>
+    <rect x="31" y="126" width="64" height="4" fill="#D9D2C1"/>
+    <rect x="31" y="142" width="88" height="34" fill="none" stroke="#C9C1AE" stroke-width="1.2"/>
+    <path d="M31 159h88M60 142v34M90 142v34" stroke="#C9C1AE" stroke-width="0.8"/>
+    <rect x="31" y="182" width="88" height="4" fill="#D9D2C1"/>
+  </g>
+
+  <g>
+    <g transform="rotate(-7 224 160)"><rect x="196" y="94" width="86" height="108" rx="5" fill="#D8D2C4"/><rect x="206" y="104" width="66" height="5" fill="#B9B19C"/></g>
+    <g transform="rotate(-3 252 160)"><rect x="228" y="90" width="86" height="108" rx="5" fill="#E4DDCE"/><rect x="238" y="100" width="66" height="5" fill="#C0B8A4"/></g>
+    <g>
+      <rect x="258" y="86" width="96" height="112" rx="5" fill="#F6F2E8"/>
+      <text x="268" y="102" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="8.5" font-weight="700" fill="#2C2A26">부동산 매매 계약서</text>
+      <path d="M268 106h76" stroke="#B9B19C" stroke-width="1"/>
+      <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="7.5" fill="#4A463E">
+        <text x="268" y="120">매매대금 320,000,000원</text>
+        <text x="268" y="132">계약금   32,000,000원</text>
+        <text x="268" y="144">잔금    288,000,000원</text>
+        <text x="268" y="158">소재지 가평군 조종면</text>
+        <text x="268" y="170">       신하리 162-9</text>
+      </g>
+      <path d="M268 176h62" stroke="#C9C1AE" stroke-width="0.8"/>
+      <g transform="rotate(-12 314 182)"><circle cx="314" cy="182" r="12" fill="none" stroke="#C0392B" stroke-width="1.6"/><text x="309" y="186" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="8" fill="#C0392B">인</text></g>
+    </g>
+  </g>
+  <text x="16" y="214" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="9" fill="#5C6B84">예시 그림입니다. 조건과 특약은 화면에서 직접 확인합니다.</text>
+</svg>
