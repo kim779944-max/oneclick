@@ -2159,8 +2159,13 @@ body.edcap .xlwrap{overflow:visible!important}
      화면 근처(±1500px)만 그리는 지연 그리기 때문에, 스크롤하지 않은 뒤쪽 장은 캔버스가 없어
      저장 그림에서 빈 여백으로 나왔다(8쪽 PDF → 5쪽까지만 내용, 6~7쪽 백지). */
   function prepareAll(){
-    var q = 1;
+    var q = 1, total = 0;
     try{ if (typeof ppWantQ === 'function') q = Math.max(1, Math.min(1.6, ppWantQ())); }catch(e){}
+    try{
+      if (typeof MF !== 'undefined' && MF.multi && MF.items) MF.items.forEach(function(it){ if (it.kind === 'pdf' && it.pdf) total += (it.pages || []).length; });
+      else if (typeof PP !== 'undefined' && PP.kind === 'pdf') total = (PP.pages || []).length;
+      if (total > 12) q = 1;              /* 긴 묶음은 장마다 1배율 — 폰 메모리 보호(화질은 화면과 같은 수준) */
+    }catch(e){}
     var jobs = [];
     try{
       if (typeof MF !== 'undefined' && MF.multi && typeof PP !== 'undefined' && PP.scale){
