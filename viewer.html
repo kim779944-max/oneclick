@@ -2155,6 +2155,25 @@ body.edcap .xlwrap{overflow:visible!important}
     });
     out.querySelectorAll('.btnz').forEach(function(b){ b.style.display = 'none'; });
   }
+  /* (2026-11-25 · 221번) 저장·더편집으로 찍기 전에 PDF 장을 전부 그려 둔다.
+     화면 근처(±1500px)만 그리는 지연 그리기 때문에, 스크롤하지 않은 뒤쪽 장은 캔버스가 없어
+     저장 그림에서 빈 여백으로 나왔다(8쪽 PDF → 5쪽까지만 내용, 6~7쪽 백지). */
+  function prepareAll(){
+    var q = 1;
+    try{ if (typeof ppWantQ === 'function') q = Math.max(1, Math.min(1.6, ppWantQ())); }catch(e){}
+    var jobs = [];
+    try{
+      if (typeof MF !== 'undefined' && MF.multi && typeof PP !== 'undefined' && PP.scale){
+        MF.items.forEach(function(it){
+          if (it.kind !== 'pdf' || !it.pdf || !it.pages) return;
+          it.pages.forEach(function(p, pi){ if (!p.frozen) jobs.push(mfRender(it, p, pi, q)); });
+        });
+      } else if (typeof PP !== 'undefined' && PP.kind === 'pdf' && PP.pdf){
+        PP.pages.forEach(function(p, i){ jobs.push(renderPdfPage(i, q)); });
+      }
+    }catch(e){}
+    return Promise.all(jobs).catch(function(){});
+  }
   /* 되돌리기 */
   function snap(){
     undo.push(out.innerHTML); if (undo.length > 40) undo.shift();
@@ -2293,7 +2312,7 @@ body.edcap .xlwrap{overflow:visible!important}
   $('edSave').onclick = function(){
     var b = this; b.disabled = true; toast('저장 파일을 만드는 중…');
     if (document.activeElement) document.activeElement.blur();
-    loadH2C().then(function(){
+    prepareAll().then(function(){ freezeCanvas(); return loadH2C(); }).then(function(){
       body.classList.add('edcap');
       /* 종이 1:1 보기에서는 확대 배율을 잠시 풀고 종이 원본 크기(794×1123 등) 그대로 찍는다 */
       var t = paper() || out, tw, th, tf = null;
@@ -2318,10 +2337,13 @@ body.edcap .xlwrap{overflow:visible!important}
       setTimeout(function(){ $('f').click(); }, 350);
       return;
     }
-    editing = true; undo = []; $('edUndo').disabled = true;
-    freezeCanvas(); layer(); setEditable(true);
-    body.classList.add('editing');
-    toast('더편집 · 글자를 누르면 바로 고쳐집니다');
+    body.classList.add('editing');           /* 준비하는 동안 지연 그리기가 장을 비우지 않게 */
+    toast('편집할 장을 준비하는 중…');
+    prepareAll().then(function(){
+      editing = true; undo = []; $('edUndo').disabled = true;
+      freezeCanvas(); layer(); setEditable(true);
+      toast('더편집 · 글자를 누르면 바로 고쳐집니다');
+    });
   }
   function exit(silent){
     if (!editing) return;
