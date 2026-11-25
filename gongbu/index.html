@@ -844,7 +844,11 @@ $('#bSheet').addEventListener('click',function(){
 });
 $('#dgSave').addEventListener('click',function(){
   var v=($('#dgk').value||'').trim();
-  if(!v){ toast('인증키를 붙여 넣어 주세요'); return }
+  if(!v){
+    S.dgk=''; LS.set('kts_gongbu_dg',''); paintKeyState();
+    S.bld={st:'NOKEY'}; paintBld();
+    toast('인증키를 지웠습니다 — 건축물대장은 키를 넣어야 열립니다'); return;
+  }
   S.dgk=v; LS.set('kts_gongbu_dg',v); paintKeyState(); toast('인증키를 이 기기에 저장했습니다');
   if(S.pnu) bldFetch(S.pnu).then(function(r){ S.bld=r; paintBld() });
 });
