@@ -178,7 +178,7 @@ function pickBone(kw){
 /* ---------- 원고 만들기 ---------- */
 function sentences(s){ return String(s).split(/(?<=[.?!])\s+/).map(function(x){ return x.trim(); }).filter(Boolean); }
 function compose(o){
-  var BB = K.D.blog_bones, bank = BB[o.tone], subs = BB.subtitles[o.tone], bone = o.bone;
+  var BB = K.D.blog_bones, bank = BB[o.tone] || BB.t2, subs = BB.subtitles[o.tone] || BB.subtitles.t2, bone = o.bone;  /* 톤 문장이 없으면(예: file:// 내장 사본) t2로 */
   var memos = o.memo.split('\n').map(function(x){ return x.trim().replace(/[.。]+$/, ''); }).filter(Boolean).slice(0, 3);
   var vars = { kw: o.kw, it: bone.it, region: o.region };
   /* 229: 글마다 문장 순서를 키워드에 따라 다르게 둘어 유사문서 위험을 낮춘다(문장 은행은 그대로) */
