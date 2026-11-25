@@ -11,7 +11,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
- background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:flex;justify-content:center;min-height:100vh;word-break:keep-all}
+ background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:block;min-height:100vh;word-break:keep-all}
+#app{margin:0 auto}
 #app{width:100%;max-width:460px;min-height:100vh;position:relative;overflow-x:hidden;
  background:radial-gradient(120% 50% at 50% -6%,rgba(255,107,0,.10) 0%,rgba(255,107,0,0) 62%),linear-gradient(180deg,#0E1B3A 0%,#0C1730 46%,#0A1128 100%)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:-.2px}
@@ -133,9 +134,15 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 #printArea{display:none}
 @media print{
  body{background:#fff;display:block}
+ /* 인쇄에는 종이(#printArea)만 — ux.js가 body에 붙이는 4버튼 막대·안내문이 빈 장을 만들지 않게 */
  #app,.bar,#toast,.modal,#busy{display:none!important}
- #printArea{display:block}
- #printArea img{width:100%;display:block;page-break-after:always}
+ body>*:not(#printArea){display:none!important}
+ .kux-flow,.kux-flowwrap,.kuxguide,.kux-morebar,.kux-free{display:none!important}
+ #printArea{display:block!important;position:relative}
+ #printArea img{width:100%;display:block;break-after:page;page-break-after:always}
+ #printArea img:last-of-type{break-after:auto;page-break-after:auto}
+ /* 워터마크는 종이 흐름에서 빼서 마지막 장 위에 엹힌다 — 빈 장이 생기지 않게 */
+ #printArea .kuxwm{display:block;position:absolute;left:0;right:0;bottom:1mm;text-align:center;color:#1a73e8;font-size:9pt;margin:0}
  @page{size:A4;margin:0}
 }
 /* ── 2026-11-25 대문 개편 · 값 입력 고정 바 · 도우미 ── */
@@ -148,18 +155,25 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 .stdgrid button b{display:block;font-size:10px;font-weight:800;color:#8FA1B8;margin-top:2px}
 .start .kv.sm{font-size:10.5px;margin-top:6px}
 /* 값 입력 — 화면에 늘 붙어 있는 [이전 칸][다음 칸] + [말해서 넣기][신분증] */
-#fillDock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom));width:100%;max-width:460px;z-index:49;display:none;padding:7px 14px 8px;background:linear-gradient(180deg,rgba(10,17,40,0),rgba(10,17,40,.97) 26%)}
+/* 한 줄로 슬림하게 — 3단(185px)이 입력칸을 덮던 것(2026-11-25) */
+#fillDock{position:fixed;left:50%;transform:translateX(-50%);bottom:var(--barh,56px);width:100%;max-width:460px;z-index:49;display:none;padding:5px 10px 7px;background:linear-gradient(180deg,rgba(10,17,40,0),rgba(10,17,40,.97) 30%)}
 body.fill #fillDock{display:block}
-body.fill main{padding-bottom:300px}
-#fillDock .fd1{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}
-#fillDock .fd1 button{min-height:44px;font-size:13px;font-weight:900;border-radius:11px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7;padding:0 8px}
-#fillDock #nfNext{color:var(--on-amber);background:var(--amber2);border-color:var(--amber2)}
-#fillDock #nfPos{font-size:12px;font-weight:900;color:#FFC08A;white-space:nowrap;padding:0 2px}
-#fillDock .fd2{display:flex;gap:6px;margin-top:6px}
-#fillDock .fd2 button{min-height:46px;font-size:13px;font-weight:900;border-radius:11px;border:1px solid var(--line2);background:#12203C;color:#E6EDF7;padding:0 10px;flex:1}
-#fillDock .fd2 #voiceBtn{flex:1.5;color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber);font-size:13.5px}
-#fillDock .fd2 #voiceBtn.on{background:linear-gradient(145deg,#FF9A3D,#E24800);color:#fff}
-#fillDock .fd2 #handBtn{flex:0 0 52px;font-size:16px;color:#FFC08A}
+body.fill main{padding-bottom:200px}
+body.fill .bar{padding:5px 12px calc(5px + env(safe-area-inset-bottom));align-items:center}
+body.fill .bar .btn{padding:11px 12px;font-size:14.5px}
+#fillDock .fdrow{display:flex;gap:4px;align-items:stretch;padding-right:44px}
+#fillDock .fdrow button{min-height:46px;font-size:13px;font-weight:900;border-radius:11px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7;padding:0 6px;flex:0 0 auto;white-space:nowrap;overflow:hidden}
+#fillDock #nfPrev{flex:0 0 40px;font-size:15px;padding:0}
+#fillDock #nfNext{flex:0 0 48px;color:var(--on-amber);background:var(--amber2);border-color:var(--amber2);font-size:15px;padding:0}
+#fillDock #voiceBtn{flex:1 1 auto;min-width:0;font-size:12.5px;letter-spacing:-.6px;color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber);padding:0 4px}
+#fillDock #voiceBtn.on{background:linear-gradient(145deg,#FF9A3D,#E24800);color:#fff}
+#fillDock #photoFill{flex:0 0 60px;font-size:10.5px;line-height:1.15;color:#FFC08A;padding:0 2px}
+#fillDock #handBtn{flex:0 0 38px;font-size:15px;color:#FFC08A;padding:0}
+#fillDock #nfPos{position:absolute;right:12px;top:-16px;font-size:10px;font-weight:900;color:#FFC08A;background:rgba(8,14,32,.94);border:1px solid var(--line2);border-radius:999px;padding:1px 9px;white-space:nowrap;pointer-events:none}
+/* 작성 중 도우미 [?] — 입력칸을 덮지 않게 고정 바 오른쪽 빈자리에 붙인다 */
+body.fill #kts-helper-btn{top:auto!important;bottom:calc(var(--barh,56px) + 3px)!important;left:auto!important;right:10px!important;width:38px!important;height:46px!important;border-radius:11px!important;z-index:52!important;opacity:1}
+body.fill #kts-helper-btn.kh-faint{opacity:1}
+body.fill #kts-helper-btn .kh-tip{display:none!important}
 #valList input,#valList textarea{scroll-margin-top:80px;scroll-margin-bottom:210px}
 .fldfocus{outline:2px solid var(--amber);outline-offset:2px;box-shadow:0 0 0 5px rgba(255,107,0,.14)}
 .spchips{display:flex;gap:5px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch}
@@ -290,8 +304,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 
 <!-- 값 입력 고정 바 — 화면 아래에 늘 붙어 있다(2026-11-25) -->
 <div id="fillDock" aria-label="값 입력 도구">
- <div class="fd1"><button type="button" id="nfPrev">◀ 이전 칸</button><div id="nfPos">- / -</div><button type="button" id="nfNext">다음 칸 ▶</button></div>
- <div class="fd2"><button type="button" id="voiceBtn">🎤 말해서 넣기</button><button type="button" id="photoFill">📷 신분증·명함</button><button type="button" id="handBtn" title="손글씨 사진 읽기" aria-label="손글씨 사진 읽기">✎</button></div>
+ <div id="nfPos">- / -</div>
+ <div class="fdrow"><button type="button" id="nfPrev" title="이전 칸" aria-label="이전 칸">◀</button><button type="button" id="voiceBtn">🎤 말해서 넣기</button><button type="button" id="photoFill">📷<br>신분증</button><button type="button" id="handBtn" title="손글씨 사진 읽기" aria-label="손글씨 사진 읽기">✎</button><button type="button" id="nfNext" title="다음 칸" aria-label="다음 칸">▶</button></div>
 </div>
 <input type="file" id="handIn" accept="image/*" hidden>
 <input type="file" id="photoIn2" accept="image/*" hidden>
@@ -324,8 +338,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
     <div class="row" id="sealSlots"></div>
     <p class="kv" id="sealNoSign" hidden>서명 칸이 없습니다 — [빈칸 지정]에서 [칸 추가] → 종류 [서명]으로 자리를 먼저 만들어 주세요.</p>
    </div>
-   <label class="lb">간인 — 쪽 경계에 반씩<em>도장으로 찍습니다</em></label>
-   <div class="seg" id="ganSeg"><button type="button" data-cp="0">안 함</button><button type="button" data-cp="2">2부</button><button type="button" data-cp="3">3부</button></div>
+   <label class="lb">부수 — 간인과 저장 매수<em>2부·3부</em></label>
+   <div class="seg" id="ganSeg"><button type="button" data-cp="0">1부</button><button type="button" data-cp="2">2부</button><button type="button" data-cp="3">3부</button></div>
    <p class="kv" id="sealInfo">간인은 2쪽 이상 문서에서만 찍힙니다 · 2부·3부는 같은 자리에 되풀이해 찍습니다.</p>
   </div>
   <div class="row"><button class="btn pri" id="exPng">사진(PNG)으로 저장</button><button class="btn pri" id="exPdf">PDF 파일로 저장</button></div>
@@ -2449,6 +2463,8 @@ const SPECIAL_PRESETS = [
 function shown(f){ const v = VALS[f.label]; if (v == null || v === '') return '';
   if (f.type === 'number') return fmtNum(v); if (f.type === 'date') return fmtDate(v); if (f.type === 'sign') return '(서명)';
   return String(v).replace(/\s*㎡\s*$/, ''); }
+/*특약·비고처럼 여러 줄로 적는 칸은 높은 자리면 글로 받는다 — 줄바꿈이 사라지지 않게 */
+function isMultiField(f){ return !!(f && (f.multi || (f.h >= 3.2 && /특약|비고|사유|내용|조건|기타|메모|의견/.test(f.label || '')))); }
 let LAST_INPUT = null;
 function renderInputs(){
   $('#s3name').textContent = CUR.name + ' · 값 입력';
@@ -2467,11 +2483,12 @@ function renderInputs(){
     if (dp && DATE_GROUPS[dp.base] && DATE_GROUPS[dp.base].y && (DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
       if (done['d:' + dp.base]) return ''; done['d:' + dp.base] = 1;
       const g = DATE_GROUPS[dp.base], val = dateVal(dp.base);
+      const anchor = Math.max.apply(null, ['y', 'm', 'd'].filter(k2 => g[k2]).map(k2 => g[k2].i));
       const parts = ['y', 'm', 'd'].filter(k2 => g[k2]).map(k2 => ({ y: '년', m: '월', d: '일' })[k2]).join(' · ');
       return hd + `<label class="lb">${escH(dp.base)}<em>달력에서 고르면 ${parts} 칸에 나뉘어 들어갑니다</em></label>`
-        + `<div class="dwrap"><input data-dg="${escH(dp.base)}" type="date" value="${val}"><span class="dm">${val ? fmtDate(val) : parts}</span></div>`;
+        + `<div class="dwrap"><input data-dg="${escH(dp.base)}" data-nav="${anchor}" type="date" value="${val}"><span class="dm">${val ? fmtDate(val) : parts}</span></div>`;
     }
-    if (f.multi){
+    if (isMultiField(f)){
       const chips = /특약/.test(f.label)
         ? `<div class="spchips">${SPECIAL_PRESETS.map((p, k) => `<button type="button" data-sp="${k}">＋ ${escH(p[0])}</button>`).join('')}</div>` : '';
       return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em></label>` + chips
@@ -2489,12 +2506,17 @@ function renderInputs(){
       + (korM ? `<div class="dline" data-hint="${i}"></div>` : '');
   }).join('');
   $('#valList').innerHTML = h;
+  /* 넘길 칸 지도 — 달력 묶음은 data-nav 자리에 한 칸으로 */
+  NAV_MAP = {};
+  $$('#valList [data-f]').forEach(el => { const k = +el.dataset.f; if (!isNaN(k)) NAV_MAP[k] = el; });
+  $$('#valList input[data-dg]').forEach(el => { const k = +el.dataset.nav; if (!isNaN(k)) NAV_MAP[k] = el; });
   $$('#valList canvas[data-sig]').forEach(cv => bindSig(cv, CUR.fields[+cv.dataset.sig]));
   CUR.fields.forEach((f, i) => { if (isKorMoney(f.label)) updMoneyHint(i); });
   updNavPos(-1);
   guideSyncSoon();
+  dockFit();
 }
-$('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) LAST_INPUT = e.target; });
+$('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null || e.target.dataset.nav != null) LAST_INPUT = e.target; });
 $('#valList').addEventListener('input', e => {
   const dg = e.target.dataset.dg; if (dg){ return; }              /* 달력은 change 에서 */
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
@@ -2541,17 +2563,35 @@ $('#valList').addEventListener('click', e => {
   const b = e.target.closest('[data-sigclr]'); if (!b) return; const f = CUR.fields[+b.dataset.sigclr]; delete VALS[f.label]; saveVals(); renderInputs();
 });
 /* ---------- 다음 칸 연속 입력 (적립 146번) — 배열 순서 · 지운 자리·서명·자동 계산 칸은 건너뜀 ---------- */
+let NAV_MAP = {};   /* 넘길 칸 번호 → 화면의 입력칸 (달력 묶음은 한 칸으로 — 묶음의 마지막 자리에 놓는다) */
 function navIdx(){
   if (!CUR) return [];
-  return CUR.fields.map((f, i) => i).filter(i => { const f = CUR.fields[i];
-    return f.type !== 'erase' && f.type !== 'sign' && !(CUR.calc && CUR.calc[f.label]) && $(`#valList [data-f="${i}"]`); });
+  return Object.keys(NAV_MAP).map(Number).sort((a, b) => a - b).filter(i => { const f = CUR.fields[i];
+    if (!f) return false;
+    return f.type !== 'erase' && f.type !== 'sign' && !(CUR.calc && CUR.calc[f.label]); });
 }
-function navEl(i){ return $(`#valList [data-f="${i}"]`); }
+function navEl(i){ return NAV_MAP[i] || null; }
+function navLabel(i){ const el = navEl(i); if (el && el.dataset.dg) return el.dataset.dg; const f = CUR.fields[i]; return f ? f.label : ''; }
+/* 지금 커서가 있는 칸의 번호 — 달력(년·월·일 묶음) 칸도 한 칸으로 센다 */
+function inListIdx(a){
+  if (!a || !a.closest || !a.closest('#valList')) return -1;
+  if (a.dataset.f != null) return +a.dataset.f;
+  if (a.dataset.nav != null) return +a.dataset.nav;
+  return -1;
+}
 /* 넣을 칸이 고정 바·자판에 가리지 않게 화면 위쪽으로 끌어올린다 (2026-11-25) */
 function dockSpace(){
   const a = $('#fillDock'), b = $('.bar');
   return (a ? a.offsetHeight : 0) + (b ? b.offsetHeight : 0) + 12;
 }
+/* 도우미 토스트·고정 바가 겹치지 않게 — 바 높이를 재서 자리를 잡는다 */
+function dockFit(){
+  const bar = $('.bar'), bh = bar ? bar.offsetHeight : 0;
+  try{ document.documentElement.style.setProperty('--barh', bh + 'px'); }catch(e){}
+  const dk = $('#fillDock'), ts = $('#toast'), fill = document.body.classList.contains('fill');
+  if (ts) ts.style.bottom = (fill && dk) ? (bh + dk.offsetHeight + 10) + 'px' : '';
+}
+window.addEventListener('resize', () => { try{ dockFit(); }catch(e){} });
 function keepVisible(el, smooth){
   if (!el || !el.getBoundingClientRect) return;
   const r = el.getBoundingClientRect(), top = 74, bottom = window.innerHeight - dockSpace();
@@ -2592,8 +2632,10 @@ function prevField(i){
   if (pv == null) return toast('첫 칸입니다');
   navFocus(pv);
 }
-const navCur = () => { const a = document.activeElement; if (a && a.closest && a.closest('#valList') && a.dataset.f != null) return +a.dataset.f;
-  return (LAST_INPUT && LAST_INPUT.isConnected && LAST_INPUT.dataset.f != null) ? +LAST_INPUT.dataset.f : -1; };
+const navCur = () => {
+  const i = inListIdx(document.activeElement); if (i >= 0) return i;
+  return (LAST_INPUT && LAST_INPUT.isConnected) ? inListIdx(LAST_INPUT) : -1;
+};
 $('#valList').addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (e.isComposing || e.keyCode === 229) return;        /* 한글 조합 중 Enter = 글자 확정 → 이동하지 않는다 */
@@ -2602,7 +2644,7 @@ $('#valList').addEventListener('keydown', e => {
   e.preventDefault();
   nextField(+i);
 });
-$('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null) updNavPos(+e.target.dataset.f); });
+$('#valList').addEventListener('focusin', e => { const k = inListIdx(e.target); if (k >= 0) updNavPos(k); });
 /* 버튼을 눌러도 입력칸 포커스(모바일 자판)가 빠지지 않게 pointerdown 기본 동작을 막는다 */
 ['#nfPrev', '#nfNext'].forEach(s => $(s).addEventListener('pointerdown', e => e.preventDefault()));
 $('#nfNext').onclick = () => { const c = navCur(); if (c < 0){ const L = navIdx(); if (L.length) navFocus(L[0]); return; } nextField(c); };
@@ -2661,7 +2703,7 @@ $('#sampleVals').onclick = () => { CUR.fields.forEach(f => { if (f.type === 'sig
 /* 음성 입력 — 지금 칸(또는 도우미가 가리키는 칸)에 대고 말하면 그 칸에 들어가고, 다음 칸을 가리킨다 */
 function pickVoiceIdx(){
   const a = document.activeElement;
-  if (a && a.closest && a.closest('#valList') && a.dataset.f != null) return +a.dataset.f;
+  const k0 = inListIdx(a); if (k0 >= 0) return k0;
   const L = navIdx();
   if (GUIDE_I >= 0 && L.includes(GUIDE_I)) return GUIDE_I;
   const empty = L.find(k => { const el = navEl(k); return el && !String(el.value || '').trim(); });
@@ -2675,6 +2717,7 @@ function startVoice(idx){
   const i = (idx == null) ? pickVoiceIdx() : idx;
   if (i < 0) return toast('먼저 값을 넣을 칸을 눌러 주세요');
   const tgt = navEl(i); if (!tgt){ navScroll(i); return toast('이 칸은 달력에서 골라 주세요'); }
+  if (tgt.dataset && tgt.dataset.dg){ navScroll(i); return toast('"' + tgt.dataset.dg + '" 는 달력에서 골라 주세요'); }
   const f = CUR.fields[i];
   const r = new SR(); r.lang = 'ko-KR'; r.interimResults = false; r.continuous = false; r.maxAlternatives = 1;
   const btn = $('#voiceBtn'); if (btn){ btn.classList.add('on'); btn.textContent = '● 듣는 중…'; }
@@ -2708,7 +2751,7 @@ function startVoice(idx){
   r.onend = done;
   try{ r.start(); }catch(err){ done(); return toast('음성 입력을 시작하지 못했습니다'); }
   GUIDE_I = i;
-  toast('"' + f.label + '" 칸에 대고 말씀하세요');
+  toast('"' + navLabel(i) + '" 칸에 대고 말씀하세요');
 }
 function flashField(i){ const el = navEl(i); if (!el) return;
   el.classList.add('fldfocus'); setTimeout(() => { try{ el.classList.remove('fldfocus'); }catch(e){} }, 1500); }
@@ -2723,13 +2766,13 @@ function guideState(){
   if (STEP !== 3 || !CUR) return null;
   const L = navIdx(); if (!L.length) return null;
   const a = document.activeElement;
-  const inList = !!(a && a.closest && a.closest('#valList') && a.dataset.f != null);
+  const k0 = inListIdx(a), inList = k0 >= 0;
   let i;
-  if (inList) i = +a.dataset.f;
+  if (inList) i = k0;
   else if (GUIDE_I >= 0 && L.includes(GUIDE_I)) i = GUIDE_I;
   else i = L.find(k => { const el = navEl(k); return el && !String(el.value || '').trim(); });
   if (i == null) i = L[L.length - 1];
-  const el = navEl(i), mic = inList || GUIDE_I === i;
+  const el = navEl(i), mic = !(el && el.dataset && el.dataset.dg) && (inList || GUIDE_I === i);
   if (!inList) updNavPos(i);
   /* 글자 칸을 다 채웠으면 사인(서명) 칸으로 이어서 안내 — 사인·도장도 같이 다닌다 */
   const emptyLeft = L.filter(k => { const e2 = navEl(k); return e2 && !String(e2.value || '').trim(); });
@@ -2746,7 +2789,7 @@ function guideState(){
   }
   return {
     active: true, mode: mic ? 'mic' : 'cursor',
-    label: CUR.fields[i].label, pos: (L.indexOf(i) + 1) + ' / ' + L.length, el: el,
+    label: navLabel(i), pos: (L.indexOf(i) + 1) + ' / ' + L.length, el: el,
     tap: function(){
       if (mic) startVoice(i);
       else { GUIDE_I = i; navScroll(i); flashField(i); }
@@ -3026,21 +3069,34 @@ async function composite(maxW, pg){
       const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
     }
     const t = shown(f); const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
-    let fs = fsz || Math.min(h * 0.78, FS0); const fw = f.type === 'number' ? 600 : 500; const pad = Math.max(3, fs * 0.28);
+    let fs = fsz || Math.min(h * 0.78, FS0); const fw = f.type === 'number' ? 600 : 500;
+    const pad = Math.max(2, Math.min(fs * 0.24, w * 0.05));
+    const innerW = Math.max(6, w - pad * 2);
+    /* 좁은 칸이라도 읽을 수 있는 밑까지만 줄이고, 넘치면 줄을 바꾸고 칸 밖으로는 넘기지 않는다 */
+    const minFs = Math.max(7, Math.min(fs, Math.max(h * 0.40, cv.width * 0.008)));
+    const setF = v => { g.font = `${fw} ${v}px ${OVF}`; };
     g.fillStyle = '#111111'; g.textBaseline = 'middle';
-    g.font = `${fw} ${fs}px ${OVF}`;
-    while (fs > 6 && g.measureText(t).width > w - pad * 2 && (f.fit || (h < fs * 2.6)) && !f.top){ fs -= .5; g.font = `${fw} ${fs}px ${OVF}`; }
-    if (f.top || (!f.fit && g.measureText(t).width > w - pad * 2 && h >= fs * 2.6)){   /* 높은 칸·특약란은 줄바꿈, 위에서부터 */
-      const lines = wrapText(g, t, w - pad * 2), lh = fs * 1.3;
-      let yy = f.top ? y + pad + fs * 0.55 : y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
-      g.textAlign = 'left'; lines.forEach(l => { if (yy < y + h) g.fillText(l, x + pad, yy); yy += lh; });
-    } else {
+    setF(fs);
+    const hasNL = t.indexOf('\n') >= 0;
+    let lines = wrapText(g, t, innerW);
+    const oneLine = !hasNL && lines.length <= 1 && !f.top;
+    g.save();
+    g.beginPath(); g.rect(x + 1, y - 2, Math.max(2, w - 2), Math.max(2, h + 4)); g.clip();
+    if (oneLine){
+      while (fs > minFs && g.measureText(t).width > innerW){ fs -= .5; setF(fs); }
       const cent = f.al === 'c';
       /* 면적은 뒤의 ㎡ 기호에 붙게 오른쪽 정렬 */
       const right = f.type === 'number' || /면적/.test(f.label || '');
       g.textAlign = cent ? 'center' : (right ? 'right' : 'left');
       g.fillText(t, cent ? x + w / 2 : (right ? x + w - pad : x + pad), y + h / 2);
+    } else {
+      /* 높은 칸·특약란·여러 줄 글 — 줄바꿈을 살리고 줄 수에 맞춰 글자를 줄인다 */
+      let lh = fs * 1.3;
+      while (fs > minFs && lines.length * lh > h - pad * 0.6){ fs -= .5; setF(fs); lines = wrapText(g, t, innerW); lh = fs * 1.3; }
+      let yy = f.top ? y + pad + fs * 0.52 : y + Math.max(fs * .7, (h - lines.length * lh) / 2 + lh / 2);
+      g.textAlign = 'left'; lines.forEach(l => { if (yy < y + h + 2) g.fillText(l, x + pad, yy); yy += lh; });
     }
+    g.restore();
   }
   /* 188 간인 — 쪽과 쪽이 맞닿는 가장자리에 도장을 정확히 반씩 */
   if (window.SEAL && SEAL.cp && SEAL.img){
@@ -3108,11 +3164,11 @@ async function doExport(kind){
 $('#exHwpx').onclick = () => doExport('hwpx');
 $('#exXlsx').onclick = () => doExport('xlsx');
 $('#exPrint').onclick = async () => { busyOn('인쇄할 종이를 만드는 중…');
-  try{ const n = tfPageCount(), urls = [];
-    for (let p = 1; p <= n; p++){ const c = await composite(2480, p); urls.push(c.toDataURL('image/png')); }
+  try{ const n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), urls = [];
+    for (let c = 0; c < cp; c++) for (let p = 1; p <= n; p++){ const cv = await composite(2480, p); urls.push(cv.toDataURL('image/png')); }
     $('#printArea').innerHTML = urls.map(u => `<img src="${u}" alt="">`).join('');
     busyOff(); setTimeout(() => window.print(), 140);
-    $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
+    $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽${cp > 1 ? ' × ' + cp + '부' : ''} 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
   }catch(e){ busyOff(); toast('인쇄 화면을 만들지 못했습니다'); } };
 /* ⑤-2 더싸인으로 이어 찍기 — 방금 적은 계약서(값이 얹힌 그대로)를 넘긴다 */
 $('#goSign').onclick = async () => {
@@ -3142,6 +3198,7 @@ function go(n, noPush){
   if (n === 2) drawEditor();
   if (n === 3) renderInputs();
   if (n === 4) renderPreview();
+  dockFit();
   guideSyncSoon();
   if (n === 5 && window.sealBoxPaint) sealBoxPaint();
   if (n === 5 && !$('#outName').value) $('#outName').value = (CUR.name || '양식') + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -3171,10 +3228,76 @@ $('#regSeg').onclick = e => { const b = e.target.closest('button'); if (b) showR
    188 (2026-11-24) 사인 · 도장 · 간인
    · 도장함은 공통 모듈 shared/kts-seal.js — 더싸인·계약서와 같은 도장을 쓴다.
    · 서명 칸에 도장을 찍고, 쪽 경계에는 간인(2부·3부)을 반씩 걸쳐 찍는다.
+   222 (2026-11-25) 이름 도장은 이 페이지에서 직접 그린다(inkSeal) — 세로 타원 테두리 +
+   두꺼운 인장 글자 + 인주 번짐. 공통 모듈(더싸인·계약서)은 그대로 둔다.
    ========================================================================== */
 var SEAL = {cur:null, img:null, cp:0};   /* cp: 0 = 간인 없음 · 2 = 2부 · 3 = 3부 */
 function sealSlots(){
   return CUR ? CUR.fields.map(function(f, i){ return {f:f, i:i}; }).filter(function(x){ return x.f.type === 'sign'; }) : [];
+}
+/* 이름 → 실물 인주 도장 (세로 타원 테두리 + 두꺼운 인장 글자 + 빨간 인주 번짐) — 222번 */
+function inkSeal(name){
+  var nm = String(name || '').replace(/\s+/g, '').slice(0, 4) || '인';
+  var W = 520, H = 640, RED = '#C9202A';
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var g = cv.getContext('2d');
+  g.clearRect(0, 0, W, H); g.strokeStyle = RED; g.fillStyle = RED; g.lineJoin = 'round'; g.lineCap = 'round';
+  var pad = 26, rx = W / 2 - pad, ry = H / 2 - pad, lw = 23;
+  /* 테두리 — 세로 타원, 두껍고 살짝 오돌도돌하게 */
+  g.lineWidth = lw;
+  g.beginPath();
+  var T = 96, jj;
+  for (var q = 0; q < T; q++){
+    var aa = q / T * Math.PI * 2, jr = 1 + (Math.random() - 0.5) * 0.016;
+    var ptx = W / 2 + Math.cos(aa) * rx * jr, pty = H / 2 + Math.sin(aa) * ry * jr;
+    if (!q) g.moveTo(ptx, pty); else g.lineTo(ptx, pty);
+  }
+  g.closePath(); g.stroke();
+  /* 이름 — 안쪽을 꽉 채우게 세로로, 획을 살짝 두껍게 */
+  var chars = nm.split(''), n = chars.length;
+  var inW = (rx - lw * 0.62) * 2, inH = (ry - lw * 0.62) * 2;
+  var step = inH / n;
+  var fs = Math.min(inW * 0.86, step * 0.80);
+  var font = '"KTSMyeongjo","바탕","Batang","HY신명조",serif';
+  g.font = '400 ' + Math.round(fs) + 'px ' + font; g.textAlign = 'center'; g.textBaseline = 'middle';
+  chars.forEach(function(ch, i){
+    var cy = H / 2 + (i - (n - 1) / 2) * step;
+    var cx = W / 2 + (i % 2 ? 1 : -1) * W * 0.004;
+    g.save(); g.translate(cx, cy); g.rotate((i % 2 ? 1 : -1) * 0.012);
+    g.fillText(ch, 0, 0);
+    g.lineWidth = Math.max(1.5, fs * 0.09); g.strokeText(ch, 0, 0);   /* 인장처럼 획을 두껍게 */
+    g.restore();
+  });
+  /* 인주 번짐 — 살짝 번진 밑그림을 만든 뒤, 테두리·글자를 군데군데 깎아 거칠게 */
+  var soft = document.createElement('canvas'); soft.width = W; soft.height = H;
+  var s = soft.getContext('2d');
+  try{ s.filter = 'blur(2.4px)'; }catch(e){}
+  s.drawImage(cv, 0, 0);
+  g.globalCompositeOperation = 'destination-out';
+  var k, a2, rr, px, py, r;
+  for (k = 0; k < 420; k++){                     /* 테두리 안팎을 오돌도돌하게 — 인주가 묻은 결 */
+    a2 = Math.random() * Math.PI * 2; rr = 1 + (Math.random() - 0.5) * 0.10;
+    px = W / 2 + Math.cos(a2) * rx * rr; py = H / 2 + Math.sin(a2) * ry * rr;
+    r = 1.5 + Math.random() * 7;
+    g.globalAlpha = 0.3 + Math.random() * 0.6;
+    g.beginPath(); g.arc(px, py, r, 0, Math.PI * 2); g.fill();
+  }
+  for (k = 0; k < 240; k++){                     /* 알맹이 결 — 작은 구멍 */
+    g.globalAlpha = 0.22 + Math.random() * 0.38;
+    g.beginPath(); g.arc(Math.random() * W, Math.random() * H, 0.7 + Math.random() * 2.6, 0, Math.PI * 2); g.fill();
+  }
+  for (k = 0; k < 8; k++){                       /* 가는 긁힌 결 */
+    g.globalAlpha = 0.20 + Math.random() * 0.25; g.lineWidth = 1 + Math.random() * 1.6;
+    var sx = Math.random() * W, sy = Math.random() * H;
+    g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + (Math.random() - 0.5) * 90, sy + (Math.random() - 0.5) * 120); g.strokeStyle = '#000'; g.stroke();
+  }
+  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  /* 번진 밑그림을 옅게 깔고 선명한 도장을 위에 */
+  var out = document.createElement('canvas'); out.width = W; out.height = H;
+  var o = out.getContext('2d');
+  o.globalAlpha = 0.5; o.drawImage(soft, 0, 0);
+  o.globalAlpha = 1; o.drawImage(cv, 0, 0);
+  return out.toDataURL('image/png');
 }
 function sealBoxPaint(){
   var b = $('#sealBox'); if (!b) return;
@@ -3195,7 +3318,12 @@ function sealBoxPaint(){
   var seg = $('#ganSeg');
   if (seg) Array.prototype.forEach.call(seg.querySelectorAll('button'), function(bt){ bt.classList.toggle('on', (+bt.getAttribute('data-cp')) === (+SEAL.cp || 0)); });
   var inf = $('#sealInfo');
-  if (inf) inf.textContent = (SEAL.cp ? ('간인 ' + SEAL.cp + '부 — 쪽마다 경계에 반씩 찍습니다. ') : '간인은 2쪽 이상 문서에서만 찍힙니다 · 2부·3부는 같은 자리에 되풀이해 찍습니다.');
+  if (inf){
+    var cp = Math.max(1, +SEAL.cp || 1);
+    inf.textContent = SEAL.cp
+      ? ('간인 ' + SEAL.cp + '부 — 쪽마다 경계에 반씩 찍고, 사진·PDF·인쇄도 ' + cp + '부로 나옵니다.' + (tfPageCount() < 2 ? ' (이 문서는 1쪽 — 간인은 찍히지 않습니다)' : ''))
+      : '1부로 저장합니다. 2부·3부를 고르면 간인을 찍고 사진·PDF·인쇄도 그 부수만큼 나옵니다(간인은 2쪽 이상).';
+  }
 }
 async function sealPick(id){
   var it = (window.KTSSeal ? KTSSeal.box() : []).filter(function(x){ return x.id === id; })[0];
@@ -3227,17 +3355,19 @@ if ($('#sealBox')){
     catch(err){ toast('도장 사진을 읽지 못했습니다'); }
     busyOff(); sealBoxPaint();
   };
-  $('#sealName').onclick = function(){
+  $('#sealName').onclick = async function(){
     var nm = window.prompt('도장에 새길 이름 (2~4자)', '');
     if (!nm) return;
-    KTSSeal.save({nm: nm.slice(0, 4), src: KTSSeal.fromName(nm, 'circle')});
+    try{ await ensureOvFont(); }catch(e){}
+    KTSSeal.save({nm: nm.slice(0, 4), src: inkSeal(nm)});
     sealBoxPaint(); toast('이름 도장을 만들었습니다 · 골라서 자리에 찍으세요');
   };
   $('#ganSeg').onclick = function(e){
     var b = e.target.closest('button'); if (!b) return;
     SEAL.cp = +b.getAttribute('data-cp') || 0;
-    if (SEAL.cp && !SEAL.img) toast('먼저 간인에 쓸 도장을 골라 주세요');
-    if (SEAL.cp && tfPageCount() < 2) toast('이 문서는 1쪽입니다 — 간인은 2쪽 이상에서 찍힙니다');
+    if (SEAL.cp && !SEAL.img) toast('간인에 쓸 도장을 고르면 쪽 경계에도 찍힙니다 · 저장은 ' + SEAL.cp + '부로 나옵니다');
+    else if (SEAL.cp && tfPageCount() < 2) toast('1쪽 문서입니다 · 저장·인쇄는 ' + SEAL.cp + '부로 나옵니다');
+    else if (SEAL.cp) toast(SEAL.cp + '부 — 사진·PDF·인쇄를 ' + SEAL.cp + '부로 만들고 간인을 찍습니다');
     sealBoxPaint(); if (STEP === 4) renderPreview();
   };
 }
@@ -3282,7 +3412,7 @@ sealBoxPaint();
 /* 시험·설명서용 손잡이 */
 window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, onPhoto, addField, addErase, undo, redo, saveCurrent, myForms, BUILT, mapRecord, personFamily, fieldKind, personOptions,
   get CUR(){ return CUR; }, get VALS(){ return VALS; }, set VALS(v){ VALS = v; }, get SEL(){ return SEL; }, set SEL(v){ SEL = v; }, get UNDO(){ return UNDO; }, drawEditor, runCalc, saveVals, renderInputs,
-  autoDetectFields, runAutoDetect, nextField, prevField, navIdx, savePreset, loadPreset, myPresets, get BG(){ return BG; }, set BG(v){ BG = v; }, set CUR(v){ CUR = v; }, sealBoxPaint,
+  autoDetectFields, runAutoDetect, nextField, prevField, navIdx, savePreset, loadPreset, myPresets, get BG(){ return BG; }, set BG(v){ BG = v; }, set CUR(v){ CUR = v; }, sealBoxPaint, inkSeal,
   get SEAL(){ return SEAL; }};
 
 /* ============================================================================
