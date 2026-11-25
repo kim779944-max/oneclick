@@ -202,6 +202,8 @@ function jsonp(url,ms){
   });
 }
 function vwErr(r){ return !r||r.__err||!r.response?({st:'error'}):({st:String(r.response.status||'')}) }
+/* 브이월드 응답은 결과가 1건이면 배열이 아니라 객체로 온다 — 항상 배열로 만든다 */
+function arr(x){ return Array.isArray(x)?x:(x&&typeof x==='object'?[x]:[]) }
 
 /* ---------- 상태 표시 ---------- */
 function state(kind,txt){ return '<div class="state '+kind+'"><span class="dot"></span><span>'+txt+'</span></div>' }
@@ -254,6 +256,8 @@ function ringAreaAbs(rings,latC){
   }
   return Math.abs(s/2);
 }
+/* 연속지적도 속성 jibun 은 '162-9 전'처럼 지번+지목이 붙어 온다 — 숫자만 지번으로 */
+function jibunParts(s){ var m=String(s||'').trim().match(/^(\d+(?:-\d+)?)\s*(.*)$/); return m?{no:m[1],jm:m[2]}:{no:String(s||''),jm:''} }
 function bboxOf(rings){
   var b={minx:1e9,miny:1e9,maxx:-1e9,maxy:-1e9};
   for(var i=0;i<rings.length;i++) for(var j=0;j<rings[i].length;j++){
@@ -287,8 +291,8 @@ function nedLand(pnu){                 /* 토지임야정보 = 토지대장/임�
   return jsonp(NED+'/ladfrlList?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=3&pageNo=1')
     .then(function(r){
       if(!r||r.__err||!r.ladfrlVOList) return null;
-      var v=r.ladfrlVOList; var arr=v.ladfrlVOList; if(!Array.isArray(arr)) arr=arr?[arr]:[];
-      return arr[0]||null;
+      var v=r.ladfrlVOList;
+      return arr(v.ladfrlVOList)[0]||null;
     }).catch(function(){return null});
 }
 function nedChar(pnu){                 /* 토지특성 — 기준연도 넣어 최신 1건 */
@@ -298,8 +302,8 @@ function nedChar(pnu){                 /* 토지특성 — 기준연도 넣어 �
     var yr=y-i; i++;
     return jsonp(NED+'/getLandCharacteristics?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=30&pageNo=1&stdrYear='+yr)
       .then(function(r){
-        var f=r&&r.landCharacteristicss&&r.landCharacteristicss.field;
-        if(!Array.isArray(f)||!f.length) return step();
+        var f=arr(r&&r.landCharacteristicss&&r.landCharacteristicss.field);
+        if(!f.length) return step();
         f.sort(function(a,b){return String(b.lastUpdtDt||'').localeCompare(String(a.lastUpdtDt||''))});
         return f[0];
       }).catch(function(){ return step() });
@@ -309,8 +313,8 @@ function nedChar(pnu){                 /* 토지특성 — 기준연도 넣어 �
 function nedPrice(pnu){                /* 개별공시지가 — 최신 연도 1건 */
   return jsonp(NED+'/getIndvdLandPriceAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=40&pageNo=1')
     .then(function(r){
-      var f=r&&r.indvdLandPrices&&r.indvdLandPrices.field;
-      if(!Array.isArray(f)||!f.length) return null;
+      var f=arr(r&&r.indvdLandPrices&&r.indvdLandPrices.field);
+      if(!f.length) return null;
       f.sort(function(a,b){
         var da=String(b.stdrYear||''), db=String(a.stdrYear||'');
         if(da!==db) return da.localeCompare(db);
@@ -322,8 +326,8 @@ function nedPrice(pnu){                /* 개별공시지가 — 최신 연도 1
 function nedUse(pnu){                  /* 토지이용계획 — 용도지역·지구·구역 */
   return jsonp(NED+'/getLandUseAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&pnu='+pnu+'&numOfRows=200&pageNo=1')
     .then(function(r){
-      var f=r&&r.landUses&&r.landUses.field;
-      if(!Array.isArray(f)) return [];
+      var f=arr(r&&r.landUses&&r.landUses.field);
+      if(!f.length) return [];
       var seen={}, out=[];
       f.forEach(function(x){
         var k=(x.cnflcAtNm||'')+'|'+x.prposAreaDstrcCodeNm+'|'+(x.prposAreaDstrcCode||'');
@@ -383,8 +387,7 @@ function setQ(t){ $('#qSt').textContent=t }
 
 function paintSum(){
   $('#cSum').classList.remove('hide');
-  var j=S.jibun||'—';
-  $('#sumJibun').textContent=j;
+  $('#sumJibun').textContent=(S.jibun||'—')+(S.jm?' '+S.jm:'');
   $('#sumArea').textContent=(S.area?num(S.area)+'㎡ · '+num(pyeong(S.area))+'평':'');
   var rows=[
     ['주소', S.addr||''],
@@ -765,11 +768,11 @@ function run(){
     return parcelAt(g.lat,g.lon);
   }).then(function(pc){
     if(!pc||pc.st!=='OK') throw new Error(pc&&pc.st==='NOT_FOUND'?'이 지점의 필지 자료가 없습니다 — 지번을 확인해 주세요':'필지 경계를 읽지 못했습니다 — 잠시 뒤 다시');
-    S.pnu=pc.pnu; S.jibun=pc.jibun; S.rings=pc.rings; S.area=pc.area; if(pc.addr) S.addr=pc.addr;
+    var jp=jibunParts(pc.jibun);
+    S.pnu=pc.pnu; S.jibun=jp.no; S.jm=jp.jm; S.rings=pc.rings; S.area=pc.area;
+    if(pc.addr) S.addr=pc.addr;
     S.box=expand(bboxOf(pc.rings),2.4);
     paintSum();
-    var jd=+(pc.jiga||0);
-    if(jd) $('#sumRows').insertAdjacentHTML('beforeend','<div class="row"><div class="k">공시지가</div><div class="v">'+num(jd)+'원/㎡ <small>연속지적도 속성</small></div></div>');
     setQ('4대 공부 받는 중');
     if(!S.pnu) return null;
     return Promise.all([
