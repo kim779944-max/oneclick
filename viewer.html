@@ -2157,27 +2157,40 @@ body.edcap .xlwrap{overflow:visible!important}
   }
   /* (2026-11-25 · 221번) 저장·더편집으로 찍기 전에 PDF 장을 전부 그려 둔다.
      화면 근처(±1500px)만 그리는 지연 그리기 때문에, 스크롤하지 않은 뒤쪽 장은 캔버스가 없어
-     저장 그림에서 빈 여백으로 나왔다(8쪽 PDF → 5쪽까지만 내용, 6~7쪽 백지). */
-  function prepareAll(){
-    var q = 1, total = 0;
+     저장 그림에서 빈 여백으로 나왔다(8쪽 PDF → 5쪽까지만 내용, 6~7쪽 백지).
+     장 그리기는 동시에 몰리면 busy 로 건너뛰므로, 모든 장에 캔버스가 생길 때까지 다시 걸어 준다. */
+  async function prepareAll(){
+    var q = 1, total = 0, multi = false;
     try{ if (typeof ppWantQ === 'function') q = Math.max(1, Math.min(1.6, ppWantQ())); }catch(e){}
     try{
-      if (typeof MF !== 'undefined' && MF.multi && MF.items) MF.items.forEach(function(it){ if (it.kind === 'pdf' && it.pdf) total += (it.pages || []).length; });
-      else if (typeof PP !== 'undefined' && PP.kind === 'pdf') total = (PP.pages || []).length;
+      multi = (typeof MF !== 'undefined' && MF.multi && typeof PP !== 'undefined' && !!PP.scale);
+      if (multi && MF.items) MF.items.forEach(function(it){ if (it.kind === 'pdf' && it.pdf) total += (it.pages || []).length; });
+      else if (typeof PP !== 'undefined' && PP.kind === 'pdf' && PP.pdf) total = (PP.pages || []).length;
       if (total > 12) q = 1;              /* 긴 묶음은 장마다 1배율 — 폰 메모리 보호(화질은 화면과 같은 수준) */
     }catch(e){}
-    var jobs = [];
+    if (!total) return;
+    var list = [];
     try{
-      if (typeof MF !== 'undefined' && MF.multi && typeof PP !== 'undefined' && PP.scale){
+      if (multi){
         MF.items.forEach(function(it){
           if (it.kind !== 'pdf' || !it.pdf || !it.pages) return;
-          it.pages.forEach(function(p, pi){ if (!p.frozen) jobs.push(mfRender(it, p, pi, q)); });
+          it.pages.forEach(function(p, pi){ if (!p.frozen) list.push({it: it, p: p, pi: pi, n: 0}); });
         });
       } else if (typeof PP !== 'undefined' && PP.kind === 'pdf' && PP.pdf){
-        PP.pages.forEach(function(p, i){ jobs.push(renderPdfPage(i, q)); });
+        (PP.pages || []).forEach(function(p, i){ list.push({it: null, p: p, pi: i, n: 0}); });
       }
     }catch(e){}
-    return Promise.all(jobs).catch(function(){});
+    var wait = function(ms){ return new Promise(function(ok){ setTimeout(ok, ms); }); };
+    var todo = function(){ return list.filter(function(c){ return c.it ? (!c.p.frozen && !c.p.canvas) : !c.p.done; }); };
+    var kick = function(){
+      todo().forEach(function(c){
+        if (c.n++ > 3) return;            /* 그려도 안 되는 장은 포기(무한 대기 방지) */
+        try{ if (c.it) mfRender(c.it, c.p, c.pi, q); else renderPdfPage(c.pi, q); }catch(e){}
+      });
+    };
+    var end = Date.now() + 30000;
+    kick();
+    while (todo().length && Date.now() < end){ await wait(90); kick(); }
   }
   /* 되돌리기 */
   function snap(){
