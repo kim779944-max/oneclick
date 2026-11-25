@@ -106,6 +106,10 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 .s5 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .s5 .chips button{font-size:11.5px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:999px;padding:7px 10px;line-height:1.3;max-width:100%;text-align:left}
 .s5 .chips button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
+#spChips .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#spChips .chips button{font-size:11.5px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:999px;padding:8px 11px;line-height:1.35;max-width:100%;text-align:left}
+#spChips .chips button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
+.tlabel i{font-style:normal;font-weight:700;color:#7C8DA6;font-size:10.5px;margin-left:6px}
 .s5sum{margin-top:8px;font-size:11.5px;line-height:1.6;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 10px;white-space:pre-wrap;word-break:break-all}
 .s5sum b{color:var(--amber2)}
 .s5sum i{font-style:normal;color:#7C8DA6}
@@ -1187,7 +1191,7 @@ function toggleChip(txt) {
 function renderChips() {
   const box = $('#spChips'); if (!box) return;
   const ls = freeLines(), list = chipLines();
-  box.innerHTML = '<div class="tlabel">고정 특약 — 누르면 바로 들어갑니다<i>다시 누르면 빠집니다</i></div>'
+  box.innerHTML = '<div class="tlabel">고정 특약<i>누르면 바로 들어갑니다 · 다시 누르면 빠집니다</i></div>'
     + '<div class="chips">' + list.map((t, i) =>
       '<button type="button" data-chip="' + i + '" class="' + (ls.indexOf(t) >= 0 ? 'on' : '') + '" title="' + escH(t) + '">'
       + escH(t.length > 26 ? t.slice(0, 25) + '…' : t) + '</button>').join('') + '</div>';
