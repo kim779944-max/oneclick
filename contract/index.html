@@ -1307,6 +1307,7 @@ function s5run() {
   const chips = S5_CHIPS[chipKind()] || [];
   if (chips[0]) { S.free = chips[0]; }
   save();
+  syncSpecial();                     /* 특약 칸에 바로 넣어 둔다 — 3단계를 건너뛰고 인쇄해도 나가게 */
   $('#s5sum').hidden = false;
   $('#s5sum').innerHTML = s5summary(A, formId, done, A.log);
   $('#s5info').textContent = '빈칸은 화면에서 채우면 됩니다 · 평↔㎡ 칸은 어느 쪽에 넣어도 같이 바뀝니다.';
@@ -1330,7 +1331,7 @@ function go(n, noPush){
   if (n === 0){ renderPick(); renderSheet(); }
   if (n === 2) renderContent();
   if (n === 3) renderSpecial();
-  if (n === 4){ renderSigns(); renderPreview(); renderCp(); renderSeal(); }
+  if (n === 4){ syncSpecial(); renderSigns(); renderPreview(); renderCp(); renderSeal(); }
   window.scrollTo(0, 0);
   if (!noPush){ try{ const st = {kc:S.step};
     if (!GO_INIT){ history.replaceState(st, ''); GO_INIT = true; } else history.pushState(st, ''); }catch(e){} }
