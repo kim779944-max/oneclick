@@ -1,7 +1,8 @@
 /* KTS 전자명함 · 매물장 — 오프라인에서도 명함이 열리게 (네트워크 우선, 없으면 캐시) */
-var CACHE = 'kts-bizcard-20261126c';
+var CACHE = 'kts-bizcard-20261126d';
 var SHELL = ['./', './index.html', './app.css', './app.js', './parse.js', './gongbu.js',
-  './assistant.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+  './assistant.js', './manifest.webmanifest', './icon-192.png', './icon-512.png',
+  './img/sample-person.jpg', './img/sample-land.jpg', './img/sample-house.jpg'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL) }).then(function () { return self.skipWaiting() }));

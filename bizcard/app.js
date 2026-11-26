@@ -6,7 +6,7 @@
   'use strict';
 
   var K = { me: 'kts_bc_me', items: 'kts_bc_items', plan: 'kts_bc_plan', seen: 'kts_bc_seen',
-            inq: 'kts_bc_inq', tip: 'kts_bc_tip', kb: 'kts_bc_kakaobar' };
+            inq: 'kts_bc_inq', tip: 'kts_bc_tip', kb: 'kts_bc_kakaobar', shared: 'kts_bc_shared' };
 
   /* ---------------- 기본 도구 ---------------- */
   var $ = function (s, r) { return (r || document).querySelector(s) };
@@ -78,12 +78,15 @@
   var DEMO = [
     { kind: '임야', addr: '경기도 가평군 북면 목동리 271', areaM2: 3967, areaP: 1200, price: 380000000,
       tags: ['보전관리', '전원주택지', '경사지'], title: '임야 1,200평 · 북면', days: 1,
+      photo: 'img/sample-land.jpg',
       raw: '[한빛부동산] 가평 북면 목동리 271 임야 3,967㎡(1,200평) 매매 3억8천 보전관리 전원주택지 010-2345-6789' },
     { kind: '대지', addr: '경기도 가평군 조종면 신하리 162-9', areaM2: 991, areaP: 300, price: 520000000,
       tags: ['도로접', '평지', '전원주택지'], title: '대지 300평 · 조종면', days: 3,
+      photo: 'img/sample-house.jpg',
       raw: '[한빛부동산] 가평 조종면 신하리 162-9 대지 991㎡(300평) 매매 5억2천 도로접 평지 010-2345-6789' },
+    /* 사진이 없는 예시 — 지적항공도가 자동으로 붙는 모습을 그대로 보여 준다 */
     { kind: '답', addr: '충남 당진시 석문면 초락도리 204-1', areaM2: 6612, areaP: 2000, price: 400000000,
-      tags: ['도로접', '평지', '농지'], title: '답 2,000평 · 석문면', days: 6,
+      tags: ['도로접', '평지', '농지'], title: '답 2,000평 · 석문면', days: 6, photo: '',
       raw: '[한빛부동산] 당진 석문면 초락도리 204-1 답 6,612㎡(2,000평) 매매 4억 도로접 농지 010-2345-6789' }
   ];
 
@@ -95,7 +98,9 @@
         price: d.price, tags: d.tags, phone: '010-2345-6789', raw: d.raw
       });
       it.demo = 1;
-      it.starred = i === 0;
+      /* 예시도 「별표 켠 매물」로 둔다 — 명함에는 별표만 올라가므로 셋 다 별표 */
+      it.starred = true;
+      it.photos = d.photo ? [d.photo] : [];
       it.createdAt = Date.now() - d.days * 86400000 - 3600000;
       return it;
     });
@@ -213,55 +218,60 @@
   function viewCard() {
     if (!S.me) { go('#/setup'); return; }
     var me = S.me;
-    var starred = S.items.filter(function (x) { return x.starred }).slice(0, 8);
-    var list = starred.length ? starred.slice(0, 4) : [];
-    if (list.length < 3) {
-      S.items.slice().sort(function (a, b) { return b.createdAt - a.createdAt }).forEach(function (x) {
-        if (list.length < 3 && list.indexOf(x) < 0) list.push(x);
-      });
-    }
+    /* 명함에는 「내가 별표(★)를 켠 매물」만 — 나머지는 매물 전체 보기 안에서만 */
+    var starred = S.items.filter(function (x) { return x.starred })
+      .sort(function (a, b) { return b.createdAt - a.createdAt });
+    var list = starred.slice(0, 3);
     var unread = unreadCount();
+    var tel = (me.phone || '').replace(/[^0-9+]/g, '');
 
     var h = '';
+    /* ① 명함 — 종이 명함 한 장 비율 */
     h += '<div class="biz">';
-    h += '<div class="biz-top">';
-    h += '<div class="av">' + (me.photo ? '<img src="' + me.photo + '" alt="">' : esc((me.name || '?').slice(0, 1))) + '</div>';
-    h += '<div class="who"><b>' + esc(me.name || '이름') + '</b><span>' + esc([me.org, me.title].filter(Boolean).join(' · ') || '전자명함') + '</span></div>';
-    h += '<button class="bell' + (unread ? ' on' : '') + '" id="btnInbox" aria-label="문의함">' + IC.bell + (unread ? '<i>' + unread + '</i>' : '') + '</button>';
+    h += '<span class="biz-mark">KTS</span>';
+    h += '<div class="biz-row">';
+    h += '<div class="av">' + (me.photo
+      ? '<img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진">'
+      : esc((me.name || '?').slice(0, 1))) + '</div>';
+    h += '<div class="who">';
+    h += '<b>' + esc(me.name || '이름') + '</b>';
+    h += '<span class="role">' + esc([me.org, me.title].filter(Boolean).join(' · ') || '전자명함') + '</span>';
+    h += '<div class="medals">';
+    if (me.field) h += '<span class="badge">' + esc(me.field) + '</span>';
+    if (me.strength) h += '<span class="edge">' + esc(me.strength) + '</span>';
+    if (!me.field && !me.strength) h += '<span class="edge">고치기에서 전문 분야를 넣어 보세요</span>';
     h += '</div>';
     if (me.intro) h += '<p class="intro"><em>“</em>' + esc(me.intro) + '</p>';
+    h += '</div></div>';
+
     h += '<div class="biz-line"></div>';
-
-    h += '<div class="acts3">';
-    h += '<a class="act" href="tel:' + esc((me.phone || '').replace(/[^0-9+]/g, '')) + '"><u>' + IC.phone + '</u><span>전화</span></a>';
-    h += '<a class="act" href="sms:' + esc((me.phone || '').replace(/[^0-9+]/g, '')) + '"><u>' + IC.sms + '</u><span>문자</span></a>';
-    h += '<a class="act" href="#" id="btnKakao"><u>' + IC.chat + '</u><span>카톡</span></a>';
+    h += '<div class="biz-acts">';
+    h += '<a class="pact tel" href="tel:' + esc(tel) + '">' + IC.phone + '<span>전화</span></a>';
+    h += '<a class="pact sms" href="sms:' + esc(tel) + '">' + IC.sms + '<span>문자</span></a>';
+    h += '<a class="pact kakao" href="#" id="btnKakao">' + IC.chat + '<span>카톡</span></a>';
+    h += '<button class="pact inst" id="btnInstall" type="button">' + IC.install + '<span>바탕화면</span></button>';
+    h += '</div>';
     h += '</div>';
 
-    h += '<button class="install" id="btnInstall">' + IC.install + '<b>바탕화면 아이콘 추가</b><em>누르면 폰 화면에 바로가기가 생깁니다</em></button>';
-    h += '<div class="biz-foot"><span class="wm">KTS <i>전자명함</i></span>'
-      + '<button class="lnk" id="btnShare">' + IC.share + ' 보내기</button>'
-      + '<button class="lnk" id="btnEdit">고치기</button></div>';
-    h += '</div>';
+    /* 명함 아래 한 줄 도구 */
+    h += '<div class="biz-tools"><span class="wm">KTS <i>전자명함</i></span>'
+      + '<button type="button" id="btnShare">' + IC.share + '보내기</button>'
+      + '<button type="button" id="btnEdit">' + IC.pen + '고치기</button>'
+      + '<button type="button" id="btnInbox"' + (unread ? ' class="on"' : '') + '>' + IC.bell + '문의'
+      + (unread ? '<i class="cnt">' + unread + '</i>' : '') + '</button></div>';
 
-    /* ② 대표매물 */
-    h += '<div class="sec-h"><b>새 물건표</b><span>' + (starred.length ? '별표 ' + starred.length + '건' : '최근 매물') + '</span></div>';
+    /* ② 새 물건표 — 별표 켠 매물만, 작은 썸네일 3열 */
+    h += '<div class="sec-h star"><b>새 물건표</b><span>'
+      + (starred.length ? '별표 ' + starred.length + '건' : '별표 없음') + '</span></div>';
     if (list.length) {
-      h += '<div class="rail">';
-      list.forEach(function (it) {
-        h += '<a class="rcard" href="#/item/' + it.id + '">'
-          + '<div class="rth">' + thumb(it) + (it.demo ? '<i class="dm">예시</i>' : '') + (ago(it.createdAt) === '오늘' ? '<i class="new">NEW</i>' : '') + '</div>'
-          + '<b>' + esc(it.title || '매물') + '</b>'
-          + '<span class="pr">' + esc(it.dealType !== '매매' && it.deposit ? '보증 ' + money(it.deposit) : money(it.price)) + '</span>'
-          + '<span class="ar">' + (it.areaP ? num(it.areaP) + '평' : '면적 미정') + '</span>'
-          + '</a>';
-      });
+      h += '<div class="grid3">';
+      list.forEach(function (it) { h += gcard(it); });
       h += '</div>';
     } else {
-      h += '<div class="empty">아직 매물이 없습니다. 받은 문자를 붙여넣으면 바로 생깁니다.</div>';
+      h += '<a class="star-empty" href="#/list"><b>★</b><span>매물장에서 별표를 켜면<br>이 자리에 손님에게 먼저 보입니다</span></a>';
     }
 
-    h += '<a class="wide" href="#/list"><b>매물 전체 보기</b><span>' + S.items.length + '건 →</span></a>';
+    h += '<a class="wide slim" href="#/list"><b>매물 전체 보기</b><span>' + S.items.length + '건 →</span></a>';
     h += '<p class="tiny">문자 → 매물장 → 전자명함 · KTS 원클릭</p>';
 
     $('#v-card').innerHTML = h;
@@ -276,6 +286,16 @@
     updateBadge();
     if (installed) $('#btnInstall').classList.add('done');
     list.forEach(ensureGeo);
+  }
+
+  /* 명함 위 작은 물건 카드 */
+  function gcard(it) {
+    var price = (it.dealType !== '매매' && it.deposit) ? '보증 ' + money(it.deposit) : money(it.price);
+    return '<a class="gcard" href="#/item/' + it.id + '">'
+      + '<div class="gth">' + thumb(it) + (it.demo ? '<i class="dm">예시</i>' : '') + '</div>'
+      + '<b>' + esc(it.title || '매물') + '</b>'
+      + '<span class="pr">' + esc(price) + '<i>' + (it.areaP ? num(it.areaP) + '평' : '면적 미정') + '</i></span>'
+      + '</a>';
   }
 
   function shareCard() {
@@ -398,6 +418,15 @@
     h += '<button class="big" id="btnParse">5초 만에 매물장 만들기</button>';
     h += '<p class="tiny">소재지는 4대 공부(토지·건축물·지적·이용계획)까지 자동으로 붙습니다.</p>';
     $('#v-new').innerHTML = h;
+
+    /* 안드로이드 [공유]로 들어온 문자는 곧바로 물건표로 */
+    var shared = LS.get(K.shared, '');
+    if (shared) {
+      LS.set(K.shared, '');
+      $('#raw').value = shared;
+      setTimeout(doParse, 0);
+      return;
+    }
 
     $('#btnClip').addEventListener('click', function () {
       if (!navigator.clipboard || !navigator.clipboard.readText) { toast('붙여넣기 칸을 길게 눌러 붙여넣어 주세요'); return; }
@@ -755,16 +784,16 @@
     inp.click();
   }
 
-  function compress(file, cb) {
+  function compress(file, cb, maxW, q) {
     var r = new FileReader();
     r.onload = function () {
       var img = new Image();
       img.onload = function () {
-        var w = 900, h = Math.round(img.height * (w / img.width));
+        var w = maxW || 900, h = Math.round(img.height * (w / img.width));
         if (img.width < w) { w = img.width; h = img.height; }
         var c = document.createElement('canvas'); c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
-        try { cb(c.toDataURL('image/jpeg', 0.7)) } catch (e) { cb(r.result) }
+        try { cb(c.toDataURL('image/jpeg', q || 0.7)) } catch (e) { cb(r.result) }
       };
       img.onerror = function () { cb(r.result) };
       img.src = r.result;
@@ -799,18 +828,59 @@
   /* ---------------- 명함 세팅 ---------------- */
   function viewSetup() {
     var me = S.me || {};
+    var cur = { photo: me.photo || '' };
     var h = '';
-    h += '<div class="page-h"><b>' + (S.me ? '명함 고치기' : '내 명함 만들기') + '</b><span>10초</span></div>';
+    h += '<div class="page-h"><b>' + (S.me ? '명함 고치기' : '내 명함 만들기') + '</b><span>사진 · 10초</span></div>';
+
+    /* 프로필 사진 */
+    h += '<div class="photobox">';
+    h += '<div class="pv" id="mePv">' + (cur.photo
+      ? '<img src="' + esc(cur.photo) + '" alt="프로필 사진">'
+      : '<b>' + esc((me.name || '?').slice(0, 1)) + '</b>') + '</div>';
+    h += '<div class="pbtns">'
+      + '<button class="btn sm main" id="btnPickMe" type="button">내 사진 넣기</button>'
+      + '<button class="btn sm" id="btnSampleMe" type="button">예시 사진</button>'
+      + '<button class="btn sm ghost" id="btnClearMe" type="button">지우기</button>'
+      + '<em>얼굴이 잘 보이는 세로 사진이 명함에 가장 잘 어울립니다.</em>'
+      + '</div></div>';
+
     h += '<div class="form">';
     h += field('name', '이름', me.name, '예) 김중개');
-    h += field('org', '회사 · 직함', me.org, '예) 한빛부동산 대표');
+    h += field('org', '회사 · 직함', me.org, '예) 한빛부동산 · 대표');
+    h += field('field', '전문 분야 (배지)', me.field, '예) 교환·급매물 전문');
+    h += field('strength', '핵심 장점 한 줄', me.strength, '예) 급매 3건 · 평당 시세 즉시 비교');
+    h += field('intro', '상태메시지 · 인삿말', me.intro, '예) 가평·남양주 토지와 전원주택 — 문자 주시면 5초 만에 물건표로 보내 드립니다.');
     h += field('phone', '전화번호', me.phone, '010-0000-0000', 'tel');
-    h += field('intro', '한 줄 소개 (선택)', me.intro, '예) 가평·남양주 토지와 전원주택 전문');
     h += field('kakao', '카톡 ID나 오픈채팅 주소 (선택)', me.kakao, '예) open.kakao.com/o/abcd');
     h += '</div>';
     h += '<button class="big" id="btnSaveMe">저장</button>';
     if (!S.me) h += '<button class="btn ghost wide2" id="btnDemoMe">예시로 채우고 둘러보기</button>';
     $('#v-setup').innerHTML = h;
+
+    function paintPv() {
+      $('#mePv').innerHTML = cur.photo
+        ? '<img src="' + esc(cur.photo) + '" alt="프로필 사진">'
+        : '<b>' + esc((($('#f-name') && $('#f-name').value) || me.name || '?').slice(0, 1)) + '</b>';
+    }
+    $('#btnPickMe').addEventListener('click', function () {
+      var inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = 'image/*';
+      inp.addEventListener('change', function () {
+        var f = inp.files && inp.files[0];
+        if (!f) return;
+        compress(f, function (data) {
+          cur.photo = data; paintPv(); toast('사진을 넣었습니다 — 저장을 눌러 주세요');
+        }, 320, 0.82);
+      });
+      inp.click();
+    });
+    $('#btnSampleMe').addEventListener('click', function () {
+      cur.photo = 'img/sample-person.jpg'; paintPv();
+      toast('예시 인물 사진입니다 — 「내 사진 넣기」로 바꿔 주세요');
+    });
+    $('#btnClearMe').addEventListener('click', function () {
+      cur.photo = ''; paintPv(); toast('사진을 지웠습니다 — 이름 첫 글자로 표시됩니다');
+    });
 
     $('#btnSaveMe').addEventListener('click', function () {
       var name = ($('#f-name').value || '').trim();
@@ -819,16 +889,24 @@
         name: name,
         org: ($('#f-org').value || '').trim(),
         phone: ($('#f-phone').value || '').trim(),
+        field: ($('#f-field').value || '').trim(),
+        strength: ($('#f-strength').value || '').trim(),
         intro: ($('#f-intro').value || '').trim(),
         kakao: ($('#f-kakao').value || '').trim(),
-        photo: (S.me && S.me.photo) || ''
+        photo: cur.photo || ''
       };
-      save(); toast('저장했습니다'); go('#/card');
+      save(); toast('저장했습니다');
+      /* 공유로 들어온 문자가 남아 있으면 그 물건표로 바로 */
+      go(LS.get(K.shared, '') ? '#/new' : '#/card');
     });
     var bd = $('#btnDemoMe');
     if (bd) bd.addEventListener('click', function () {
-      S.me = { name: '김중개', org: '한빛부동산 · 대표', phone: '010-2345-6789',
-        intro: '가평·남양주 토지와 전원주택 — 문자 주시면 5초 만에 물건표로 보내 드립니다.', kakao: '', photo: '' };
+      S.me = {
+        name: '김중개', org: '한빛부동산 · 대표', phone: '010-2345-6789',
+        field: '교환·급매물 전문', strength: '급매 3건 · 평당 시세 즉시 비교',
+        intro: '가평·남양주 토지와 전원주택 — 문자 주시면 5초 만에 물건표로 보내 드립니다.',
+        kakao: '', photo: 'img/sample-person.jpg'
+      };
       seedDemo(); save(); go('#/card');
     });
   }
@@ -954,6 +1032,24 @@
     toastT = setTimeout(function () { t.classList.remove('on') }, ms || 2600);
   }
 
+  /* ---------------- [공유]로 들어온 문자 받기 ---------------- */
+  /* 안드로이드에서 문자·카톡을 꾹 눌러 [공유 → 전자명함]을 고르면
+     manifest 의 share_target 이 ?title=&text=&url= 로 이 앱을 연다. */
+  function takeShared() {
+    var q = String(location.search || '').replace(/^\?/, '');
+    if (!q) return '';
+    var p;
+    try { p = new URLSearchParams(q) } catch (e) { return ''; }
+    var title = (p.get('title') || '').trim();
+    var text = (p.get('text') || '').trim();
+    var url = (p.get('url') || '').trim();
+    var body = (text || title || url || '').trim();
+    if (!body) return '';
+    /* 새로고침해도 다시 파싱하지 않게 주소의 공유값을 지운다 */
+    try { history.replaceState(null, '', location.pathname + (location.hash || '')); } catch (e) { }
+    return body.slice(0, 4000);
+  }
+
   /* ---------------- 시작 ---------------- */
   function boot() {
     /* 검수용: ?reset=1 이면 이 기기의 매물장·명함을 비우고 처음부터 */
@@ -974,6 +1070,16 @@
     $('#sheet').addEventListener('click', function (e) { if (e.target === $('#sheet')) closeSheet(); });
     if (isStandalone) installed = true;
     if (!S.items) seedDemo();
+
+    /* PWA [공유](share_target) — 문자·카톡에서 공유하면 ?title=&text= 로 들어온다 */
+    var shared = takeShared();
+    if (shared) {
+      LS.set(K.shared, shared);
+      location.hash = S.me ? '#/new' : '#/setup';
+      render();
+      if (S.me) toast('공유한 문자를 물건표로 만드는 중입니다');
+    }
+
     if (!location.hash) location.hash = S.me ? '#/card' : '#/setup';
     render();
     kakaoBar();
