@@ -69,6 +69,7 @@
     map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>',
     doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg>',
     bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2.5h-15z"/><path d="M10 21h4"/></svg>',
+    pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 6V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h1"/></svg>'
   };
@@ -173,7 +174,7 @@
   }
 
   /* ---------------- 라우터 ---------------- */
-  var route = { name: 'card', id: null }, lastKey = '';
+  var route = { name: 'card', id: null }, lastKey = '', editing = null;
   function go(h) { if (location.hash === h) render(); else location.hash = h; }
 
   function parseHash() {
@@ -483,7 +484,9 @@
     var h = '';
     h += '<div class="dhead"><button class="icob" id="btnBack">' + IC.back + '</button>'
       + '<b>매물 상세</b><span class="sp"></span>'
+      + '<button class="icob" id="btnEditItem" aria-label="매물 고치기">' + IC.pen + '</button>'
       + '<button class="icob" id="btnShareItem">' + IC.share + '</button></div>';
+    if (editing === it.id) h += editBlock(it);
 
     /* 대표 사진 */
     h += '<div class="hero" id="hero">';
@@ -510,6 +513,7 @@
       + '</div>';
     var jibunDup = it.jibun && String(it.addr || '').replace(/\s/g, '').indexOf(String(it.jibun).replace(/\s/g, '')) >= 0;
     if (it.addr) h += '<div class="addr">' + IC.map + '<span>' + esc(it.addr) + (it.jibun && !jibunDup ? ' (' + esc(it.jibun) + ')' : '') + '</span><button class="lnk sm" id="btnCopyAddr">복사</button></div>';
+    if (!it.addr) h += '<div class="addr"><span>소재지가 없습니다 — 오른쪽 위 ✎ 로 넣으면 4대 공부가 붙습니다.</span></div>';
     if (it.tags && it.tags.length) h += '<div class="tags">' + it.tags.map(function (t) { return '<i>' + esc(t) + '</i>' }).join('') + '</div>';
 
     /* 4대 공부 */
@@ -532,6 +536,11 @@
 
     $('#btnBack').addEventListener('click', function () { history.length > 1 ? history.back() : go('#/list'); });
     $('#btnShareItem').addEventListener('click', function () { shareItem(it); });
+    $('#btnEditItem').addEventListener('click', function () { editing = (editing === it.id) ? null : it.id; render(); });
+    var edSave = $('#edSave');
+    if (edSave) edSave.addEventListener('click', function () { saveEdit(it); });
+    var edCancel = $('#edCancel');
+    if (edCancel) edCancel.addEventListener('click', function () { editing = null; render(); });
     $('#btnStar').addEventListener('click', function () {
       it.starred = !it.starred; save(); toast(it.starred ? '명함 맨 위「새 물건표」에 올렸습니다' : '별표를 뺐습니다'); viewDetail(it.id);
     });
@@ -677,6 +686,42 @@
       });
     }, 0);
     return out;
+  }
+
+  function erow(id, label, val, ph) {
+    return '<label class="fl"><span>' + label + '</span>'
+      + '<input id="' + id + '" type="text" value="' + esc(val == null ? '' : val) + '" placeholder="' + esc(ph || '') + '" autocomplete="off"></label>';
+  }
+  function editBlock(it) {
+    return '<div class="block edit"><h3>매물 고치기</h3>'
+      + erow('e-title', '제목', it.title, '예) 임야 1,200평 · 북면')
+      + erow('e-addr', '소재지', it.addr, '예) 경기도 가평군 북면 목동리 271')
+      + '<div class="two">'
+      + erow('e-m2', '면적(㎡)', it.areaM2 || '', '예) 3967')
+      + erow('e-price', '매매가(만원)', it.price ? Math.round(it.price / 1e4) : '', '예) 38000')
+      + '</div>'
+      + erow('e-tags', '특징 (쉼표로 구분)', (it.tags || []).join(', '), '예) 도로접, 평지')
+      + '<div class="row2"><button class="btn sm main" id="edSave">저장</button>'
+      + '<button class="btn sm" id="edCancel">취소</button></div>'
+      + '<p class="tiny" style="text-align:left;margin-top:8px">주소를 고치면 4대 공부·지적항공도를 새로 받습니다.</p></div>';
+  }
+  function saveEdit(it) {
+    var v = function (id) { var el = $('#' + id); return el ? el.value : ''; };
+    var addr = v('e-addr').trim();
+    var m2 = parseFloat(String(v('e-m2')).replace(/[^\d.]/g, ''));
+    var pm = parseFloat(String(v('e-price')).replace(/[^\d.]/g, ''));
+    it.title = v('e-title').trim() || it.title;
+    if (addr !== it.addr) {
+      it.addr = addr; it.gb = null; it.lat = null; it.lon = null; it.pnu = ''; it.jibun = ''; it.gbSt = 'none';
+      delete fullQ[it.id]; delete geoQ[it.id];
+    }
+    it.areaM2 = (isFinite(m2) && m2 > 0) ? m2 : null;
+    it.areaP = it.areaM2 ? Math.round(it.areaM2 / 3.305785) : null;
+    it.price = (isFinite(pm) && pm > 0) ? Math.round(pm) * 10000 : null;
+    it.tags = String(v('e-tags')).split(/[,\s]+/).filter(Boolean);
+    editing = null; save(); render();
+    if (!it.gb && it.addr) ensureFull(it);
+    toast('고쳤습니다');
   }
 
   function shareItem(it) {

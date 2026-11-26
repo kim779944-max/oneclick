@@ -138,10 +138,38 @@
       }
       if (parts.length >= 2) return parts.join(' ');
     }
+    /* 시도를 빼고 보내는 문자(“가평 북면 목동리 271”) 대비 — 읍면동리 줄기를 찾아 앞의 시군구를 붙인다 */
+    var loose = addrLoose(tokens);
+    if (loose) return loose;
     /* 띄어쓰기 없이 붙은 주소 대비 */
     var re = /((?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]{1,6}(?:시|군|구)[가-힣0-9]*?(?:\d{1,5}(?:-\d{1,5})?)?)/;
     var m = String(text).match(re);
     return m ? m[1] : '';
+  }
+
+  var ADDR_STOP = /매매|급매|급처|시급|임야|대지|전답|농지|상가|주택|빌라|공장|창고|보증금|월세|전세|문의|연락|가격|평|억|만/;
+
+  function addrLoose(tokens) {
+    for (var i = 0; i < tokens.length; i++) {
+      if (!/^[가-힣]{1,7}(읍|면|동|리)$/.test(tokens[i])) continue;
+      if (ADDR_STOP.test(tokens[i])) continue;
+      var back = [], k = i - 1;
+      while (k >= 0 && back.length < 2 && /^[가-힣]{1,7}(시|군|구)$/.test(tokens[k])) { back.unshift(tokens[k]); k--; }
+      if (!back.length && k >= 0 && /^[가-힣]{2,6}$/.test(tokens[k]) && !ADDR_STOP.test(tokens[k])) {
+        back.unshift(tokens[k]);
+      }
+      if (!back.length) continue;
+      var parts = back.slice(), j = i, guard = 0;
+      while (j < tokens.length && guard++ < 4) {
+        var t = tokens[j];
+        if (/^\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
+        if (/^[가-힣]{1,7}(읍|면|동|리|가)$/.test(t)) { parts.push(t); j++; continue; }
+        if (/^[가-힣]{1,8}\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
+        break;
+      }
+      if (parts.length >= 2) return parts.join(' ');
+    }
+    return '';
   }
 
   function normAddr(a) {
