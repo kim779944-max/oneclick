@@ -261,7 +261,7 @@
       + (unread ? '<i class="cnt">' + unread + '</i>' : '') + '</button></div>';
 
     /* ② 새 물건표 — 별표 켠 매물만, 작은 썸네일 3열 */
-    h += '<div class="sec-h star"><b>새 물건표</b><span>'
+    h += '<div class="sec-h starred"><b>새 물건표</b><span>'
       + (starred.length ? '별표 ' + starred.length + '건' : '별표 없음') + '</span></div>';
     if (list.length) {
       h += '<div class="grid3">';
