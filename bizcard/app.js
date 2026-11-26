@@ -71,7 +71,8 @@
     bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2.5h-15z"/><path d="M10 21h4"/></svg>',
     pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
-    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 6V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h1"/></svg>'
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 6V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h1"/></svg>',
+    down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 11 4.5 4.5L16.5 11"/><path d="M5 19h14"/></svg>'
   };
 
   /* ---------------- 예시 매물 (처음 둘러보기용 · '예시' 표시) ---------------- */
@@ -226,15 +227,17 @@
     var tel = (me.phone || '').replace(/[^0-9+]/g, '');
 
     var h = '';
-    /* ① 명함 — 종이 명함 한 장 비율 */
-    h += '<div class="biz">';
+    /* ① 명함 — 종이 명함 한 장 비율. 사진이 없으면 빈 칸 없이 글자·모노그램이 꽉 차게 */
+    var hasPhoto = !!me.photo;
+    h += '<div class="biz' + (hasPhoto ? '' : ' nophoto') + '">';
     h += '<span class="biz-mark">KTS</span>';
     h += '<div class="biz-row">';
-    h += '<div class="av">' + (me.photo
-      ? '<img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진">'
-      : esc((me.name || '?').slice(0, 1))) + '</div>';
+    if (hasPhoto) {
+      h += '<div class="av"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
+    }
     h += '<div class="who">';
-    h += '<b>' + esc(me.name || '이름') + '</b>';
+    h += '<div class="nmrow"><b>' + esc(me.name || '이름') + '</b>'
+      + (hasPhoto ? '' : '<span class="biz-seal">' + esc((me.name || '?').slice(0, 1)) + '</span>') + '</div>';
     h += '<span class="role">' + esc([me.org, me.title].filter(Boolean).join(' · ') || '전자명함') + '</span>';
     h += '<div class="medals">';
     if (me.field) h += '<span class="badge">' + esc(me.field) + '</span>';
@@ -249,13 +252,20 @@
     h += '<a class="pact tel" href="tel:' + esc(tel) + '">' + IC.phone + '<span>전화</span></a>';
     h += '<a class="pact sms" href="sms:' + esc(tel) + '">' + IC.sms + '<span>문자</span></a>';
     h += '<a class="pact kakao" href="#" id="btnKakao">' + IC.chat + '<span>카톡</span></a>';
-    h += '<button class="pact inst" id="btnInstall" type="button">' + IC.install + '<span>바탕화면</span></button>';
+    if (isKakao && !isIOS) {
+      /* 카톡 인앱 — 누르는 순간 크롬 앱을 바로 열어 탈출한다(intent://) */
+      h += '<a class="pact inst esc" id="btnInstall" href="' + esc(chromeIntentUrl()) + '">' + IC.install + '<span>바탕화면</span></a>';
+    } else {
+      h += '<button class="pact inst" id="btnInstall" type="button">' + IC.install + '<span>바탕화면</span></button>';
+    }
     h += '</div>';
+    h += '<p class="inst-tip">' + IC.spark + '<span><b>바탕화면</b>에 두면 신규 급매물을 제일 먼저 받아볼 수 있어요</span></p>';
     h += '</div>';
 
     /* 명함 아래 한 줄 도구 */
     h += '<div class="biz-tools"><span class="wm">KTS <i>전자명함</i></span>'
       + '<button type="button" id="btnShare">' + IC.share + '보내기</button>'
+      + '<button type="button" id="btnImg" aria-label="명함을 이미지로 저장">' + IC.down + '이미지</button>'
       + '<button type="button" id="btnEdit">' + IC.pen + '고치기</button>'
       + '<button type="button" id="btnInbox"' + (unread ? ' class="on"' : '') + '>' + IC.bell + '문의'
       + (unread ? '<i class="cnt">' + unread + '</i>' : '') + '</button></div>';
@@ -278,8 +288,13 @@
 
     $('#btnInbox').addEventListener('click', openInbox);
     $('#btnShare').addEventListener('click', shareCard);
+    $('#btnImg').addEventListener('click', saveCardImage);
     $('#btnEdit').addEventListener('click', function () { go('#/setup'); });
-    $('#btnInstall').addEventListener('click', doInstall);
+    $('#btnInstall').addEventListener('click', function (e) {
+      /* 카톡 인앱은 <a href="intent://…"> 그대로 두어 크롬이 바로 열리게 한다 */
+      if (this.tagName === 'A') return;
+      e.preventDefault(); doInstall();
+    });
     $('#btnKakao').addEventListener('click', function (e) { e.preventDefault(); openKakao(); });
 
     LS.set(K.seen, Date.now());
@@ -288,13 +303,26 @@
     list.forEach(ensureGeo);
   }
 
-  /* 명함 위 작은 물건 카드 */
+  /* 명함 위 작은 물건 카드 — 썸네일 아래는 「지역/평수」·「가격」 두 줄만, 굵고 크게 */
+  function regionOf(it) {
+    var parts = String(it.addr || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    for (var i = parts.length - 1; i >= 0; i--) {
+      if (/[읍면동]$/.test(parts[i]) && !/^\d/.test(parts[i])) return parts[i];
+    }
+    for (var j = 0; j < parts.length; j++) {
+      if (/[시군구]$/.test(parts[j]) && parts[j].length > 1) return parts[j];
+    }
+    return it.kind || '지역';
+  }
+
   function gcard(it) {
     var price = (it.dealType !== '매매' && it.deposit) ? '보증 ' + money(it.deposit) : money(it.price);
+    var line1 = regionOf(it) + (it.areaP ? ' ' + num(it.areaP) + '평'
+      : (it.areaM2 ? ' ' + num(it.areaM2) + '㎡' : ''));
     return '<a class="gcard" href="#/item/' + it.id + '">'
       + '<div class="gth">' + thumb(it) + (it.demo ? '<i class="dm">예시</i>' : '') + '</div>'
-      + '<b>' + esc(it.title || '매물') + '</b>'
-      + '<span class="pr">' + esc(price) + '<i>' + (it.areaP ? num(it.areaP) + '평' : '면적 미정') + '</i></span>'
+      + '<b class="gc1">' + esc(line1) + '</b>'
+      + '<span class="gc2">' + esc(price) + '</span>'
       + '</a>';
   }
 
@@ -318,6 +346,194 @@
       return;
     }
     toast('명함 고치기에서 카톡 ID나 오픈채팅 주소를 넣어 두세요');
+  }
+
+  /* ---------------- 카톡 인앱 → 크롬 탈출 (intent://) ---------------- */
+  function chromeIntentUrl() {
+    var host = location.host || 'autooneclick.com';
+    var path = (location.pathname || '/bizcard/') + (location.hash || '');
+    return 'intent://' + host + path + '#Intent;scheme=https;package=com.android.chrome;'
+      + 'S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end';
+  }
+  function openChrome() { location.href = chromeIntentUrl(); }
+
+  /* ---------------- 명함 1장 → PNG (Canvas) ---------------- */
+  function rr(x, px, py, w, h, r) {
+    x.beginPath();
+    x.moveTo(px + r, py);
+    x.lineTo(px + w - r, py); x.quadraticCurveTo(px + w, py, px + w, py + r);
+    x.lineTo(px + w, py + h - r); x.quadraticCurveTo(px + w, py + h, px + w - r, py + h);
+    x.lineTo(px + r, py + h); x.quadraticCurveTo(px, py + h, px, py + h - r);
+    x.lineTo(px, py + r); x.quadraticCurveTo(px, py, px + r, py);
+    x.closePath();
+  }
+
+  function saveCardImage() {
+    var me = S.me || {};
+    /* 카톡 인앱에서는 내려받기가 막힌다 — 크롬으로 탈출해서 저장 */
+    if (isKakao && !isIOS) {
+      toast('카톡 안에서는 저장이 막힙니다 — 크롬에서 저장합니다', 2400);
+      setTimeout(openChrome, 700);
+      return;
+    }
+    var W = 1080, H = 594, PAD = 62, right = W - PAD;
+    var c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    var x = c.getContext('2d');
+    if (!x) { toast('이 기기에서는 이미지 저장이 어렵습니다'); return; }
+
+    function font(size, weight) {
+      return (weight || 700) + ' ' + size + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR",sans-serif';
+    }
+
+    /* 바탕 — 화면과 같은 딥네이비 그라데이션 + 금색 테두리 */
+    var g = x.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#26375a'); g.addColorStop(.44, '#1b2949'); g.addColorStop(1, '#121d36');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var glow = x.createRadialGradient(W, 0, 0, W, 0, 640);
+    glow.addColorStop(0, 'rgba(201,160,99,.22)'); glow.addColorStop(1, 'rgba(201,160,99,0)');
+    x.fillStyle = glow; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(201,160,99,.55)'; x.lineWidth = 3; x.strokeRect(1.5, 1.5, W - 3, H - 3);
+    var tl = x.createLinearGradient(0, 0, W, 0);
+    tl.addColorStop(0, 'rgba(226,186,122,0)'); tl.addColorStop(.5, 'rgba(226,186,122,.9)'); tl.addColorStop(1, 'rgba(226,186,122,0)');
+    x.fillStyle = tl; x.fillRect(0, 0, W, 3);
+
+    function text(str) { return String(str == null ? '' : str); }
+
+    function wrap(t, wx, wy, maxW, lh, maxLines) {
+      var words = text(t).split(/\s+/).filter(Boolean), line = '', n = 0;
+      for (var i = 0; i < words.length; i++) {
+        var cand = line ? line + ' ' + words[i] : words[i];
+        if (x.measureText(cand).width > maxW && line) {
+          x.fillText(line, wx, wy + n * lh); n++; line = words[i];
+          if (n >= maxLines) return;
+        } else line = cand;
+      }
+      if (line && n < maxLines) x.fillText(line, wx, wy + n * lh);
+    }
+
+    function exportPng() {
+      c.toBlob(function (b) {
+        if (!b) { toast('이미지를 만들지 못했습니다'); return; }
+        var url = URL.createObjectURL(b);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = text(me.name || '전자명함').replace(/[\\/:*?"<>|]/g, '') + '_명함.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { try { URL.revokeObjectURL(url) } catch (e) { } }, 6000);
+        toast('명함 1장을 PNG로 저장했습니다 — 카톡·문자에 붙여 보내세요', 3600);
+      }, 'image/png');
+    }
+
+    function paint(img) {
+      var top = 118;
+      var tx = PAD, wText = W - PAD * 2;
+
+      /* KTS 마크 */
+      x.textAlign = 'right'; x.textBaseline = 'alphabetic';
+      x.fillStyle = '#e2ba7a'; x.font = font(26, 900);
+      try { x.letterSpacing = '7px' } catch (e) { }
+      x.fillText('KTS', right, PAD + 12);
+      try { x.letterSpacing = '0px' } catch (e) { }
+
+      /* 사진 — 있으면 금색 테두리 안에 4:5 로 채워 넣는다 */
+      if (img) {
+        var pw = 196, ph = 245;
+        rr(x, PAD - 3, top - 3, pw + 6, ph + 6, 14);
+        x.fillStyle = 'rgba(226,186,122,.42)'; x.fill();
+        x.save();
+        rr(x, PAD, top, pw, ph, 11); x.clip();
+        var s = Math.max(pw / img.width, ph / img.height);
+        var dw = img.width * s, dh = img.height * s;
+        x.drawImage(img, PAD + (pw - dw) / 2, top + (ph - dh) / 2, dw, dh);
+        x.restore();
+        tx = PAD + pw + 40;
+        wText = right - tx;
+      }
+
+      /* 이름 */
+      var nameSize = img ? 74 : 86;
+      var nameY = top + (img ? 76 : 80);
+      x.textAlign = 'left'; x.fillStyle = '#ffffff'; x.font = font(nameSize, 900);
+      x.fillText(text(me.name || '이름'), tx, nameY, wText - (img ? 0 : 150));
+
+      /* 사진이 없으면 — 이름 옆 금색 모노그램 도장 */
+      if (!img) {
+        var cx = right - 48, cy = nameY - 28, rad = 46;
+        x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2);
+        x.fillStyle = 'rgba(226,186,122,.12)'; x.fill();
+        x.strokeStyle = 'rgba(226,186,122,.62)'; x.lineWidth = 2.5; x.stroke();
+        x.textAlign = 'center'; x.fillStyle = '#f2d8a8'; x.font = font(44, 900);
+        x.fillText(text(me.name || '?').slice(0, 1), cx, cy + 16);
+        x.textAlign = 'left';
+      }
+
+      /* 소속 · 직함 */
+      var y = nameY + 46;
+      x.fillStyle = '#abbacf'; x.font = font(31, 600);
+      x.fillText(text([me.org, me.title].filter(Boolean).join(' · ') || '전자명함'), tx, y, wText);
+
+      /* 전문 분야 배지 + 핵심 장점 */
+      y += 54;
+      var px = tx;
+      if (me.field) {
+        x.font = font(28, 900);
+        var fw = x.measureText(me.field).width + 40;
+        rr(x, px, y - 30, fw, 42, 21);
+        x.fillStyle = 'rgba(226,186,122,.15)'; x.fill();
+        x.strokeStyle = 'rgba(226,186,122,.6)'; x.lineWidth = 2; x.stroke();
+        x.fillStyle = '#f2d8a8'; x.fillText(me.field, px + 20, y);
+        px += fw + 16;
+      }
+      if (me.strength) {
+        x.font = font(28, 700); x.fillStyle = '#cbb68f';
+        x.fillText(me.strength, px, y, Math.max(40, right - px));
+      }
+
+      /* 인삿말 */
+      if (me.intro) {
+        y += 58;
+        x.font = font(30, 500); x.fillStyle = '#c1ccdd';
+        wrap('“ ' + me.intro, tx, y, wText, 42, 2);
+      }
+
+      /* 금색 구분선 */
+      var lg = x.createLinearGradient(tx, 0, right, 0);
+      lg.addColorStop(0, 'rgba(226,186,122,.55)'); lg.addColorStop(.45, 'rgba(255,255,255,.14)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = lg; x.fillRect(tx, 430, right - tx, 2);
+
+      /* 연락 알약 — 전화·문자·카톡 */
+      var py2 = 458, ph2 = 64, qx = tx;
+      function pill(label, fill, stroke, color) {
+        x.font = font(28, 900);
+        var w2 = x.measureText(label).width + 46;
+        rr(x, qx, py2, w2, ph2, 14);
+        x.fillStyle = fill; x.fill();
+        if (stroke) { x.strokeStyle = stroke; x.lineWidth = 2; x.stroke(); }
+        x.fillStyle = color; x.textAlign = 'center';
+        x.fillText(label, qx + w2 / 2, py2 + 42);
+        x.textAlign = 'left';
+        qx += w2 + 12;
+      }
+      pill('전화' + (me.phone ? '  ' + me.phone : ''), 'rgba(34,197,94,.16)', 'rgba(34,197,94,.42)', '#8ff0b4');
+      pill('문자', 'rgba(96,165,250,.15)', 'rgba(96,165,250,.4)', '#a9ccff');
+      pill('카톡', '#fee500', null, '#2a2200');
+
+      /* 아래 브랜드 */
+      x.textAlign = 'right'; x.font = font(22, 800); x.fillStyle = '#71829f';
+      x.fillText('KTS 전자명함 · autooneclick.com/bizcard', right, 566);
+      x.textAlign = 'left';
+
+      exportPng();
+    }
+
+    if (me.photo) {
+      toast('명함 이미지를 만드는 중입니다', 1600);
+      var im = new Image();
+      im.onload = function () { try { paint(im) } catch (e) { paint(null) } };
+      im.onerror = function () { paint(null) };
+      im.src = me.photo;
+    } else paint(null);
   }
 
   /* ---------------- ③ 매물장 ---------------- */
@@ -982,6 +1198,16 @@
 
   function doInstall() {
     if (isStandalone) { toast('이미 바탕화면 아이콘으로 열려 있습니다'); return; }
+    /* 카톡 인앱 브라우저는 홈 화면 추가가 아예 막힌다 — 안내만 띄우지 말고 크롬으로 바로 탈출 */
+    if (isKakao && !isIOS) {
+      toast('카톡 안에서는 설치가 막힙니다 — 크롬으로 엽니다', 2000);
+      openChrome();
+      return;
+    }
+    if (isKakao && isIOS) {
+      toast('아이폰은 오른쪽 위 ⋯ → 「Safari로 열기」를 누른 뒤 홈 화면에 추가해 주세요', 5000);
+      return;
+    }
     if (installPrompt) {
       installPrompt.prompt();
       installPrompt.userChoice.then(function (c) {
@@ -1012,11 +1238,7 @@
       var b = document.createElement('button');
       b.className = 'btn sm main';
       b.textContent = '크롬으로 열기';
-      b.addEventListener('click', function () {
-        var host = location.host, path = location.pathname + location.hash;
-        location.href = 'intent://' + host + path + '#Intent;scheme=https;package=com.android.chrome;'
-          + 'S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end';
-      });
+      b.addEventListener('click', openChrome);
       bar.appendChild(b);
     }
     var x = document.createElement('button');
@@ -1090,7 +1312,7 @@
     if (!S.me) go('#/setup');
   }
 
-  g.KTS_APP = { go: go, state: S };
+  g.KTS_APP = { go: go, state: S, cardPng: saveCardImage, chromeIntent: chromeIntentUrl };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })(window);

@@ -34,10 +34,10 @@ img{display:block;max-width:100%}
   background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px}
 
 /* ---------- 카톡 안내 ---------- */
-.kakaobar{position:relative;display:flex;align-items:center;gap:10px;margin:2px 0 10px;padding:11px 12px;
-  background:linear-gradient(180deg,#3b2a10,#2a1f0c);border:1px solid #6b4a1d;border-radius:var(--r);font-size:12px}
-.kakaobar b{display:block;font-size:12.5px;color:#ffd7a4}
-.kakaobar span{color:#e0c49a;font-size:11.5px}
+.kakaobar{position:relative;display:flex;align-items:center;gap:9px;margin:0 0 4px;padding:7px 10px;
+  background:linear-gradient(180deg,#3b2a10,#2a1f0c);border:1px solid #6b4a1d;border-radius:var(--r);font-size:11.5px}
+.kakaobar b{display:block;font-size:11.8px;color:#ffd7a4;line-height:1.3}
+.kakaobar span{display:block;color:#e0c49a;font-size:10.8px;line-height:1.3}
 .kakaobar>div{flex:1;min-width:0}
 .kbx{border:0;background:none;color:#c9a97a;font-size:14px;padding:2px 4px}
 
@@ -100,6 +100,7 @@ img{display:block;max-width:100%}
   box-shadow:0 0 0 1px rgba(226,186,122,.4),0 5px 12px rgba(0,0,0,.36)}
 .av img{width:100%;height:100%;object-fit:cover}
 .who{flex:1;min-width:0;padding-right:22px}
+.nmrow{display:flex;align-items:center;gap:8px}
 .who b{display:block;font-size:19.5px;font-weight:900;letter-spacing:.4px;line-height:1.15}
 .who .role{display:block;margin-top:2px;font-size:10.5px;color:#abbacf;letter-spacing:.1px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -111,6 +112,23 @@ img{display:block;max-width:100%}
 .intro{margin:6px 0 0;font-size:10.8px;color:#c1ccdd;line-height:1.5;letter-spacing:-.1px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .intro em{font-style:normal;color:#e2ba7a;margin-right:1px;font-size:11.5px;vertical-align:-.5px}
+
+/* 사진을 넣지 않은 명함 — 빈 사진 칸 없이 글자·모노그램이 카드에 꽉 차게 */
+.biz.nophoto{padding-left:14px}
+.biz.nophoto .biz-mark{display:none}
+.biz.nophoto .who{padding-right:46px}
+.biz.nophoto .nmrow b{font-size:22.5px;letter-spacing:.2px;line-height:1.1;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.biz-seal{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  font-size:14.5px;font-weight:900;color:#f2d8a8;letter-spacing:0;
+  background:radial-gradient(circle at 32% 26%,rgba(226,186,122,.28),rgba(226,186,122,.1));
+  border:1px solid rgba(226,186,122,.62);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.biz.nophoto .who .role{font-size:11.2px;margin-top:3px;padding-right:6px}
+.biz.nophoto .medals{margin-top:7px;gap:6px}
+.biz.nophoto .medals .badge{font-size:10px;padding:3.5px 8px}
+.biz.nophoto .medals .edge{font-size:10px}
+.biz.nophoto .intro{font-size:11.4px;line-height:1.55;margin-top:7px;-webkit-line-clamp:3}
+.biz.nophoto .biz-line{margin-top:8px;background:linear-gradient(90deg,rgba(226,186,122,.55),rgba(255,255,255,.08) 64%,transparent)}
 .biz-line{position:relative;z-index:1;height:1px;margin-top:9px;
   background:linear-gradient(90deg,rgba(226,186,122,.5),rgba(255,255,255,.08) 44%,transparent 92%)}
 
@@ -129,13 +147,23 @@ img{display:block;max-width:100%}
 .pact.inst svg{width:12px;height:12px}
 .pact.inst.ready{border-style:solid;background:rgba(226,186,122,.18)}
 .pact.inst.done{border-style:solid;border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.12);color:#8ff0b4}
+.pact.inst.esc{border-style:solid;background:linear-gradient(180deg,rgba(226,186,122,.22),rgba(226,186,122,.12));
+  color:#ffe3b0;animation:escPulse 2.4s ease-in-out infinite}
+@keyframes escPulse{50%{box-shadow:0 0 0 2px rgba(226,186,122,.22)}}
+
+/* 바탕화면 혜택 한 줄 */
+.inst-tip{display:flex;align-items:center;gap:5px;margin:7px 1px 0;position:relative;z-index:1;
+  font-size:10.3px;font-weight:700;line-height:1.35;color:#cbb68f;letter-spacing:-.1px}
+.inst-tip svg{width:11px;height:11px;flex:0 0 auto;color:#ffc53d}
+.inst-tip b{color:#f2d8a8;font-weight:900}
+.inst-tip span{min-width:0}
 
 /* 명함 아래 한 줄 도구 */
-.biz-tools{display:flex;align-items:center;gap:8px;margin:6px 3px 0}
-.biz-tools .wm{margin-right:auto;font-size:9.5px;font-weight:900;letter-spacing:.5px;color:#71829f}
+.biz-tools{display:flex;align-items:center;gap:5px;margin:6px 3px 0}
+.biz-tools .wm{margin-right:auto;font-size:9.5px;font-weight:900;letter-spacing:.5px;color:#71829f;white-space:nowrap}
 .biz-tools .wm i{font-style:normal;color:#c6a054}
-.biz-tools button{display:inline-flex;align-items:center;gap:3px;height:27px;padding:0 3px;border:0;
-  background:none;color:#a9b8cd;font-size:11px;font-weight:800}
+.biz-tools button{display:inline-flex;align-items:center;gap:3px;height:27px;padding:0 2px;border:0;
+  background:none;color:#a9b8cd;font-size:10.8px;font-weight:800;white-space:nowrap}
 .biz-tools button.on{color:var(--acc2)}
 .biz-tools svg{width:12px;height:12px}
 .biz-tools .cnt{min-width:15px;height:15px;border-radius:999px;background:var(--acc);color:#141414;
@@ -154,11 +182,11 @@ img{display:block;max-width:100%}
   background:repeating-linear-gradient(45deg,#18233f 0 6px,#152038 6px 12px)}
 .gth .dm{position:absolute;left:4px;top:4px;font-style:normal;font-size:9px;font-weight:900;padding:1px 4px;
   border-radius:5px;background:rgba(11,19,43,.82);color:#ffd7a4;border:1px solid rgba(255,190,120,.35)}
-.gcard b{font-size:11.5px;font-weight:800;letter-spacing:-.4px;margin-top:5px;line-height:1.25;height:2.5em;
-  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.gcard .pr{font-size:11.5px;font-weight:900;color:var(--acc2);letter-spacing:-.4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gcard .pr i{font-style:normal;font-size:9.5px;font-weight:700;color:var(--ink3);margin-left:3px}
+/* 썸네일 아래 두 줄 — 지역/평수 + 가격만 굵고 크게 */
+.gcard .gc1{display:block;margin-top:5px;font-size:12.6px;font-weight:900;letter-spacing:-.45px;line-height:1.25;
+  color:#eef3fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gc2{display:block;margin-top:1px;font-size:13.4px;font-weight:900;letter-spacing:-.5px;line-height:1.2;
+  color:var(--acc2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .star-empty{display:flex;align-items:center;justify-content:center;gap:7px;min-height:64px;padding:8px 10px;
   border:1px dashed var(--line2);border-radius:11px;color:var(--ink3);font-size:11.5px;
   text-decoration:none;text-align:left;line-height:1.45}

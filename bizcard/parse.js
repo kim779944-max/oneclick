@@ -118,8 +118,27 @@
     return String(t || '').replace(/^[[(<{（「『"'·•▲▶■□\-–—*]+/, '').replace(/[\[\](){}（）「」『"'·•▲▶■□~,.;:!?]+$/, '');
   }
 
+  /* 머리말 [발신자] · [한빛부동산] — 통째로 괄호에 싸인 맨 앞 토막은 이름표다.
+     소재지 부품으로 쓰면 「발신자명 조종면 신하리」처럼 엉뚱한 곳이 주소가 된다.
+     단, 문장 중간의 [가평] 같은 지역 표기는 살려 둔다. */
+  function isLabelTok(raw) {
+    return /^[\[【〔(（][^\]】〕)）]*[\]】〕)）]$/.test(String(raw || ''));
+  }
+
+  function tokenize(text) {
+    var out = [];
+    String(text).split(/[\s\n\r\t,]+/).forEach(function (raw, i) {
+      if (!raw) return;
+      var t = cleanToken(raw);
+      if (!t) return;
+      if (isLabelTok(raw) && (i === 0 || NAME_STOP.test(t))) return;
+      out.push(t);
+    });
+    return out;
+  }
+
   function addrFromTokens(text) {
-    var tokens = String(text).split(/[\s\n\r\t,]+/).map(cleanToken).filter(Boolean);
+    var tokens = tokenize(text);
     for (var i = 0; i < tokens.length; i++) {
       if (!isSido(tokens[i])) continue;
       var parts = [SIDO_FULL[tokens[i]] || tokens[i]];
@@ -148,6 +167,8 @@
   }
 
   var ADDR_STOP = /^(매매|급매|급처|시급|임야|대지|전답|답|논|밭|농지|상가|주택|빌라|공장|창고|보증금|월세|전세|문의|연락|가격|특가|토지)$/;
+  /* 상호·발신자 이름은 소재지 앞머리가 아니다 (부동산·중개사·직함·인사말) */
+  var NAME_STOP = /부동산|공인중개|중개|대표|사장|팀장|실장|과장|부장|이사|님$|입니다|드림|문의|연락/;
 
   function addrLoose(tokens) {
     for (var i = 0; i < tokens.length; i++) {
@@ -156,7 +177,8 @@
       if (ADDR_STOP.test(tokens[i])) continue;
       var back = [], k = i - 1;
       while (k >= 0 && back.length < 2 && /^[가-힣]{1,7}(시|군|구)$/.test(tokens[k])) { back.unshift(tokens[k]); k--; }
-      if (!back.length && k >= 0 && /^[가-힣]{2,6}$/.test(tokens[k]) && !ADDR_STOP.test(tokens[k])) {
+      if (!back.length && k >= 0 && /^[가-힣]{2,6}$/.test(tokens[k])
+        && !ADDR_STOP.test(tokens[k]) && !NAME_STOP.test(tokens[k])) {
         back.unshift(tokens[k]);
       }
       if (!back.length) continue;
