@@ -9,6 +9,10 @@
 </style>
 </head>
 <body>
-  <iframe src="./index.html?dev=1"></iframe>
+  <iframe id="f" src="./index.html?dev=1"></iframe>
+  <script>
+    /* 검수 때마다 새로 받도록 (캐시 때문에 옛 화면이 보이는 것 방지) */
+    document.getElementById('f').src = './index.html?dev=1&t=' + Date.now();
+  </script>
 </body>
 </html>
