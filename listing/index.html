@@ -309,8 +309,9 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
   function vwMap(lat, lng, w, h, z) {
     if (!has(lat) || !has(lng)) return '';
     return 'https://api.vworld.kr/req/image?service=image&request=getmap&key=' + VW_KEY +
-      '&format=png&basemap=PHOTO_HYBRID&crs=EPSG:4326&center=' + Number(lng) + ',' + Number(lat) +
-      '&zoom=' + (z || 17) + '&size=' + (w || 760) + ',' + (h || 520);
+      '&domain=autooneclick.com&format=png&basemap=PHOTO_HYBRID' +
+      '&center=' + Number(lng).toFixed(6) + ',' + Number(lat).toFixed(6) +
+      '&zoom=' + (z || 16) + '&size=' + (w || 760) + ',' + (h || 520) + '&crs=EPSG:4326';
   }
 
   /* ── 데이터 ── */
