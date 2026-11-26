@@ -3,6 +3,7 @@
 <script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
 <script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
 <script src="../shared/kts-seal.js?v=20261124b"></script>
+<script src="prop.js?v=20261126a" onerror="window.KTS_GB=null"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 표준계약서 — 원본 계약서 그대로, 빈칸만 채워 서명까지</title>
 <meta name="description" content="부동산 매매·교환·임대차·등기위임장·근로·차용·용역·동업 계약서를 원본 양식 그대로 띄우고 빈칸만 채워 인쇄·PDF로 뽑습니다. 마지막 (인) 자리에 손가락 서명. 모든 처리는 이 기기 안에서만.">
@@ -119,6 +120,72 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 .area2 input.py{flex:0 0 34%}
 /* 결과 전체뷰(공용 ux.js)가 A4 원본 크기로 그려지지 않도록 — 이 화면 안에서만 */
 .kux-full .body img{width:100%;max-width:100%;height:auto;display:block}
+/* ===== 245 — 5초 단축 작성 화면 ===== */
+.wsec{background:linear-gradient(180deg,#12203C 0%,#0F1B33 100%);border:1px solid var(--line);border-radius:14px;padding:9px 10px;margin-top:8px}
+.wsec>h3{font-size:13.5px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px;line-height:1.3}
+.wsec>h3 .n{width:17px;height:17px;border-radius:6px;background:var(--amber);color:var(--on-amber);font-size:10px;font-weight:900;display:grid;place-items:center;flex:0 0 auto;font-style:normal}
+.wsec>h3 .mini{margin-left:auto;font-size:10.5px;padding:6px 9px;border-radius:999px}
+.sub2{font-size:10.5px;color:#7C8DA6;line-height:1.45;margin-top:3px}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 7px;margin-top:6px;min-width:0}
+.wgrid .fld{min-width:0}
+.wgrid .fld.full{grid-column:1/-1}
+.wgrid .lb{font-size:10.5px;font-weight:800;color:#9DAEC5;margin:0 0 3px;display:block;line-height:1.25}
+.wgrid .lb i{font-style:normal;font-weight:800;color:#6E7F99;font-size:9.5px;margin-left:4px}
+.wgrid input,.wgrid textarea{padding:8px 9px;font-size:13.5px;border-radius:9px}
+.wgrid .kor{font-size:9.5px;margin-top:1px;line-height:1.3;min-height:0}
+.wgrid .area2{display:flex;gap:4px;align-items:center}
+.wgrid .area2 input{min-width:0}
+.wgrid .area2 input.py{flex:0 0 42%}
+.tl2{font-size:10.5px;font-weight:900;color:#7C8DA6;margin:8px 0 4px}
+.dgrp{border-top:1px dashed #22335A;padding-top:6px;margin-top:6px}
+.dgrp:first-child{border-top:0;padding-top:0;margin-top:0}
+.dgh{display:flex;align-items:baseline;gap:6px;font-size:11.5px;font-weight:900;color:#DCE6F2;line-height:1.3}
+.dgh em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--amber2);margin-left:auto}
+.dch{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.dch button{font-size:11px;font-weight:900;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:999px;padding:6px 10px;min-height:30px}
+.dch button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
+.dd2{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:3px;margin-top:4px}
+.dd2 input{text-align:center;padding:7px 2px;font-size:13px}
+.dd2 .sep{color:#4B5B78;font-weight:900;font-size:11px}
+.dpick{width:100%;margin-top:4px;padding:7px 9px;font-size:12.5px}
+.pcard{border:1px solid var(--line);border-radius:12px;padding:8px 9px;margin-top:7px;background:#0D1930}
+.pcard:first-child{margin-top:4px}
+.phead{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:900;color:#fff}
+.phead .tag{background:var(--amber);color:var(--on-amber);border-radius:6px;width:18px;height:18px;display:grid;place-items:center;font-size:10.5px;flex:0 0 auto}
+.phead .pcnt{margin-left:auto;font-size:10px;color:#7C8DA6;font-weight:800}
+.pbtns{display:flex;gap:4px;margin-top:6px}
+.pbtns button{flex:1;font-size:11px;font-weight:900;color:#E6EDF7;background:#0B1729;border:1px solid var(--line2);border-radius:9px;padding:7px 3px;min-height:32px;line-height:1.2}
+.pbtns button:active{background:#1B2C52}
+.prow2{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:11px;font-weight:900;color:#9DAEC5}
+.prow2 .mini{margin-left:auto;font-size:10.5px;padding:6px 9px}
+.microw{display:flex;gap:5px;margin:7px 0 5px;flex-wrap:wrap}
+.microw button{font-size:11.5px;font-weight:900;color:#E6EDF7;background:#12203C;border:1px solid var(--line2);border-radius:999px;padding:8px 11px;min-height:34px}
+.optrow{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.optrow button{font-size:11.5px;font-weight:900;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:999px;padding:8px 11px;min-height:34px}
+.optrow button.on{color:var(--on-amber);background:linear-gradient(135deg,var(--amber),var(--amber2));border-color:var(--amber)}
+.optlink{margin:9px 0 0;text-align:center}
+.optlink button{font-size:11.5px;font-weight:900;color:var(--amber2);padding:8px}
+body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
+/* 마이크 배너 — 지금 듣고 있어요 · 이퀄라이저 · 실시간 글자 */
+#micBar{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:calc(86px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:436px;z-index:88;background:linear-gradient(160deg,#1B2C52,#101C36);border:1px solid var(--amber);border-radius:16px;padding:9px 12px 11px;box-shadow:0 14px 34px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+#micBar.on{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.mbTop{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:900;color:#fff}
+.mbDot{width:8px;height:8px;border-radius:50%;background:#FF4D4D;flex:0 0 auto;animation:mbPulse 1.1s infinite}
+@keyframes mbPulse{0%{box-shadow:0 0 0 0 rgba(255,77,77,.55)}70%{box-shadow:0 0 0 8px rgba(255,77,77,0)}100%{box-shadow:0 0 0 0 rgba(255,77,77,0)}}
+.mbTop .stop{margin-left:auto;font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:5px 11px}
+#micEq{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:38px;margin:6px 0 4px;overflow:hidden}
+#micEq i{display:block;width:4px;height:6px;border-radius:2px;background:linear-gradient(180deg,var(--amber2),var(--amber))}
+#micLive{font-size:15px;font-weight:900;color:#fff;line-height:1.35;min-height:38px;max-height:62px;overflow:hidden;word-break:keep-all}
+#micLive small{display:block;font-size:10px;font-weight:800;color:#9DAEC5;margin-bottom:1px}
+#micLive b{color:var(--amber2)}
+/* 물건정보 불러오기 시트 */
+#propSheet{position:fixed;inset:0;z-index:92;display:none;background:rgba(3,7,18,.68)}
+#propSheet.on{display:block}
+#propSheet .ps{position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;background:#0F1B33;border:1px solid var(--line2);border-top-left-radius:18px;border-top-right-radius:18px;padding:12px 14px calc(14px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto}
+#propSheet h3{display:flex;align-items:center;font-size:14px;font-weight:900;color:#fff}
+#propSheet h3 .stop{margin-left:auto;font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:5px 11px}
+#propSheet .lb{margin-top:9px}
+#propSheet input,#propSheet textarea{font-size:14px}
 @media print{
  html,body{background:#fff;display:block;height:auto}
  body>*{display:none!important}          /* 확인하기·전체뷰·저장·공유 막대, 워터마크, 안내까지 모두 종이에서 뺀다 */
@@ -149,105 +216,97 @@ label.lb i{font-style:normal;color:#7C8DA6;font-weight:700;margin-left:4px;font-
 </header>
 
 <main>
-<!-- 0 양식 고르기 · A4 원본 미리보기 -->
+<!-- 0 양식 고르기 -->
 <section class="scr" id="s0">
  <div class="card s5">
-  <h2><span class="n">⚡</span>5초 계약서<button type="button" class="mini" id="s5help">어떻게?</button></h2>
-  <p class="sub">문자·카톡으로 받은 매물 글을 <b>통째로 붙여넣고</b> 한 번만 누르면 주소·금액·면적·당사자·날짜가 계약서 빈칸에 들어갑니다. 오타는 자동으로 고치고, 평↔㎡는 같이 환산합니다.</p>
-  <textarea id="s5txt" rows="4" placeholder="예) [매매] 경기 가평군 청평면 신하리 123-4 대지 330㎡(100평) 매매 3억5천 / 매도인 김태수 010-2002-2899 / 매수인 이영희 / 잔금 2026년 12월 20일"></textarea>
+  <h2><span class="n">⚡</span>5초 계약서</h2>
+  <textarea id="s5txt" rows="3" placeholder="매물 문자·카톡을 그대로 붙여넣으세요 — 주소·금액·면적·당사자·날짜가 들어갑니다"></textarea>
   <div class="chips" id="s5form">
-   <button type="button" data-s5f="auto" class="on">자동 판별</button>
+   <button type="button" data-s5f="auto" class="on">자동</button>
    <button type="button" data-s5f="sale">매매</button>
-   <button type="button" data-s5f="house">전세·임대차</button>
+   <button type="button" data-s5f="house">전세·임대</button>
    <button type="button" data-s5f="exchange">교환</button>
   </div>
   <div class="row"><button class="btn pri" id="s5go">⚡ 5초 계약서 만들기</button></div>
-  <p class="kv" id="s5info">붙여넣은 글은 이 기기 안에서만 처리합니다. 서버로 보내지 않습니다.</p>
   <div class="s5sum" id="s5sum" hidden></div>
  </div>
- <!-- 231·개선 2: 결과물 전/후 예시 1장 -->
- <figure class="baEx">
-  <img src="../shared/examples/contract_before_after.svg" alt="전: 빈 A4 서식, 후: 3부로 인쇄된 계약서" loading="lazy" width="390" height="230">
-  <figcaption>예시 · 서식 고르고 조건만 넣으면 갑·을·중개사 3부 인쇄까지 나옵니다</figcaption>
- </figure>
  <div class="card">
-  <h2><span class="n">★</span>표준계약서 고르기</h2>
-  <p class="sub">서식을 고르면 A4 원본 양식이 크게 뜹니다. [이 양식으로 작성하기]를 누르면 1단계 입력이 시작됩니다.</p>
+  <h2><span class="n">★</span>서식</h2>
   <div class="picks" id="pickGrid"></div>
- </div>
- <div class="card">
-  <h2><span class="n">A4</span><span id="pvTitle">원본 양식 미리보기</span></h2>
-  <p class="sub" id="pvSub">원본 그대로의 빈 양식입니다. 빈칸만 채워 인쇄·PDF로 뽑습니다.</p>
-  <canvas class="pv" id="pv0"></canvas>
-  <div id="thmBox"></div>
-  <div class="row"><button class="btn pri" id="startBtn">이 양식으로 작성하기</button></div>
-  <p class="kv" id="pvInfo"></p>
- </div>
-</section>
-<!-- 1 당사자 -->
-<section class="scr" id="s1">
- <div class="card">
-  <h2><span class="n">1</span><span id="s1t">당사자 정보</span><button type="button" class="newb" id="otherForm">다른 양식</button></h2>
-  <p class="sub">카드마다 있는 [📷 신분증으로 채우기]를 누르면 그 사람 칸(성명·주민번호·주소·전화)만 채웁니다. 물건 소재지는 건드리지 않습니다.</p>
- </div>
- <div id="partyWrap"></div>
- <div class="fillrow"><button type="button" id="vFill">🎤 말로 채우기</button></div>
- <p class="fillinfo" id="fillInfo">칸을 누른 뒤 마이크에 대고 말하면 그 칸에 들어갑니다. 카드의 [📷 신분증으로 채우기]는 그 사람 칸(성명·주민번호·주소·전화)만 채우고 물건 소재지는 건드리지 않습니다.</p>
- <input type="file" id="pIn" accept="image/*" hidden>
-</section>
-<!-- 2 내용 -->
-<section class="scr" id="s2">
- <div class="card"><h2><span class="n">2</span><span id="s2t">물건 · 계약 내용</span></h2>
-  <p class="sub">숫자만 넣으면 콤마와 한글 금액이 붙습니다. 날짜 칸은 [오늘]을 누르면 바로 들어갑니다.</p>
-  <div id="contentBox"></div>
- </div>
- <div class="fillrow"><button type="button" id="vFill2">🎤 말로 채우기</button></div>
-</section>
-<!-- 3 특약 -->
-<section class="scr" id="s3">
- <div class="card"><h2><span class="n">3</span>특약사항</h2>
-  <p class="sub">자주 쓰는 특약을 고르면 양식의 특약 칸에 번호를 붙여 그대로 들어갑니다.</p>
-  <div id="spChips"></div>
-  <div class="sp-list" id="spList"></div>
-  <label class="lb">직접 적는 특약<i>줄마다 한 항목</i></label><textarea id="spFree" rows="3"></textarea>
-  <div class="draft" id="spPrev"></div>
- </div>
-</section>
-<!-- 4 서명 -->
-<section class="scr" id="s4">
- <div class="card"><h2><span class="n">4</span>서명 — (인) 자리에 손가락으로</h2>
-  <p class="sub">서명하지 않은 자리는 원본 빈칸((인)) 그대로 나갑니다. 서명은 이 기기 밖으로 나가지 않습니다.</p>
-  <div id="signBox"></div>
- </div>
- <div class="card"><h2><span class="n">보</span>미리보기 · 출력</h2>
-  <canvas class="pv" id="pvCv"></canvas>
-  <div id="thmBox2"></div>
-  <div class="missbox" id="missBox"></div>
-  <label class="lb">인쇄 · 사진 부수<em>인쇄와 사진 저장에 같이 적용</em></label>
-  <div class="seg" id="cpSeg"><button data-cp="1">1부</button><button data-cp="2">2부</button><button data-cp="3">3부</button></div>
-  <label class="lb">간인 — 쪽 경계에 반씩<em>2쪽 이상 계약서</em></label>
-  <div class="seg" id="ganSeg"><button data-v="0">안 함</button><button data-v="seal">도장 간인</button><button data-v="sign">사인 간인</button></div>
-  <div class="row"><button class="btn sec sm" id="cSealPhoto">도장 사진 올리기</button><button class="btn sec sm" id="cSealName">이름 도장 만들기</button></div>
-  <input type="file" id="cSealIn" accept="image/*" hidden>
-  <div id="cSealBox"></div>
-  <p class="kv" id="ganInfo">간인을 켜면 도장을 고르거나 서명을 해 두어야 합니다 · 부수(2부·3부)는 같은 자리에 되풀이해 찍힙니다.</p>
-  <div class="row"><button class="btn pri" id="printBtn">인쇄 · PDF 저장</button></div>
-  <div class="row"><button class="btn sec" id="pngBtn">사진(PNG)으로 저장</button></div>
-  <p class="kv" id="outInfo">A4 한 장 그대로 나갑니다. 부수를 2부·3부로 고르면 인쇄와 사진 저장 모두 그 수만큼 나옵니다.</p>
+  <div class="row"><button class="btn sec" id="pvBtn">양식 미리보기 (선택)</button></div>
+  <div id="pvWrap" hidden>
+   <div class="tl2" id="pvTitle"></div>
+   <canvas class="pv" id="pv0"></canvas>
+   <div id="thmBox"></div>
+   <p class="kv" id="pvInfo"></p>
+  </div>
  </div>
 </section>
 
-<section class="card qa">
- <h2><span class="n">?</span>60초 문의</h2>
- <p class="sub">필요한 서식이나 특약 문구를 알려 주시면 다음 판에 넣어 드립니다.</p>
- <label class="lb">이름</label><input id="qName" maxlength="20">
- <label class="lb">연락처</label><input id="qTel" maxlength="30" inputmode="tel" placeholder="010-0000-0000">
- <label class="lb">문의 내용</label><textarea id="qMsg" rows="3" maxlength="500" placeholder="예: 전세 계약서에 확정일자 특약도 넣어 주세요"></textarea>
- <div class="row"><button class="btn sec sm" id="qMake">답장 초안 만들기</button><button class="btn sec sm" id="qSave">승인 대기에 담기</button></div>
- <div class="draft" id="qDraft"></div>
- <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
+<!-- 1 작성 — 한 화면 -->
+<section class="scr" id="s1">
+ <div class="wsec">
+  <h3><span class="n">1</span><span id="secMainT">물건 · 금액</span><button type="button" class="mini" id="propBtn" data-prop="x">물건정보 불러오기</button></h3>
+  <div class="wgrid" id="propFields"></div>
+  <div id="secMoney" hidden><div class="tl2">금액</div><div class="wgrid" id="moneyFields"></div></div>
+ </div>
+ <div class="wsec">
+  <h3><span class="n">2</span>일정</h3>
+  <div id="dateBox"></div>
+ </div>
+ <div class="wsec" id="secSp">
+  <h3><span class="n">3</span>특약</h3>
+  <div class="sp-list" id="spList"></div>
+  <div class="microw"><button type="button" data-micfree="1">🎤 말로 특약</button><button type="button" data-typefree="1">⌨️ 직접 입력</button></div>
+  <textarea id="spFree" rows="2" placeholder="줄마다 한 항목"></textarea>
+  <div class="draft" id="spPrev"></div>
+ </div>
+ <div class="wsec">
+  <h3><span class="n">4</span>인적사항</h3>
+  <p class="sub2">사진은 성명·주민번호·주소·전화만 채웁니다 · 마이크는 빈 칸부터 차례로 들어갑니다</p>
+  <div id="partyWrap"></div>
+  <input type="file" id="pIn" accept="image/*" hidden>
+ </div>
+ <p class="optlink"><button type="button" id="toOpt">사인·도장 · 부수 · 미리보기 (선택) →</button></p>
 </section>
-<p class="foot">표준계약서 · KTS 원클릭 · 서버 0 · 유료 API 0<br>입력값·서명은 이 기기 브라우저 안에만 저장됩니다.</p>
+
+<!-- 2 출력 — 사인·도장·미리보기는 접어 둔다 -->
+<section class="scr" id="s2">
+ <div class="wsec">
+  <h3><span class="n">출</span>인쇄 · 저장</h3>
+  <div class="optrow"><button type="button" data-opt="pv">🔍 미리보기</button><button type="button" data-opt="sig">✍️ 사인·도장 넣기 (선택)</button></div>
+  <div id="pvWrap2" hidden>
+   <canvas class="pv" id="pvCv"></canvas>
+   <div id="thmBox2"></div>
+   <div class="missbox" id="missBox"></div>
+  </div>
+  <div id="sigWrap" hidden>
+   <div id="signBox"></div>
+   <div class="row"><button class="btn sec sm" id="cSealPhoto">도장 사진 올리기</button><button class="btn sec sm" id="cSealName">이름 도장 만들기</button></div>
+   <input type="file" id="cSealIn" accept="image/*" hidden>
+   <div id="cSealBox"></div>
+   <div class="tl2">간인 (2쪽 이상)</div>
+   <div class="seg" id="ganSeg"><button data-v="0">안 함</button><button data-v="seal">도장</button><button data-v="sign">사인</button></div>
+   <p class="kv" id="ganInfo"></p>
+  </div>
+  <div class="tl2">부수</div>
+  <div class="seg" id="cpSeg"><button data-cp="1">1부</button><button data-cp="2">2부</button><button data-cp="3">3부</button></div>
+  <p class="kv" id="missLine"></p>
+  <div class="row"><button class="btn pri" id="printBtn">인쇄 · PDF 저장</button></div>
+  <div class="row"><button class="btn sec" id="pngBtn">사진(PNG)으로 저장</button></div>
+  <p class="kv" id="outInfo"></p>
+ </div>
+ <section class="card qa">
+  <h2><span class="n">?</span>60초 문의</h2>
+  <label class="lb">이름</label><input id="qName" maxlength="20">
+  <label class="lb">연락처</label><input id="qTel" maxlength="30" inputmode="tel" placeholder="010-0000-0000">
+  <label class="lb">문의 내용</label><textarea id="qMsg" rows="3" maxlength="500" placeholder="예: 전세 계약서에 확정일자 특약도 넣어 주세요"></textarea>
+  <div class="row"><button class="btn sec sm" id="qMake">답장 초안 만들기</button><button class="btn sec sm" id="qSave">승인 대기에 담기</button></div>
+  <div class="draft" id="qDraft"></div>
+  <p class="kv" id="qInfo">자동 발송은 하지 않습니다. 사람이 확인하고 승인한 뒤에만 보냅니다.</p>
+ </section>
+ <p class="foot">표준계약서 · KTS 원클릭 · 서버 0 · 유료 API 0<br>입력값·서명은 이 기기 브라우저 안에만 저장됩니다.</p>
+</section>
 </main>
 <div class="bar"><button class="btn sec back" id="backBtn">이전</button><button class="btn pri" id="nextBtn">다음</button></div>
 </div>
@@ -300,9 +359,10 @@ const getV = fid => { const v = S.v[VK(fid)]; return v == null ? '' : v; };
 const setV = (fid, v) => { S.v[VK(fid)] = v; save(); };
 
 /* ---------- 단계 ---------- */
-const STEP_NM = {0:'양식', 1:'당사자', 2:'내용', 3:'특약', 4:'서명'};
+const STEP_NM = {0:'양식', 1:'작성', 2:'출력'};
 function hasSpecial(){ const f = curForm(); return f.fields.some(x => x.grp === 's'); }
-function stepList(){ return hasSpecial() ? [0, 1, 2, 3, 4] : [0, 1, 2, 4]; }
+/* 245 — 5초 동선: 양식 → 작성(한 화면) → 출력 */
+function stepList(){ return [0, 1, 2]; }
 
 /* ---------- 색감 테마 (흑백 · 하늘색 · 연두색 · 회색) ---------- */
 const THEMES = [{id:'mono', nm:'흑백', c:'#FFFFFF'}, {id:'sky', nm:'하늘색', c:'#DCEAF7'}, {id:'green', nm:'연두색', c:'#DFF0D8'}, {id:'gray', nm:'회색', c:'#E5E7EA'}];
@@ -403,21 +463,29 @@ function renderPick(){
 function renderParty(){
   const f = curForm();
   const role = {a:f.roleA, b:f.roleB, c:f.roleC};
-  const tag = {a:'갑', b:'을', c:'중'};
   let h = '';
   const ORD = {name:0, rrn:1, addr:2, tel:3, office_addr:4, office:5, bizno:6, rep:7, thing:8};
-  const okind = x => { const k = kindOf(x.label); return ORD[k] == null ? 9 : ORD[k]; };
-  /* 공동명의·대리인 칸은 그 사람(본인) 뒤에 따로 모아 — 같은 이름 라벨이 붙어 보이지 않게 */
-  const sub = x => /(공동명의|대리인)/.test(String(x.label || '')) ? 1 : 0;
+  const okind = x => { const k = kindOf(LBL(x)); return ORD[k] == null ? 9 : ORD[k]; };
+  const sub = x => /(공동명의|대리인)/.test(LBL(x)) ? 1 : 0;
   ['a', 'b', 'c'].forEach(g => {
-    const list = f.fields.filter(x => x.grp === g && x.type !== 'sign')
+    const all = f.fields.filter(x => x.grp === g && x.type !== 'sign');
+    if (!all.length) return;
+    const props = all.filter(x => isPartyProp(x) || x.money);
+    const ppl = all.filter(x => !(isPartyProp(x) || x.money))
       .map((x, i) => ({x, i})).sort((p, q) => (sub(p.x) - sub(q.x)) || (sub(p.x) ? (p.i - q.i) : ((okind(p.x) - okind(q.x)) || (p.i - q.i)))).map(o => o.x);
-    if (!list.length) return;
-    h += `<div class="card"><h2><span class="n">${tag[g]}</span>${escH(role[g] || '')}</h2>`
-      + `<div class="prow"><button type="button" class="mini" data-photo="${g}">📷 신분증으로 채우기</button></div>`
-      + `<div>${fieldsHtml(list)}</div></div>`;
+    const filled = all.filter(x => String(getV(x.id) || '').trim()).length;
+    h += `<div class="pcard"><div class="phead"><span class="tag">${ROLE_TAG[g]}</span><b>${escH(role[g] || '')}</b><span class="pcnt">${filled}/${all.length}</span></div>`;
+    if (props.length){
+      h += `<div class="prow2"><span>물건</span><button type="button" class="mini" data-prop="${g}">물건정보 불러오기</button></div>`
+        + `<div class="wgrid">${props.map(x => fldHtml(x)).join('')}</div>`;
+    }
+    h += `<div class="pbtns">`
+      + `<button type="button" data-photo="${g}">📷 신분증·명함</button>`
+      + `<button type="button" data-micg="${g}">🎤 말로</button>`
+      + `<button type="button" data-typeg="${g}">⌨️ 타자</button></div>`
+      + `<div class="wgrid" data-pg="${g}">${ppl.map(x => fldHtml(x)).join('')}</div></div>`;
   });
-  if (!h) h = `<div class="card"><p class="sub">이 양식은 당사자 칸이 없습니다. [다음]으로 넘어가세요.</p></div>`;
+  if (!h) h = '<p class="sub2">이 서식에는 당사자 칸이 없습니다.</p>';
   $('#partyWrap').innerHTML = h;
 }
 
@@ -435,7 +503,7 @@ function renderContent(){
   });
   /* 날짜 묶음은 fieldsHtml 로 다시 그린다(년/월/일 한 줄) */
   $('#contentBox').innerHTML = renderSeq(list);
-  $('#s2t').textContent = (curForm().id === 'power') ? '위임 내용' : '물건 · 계약 내용';
+  $('#s2t') && ($('#s2t').textContent = (curForm().id === 'power') ? '위임 내용' : '물건 · 계약 내용');
 }
 function renderSeq(list){
   const done = {}; let out = '', last = '';
@@ -470,9 +538,8 @@ function syncSpecial(){
 function renderSpecial(){
   const f = curForm();
   $('#spList').innerHTML = (f.specials || []).map((t, i) => `<label><input type="checkbox" data-sp="${i}"${S.sp.indexOf(i) >= 0 ? ' checked' : ''}><span>${escH(t)}</span></label>`).join('')
-    || '<p class="sub">이 양식에 자주 쓰는 특약 목록이 없습니다. 아래에 직접 적으세요.</p>';
+    || '<p class="sub2">기본 특약이 없는 서식입니다 — 아래에 직접 적으세요.</p>';
   $('#spFree').value = S.free || '';
-  renderChips();
   syncSpecial();
 }
 
@@ -515,7 +582,7 @@ function bindSig(cv, f){
     o.getContext('2d').drawImage(ink, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
     return o.toDataURL('image/png');
   };
-  const end = () => { if (!on) return; on = false; const v = crop(); if (v) setV(f.id, v); if (S.step === 4) renderPreview(); };
+  const end = () => { if (!on) return; on = false; const v = crop(); if (v) setV(f.id, v); if (S.step === 2) renderPreview(); };
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
 }
 
@@ -847,6 +914,9 @@ function empties(){
 }
 function renderMiss(){
   const e = empties(), box = $('#missBox');
+  const ln = $('#missLine');
+  if (ln) ln.innerHTML = e.length ? `<b>비어 있는 칸 ${e.length}곳</b> — 그대로 인쇄하면 원본 빈칸으로 나갑니다` : '<span class="dot"></span>빈칸 없이 다 채웠습니다';
+  if (!box) return;
   if (!e.length){ box.style.display = 'none'; return; }
   box.style.display = 'block';
   box.innerHTML = `<b>비어 있는 칸 ${e.length}곳</b> — ` + e.slice(0, 8).map(f => escH(f.label)).join(', ') + (e.length > 8 ? ' …' : '') + '<br>그대로 인쇄하면 그 자리는 원본 빈칸으로 나갑니다.';
@@ -1324,9 +1394,9 @@ function s5run() {
   syncSpecial();                     /* 특약 칸에 바로 넣어 둔다 — 3단계를 건너뛰고 인쇄해도 나가게 */
   $('#s5sum').hidden = false;
   $('#s5sum').innerHTML = s5summary(A, formId, done, A.log);
-  $('#s5info').textContent = '빈칸은 화면에서 채우면 됩니다 · 평↔㎡ 칸은 어느 쪽에 넣어도 같이 바뀝니다.';
+  if ($('#s5info')) $('#s5info').textContent = '빈칸은 화면에서 채우면 됩니다 · 금액은 숫자만, 면적은 ㎡·평 같이 바뀝니다.';
   BG = null; BG_SRC = null;
-  go(2, true);                       /* 물건 · 계약 내용부터 확인 */
+  go(1, true);                       /* 작성 화면으로 바로 — 한 화면에서 끝낸다 */
   toast('5초 만에 ' + done.length + '칸을 채웠습니다');
 }
 
@@ -1340,12 +1410,11 @@ function go(n, noPush){
   renderSteps();
   const i = list.indexOf(n);
   $('#backBtn').style.display = (i === 0) ? 'none' : '';
-  $('#nextBtn').textContent = (n === 0) ? '이 양식으로 작성하기' : ((i === list.length - 1) ? '인쇄 · PDF' : ('다음: ' + STEP_NM[list[i + 1]]));
-  if (n === 1){ renderParty(); }
+  $('#nextBtn').textContent = (n === 0) ? '작성 시작' : '인쇄 · PDF';
+  if (n === 1){ renderWrite(); }
   if (n === 0){ renderPick(); renderSheet(); }
-  if (n === 2) renderContent();
-  if (n === 3) renderSpecial();
-  if (n === 4){ syncSpecial(); renderSigns(); renderPreview(); renderCp(); renderSeal(); }
+  if (n === 2){ syncSpecial(); renderOpts(); renderSigns(); renderPreview(); renderCp(); renderSeal(); }
+  const lg = $('#legalTop'); if (lg) lg.style.display = (n === 0) ? '' : 'none';
   window.scrollTo(0, 0);
   if (!noPush){ try{ const st = {kc:S.step};
     if (!GO_INIT){ history.replaceState(st, ''); GO_INIT = true; } else history.pushState(st, ''); }catch(e){} }
@@ -1353,7 +1422,7 @@ function go(n, noPush){
 window.addEventListener('popstate', e => {
   const st = e.state && e.state.kc;
   const list = stepList();
-  go((st >= 0 && st <= 4) ? st : list[0], true);
+  go((st >= 0 && st <= 2) ? st : list[0], true);
 });
 function renderCp(){
   $$('#cpSeg button').forEach(b => b.classList.toggle('on', (+b.dataset.cp) === (+S.cp || 1)));
@@ -1397,13 +1466,31 @@ document.addEventListener('input', e => {
   }
   setV(fid, v);
   if (f.money && f.kor) setV(f.kor, v ? korNum(v) : '');
-  if (S.step === 4) renderPreview();
+  if (S.step === 1 && (f.dg || isDateField(f))) markDates();
+  if (S.step === 2) renderPreview();
 });
 document.addEventListener('change', e => {
   const el = e.target;
+  if (el.dataset && el.dataset.dpk && el.value){ datePickSet(el.dataset.dpk, el.value); el.hidden = true; el.value = ''; return; }
   if (el.dataset && el.dataset.sp != null){ const i = +el.dataset.sp; S.sp = (S.sp || []).filter(x => x !== i); if (el.checked) S.sp.push(i); save(); syncSpecial(); }
 });
 document.addEventListener('click', e => {
+  /* 245 — 한 화면 작성 도구 */
+  const pr = e.target.closest('[data-prop]');
+  if (pr){ e.preventDefault(); propLoad(pr.dataset.prop); return; }
+  const mg = e.target.closest('[data-micg]');
+  if (mg){ e.preventDefault(); micParty(mg.dataset.micg); return; }
+  const tg = e.target.closest('[data-typeg]');
+  if (tg){ e.preventDefault(); typeParty(tg.dataset.typeg); return; }
+  if (e.target.closest('[data-micfree]')){ e.preventDefault(); micStart($('#spFree')); return; }
+  if (e.target.closest('[data-typefree]')){ e.preventDefault(); $('#spFree').focus(); return; }
+  if (e.target.closest('[data-micstop]')){ e.preventDefault(); micStop(); return; }
+  const da = e.target.closest('[data-dadd]');
+  if (da){ e.preventDefault(); dateChip(da.dataset.dk, +da.dataset.dadd); return; }
+  const dp = e.target.closest('[data-dpick]');
+  if (dp){ e.preventDefault(); datePickOpen(dp.dataset.dk); return; }
+  const op = e.target.closest('[data-opt]');
+  if (op){ e.preventDefault(); toggleOpt(op.dataset.opt); return; }
   const b = e.target.closest('[data-today]');
   if (b){
     const dg = b.dataset.today, d = new Date();
@@ -1417,7 +1504,7 @@ document.addEventListener('click', e => {
   }
   const c = e.target.closest('[data-sigclr]');
   if (c){ const id = c.dataset.sigclr; setV(id, ''); const f = byId(id); const cv = document.querySelector(`canvas[data-sig="${id}"]`);
-    if (cv && f) bindSig(cv, f); if (S.step === 4) renderPreview(); return; }
+    if (cv && f) bindSig(cv, f); if (S.step === 2) renderPreview(); return; }
   const ss = e.target.closest('[data-sigseal]');
   if (ss){                       /* 188: 서명 자리에 도장을 찍는다 */
     const it = (window.KTSSeal ? (KTSSeal.box().find(x => x.id === S.seal) || KTSSeal.box()[0]) : null);
@@ -1443,15 +1530,15 @@ document.addEventListener('click', e => {
     return;
   }
 });
-$('#startBtn').onclick = () => go(1);
+if ($('#startBtn')) $('#startBtn').onclick = () => go(1);
+if ($('#pvBtn')) $('#pvBtn').onclick = () => { const w = $('#pvWrap'); w.hidden = !w.hidden; if (!w.hidden) renderSheet(); };
+if ($('#toOpt')) $('#toOpt').onclick = () => go(2);
 if ($('#s5go')) $('#s5go').onclick = s5run;
-if ($('#s5help')) $('#s5help').onclick = () => toast('매물 글을 그대로 붙여넣고 [⚡ 5초 계약서]만 누르세요 · 주소·금액·면적·당사자·날짜를 찾아 넣고, 오타는 고칩니다');
-$('#otherForm').onclick = () => go(0);
-$('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 4) renderPreview(); });
+$('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 2) renderPreview(); });
 $('#cpSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.cp = +b.dataset.cp; save(); renderCp(); };
 $('#printBtn').onclick = doPrint;
 $('#pngBtn').onclick = doPng;
-$('#nextBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step); if (i === list.length - 1) doPrint(); else go(list[i + 1]); };
+$('#nextBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step); if (S.step === 0) return go(1); doPrint(); };
 $('#backBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step);
   if (i <= 0) return;
   if (history.state && history.state.kc && history.state.kc > list[0]){ try{ history.back(); return; }catch(e){} }
@@ -1490,7 +1577,7 @@ function bindVoice(btnSel){
     el.focus(); toast('선택한 칸에 대고 말씀하세요');
   };
 }
-bindVoice('#vFill'); bindVoice('#vFill2');
+/* 245 — 이 화면의 마이크는 micStart() 하나로 돌린다 (옛 bindVoice 는 쓰지 않는다) */
 
 /* ---------- 사진으로 채우기 (신분증·명함 → 그 사람 칸만) ---------- */
 function aiKey(){ let k = ''; try{ k = localStorage.getItem('kts_ai_key') || ''; }catch(e){}
@@ -1601,7 +1688,6 @@ function mapPhoto(rec, grp){
 $('#pIn').onchange = async e => {
   const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
   const role = roleOf(PHOTO_G);
-  $('#fillInfo').textContent = role + ' 정보를 사진에서 읽는 중…';
   try{
     let rec = null, how = '';
     if (aiKey()){ busyOn('AI가 사진을 읽는 중…'); const b64 = await fileB64(file, 1600); rec = await aiRead(CPICK, b64); how = 'AI'; }
@@ -1609,14 +1695,15 @@ $('#pIn').onchange = async e => {
       if (!Object.keys(rec).length) throw new Error('NO_READ'); }
     const n = mapPhoto(rec, PHOTO_G);
     busyOff();
-    if (!n){ $('#fillInfo').textContent = '읽었지만 ' + role + ' 칸을 찾지 못했습니다 · 사진을 밝게 다시 찍어 주세요'; toast('맞는 칸을 찾지 못했습니다'); }
-    else { $('#fillInfo').textContent = how + '로 ' + role + ' ' + n + '칸을 채웠습니다 · 물건 소재지와 다른 사람 칸은 그대로 뒀습니다.'; toast(how + '로 ' + n + '칸을 채웠습니다'); }
+    if (!n) toast('읽었지만 ' + role + ' 칸을 찾지 못했습니다 · 사진을 밝게 다시 찍어 주세요');
+    else toast(how + '로 ' + role + ' ' + n + '칸을 채웠습니다');
+    renderWrite();
   }catch(err){
     busyOff();
     const m = err.message === 'NO_KEY' ? 'AI 열쇠가 없어 기기 인식도 쓰지 못했습니다(인터넷 필요)'
       : err.message === 'NO_READ' ? '사진에서 글자를 읽지 못했습니다. 밝은 곳에서 다시 찍어 주세요'
-      : err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진에서 칸을 찾지 못했습니다 — 문서가 화면에 꽉 차게 밝은 곳에서 다시 찍어 주세요';
-    $('#fillInfo').textContent = m; toast(m);
+      : err.message === 'OCR_LOAD' ? '기기 인식 준비에 실패했습니다. AI 열쇠를 넣으면 정확하게 읽습니다' : '사진에서 칸을 찾지 못했습니다 — 문서가 화면에 꼭 차게 밝은 곳에서 다시 찍어 주세요';
+    toast(m);
   }
 };
 
@@ -1631,6 +1718,523 @@ function qDraft(){
 $('#qMake').onclick = () => { const q = qDraft(); if (!q) return; $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[답장 초안 · 아직 보내지 않음]\n' + q.draft; };
 $('#qSave').onclick = () => { const q = qDraft(); if (!q) return; let a = []; try{ a = JSON.parse(localStorage.getItem(LS_Q) || '[]'); }catch(e){} a.push(q); try{ localStorage.setItem(LS_Q, JSON.stringify(a)); }catch(e){}
   $('#qDraft').style.display = 'block'; $('#qDraft').textContent = '[승인 대기 ' + a.length + '건 · 사람이 확인 후 발송]\n' + q.draft; $('#qInfo').textContent = '이 기기의 승인 대기 목록에 담았습니다. 자동으로 보내지 않습니다.'; };
+
+/* ============================================================================
+   245 (2026-11-26) — 5초 단축 작성 화면
+   · 한 화면: 물건정보 불러오기 1번 → 일정 버튼 → 특약 체크 → 인적사항 → 인쇄/저장
+   · 일정: [오늘] / [1달][2달][3달][달 정하기] 버튼식
+   · 인적사항: 신분증·명함 사진 / 마이크 / 타자
+   · 마이크: 키보드 차단(blur) + "지금 듣고 있어요" 배너 + 이퀄라이저 + 실시간 글자
+   · 사인·도장·미리보기: 기본 접힘, 선택 버튼을 눌렀을 때만
+   ========================================================================== */
+const ROLE_TAG = {a:'갑', b:'을', c:'중'};
+const LBL = f => String((f && f.label) || '');
+const PROP_RE = /소재지|지목|면적|구조|용도|주택\s*종류|부동산의\s*표시|목적물|임대할\s*부분|건물\s*[·ㆍ]?\s*호수|물건\s*표시|대상물건|물건지/;
+const DATEW_RE = /(작성일|계약일|잔금|중도금|기간|인도일|교부일|차임|등기원인|위임일|계약금|시작일|종료일|완료일|변제기일|차용일|지급일)/;
+const DATEH_RE = /년|월|일|기간|날짜|일자|시작|종료|완료|변제|차용|지급/;
+const isPropField = f => PROP_RE.test(LBL(f));
+const isPartyProp = f => /대상물건|물건\s*표시|물건지/.test(LBL(f));
+const isDateGrouped = f => !!f.dg || /\s(년|월|일)(\s*\(|$)/.test(LBL(f));
+const isDateField = f => !!f.dg || (DATEW_RE.test(LBL(f)) && DATEH_RE.test(LBL(f)));
+
+/* ---------- 칸 하나 ---------- */
+function fldHtml(f){
+  const v = getV(f.id), lb = LBL(f);
+  const full = /주소|소재지|대상물건|부동산의\s*표시|목적물|물건\s*표시|주민|비고|내용|근무|위탁|업무|사업/.test(lb);
+  if (f.multi) return `<div class="fld full"><label class="lb">${escH(lb)}</label><textarea data-f="${escH(f.id)}" rows="2">${escH(v)}</textarea></div>`;
+  if (!f.money && /면적/.test(lb)){
+    const m2 = v ? s5num(v) : 0, py = m2 ? s5fmtNum(s5cut(m2ToPy(m2), 2)) : '';
+    return `<div class="fld full"><label class="lb">${escH(lb.replace(/\s*\(㎡\)/, ''))}<i>㎡·평</i></label>`
+      + `<div class="area2"><input data-f="${escH(f.id)}" inputmode="decimal" value="${escH(m2 ? s5fmtNum(m2) : '')}" placeholder="㎡">`
+      + `<input class="py" data-py="${escH(f.id)}" inputmode="decimal" value="${escH(py)}" placeholder="평"></div></div>`;
+  }
+  return `<div class="fld${full ? ' full' : ''}"><label class="lb">${escH(lb)}${f.money ? '<i>숫자만</i>' : ''}</label>`
+    + `<input data-f="${escH(f.id)}" value="${escH(f.money ? (v ? comma(v) : '') : v)}"${f.money ? ' inputmode="numeric"' : ''}>`
+    + (f.money ? `<div class="kor">${escH(korWon(v))}</div>` : '') + '</div>';
+}
+
+/* ---------- 작성 화면 ---------- */
+function renderWrite(){
+  const f = curForm();
+  const xs = f.fields.filter(x => x.grp === 'x' && x.type !== 'sign');
+  const prop = xs.filter(isPropField);
+  const money = xs.filter(x => !isPropField(x) && !isDateField(x));
+  $('#propFields').innerHTML = prop.map(x => fldHtml(x)).join('');
+  $('#moneyFields').innerHTML = money.map(x => fldHtml(x)).join('');
+  $('#propBtn').style.display = prop.length ? '' : 'none';
+  $('#secMainT').textContent = prop.length ? '물건 · 금액' : '내용';
+  $('#secMoney').hidden = !money.length;
+  const sp = $('#secSp'); if (sp) sp.style.display = f.fields.some(x => x.grp === 's') ? '' : 'none';
+  renderDates();
+  renderSpecial();
+  renderParty();
+}
+function refreshWrite(){ const y = window.scrollY; renderWrite(); window.scrollTo(0, y); }
+
+/* ---------- 일정 — 버튼식 ---------- */
+function dateKey(f){
+  let s = LBL(f).replace(/\([^)]*\)/g, '').trim();
+  s = s.replace(/\s*(년|월|일)$/, '').trim();
+  return s || f.id;
+}
+function dpOf(f){
+  const l = LBL(f);
+  if (/\s*년(\s*\(|$)/.test(l)) return 'y';
+  if (/\s*월(\s*\(|$)/.test(l)) return 'm';
+  if (/\s*일(\s*\(|$)/.test(l)) return 'd';
+  return f.dp || 'y';
+}
+function dateGroups(){
+  const xs = curForm().fields.filter(f => f.grp === 'x' && f.type !== 'sign' && isDateGrouped(f));
+  const map = new Map();
+  xs.forEach(f => { const k = dateKey(f); if (!map.has(k)) map.set(k, []); map.get(k).push(f); });
+  return Array.from(map.entries()).map(([k, fs]) => ({ k: k, fs: fs.slice().sort((a, b) => 'ymd'.indexOf(dpOf(a)) - 'ymd'.indexOf(dpOf(b))) }));
+}
+/* 년·월·일로 쪼개지지 않은 날짜 칸(기간 시작·차용일 등)은 그대로 한 칸 */
+function dateSingles(){
+  return curForm().fields.filter(f => f.grp === 'x' && f.type !== 'sign' && isDateField(f) && !isDateGrouped(f));
+}
+function pad2(v){ return String(v).padStart(2, '0'); }
+function ymdToday(){ const d = new Date(); return { y: String(d.getFullYear()), m: String(d.getMonth() + 1), d: String(d.getDate()) }; }
+function readGroup(g){
+  const o = {};
+  g.fs.forEach(f => { const v = String(getV(f.id) || '').trim(); if (v) o[dpOf(f)] = v; });
+  return (o.y && o.m && o.d) ? o : null;
+}
+function baseDate(){
+  const g = dateGroups().find(x => /^(작성일|계약일)$/.test(x.k));
+  if (g){ const o = readGroup(g); if (o) return o; }
+  return ymdToday();
+}
+function addMonths(b, n){
+  const y = +b.y, m = +b.m - 1, d = +b.d;
+  const dt = new Date(y, m + n, 1);
+  const last = new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
+  dt.setDate(Math.min(d, last));
+  return { y: String(dt.getFullYear()), m: String(dt.getMonth() + 1), d: String(dt.getDate()) };
+}
+function sameD(a, b){ return String(+a.y) === String(+b.y) && String(+a.m) === String(+b.m) && String(+a.d) === String(+b.d); }
+function setGroup(g, d){
+  g.fs.forEach(f => {
+    const k = dpOf(f), v = String(+d[k]);
+    setV(f.id, v);
+    const inp = document.querySelector(`input[data-f="${f.id}"]`);
+    if (inp) inp.value = v;
+  });
+  markDates();
+  if (S.step === 2) renderPreview();
+}
+function markDates(){
+  const base = baseDate();
+  $$('.dch button[data-dk]').forEach(b => {
+    const dk = b.dataset.dk, g = dateGroups().find(x => x.k === dk);
+    if (!g) return;
+    const cur = readGroup(g);
+    let on = false;
+    if (b.dataset.dadd != null){ const n = +b.dataset.dadd; const d = n === 0 ? ymdToday() : addMonths(base, n); on = !!cur && sameD(cur, d); }
+    b.classList.toggle('on', on);
+    const val = document.querySelector(`[data-dval="${dk}"]`);
+    if (val) val.textContent = cur ? `${cur.y}. ${+cur.m}. ${+cur.d}.` : '';
+  });
+}
+function renderDates(){
+  const box = $('#dateBox'); if (!box) return;
+  const gs = dateGroups();
+  const singles = dateSingles();
+  if (!gs.length && !singles.length){ box.innerHTML = '<p class="sub2">이 서식에는 날짜 칸이 없습니다.</p>'; return; }
+  box.innerHTML = gs.map(g => {
+    const isM = /중도금|잔금/.test(g.k);
+    const chips = isM
+      ? [1, 2, 3].map(n => `<button type="button" data-dadd="${n}" data-dk="${escH(g.k)}">${n}달</button>`).join('')
+        + `<button type="button" data-dpick="1" data-dk="${escH(g.k)}">달 정하기</button>`
+      : `<button type="button" data-dadd="0" data-dk="${escH(g.k)}">오늘</button>`;
+    return `<div class="dgrp"><div class="dgh">${escH(g.k)}<em data-dval="${escH(g.k)}"></em></div>`
+      + `<div class="dch">${chips}</div>`
+      + `<div class="dd2">${g.fs.map(x => `<input data-f="${escH(x.id)}" inputmode="numeric" maxlength="4" placeholder="${{y:'년',m:'월',d:'일'}[dpOf(x)] || ''}" value="${escH(getV(x.id))}">`).join('<span class="sep">.</span>')}</div>`
+      + `<input type="date" class="dpick" data-dpk="${escH(g.k)}" hidden>`
+      + `</div>`;
+  }).join('') + singles.map(x => `<div class="dgrp"><div class="dgh">${escH(LBL(x))}</div>`
+      + `<div class="fld"><input data-f="${escH(x.id)}" value="${escH(getV(x.id))}" placeholder="2026.11.26"></div></div>`).join('');
+  markDates();
+}
+function dateChip(dk, n){
+  const g = dateGroups().find(x => x.k === dk); if (!g) return;
+  const d = n === 0 ? ymdToday() : addMonths(baseDate(), n);
+  setGroup(g, d);
+  toast(dk + ' ' + d.y + '.' + pad2(d.m) + '.' + pad2(d.d));
+}
+function datePickOpen(dk){
+  const g = dateGroups().find(x => x.k === dk); if (!g) return;
+  const inp = document.querySelector(`input[data-dpk="${dk}"]`); if (!inp) return;
+  const cur = readGroup(g);
+  inp.hidden = false;
+  inp.value = cur ? `${cur.y}-${pad2(cur.m)}-${pad2(cur.d)}` : '';
+  try{ if (inp.showPicker) inp.showPicker(); else inp.focus(); }catch(e){ try{ inp.focus(); }catch(e2){} }
+}
+function datePickSet(dk, val){
+  const g = dateGroups().find(x => x.k === dk); if (!g || !val) return;
+  const [y, m, d] = val.split('-');
+  setGroup(g, { y: y, m: String(+m), d: String(+d) });
+}
+/* 달을 직접 고르는 칸은 달력(input type=date)에서 고른다 */
+
+/* ---------- 물건정보 불러오기 (주소·문자·4대 공부) ---------- */
+let PROP_SCOPE = 'x';
+function propPool(scope){
+  const f = curForm();
+  return (scope === 'a' || scope === 'b' || scope === 'c')
+    ? f.fields.filter(x => x.grp === scope && x.type !== 'sign')
+    : f.fields.filter(x => x.grp === 'x' && x.type !== 'sign');
+}
+function propTargets(scope){
+  const pool = propPool(scope);
+  const find = re => pool.find(x => re.test(LBL(x)));
+  return {
+    addr: find(/소재지|대상물건|물건\s*표시|부동산의\s*표시|목적물|물건지/),
+    jimok: find(/지목/),
+    land: find(/(토지|대지)\s*면적/) || find(/면적/),
+    bldg: find(/건물\s*면적|전용\s*면적/),
+    struct: find(/구조|용도|주택\s*종류|건물/)
+  };
+}
+function fillProp(scope, d, onlyEmpty){
+  const t = propTargets(scope), done = [];
+  const set = (f, v, isArea, force) => {
+    if (!f || v == null || v === '') return;
+    if (onlyEmpty && !force && String(getV(f.id) || '').trim()) return;
+    const val = isArea ? s5fmtNum(+v) : String(v);
+    if (!val) return;
+    setV(f.id, val);
+    const inp = document.querySelector(`input[data-f="${f.id}"]`);
+    if (inp) inp.value = isArea ? s5fmtNum(+v) : val;
+    if (isArea){ const py = document.querySelector(`input[data-py="${f.id}"]`); if (py) py.value = s5fmtNum(s5cut(m2ToPy(+v), 2)); }
+    done.push(LBL(f) || f.id);
+  };
+  set(t.addr, d.addr, false, true);
+  set(t.jimok, d.jimok);
+  set(t.land, d.land, true);
+  set(t.bldg, d.bldg, true);
+  set(t.struct, d.struct);
+  return done;
+}
+async function propLoad(scope){
+  scope = scope || 'x';
+  PROP_SCOPE = scope;
+  let src = ($('#s5txt') && $('#s5txt').value || '').trim();
+  if (!src){
+    try{ if (navigator.clipboard && navigator.clipboard.readText) src = String((await navigator.clipboard.readText()) || '').trim(); }catch(e){}
+  }
+  if (src){
+    const A = s5parse(src);
+    const isB = scope === 'b';
+    const ar = (isB ? A.areasB : (A.areasA || A.areas)) || { land: 0, bldg: 0, any: 0 };
+    const d = {
+      addr: isB ? (A.propB || A.addr || '') : (A.propA || A.addr || ''),
+      jimok: A.jimok,
+      land: ar.land || ar.any || 0,
+      bldg: ar.bldg || 0,
+      struct: A.structure
+    };
+    const done = fillProp(scope, d);
+    if (done.length){
+      refreshWrite();
+      toast(done.length + '칸을 채웠습니다');
+      if (d.addr && window.KTS_GB) propEnrich(scope, d.addr);
+      return;
+    }
+  }
+  openPropSheet(scope);
+}
+async function propEnrich(scope, addr){
+  if (!window.KTS_GB || !addr) return;
+  try{
+    busyOn('4대 공부 확인 중…');
+    const r = await KTS_GB.lookup(addr);
+    busyOff();
+    if (!r || r.st !== 'OK'){ return; }
+    const toji = r.toji || {}, ch = r.char || {};
+    const b = (r.bld && r.bld.st === 'OK' && r.bld.items && r.bld.items[0]) || null;
+    const d = {
+      addr: r.addr || '',
+      jimok: ch.lndcgrCodeNm || toji.lndcgrCodeNm || '',
+      land: toji.lndpclAr ? +toji.lndpclAr : (ch.lndpclAr ? +ch.lndpclAr : 0),
+      bldg: b && b.totArea ? +b.totArea : 0,
+      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
+    };
+    const done = fillProp(scope, d, true);
+    if (done.length){ refreshWrite(); toast('4대 공부로 ' + done.length + '칸을 더 채웠습니다'); }
+  }catch(e){ busyOff(); }
+}
+function openPropSheet(scope){
+  PROP_SCOPE = scope || 'x';
+  let d = document.getElementById('propSheet');
+  if (!d){
+    d = document.createElement('div'); d.id = 'propSheet';
+    d.innerHTML = '<div class="ps"><h3>물건정보 불러오기<button type="button" class="stop" data-psclose="1">닫기</button></h3>'
+      + '<label class="lb">주소</label><input id="psAddr" placeholder="예) 경기 가평군 청평면 신하리 123-4">'
+      + '<div class="row"><button type="button" class="btn pri sm" id="psGb">4대 공부로 채우기</button></div>'
+      + '<label class="lb">매물 글 (문자·카톡)</label>'
+      + '<textarea id="psTxt" rows="3" placeholder="붙여넣으면 주소·면적·지목을 읽어 넣습니다"></textarea>'
+      + '<div class="row"><button type="button" class="btn sec sm" id="psPaste">붙여넣기</button><button type="button" class="btn sec sm" id="psRead">읽어서 채우기</button></div>'
+      + '<p class="kv">4대 공부는 브이월드·건축HUB에서 이 기기로 바로 조회합니다.</p></div>';
+    document.body.appendChild(d);
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-psclose]')) d.classList.remove('on'); });
+    d.querySelector('#psPaste').onclick = async () => {
+      try{ const t = await navigator.clipboard.readText(); d.querySelector('#psTxt').value = t || ''; toast('붙여넣었습니다'); }
+      catch(e){ d.querySelector('#psTxt').focus(); toast('칸을 길게 눌러 붙여넣어 주세요'); }
+    };
+    d.querySelector('#psRead').onclick = () => {
+      const txt = (d.querySelector('#psTxt').value || d.querySelector('#psAddr').value || '').trim();
+      if (!txt) return toast('주소나 매물 글을 넣어 주세요');
+      const A = s5parse(txt);
+      const isB = PROP_SCOPE === 'b';
+      const ar = (isB ? A.areasB : (A.areasA || A.areas)) || { land: 0, bldg: 0, any: 0 };
+      const ad = isB ? (A.propB || A.addr) : (A.propA || A.addr);
+      const done = fillProp(PROP_SCOPE, { addr: ad || '', jimok: A.jimok, land: ar.land || ar.any || 0, bldg: ar.bldg || 0, struct: A.structure });
+      if (!done.length) return toast('주소를 찾지 못했습니다 — 주소 칸에 직접 넣어 주세요');
+      d.classList.remove('on'); refreshWrite(); toast(done.length + '칸을 채웠습니다');
+    };
+    d.querySelector('#psGb').onclick = () => {
+      const a = (d.querySelector('#psAddr').value || '').trim();
+      if (!a) return toast('주소를 넣어 주세요');
+      d.classList.remove('on');
+      propEnrichForce(PROP_SCOPE, a);
+    };
+  }
+  d.classList.add('on');
+}
+async function propEnrichForce(scope, addr){
+  try{
+    busyOn('4대 공부 확인 중…');
+    const r = await KTS_GB.lookup(addr);
+    busyOff();
+    if (!r || r.st !== 'OK'){ toast('4대 공부에서 찾지 못했습니다 — 주소를 확인해 주세요'); return; }
+    const toji = r.toji || {}, ch = r.char || {};
+    const b = (r.bld && r.bld.st === 'OK' && r.bld.items && r.bld.items[0]) || null;
+    const done = fillProp(scope, {
+      addr: r.addr || addr, jimok: ch.lndcgrCodeNm || toji.lndcgrCodeNm || '',
+      land: toji.lndpclAr ? +toji.lndpclAr : 0, bldg: b && b.totArea ? +b.totArea : 0,
+      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
+    }, true);
+    refreshWrite();
+    toast(done.length ? ('4대 공부로 ' + done.length + '칸을 채웠습니다') : '이미 다 채워져 있습니다');
+  }catch(e){ busyOff(); toast('4대 공부를 불러오지 못했습니다'); }
+}
+
+/* ---------- 마이크: 지금 듣고 있어요 + 이퀄라이저 ---------- */
+const MIC = { on:false, want:false, rec:null, el:null, bars:[], ac:null, an:null, raf:0, stream:null, noLevel:false, ends:0 };
+function micKillKb(){
+  try{ const a = document.activeElement; if (a && a.blur && a !== document.body) a.blur(); }catch(e){}
+  try{ const a = document.activeElement; if (a && a.blur) a.blur(); }catch(e){}
+  try{ window.getSelection && window.getSelection().removeAllRanges(); }catch(e){}
+}
+function micBarEl(){
+  let d = document.getElementById('micBar');
+  if (d) return d;
+  d = document.createElement('div'); d.id = 'micBar';
+  d.innerHTML = '<div class="mbTop"><span class="mbDot"></span><span>지금 듣고 있어요</span><button type="button" class="stop" data-micstop="1">그만</button></div>'
+    + '<div id="micEq">' + new Array(21).fill('<i></i>').join('') + '</div>'
+    + '<div id="micLive"><small id="mbWhere"></small><b id="mbTxt">말씀하세요…</b></div>';
+  document.body.appendChild(d);
+  MIC.bars = Array.prototype.slice.call(d.querySelectorAll('#micEq i'));
+  const stop = d.querySelector('[data-micstop]');
+  if (stop) stop.onclick = function(e){ e.preventDefault(); micStop(); };
+  return d;
+}
+function micShow(on){ micBarEl().classList.toggle('on', !!on); document.body.classList.toggle('micOn', !!on); }
+function micWhere(el){
+  if (!el) return '';
+  if (el.id === 'spFree') return '특약 — 말하면 한 줄씩 들어갑니다';
+  const f = el.dataset && el.dataset.f ? byId(el.dataset.f) : null;
+  if (!f) return '';
+  const g = f.grp;
+  const role = g === 'a' ? curForm().roleA : g === 'b' ? curForm().roleB : g === 'c' ? (curForm().roleC || '중개업자') : '';
+  return (role ? role + ' · ' : '') + LBL(f);
+}
+function micSetTarget(el){
+  MIC.el = el || null;
+  const w = document.getElementById('mbWhere');
+  if (w) w.textContent = el ? ('받아 적는 칸 · ' + micWhere(el)) : '받아 적을 칸을 눌러 주세요';
+}
+function micSay(msg){
+  const b = document.getElementById('mbTxt');
+  if (b){ b.textContent = msg; b.style.color = '#FF9C9C'; }
+}
+function micLive(t, fin){
+  const b = document.getElementById('mbTxt');
+  if (!b) return;
+  b.textContent = t; b.style.color = fin ? '#FFA24D' : '#fff';
+}
+function voiceFields(){
+  return Array.prototype.slice.call(document.querySelectorAll('#s1 input[data-f], #s1 textarea[data-f]'))
+    .filter(e => e.getClientRects().length);
+}
+function voicePick(){
+  const els = voiceFields();
+  return els.find(e => !e.getAttribute('inputmode') && !String(e.value || '').trim())
+    || els.find(e => !String(e.value || '').trim())
+    || els.find(e => !e.getAttribute('inputmode'))
+    || els[0];
+}
+function micStart(el){
+  micKillKb();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR){ toast('이 브라우저는 음성 입력이 안 됩니다 — 키보드 마이크를 쓰세요'); return; }
+  if (!el) el = (LASTEL && document.body.contains(LASTEL) && LASTEL.getClientRects().length) ? LASTEL : voicePick();
+  if (!el) return toast('먼저 채울 칸을 눌러 주세요');
+  if (MIC.on) micStop(false);
+  MIC.on = true; MIC.want = true; MIC.ends = 0;
+  micBarEl();
+  micSetTarget(el);
+  micLive('말씀하세요…', false);
+  micShow(true);
+  startRec();
+  micLevel();
+  [70, 380, 900].forEach(ms => setTimeout(() => { if (MIC.on) micKillKb(); }, ms));
+}
+function startRec(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  let r; try{ r = new SR(); }catch(e){ return; }
+  MIC.rec = r;
+  r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
+  r.onresult = e => {
+    MIC.ends = 0;
+    let it = '', fn = '';
+    for (let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i], t = (res[0] && res[0].transcript) || '';
+      if (res.isFinal) fn += t; else it += t;
+    }
+    if (it.trim()) micLive(it.trim(), false);
+    if (fn.trim()) micInsert(fn.trim());
+    micKillKb();
+  };
+  r.onerror = e => {
+    const er = (e && e.error) || '';
+    if (er === 'not-allowed' || er === 'service-not-allowed'){ micSay('마이크 권한을 허용해 주세요 (주소창 자물쇠 → 마이크)'); setTimeout(() => micStop(true), 2600); return; }
+    if (er === 'network'){ micSay('음성 인식 서버에 연결하지 못했습니다 — 키보드 마이크를 쓰세요'); setTimeout(() => micStop(true), 2600); return; }
+    if (er === 'no-speech' || er === 'aborted'){ micSay('말씀하세요…'); return; }
+    if (er === 'audio-capture'){ MIC.noLevel = true; stopLevel(); return; }
+    micSay('다시 한 번 말씀해 주세요');
+  };
+  r.onend = () => {
+    if (!MIC.on || !MIC.want) return micEnd();
+    MIC.ends++;
+    if (MIC.ends > 8){ micSay('음성 인식을 멈췄습니다 — 다시 눌러 주세요'); return micEnd(); }
+    setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 200);
+  };
+  try{ r.start(); }catch(e){ setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 450); }
+}
+function micInsert(t){
+  const el = MIC.el; if (!el) return;
+  const isTa = el.tagName === 'TEXTAREA';
+  const cur = String(el.value || '');
+  el.value = cur ? (cur + (isTa ? '\n' : ' ') + t) : t;
+  try{ el.dispatchEvent(new Event('input', { bubbles: true })); }catch(e){}
+  LASTEL = el;
+  micLive(t, true);
+  if (el.id !== 'spFree' && S.step === 1) setTimeout(micNext, 80);
+}
+function micNext(){
+  const els = voiceFields(); if (!els.length) return;
+  const i = els.indexOf(MIC.el);
+  const nx = els[i + 1] || els.find(e => !String(e.value || '').trim());
+  if (nx && nx !== MIC.el) micSetTarget(nx);
+}
+function micStop(){
+  MIC.want = false; MIC.on = false;
+  try{ MIC.rec && MIC.rec.stop(); }catch(e){}
+  setTimeout(() => { try{ MIC.rec && MIC.rec.abort(); }catch(e){} }, 60);
+  stopLevel();
+  setTimeout(() => { if (!MIC.on) micShow(false); }, 450);
+}
+function micEnd(){ MIC.on = false; MIC.want = false; stopLevel(); setTimeout(() => { if (!MIC.on) micShow(false); }, 1400); }
+function micLevel(){
+  if (MIC.noLevel || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return micWave();
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(st => {
+    if (!MIC.on){ st.getTracks().forEach(t => t.stop()); return; }
+    MIC.stream = st;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return micWave();
+    const ac = new AC(); MIC.ac = ac;
+    const src = ac.createMediaStreamSource(st);
+    const an = ac.createAnalyser(); an.fftSize = 64; an.smoothingTimeConstant = .72;
+    src.connect(an); MIC.an = an;
+    const buf = new Uint8Array(an.frequencyBinCount);
+    const loop = () => {
+      if (!MIC.on || !MIC.an) return;
+      an.getByteFrequencyData(buf);
+      const n = MIC.bars.length;
+      for (let i = 0; i < n; i++){
+        const k = Math.min(buf.length - 1, Math.round(i * buf.length / n));
+        const v = (buf[k] || 0) / 255;
+        MIC.bars[i].style.height = (6 + Math.round(Math.pow(v, 1.2) * 32)) + 'px';
+      }
+      MIC.raf = requestAnimationFrame(loop);
+    };
+    loop();
+  }).catch(() => { MIC.noLevel = true; micWave(); });
+}
+function micWave(){
+  const t0 = performance.now();
+  const loop = t => {
+    if (!MIC.on) return;
+    const dt = t - t0;
+    MIC.bars.forEach((b, i) => {
+      const v = .16 + .52 * Math.abs(Math.sin(dt / 150 + i * .62)) * Math.abs(Math.sin(dt / 820 + i * .27));
+      b.style.height = (6 + Math.round(v * 32)) + 'px';
+    });
+    MIC.raf = requestAnimationFrame(loop);
+  };
+  MIC.raf = requestAnimationFrame(loop);
+}
+function stopLevel(){
+  if (MIC.raf) cancelAnimationFrame(MIC.raf); MIC.raf = 0;
+  try{ MIC.stream && MIC.stream.getTracks().forEach(t => t.stop()); }catch(e){}
+  MIC.stream = null;
+  try{ MIC.ac && MIC.ac.close(); }catch(e){}
+  MIC.ac = null; MIC.an = null;
+}
+function micParty(g){
+  const wrap = document.querySelector(`[data-pg="${g}"]`);
+  if (!wrap) return;
+  const els = Array.prototype.slice.call(wrap.querySelectorAll('input[data-f]')).filter(e => e.getClientRects().length);
+  const el = els.find(e => !String(e.value || '').trim()) || els[0];
+  if (!el) return toast('이 사람 칸이 없습니다');
+  micStart(el);
+}
+function typeParty(g){
+  const wrap = document.querySelector(`[data-pg="${g}"]`);
+  if (!wrap) return;
+  const els = Array.prototype.slice.call(wrap.querySelectorAll('input[data-f],textarea[data-f]')).filter(e => e.getClientRects().length);
+  const el = els.find(e => !String(e.value || '').trim()) || els[0];
+  if (!el) return;
+  try{ el.scrollIntoView({ block: 'center' }); }catch(e){}
+  el.focus();
+}
+
+/* ---------- 출력 화면 (미리보기·사인·도장은 접힌 채 시작) ---------- */
+function renderOpts(){
+  const pv = $('#pvWrap2'), sg = $('#sigWrap');
+  const bp = document.querySelector('[data-opt="pv"]'), bs = document.querySelector('[data-opt="sig"]');
+  if (bp && pv) bp.classList.toggle('on', !pv.hidden);
+  if (bs && sg) bs.classList.toggle('on', !sg.hidden);
+  renderMiss();
+}
+function toggleOpt(k){
+  if (k === 'pv'){
+    const pv = $('#pvWrap2');
+    pv.hidden = !pv.hidden;
+    if (!pv.hidden) renderPreview();
+  } else {
+    const sg = $('#sigWrap');
+    sg.hidden = !sg.hidden;
+    if (!sg.hidden){ renderSigns(); renderSeal(); }
+  }
+  renderOpts();
+}
+window.KC_MIC = { start: micStart, stop: micStop, show: function(){ micBarEl(); MIC.on = true; micSetTarget(voicePick()); micShow(true); micWave(); setTimeout(function(){ MIC.on = false; micShow(false); }, 6000); }, get on(){ return MIC.on; } };
+window.KC_WRITE = { render: renderWrite, dates: dateGroups, propLoad: propLoad, fillProp: fillProp };
 
 /* ---------- 시작 ---------- */
 window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, set BG(v){ BG = v; },
@@ -1648,95 +2252,5 @@ window.KC = {get S(){ return S; }, set S(v){ S = v; }, get BG(){ return BG; }, s
 <!-- 공통 UX (1트랙 2026-11-21) — 하루 무료 횟수 · [그 이상 쓰기] · 결과물 표기 -->
 <script>window.KTS_UX_CFG={tool:"contract",wm:["#printArea"],flow:1,guide:0};</script>
 <script src="../ux.js?v=20261125a"></script>
-<script src="../helper.js?v=20261125c"></script>
-<script>
-/* ===== 2026-11-25 작성 도우미 — 커서(👆) → 마이크(🎤) → 다음 칸 / 작성 끝엔 [?]=60초 문의 ===== */
-(function(){
-  if (!window.KTS_HELPER || !KTS_HELPER.writing) return;
-  var CW = { i: -1, armed: false };
-  function scrEls(){
-    var scr = document.getElementById('s' + S.step); if (!scr) return [];
-    var list = [].slice.call(scr.querySelectorAll('input[data-f],textarea[data-f]'));
-    if (S.step === 3){ var ta = document.getElementById('spFree'); if (ta) list.push(ta); }
-    if (S.step === 4) list = [].slice.call(scr.querySelectorAll('canvas[data-sig]'));
-    return list.filter(function(e){ return e.getClientRects().length; });
-  }
-  function labelOf(el){
-    if (S.step === 1 || S.step === 2) {
-      var host = el.closest('.dd') || el;
-      var prev = host.previousElementSibling, guard = 0;
-      while (prev && guard++ < 4){
-        var t = (prev.textContent || '').replace(/\s+/g, ' ').trim();
-        if (/^(LABEL)$/.test(prev.tagName) && t) return t.replace(/<[^>]+>/g, '').slice(0, 20);
-        prev = prev.previousElementSibling;
-      }
-      return '이 칸';
-    }
-    if (S.step === 3) return '특약';
-    var lab = el.previousElementSibling;
-    if (lab){
-      var c = lab.cloneNode(true), em = c.querySelector('em'); if (em) em.remove();
-      var t2 = (c.textContent || '').replace(/\s+/g, ' ').trim();
-      if (t2) return t2.slice(0, 20);
-    }
-    return '서명';
-  }
-  function refresh(){ try{ KTS_HELPER.guideRefresh(); }catch(e){} }
-  /* 인쇄·저장을 누르면 작성이 끝난 것으로 본다 → [?]는 60초 문의로 돌아간다 */
-  ['printBtn', 'pngBtn'].forEach(function(id){
-    var b = document.getElementById(id);
-    if (b) b.addEventListener('click', function(){ CW.done = true; setTimeout(refresh, 300); });
-  });
-  if (document.getElementById('plbls')) document.getElementById('plbls').addEventListener('click', function(){ CW.done = false; setTimeout(refresh, 120); });
-  if (document.getElementById('newBtn')) document.getElementById('newBtn').addEventListener('click', function(){ CW.done = false; });
-  ['startBtn', 'otherForm'].forEach(function(id){
-    var b = document.getElementById(id);
-    if (b) b.addEventListener('click', function(){ CW.done = false; setTimeout(refresh, 200); });
-  });
-  KTS_HELPER.writing(function(){
-    if (CW.done) return null;
-    if (!(S.step >= 1 && S.step <= 4)) return null;
-    var els = scrEls(); if (!els.length) return null;
-    var a = document.activeElement, focused = els.indexOf(a) >= 0;
-    var idx = focused ? els.indexOf(a) : (CW.armed && els[CW.i] ? CW.i : -1);
-    if (idx < 0) idx = Math.max(0, els.findIndex(function(e){ return !String(e.value || '').trim(); }));
-    if (idx < 0) idx = els.length - 1;
-    var el = els[idx], mic = focused || (CW.armed && CW.i === idx);
-    return {
-      active: true, mode: mic ? 'mic' : 'cursor', el: el,
-      label: labelOf(el), pos: (idx + 1) + ' / ' + els.length + (S.step === 4 ? ' · 서명' : (S.step === 3 ? ' · 특약' : '')),
-      tap: function(){
-        CW.i = idx; CW.armed = true;
-        if (mic){
-          LASTEL = el;
-          var b = document.getElementById(S.step === 2 ? 'vFill2' : 'vFill');
-          if (b) b.click(); else { try{ el.focus(); }catch(e){} }
-        } else {
-          try{ el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
-          if (el.tagName === 'CANVAS'){ el.classList.add('kts-guidefld'); setTimeout(function(){ try{ el.classList.remove('kts-guidefld'); }catch(e){} }, 1600); }
-        }
-        setTimeout(refresh, 160);
-      }
-    };
-  });
-  /* 단계를 옮기면 안내도 새 단계로 */
-  var _go = window.go;
-  window.addEventListener('click', function(){ setTimeout(refresh, 60); }, true);
-  window.addEventListener('scroll', function(){ }, { passive: true });
-  /* 말로 채운 뒤 다음 칸으로 */
-  window.KTS_NEXT_AFTER_VOICE = function(){
-    var els = scrEls(); if (!els.length) return;
-    var cur = els.indexOf(LASTEL);
-    var nx = cur + 1; if (nx >= els.length) { CW.armed = false; CW.i = -1; refresh(); return; }
-    CW.i = nx; CW.armed = true;
-    try{ if (LASTEL && LASTEL.blur) LASTEL.blur(); }catch(e){}
-    try{ els[nx].scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){}
-    refresh();
-  };
-  refresh();
-  window.addEventListener('load', refresh);
-  setTimeout(refresh, 300); setTimeout(refresh, 1200);
-})();
-</script>
 <script src="/shared/pwa-install.js?v=20261126" data-name="표준계약서" data-start="/contract/" data-manifest="/shared/pwa/contract.webmanifest" defer></script>
 </body></html>
