@@ -269,7 +269,7 @@
     var me = S.me || {};
     if (me.kakao && /^https?:/.test(me.kakao)) { window.open(me.kakao, '_blank'); return; }
     if (me.kakao) {
-      if (navigator.clipboard) navigator.clipboard.writeText(me.kakao).then(function () { toast('카톡 ID 「' + me.kakao + '」 복사 — 카톡에서 붙여넣으세요' }); });
+      if (navigator.clipboard) navigator.clipboard.writeText(me.kakao).then(function () { toast('카톡 ID 「' + me.kakao + '」 복사 — 카톡에서 붙여넣으세요'); });
       else toast('카톡 ID: ' + me.kakao);
       return;
     }
