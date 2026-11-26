@@ -204,6 +204,10 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 #valList input.has:not(:focus),#valList textarea.has:not(:focus){border-color:transparent;background:rgba(255,255,255,.035)}
 .fld.done{border-color:transparent;background:transparent}
 .fld.done .lbl2{position:absolute;left:2px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:900;color:#0B1A3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* 231·개선 2 (트랙4 이관): 결과물 전/후 예시 1장 */
+.baEx{margin:10px 0 0;padding:0;border:0;border-radius:14px;overflow:hidden;background:#0E1B36}
+.baEx img{display:block;width:100%;height:auto}
+.baEx figcaption{padding:8px 12px;font-size:11.5px;line-height:1.5;color:#9DAEC5;background:#12203C;word-break:keep-all}
 </style>
 </head><body>
 <div id="app">
@@ -240,6 +244,11 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
    <button type="button" data-std="p_consult">컨설팅 전속약정서</button>
   </div>
   <p class="kv sm">비워 둔 칸은 원본 빈칸 그대로 나옵니다 · 표준 양식은 열쇠 없이 무료</p>
+  <!-- 231·개선 2 (트랙4 이관): 결과물 전/후 예시 1장 — 첫 버튼은 그대로 맨 위, 예시는 그 아래 -->
+  <figure class="baEx">
+   <img src="../shared/examples/theform_before_after.svg" alt="전: 종이 표 사진, 후: 한글·엑셀 표 파일" loading="lazy" width="390" height="230">
+   <figcaption>예시 · 표 사진 한 장이 병합·열 너비 그대로 한글(.hwpx)/엑셀(.xlsx)로 나옵니다</figcaption>
+  </figure>
   <input type="file" id="photoIn" accept="image/*" hidden>
   <div id="regBox" style="display:none">
    <div class="stage" id="regStage"><canvas id="regCv"></canvas></div>
