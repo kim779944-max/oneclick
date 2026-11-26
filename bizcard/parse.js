@@ -68,11 +68,11 @@
 
   /* ---------- 숫자 뽑기 ---------- */
   function cleanNum(s) {
-    return String(s == null ? '' : s).replace(/(\d),(?=\d{3})/g, '').replace(/[^\d.]/g, '');
+    return String(s == null ? '' : s).replace(/(\d),(?=\d{3})/g, '$1').replace(/[^\d.]/g, '');
   }
 
   function parseMoney(s) {
-    s = String(s || '').replace(/(\d),(?=\d{3})/g, '').replace(/\s+/g, ' ');
+    s = String(s || '').replace(/(\d),(?=\d{3})/g, '$1').replace(/\s+/g, ' ');
     var total = 0, hit = false, lastUnit = 0, lastIdx = 0;
     var re = /(\d+(?:\.\d+)?)\s*(억|천만|백만|만|천)/g, m;
     while ((m = re.exec(s))) {
