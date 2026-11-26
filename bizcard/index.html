@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="전자명함">
-<link rel="stylesheet" href="app.css?v=20261126b">
+<link rel="stylesheet" href="app.css?v=20261126c">
 </head>
 <body>
 
@@ -75,18 +75,19 @@
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* 화면에 에러를 바로 보여 준다(백지 화면 대신) */
-window.addEventListener('error', function (e) {
-  var t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = 'ERR ' + (e.message || '') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || '');
-  t.classList.add('on');
-  t.setAttribute('data-err', '1');
-});
+/* 개발용(?dev=1)에서만 오류를 화면에 보여 준다 — 백지 화면 대신 원인을 보려고 */
+if (/[?&]dev=1/.test(location.search)) {
+  window.addEventListener('error', function (e) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = 'ERR ' + (e.message || '') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || '');
+    t.classList.add('on');
+  });
+}
 </script>
-<script src="parse.js?v=20261126b"></script>
-<script src="gongbu.js?v=20261126b"></script>
-<script src="assistant.js?v=20261126b"></script>
-<script src="app.js?v=20261126b"></script>
+<script src="parse.js?v=20261126c"></script>
+<script src="gongbu.js?v=20261126c"></script>
+<script src="assistant.js?v=20261126c"></script>
+<script src="app.js?v=20261126c"></script>
 </body>
 </html>

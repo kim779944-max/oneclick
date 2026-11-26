@@ -115,26 +115,44 @@
     };
   }
 
-  var enrichQ = {};
-  function enrich(it) {
-    if (!it || !it.addr || it.gb || enrichQ[it.id]) return;
-    if (!g.KTS_GB) return;
-    enrichQ[it.id] = 1;
+  var geoQ = {}, fullQ = {};
+
+  /* 지도·지번만 (목록 썸네일용 — 요청을 아끼려고 좌표만 받는다) */
+  function ensureGeo(it) {
+    if (!it || !it.addr || (it.lat && it.lon) || geoQ[it.id] || !g.KTS_GB) return;
+    geoQ[it.id] = 1;
+    g.KTS_GB.geo(it.addr).then(function (r) {
+      delete geoQ[it.id];
+      if (r.st === 'OK') {
+        it.lat = r.lat; it.lon = r.lon; it.geoSt = 'ok';
+        if (r.pnu) it.pnu = r.pnu;
+        if (r.jibun) it.jibun = it.jibun || r.jibun;
+      } else it.geoSt = r.st;
+      save(); render();
+    }).catch(function () { delete geoQ[it.id]; it.geoSt = 'err'; render(); });
+  }
+
+  /* 4대 공부까지 (상세를 열었을 때만) */
+  function ensureFull(it) {
+    if (!it) return;
+    if (!it.addr) { it.gbSt = 'noaddr'; return; }
+    if (it.gb || fullQ[it.id] || !g.KTS_GB) return;
+    fullQ[it.id] = 1;
     it.gbSt = 'loading';
-    g.KTS_GB.lookup(it.addr).then(function (r) {
+    render();
+    g.KTS_GB.lookup(it.addr, (it.lat && it.lon) ? { lat: it.lat, lon: it.lon } : null).then(function (r) {
+      delete fullQ[it.id];
       it.gb = r; it.gbSt = (r.st === 'OK') ? 'ok' : r.st;
       if (r.lat) { it.lat = r.lat; it.lon = r.lon; }
       if (r.pnu) it.pnu = r.pnu;
-      if (r.jibun && !it.jibun) it.jibun = r.jibun;
-      if (!it.areaM2 && (r.char && r.char.lndpclAr || r.toji && r.toji.lndpclAr)) {
+      if (r.jibun) it.jibun = it.jibun || r.jibun;
+      if (!it.areaM2) {
         var a = +(r.char && r.char.lndpclAr || r.toji && r.toji.lndpclAr);
         if (a > 0) { it.areaM2 = a; it.areaP = Math.round(a / 3.305785); }
       }
-      delete enrichQ[it.id];
-      save();
-      render();
+      save(); render();
     }).catch(function () {
-      it.gbSt = 'err'; delete enrichQ[it.id]; save(); render();
+      delete fullQ[it.id]; it.gbSt = 'err'; save(); render();
     });
   }
 
@@ -195,7 +213,12 @@
     if (!S.me) { go('#/setup'); return; }
     var me = S.me;
     var starred = S.items.filter(function (x) { return x.starred }).slice(0, 8);
-    var list = starred.length ? starred : S.items.slice(0, 4);
+    var list = starred.length ? starred.slice(0, 4) : [];
+    if (list.length < 3) {
+      S.items.slice().sort(function (a, b) { return b.createdAt - a.createdAt }).forEach(function (x) {
+        if (list.length < 3 && list.indexOf(x) < 0) list.push(x);
+      });
+    }
     var unread = unreadCount();
 
     var h = '';
@@ -251,7 +274,7 @@
     LS.set(K.seen, Date.now());
     updateBadge();
     if (installed) $('#btnInstall').classList.add('done');
-    S.items.forEach(function (it) { if (!it.gb && it.addr) enrich(it); });
+    list.forEach(ensureGeo);
   }
 
   function shareCard() {
@@ -315,6 +338,7 @@
 
     h += '<p class="tiny">★ 별표를 누르면 명함 맨 위「새 물건표」로 올라갑니다.</p>';
     $('#v-list').innerHTML = h;
+    items.slice(0, 12).forEach(ensureGeo);
 
     $('#btnPaste').addEventListener('click', function () { go('#/new'); });
     $$('#filter .chip').forEach(function (b) {
@@ -450,7 +474,7 @@
   function viewDetail(id) {
     var it = byId(id);
     if (!it) { go('#/list'); return; }
-    if (!it.gb && it.addr) enrich(it);
+    ensureFull(it);
 
     var gb = it.gb || {};
     var jiga = jigaPerM2(gb);
@@ -517,7 +541,7 @@
       else toast(it.addr);
     });
     var rt = $('#btnRetry');
-    if (rt) rt.addEventListener('click', function () { it.gb = null; it.gbSt = 'none'; enrich(it); });
+    if (rt) rt.addEventListener('click', function () { it.gb = null; it.gbSt = 'none'; delete fullQ[it.id]; ensureFull(it); });
   }
 
   function gbLabel(it) {

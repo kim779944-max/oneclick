@@ -24,7 +24,22 @@
 
   function arr(x) { return Array.isArray(x) ? x : (x && typeof x === 'object' ? [x] : []) }
 
-  /* 브이월드는 CORS 헤더를 주지 않는다 → JSONP */
+  /* 브이월드는 CORS 헤더를 주지 않는다 → JSONP. 다만 같은 키로 동시에 여러 건을 보내면
+     응답이 밀린다(실측: 3건 동시요청 중 2건 타임아웃) → 한 번에 한 건씩 줄을 세운다. */
+  var Q = [], BUSY = false;
+  function enqueue(fn) {
+    return new Promise(function (res, rej) {
+      Q.push({ fn: fn, res: res, rej: rej }); drain();
+    });
+  }
+  function drain() {
+    if (BUSY || !Q.length) return;
+    BUSY = true;
+    var job = Q.shift();
+    Promise.resolve().then(job.fn).then(function (v) { BUSY = false; job.res(v); drain(); },
+      function (e) { BUSY = false; job.rej(e); drain(); });
+  }
+
   function jsonp(url, ms) {
     return new Promise(function (res) {
       var cb = '__ktsbc' + Math.floor(Math.random() * 1e7),
@@ -43,11 +58,20 @@
     });
   }
 
+  /* 한 건씩 — 타임아웃이면 한 번 다시 */
+  function http(url, ms, tries) {
+    tries = (tries == null) ? 2 : tries;
+    return enqueue(function () { return jsonp(url, ms) }).then(function (r) {
+      if (r && r.__err && tries > 1) return http(url, ms, tries - 1);
+      return r;
+    });
+  }
+
   /* ---------- 1) 주소 → 좌표 ---------- */
   function geocodeOne(q, type) {
     var url = API + '?service=address&request=getcoord&version=2.0&crs=EPSG:4326&format=json&type=' + type
       + '&key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN + '&address=' + encodeURIComponent(q);
-    return jsonp(url, 9000).then(function (r) {
+    return http(url, 9000).then(function (r) {
       if (r && r.response && r.response.status === 'OK' && r.response.result && r.response.result.point) {
         var p = r.response.result.point;
         return {
@@ -82,7 +106,7 @@
       + '&key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
       + '&format=json&size=1&page=1&geometry=true&attribute=true&crs=EPSG:4326'
       + '&geomFilter=' + encodeURIComponent('POINT(' + lon.toFixed(7) + ' ' + lat.toFixed(7) + ')');
-    return jsonp(url, 12000).then(function (r) {
+    return http(url, 12000).then(function (r) {
       if (!r || r.__err || !r.response || r.response.status !== 'OK') return null;
       var fc = r.response.result && r.response.result.featureCollection;
       var ft = fc && fc.features && fc.features[0];
@@ -94,7 +118,7 @@
 
   /* ---------- 3) 토지대장 · 토지특성 · 공시지가 · 이용계획 ---------- */
   function nedToji(pnu) {
-    return jsonp(NED + '/ladfrlList?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
+    return http(NED + '/ladfrlList?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
       + '&format=json&pnu=' + pnu + '&numOfRows=3&pageNo=1')
       .then(function (r) {
         if (!r || r.__err || !r.ladfrlVOList) return null;
@@ -107,7 +131,7 @@
     function step() {
       if (i > 2) return Promise.resolve(null);
       var yr = y - i; i++;
-      return jsonp(NED + '/getLandCharacteristics?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
+      return http(NED + '/getLandCharacteristics?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
         + '&format=json&pnu=' + pnu + '&numOfRows=30&pageNo=1&stdrYear=' + yr)
         .then(function (r) {
           var f = arr(r && r.landCharacteristicss && r.landCharacteristicss.field);
@@ -120,7 +144,7 @@
   }
 
   function nedPrice(pnu) {
-    return jsonp(NED + '/getIndvdLandPriceAttr?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
+    return http(NED + '/getIndvdLandPriceAttr?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
       + '&format=json&pnu=' + pnu + '&numOfRows=40&pageNo=1')
       .then(function (r) {
         var f = arr(r && r.indvdLandPrices && r.indvdLandPrices.field);
@@ -135,7 +159,7 @@
   }
 
   function nedUse(pnu) {
-    return jsonp(NED + '/getLandUseAttr?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
+    return http(NED + '/getLandUseAttr?key=' + encodeURIComponent(key()) + '&domain=' + DOMAIN
       + '&format=json&pnu=' + pnu + '&numOfRows=200&pageNo=1')
       .then(function (r) {
         var f = arr(r && r.landUses && r.landUses.field);
@@ -176,7 +200,23 @@
     }).catch(function (e) { return { st: 'NET', msg: String(e && e.message || e).slice(0, 80) } });
   }
 
-  /* ---------- 5) 지적항공도(사진 없을 때 대표사진) ---------- */
+  /* ---------- 5) 좌표만 빠르게 (목록 썸네일용) ---------- */
+  function geo(addr) {
+    var t0 = Date.now();
+    return geocode(addr).then(function (pt) {
+      if (!pt) return { st: 'NOT_FOUND', ms: Date.now() - t0 };
+      return parcelAt(pt.lat, pt.lon).then(function (pc) {
+        return {
+          st: 'OK', ms: Date.now() - t0, lat: pt.lat, lon: pt.lon,
+          addr: (pc && pc.addr) || pt.text, pnu: (pc && pc.pnu) || '',
+          jibun: (pc && pc.jibun) || '', jiga: (pc && pc.jiga) || null,
+          map: mapUrl(pt.lat, pt.lon)
+        };
+      });
+    }).catch(function (e) { return { st: 'ERR', msg: String(e && e.message || e).slice(0, 80) } });
+  }
+
+  /* ---------- 6) 지적항공도(사진 없을 때 대표사진) ---------- */
   function mapUrl(lat, lon, w, h, zoom) {
     if (!isFinite(lat) || !isFinite(lon)) return '';
     return IMG + '?service=image&request=getmap&key=' + encodeURIComponent(key())
@@ -186,9 +226,10 @@
   }
 
   /* ---------- 전체 묶음 ---------- */
-  function lookup(addr) {
+  function lookup(addr, cached) {
     var t0 = Date.now();
-    return geocode(addr).then(function (pt) {
+    var first = (cached && cached.lat && cached.lon) ? Promise.resolve(cached) : geocode(addr);
+    return first.then(function (pt) {
       if (!pt) return { st: 'NOT_FOUND', ms: Date.now() - t0 };
       return parcelAt(pt.lat, pt.lon).then(function (pc) {
         var pnu = pc && pc.pnu || '';
@@ -210,5 +251,5 @@
     });
   }
 
-  g.KTS_GB = { lookup: lookup, mapUrl: mapUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse };
+  g.KTS_GB = { lookup: lookup, geo: geo, mapUrl: mapUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse };
 })(window);
