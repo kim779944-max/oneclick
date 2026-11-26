@@ -1735,7 +1735,16 @@ const DATEH_RE = /년|월|일|기간|날짜|일자|시작|종료|완료|변제|�
 const isPropField = f => PROP_RE.test(LBL(f));
 const isPartyProp = f => /대상물건|물건\s*표시|물건지/.test(LBL(f));
 const isDateGrouped = f => !!f.dg || /\s(년|월|일)(\s*\(|$)/.test(LBL(f));
-const isDateField = f => !!f.dg || (DATEW_RE.test(LBL(f)) && DATEH_RE.test(LBL(f)));
+/* 날짜 한 칸(기간 시작·차용일 등) — 이름이 날짜처럼 끝나는 칸만. '월 차임'·'약정기간(개월)' 같은 금액·기간은 날짜가 아니다 */
+const DATE_SINGLE_RE = /(일|일자|날짜|기한)$/;
+const DATE_SINGLE_EXACT = /^(기간\s*(시작|끝|만료)|시작일|종료일|만기일)$/;
+const isDateSingle = f => {
+  if (isDateGrouped(f)) return false;
+  const l = LBL(f).replace(/\([^)]*\)\s*$/, '').trim();
+  if (/[·ㆍ]|및/.test(l)) return false;
+  return DATE_SINGLE_RE.test(l) || DATE_SINGLE_EXACT.test(l);
+};
+const isDateField = f => isDateGrouped(f) || isDateSingle(f);
 
 /* ---------- 칸 하나 ---------- */
 function fldHtml(f){
@@ -1792,7 +1801,7 @@ function dateGroups(){
 }
 /* 년·월·일로 쪼개지지 않은 날짜 칸(기간 시작·차용일 등)은 그대로 한 칸 */
 function dateSingles(){
-  return curForm().fields.filter(f => f.grp === 'x' && f.type !== 'sign' && isDateField(f) && !isDateGrouped(f));
+  return curForm().fields.filter(f => f.grp === 'x' && f.type !== 'sign' && isDateSingle(f));
 }
 function pad2(v){ return String(v).padStart(2, '0'); }
 function ymdToday(){ const d = new Date(); return { y: String(d.getFullYear()), m: String(d.getMonth() + 1), d: String(d.getDate()) }; }
