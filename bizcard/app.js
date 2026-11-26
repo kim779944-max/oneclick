@@ -317,6 +317,11 @@
     });
     h += '</div>';
 
+    if (!LS.get(K.tip, {}).star) {
+      h += '<div class="bubble tip" id="tipStar"><b>★</b> 별표를 누르면 명함 맨 위「새 물건표」로 올라가 손님에게 먼저 보입니다.'
+        + '<button id="tipStarX">알겠습니다</button></div>';
+    }
+
     var items = S.items.slice().sort(function (a, b) {
       if (!!b.starred !== !!a.starred) return (b.starred ? 1 : 0) - (a.starred ? 1 : 0);
       return b.createdAt - a.createdAt;
@@ -354,6 +359,10 @@
         toast(it.starred ? '명함 맨 위「새 물건표」에 올렸습니다' : '별표를 뺐습니다');
         viewList();
       });
+    });
+    var ts = $('#tipStar');
+    if (ts) $('#tipStarX').addEventListener('click', function () {
+      var t = LS.get(K.tip, {}); t.star = 1; LS.set(K.tip, t); ts.remove();
     });
     var td = $('#tipDemo');
     if (td) $('#tipDemoX').addEventListener('click', function () {
