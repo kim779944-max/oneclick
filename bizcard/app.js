@@ -900,6 +900,11 @@
 
   /* ---------------- 시작 ---------------- */
   function boot() {
+    /* 검수용: ?reset=1 이면 이 기기의 매물장·명함을 비우고 처음부터 */
+    if (/[?&]reset=1/.test(location.search)) {
+      [K.me, K.items, K.plan, K.seen, K.inq, K.tip].forEach(function (k) { try { localStorage.removeItem(k) } catch (e) { } });
+      S.me = null; S.items = null; S.plan = 'free';
+    }
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function () { });
     }
