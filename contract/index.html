@@ -2050,7 +2050,7 @@ function micBarEl(){
   if (stop) stop.onclick = function(e){ e.preventDefault(); micStop(); };
   return d;
 }
-function micShow(on){ micBarEl().classList.toggle('on', !!on); document.body.classList.toggle('micOn', !!on); }
+function micShow(on){ const d = micBarEl(); d.classList.toggle('on', !!on); d.setAttribute('aria-hidden', on ? 'false' : 'true'); document.body.classList.toggle('micOn', !!on); }
 function micWhere(el){
   if (!el) return '';
   if (el.id === 'spFree') return '특약 — 말하면 한 줄씩 들어갑니다';
