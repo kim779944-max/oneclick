@@ -351,9 +351,11 @@
   /* ---------------- 카톡 인앱 → 크롬 탈출 (intent://) ---------------- */
   function chromeIntentUrl() {
     var host = location.host || 'autooneclick.com';
-    var path = (location.pathname || '/bizcard/') + (location.hash || '');
+    /* 해시(#/card)를 intent 경로에 붙이면 안드로이드가 Intent; 를 못 찾는다 — 경로만 넣고
+       뒤로 돌아갈 곳(browser_fallback_url)에만 해시를 살려 넣는다. */
+    var path = location.pathname || '/bizcard/';
     return 'intent://' + host + path + '#Intent;scheme=https;package=com.android.chrome;'
-      + 'S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end';
+      + 'S.browser_fallback_url=' + encodeURIComponent(location.origin + path + (location.hash || '')) + ';end';
   }
   function openChrome() { location.href = chromeIntentUrl(); }
 
