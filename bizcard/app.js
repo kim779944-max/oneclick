@@ -419,13 +419,16 @@
     h += '<p class="tiny">소재지는 4대 공부(토지·건축물·지적·이용계획)까지 자동으로 붙습니다.</p>';
     $('#v-new').innerHTML = h;
 
-    /* 안드로이드 [공유]로 들어온 문자는 곧바로 물건표로 */
+    /* 안드로이드 [공유]로 들어온 문자는 곧바로 물건표로 (pending 을 바로 세팅해야 다시 그려도 살아남는다) */
     var shared = LS.get(K.shared, '');
     if (shared) {
       LS.set(K.shared, '');
       $('#raw').value = shared;
-      setTimeout(doParse, 0);
-      return;
+      if (g.KTS_PARSE) {
+        pending = g.KTS_PARSE.parse(shared);
+        viewNewPreview();
+        return;
+      }
     }
 
     $('#btnClip').addEventListener('click', function () {
@@ -473,10 +476,11 @@
     $('#v-new').innerHTML = h;
     $('#btnSave').addEventListener('click', function () {
       var it = baseItem(p);
-      it.starred = S.items.filter(function (x) { return !x.demo }).length < 3;
+      /* 별표는 당사자가 직접 누를 때만 — 새 매물이 명함에 저절로 올라가지 않는다 */
+      it.starred = false;
       S.items.push(it); save();
       pending = null;
-      toast('매물장에 담았습니다');
+      toast('매물장에 담았습니다 — 명함에 올리려면 매물장에서 ★를 누르세요', 3200);
       setTimeout(function () { go('#/item/' + it.id); }, 220);
     });
     $('#btnAgain').addEventListener('click', function () { pending = null; viewNew(); });

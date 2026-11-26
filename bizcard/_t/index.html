@@ -105,8 +105,21 @@ async function run(){
   /* 담기 */
   var btn=doc(s).querySelector('#btnSave');
   out('  담기 버튼='+(!!btn));
-  if(btn){ btn.click(); await sleep(1200); out('  담은 뒤 hash='+win(s).location.hash+' / 전체건수='+(doc(s).querySelector('#v-card .wide span')||{}).textContent); }
+  if(btn){
+    btn.click(); await sleep(1000);
+    out('  담은 뒤 hash='+win(s).location.hash);
+    win(s).location.hash='#/card'; await sleep(600);
+    var aft=m(s);
+    out('  담은 뒤 명함 카드수='+aft.cards+' (별표 안 눌렀으므로 그대로여야 함) / 전체='+(doc(s).querySelector('#v-card .wide span')||{}).textContent);
+  }
   del(s);
+  /* 화면 확인용 — 390x660 프레임을 맨 위에 남긴다 */
+  var v=await mk(390,660,'../index.html?reset=1&dev=1&r='+Date.now());
+  await sleep(500);
+  doc(v).querySelector('#btnDemoMe').click();
+  await sleep(1800);
+  document.getElementById('frames').insertBefore(v, document.getElementById('frames').firstChild);
+  out('VIEW_IFRAME_READY');
   out('DONE');
 }
 run().catch(function(e){ out('HARNESS ERROR '+e); });
