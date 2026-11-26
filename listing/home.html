@@ -57,6 +57,7 @@ html[data-kts-theme="light"] .chips button[aria-pressed="true"]{background:#fff1
 .list{display:grid;gap:10px}
 .card{display:grid;grid-template-columns:104px 1fr;gap:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px;min-height:44px}
 .card img{width:104px;height:78px;object-fit:cover;border-radius:8px;display:block}
+.card .noimg{width:104px;height:78px;border-radius:8px;display:grid;place-items:center;font-size:11px;color:var(--muted);border:1px dashed var(--b2);background:var(--p3);text-align:center;line-height:1.25}
 .card .t{font-weight:750;font-size:15px;letter-spacing:-.3px}
 .card .a{font-size:12px;color:var(--muted)}
 .card .chipline{display:flex;gap:5px;margin-bottom:3px}
@@ -99,7 +100,7 @@ html[data-kts-theme="light"] .chips button[aria-pressed="true"]{background:#fff1
   <div class="count"><span id="cnt" aria-live="polite"></span><button type="button" id="clr">필터 지우기</button></div>
   <div class="list" id="list"></div>
 
-  <p class="foot">예시 매물입니다(가상 데이터) · 비공개 매물은 이 목록과 개수에서 빠지고, 중개사가 보낸 직접 링크로만 열립니다 · 수익률은 층별 임대차 표의 월세 합계 × 12 ÷ 실투자금으로 계산합니다 · 서버 전송·업로드 없음 · autooneclick.com</p>
+  <p class="foot">예시 매물(가상 데이터) · 비공개 매물은 목록·개수에서 빠지고 중개사가 보낸 링크로만 열립니다 · 수익률 = 월세 합계 × 12 ÷ 실투자금 · 서버 전송 없음 · autooneclick.com</p>
 </main>
 <script>
 (function () {
@@ -111,6 +112,14 @@ html[data-kts-theme="light"] .chips button[aria-pressed="true"]{background:#fff1
   function eok(n) { if (!has(n)) return null; n = Number(n); if (Math.abs(n) < 10000) return num(n) + '만'; return num(Math.round(n / 1000) / 10) + '억'; }
   function digits(s) { return String(s || '').replace(/[^0-9+]/g, ''); }
   function thumbOf(src) { return /^img\/[^?]+\.jpg$/.test(src) ? src.replace(/\.jpg$/, '_sm.jpg') : src; }
+  /* 사진 없는 매물은 지적항공도를 카드 그림으로 (4대 공부·경사도와 같은 키) */
+  var VW_KEY = '0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
+  function vwMap(lat, lng, w, h, z) {
+    if (!has(lat) || !has(lng)) return '';
+    return 'https://api.vworld.kr/req/image?service=image&request=getmap&key=' + VW_KEY +
+      '&format=png&basemap=PHOTO_HYBRID&crs=EPSG:4326&center=' + Number(lng) + ',' + Number(lat) +
+      '&zoom=' + (z || 17) + '&size=' + (w || 240) + ',' + (h || 180);
+  }
   /* index.html 의 calc() 와 같은 식 */
   function calc(l) {
     var p = l.price || {}, dep = 0, rent = 0, dn = 0, rn = 0;
@@ -167,7 +176,8 @@ html[data-kts-theme="light"] .chips button[aria-pressed="true"]{background:#fff1
       var kv = VIEW === 'inv'
         ? [['수익률', c.y != null ? c.y.toFixed(1) + '%' : null, 1], ['실투자금', eok(c.ri), 1], ['월세', c.rent != null ? num(c.rent) + '만' : null, 1], ['매매가', eok(p.sale)]]
         : [['층', l.floors || null, 1], ['면적', f.gross || null, 1], ['주차', has(f.parking) ? f.parking + '대' : null, 1], ['입주', l.moveIn || null, 1]];
-      return '<a class="card" href="./?m=' + encodeURIComponent(l.id) + '" data-id="' + esc(l.id) + '"><img src="' + esc(thumbOf((l.photos || [])[0] || '')) + '" alt="" loading="lazy">' +
+      var cardImg = (l.photos || [])[0] || vwMap(l.lat, l.lng);
+      return '<a class="card" href="./?m=' + encodeURIComponent(l.id) + '" data-id="' + esc(l.id) + '">' + (cardImg ? '<img src="' + esc(thumbOf(cardImg)) + '" alt="" loading="lazy">' : '<span class="noimg">지적항공도</span>') +
         '<div><div class="chipline"><span class="chip deal">' + esc(l.deal) + '</span><span class="chip">' + esc(l.type) + '</span></div><p class="t">' + esc(l.title) + '</p><p class="a">' + esc(l.address) + '</p>' +
         '<p class="a">' + esc(l.id) + ' · ' + (eok(p.sale) ? '매매 ' + eok(p.sale) : '가격 미확인') + '</p></div>' +
         '<div class="kv">' + kv.map(function (x) { return '<div class="' + (x[2] ? 'hl' : '') + '">' + x[0] + '<b>' + (x[1] != null ? esc(x[1]) : UNK) + '</b></div>'; }).join('') + '</div></a>';

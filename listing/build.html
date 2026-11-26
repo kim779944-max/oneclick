@@ -61,7 +61,7 @@ iframe{width:100%;max-width:390px;height:780px;border:1px solid var(--line);bord
   <div class="noprint">
     <div class="box">
       <h2>1. 시작</h2>
-      <p class="note">입력한 내용과 사진은 <b>이 브라우저 안에서만</b> 처리합니다. 서버로 보내거나 업로드하지 않습니다. 금액 단위는 <b>만원</b>입니다(45억 = 450000). 모르는 값은 비워 두면 매물장에 <b>미확인</b>으로 나옵니다.</p>
+      <p class="note">입력한 내용·사진은 <b>이 브라우저 안에서만</b> 처리합니다. 금액 단위는 <b>만원</b>(45억 = 450000), 모르는 값은 비워 두면 매물장에 <b>미확인</b>으로 나옵니다.</p>
       <div class="g" style="margin-top:10px"><label class="w">예시 매물 불러오기<select id="seed"></select></label></div>
     </div>
     <form id="f" autocomplete="off">
@@ -131,6 +131,11 @@ iframe{width:100%;max-width:390px;height:780px;border:1px solid var(--line);bord
   function fill(l) {
     BASE = JSON.parse(JSON.stringify(l));
     var p = l.price || {}, f = l.facts || {}, b = l.broker || {};
+    /* 교환·급매처럼 기본 목록에 없는 거래유형도 그대로 살린다(문자에서 넘어온 매물) */
+    var dl = el('deal');
+    if (has(l.deal) && !Array.prototype.some.call(dl.options, function (o) { return o.value === String(l.deal); })) {
+      var op = document.createElement('option'); op.textContent = String(l.deal); dl.appendChild(op);
+    }
     ['id', 'title', 'deal', 'type', 'address', 'floors', 'moveIn'].forEach(function (k) { el(k).value = has(l[k]) ? l[k] : ''; });
     el('private').checked = !!l.private;
     ['sale', 'appraisal', 'loanAmount', 'loanRate', 'deposit', 'rent', 'realInvest', 'yield', 'note'].forEach(function (k) { el('p.' + k).value = has(p[k]) ? p[k] : ''; });
@@ -233,10 +238,26 @@ iframe{width:100%;max-width:390px;height:780px;border:1px solid var(--line);bord
   });
   document.getElementById('print').addEventListener('click', function () { try { PV.contentWindow.focus(); PV.contentWindow.print(); } catch (e) { window.open('index.html?m=' + encodeURIComponent(read().id), '_blank', 'noopener'); } });
 
-  fetch('data/listings.json').then(function (r) { return r.json(); }).then(function (d) {
-    SEEDS = d.listings || []; var s = document.getElementById('seed');
+  /* 매물수집기(realty)에서 넘어온 매물 — 문자 하나로 매물장 5초 완성 */
+  function takeHand() {
+    var raw = null;
+    try { raw = sessionStorage.getItem('kts_realty_hand'); } catch (e) { }
+    if (!raw) return null;
+    var o; try { o = JSON.parse(raw); } catch (e) { return null; }
+    try { sessionStorage.removeItem('kts_realty_hand'); } catch (e) { }
+    return o && o.title ? o : null;
+  }
+  Promise.all([fetch('data/listings.json').then(function (r) { return r.json(); }), fetch('data/broker.json').then(function (r) { return r.json(); }).catch(function () { return null; })]).then(function (a) {
+    SEEDS = a[0].listings || []; var s = document.getElementById('seed');
     s.innerHTML = SEEDS.map(function (l, i) { return '<option value="' + i + '">' + l.id + ' · ' + l.title + (l.private ? ' (비공개)' : '') + '</option>'; }).join('');
     s.addEventListener('change', function () { fill(SEEDS[+s.value]); });
+    var hand = takeHand();
+    if (hand) {
+      if ((!hand.broker || !hand.broker.name) && a[1]) hand.broker = a[1];   // 명함은 내 명함(예시)으로
+      fill(hand);
+      toast('문자에서 넘어온 매물로 채웠습니다 · 금액·사진만 확인하세요');
+      return;
+    }
     var go = function () { fill(SEEDS[0]); };
     if (PV.contentWindow && PV.contentWindow.KTS_LISTING) go(); else PV.addEventListener('load', function () { setTimeout(go, 150); }, { once: true });
   });

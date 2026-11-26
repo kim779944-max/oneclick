@@ -16,7 +16,7 @@
     background:var(--navy); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     font-size:14px; line-height:1.5; letter-spacing:-.2px;
-    padding-bottom:40px;
+    padding-bottom:96px;
   }
   .wrap{max-width:480px; margin:0 auto; padding:0 16px}
   header{padding:22px 0 10px}
@@ -90,6 +90,20 @@
   .empty{text-align:center; color:var(--muted); font-size:13px; padding:26px 10px; border:1px dashed var(--line); border-radius:12px}
   .msg{margin:10px 0 0; font-size:12.5px; color:var(--green); min-height:18px}
   .msg.err{color:var(--red)}
+  /* 카드 → 매물장 */
+  .card .go2{margin-top:9px; width:100%; min-height:40px; border:1px solid rgba(255,107,0,.5); background:rgba(255,107,0,.1); color:var(--orange-soft); border-radius:9px; font-size:12.5px; font-weight:800}
+  .card .go2:active{background:rgba(255,107,0,.22)}
+  /* 이어서 쓰기 — 매물장 · 4대 공부 · 전자명함 · 5초 계약서 */
+  .next{margin:4px 0 14px}
+  .next .hd{display:flex; align-items:baseline; gap:8px; margin-bottom:8px}
+  .next .hd b{font-size:13px; font-weight:800}
+  .next .hd span{font-size:11.5px; color:var(--muted)}
+  .next .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:6px}
+  .next a{min-height:58px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:10px;
+    border:1px solid var(--line); background:var(--card); color:var(--text); text-decoration:none; font-size:11px; font-weight:700; text-align:center}
+  .next a:first-child{background:var(--orange); border-color:var(--orange); color:#1A0E00}
+  .next a span{font-size:10px; color:var(--muted); font-weight:600}
+  .next a:first-child span{color:#4A2600}
   footer{margin-top:18px; font-size:11px; color:#5C6B85; line-height:1.6}
   .kbd{background:#0D1630; border:1px solid var(--line); border-radius:5px; padding:1px 5px; font-size:11px; color:var(--muted)}
   @media (min-width:520px){
@@ -106,17 +120,11 @@
 <link rel="manifest" href="/shared/pwa/realty.webmanifest"></head>
 <body>
 <div class="wrap">
-  <a class="apkbar" href="KTS_매물수집기_v1.2_debug.apk" download>
-    <span style="font-size:16px">⬇</span>
-    <span><b>앱(APK)으로 쓰면 문자·카톡 공유를 바로 받습니다</b>
-      <i>v1.2 · 폰 주소록 이름·수신 날짜까지</i></span>
-    <span class="go">받기</span>
-  </a>
   <header>
-    <a href="https://autooneclick.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font-size:11px;font-weight:800;color:#FFA24D;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;letter-spacing:-.2px;margin-bottom:8px;">← 원클릭 쇼룸</a>
+    <a href="https://autooneclick.com/" style="display:inline-flex;align-items:center;font-size:11px;font-weight:800;color:#FFA24D;text-decoration:none;border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;letter-spacing:-.2px;margin-bottom:10px;">← 원클릭 쇼룸</a>
     <div class="brand"><span class="dot"></span>KTS 매물 정리</div>
     <h1>부동산 매물 <em>1초</em> 정리기</h1>
-    <p class="sub">문자·카톡·수집기 JSON을 통째로 넣으면 거래유형 · 물건 · 지역 · 가격 · 면적 · 연락처로 자동 정리합니다. 서버 전송 없이 이 기기 안에서만 처리됩니다.</p>
+    <p class="sub">매물 문자·카톡을 붙여넣고 한 번만 누르면 거래유형·물건·지역·가격·연락처로 정리됩니다. 이 기기 안에서만 처리합니다.</p>
   </header>
 
   <section class="panel">
@@ -161,6 +169,23 @@
     <p class="msg" id="msg"></p>
   </section>
 
+  <section class="next">
+    <div class="hd"><b>이어서 쓰기</b><span>정리한 매물은 매물장으로 이어집니다</span></div>
+    <div class="grid">
+      <a href="../listing/">매물장<span>보기·공유</span></a>
+      <a href="../gongbu/">4대 공부<span>토지·건축·지적</span></a>
+      <a href="../bizcard/">전자명함<span>손님에게</span></a>
+      <a href="../contract/">5초 계약서<span>바로 작성</span></a>
+    </div>
+  </section>
+
+  <a class="apkbar" href="KTS_매물수집기_v1.2_debug.apk" download>
+    <span style="font-size:16px">⬇</span>
+    <span><b>앱(APK)으로 쓰면 문자·카톡 공유를 바로 받습니다</b>
+      <i>v1.2 · 폰 주소록 이름·수신 날짜까지</i></span>
+    <span class="go">받기</span>
+  </a>
+
   <details class="ai">
     <summary>AI 보정 (선택 · 무료 키)</summary>
     <div class="inner">
@@ -187,8 +212,7 @@
   </section>
 
   <footer>
-    수집기 앱과 같은 규칙으로 정리합니다. 같은 원문은 한 번만 남기고, 스팸·인증번호·택배 문자는 처음부터 걸러냅니다.<br>
-    입력한 내용은 어디에도 저장·전송되지 않습니다(브라우저를 닫으면 사라집니다).
+    같은 원문은 한 번만 남기고, 스팸·인증번호·택배 문자는 처음부터 걸러냅니다. 입력한 내용은 이 기기 안에서만 처리하고 어디에도 저장·전송하지 않습니다.
   </footer>
 </div>
 
@@ -509,6 +533,11 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     var added = addAll(list);
     render();
     say(label + " " + list.length + "건 인식 · 새로 " + added + "건 정리 (" + mode + ")");
+    /* 결과가 보이도록 바로 옮긴다 — 누른 뒤 찾아 내려가지 않게(236번 단축) */
+    setTimeout(function(){
+      var to = document.querySelector(".kux-flow") || document.getElementById("result");
+      if(to && to.scrollIntoView) to.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 120);
     return added;
   }
 
@@ -551,6 +580,35 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     return d;
   }
 
+  /* ── 문자 → 매물장(5초) ─────────────────────────────────── */
+  function toMan(price){            /* "3억5천만"·"5,000만"·"25억" → 만원 숫자 */
+    var s = String(price || "").replace(/[\s,]/g, "");
+    var m = /([0-9.]+)억(?:([0-9.]+)(천|만))?/.exec(s);
+    if(m){ var v = parseFloat(m[1]) * 10000; if(m[2]) v += parseFloat(m[2]) * (m[3] === "천" ? 1000 : 1); return Math.round(v); }
+    m = /([0-9.]+)만/.exec(s); if(m) return Math.round(parseFloat(m[1]));
+    return null;
+  }
+  function toListing(x){
+    var man = toMan(x.price);
+    var rent = (x.type === "월세" || x.type === "임대" || x.type === "전세");
+    var o = {
+      id: "TX-" + String(x.key || "").slice(0, 6).toUpperCase(),
+      title: [x.region, x.kind].filter(Boolean).join(" ") || (x.summary || "문자 매물").slice(0, 24),
+      deal: x.type || "매매", type: x.kind || "", address: x.region || "", floors: "", moveIn: "",
+      price: {}, facts: {}, leases: [], private: false, broker: {},
+      points: [{ icon: "bulb", t: "문자로 접수한 매물", s: (x.summary || "").slice(0, 90) }], photos: []
+    };
+    if(man != null){ if(rent) o.price.deposit = man; else o.price.sale = man; }
+    if(x.price) o.price.note = "원문 표기 " + x.price;
+    if(x.area) o.facts.gross = x.area;
+    return o;
+  }
+  function handTo(x){
+    try { sessionStorage.setItem("kts_realty_hand", JSON.stringify(toListing(x))); }
+    catch(e){ say("이 브라우저에서는 넘길 수 없습니다. JSON으로 복사해 [매물장 만들기]에 붙여넣어 주세요.", true); return; }
+    location.href = "../listing/build.html?from=realty";
+  }
+
   function card(x, no){
     var c = el("div","card");
     var top = el("div","top");
@@ -576,6 +634,11 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     d.appendChild(el("summary", null, "원문 보기"));
     d.appendChild(el("p", null, x.text));
     c.appendChild(d);
+
+    var go2 = el("button", "go2", "매물장 만들기 →");
+    go2.type = "button";
+    go2.onclick = function(){ handTo(x); };
+    c.appendChild(go2);
     return c;
   }
 
