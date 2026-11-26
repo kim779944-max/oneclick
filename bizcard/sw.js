@@ -2,7 +2,7 @@
 var CACHE = 'kts-bizcard-20261126e';
 var SHELL = ['./', './index.html', './app.css', './app.js', './parse.js', './gongbu.js',
   './assistant.js', './manifest.webmanifest', './icon-192.png', './icon-512.png',
-  './img/sample-person.jpg', './img/sample-land.jpg', './img/sample-house.jpg'];
+  './img/sample_person.jpg', './img/sample_land.jpg', './img/sample_house.jpg'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL) }).then(function () { return self.skipWaiting() }));

@@ -78,11 +78,11 @@
   var DEMO = [
     { kind: '임야', addr: '경기도 가평군 북면 목동리 271', areaM2: 3967, areaP: 1200, price: 380000000,
       tags: ['보전관리', '전원주택지', '경사지'], title: '임야 1,200평 · 북면', days: 1,
-      photo: 'img/sample-land.jpg',
+      photo: 'img/sample_land.jpg',
       raw: '[한빛부동산] 가평 북면 목동리 271 임야 3,967㎡(1,200평) 매매 3억8천 보전관리 전원주택지 010-2345-6789' },
     { kind: '대지', addr: '경기도 가평군 조종면 신하리 162-9', areaM2: 991, areaP: 300, price: 520000000,
       tags: ['도로접', '평지', '전원주택지'], title: '대지 300평 · 조종면', days: 3,
-      photo: 'img/sample-house.jpg',
+      photo: 'img/sample_house.jpg',
       raw: '[한빛부동산] 가평 조종면 신하리 162-9 대지 991㎡(300평) 매매 5억2천 도로접 평지 010-2345-6789' },
     /* 사진이 없는 예시 — 지적항공도가 자동으로 붙는 모습을 그대로 보여 준다 */
     { kind: '답', addr: '충남 당진시 석문면 초락도리 204-1', areaM2: 6612, areaP: 2000, price: 400000000,
@@ -879,7 +879,7 @@
       inp.click();
     });
     $('#btnSampleMe').addEventListener('click', function () {
-      cur.photo = 'img/sample-person.jpg'; paintPv();
+      cur.photo = 'img/sample_person.jpg'; paintPv();
       toast('예시 인물 사진입니다 — 「내 사진 넣기」로 바꿔 주세요');
     });
     $('#btnClearMe').addEventListener('click', function () {
@@ -909,7 +909,7 @@
         name: '김중개', org: '한빛부동산 · 대표', phone: '010-2345-6789',
         field: '교환·급매물 전문', strength: '급매 3건 · 평당 시세 즉시 비교',
         intro: '가평·남양주 토지와 전원주택 — 문자 주시면 5초 만에 물건표로 보내 드립니다.',
-        kakao: '', photo: 'img/sample-person.jpg'
+        kakao: '', photo: 'img/sample_person.jpg'
       };
       seedDemo(); save(); go('#/card');
     });
