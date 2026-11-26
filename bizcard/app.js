@@ -265,7 +265,7 @@
     /* 명함 아래 한 줄 도구 */
     h += '<div class="biz-tools"><span class="wm">KTS <i>전자명함</i></span>'
       + '<button type="button" id="btnShare">' + IC.share + '보내기</button>'
-      + '<button type="button" id="btnImg" aria-label="명함을 이미지로 저장">' + IC.down + '이미지</button>'
+      + '<button type="button" id="btnImg" aria-label="명함을 이미지(PNG)로 저장">' + IC.down + '이미지 저장</button>'
       + '<button type="button" id="btnEdit">' + IC.pen + '고치기</button>'
       + '<button type="button" id="btnInbox"' + (unread ? ' class="on"' : '') + '>' + IC.bell + '문의'
       + (unread ? '<i class="cnt">' + unread + '</i>' : '') + '</button></div>';
