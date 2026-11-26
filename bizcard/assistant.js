@@ -67,7 +67,8 @@
     var w = el('button', 'ai-item');
     w.type = 'button';
     var th = el('div', 'ai-th');
-    if (x.map) { var im = el('img'); im.src = x.map; im.alt = ''; im.loading = 'lazy'; th.appendChild(im); }
+    var m = x.map || (x.lat && x.lon && window.KTS_GB ? window.KTS_GB.mapUrl(x.lat, x.lon, 280, 220, 15) : '');
+    if (m) { var im = el('img'); im.src = m; im.alt = ''; im.loading = 'lazy'; th.appendChild(im); }
     else th.textContent = (x.kind || '매물').slice(0, 2);
     var body = el('div', 'ai-bd');
     body.appendChild(el('b', null, x.title || '매물'));
@@ -163,15 +164,18 @@
 
   function finishSurvey() {
     var list = matching();
+    chipEl.innerHTML = '';
     bot('정리했습니다 — ' + condText() + '.').then(function () {
       if (list.length) {
         bot('이 조건에 가까운 매물 ' + list.length + '건이 사장님 매물장에 있습니다.', 320).then(function () {
           list.forEach(card);
           afterList();
+          menu();
         });
       } else {
         bot('지금 매물장에는 딱 맞는 물건이 없습니다. 조건을 사장님께 그대로 전해 두면 새로 들어오는 물건을 먼저 보내 드립니다.', 320).then(function () {
           actionRow();
+          menu();
         });
       }
     });
@@ -218,7 +222,7 @@
         { label: '답사 신청', act: function () { guest('답사 신청'); freeText('답사', '가능한 날짜·시간을 적어 주세요. 예) 토요일 오전'); } },
         { label: '서류 요청', act: function () { guest('서류 요청'); freeText('서류', '필요한 서류를 적어 주세요. 예) 등기부등본, 토지대장'); } },
         { label: '그 밖의 질문', act: function () { guest('그 밖의 질문'); freeText('질문', '궁금한 점을 적어 주세요.'); } }
-      ], true);
+      ], false);
     });
   }
 
@@ -232,6 +236,7 @@
       var v = input.value.trim();
       if (!v) { input.focus(); return; }
       inputWrap.hidden = true;
+      chipEl.innerHTML = '';
       guest(v);
       var summary = '[' + kind + '] ' + v + (condText() ? ' / 관심 조건: ' + condText() : '');
       bot('이렇게 전달할게요 —\n' + summary).then(function () { actionRow(kind, v); });

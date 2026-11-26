@@ -515,6 +515,7 @@
     h += '<div class="sec-h"><b>4대 공부</b><span>' + gbLabel(it) + '</span></div>';
     h += '<div class="gongbu">' + gongbuTiles(it, gb, jiga, zone) + '</div>';
     h += '<a class="wide ghost" href="../gongbu/?q=' + encodeURIComponent(it.addr || '') + '" target="_blank" rel="noopener">4대 공부 원문 · PDF/이미지 저장 ' + IC.doc + '</a>';
+    h += '<p class="credit">지도·지적 © 브이월드(Vworld) · 건축물대장 © 국토교통부 건축HUB</p>';
     if (it.gbSt === 'err' || it.gbSt === 'NOT_FOUND') {
       h += '<button class="btn ghost wide2" id="btnRetry">4대 공부 다시 불러오기</button>';
     }
@@ -566,11 +567,22 @@
     /* 건축물대장 */
     var b = gb.bld || {};
     var bOK = b.st === 'OK' && b.items && b.items.length;
-    T.push({
-      n: '건축물', ok: bOK,
-      l1: bOK ? (b.items[0].mainPurpsCdNm || '건축물 있음') : (b.st === 'EMPTY' ? '건축물 없음(대지)' : (b.st === 'KEYERR' || b.st === 'NET' ? '지금 확인 불가' : (it.gbSt === 'loading' ? '확인 중' : '건축물 없음'))),
-      l2: bOK ? (b.items[0].platArea ? '대지 ' + num(b.items[0].platArea, 1) + '㎡' : '') : ''
-    });
+    var bTxt, bSub = '';
+    if (bOK) {
+      bTxt = b.items[0].mainPurpsCdNm || '건축물 있음';
+      bSub = b.items[0].platArea ? '대지 ' + num(b.items[0].platArea, 1) + '㎡' : '';
+    } else if (b.st === 'EMPTY') {
+      bTxt = '건축물 없음(대지)';
+    } else if (b.st === 'NOKEY') {
+      bTxt = '인증키 필요'; bSub = '4대 공부 원문에서 확인';
+    } else if (b.st === 'loading' || it.gbSt === 'loading') {
+      bTxt = '확인 중';
+    } else if (b.st === 'NET' || b.st === 'BADJSON' || b.st === 'KEYERR' || b.st === 'ERR') {
+      bTxt = '지금 확인 불가'; bSub = '건축HUB 응답 없음';
+    } else {
+      bTxt = '확인 중';
+    }
+    T.push({ n: '건축물', ok: bOK, l1: bTxt, l2: bSub });
     /* 지적 */
     T.push({
       n: '지적', ok: !!it.pnu,
@@ -773,6 +785,7 @@
   function openAI(it) {
     var sheet = $('#sheet');
     sheet.classList.add('on');
+    document.body.style.overflow = 'hidden';
     $('#aiTitle').textContent = (S.me ? S.me.name + ' ' : '') + 'AI 영업 비서';
     g.KTS_AI.open({
       item: it, items: S.items, me: S.me,
@@ -785,7 +798,7 @@
       }
     });
   }
-  function closeSheet() { $('#sheet').classList.remove('on'); }
+  function closeSheet() { $('#sheet').classList.remove('on'); document.body.style.overflow = ''; }
 
   /* ---------------- 문의함 ---------------- */
   function inbox() { return LS.get(K.inq, []); }
@@ -800,6 +813,7 @@
       return '<div class="iq"><b>' + esc(q.itemTitle || '매물') + '</b><pre>' + esc(q.text) + '</pre><span>' + ago(q.at) + '</span></div>';
     }).join('') + '</div>';
     $('#sheet').classList.add('on');
+    document.body.style.overflow = 'hidden';
     $('#aiTitle').textContent = '문의함';
     var log = $('#aiLog'); log.innerHTML = h;
     $('#aiChips').innerHTML = ''; $('#aiInput').hidden = true;
@@ -895,6 +909,8 @@
     });
     window.addEventListener('appinstalled', function () { installed = true; toast('바탕화면에 아이콘을 만들었습니다'); });
     window.addEventListener('hashchange', render);
+    $('#aiX').addEventListener('click', closeSheet);
+    $('#sheet').addEventListener('click', function (e) { if (e.target === $('#sheet')) closeSheet(); });
     if (isStandalone) installed = true;
     if (!S.items) seedDemo();
     if (!location.hash) location.hash = S.me ? '#/card' : '#/setup';
