@@ -126,7 +126,7 @@
       if (r.st === 'OK') {
         it.lat = r.lat; it.lon = r.lon; it.geoSt = 'ok';
         if (r.pnu) it.pnu = r.pnu;
-        if (r.jibun) it.jibun = it.jibun || r.jibun;
+        if (r.jibun && !it.jibun) it.jibun = String(r.jibun).replace(/[^0-9-]/g, '');
       } else it.geoSt = r.st;
       save(); render();
     }).catch(function () { delete geoQ[it.id]; it.geoSt = 'err'; render(); });
@@ -145,7 +145,7 @@
       it.gb = r; it.gbSt = (r.st === 'OK') ? 'ok' : r.st;
       if (r.lat) { it.lat = r.lat; it.lon = r.lon; }
       if (r.pnu) it.pnu = r.pnu;
-      if (r.jibun) it.jibun = it.jibun || r.jibun;
+      if (r.jibun && !it.jibun) it.jibun = String(r.jibun).replace(/[^0-9-]/g, '');
       if (!it.areaM2) {
         var a = +(r.char && r.char.lndpclAr || r.toji && r.toji.lndpclAr);
         if (a > 0) { it.areaM2 = a; it.areaP = Math.round(a / 3.305785); }
@@ -838,7 +838,7 @@
 
   /* ---------------- 설치(PWA) · 카톡 ---------------- */
   var ua = navigator.userAgent || '';
-  var isKakao = /KAKAOTALK/i.test(ua);
+  var isKakao = /KAKAOTALK/i.test(ua) || /[?&]kakao=1/.test(location.search);
   var isIOS = /iPhone|iPad|iPod/i.test(ua);
   var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 

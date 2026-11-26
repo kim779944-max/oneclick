@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="전자명함">
-<link rel="stylesheet" href="app.css?v=20261126e">
+<link rel="stylesheet" href="app.css?v=20261126f">
 </head>
 <body>
 
@@ -75,19 +75,27 @@
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* 개발용(?dev=1)에서만 오류를 화면에 보여 준다 — 백지 화면 대신 원인을 보려고 */
+/* 개발·검수용(?dev=1)에서만 오류를 모아 화면에 보여 준다 */
 if (/[?&]dev=1/.test(location.search)) {
-  window.addEventListener('error', function (e) {
+  window.__errs = [];
+  function __log(msg) {
+    window.__errs.push(msg);
     var t = document.getElementById('toast');
     if (!t) return;
-    t.textContent = 'ERR ' + (e.message || '') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || '');
+    t.textContent = 'ERR ' + msg;
     t.classList.add('on');
+  }
+  window.addEventListener('error', function (e) {
+    __log((e.message || 'script error') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    __log('promise ' + ((e.reason && e.reason.message) || e.reason));
   });
 }
 </script>
-<script src="parse.js?v=20261126e"></script>
-<script src="gongbu.js?v=20261126e"></script>
-<script src="assistant.js?v=20261126e"></script>
-<script src="app.js?v=20261126e"></script>
+<script src="parse.js?v=20261126f"></script>
+<script src="gongbu.js?v=20261126f"></script>
+<script src="assistant.js?v=20261126f"></script>
+<script src="app.js?v=20261126f"></script>
 </body>
 </html>
