@@ -1,0 +1,26 @@
+{
+  "name": "원클릭 가계부",
+  "short_name": "가계부",
+  "lang": "ko",
+  "id": "/shared/pwa/gagebu.webmanifest",
+  "start_url": "/gagebu/",
+  "scope": "/gagebu/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    {
+      "src": "/shared/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

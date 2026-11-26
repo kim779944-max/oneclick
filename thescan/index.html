@@ -124,7 +124,7 @@ body.live .gal,body.live #prog{display:none}
  font-size:12px;font-weight:800;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;z-index:90;max-width:88%;text-align:center;pointer-events:none}
 .toast.on{opacity:1}
 body.sheet-on .toast{top:14px;bottom:auto}
-</style></head><body>
+</style><link rel="manifest" href="/shared/pwa/thescan.webmanifest"></head><body>
 <div id="app">
 <header><a href="../" target="_blank" rel="noopener" aria-label="원클릭으로">← 원클릭</a><span class="brand">KTS <i>더스캔</i></span><span class="sp"></span><a href="theeraser.html">더지우개 →</a></header>
 
@@ -837,4 +837,5 @@ if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
 <script>window.KTS_UX_CFG={tool:"thescan",wm:["#sheet"],flow:1};</script>
 <script src="../ux.js?v=20261125a"></script>
 <script src="../helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="더스캔" data-start="/thescan/" data-manifest="/shared/pwa/thescan.webmanifest" defer></script>
 </body></html>

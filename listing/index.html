@@ -202,7 +202,7 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
 <link rel="stylesheet" href="../shared/kts-print.css">
 <link rel="stylesheet" href="print.css">
 <script src="../shared/kts-ui.js" defer></script>
-</head>
+<link rel="manifest" href="/shared/pwa/listing.webmanifest"></head>
 <body>
 <div class="bar" id="bar">
   <span class="brandicon" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -547,5 +547,6 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
     .catch(function () { document.getElementById('sheet').innerHTML = '<p class="loading">매물 정보를 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>'; });
 })();
 </script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="매물장" data-start="/listing/" data-manifest="/shared/pwa/listing.webmanifest" defer></script>
 </body>
 </html>

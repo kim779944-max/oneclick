@@ -1,0 +1,26 @@
+{
+  "name": "KTS 양식만들기",
+  "short_name": "양식만들기",
+  "lang": "ko",
+  "id": "/shared/pwa/theform_html.webmanifest",
+  "start_url": "/theform.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    {
+      "src": "/shared/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -209,7 +209,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 .baEx img{display:block;width:100%;height:auto}
 .baEx figcaption{padding:8px 12px;font-size:11.5px;line-height:1.5;color:#9DAEC5;background:#12203C;word-break:keep-all}
 </style>
-</head><body>
+<link rel="manifest" href="/shared/pwa/theform.webmanifest"></head><body>
 <div id="app">
 <header class="top">
  <div class="hd">
@@ -3506,4 +3506,5 @@ updKey(); go(1);
 /* 도우미 작성 모드 연결 — helper.js 가 올라온 뒤에 붙인다 */
 (function(){ try{ if (window.KTS_HELPER && KTS_HELPER.writing) KTS_HELPER.writing(guideState); }catch(e){ console.warn('guide off', e); } })();
 </script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="양식만들기" data-start="/theform/" data-manifest="/shared/pwa/theform.webmanifest" defer></script>
 </body></html>

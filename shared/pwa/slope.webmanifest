@@ -1,0 +1,26 @@
+{
+  "name": "KTS 지번·경사도 지도",
+  "short_name": "경사도",
+  "lang": "ko",
+  "id": "/shared/pwa/slope.webmanifest",
+  "start_url": "/slope/",
+  "scope": "/slope/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    {
+      "src": "/shared/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

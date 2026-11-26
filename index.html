@@ -309,7 +309,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 </style>
 <link rel="stylesheet" href="shared/kts-print.css?v=20261124a">
 <script src="shared/kts-ui.js?v=20261124a" defer></script>
-</head>
+<link rel="manifest" href="/shared/pwa/home.webmanifest"></head>
 <body>
 <div id="app">
   <header class="k-hd">
@@ -860,5 +860,6 @@ window.addEventListener('hashchange', function(){ if (location.hash === '#coupon
 })();
 </script>
 <script src="helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="원클릭" data-start="/" data-manifest="/shared/pwa/home.webmanifest" defer></script>
 </body>
 </html>

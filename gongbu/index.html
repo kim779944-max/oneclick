@@ -84,7 +84,7 @@ canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0
 .bld{border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:8px;background:rgba(11,23,41,.55)}
 .bld b.nm{display:block;font-size:12.5px;font-weight:900;color:#fff;margin-bottom:2px}
 </style>
-</head><body><div id="app">
+<link rel="manifest" href="/shared/pwa/gongbu.webmanifest"></head><body><div id="app">
 <header>
   <a class="back" href="../">← 원클릭</a>
   <span class="brand">KTS <i>4대 공부</i></span>
@@ -185,7 +185,10 @@ var VW='https://api.vworld.kr', DATA=VW+'/req/data', NED=VW+'/ned/data', API=VW+
     WMTS=VW+'/req/wmts/1.0.0', DG='https://apis.data.go.kr/1613000/BldRgstHubService';
 
 var S={key:(function(){var v=LS.get('kts_gongbu_vk',null);return v==null?VW_DEF:v})(),
-       dgk:(function(){var v=LS.get('kts_gongbu_dg',null);return (v==null||v==='')?DG_DEF:v})(),
+       dgk:(function(){ var v=LS.get('kts_gongbu_dg',null);
+            if(v!=null){ v=String(v).trim() }
+            if(!dgKeyOk(v)){ if(v!=null){ try{localStorage.removeItem('kts_gongbu_dg')}catch(e){} } return DG_DEF }
+            return v })(),
        mode:'sat', lat:0,lon:0,addr:'',pnu:'',jibun:'',area:0,rings:null,
        toji:null,ch:null,price:null,use:null,bld:null,box:null,zoomed:false,busy:false};
 
@@ -358,30 +361,72 @@ function bldKeyParam(k){
   /* data.go.kr 인증키는 'Encoding' 키에 %가 들어 있다 — 그대로 쓰고, 아니면 인코딩한다 */
   return (k.indexOf('%')>=0)?k:encodeURIComponent(k);
 }
+/* 인증키 유효성 — 빈 문자열·공백·짧은 쓰레기 값이 캐시에 남아 내장 키를 덮어쓰지 않게 (233 후속) */
+function dgKeyOk(k){
+  if(k==null) return false;
+  var v=String(k).trim();
+  if(v.length<30) return false;
+  if(!/^[A-Za-z0-9%._~+\/=\-]+$/.test(v)) return false;
+  if(/^(null|undefined|none|test|key|0)$/i.test(v)) return false;
+  return true;
+}
+/* 일시 장애(포털 서버 타임아웃·게이트웨이 502/503/504)와 인증키 오류를 구분한다.
+   실측 2026-11-26: 정상 키로도 SERVICETIMEOUT_ERROR(HTTP 503, reasonCode 05)가 간헐로 온다
+   → 인증키 오류(SERVICE_KEY_IS_NOT_REGISTERED_ERROR, HTTP 403, reasonCode 30)와 다르다 */
+function dgTransient(txt,http){
+  if(http&&(http===429||http>=500)) return true;
+  var s=String(txt||'');
+  return /SERVICETIMEOUT|SERVICE_TIMEOUT|TIMEOUT|GATEWAY|연결실패/i.test(s);
+}
+function bldParse(res){
+  var t=(res&&res.txt)||'', http=(res&&res.http)||0, j=null;
+  try{ j=JSON.parse(t) }catch(e){}
+  if(!j){
+    if(dgTransient(t,http)) return {st:'TIMEOUT',http:http};
+    if(http>=400) return {st:'NET',msg:'HTTP '+http};
+    return {st:'BADJSON',raw:String(t).slice(0,200),http:http};
+  }
+  if(j.OpenAPI_ServiceResponse){
+    var h=j.OpenAPI_ServiceResponse.cmmMsgHeader||{};
+    var em=h.errMsg||'', am=h.returnAuthMsg||'', rc=String(h.returnReasonCode||'');
+    if(rc==='22'||/LIMITED_NUMBER_OF_SERVICE_REQUESTS/i.test(em)) return {st:'LIMIT',msg:em||am,code:rc};
+    if(dgTransient(em+' '+am,http)) return {st:'TIMEOUT',http:http,code:rc};
+    return {st:'KEYERR',msg:em||am,code:rc,http:http};
+  }
+  var code=((j.response&&j.response.header)||{}).resultCode;
+  var msg=((j.response&&j.response.header)||{}).resultMsg||'';
+  if(code&&code!=='00'&&code!=='0'){
+    if(dgTransient(msg,http)) return {st:'TIMEOUT',http:http};
+    return {st:'ERR',code:code,msg:msg};
+  }
+  var body=(j.response&&j.response.body)||{};
+  var it=(body.items&&body.items.item)||[];
+  if(!Array.isArray(it)) it=it?[it]:[];
+  return {st:it.length?'OK':'EMPTY',items:it,total:body.totalCount||it.length};
+}
+function bldNote(t){ var el=$('#bldBody'); if(el&&el.innerHTML.indexOf('state ing')>=0) el.innerHTML=state('ing',esc(t)) }
 function bldFetch(pnu){
-  if(!S.dgk) return Promise.resolve({st:'NOKEY'});
+  if(!dgKeyOk(S.dgk)) return Promise.resolve({st:'NOKEY'});
   var sg=pnu.slice(0,5), bd=pnu.slice(5,10), pg=(pnu.charAt(10)==='2'?'1':'0'),
       bun=pnu.slice(11,15), ji=pnu.slice(15,19);
   var q='?serviceKey='+bldKeyParam(S.dgk)+'&sigunguCd='+sg+'&bjdongCd='+bd+'&platGbCd='+pg+'&bun='+bun+'&ji='+ji;
   var url1=DG+'/getBrTitleInfo'+q+'&_type=json&numOfRows=20&pageNo=1';
-  var url2=DG+'/getBrBasisOulnInfo'+q+'&_type=json&numOfRows=20&pageNo=1';
-  return fetch(url1,{headers:{'Accept':'application/json'}}).then(function(r){return r.text()}).then(function(t){
-    var j=null; try{j=JSON.parse(t)}catch(e){}
-    if(!j) return {st:'BADJSON',raw:String(t).slice(0,200)};
-    if(j.OpenAPI_ServiceResponse){
-      var m=(j.OpenAPI_ServiceResponse.cmmMsgHeader||{}).errMsg||'';
-      return {st:'KEYERR',msg:m};
-    }
-    var code=((j.response&&j.response.header)||{}).resultCode;
-    var msg=((j.response&&j.response.header)||{}).resultMsg||'';
-    if(code&&code!=='00'&&code!=='0') return {st:'ERR',code:code,msg:msg};
-    var body=(j.response&&j.response.body)||{};
-    var it=(body.items&&body.items.item)||[];
-    if(!Array.isArray(it)) it=it?[it]:[];
-    return {st:it.length?'OK':'EMPTY',items:it,total:body.totalCount||it.length};
-  }).catch(function(e){
-    return {st:'NET',msg:String(e&&e.message||e).slice(0,120)};
-  });
+  var waits=[0,700,1600];            /* 최초 1회 + 자동 재시도 최대 2회 */
+  var n=0;
+  function attempt(){
+    if(n>0) bldNote('공공데이터포털 응답 지연 — 자동 재시도 '+n+'/2…');
+    return fetch(url1,{headers:{'Accept':'application/json'},cache:'no-store'}).then(function(r){
+      return r.text().then(function(t){ return {http:r.status,txt:t} });
+    }).then(bldParse).catch(function(e){
+      return {st:'NET',msg:String(e&&e.message||e).slice(0,120)};
+    }).then(function(v){
+      var again=(v.st==='TIMEOUT'||v.st==='NET'||v.st==='BADJSON')&&n<2;
+      if(!again){ if(n>0&&v.st==='OK') v.retried=n; return v }
+      n++;
+      return new Promise(function(res){ setTimeout(res,waits[n]) }).then(attempt);
+    });
+  }
+  return attempt();
 }
 
 /* ---------- 화면 그리기 ---------- */
@@ -449,9 +494,30 @@ function paintBld(){
       +'<p class="note">신청 화면에서 <b>활용신청</b> → 승인 후 <b>일반 인증키(Encoding)</b>를 복사해 붙여 넣으세요.</p>';
     return;
   }
+  if(b.st==='TIMEOUT'){
+    el.innerHTML=state('err','공공데이터포털 서버 응답이 지연되고 있습니다 (다시 조회 버튼으로 재시도)')
+      +'<div class="btnrow"><button class="btn main" id="bldAgain" type="button">다시 조회</button>'
+      +'<button class="btn" id="bldAll" type="button">주소부터 다시</button></div>'
+      +'<p class="note">인증키는 정상입니다. 국토교통부 건축HUB 쪽이 잠깐 붐빌 때 나오는 응답이라 <b>다시 조회</b>를 한두 번 누르면 들어옵니다. 다른 3종(토지대장·지적도·토지이용계획)은 이미 받았습니다.</p>';
+    var g1=$('#bldAgain'), g2=$('#bldAll');
+    if(g1) g1.addEventListener('click',bldReload);
+    if(g2) g2.addEventListener('click',function(){ run() });
+    return;
+  }
+  if(b.st==='LIMIT'){
+    el.innerHTML=state('err','공공데이터포털 <b>하루 조회 한도</b>를 넘었습니다 — 내일 다시 조회하거나 내 인증키를 넣어 주세요.')
+      +'<div class="btnrow"><button class="btn" id="bldAgain" type="button">다시 조회</button></div>';
+    var g3=$('#bldAgain'); if(g3) g3.addEventListener('click',bldReload);
+    return;
+  }
   if(b.st==='KEYERR'||b.st==='KEYERR2'){ el.innerHTML=state('err','인증키가 승인되지 않았습니다 · '+esc(b.msg||''))+keyHint(); return }
   if(b.st==='ERR'){ el.innerHTML=state('err','건축물대장에서 이 지번을 찾지 못했습니다 — 번지까지 넣어 다시 조회하거나, 위의 [키 다시 넣기]로 인증키를 확인해 주세요.')+keyHint(); return }
-  if(b.st==='NET'||b.st==='BADJSON'){ el.innerHTML=state('err','건축물대장 서버에 연결하지 못했습니다 — 잰시 뒤 다시 누르거나, 전자지도에서 지번을 다시 골라 주세요.'); return }
+  if(b.st==='NET'||b.st==='BADJSON'){
+    el.innerHTML=state('err','건축물대장 서버에 연결하지 못했습니다 — 잠시 뒤 다시 눌러 주세요.')
+      +'<div class="btnrow"><button class="btn" id="bldAgain" type="button">다시 조회</button></div>';
+    var g4=$('#bldAgain'); if(g4) g4.addEventListener('click',bldReload);
+    return;
+  }
   if(b.st==='EMPTY'||!b.items||!b.items.length){
     el.innerHTML=state('ok','이 필지에 <b>건축물대장이 없습니다</b> (건물 미등재 — 나대지·임야 등)')
       +'<p class="note">건물이 있는데도 안 나오면 지번(산 여부·부번)을 확인하거나 정부24에서 원본을 보세요.</p>';
@@ -481,6 +547,12 @@ function paintBld(){
   el.innerHTML=h.join('');
 }
 function keyHint(){ return '<p class="note">연결 설정에서 <b>일반 인증키(Encoding)</b>를 다시 확인해 주세요. 활용신청 승인 직후에는 반영에 몇 분 걸릴 수 있습니다.</p>' }
+function bldReload(){                        /* 다시 조회 — 주소 다시 찾지 않고 건축물대장만 */
+  if(!S.pnu){ run(); return }
+  var el=$('#bldBody');
+  el.innerHTML=state('ing','건축물대장 다시 조회 중…');
+  bldFetch(S.pnu).then(function(r){ S.bld=r; paintBld() });
+}
 
 function paintUse(){
   var el=$('#useBody'), u=S.use;
@@ -901,6 +973,7 @@ $('#dgSave').addEventListener('click',function(){
     if(S.pnu) bldFetch(S.pnu).then(function(r){ S.bld=r; paintBld() });
     return;
   }
+  if(!dgKeyOk(v)){ toast('인증키 형식이 아닙니다 — 일반 인증키(Encoding) 전체를 붙여 넣어 주세요'); return }
   S.dgk=v; LS.set('kts_gongbu_dg',v); paintKeyState(); toast('내 인증키를 이 기기에 저장했습니다');
   if(S.pnu) bldFetch(S.pnu).then(function(r){ S.bld=r; paintBld() });
 });
@@ -931,4 +1004,5 @@ window.__KTS_GB=function(){ return {pnu:S.pnu,jibun:S.jibun,area:S.area,
   toji:!!S.toji,ch:!!S.ch,price:!!S.price,use:(S.use||[]).length,bld:(S.bld&&S.bld.st)||'',range:(S.range||[]).length,mode:S.mode} };
 })();
 </script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="4대 공부" data-start="/gongbu/" data-manifest="/shared/pwa/gongbu.webmanifest" defer></script>
 </body></html>

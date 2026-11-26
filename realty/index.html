@@ -103,7 +103,7 @@
 .apkbar i{display:block;font-style:normal;font-size:10px;color:#9FB0C8;margin-top:2px}
 .apkbar .go{margin-left:auto;font-size:11px;font-weight:900;color:#0A1128;background:#FFA24D;border-radius:8px;padding:6px 9px}
 </style>
-</head>
+<link rel="manifest" href="/shared/pwa/realty.webmanifest"></head>
 <body>
 <div class="wrap">
   <a class="apkbar" href="KTS_매물수집기_v1.2_debug.apk" download>
@@ -796,5 +796,6 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
 <script>window.KTS_UX_CFG={tool:"realty",wm:["#result"],flow:1};</script>
 <script src="../ux.js?v=20261125a"></script>
 <script src="../helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="매물정리" data-start="/realty/" data-manifest="/shared/pwa/realty.webmanifest" defer></script>
 </body>
 </html>

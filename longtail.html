@@ -85,7 +85,7 @@ input.bad{border-color:#FF6B6B}
 .arbody b{color:var(--amber2)}
 .arbody .kv{display:grid;grid-template-columns:72px 1fr;gap:2px 8px;font-size:12px;margin:6px 0 8px;white-space:normal}
 .arbody .kv span:nth-child(odd){color:var(--gray);font-weight:800}
-</style></head><body><div id="app">
+</style><link rel="manifest" href="/shared/pwa/longtail.webmanifest"></head><body><div id="app">
 <header><div class="hd">
   <a class="back" href="index.html" aria-label="뒤로">←</a>
   <div class="brand">롱테일 키워드 · 유튜브 최적화<small>KTS 원클릭 · 설치 없음 · 결과 바로 엑셀</small></div>
@@ -522,4 +522,5 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 <script>window.KTS_UX_CFG={tool:"longtail",free:"미리보기 무료",more:"기본 <b>17,000원</b> · 대량 <b>150,000원</b> — 문자로 신청합니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%A1%B1%ED%85%8C%EC%9D%BC%20%ED%82%A4%EC%9B%8C%EB%93%9C%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:[],flow:1};</script>
 <script src="ux.js?v=20261125a"></script>
 <script src="helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="롱테일" data-start="/longtail.html" data-manifest="/shared/pwa/longtail.webmanifest" defer></script>
 </body></html>

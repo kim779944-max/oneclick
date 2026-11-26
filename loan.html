@@ -134,7 +134,7 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 </style>
 <script>function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}</script>
-</head>
+<link rel="manifest" href="/shared/pwa/loan.webmanifest"></head>
 <body>
 <a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:6px;margin:8px 12px 0;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,107,0,.38);background:rgba(255,107,0,.08);text-decoration:none;color:#C7D3E3;line-height:1.25;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:8.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0;font-size:10.5px;font-weight:800;color:#AFBDD0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">현재 지역 <b style="color:#FFA24D;font-weight:900">무료 세팅</b> 사전예약 중</span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:12px">→</span></a>
 
@@ -590,5 +590,6 @@ try{
 <script>window.KTS_UX_CFG={tool:"loan",free:"진단 무료",more:"실행계획 리포트 <b>29,000원</b> — 문자로 신청합니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%8C%80%EC%B6%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:["#preview"],flow:1};</script>
 <script src="ux.js?v=20261125a"></script>
 <script src="helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="대출" data-start="/loan.html" data-manifest="/shared/pwa/loan.webmanifest" defer></script>
 </body>
 </html>

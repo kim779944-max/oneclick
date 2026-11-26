@@ -1,0 +1,26 @@
+{
+  "name": "부동산 매물 1초 정리기",
+  "short_name": "매물정리",
+  "lang": "ko",
+  "id": "/shared/pwa/realty.webmanifest",
+  "start_url": "/realty/",
+  "scope": "/realty/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    {
+      "src": "/shared/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

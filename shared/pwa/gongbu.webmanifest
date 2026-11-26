@@ -1,0 +1,26 @@
+{
+  "name": "KTS 4대 공부 — 토지·건축물·지적·이용계획",
+  "short_name": "4대 공부",
+  "lang": "ko",
+  "id": "/shared/pwa/gongbu.webmanifest",
+  "start_url": "/gongbu/",
+  "scope": "/gongbu/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "icons": [
+    {
+      "src": "/shared/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

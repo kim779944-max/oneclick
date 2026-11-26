@@ -117,7 +117,7 @@ input.tx:focus{border-color:rgba(255,107,0,.6)}
 .boxask .sp{flex:1}
 .stcount{font-size:10.5px;color:var(--gray);font-weight:800;margin-top:6px}
 .stcount b{color:var(--amber2)}
-</style></head><body>
+</style><link rel="manifest" href="/shared/pwa/sign.webmanifest"></head><body>
 <div id="app">
 <header><a class="back" href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭</a><span class="brand">KTS <i>더싸인</i></span><span class="sp"></span><span class="st" id="planTag">한 장 무료</span></header>
 <a class="ktsRsv" href="https://autooneclick.com/#coupon" style="display:flex;align-items:center;gap:6px;margin:8px 12px 0;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,107,0,.38);background:rgba(255,107,0,.08);text-decoration:none;color:#C7D3E3;line-height:1.25;-webkit-tap-highlight-color:transparent"><span style="flex:0 0 auto;font-size:8.5px;font-weight:900;color:#0B2C1B;background:#4ADE80;border-radius:999px;padding:2px 6px;letter-spacing:.02em">사전예약</span><span style="flex:1;min-width:0;font-size:10.5px;font-weight:800;color:#AFBDD0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">현재 지역 <b style="color:#FFA24D;font-weight:900">무료 세팅</b> 사전예약 중</span><span style="flex:0 0 auto;color:#FFA24D;font-weight:900;font-size:12px">→</span></a>
@@ -698,4 +698,5 @@ if(window.KTSApp && window.KTSApp.ready) try{ window.KTSApp.ready(); }catch(e){}
 <script>window.KTS_UX_CFG={tool:"sign",after:'.ktsRsv',free:"한 장 무료",more:"여러 장 · 간인(사이간자)은 <b>월 4,900원</b> 이용권입니다. 문자로 신청하면 그 달 코드를 보내 드립니다. 이 화면에서는 결제하지 않습니다. <a href=\"sms:01020022899?body=%5BKTS%5D%20%EB%8D%94%EC%8B%B8%EC%9D%B8%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD\">문자로 신청</a>",wm:["#stage"],flow:1};</script>
 <script src="../ux.js?v=20261125a"></script>
 <script src="../helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="더싸인" data-start="/sign/" data-manifest="/shared/pwa/sign.webmanifest" defer></script>
 </body></html>

@@ -74,7 +74,7 @@ body{padding-bottom:26px}
 .dl .da{font-size:12px;font-weight:900;background:#0A1224;color:#FFA24D;border-radius:9px;padding:7px 11px;flex:0 0 auto}
 .dnote{font-size:10.5px;line-height:1.6;color:#7286A2;margin:0 2px 12px}
 </style>
-</head>
+<link rel="manifest" href="/shared/pwa/organizer.webmanifest"></head>
 <body>
 
 <div class="hd">
@@ -246,5 +246,6 @@ function boot(raw){
 if(window.Native && Native.apps){ boot(Native.apps()); } else { boot(null); }
 </script>
 <script src="../helper.js?v=20261125c"></script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="폰정리" data-start="/organizer/" data-manifest="/shared/pwa/organizer.webmanifest" defer></script>
 </body>
 </html>

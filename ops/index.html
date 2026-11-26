@@ -143,7 +143,7 @@
   .gate .err{color:#FF8A8A;font-size:11.5px;height:16px;margin-top:9px}
   .gate .back{display:inline-block;margin-top:16px;font-size:11.5px;color:var(--ink3)}
 </style>
-</head>
+<link rel="manifest" href="/shared/pwa/ops.webmanifest"></head>
 <body>
 
 <!-- PIN 2899 대표님 전용 -->
@@ -410,5 +410,6 @@
   gate(); if (allowed()) load();
 })();
 </script>
+<script src="/shared/pwa-install.js?v=20261126" data-name="상황판" data-start="/ops/" data-manifest="/shared/pwa/ops.webmanifest" defer></script>
 </body>
 </html>
