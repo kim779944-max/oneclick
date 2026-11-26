@@ -38,6 +38,10 @@ main{padding:12px 14px 96px}
 .hero ul{margin:9px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:5px}
 .hero ul li{font-size:10.5px;font-weight:800;color:#DCE6F2;background:rgba(255,255,255,.06);border:1px solid var(--line2);border-radius:999px;padding:4px 8px}
 .card{background:linear-gradient(180deg,#12203C 0%,#0F1B33 100%);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 6px 16px rgba(0,0,0,.28);margin-top:10px}
+/* 231·개선 2 (트랙4 이관): 결과물 전/후 예시 1장 */
+.baEx{margin:10px 0 0;padding:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0E1B36}
+.baEx img{display:block;width:100%;height:auto}
+.baEx figcaption{padding:8px 12px;font-size:11.5px;line-height:1.5;color:#9DAEC5;background:#12203C;word-break:keep-all}
 .card h2{font-size:14px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px;letter-spacing:-.4px}
 .pseg{display:flex;gap:6px;background:#0B1729;border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:9px}
 .pseg button{flex:1;font-size:12px;font-weight:900;color:#94A3B8;border-radius:9px;padding:9px 6px}
@@ -255,6 +259,12 @@ table.pv td.selcell{outline:2px solid #FF6B00;outline-offset:-2px}
     <p>카톡·문자로 받은 견적서·거래명세표 사진을 넣으면, AI가 표를 읽어 <b style="color:#FFA24D">병합 칸·열 너비·배경색·정렬</b>까지 원본 그대로 복제합니다. 설치 없이 이 브라우저에서 바로.</p>
     <ul><li>병합 셀 복제</li><li>금액은 숫자로</li><li>바로 열어보기</li><li>사진 유출 없음</li></ul>
   </div>
+
+  <!-- 231·개선 2 (트랙4 이관): 결과물 전/후 예시 1장 — 표 사진 화면에 맞춰 -->
+  <figure class="baEx">
+    <img src="../shared/examples/theform_before_after.svg" alt="전: 종이 표 사진, 후: 병합·열 너비 그대로 나온 엑셀 표" loading="lazy" width="390" height="230">
+    <figcaption>예시 · 표 사진 한 장이 병합·열 너비 그대로 한글(.hwpx)/엑셀(.xlsx)로 나옵니다</figcaption>
+  </figure>
 
   <div class="resume" id="resumeCard" style="display:none">
     <div class="t"><b>마지막 변환 결과가 남아 있습니다</b><span id="resumeMeta">-</span></div>
