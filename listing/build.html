@@ -254,6 +254,9 @@ iframe{width:100%;max-width:390px;height:780px;border:1px solid var(--line);bord
     var hand = takeHand();
     if (hand) {
       if ((!hand.broker || !hand.broker.name) && a[1]) hand.broker = a[1];   // 명함은 내 명함(예시)으로
+      var ho = document.createElement('option');
+      ho.value = ''; ho.textContent = '문자에서 넘어온 매물 · ' + (hand.title || '');
+      s.insertBefore(ho, s.firstChild); s.value = '';                       // 예시 매물로 잘못 보이지 않게
       fill(hand);
       toast('문자에서 넘어온 매물로 채웠습니다 · 금액·사진만 확인하세요');
       return;
