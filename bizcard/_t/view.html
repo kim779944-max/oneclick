@@ -15,6 +15,12 @@ f.addEventListener('load',function(){
       var b=d.querySelector('#btnDemoMe'); if(b) b.click();
     } else if(v==='setup'){
       var p2=d.querySelector('#btnSampleMe'); if(p2) p2.click();
+    } else if(v==='detail'||v==='list'){
+      var b3=d.querySelector('#btnDemoMe'); if(b3) b3.click();
+      setTimeout(function(){
+        if(v==='list'){ win.location.hash='#/list'; }
+        else { var a=d.querySelector('#v-card .gcard'); if(a) win.location.hash=a.getAttribute('href'); }
+      },900);
     }
     setTimeout(function(){ document.title='READY '+w+'x'+h; }, 1200);
   },400);
