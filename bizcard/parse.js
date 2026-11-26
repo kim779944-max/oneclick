@@ -147,11 +147,12 @@
     return m ? m[1] : '';
   }
 
-  var ADDR_STOP = /매매|급매|급처|시급|임야|대지|전답|농지|상가|주택|빌라|공장|창고|보증금|월세|전세|문의|연락|가격|평|억|만/;
+  var ADDR_STOP = /^(매매|급매|급처|시급|임야|대지|전답|답|논|밭|농지|상가|주택|빌라|공장|창고|보증금|월세|전세|문의|연락|가격|특가|토지)$/;
 
   function addrLoose(tokens) {
     for (var i = 0; i < tokens.length; i++) {
       if (!/^[가-힣]{1,7}(읍|면|동|리)$/.test(tokens[i])) continue;
+      if (/^[가-힣]{0,3}가$/.test(tokens[i]) && !/\d가$/.test(tokens[i])) continue;
       if (ADDR_STOP.test(tokens[i])) continue;
       var back = [], k = i - 1;
       while (k >= 0 && back.length < 2 && /^[가-힣]{1,7}(시|군|구)$/.test(tokens[k])) { back.unshift(tokens[k]); k--; }
@@ -163,7 +164,7 @@
       while (j < tokens.length && guard++ < 4) {
         var t = tokens[j];
         if (/^\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
-        if (/^[가-힣]{1,7}(읍|면|동|리|가)$/.test(t)) { parts.push(t); j++; continue; }
+        if (/^[가-힣0-9]{1,7}(읍|면|동|리|\d가)$/.test(t)) { parts.push(t); j++; continue; }
         if (/^[가-힣]{1,8}\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
         break;
       }
