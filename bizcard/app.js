@@ -508,7 +508,8 @@
       + '<div class="kpi"><span>면적</span><b>' + (it.areaP ? num(it.areaP) + '평' : '미정') + '</b><em>' + (it.areaM2 ? num(it.areaM2, 1) + '㎡' : '') + '</em></div>'
       + '<div class="kpi"><span>평당</span><b>' + (pyPrice(it) ? money(pyPrice(it)) : '—') + '</b></div>'
       + '</div>';
-    if (it.addr) h += '<div class="addr">' + IC.map + '<span>' + esc(it.addr) + (it.jibun ? ' (' + esc(it.jibun) + ')' : '') + '</span><button class="lnk sm" id="btnCopyAddr">복사</button></div>';
+    var jibunDup = it.jibun && String(it.addr || '').replace(/\s/g, '').indexOf(String(it.jibun).replace(/\s/g, '')) >= 0;
+    if (it.addr) h += '<div class="addr">' + IC.map + '<span>' + esc(it.addr) + (it.jibun && !jibunDup ? ' (' + esc(it.jibun) + ')' : '') + '</span><button class="lnk sm" id="btnCopyAddr">복사</button></div>';
     if (it.tags && it.tags.length) h += '<div class="tags">' + it.tags.map(function (t) { return '<i>' + esc(t) + '</i>' }).join('') + '</div>';
 
     /* 4대 공부 */
@@ -572,7 +573,8 @@
       bTxt = b.items[0].mainPurpsCdNm || '건축물 있음';
       bSub = b.items[0].platArea ? '대지 ' + num(b.items[0].platArea, 1) + '㎡' : '';
     } else if (b.st === 'EMPTY') {
-      bTxt = '건축물 없음(대지)';
+      bTxt = '건축물 없음';
+      if (it.kind === '대지') bSub = '나대지';
     } else if (b.st === 'NOKEY') {
       bTxt = '인증키 필요'; bSub = '4대 공부 원문에서 확인';
     } else if (b.st === 'loading' || it.gbSt === 'loading') {
@@ -586,8 +588,8 @@
     /* 지적 */
     T.push({
       n: '지적', ok: !!it.pnu,
-      l1: it.pnu ? 'PNU ' + it.pnu : '필지 확인 중',
-      l2: it.jibun ? '지번 ' + it.jibun : ''
+      l1: it.jibun ? '지번 ' + it.jibun : (it.pnu ? '필지 확인됨' : '필지 확인 중'),
+      l2: it.pnu ? 'PNU ' + it.pnu : ''
     });
     /* 이용계획 */
     var uses = useNames(gb);
