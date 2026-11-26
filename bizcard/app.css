@@ -95,17 +95,17 @@ img{display:block;max-width:100%}
 .biz-mark{position:absolute;right:12px;top:11px;z-index:2;font-size:9px;font-weight:900;
   letter-spacing:2.2px;color:#e2ba7a;opacity:.95}
 .biz-row{position:relative;z-index:1;display:flex;gap:11px;align-items:flex-start}
-.av{width:72px;height:90px;flex:0 0 auto;border-radius:10px;overflow:hidden;display:grid;place-items:center;
+.av{width:76px;height:96px;flex:0 0 auto;border-radius:10px;overflow:hidden;display:grid;place-items:center;
   background:linear-gradient(155deg,#ffa04d,#ff6b00);color:#2a1500;font-size:26px;font-weight:900;
   box-shadow:0 0 0 1px rgba(226,186,122,.4),0 5px 12px rgba(0,0,0,.36)}
 .av img{width:100%;height:100%;object-fit:cover}
 .who{flex:1;min-width:0;padding-right:22px}
-.who b{display:block;font-size:19px;font-weight:900;letter-spacing:-.8px;line-height:1.15}
+.who b{display:block;font-size:19.5px;font-weight:900;letter-spacing:.4px;line-height:1.15}
 .who .role{display:block;margin-top:2px;font-size:10.5px;color:#abbacf;letter-spacing:.1px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .medals{display:flex;align-items:center;gap:5px;margin-top:6px;min-width:0}
-.medals .badge{flex:0 0 auto;font-size:9.5px;font-weight:900;letter-spacing:-.2px;padding:3px 7px;border-radius:999px;
-  color:#20140a;background:linear-gradient(180deg,#f4d49c,#d9a862);box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.medals .badge{flex:0 0 auto;font-size:9.5px;font-weight:900;letter-spacing:0;padding:3px 7px;border-radius:999px;
+  color:#f2d8a8;background:rgba(226,186,122,.14);border:1px solid rgba(226,186,122,.55)}
 .medals .edge{min-width:0;font-size:9.5px;font-weight:700;color:#cbb68f;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .intro{margin:6px 0 0;font-size:10.8px;color:#c1ccdd;line-height:1.5;letter-spacing:-.1px;
@@ -148,13 +148,13 @@ img{display:block;max-width:100%}
 .gcard{display:flex;flex-direction:column;min-width:0;padding:4px 4px 5px;text-decoration:none;border-radius:11px;
   border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#18253f,#141f38);
   box-shadow:0 4px 12px rgba(0,0,0,.22)}
-.gth{position:relative;height:62px;border-radius:8px;overflow:hidden;background:var(--panel2)}
+.gth{position:relative;height:70px;border-radius:8px;overflow:hidden;background:var(--panel2)}
 .gth img{width:100%;height:100%;object-fit:cover}
 .gth .ph{display:grid;place-items:center;width:100%;height:100%;font-size:13px;font-weight:900;color:var(--ink3);
   background:repeating-linear-gradient(45deg,#18233f 0 6px,#152038 6px 12px)}
 .gth .dm{position:absolute;left:4px;top:4px;font-style:normal;font-size:9px;font-weight:900;padding:1px 4px;
   border-radius:5px;background:rgba(11,19,43,.82);color:#ffd7a4;border:1px solid rgba(255,190,120,.35)}
-.gcard b{font-size:11px;font-weight:800;letter-spacing:-.4px;margin-top:5px;line-height:1.25;height:2.5em;
+.gcard b{font-size:11.5px;font-weight:800;letter-spacing:-.4px;margin-top:5px;line-height:1.25;height:2.5em;
   overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .gcard .pr{font-size:11.5px;font-weight:900;color:var(--acc2);letter-spacing:-.4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
