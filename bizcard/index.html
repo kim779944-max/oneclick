@@ -74,6 +74,16 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
+<script>
+/* 화면에 에러를 바로 보여 준다(백지 화면 대신) */
+window.addEventListener('error', function (e) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = 'ERR ' + (e.message || '') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || '');
+  t.classList.add('on');
+  t.setAttribute('data-err', '1');
+});
+</script>
 <script src="parse.js?v=1"></script>
 <script src="gongbu.js?v=1"></script>
 <script src="assistant.js?v=1"></script>
