@@ -49,7 +49,11 @@ function m(f){
     thumbs: Array.prototype.map.call(d.querySelectorAll('#v-card .gth img'),function(i){return i.naturalWidth}),
     tableRows: d.querySelectorAll('#v-new .obj-table tr').length,
     tableText: (function(){var t=q('#v-new .obj-table'); return t? t.textContent.replace(/\s+/g,' ').slice(0,180):''})(),
-    bodyScroll: (function(){var b=d.body; return b? b.scrollHeight:0})()
+    bodyScroll: (function(){var b=d.body; return b? b.scrollHeight:0})(),
+    pactW: Array.prototype.map.call(d.querySelectorAll('#v-card .pact'),function(e){return Math.round(e.getBoundingClientRect().width)+':'+e.textContent.trim()}),
+    cardOverflowX: (function(){var e=q('#v-card'); return e? e.scrollWidth-e.clientWidth : -1})(),
+    avatarRect: rect(r('#v-card .av')),
+    whoScroll: (function(){var e=q('#v-card .who'); return e? e.scrollWidth-e.clientWidth : -1})()
   };
 }
 async function run(){
@@ -115,10 +119,13 @@ async function run(){
   del(s);
   /* 화면 확인용 — 390x660 프레임을 맨 위에 남긴다 */
   var v=await mk(390,660,'../index.html?reset=1&dev=1&r='+Date.now());
-  await sleep(500);
+  await sleep(600);
   doc(v).querySelector('#btnDemoMe').click();
   await sleep(1800);
-  document.getElementById('frames').insertBefore(v, document.getElementById('frames').firstChild);
+  out('VIEW1 '+JSON.stringify(m(v)));
+  var v2=await mk(360,640,'../index.html?dev=1&r='+Date.now());
+  await sleep(1500);
+  out('VIEW2 '+JSON.stringify(m(v2)));
   out('VIEW_IFRAME_READY');
   out('DONE');
 }
