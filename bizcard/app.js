@@ -317,7 +317,7 @@
     });
     h += '</div>';
 
-    if (!LS.get(K.tip, {}).star) {
+    if (!LS.get(K.tip, {}).star && !S.items.some(function (x) { return x.demo })) {
       h += '<div class="bubble tip" id="tipStar"><b>★</b> 별표를 누르면 명함 맨 위「새 물건표」로 올라가 손님에게 먼저 보입니다.'
         + '<button id="tipStarX">알겠습니다</button></div>';
     }
