@@ -136,7 +136,7 @@ button{font:inherit;cursor:pointer}
   html,body{background:#fff!important;color:#000!important;padding:0!important;margin:0!important}
   .bar,.tools,.tip,#toast,.noprint{display:none!important}
   .wrap{max-width:none;padding:0;margin:0}
-  .paper{box-shadow:none;border-radius:0;margin:0;padding:0;width:auto;overflow:visible}
+  .paper{box-shadow:none;border-radius:0;margin:0;padding:0 1.5mm;width:auto;overflow:visible}
   .p-foot{margin:6mm 0 0;padding:4mm 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .p-photos{height:62mm}
