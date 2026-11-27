@@ -220,7 +220,8 @@ main{padding:12px 14px 0}
 /* 258 검색 버튼 · 첫 결과 강조 */
 .srch .go{flex:0 0 auto;border:0;border-radius:11px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:900;color:var(--on);cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber2));white-space:nowrap;box-shadow:0 6px 14px rgba(255,107,0,.24)}
 .srch .go:active{transform:translateY(1px)}
-.item.hit{border-color:var(--amber);outline:2px solid rgba(255,107,0,.55);outline-offset:1px;background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,107,0,.04))}
+.item.hit{border-color:var(--amber);outline:2px solid rgba(255,107,0,.55);outline-offset:1px;background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,107,0,.04));animation:hitp 1s ease-out 1}
+@keyframes hitp{0%{outline-color:rgba(255,107,0,.95);box-shadow:0 0 0 6px rgba(255,107,0,.22)}100%{outline-color:rgba(255,107,0,.55);box-shadow:0 0 0 0 rgba(255,107,0,0)}}
 .item.hit .nm{color:#fff}
 /* 258 공개데이터 표 · 동의율 안내 · 주체 상자 · 접이식 현장정보 */
 .spec{margin-top:10px;border:1px solid #1D2C49;border-radius:12px;overflow:hidden;background:#0B1729}
@@ -1130,10 +1131,10 @@ function firstItem(){
 }
 function markFirst(){
   var f=firstItem(); if(!f) return;
-  f.classList.remove('hit');
+  var all=$('list').querySelectorAll('.item.hit');
+  for(var i=0;i<all.length;i++) all[i].classList.remove('hit');
   void f.offsetWidth;
-  f.classList.add('hit');
-  setTimeout(function(){ f.classList.remove('hit'); }, 2800);
+  f.classList.add('hit');           /* 다음 검색·다른 구역을 열 때까지 그대로 강조 */
 }
 function goListTop(){
   var box=$('list'); if(!box) return;
@@ -1168,6 +1169,7 @@ $('chips').addEventListener('click',function(e){
 $('more').addEventListener('click',function(){ SHOWN+=40; render(); });
 $('list').addEventListener('click',function(e){
   var b=e.target.closest('.item'); if(!b) return;
+  b.classList.remove('hit');
   openSheet([b.dataset.t, Number(b.dataset.i)]);
 });
 $('panel').addEventListener('click',function(e){
