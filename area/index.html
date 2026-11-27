@@ -1003,8 +1003,10 @@ if(pq){
 }else{
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
-window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge} };
+window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,cx:S.V.cx,cy:S.V.cy} };
 window.__KTS_SHEET=function(){ return buildSheet() };
+window.__KTS_HIT=function(cx,cy){ var r=MAPW/$('#map').getBoundingClientRect().width, t=topLeft();
+  var f=hitTest(x2lon(t.x+cx*r,S.V.z),y2lat(t.y+cy*r,S.V.z)); return f?{jibun:f.jibun,pnu:f.pnu}:null };
 })();
 </script>
 <script src="/shared/pwa-install.js?v=20261127" data-name="면적 그리기" data-start="/area/" data-manifest="/shared/pwa/area.webmanifest" defer></script>
