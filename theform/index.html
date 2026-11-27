@@ -73,9 +73,12 @@ main{padding:12px 14px 120px}
 .fld.ez span{color:#B91C1C;font-weight:900}
 #ezBtn.on{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
 .tools{display:flex;gap:6px;margin-top:8px}
-.tools button{flex:1;font-size:13px;font-weight:900;border-radius:10px;padding:10px 4px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
-.tools button.pl{font-size:18px;color:var(--amber2)}
-.tools button.pl.txt{flex:1.3;font-size:13px;font-weight:900;color:#FFC9C9;border-color:rgba(239,68,68,.55);background:rgba(239,68,68,.14)}
+.tools button{flex:1;font-size:12.5px;font-weight:900;border-radius:10px;padding:10px 4px;background:#12203C;border:1px solid var(--line2);color:#E6EDF7}
+.tools button.pl{font-size:12.5px;color:#E6EDF7}
+.tools button.pl.txt{flex:1;font-size:12.5px;font-weight:900;color:#FFC9C9;border-color:rgba(239,68,68,.55);background:rgba(239,68,68,.14)}
+/* 249 — 지울 박스만 톡 (한 줄 전체) */
+#keepBtn{flex:1 1 100% !important;min-height:44px;font-size:13px !important;font-weight:900;color:#0A1224 !important;background:linear-gradient(135deg,#FFA24D,#FF6B00) !important;border:1px solid #FF6B00 !important}
+#keepBtn:not(.on){color:#FFC08A !important;background:rgba(255,107,0,.10) !important;border-color:rgba(255,107,0,.55) !important}
 .delbox{position:absolute;z-index:6;font-family:inherit;font-size:11px;font-weight:900;color:#fff;background:#EF4444;
   border:0;border-radius:6px;padding:4px 9px;box-shadow:0 4px 10px rgba(0,0,0,.35);cursor:pointer;letter-spacing:-.2px}
 .delbox:active{transform:scale(.96)}
@@ -204,6 +207,20 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 #valList input.has:not(:focus),#valList textarea.has:not(:focus){border-color:transparent;background:rgba(255,255,255,.035)}
 .fld.done{border-color:transparent;background:transparent}
 .fld.done .lbl2{position:absolute;left:2px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:900;color:#0B1A3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* 서식 창고 (248) */
+#storeSheet{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,7,18,.7)}
+#storeSheet.on{display:block}
+#storeSheet .pane{position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;max-height:88vh;overflow:auto;background:#0F1B33;border:1px solid var(--line2);border-top-left-radius:18px;border-top-right-radius:18px;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
+#storeSheet .hd{display:flex;align-items:center;font-size:15px;font-weight:900;color:#fff}
+#storeSheet .hd button{margin-left:auto;font-size:11.5px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:6px 12px}
+#storeSheet .grp{font-size:11.5px;font-weight:900;color:#FFC08A;margin:12px 0 5px}
+#storeSheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#storeSheet .grid button{font-size:12px;font-weight:800;color:#F3F6FA;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:11px 6px;min-height:42px;line-height:1.25}
+#storeSheet .grid button:active{background:#1B2C52}
+#storeSheet .grid button.wide{grid-column:1 / -1}
+#storeSheet .kv{margin-top:10px}
+#keepBtn.on{color:#0A1224;background:linear-gradient(135deg,#FFA24D,#FF6B00);border-color:#FF6B00}
+#autoBar.keep span{color:#FFD7B8}
 </style>
 <link rel="manifest" href="/shared/pwa/theform.webmanifest"></head><body>
 <div id="app">
@@ -229,7 +246,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 <section class="scr" id="s1">
  <div class="card start">
   <div class="row"><button class="btn pri big" id="pickBtn">📷 사진으로 양식 올리기</button></div>
-  <p class="kv sm">종이 양식을 찍으면 기울기를 바로잡고 빈칸을 잡아 내 양식으로 저장합니다.</p>
+  <p class="kv sm">종이 양식을 찍으면 기울기를 바로잡고 빈칸을 자동으로 잡아 내 양식으로 저장합니다.</p>
+  <div class="row" style="margin-top:2px"><button class="btn sec sm" id="storeBtn">📚 서식 창고 — 표준계약서 · 확인설명서 · 영수증</button></div>
   <div class="stdttl">📄 표준 양식 바로 쓰기 <em>누르면 바로 값 입력</em></div>
   <div class="stdgrid" id="stdGrid">
    <button type="button" data-std="p_sale">부동산 매매계약서</button>
@@ -258,14 +276,14 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 <section class="scr" id="s2">
  <div class="card">
   <h2><span class="n">2</span>채울 자리 찍기</h2>
-  <p class="sub" id="s2tip">미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.</p>
+  <p class="sub" id="s2tip">미리보기 위 빈 곳을 누르면 칸이 생깁니다. 자동으로 잡힌 박스는 <b style="color:#FFC08A">톡 한 번 누르면 지워집니다</b>(남길 것만 남기기). 박스를 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.</p>
   <div class="tools autow">
-   <button class="auto" id="autoF" type="button">자동 빈칸 찾기</button><button class="pl" id="addF" title="칸 추가">+ 칸 추가</button><button class="pl txt" id="delF" title="칸 삭제">칸 삭제</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
+   <button class="auto" id="autoF" type="button">자동 박스 다시 찾기</button><button class="pl" id="keepBtn" type="button">👆 지울 박스만 톡</button><button class="pl" id="addF" title="칸 추가">+ 칸 추가</button><button class="pl txt" id="delF" title="칸 삭제">칸 삭제</button><button id="undoF">되돌리기</button><button id="redoF">다시</button>
   </div>
   <div class="tools"><button id="ezBtn" title="그림·로고·도장 자리를 지웁니다">🖼 그림·도장 지우기</button></div>
   <p class="kv" id="ezTip">그림·로고·도장이 있는 자리를 눌러 <b style="color:#FFC08A">흰색으로 지우고</b>, 그 자리에 글자를 넣고 싶으면 [글자 칸으로]를 누르세요.</p>
   <div class="stage" id="edStage"></div>
-  <div id="autoBar"><span>자동으로 <b id="autoN">0</b>칸을 찾았습니다 · 틀린 칸은 ✕로 지우세요</span><button type="button" id="autoClr">모두 지우기</button></div>
+  <div id="autoBar"><span>자동으로 <b id="autoN">0</b>칸을 찾았습니다 · 지울 박스만 톡 누르세요</span><button type="button" id="keepDone">이대로 남기기</button><button type="button" id="autoClr">모두 지우기</button></div>
   <div id="fEdit" style="display:none">
    <div class="row" id="ezConvRow" style="display:none;margin-top:0"><button class="btn pri sm" id="ezConv">🅰 이 자리에 글자 칸 만들기</button></div>
    <label class="lb">이름표<em>예: 성명 · 금액 · 날짜</em></label>
@@ -384,6 +402,42 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 <div id="printArea"></div>
 <script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
 <script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
+<div id="storeSheet">
+ <div class="pane">
+  <div class="hd"><b>📚 서식 창고</b><button type="button" id="ssClose">닫기</button></div>
+  <p class="kv sm" style="margin-top:4px">내 종이 양식이 기본입니다. 필요한 서식만 여기서 골라 부르세요 — 모두 열쇠 없이 무료입니다.</p>
+  <div class="grp">① 표준계약서 — 빈칸만 채워 서명·인쇄</div>
+  <div class="grid">
+   <button type="button" data-cf="sale">부동산 매매계약서</button>
+   <button type="button" data-cf="exchange">교환계약서(당사자)</button>
+   <button type="button" data-cf="exbroker">교환계약서(중개사)</button>
+   <button type="button" data-cf="lease">부동산 임대차계약서</button>
+   <button type="button" data-cf="house">주택 임대차계약서</button>
+   <button type="button" data-cf="shop">상가건물 임대차계약서</button>
+   <button type="button" data-cf="power">등기 위임장</button>
+   <button type="button" data-cf="labor">표준 근로계약서</button>
+   <button type="button" data-cf="loan">차용증</button>
+   <button type="button" data-cf="service">업무위탁(용역)계약서</button>
+   <button type="button" data-cf="partner">동업계약서</button>
+   <button type="button" data-cf="consult">컨설팅 전속거래 약정서</button>
+  </div>
+  <div class="grp">② 계약에 붙이는 서류 — 체크하면 값이 그대로 채워집니다</div>
+  <div class="grid">
+   <button type="button" data-doc="confirm">중개대상물 확인설명서</button>
+   <button type="button" data-doc="fee">중개보수 영수증</button>
+  </div>
+  <div class="grp">③ 한글·엑셀로 바로 내보내는 기본 양식</div>
+  <div class="grid">
+   <button type="button" data-std2="p_sale">매매계약서(한글·엑셀)</button>
+   <button type="button" data-std2="p_lease">임대차계약서(한글·엑셀)</button>
+   <button type="button" data-std2="p_exchange">교환계약서(한글·엑셀)</button>
+   <button type="button" data-std2="p_exbroker">교환(중개사·한글·엑셀)</button>
+   <button type="button" data-std2="p_power">등기 위임장(한글·엑셀)</button>
+   <button type="button" data-std2="p_consult">컨설팅 약정서(한글·엑셀)</button>
+  </div>
+  <p class="kv">①·②는 5초 계약서에서 열립니다 — 주소 한 줄이면 4대 공부까지 자동으로 채워지고, 두 필지부터 별지가 붙습니다.</p>
+ </div>
+</div>
 <script src="../shared/kts-handoff.js?v=20261124b"></script>
 <script src="../shared/kts-seal.js?v=20261124b"></script>
 <script>
@@ -2065,7 +2119,7 @@ function drawEditor(){
   $('#fCount').textContent = `빈칸 ${CUR.fields.filter(x => x.type !== 'erase').length}개 · 지운 자리 ${CUR.fields.filter(x => x.type === 'erase').length}곳 · 되돌리기 ${UNDO.length}단계 저장됨` + (CUR.fields.some(x => x._auto) ? ` · 자동 ${CUR.fields.filter(x => x._auto).length}칸` : '') + ` · 프리셋 ${myPresets().length}개` + (ro() ? ' · 기본 양식은 보기 전용' : '');
   updAutoBar(); renderPresets();
   $('#s2tip').textContent = ro() ? '기본 양식입니다. 칸 위치를 바꾸려면 목록에서 [복제]한 뒤 고치세요. 그림·도장은 [🖼 그림·도장 지우기]로 바로 지울 수 있습니다.'
-    : '미리보기 위 빈 곳을 누르면 칸이 생깁니다. 칸을 끌어 옮기고, 파란 점을 끌어 크기를 바꿉니다.';
+    : '빈 곳을 누르면 칸이 생깁니다. 자동으로 잡힌 박스는 톡 한 번 누르면 지워집니다(남길 것만 남기기). 칸을 끌어 옮기고, 아래 파란 점을 끌면 크기가 바뀝니다.';
   $('#formName').value = CUR.name || '';
   $('#formName').disabled = ro();
 }
@@ -2089,6 +2143,11 @@ const TYPE_NM = {text:'일반 글자', sign:'서명', number:'일반 글자', da
     const fd = e.target.closest('.fld');
     const [px, py] = pct(e);
     if (!fd){ if (EZMODE){ addErase(px, py); return; } addField(px, py); return; }
+    /* 249 — 남길 것만 남기기: 지울 박스를 톡 한 번 누르면 바로 지운다 */
+    if (KEEPONLY && !ro() && CUR.fields[+fd.dataset.i] && CUR.fields[+fd.dataset.i]._auto){
+      const ki = +fd.dataset.i; e.preventDefault(); snap(); CUR.fields.splice(ki, 1); SEL = -1; drawEditor();
+      toast('박스를 지웠습니다 · [되되도리기]로 복구'); return;
+    }
     SEL = +fd.dataset.i;
     const ff0 = CUR.fields[SEL];
     if (ro() && !(ff0 && ff0._add)){ const ff = CUR.fields[SEL]; if (ff) toast('"' + (ff.type === 'erase' ? '지운 자리' : ff.label) + '" 칸' + (ff.type === 'sign' ? ' · 서명' : '')); drawEditor(); return; }
@@ -2296,6 +2355,40 @@ function updAutoBar(){
   $('#autoN').textContent = n;
 }
 $('#autoF').onclick = runAutoDetect;
+/* 249 — 사진·서식에서 글자 박스를 자동으로 만들고, 지울 박스만 톡 눌러 남긴다 */
+let KEEPONLY = true;
+const AUTO_ONCE = {};
+function keepBtnSync(){
+  const b = $('#keepBtn'); if (b) b.classList.toggle('on', !!KEEPONLY);
+  const bar = $('#autoBar'); if (bar) bar.classList.toggle('keep', !!KEEPONLY);
+}
+function autoRunForKeep(){
+  if (!CUR || ro()) return;
+  if (!BG || BG instanceof HTMLCanvasElement) return;
+  if (CUR.fields.some(f => f.type !== 'erase')) return;
+  if (AUTO_ONCE[CUR.id]) return;
+  AUTO_ONCE[CUR.id] = 1;
+  setTimeout(() => {
+    if (!CUR) return;
+    let r = null;
+    try{ r = autoDetectFields(true); }catch(e){ r = null; }
+    if (!r || !r.fields.length){
+      toast('글자 박스를 찾지 못했습니다 · 빈 곳을 눌러 직접 찍어 주세요');
+      return;
+    }
+    snap();
+    let n = CUR.fields.filter(f => f.type !== 'erase').length;
+    r.fields.forEach(f => CUR.fields.push({id:uid(), label:'칸' + (++n), type:'text', x:f.x, y:f.y, w:f.w, h:f.h, _auto:1}));
+    KEEPONLY = true; SEL = -1; drawEditor(); keepBtnSync();
+    toast('글자 박스 ' + r.fields.length + '개를 자동으로 만들었습니다 · 지울 박스만 톡 톡 누르세요');
+  }, 280);
+}
+$('#keepBtn').onclick = () => {
+  if (!CUR) return toast('먼저 양식을 열어 주세요');
+  KEEPONLY = !KEEPONLY; keepBtnSync();
+  toast(KEEPONLY ? '지울 박스를 톡 누르면 바로 지워집니다' : '박스를 누르면 고치기 모드로 돌아갑니다');
+};
+$('#keepDone').onclick = () => { KEEPONLY = false; keepBtnSync(); toast('박스를 그대로 남겼습니다 · [다음]으로 넘어가세요'); };
 $('#autoClr').onclick = () => {
   if (!CUR || !CUR.fields.some(f => f._auto)) return;
   snap(); CUR.fields = CUR.fields.filter(f => !f._auto); SEL = -1; drawEditor(); toast('자동으로 찾은 칸을 모두 지웠습니다 · [되돌리기]로 복구');
@@ -3195,7 +3288,7 @@ function go(n, noPush){
   $('#nextBtn').textContent = ['', '빈칸 지정으로', ro() ? '값 입력으로' : '내 양식으로 저장', '미리보기', '내보내기', '처음으로'][n];
   document.body.classList.toggle('fill', n === 3);
   if (n !== 3) GUIDE_I = -1;
-  if (n === 2) drawEditor();
+  if (n === 2){ drawEditor(); autoRunForKeep(); }
   if (n === 3) renderInputs();
   if (n === 4) renderPreview();
   dockFit();
@@ -3221,6 +3314,18 @@ $('#nextBtn').onclick = async () => {
 $('#backBtn').onclick = () => { if (STEP <= 1) return; if (history.state && history.state.tf > 1) { try{ history.back(); return; }catch(e){} } go(STEP - 1); };
 $('#steps').onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.s); };
 $('#pickBtn').onclick = () => $('#photoIn').click();
+/* 248 — 서식 창고(내 종이 양식이 기본 · 표준계약서·확인설명서·영수증은 여기서 부른다) */
+$('#storeBtn').onclick = () => $('#storeSheet').classList.add('on');
+$('#ssClose').onclick = () => $('#storeSheet').classList.remove('on');
+$('#storeSheet').addEventListener('click', async e => {
+  if (e.target && e.target.id === 'storeSheet'){ $('#storeSheet').classList.remove('on'); return; }
+  const cf = e.target.closest('[data-cf]');
+  if (cf){ location.href = '/contract/?form=' + encodeURIComponent(cf.dataset.cf); return; }
+  const dc = e.target.closest('[data-doc]');
+  if (dc){ location.href = '/contract/?doc=' + encodeURIComponent(dc.dataset.doc); return; }
+  const st = e.target.closest('[data-std2]');
+  if (st){ $('#storeSheet').classList.remove('on'); busyOn('양식을 여는 중…'); try{ await openForm(st.dataset.std2, 3); }catch(err){ toast('양식을 열지 못했습니다'); } busyOff(); }
+});
 $('#photoIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; onPhoto(f); };
 $('#regSeg').onclick = e => { const b = e.target.closest('button'); if (b) showReg(b.dataset.v); };
 
@@ -3457,7 +3562,7 @@ window.TF = {go, openForm, dupForm, delForm, exportBlob, exportRaw, composite, o
     const list = myForms(); list.unshift(f); saveMyForms(list);
     await openForm(id, 2);
     busyOff();
-    toast('더뷰에서 ' + pages.length + '쪽을 받았습니다 · [자동 빈칸 찾기]를 눌러 칸을 잡으세요');
+    toast('더뷰에서 ' + pages.length + '쪽을 받았습니다 · 글자 박스를 자동으로 잡습니다');
   }catch(e){ busyOff(); console.warn('from viewer fail', e); toast('더뷰 문서를 열지 못했습니다 · 더뷰에서 [PDF 저장] 후 [양식 사진 찍기]로 올려 주세요'); }
 })();
 updKey(); go(1);

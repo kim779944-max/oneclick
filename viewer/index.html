@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>더뷰 — KTS 만능 뷰어</title>
+<meta name="description" content="한글·엑셀·워드·PDF·사진을 그 자리에서 펼쳐 보는 KTS 더뷰. 파일은 이 기기 안에서만 처리됩니다.">
+<link rel="canonical" href="https://autooneclick.com/viewer.html">
+<meta name="theme-color" content="#0A1128">
+<link rel="icon" href="/icon_viewer.png">
+<link rel="apple-touch-icon" href="/icon_viewer.png">
+<link rel="manifest" href="/shared/pwa/viewer.webmanifest">
+<meta http-equiv="refresh" content="0; url=/viewer.html">
+<style>
+html,body{margin:0;height:100%;background:#070D1E;color:#F3F6FA;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif}
+.w{height:100%;display:grid;place-items:center;text-align:center;padding:24px;box-sizing:border-box}
+.m{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;margin:0 auto 12px;background:linear-gradient(145deg,#FFA24D,#FF6B00);color:#0A1224;font-weight:900}
+a{color:#FFA24D;font-weight:900;text-decoration:none;border:1px solid rgba(255,107,0,.5);border-radius:999px;padding:12px 18px;display:inline-block;margin-top:14px}
+p{margin:0;font-size:13.5px;line-height:1.6;color:#E6EDF7}
+.b{font-size:16px;font-weight:900;color:#fff;margin-bottom:4px}
+</style></head><body>
+<div class="w"><div>
+ <div class="m">뷰</div>
+ <div class="b">더뷰를 여는 중…</div>
+ <p>자동으로 넘어가지 않으면 아래를 눌러 주세요.</p>
+ <a id="go" href="/viewer.html">더뷰 열기 →</a>
+</div></div>
+<script>
+(function(){
+  var q = location.search || '', h = location.hash || '';
+  var u = '/viewer.html' + q + h;
+  var a = document.getElementById('go'); if (a) a.href = u;
+  try{ location.replace(u); }catch(e){}
+})();
+</script>
+</body></html>
