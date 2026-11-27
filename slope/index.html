@@ -21,6 +21,12 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.94);-webkit-ba
 header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px;white-space:nowrap}
 .brand{font-weight:900;font-size:14.5px;color:#fff;letter-spacing:-.4px;white-space:nowrap}.brand i{font-style:normal;color:var(--amber2)}
 header .sp{flex:1}
+/* ── 1호 세트 이동 띠 (247·259) ── */
+.setnav{display:flex;gap:6px;padding:8px 14px 0}
+.setnav a{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;min-height:36px;border:1px solid var(--line2,#26375F);border-radius:10px;
+ background:#0D1830;color:var(--ink2,#D7E2F2);font-size:12px;font-weight:900;text-decoration:none;letter-spacing:-.4px;white-space:nowrap}
+.setnav a.on{background:linear-gradient(135deg,rgba(255,107,0,.22),rgba(255,162,77,.10));border-color:rgba(255,107,0,.75);color:#fff}
+.setnav a b{color:var(--amber2,#FFA24D);font-weight:900}
 header .st{font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:999px;padding:3px 8px;white-space:nowrap}
 main{padding:12px 14px 0}
 .hero h1{margin:2px 0 5px;font-size:20px;font-weight:900;letter-spacing:-.8px;line-height:1.32}
@@ -356,6 +362,11 @@ details.adv .keyrow{margin-top:7px}
   <span class="sp"></span>
   <span class="st" id="planTag">하루 3건 무료</span>
 </header>
+<nav class="setnav" aria-label="1호 세트">
+  <a href="/area/" id="setArea">면적 그리기 <b>→</b></a>
+  <a class="on" href="/slope/" aria-current="page">경사도</a>
+  <a href="/gongbu/" id="setGongbu">4대 공부 <b>→</b></a>
+</nav>
 <main>
   <div class="hero">
     <h1>지번 하나로, 그 자리의<br><b>필지 경사도</b>가 그림으로</h1>
@@ -1589,6 +1600,7 @@ function renderHits(list,q){
 function applyPlace(p,label){
   S.lat=clamp(p.lat,-85,85); S.lon=((p.lon+540)%360)-180; S.addr=label||p.name||'선택한 지점';
   S.zoom=Math.max(16.6,S.zoom);
+  setNavLinks();
   $('#hits').classList.add('hide');
   $('#hint').classList.add('off');
   commitPlace(); requestRender(); buildTerrain();
@@ -1606,7 +1618,7 @@ function doSearch(){
     ? vwGeocode(q,'parcel').then(function(a){ return a||vwGeocode(q,'road') })
     : Promise.resolve(null);
   chain.then(function(a){
-    if(a){ applyPlace(a,q); return null }
+    if(a){ applyPlace(a,a.name||q); return null }
     return nomiSearch(q);
   }).then(function(list){
     busy(false);
@@ -3169,6 +3181,24 @@ if(S.key){
   var pb0=document.querySelector('#togs button[data-l="parcel"]');
   if(pb0) pb0.classList.add('on');
 }
+/* 1호 세트 — 지금 보고 있는 주소를 그대로 넘긴다 */
+function setNavLinks(){
+  var a=(S.addr||'').trim(), suf=a?('?q='+encodeURIComponent(a)):'';
+  var e1=$('#setArea'), e2=$('#setGongbu');
+  if(e1) e1.href='/area/'+suf;
+  if(e2) e2.href='/gongbu/'+suf;
+}
+setNavLinks();
+/* ?q= 로 들어오면 바로 분석 — 면적 그리기·4대 공부에서 1터치 이동 */
+(function(){
+  var pq=(location.search.match(/[?&]q=([^&]*)/)||[])[1];
+  if(!pq) return;
+  try{
+    var q0=decodeURIComponent(pq.replace(/\+/g,' '));
+    if(!q0) return;
+    $('#q').value=q0; doSearch();
+  }catch(e){}
+})();
 requestRender(); buildTerrain(); drawProfile(); parcelFetch(S.lat,S.lon);
 $('#buy').href='sms:01020022899?body='+encodeURIComponent('[KTS 경사도] 10건권 9,000원 신청합니다. 입금 안내와 이용권 코드 부탁드립니다.');
 setTimeout(function(){ $('#hint').classList.add('off') },6000);
