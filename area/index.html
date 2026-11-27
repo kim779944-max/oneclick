@@ -55,6 +55,11 @@ main{padding:10px 12px 0}
 .mode button.on{background:rgba(226,58,46,.18);border-color:var(--red);color:#fff}
 .mode button.on.out{background:rgba(127,178,255,.16);border-color:#5C86C8}
 .mode button em{font-style:normal;font-size:10.5px;color:var(--ink2);margin-left:3px}
+.edgebtn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-height:34px;margin:-2px 0 8px;border:1px dashed var(--line2);
+ border-radius:9px;background:#0B1729;color:var(--ink2);font-size:11.5px;font-weight:900;cursor:pointer;letter-spacing:-.3px}
+.edgebtn em{font-style:normal;font-size:10.5px;font-weight:800;color:#8FA3BF}
+.edgebtn.on{border:1px solid var(--amber);background:rgba(255,107,0,.16);color:#fff}
+.edgebtn.on em{color:var(--amber2)}
 /* 지도 */
 .mapwrap{position:relative;border-radius:13px;overflow:hidden;border:1px solid var(--line2);background:#0B1729}
 #map{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
@@ -126,7 +131,7 @@ main{padding:10px 12px 0}
   #sheet .sh .d{font-size:9pt}
   #sheet .sum{margin:0 0 3mm;font-size:11pt}
   #sheet .sum b{font-size:14pt}
-  #sheet img{width:auto;max-width:100%;max-height:86mm;display:block;margin:0 auto 3mm;border:1px solid #000}
+  #sheet img{width:auto;height:auto;max-width:100%;max-height:90mm;object-fit:contain;display:block;margin:0 auto 3mm;border:1px solid #000}
   #sheet table{width:100%;border-collapse:collapse;font-size:9.5pt}
   #sheet th,#sheet td{border:1px solid #000;padding:1.1mm 1.6mm;text-align:left}
   #sheet th{background:#EDEDED!important;font-weight:900}
@@ -170,6 +175,7 @@ main{padding:10px 12px 0}
       <button type="button" data-m="in" class="on">담기<em>빨강</em></button>
       <button type="button" data-m="out" class="out">빼기<em>점선</em></button>
     </div>
+    <button type="button" id="edgeBtn" class="edgebtn" aria-pressed="false">테두리만<em>안쪽 채우기 없이 굵은 선</em></button>
     <div class="mapwrap">
       <canvas id="map" width="760" height="700" aria-label="필지 지도"></canvas>
       <div class="mapmode" id="mapMode">
@@ -231,6 +237,7 @@ var VW='https://api.vworld.kr', DATA=VW+'/req/data', API=VW+'/req/address', NED=
 var S={
   key:LS.get('kts_area_vk',null)||VW_KEY,
   mode:'in',                       /* in=담기, out=빼기 */
+  edge:false,                      /* true=테두리만 그리기(안쪽 채우기 없음) */
   view:'line',                     /* line | sat | base */
   V:{cx:127.3669,cy:37.8319,z:16},
   F:{box:null,items:[],busy:false,full:false},
@@ -417,7 +424,7 @@ function render(){
     ctx.font='800 21px system-ui,sans-serif'; ctx.fillStyle='#41597F';
     ctx.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',MAPW/2,MAPH/2+30);
     ctx.textAlign='left';
-    return;
+    return Promise.resolve();
   }
   var jobs=[];
   if(S.view!=='line'){
@@ -430,7 +437,7 @@ function render(){
       (function(tx,ty,mx,my2){ jobs.push(getTile(S.view,tz,mx,my2).then(function(im){ if(im&&my===drawSeq) ctx.drawImage(im,tx*tl-t.x,ty*tl-t.y,tl,tl) })) })(tx,ty,mx,my2);
     }
   }
-  Promise.all(jobs).then(function(){
+  return Promise.all(jobs).then(function(){
     if(my!==drawSeq) return;
     if(S.view==='line'){ ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,MAPW,MAPH) }
     var dark=(S.view!=='line');
@@ -477,7 +484,23 @@ function render(){
       var it=S.sel[S.order[a]]; if(!it) continue;
       var isIn=it.state==='in';
       path(it.rings);
-      if(isIn){
+      if(S.edge){
+        /* 테두리만: 안쪽은 채우지 않고 굵고 선명한 선만 */
+        if(isIn){
+          ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=10; ctx.stroke();
+          ctx.strokeStyle='#FF6B00'; ctx.lineWidth=7; ctx.stroke();
+          ctx.strokeStyle='#FFD24D'; ctx.lineWidth=2.6; ctx.stroke();
+        }else{
+          ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=7; ctx.stroke();
+          ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4; ctx.setLineDash([9,6]); ctx.stroke(); ctx.setLineDash([]);
+          var xb=it.bb||bboxOf(it.rings);
+          var x1=lon2x(xb.minx,z)-t.x, x2=lon2x(xb.maxx,z)-t.x, y1=lat2y(xb.maxy,z)-t.y, y2=lat2y(xb.miny,z)-t.y;
+          var mx1=x1+(x2-x1)*0.28, mx2=x1+(x2-x1)*0.72, my1=y1+(y2-y1)*0.28, my2=y1+(y2-y1)*0.72;
+          ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4.5; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(mx1,my1); ctx.lineTo(mx2,my2); ctx.moveTo(mx2,my1); ctx.lineTo(mx1,my2); ctx.stroke();
+          ctx.lineCap='butt';
+        }
+      }else if(isIn){
         ctx.fillStyle='rgba(226,58,46,.20)'; ctx.fill();
         ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=7; ctx.stroke();
         ctx.strokeStyle='#E23A2E'; ctx.lineWidth=6; ctx.stroke();
@@ -491,7 +514,7 @@ function render(){
         var lab=it.jibun||'';
         ctx.font='900 25px system-ui,sans-serif';
         var w3=ctx.measureText(lab).width;
-        ctx.fillStyle=isIn?'#E23A2E':'#4A5C7A';
+        ctx.fillStyle=isIn?(S.edge?'#FF6B00':'#E23A2E'):'#4A5C7A';
         ctx.fillRect(lx-w3/2-8,ly-17,w3+16,34);
         ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
       }
@@ -666,7 +689,10 @@ function inRings(rings,lon,lat){
 }
 /* 드래그·핀치 */
 (function(){
-  var cv=$('#map'), drag=null, moved=0, pinch=null;
+  var cv=$('#map'), drag=null, moved=0, pinch=null, lastTouchAt=0;
+  var TAP_PX=10, TOUCH_GUARD=450;
+  function isTouchEv(e){ return String(e.type||'').indexOf('touch')===0 }
+  function mouseBlocked(e){ return !isTouchEv(e) && (Date.now()-lastTouchAt)<TOUCH_GUARD }
   function scale(){ return MAPW/cv.getBoundingClientRect().width }
   function pos(e){
     var r=cv.getBoundingClientRect();
@@ -679,13 +705,15 @@ function inRings(rings,lon,lat){
     return {lon:x2lon(t.x+p.x*p.sc,S.V.z),lat:y2lat(t.y+p.y*p.sc,S.V.z)};
   }
   function start(e){
+    if(isTouchEv(e)) lastTouchAt=Date.now(); else if(mouseBlocked(e)) return;
     if(e.touches&&e.touches.length===2){
       var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
       pinch={d:d,z:S.V.z}; drag=null; return;
     }
-    var p=pos(e); drag={x:p.x,y:p.y,lx:p.x,ly:p.y,sc:p.sc,moved:0}; moved=0;
+    var p=pos(e); drag={x:p.x,y:p.y,lx:p.x,ly:p.y,sc:p.sc,moved:0,active:false}; moved=0;
   }
   function move(e){
+    if(isTouchEv(e)) lastTouchAt=Date.now(); else if(mouseBlocked(e)) return;
     if(pinch&&e.touches&&e.touches.length===2){
       e.preventDefault();
       var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
@@ -695,16 +723,24 @@ function inRings(rings,lon,lat){
     if(!drag) return;
     var p=pos(e), dx=p.x-drag.lx, dy=p.y-drag.ly;
     drag.lx=p.x; drag.ly=p.y; drag.moved+=Math.abs(dx)+Math.abs(dy); moved=drag.moved;
-    var t=topLeft();
-    S.V.cx=x2lon(t.x-dx*drag.sc,S.V.z); S.V.cy=y2lat(t.y-dy*drag.sc,S.V.z);
+    /* 10px 미만 손떨림 구간에서는 지도를 움직이지 않는다(좌표 점프 방지) */
+    if(!drag.active){
+      if(drag.moved<TAP_PX){ if(e.cancelable) e.preventDefault(); return }
+      drag.active=true;
+    }
+    /* 현재 중심 좌표 기준으로 이동 */
+    var cxPx=lon2x(S.V.cx,S.V.z), cyPx=lat2y(S.V.cy,S.V.z);
+    S.V.cx=x2lon(cxPx-dx*drag.sc,S.V.z); S.V.cy=y2lat(cyPx-dy*drag.sc,S.V.z);
     render();
     if(e.cancelable) e.preventDefault();
   }
   function end(e){
+    if(isTouchEv(e)) lastTouchAt=Date.now(); else if(mouseBlocked(e)) return;
     if(pinch){ pinch=null; syncRange(true); return }
     if(!drag) return;
-    var wasTap=(drag.moved<7);
-    var p={x:drag.lx,y:drag.ly,sc:drag.sc};
+    var wasTap=(drag.moved<TAP_PX);
+    /* 탭은 처음 누른 좌표로 정확히 집는다 */
+    var p={x:drag.x,y:drag.y,sc:drag.sc};
     drag=null;
     if(wasTap) tap(p);
     else syncRange(false);
@@ -809,8 +845,7 @@ function buildSheet(){
   }
   var totA=0;
   ins.forEach(function(r){ totA+=r.a||0 });
-  var img='';
-  try{ var cv=$('#map'); img=cv.toDataURL('image/png') }catch(e){ img='' }
+  return captureFit().then(function(img){
   var h=[];
   h.push('<div class="sh"><h1>필지 면적 합계표</h1><div class="d">'+todayStr()+' · KTS 원클릭</div></div>');
   h.push('<div class="sum">담은 필지 <b>'+ins.length+'</b>필지 · 합계 <b>'+num(totA,0)+'㎡</b> ('+num(pyeong(totA))+'평)'
@@ -829,11 +864,49 @@ function buildSheet(){
   }
   h.push('<div class="shf">자료 · 브이월드 연속지적도(참고용) · 토지임야정보(토지대장 요약). 이 표는 <b>참고용</b>이며 법적 효력이 없습니다. 법적 면적·경계는 지적공부 원본(정부24)과 담당 관청 확인이 기준입니다.</div>');
   $('#sheet').innerHTML=h.join('');
+  return img;
+  });
+}
+/* 담은 모든 필지가 100% 들어오는 임시 뷰로 1회 렌더 → PNG 추출 → 원래 뷰 복원 */
+function selBox(){
+  var b=null;
+  for(var i=0;i<S.order.length;i++){
+    var it=S.sel[S.order[i]]; if(!it) continue;
+    var bb=it.bb||bboxOf(it.rings); if(!bb) continue;
+    if(!b) b={minx:bb.minx,miny:bb.miny,maxx:bb.maxx,maxy:bb.maxy};
+    else{ b.minx=Math.min(b.minx,bb.minx);b.maxx=Math.max(b.maxx,bb.maxx);
+          b.miny=Math.min(b.miny,bb.miny);b.maxy=Math.max(b.maxy,bb.maxy) }
+  }
+  return b;
+}
+function captureFit(){
+  if(!S.order.length) return Promise.resolve('');
+  var b=selBox(), old={cx:S.V.cx,cy:S.V.cy,z:S.V.z};
+  if(b){
+    var pad=0.25, cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
+    var w=Math.max(b.maxx-b.minx,1e-9)*(1+pad*2), h=Math.max(b.maxy-b.miny,1e-9)*(1+pad*2);
+    var z=19;
+    for(;z>12;z-=0.25){
+      var px=lon2x(cx+w/2,z)-lon2x(cx-w/2,z);
+      var py=lat2y(cy-h/2,z)-lat2y(cy+h/2,z);
+      if(px<MAPW*0.9&&py<MAPH*0.9) break;
+    }
+    S.V={cx:cx,cy:cy,z:Math.max(14,Math.min(19,z))};
+  }
+  return Promise.resolve(render())
+    .then(function(){ return new Promise(function(r){ setTimeout(r,40) }) })
+    .then(function(){
+      var img='';
+      try{ img=$('#map').toDataURL('image/png') }catch(e){ img='' }
+      S.V=old; render();
+      return img;
+    });
 }
 function printSheet(){
   if(!S.order.length){ toast('먼저 필지를 담아 주세요'); return }
-  buildSheet();
-  setTimeout(function(){ try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다') } },80);
+  buildSheet().then(function(){
+    setTimeout(function(){ try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다') } },80);
+  });
 }
 
 /* ---------- 이벤트 ---------- */
@@ -859,6 +932,13 @@ Array.prototype.forEach.call($('#mode').querySelectorAll('button'),function(b){
     b.classList.add('on'); S.mode=b.getAttribute('data-m');
     toast(S.mode==='in'?'누른 필지를 담습니다 (한 번 더 누르면 빠짐)':'누른 필지를 뺍니다 (점선으로 표시)');
   });
+});
+$('#edgeBtn').addEventListener('click',function(){
+  S.edge=!S.edge;
+  this.classList.toggle('on',S.edge);
+  this.setAttribute('aria-pressed',S.edge?'true':'false');
+  render();
+  toast(S.edge?'테두리만 그립니다 (안쪽 채우기 없이 굵은 선)':'면을 채워 그립니다');
 });
 Array.prototype.forEach.call($('#mapMode').querySelectorAll('button'),function(b){
   b.addEventListener('click',function(){
@@ -923,7 +1003,8 @@ if(pq){
 }else{
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
-window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z} };
+window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge} };
+window.__KTS_SHEET=function(){ return buildSheet() };
 })();
 </script>
 <script src="/shared/pwa-install.js?v=20261127" data-name="면적 그리기" data-start="/area/" data-manifest="/shared/pwa/area.webmanifest" defer></script>
