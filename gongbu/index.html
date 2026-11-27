@@ -874,7 +874,7 @@ function paperInner(b,forPrint){
     fl=fl.slice().sort(function(a,b){
       var da=String(a.dongNm||'').trim(), db=String(b.dongNm||'').trim();
       if(da!==db) return da.localeCompare(db,'ko');
-      var fa=(+a.flrGbCd||0)*1000-(+a.flrNo||0), fb=(+b.flrGbCd||0)*1000-(+b.flrNo||0);
+      var fa=(+a.flrGbCd||0)*1000+(+a.flrNo||0), fb=(+b.flrGbCd||0)*1000+(+b.flrNo||0);
       if(fa!==fb) return fa-fb;
       return String(a.flrNoNm||'').localeCompare(String(b.flrNoNm||''),'ko');
     });
