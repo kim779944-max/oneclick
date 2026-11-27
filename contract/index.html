@@ -347,7 +347,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
   </div>
   <div class="tl2">부수</div>
   <div class="seg" id="cpSeg"><button data-cp="1">1부</button><button data-cp="2">2부</button><button data-cp="3">3부</button></div>
-  <div class="tl2">함께 붙이는 서류 <em style="font-style:normal;font-size:10px;color:#C9D6E6;font-weight:800;margin-left:4px">체크하면 적은 값 그대로 뒤에 붙습니다</em></div>
+  <div class="tl2" id="docTitle">함께 붙이는 서류 <em style="font-style:normal;font-size:10px;color:#C9D6E6;font-weight:800;margin-left:4px">체크하면 적은 값 그대로 뒤에 붙습니다</em></div>
   <div class="docs" id="docBox">
    <label id="docConfirmL"><input type="checkbox" id="docConfirm"><span>중개대상물 확인설명서<em id="docConfirmV">주소·지목·면적·금액·중개업자를 자동으로 적습니다</em></span></label>
    <label id="docFeeL"><input type="checkbox" id="docFee"><span>중개보수 영수증<em id="docFeeV">거래금액과 중개보수를 자동으로 계산해 적습니다</em></span></label>
@@ -933,9 +933,10 @@ async function compositeAll(maxW){
   for (let p = 1; p <= n; p++) out.push(await composite(maxW, p));
   /* 248 — 다필지면 별지, 체크한 서류면 확인설명서·영수증을 뒤에 붙인다 */
   try{ appendixCanvases(maxW).forEach(c => out.push(c)); }catch(e){ console.warn('appendix', e); }
+  const isProp = curForm().fields.some(isPropField) || ['sale', 'exchange', 'exbroker', 'lease', 'house', 'shop'].indexOf(curForm().id) >= 0;
   try{
-    if (S.docs && S.docs.confirm) out.push(docConfirmCanvas(maxW));
-    if (S.docs && S.docs.fee) out.push(docFeeCanvas(maxW));
+    if (isProp && S.docs && S.docs.confirm) out.push(docConfirmCanvas(maxW));
+    if (isProp && S.docs && S.docs.fee) out.push(docFeeCanvas(maxW));
   }catch(e){ console.warn('docs', e); }
   return out;
 }
@@ -1483,7 +1484,7 @@ function go(n, noPush){
   $('#nextBtn').textContent = (n === 0) ? '작성 시작' : '인쇄 · PDF';
   if (n === 1){ renderWrite(); }
   if (n === 0){ renderPick(); renderSheet(); }
-  if (n === 2){ syncSpecial(); renderOpts(); renderSigns(); renderPreview(); renderCp(); renderSeal(); }
+  if (n === 2){ syncSpecial(); renderOpts(); renderSigns(); renderPreview(); renderCp(); renderSeal(); syncDocVis(); }
   const lg = $('#legalTop'); if (lg) lg.style.display = (n === 0) ? '' : 'none';
   window.scrollTo(0, 0);
   if (!noPush){ try{ const st = {kc:S.step};
@@ -1496,6 +1497,15 @@ window.addEventListener('popstate', e => {
 });
 function renderCp(){
   $$('#cpSeg button').forEach(b => b.classList.toggle('on', (+b.dataset.cp) === (+S.cp || 1)));
+}
+/* 248 — 부동산 건에서만 필지·중개서류를 보여 준다 */
+function isPropDocForm(){ const f = curForm(); return !!(f && (f.fields.some(isPropField) || ['sale', 'exchange', 'exbroker', 'lease', 'house', 'shop', 'power'].indexOf(f.id) >= 0)); }
+function syncDocVis(){
+  const on = isPropDocForm();
+  const dbox = $('#docBox'), dttl = $('#docTitle'), pc = $('#wsecPcl');
+  if (dbox) dbox.style.display = on ? '' : 'none';
+  if (dttl) dttl.style.display = on ? '' : 'none';
+  if (pc) pc.style.display = on ? '' : 'none';
 }
 
 /* ---------- 입력 처리 ---------- */
@@ -1853,6 +1863,8 @@ function renderWrite(){
   const f = curForm();
   const xs = f.fields.filter(x => x.grp === 'x' && x.type !== 'sign');
   const prop = xs.filter(isPropField);
+  /* 248 — 부동산 건이 아니면 필지·별지·중개서류를 감춘다 */
+  syncDocVis();
   const money = xs.filter(x => !isPropField(x) && !isDateField(x));
   $('#propFields').innerHTML = prop.map(x => fldHtml(x)).join('');
   $('#moneyFields').innerHTML = money.map(x => fldHtml(x)).join('');
@@ -2584,6 +2596,8 @@ function a4fill(o, x, y, w, h, color){
   const g = o.g; g.fillStyle = color || '#EFEFEF'; g.fillRect(x * o.k, y * o.k, w * o.k, h * o.k);
 }
 function appendixCanvases(maxW){
+  const f = curForm();
+  if (!(f.fields.some(isPropField) || ['sale', 'exchange', 'exbroker', 'lease', 'house', 'shop'].indexOf(f.id) >= 0)) return [];
   const list = pclList().filter(p => String(p.addr || '').trim() || +p.area);
   if (list.length < 2) return [];
   const per = 12, out = [];
