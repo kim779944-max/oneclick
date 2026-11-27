@@ -69,6 +69,8 @@ main{padding:10px 12px 0}
 .mapmode{position:absolute;left:7px;top:7px;display:flex;gap:4px;z-index:3}
 .mapmode button{border:1px solid rgba(255,255,255,.32);background:rgba(8,16,34,.8);color:#E8EEF8;border-radius:8px;padding:5px 8px;font-size:10.5px;font-weight:900;cursor:pointer}
 .mapmode button.on{background:var(--amber);border-color:var(--amber);color:#0A1224}
+.mapmode button.tg{margin-left:4px;border-color:rgba(255,162,77,.6);color:#FFD9B8}
+.mapmode button.tg.on{background:var(--amber);border-color:var(--amber);color:#0A1224}
 .mapst{position:absolute;left:7px;bottom:7px;z-index:3;background:rgba(8,16,34,.82);border:1px solid rgba(255,255,255,.2);border-radius:8px;
  padding:3px 7px;font-size:10px;font-weight:800;color:#E8EEF8;max-width:78%}
 .legend{display:flex;gap:10px;align-items:center;margin-top:7px;font-size:10.5px;font-weight:800;color:var(--ink2);flex-wrap:wrap}
@@ -183,6 +185,7 @@ main{padding:10px 12px 0}
         <button type="button" data-v="line" class="on">지적도</button>
         <button type="button" data-v="sat">위성</button>
         <button type="button" data-v="base">일반</button>
+        <button type="button" id="numBtn" class="tg" aria-pressed="false" aria-label="지번 표시·숨김 전환" title="지번 표시·숨김 전환">지번 표시</button>
       </div>
       <div class="mapbar">
         <button type="button" id="zin" aria-label="확대">+</button>
@@ -240,6 +243,7 @@ var S={
   mode:'in',                       /* in=담기, out=빼기 */
   edge:false,                      /* true=테두리만 그리기(안쪽 채우기 없음) */
   view:'line',                     /* line | sat | base */
+  hideNum:false,                   /* true=지도·인쇄에서 지번 라벨을 그리지 않음 */
   V:{cx:127.3669,cy:37.8319,z:16},
   F:{box:null,items:[],busy:false,full:false},
   sel:{},                          /* pnu -> item */
@@ -504,9 +508,9 @@ function render(){
       ctx.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)';
       ctx.lineWidth=1.2; ctx.stroke();
     }
-    /* 2) 지번 라벨 */
+    /* 2) 지번 라벨 (지번 숨김 상태면 그리지 않는다) */
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    for(var k=0;k<items.length;k++){
+    if(!S.hideNum) for(var k=0;k<items.length;k++){
       var g=items[k]; if(!g.jibun) continue;
       if(S.sel[g.pnu]) continue;            /* 담은 필지는 아래에서 빨강 라벨로 한 번만 */
       var bb=g.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
@@ -559,7 +563,7 @@ function render(){
     }
     /* 3-2) 담은·뺀 필지의 지번 (테두리만 모드는 색 박스 없이 배경과 같은 얇은 글씨) */
     ctx.font='900 25px system-ui,sans-serif';
-    for(var a2=0;a2<S.order.length;a2++){
+    if(!S.hideNum) for(var a2=0;a2<S.order.length;a2++){
       var it2=S.sel[S.order[a2]]; if(!it2) continue;
       var isIn2=it2.state==='in';
       var bc=centroid(it2.rings);
@@ -1020,9 +1024,9 @@ $('#edgeBtn').addEventListener('click',function(){
   render();
   toast(S.edge?'테두리만: 담은 필지 전체의 바깥 빨간 선만 그립니다':'면을 채워 그립니다');
 });
-Array.prototype.forEach.call($('#mapMode').querySelectorAll('button'),function(b){
+Array.prototype.forEach.call($('#mapMode').querySelectorAll('button[data-v]'),function(b){
   b.addEventListener('click',function(){
-    Array.prototype.forEach.call($('#mapMode').querySelectorAll('button'),function(x){x.classList.remove('on')});
+    Array.prototype.forEach.call($('#mapMode').querySelectorAll('button[data-v]'),function(x){x.classList.remove('on')});
     b.classList.add('on'); S.view=b.getAttribute('data-v'); tileCache={}; render();
   });
 });
@@ -1030,6 +1034,14 @@ $('#list').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('button[data-p]'):null;
   if(!b) return;
   selSet(b.getAttribute('data-p'),b.getAttribute('data-a'));
+});
+$('#numBtn').addEventListener('click',function(){
+  S.hideNum=!S.hideNum;
+  this.classList.toggle('on',S.hideNum);
+  this.setAttribute('aria-pressed',S.hideNum?'true':'false');
+  this.textContent=S.hideNum?'지번 숨김':'지번 표시';
+  render();
+  toast(S.hideNum?'지번을 숨겼습니다':'지번을 표시합니다');
 });
 $('#zin').addEventListener('click',function(){ zoomBy(0.6) });
 $('#zout').addEventListener('click',function(){ zoomBy(-0.6) });
@@ -1083,7 +1095,7 @@ if(pq){
 }else{
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
-window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,cx:S.V.cx,cy:S.V.cy} };
+window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,hideNum:!!S.hideNum,cx:S.V.cx,cy:S.V.cy} };
 window.__KTS_SHEET=function(){ return buildSheet() };
 window.__KTS_HIT=function(cx,cy){ var r=MAPW/$('#map').getBoundingClientRect().width, t=topLeft();
   var f=hitTest(x2lon(t.x+cx*r,S.V.z),y2lat(t.y+cy*r,S.V.z)); return f?{jibun:f.jibun,pnu:f.pnu}:null };
