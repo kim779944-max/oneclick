@@ -233,7 +233,7 @@
     h += '<div class="biz' + (hasPhoto ? '' : ' nophoto') + '">';
     /* 직인 도장 QR — 이름이 가운데 박힌 도장. 누르면 크게 보기 */
     h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="직인 도장 QR 크게 보기">'
-      + '<canvas id="sealCv"></canvas><span class="seal-lbl">QR</span></button>';
+      + '<canvas id="sealCv"></canvas></button>';
     h += '<div class="biz-row">';
     if (hasPhoto) {
       h += '<div class="av"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
@@ -330,7 +330,9 @@
   }
   function paintSeal(cv, size) {
     if (!cv || !g.KTS || !KTS.Seal) return;
-    try { KTS.Seal.paint(cv, size, sealOpts()) } catch (e) { }
+    /* 명함 위 도장은 세로가 길어지지 않게 — 타원은 가로를 줄여 높이를 92px 안에 맞춘다 */
+    var s2 = sealShape() === 'oval' ? Math.round(size * 0.76) : size;
+    try { KTS.Seal.paint(cv, s2, sealOpts()) } catch (e) { }
   }
   function openSeal() {
     var box = $('#sealBox'); if (!box) return;
