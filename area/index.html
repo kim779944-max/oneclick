@@ -126,12 +126,12 @@ main{padding:10px 12px 0}
   #sheet .sh .d{font-size:9pt}
   #sheet .sum{margin:0 0 3mm;font-size:11pt}
   #sheet .sum b{font-size:14pt}
-  #sheet img{width:100%;max-height:92mm;object-fit:contain;border:1px solid #000;margin:0 0 3mm}
+  #sheet img{width:auto;max-width:100%;max-height:86mm;display:block;margin:0 auto 3mm;border:1px solid #000}
   #sheet table{width:100%;border-collapse:collapse;font-size:9.5pt}
   #sheet th,#sheet td{border:1px solid #000;padding:1.1mm 1.6mm;text-align:left}
   #sheet th{background:#EDEDED!important;font-weight:900}
   #sheet td.n{text-align:right;font-variant-numeric:tabular-nums}
-  #sheet tr.tot td{font-weight:900;background:#F4F4F4!important}
+  #sheet tr.stot td{font-weight:900;background:#F4F4F4!important}
   #sheet .shf{margin-top:2.5mm;font-size:8.5pt;border-top:1px solid #000;padding-top:1.5mm}
 }
 </style></head>
@@ -822,7 +822,7 @@ function buildSheet(){
     h.push('<tr><td>'+esc(r.jibun)+'</td><td>'+esc(r.jmok)+'</td><td class="n">'+num(r.a,0)+'</td><td class="n">'+num(pyeong(r.a))+'</td></tr>');
   });
   if(ins.length>LIM) h.push('<tr><td colspan="4">외 '+(ins.length-LIM)+'필지</td></tr>');
-  h.push('<tr class="tot"><td>합계 '+ins.length+'필지</td><td></td><td class="n">'+num(totA,0)+'</td><td class="n">'+num(pyeong(totA))+'</td></tr>');
+  h.push('<tr class="stot"><td>합계 '+ins.length+'필지</td><td></td><td class="n">'+num(totA,0)+'</td><td class="n">'+num(pyeong(totA))+'</td></tr>');
   h.push('</tbody></table>');
   if(outs.length){
     h.push('<p style="margin:2.5mm 0 0;font-size:9pt">제외 필지: '+outs.map(function(r){return esc(r.jibun)+'('+num(r.a,0)+'㎡)'}).join(' · ')+'</p>');

@@ -93,6 +93,7 @@ canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0
 .onebtn{flex:1;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border-radius:11px;border:1px solid rgba(255,107,0,.55);
  background:rgba(255,107,0,.12);color:#FFC894;font-size:12px;font-weight:900;padding:0 10px;cursor:pointer;text-align:center;letter-spacing:-.3px}
 .onebtn:active{transform:translateY(1px)}
+.btnrow .onebtn.w{flex:1 1 100%}
 /* ── 정부24 서식 표(종이) ── */
 .paper{background:#fff;border-radius:10px;padding:10px 9px;margin-top:9px;color:#000;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .paper .ph{display:flex;align-items:baseline;gap:6px;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:6px}
@@ -242,7 +243,7 @@ canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0
     <h2><i>⑤</i>상권 권리분석<small>카드매출·수익형</small></h2>
     <div class="rows" id="sangHead"><div class="row"><div class="k">주소</div><div class="v">주소를 넣으면 이 자리 기준으로 열립니다</div></div></div>
     <div class="btnrow">
-      <button class="onebtn" id="bNice" type="button">나이스비즈맵 카드매출 — 주소 복사하고 열기</button>
+      <button class="onebtn w" id="bNice" type="button">나이스비즈맵 카드매출 — 주소 복사하고 열기</button>
       <button class="btn" id="bSbiz" type="button">소상공인365 상권</button>
     </div>
     <div class="two">
