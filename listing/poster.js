@@ -144,7 +144,7 @@
     var locBits = [];
     if (fa.behind) locBits.push('배후 상권: ' + fa.behind);
     if (L.floors) locBits.push('규모: ' + L.floors);
-    if (L.site || fa.site) locBits.push('대지 ' + (fa.site || L.site) + ' · 연면적 ' + (fa.gross || fa.gross || '미확인'));
+    if (L.site || fa.site) locBits.push('대지 ' + (fa.site || L.site) + ' · 연면적 ' + (fa.gross || L.gross || '미확인'));
     if (L.moveIn) locBits.push('입주: ' + L.moveIn);
     locBits.push('상세 입지는 현장 확인 후 한 줄씩 고쳐 주세요');
     $('#p-loc').innerHTML = locBits.map(function (t) {
