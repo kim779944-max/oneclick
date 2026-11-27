@@ -106,7 +106,7 @@
   }
 
   /* ---------------- 불러오기 ---------------- */
-  var DEMO_PHOTOS = ['img/ex3.jpg', 'img/ex4.jpg', 'img/ex2.jpg'];
+  var DEMO_PHOTOS = ['../bizcard/img/sample_land.jpg', 'img/ex4.jpg', '../bizcard/img/sample_house.jpg'];
 
   function sample() {
     DEMO_PHOTOS.forEach(function (p, i) { setPhoto(i, p) });
@@ -182,7 +182,8 @@
     return out.length ? out : [''];
   }
 
-  function drawPoster(scale) {
+  function drawPoster(scale, fill) {
+    fill = fill || 0;
     var c = drawPoster.cv;
     var ctx = c.getContext('2d');
     var m = model();
@@ -251,7 +252,7 @@
     ctx.fillStyle = 'rgba(15,27,45,.9)'; ctx.fillRect(pad, y + phH - 28 * S, 104 * S, 28 * S);
     ctx.fillStyle = '#fff'; ctx.font = f(14 * S, 900);
     ctx.fillText('① 현장 사진', pad + 10 * S, y + phH - 9 * S);
-    y += phH + 12 * S;
+    y += phH + 12 * S + fill;
 
     /* ---- 핵심 4칸 ---- */
     var kw = (availW - 3 * 8 * S) / 4, kh = 78 * S;
@@ -268,7 +269,7 @@
       while (ctx.measureText(val).width > kw - 24 * S && val.length > 2) val = val.slice(0, -2) + '…';
       ctx.fillText(val, x + 12 * S, y + 58 * S);
     });
-    y += kh + 16 * S;
+    y += kh + 16 * S + fill;
 
     /* ---- 섹션 머리 ---- */
     function secHead(num, title, note) {
@@ -319,17 +320,17 @@
     /* ---- ② 4대 공부 ---- */
     secHead('②', '4대 공부', '(토지대장 · 건축물대장 · 등기부 · 토지이용계획)');
     table(m.gongbu);
-    y += 14 * S;
+    y += 14 * S + fill;
 
     /* ---- ③ 입지 정보 ---- */
     secHead('③', '입지 정보');
     bullets(m.loc);
-    y += 10 * S;
+    y += 10 * S + fill;
 
     /* ---- ④ 권리 분석 ---- */
     secHead('④', '권리 분석');
     bullets(m.right);
-    y += 10 * S;
+    y += 10 * S + fill;
 
     /* ---- ⑤ 주변 실거래가 ---- */
     secHead('⑤', '주변 실거래가', '(국토부 실거래 공개 기준 · 최근 6개월)');
@@ -365,7 +366,7 @@
     ctx.fillStyle = C.navy; ctx.fillRect(0, fy, W, H - fy);
     /* 직인 */
     try {
-      var sealSize = 150 * S;
+      var sealSize = 200 * S;
       var sc = document.createElement('canvas');
       KTS.Seal.paint(sc, sealSize, sealOpts());
       var sh = sealSize * sc.height / Math.max(1, sc.width);
@@ -391,13 +392,19 @@
     var cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     drawPoster.cv = cv;
-    var scale = 1;
+    var scale = 1, fill = 0;
     for (var i = 0; i < 9; i++) {
-      drawPoster(scale);
+      drawPoster(scale, fill);
       /* 본문 끝이 발(footer) 자리를 넘으면 글자를 줄여 다시 그린다 */
       if (drawPoster.lastContent <= H - 186 * scale - M) break;
-      scale -= 0.045;
+      fill = 0; scale -= 0.045;
       if (scale < 0.68) break;
+    }
+    /* 내용이 짧아 아래가 비면 섹션 사이 여백을 고르게 늘려 A4를 채운다 */
+    var rest = (H - 186 * scale - M) - drawPoster.lastContent;
+    if (rest > 24) {
+      fill = Math.min(46, Math.round(rest / 6));
+      drawPoster(scale, fill);
     }
     return cv;
   }

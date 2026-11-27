@@ -114,7 +114,8 @@
     var qr = G.qr;
     var m = qr / (n + QZ * 2);                 /* 1모듈 크기 */
     /* 모듈을 픽셀에 맞춰 또렷하게 (스캔률) */
-    var mR = Math.max(1, Math.floor(m * 4) / 4);
+    /* 작은 크기에서도 모서리가 뭉개지지 않게 모듈을 픽셀에 맞춘다 */
+    var mR = m >= 4 ? Math.floor(m) : Math.max(1, Math.floor(m * 2) / 2);
     var span = mR * (n + QZ * 2);
     var qx = Math.round(G.cx - span / 2);
     var qy = Math.round(G.cy - span / 2);

@@ -530,18 +530,10 @@
       var nameSize = img ? 74 : 86;
       var nameY = top + (img ? 76 : 80);
       x.textAlign = 'left'; x.fillStyle = '#ffffff'; x.font = font(nameSize, 900);
-      x.fillText(text(me.name || '이름'), tx, nameY, wText - (img ? 0 : 150));
+      x.fillText(text(me.name || '이름'), tx, nameY, wText);
 
-      /* 사진이 없으면 — 이름 옆 금색 모노그램 도장 */
-      if (!img) {
-        var cx = right - 48, cy = nameY - 28, rad = 46;
-        x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2);
-        x.fillStyle = 'rgba(226,186,122,.12)'; x.fill();
-        x.strokeStyle = 'rgba(226,186,122,.62)'; x.lineWidth = 2.5; x.stroke();
-        x.textAlign = 'center'; x.fillStyle = '#f2d8a8'; x.font = font(44, 900);
-        x.fillText(text(me.name || '?').slice(0, 1), cx, cy + 16);
-        x.textAlign = 'left';
-      }
+      /* 사진이 없으면 이름이 폭을 넓게 쓴다 — 도장은 아래 띠에 크게 찍힌다 */
+      if (!img) { x.textAlign = 'left'; }
 
       /* 소속 · 직함 */
       var y = nameY + 46;
