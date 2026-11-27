@@ -496,10 +496,13 @@ function render(){
           ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4; ctx.setLineDash([9,6]); ctx.stroke(); ctx.setLineDash([]);
           var xb=it.bb||bboxOf(it.rings);
           var x1=lon2x(xb.minx,z)-t.x, x2=lon2x(xb.maxx,z)-t.x, y1=lat2y(xb.maxy,z)-t.y, y2=lat2y(xb.miny,z)-t.y;
-          var mx1=x1+(x2-x1)*0.28, mx2=x1+(x2-x1)*0.72, my1=y1+(y2-y1)*0.28, my2=y1+(y2-y1)*0.72;
-          ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4.5; ctx.lineCap='round';
-          ctx.beginPath(); ctx.moveTo(mx1,my1); ctx.lineTo(mx2,my2); ctx.moveTo(mx2,my1); ctx.lineTo(mx1,my2); ctx.stroke();
-          ctx.lineCap='butt';
+          /* 지번 라벨이 들어갈 만큼 큰 필지에만 X 표시(작은 필지는 빨간 점선만) */
+          if((x2-x1)>130&&(y2-y1)>80){
+            var mx1=x1+(x2-x1)*0.24, mx2=x1+(x2-x1)*0.76, my1=y1+(y2-y1)*0.24, my2=y1+(y2-y1)*0.76;
+            ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4.5; ctx.lineCap='round';
+            ctx.beginPath(); ctx.moveTo(mx1,my1); ctx.lineTo(mx2,my2); ctx.moveTo(mx2,my1); ctx.lineTo(mx1,my2); ctx.stroke();
+            ctx.lineCap='butt';
+          }
         }
       }else if(isIn){
         ctx.fillStyle='rgba(226,58,46,.20)'; ctx.fill();
@@ -513,10 +516,14 @@ function render(){
       var lx=lon2x(bc[0],z)-t.x, ly=lat2y(bc[1],z)-t.y;
       if(lx>-40&&lx<MAPW+40&&ly>-30&&ly<MAPH+30){
         var lab=it.jibun||'';
-        ctx.font='900 25px system-ui,sans-serif';
+        var lb=it.bb||bboxOf(it.rings), bw=lon2x(lb.maxx,z)-lon2x(lb.minx,z), bh=lat2y(lb.miny,z)-lat2y(lb.maxy,z);
+        var fs=25; ctx.font='900 '+fs+'px system-ui,sans-serif';
         var w3=ctx.measureText(lab).width;
+        /* 필지 폭보다 라벨이 넓으면 이웃 라벨과 겹치므로 폭에 맞게 줄인다 */
+        if(bw>34&&bh>18){ while(fs>13&&w3+14>bw){ fs-=2; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width } }
+        var bh2=Math.round(fs*1.35);
         ctx.fillStyle=isIn?(S.edge?'#FF6B00':'#E23A2E'):'#4A5C7A';
-        ctx.fillRect(lx-w3/2-8,ly-17,w3+16,34);
+        ctx.fillRect(lx-w3/2-7,ly-bh2/2,w3+14,bh2);
         ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
       }
     }
