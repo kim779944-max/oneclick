@@ -709,7 +709,9 @@ function paintDTab(n){
 /* 공개 데이터 표 — 추진단계·인가일·구역면적·세대수·소유자·조합원·연락처 (없으면 숨기지 않고 '공개자료 없음') */
 function latestDate(r){
   var d=r.dt||{}, best='', lab='';
-  DATE_KEYS.forEach(function(k,i){ if(d[k] && (!best || String(d[k])>best)){ best=String(d[k]); lab=DATE_LABELS[i]; } });
+  /* 인가일 = 구역지정·추진위·조합설립·사업시행·관리처분 (이주·착공은 인가가 아님) */
+  DATE_KEYS.forEach(function(k,i){ if(i>4) return; if(d[k] && (!best || String(d[k])>best)){ best=String(d[k]); lab=DATE_LABELS[i]; } });
+  if(!best) DATE_KEYS.forEach(function(k,i){ if(d[k] && (!best || String(d[k])>best)){ best=String(d[k]); lab=DATE_LABELS[i]; } });
   return best ? {val:best, lab:lab} : null;
 }
 function specHTML(r){
@@ -738,9 +740,10 @@ function consentHTML(r){
     : r.__tab==='seoul' ? 'https://cleanup.seoul.go.kr/cleanup/bsnsstus/lscrMainIndx.do'
     : r.__tab==='gyeonggi' ? 'https://data.gg.go.kr/'
     : 'https://www.data.go.kr/data/15160169/fileData.do';
+  var src = r.__tab==='seoul' ? '정보몽땅 사업개요' : r.__tab==='gyeonggi' ? '경기데이터드림·구청 고시' : '국토부 통합데이터·구청 고시';
   return '<div class="nonebox"><div class="nh">동의율 <b>공개자료 없음</b></div>'+
-    '<p>추진위원회·조합 <b>동의율</b>은 공개 데이터에 들어 있지 않습니다. <b>정보몽땅 사업개요 원문</b>에서 확인하세요.</p>'+
-    '<a href="'+href+'" target="_blank" rel="noopener">정보몽땅 원문 바로가기 →</a></div>';
+    '<p>추진위원회·조합 <b>동의율</b>은 공개 데이터에 들어 있지 않습니다. <b>'+src+' 원문</b>에서 확인하세요.</p>'+
+    '<a href="'+href+'" target="_blank" rel="noopener">'+src+' 원문 바로가기 →</a></div>';
 }
 function priceHTML(r){
   var addr=addrOf(r), priceQ=encodeURIComponent(addr);
