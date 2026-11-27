@@ -93,6 +93,7 @@
   /* 카드 → 매물장 */
   .card .go2{margin-top:9px; width:100%; min-height:40px; border:1px solid rgba(255,107,0,.5); background:rgba(255,107,0,.1); color:var(--orange-soft); border-radius:9px; font-size:12.5px; font-weight:800}
   .card .go2:active{background:rgba(255,107,0,.22)}
+  .card .go2.ghost{background:transparent; border-color:rgba(255,255,255,.28); color:#cfd9e8; margin-top:6px}
   /* 이어서 쓰기 — 매물장 · 4대 공부 · 전자명함 · 5초 계약서 */
   .next{margin:4px 0 14px}
   .next .hd{display:flex; align-items:baseline; gap:8px; margin-bottom:8px}
@@ -603,6 +604,10 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     if(x.area) o.facts.gross = x.area;
     return o;
   }
+  function handPoster(x){
+    try { sessionStorage.setItem("kts_poster_hand", JSON.stringify(toListing(x))); } catch(e){}
+    location.href = "../listing/poster.html?from=realty";
+  }
   function handTo(x){
     try { sessionStorage.setItem("kts_realty_hand", JSON.stringify(toListing(x))); }
     catch(e){ say("이 브라우저에서는 넘길 수 없습니다. JSON으로 복사해 [매물장 만들기]에 붙여넣어 주세요.", true); return; }
@@ -639,6 +644,12 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     go2.type = "button";
     go2.onclick = function(){ handTo(x); };
     c.appendChild(go2);
+
+    /* 물건 포스터(260번) — 사진·4대 공부·입지·권리·실거래가 A4 한 장 */
+    var go3 = el("button", "go2 ghost", "물건 포스터 (A4) →");
+    go3.type = "button";
+    go3.onclick = function(){ handPoster(x); };
+    c.appendChild(go3);
     return c;
   }
 

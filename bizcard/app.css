@@ -395,3 +395,71 @@ img{display:block;max-width:100%}
   max-width:88vw;padding:11px 15px;border-radius:12px;background:rgba(20,31,56,.98);border:1px solid var(--line2);
   color:var(--ink);font-size:12.5px;font-weight:700;line-height:1.45;opacity:0;pointer-events:none;transition:.22s;z-index:120;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ==========================================================================
+   250번 — 직인 도장 QR · 전화번호 상단 노출 · 4버튼(명함저장)
+   ========================================================================== */
+/* 명함 위 도장 — 오른쪽 위, 흰 바탕이라 스캔 여백이 산다 */
+.biz-stamp{position:absolute;right:8px;top:8px;z-index:3;width:88px;padding:0;border:0;background:none;
+  display:block;border-radius:50%;line-height:0;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.45))}
+.biz-stamp canvas{display:block;width:88px;height:auto;border-radius:50%}
+.biz-stamp .seal-lbl{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);
+  font-size:8.5px;font-weight:900;letter-spacing:1px;color:#e2ba7a;line-height:1}
+.biz-stamp:active{transform:scale(.97)}
+.biz .who{padding-right:96px}
+.biz.nophoto .who{padding-right:96px}
+/* 전화번호 — 버튼을 누르지 않아도 바로 보이게 */
+.biz-tel{display:inline-block;margin-top:5px;font-size:16.5px;font-weight:900;letter-spacing:.4px;
+  color:#ffffff;text-decoration:none;line-height:1.15;font-variant-numeric:tabular-nums;
+  border-bottom:1px solid rgba(226,186,122,.5);padding-bottom:1px}
+.biz-tel em{font-style:normal;font-size:12px;font-weight:800;color:#f2d8a8;border:0}
+.biz.nophoto .biz-tel{font-size:18px;margin-top:6px}
+.biz-row{position:relative;z-index:1;display:flex;gap:11px;align-items:flex-start}
+/* 역할·인사말은 남색 바탕에서도 또렷하게(흐린 회색 금지) */
+.biz .who .role{color:#dbe4f2;font-weight:700}
+.biz .medals .edge{color:#efdfbd}
+.biz .intro{color:#dfe7f3}
+/* 4번째 버튼 = 명함저장 */
+.pact.save{border-color:rgba(226,186,122,.55);background:rgba(226,186,122,.14);color:#ffe3b0}
+/* 바탕화면 — 작은 줄 하나로(설치했으면 아예 안 뜬다) */
+.inst-row{display:flex;align-items:center;gap:7px;margin:7px 1px 0;position:relative;z-index:1;flex-wrap:wrap}
+.inst-mini{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 9px;border-radius:8px;
+  border:1px dashed rgba(226,186,122,.5);background:rgba(226,186,122,.07);color:#edd4a5;
+  font-size:10px;font-weight:900;text-decoration:none}
+.inst-mini svg{width:11px;height:11px}
+.inst-row .inst-tip{margin:0;font-size:10px;color:#cbb68f;gap:3px;flex:1;min-width:0}
+.inst-row .inst-tip svg{width:10px;height:10px}
+
+/* 직인 크게 보기 */
+#sealBox{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:16px;
+  background:rgba(4,8,18,.78);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#sealBox[hidden]{display:none}
+.seal-card{width:100%;max-width:390px;background:#101a31;border:1px solid var(--line2);border-radius:18px;
+  padding:12px 14px calc(14px + env(safe-area-inset-bottom));animation:up .2s ease}
+.seal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.seal-h b{font-size:14px;letter-spacing:-.3px;color:#eef3fb}
+.seal-stage{display:grid;place-items:center;background:#fff;border-radius:14px;padding:12px;min-height:200px}
+.seal-stage canvas{display:block;max-width:100%;height:auto}
+.seal-note{margin:9px 2px 11px;font-size:11.5px;line-height:1.5;color:#c7d2e4;text-align:center}
+.seal-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seal-acts .btn.sm{min-height:44px;font-size:13px}
+
+/* 고치기 — 직인 모양 고르기 */
+.seal-set{margin-top:12px;padding:12px;border:1px solid var(--line2);border-radius:14px;background:#16213a}
+.ss-h{display:flex;align-items:baseline;gap:7px;margin-bottom:9px}
+.ss-h b{font-size:13px;color:#eef3fb;letter-spacing:-.3px}
+.ss-h em{font-style:normal;font-size:10.5px;color:#c7d2e4}
+.seal-shapes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ss-btn{display:flex;flex-direction:column;align-items:center;gap:5px;min-height:64px;justify-content:center;
+  border:1px solid var(--line2);border-radius:11px;background:#0f1a31;color:#cfd9e8;font-size:11.5px;font-weight:800}
+.ss-btn.on{border-color:rgba(226,186,122,.85);background:rgba(226,186,122,.13);color:#ffe3b0}
+.ss-ico{width:26px;height:26px;border:2px solid currentColor;display:block}
+.ss-ico.circle{border-radius:50%}
+.ss-ico.square{border-radius:5px}
+.ss-ico.oval{width:22px;height:30px;border-radius:50%}
+.seal-prev{display:grid;place-items:center;margin-top:10px;background:#fff;border-radius:12px;padding:10px;min-height:150px}
+.seal-prev canvas{display:block;max-width:100%;height:auto}
+.seal-kind{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:11.5px;color:#c7d2e4}
+.seal-kind select{min-height:44px;border-radius:9px;border:1px solid var(--line2);background:#0b1428;
+  color:var(--ink);font:inherit;font-size:13px;padding:0 10px}

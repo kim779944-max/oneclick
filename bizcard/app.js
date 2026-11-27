@@ -6,7 +6,8 @@
   'use strict';
 
   var K = { me: 'kts_bc_me', items: 'kts_bc_items', plan: 'kts_bc_plan', seen: 'kts_bc_seen',
-            inq: 'kts_bc_inq', tip: 'kts_bc_tip', kb: 'kts_bc_kakaobar', shared: 'kts_bc_shared' };
+            inq: 'kts_bc_inq', tip: 'kts_bc_tip', kb: 'kts_bc_kakaobar', shared: 'kts_bc_shared',
+            inst: 'kts_bc_installed' };
 
   /* ---------------- 기본 도구 ---------------- */
   var $ = function (s, r) { return (r || document).querySelector(s) };
@@ -227,22 +228,26 @@
     var tel = (me.phone || '').replace(/[^0-9+]/g, '');
 
     var h = '';
-    /* ① 명함 — 종이 명함 한 장 비율. 사진이 없으면 빈 칸 없이 글자·모노그램이 꽉 차게 */
+    /* ① 명함 — 종이 명함 한 장 비율. 사진이 없으면 빈 칸 없이 글자·직인이 꽉 차게 */
     var hasPhoto = !!me.photo;
     h += '<div class="biz' + (hasPhoto ? '' : ' nophoto') + '">';
-    h += '<span class="biz-mark">KTS</span>';
+    /* 직인 도장 QR — 이름이 가운데 박힌 도장. 누르면 크게 보기 */
+    h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="직인 도장 QR 크게 보기">'
+      + '<canvas id="sealCv"></canvas><span class="seal-lbl">QR</span></button>';
     h += '<div class="biz-row">';
     if (hasPhoto) {
       h += '<div class="av"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
     }
     h += '<div class="who">';
-    h += '<div class="nmrow"><b>' + esc(me.name || '이름') + '</b>'
-      + (hasPhoto ? '' : '<span class="biz-seal">' + esc((me.name || '?').slice(0, 1)) + '</span>') + '</div>';
+    h += '<div class="nmrow"><b>' + esc(me.name || '이름') + '</b></div>';
     h += '<span class="role">' + esc([me.org, me.title].filter(Boolean).join(' · ') || '전자명함') + '</span>';
+    /* 전화번호는 버튼을 누르지 않아도 바로 보이게 — 가장 크게 */
+    h += '<a class="biz-tel" href="tel:' + esc(tel) + '">'
+      + (me.phone ? esc(me.phone) : '<em>전화번호 넣기</em>') + '</a>';
     h += '<div class="medals">';
     if (me.field) h += '<span class="badge">' + esc(me.field) + '</span>';
+    else h += '<span class="badge">교환급매물 전문</span>';
     if (me.strength) h += '<span class="edge">' + esc(me.strength) + '</span>';
-    if (!me.field && !me.strength) h += '<span class="edge">고치기에서 전문 분야를 넣어 보세요</span>';
     h += '</div>';
     if (me.intro) h += '<p class="intro"><em>“</em>' + esc(me.intro) + '</p>';
     h += '</div></div>';
@@ -252,14 +257,19 @@
     h += '<a class="pact tel" href="tel:' + esc(tel) + '">' + IC.phone + '<span>전화</span></a>';
     h += '<a class="pact sms" href="sms:' + esc(tel) + '">' + IC.sms + '<span>문자</span></a>';
     h += '<a class="pact kakao" href="#" id="btnKakao">' + IC.chat + '<span>카톡</span></a>';
-    if (isKakao && !isIOS) {
-      /* 카톡 인앱 — 누르는 순간 크롬 앱을 바로 열어 탈출한다(intent://) */
-      h += '<a class="pact inst esc" id="btnInstall" href="' + esc(chromeIntentUrl()) + '">' + IC.install + '<span>바탕화면</span></a>';
-    } else {
-      h += '<button class="pact inst" id="btnInstall" type="button">' + IC.install + '<span>바탕화면</span></button>';
-    }
+    h += '<button class="pact save" id="btnSaveCard" type="button">' + IC.down + '<span>명함저장</span></button>';
     h += '</div>';
-    h += '<p class="inst-tip">' + IC.spark + '<span><b>바탕화면</b>에 두면 신규 급매물을 제일 먼저 받아볼 수 있어요</span></p>';
+    /* 바탕화면 바로가기 — 이미 설치했거나 앱으로 열었으면 아예 띄우지 않는다 */
+    if (!isInstalledNow()) {
+      h += '<div class="inst-row" id="instRow">';
+      if (isKakao && !isIOS) {
+        h += '<a class="inst-mini" id="btnInstall" href="' + esc(chromeIntentUrl()) + '">' + IC.install + '바탕화면에 두기</a>';
+      } else {
+        h += '<button class="inst-mini" id="btnInstall" type="button">' + IC.install + '바탕화면에 두기</button>';
+      }
+      h += '<span class="inst-tip">' + IC.spark + '두면 새 급매물을 먼저 받아요</span>';
+      h += '</div>';
+    }
     h += '</div>';
 
     /* 명함 아래 한 줄 도구 */
@@ -290,17 +300,79 @@
     $('#btnShare').addEventListener('click', shareCard);
     $('#btnImg').addEventListener('click', saveCardImage);
     $('#btnEdit').addEventListener('click', function () { go('#/setup'); });
-    $('#btnInstall').addEventListener('click', function (e) {
+    $('#btnSaveCard').addEventListener('click', saveCardImage);
+    $('#btnSeal').addEventListener('click', openSeal);
+    var bi = $('#btnInstall');
+    if (bi) bi.addEventListener('click', function (e) {
       /* 카톡 인앱은 <a href="intent://…"> 그대로 두어 크롬이 바로 열리게 한다 */
       if (this.tagName === 'A') return;
       e.preventDefault(); doInstall();
     });
     $('#btnKakao').addEventListener('click', function (e) { e.preventDefault(); openKakao(); });
+    paintSeal($('#sealCv'), 92);
 
     LS.set(K.seen, Date.now());
     updateBadge();
-    if (installed) $('#btnInstall').classList.add('done');
     list.forEach(ensureGeo);
+  }
+
+  /* ---------------- 직인 도장 QR (250번) ---------------- */
+  function sealShape() {
+    var s = (S.me && S.me.stamp) || 'circle';
+    return (s === 'square' || s === 'oval') ? s : 'circle';
+  }
+  function sealOpts(extra) {
+    var me = S.me || {};
+    var o = { shape: sealShape(), name: me.name || '', me: me,
+              value: (g.KTS && KTS.Seal) ? KTS.Seal.payload(me) : '' };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    return o;
+  }
+  function paintSeal(cv, size) {
+    if (!cv || !g.KTS || !KTS.Seal) return;
+    try { KTS.Seal.paint(cv, size, sealOpts()) } catch (e) { }
+  }
+  function openSeal() {
+    var box = $('#sealBox'); if (!box) return;
+    var stage = $('#sealStage');
+    var w = Math.min(360, Math.max(220, Math.round((window.innerWidth || 390) * 0.66)));
+    stage.innerHTML = '';
+    var cv = document.createElement('canvas');
+    stage.appendChild(cv);
+    try { KTS.Seal.paint(cv, w, sealOpts()) } catch (e) { stage.innerHTML = '<p class="tiny">QR을 만들지 못했습니다.</p>' }
+    $('#sealShape').textContent = '모양 바꾸기 (' + ({ circle: '원형', square: '사각', oval: '타원' })[sealShape()] + ')';
+    box.hidden = false;
+  }
+  function closeSeal() { var b = $('#sealBox'); if (b) b.hidden = true; }
+  function cycleSealShape() {
+    var order = ['circle', 'square', 'oval'];
+    var i = order.indexOf(sealShape());
+    S.me.stamp = order[(i + 1) % 3];
+    save();
+    openSeal();
+    if ($('#sealCv')) paintSeal($('#sealCv'), 92);
+    toast('직인 모양 — ' + ({ circle: '원형', square: '사각', oval: '타원' })[S.me.stamp]);
+  }
+  function saveSealImage() {
+    try {
+      var url = KTS.Seal.dataUrl(1000, sealOpts());
+      if (!url) { toast('QR 이미지를 만들지 못했습니다'); return; }
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = (S.me && S.me.name ? S.me.name : 'KTS') + '_직인QR.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('직인 QR을 저장했습니다 — 인쇄물·포스터에 붙이세요', 3200);
+    } catch (e) { toast('이 기기에서는 저장이 어렵습니다'); }
+  }
+  function isInstalledNow() {
+    if (installed) return true;
+    if (LS.get(K.inst, 0)) return true;
+    try {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) return true;
+      if (navigator.standalone) return true;
+    } catch (e) { }
+    return false;
   }
 
   /* 명함 위 작은 물건 카드 — 썸네일 아래는 「지역/평수」·「가격」 두 줄만, 굵고 크게 */
@@ -378,7 +450,8 @@
       setTimeout(openChrome, 700);
       return;
     }
-    var W = 1080, H = 594, PAD = 62, right = W - PAD;
+    /* 위 594 = 명함 한 장 / 아래 306 = 직인 도장 QR 띠(흰 바탕 → 스캔 여백 확보) */
+    var W = 1080, H = 900, PAD = 62, right = W - PAD, CARDH = 594;
     var c = document.createElement('canvas');
     c.width = W; c.height = H;
     var x = c.getContext('2d');
@@ -522,9 +595,38 @@
       pill('카톡', '#fee500', null, '#2a2200');
 
       /* 아래 브랜드 */
-      x.textAlign = 'right'; x.font = font(22, 800); x.fillStyle = '#71829f';
+      x.textAlign = 'right'; x.font = font(22, 800); x.fillStyle = '#c9d6ea';
       x.fillText('KTS 전자명함 · autooneclick.com/bizcard', right, 566);
       x.textAlign = 'left';
+
+      /* ── 직인 도장 QR 띠 ── */
+      x.fillStyle = '#ffffff'; x.fillRect(0, CARDH, W, H - CARDH);
+      x.fillStyle = '#c9a063'; x.fillRect(0, CARDH, W, 3);
+      var sealSize = 268, sealX = 54, sealY = CARDH + 19;
+      try {
+        var sealCanvas = document.createElement('canvas');
+        KTS.Seal.paint(sealCanvas, sealSize, sealOpts());
+        var sh2 = sealSize * sealCanvas.height / Math.max(1, sealCanvas.width);
+        x.drawImage(sealCanvas, sealX, sealY, sealSize, sh2);
+      } catch (e) { }
+
+      var tx2 = sealX + sealSize + 40;
+      x.textAlign = 'left'; x.fillStyle = '#111111';
+      x.font = font(24, 900);
+      x.fillText('직인 QR', tx2, CARDH + 66);
+      x.font = font(40, 900);
+      x.fillText(text(me.name || '이름'), tx2, CARDH + 124, right - tx2);
+      x.font = font(24, 700); x.fillStyle = '#333333';
+      x.fillText(text([me.org, me.title].filter(Boolean).join(' · ') || 'KTS 원클릭'), tx2, CARDH + 162, right - tx2);
+      x.font = font(38, 900); x.fillStyle = '#000000';
+      x.fillText(text(me.phone || ''), tx2, CARDH + 218, right - tx2);
+      x.font = font(20, 700); x.fillStyle = '#444444';
+      x.fillText('휴대폰 카메라로 찍으면 전자명함이 열립니다', tx2, CARDH + 262, right - tx2);
+      x.textAlign = 'right'; x.font = font(18, 800); x.fillStyle = '#b01b22';
+      x.fillText('KTS', right, CARDH + 284);
+      x.textAlign = 'left';
+      /* 테두리 다시 — 흰 띠 위에도 금선이 이어지게 */
+      x.strokeStyle = 'rgba(201,160,99,.55)'; x.lineWidth = 3; x.strokeRect(1.5, 1.5, W - 3, H - 3);
 
       exportPng();
     }
@@ -1075,6 +1177,21 @@
     h += field('phone', '전화번호', me.phone, '010-0000-0000', 'tel');
     h += field('kakao', '카톡 ID나 오픈채팅 주소 (선택)', me.kakao, '예) open.kakao.com/o/abcd');
     h += '</div>';
+
+    /* 직인 도장 QR — 모양 3종 + QR에 담을 것 */
+    h += '<div class="seal-set"><div class="ss-h"><b>직인 도장 QR</b><em>명함·포스터에 찍히는 도장</em></div>';
+    h += '<div class="seal-shapes" id="sealShapes">';
+    [['circle', '원형'], ['square', '사각'], ['oval', '타원']].forEach(function (p) {
+      h += '<button type="button" class="ss-btn' + (sealShape() === p[0] ? ' on' : '') + '" data-shape="' + p[0] + '">'
+        + '<i class="ss-ico ' + p[0] + '"></i>' + p[1] + '</button>';
+    });
+    h += '</div>';
+    h += '<div class="seal-prev" id="sealPrev"></div>';
+    h += '<label class="seal-kind"><span>QR에 담을 것</span><select id="f-qr">'
+      + '<option value="url"' + ((me.qrKind || 'url') === 'url' ? ' selected' : '') + '>전자명함 주소(누구나 열림)</option>'
+      + '<option value="contact"' + (me.qrKind === 'contact' ? ' selected' : '') + '>연락처 — 찍으면 명함 저장</option>'
+      + '</select></label></div>';
+
     h += '<button class="big" id="btnSaveMe">저장</button>';
     if (!S.me) h += '<button class="btn ghost wide2" id="btnDemoMe">예시로 채우고 둘러보기</button>';
     $('#v-setup').innerHTML = h;
@@ -1104,6 +1221,33 @@
       cur.photo = ''; paintPv(); toast('사진을 지웠습니다 — 이름 첫 글자로 표시됩니다');
     });
 
+    /* 직인 미리보기 — 이름·모양을 바꾸면 바로 다시 그린다 */
+    var previewShape = sealShape();
+    function paintPreview() {
+      var box = $('#sealPrev'); if (!box) return;
+      box.innerHTML = '';
+      var cv = document.createElement('canvas');
+      box.appendChild(cv);
+      var nameV = ($('#f-name') && $('#f-name').value) || me.name || '';
+      var kind = ($('#f-qr') && $('#f-qr').value) || 'url';
+      try {
+        KTS.Seal.paint(cv, 140, { shape: previewShape, name: nameV,
+          value: KTS.Seal.payload({ name: nameV, phone: ($('#f-phone') && $('#f-phone').value) || me.phone, org: ($('#f-org') && $('#f-org').value) || me.org, qrKind: kind }) });
+      } catch (e) { }
+    }
+    $$('#sealShapes .ss-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        previewShape = b.getAttribute('data-shape');
+        $$('#sealShapes .ss-btn').forEach(function (o) { o.classList.toggle('on', o === b) });
+        paintPreview();
+      });
+    });
+    ['#f-name', '#f-phone', '#f-org'].forEach(function (sel) {
+      var el2 = $(sel); if (el2) el2.addEventListener('input', paintPreview);
+    });
+    if ($('#f-qr')) $('#f-qr').addEventListener('change', paintPreview);
+    paintPreview();
+
     $('#btnSaveMe').addEventListener('click', function () {
       var name = ($('#f-name').value || '').trim();
       if (!name) { toast('이름을 넣어 주세요'); $('#f-name').focus(); return; }
@@ -1115,7 +1259,9 @@
         strength: ($('#f-strength').value || '').trim(),
         intro: ($('#f-intro').value || '').trim(),
         kakao: ($('#f-kakao').value || '').trim(),
-        photo: cur.photo || ''
+        photo: cur.photo || '',
+        stamp: previewShape,
+        qrKind: ($('#f-qr') && $('#f-qr').value) || 'url'
       };
       save(); toast('저장했습니다');
       /* 공유로 들어온 문자가 남아 있으면 그 물건표로 바로 */
@@ -1213,7 +1359,7 @@
     if (installPrompt) {
       installPrompt.prompt();
       installPrompt.userChoice.then(function (c) {
-        if (c.outcome === 'accepted') { installed = true; toast('바탕화면에 아이콘을 만들었습니다'); }
+        if (c.outcome === 'accepted') { installed = true; LS.set(K.inst, Date.now()); toast('바탕화면에 아이콘을 만들었습니다'); render(); }
         installPrompt = null;
       });
       return;
@@ -1282,7 +1428,7 @@
   function boot() {
     /* 검수용: ?reset=1 이면 이 기기의 매물장·명함을 비우고 처음부터 */
     if (/[?&]reset=1/.test(location.search)) {
-      [K.me, K.items, K.plan, K.seen, K.inq, K.tip].forEach(function (k) { try { localStorage.removeItem(k) } catch (e) { } });
+      [K.me, K.items, K.plan, K.seen, K.inq, K.tip, K.inst].forEach(function (k) { try { localStorage.removeItem(k) } catch (e) { } });
       S.me = null; S.items = null; S.plan = 'free';
     }
     if ('serviceWorker' in navigator) {
@@ -1292,8 +1438,17 @@
       e.preventDefault(); installPrompt = e;
       var b = $('#btnInstall'); if (b) b.classList.add('ready');
     });
-    window.addEventListener('appinstalled', function () { installed = true; toast('바탕화면에 아이콘을 만들었습니다'); });
+    window.addEventListener('appinstalled', function () {
+      installed = true; LS.set(K.inst, Date.now());
+      toast('바탕화면에 아이콘을 만들었습니다'); render();
+    });
     window.addEventListener('hashchange', render);
+    /* 직인 도장 QR 크게 보기 */
+    if ($('#sealX')) $('#sealX').addEventListener('click', closeSeal);
+    if ($('#sealSave')) $('#sealSave').addEventListener('click', saveSealImage);
+    if ($('#sealShape')) $('#sealShape').addEventListener('click', cycleSealShape);
+    if ($('#sealBox')) $('#sealBox').addEventListener('click', function (e) { if (e.target === this) closeSeal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSeal(); });
     $('#aiX').addEventListener('click', closeSheet);
     $('#sheet').addEventListener('click', function (e) { if (e.target === $('#sheet')) closeSheet(); });
     if (isStandalone) installed = true;
