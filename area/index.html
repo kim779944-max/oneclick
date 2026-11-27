@@ -411,6 +411,14 @@ function render(){
   ctx.setTransform(1,0,0,1,0,0);
   var t=topLeft(), z=S.V.z;
   ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,MAPW,MAPH);
+  if(!(S.F.items||[]).length&&!S.order.length){
+    ctx.fillStyle='#16233D'; ctx.font='900 20px system-ui,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('주소를 넣으면 지도가 열립니다',MAPW/2,MAPH/2-6);
+    ctx.font='800 14px system-ui,sans-serif'; ctx.fillStyle='#41597F';
+    ctx.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',MAPW/2,MAPH/2+22);
+    ctx.textAlign='left';
+    return;
+  }
   var jobs=[];
   if(S.view!=='line'){
     var tz=Math.min(19,Math.floor(z)), ts=Math.pow(2,z-tz), tl=256*ts;
@@ -857,14 +865,16 @@ $('#zin').addEventListener('click',function(){ zoomBy(0.6) });
 $('#zout').addEventListener('click',function(){ zoomBy(-0.6) });
 $('#zfit').addEventListener('click',fitSel);
 $('#addAll').addEventListener('click',function(){
+  if(S.F.full){ toast('필지가 너무 많습니다 — 확대한 뒤 다시 눌러 주세요'); return }
   var vb=viewBox(), n=0;
   (S.F.items||[]).forEach(function(f){
+    if(n>=60) return;
     var c=centroid(f.rings);
     if(c[0]<vb.minx||c[0]>vb.maxx||c[1]<vb.miny||c[1]>vb.maxy) return;
     if(S.sel[f.pnu]) return;
     selAdd(f,'in'); n++;
   });
-  toast(n?n+'필지 담았습니다 · 뺄 필지는 [빼기]로 톡':'새로 담을 필지가 없습니다');
+  toast(n?n+'필지 담았습니다 · 뺄 필지는 [빼기]로 톡'+(n>=60?' (한 번에 60필지까지)':''):'새로 담을 필지가 없습니다');
 });
 $('#clearAll').addEventListener('click',function(){
   S.sel={}; S.order=[]; paintList(); render(); toast('선택을 모두 비웠습니다');
@@ -901,7 +911,7 @@ if(pq){
     $('#q').value=q0; addMany(q0);
   }catch(e){}
 }else{
-  syncRange(true);
+  $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
 window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z} };
 })();
