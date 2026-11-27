@@ -400,10 +400,10 @@ img{display:block;max-width:100%}
    250번 — 직인 도장 QR · 전화번호 상단 노출 · 4버튼(명함저장)
    ========================================================================== */
 /* 명함 위 도장 — 오른쪽 위, 흰 바탕이라 스캔 여백이 산다 */
-.biz-stamp{position:absolute;right:8px;top:8px;z-index:3;width:88px;padding:0;border:0;background:none;
-  display:block;border-radius:50%;line-height:0;
+.biz-stamp{position:absolute;right:8px;top:8px;z-index:3;padding:0;border:0;background:none;
+  display:block;line-height:0;
   filter:drop-shadow(0 3px 8px rgba(0,0,0,.45))}
-.biz-stamp canvas{display:block;width:88px;height:auto;border-radius:50%}
+.biz-stamp canvas{display:block;height:auto}
 .biz-stamp .seal-lbl{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);
   font-size:8.5px;font-weight:900;letter-spacing:1px;color:#e2ba7a;line-height:1}
 .biz-stamp:active{transform:scale(.97)}

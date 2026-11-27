@@ -87,11 +87,11 @@ button{font:inherit;cursor:pointer}
   display:flex;align-items:center;gap:5px;border-left:3px solid var(--org);padding-left:6px;line-height:1.25}
 .p-sec h2 i{font-style:normal;color:var(--org);font-size:13px}
 .p-sec h2 em{font-style:normal;font-size:9px;font-weight:700;color:#555}
-.tb{width:100%;border-collapse:collapse;font-size:10.5px;table-layout:fixed}
-.tb col.c1{width:74px}
+.tb{width:100%;border-collapse:collapse;font-size:10.5px;table-layout:fixed;word-break:keep-all}
+.tb col.c1{width:88px}
 .tb th,.tb td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top;
   line-height:1.4;word-break:keep-all;color:var(--ink)}
-.tb th{background:var(--soft);font-weight:900;color:#000;white-space:nowrap}
+.tb th{background:var(--soft);font-weight:900;color:#000;overflow-wrap:break-word}
 .tb thead th{background:#eef1f6}
 .tb.tx col{width:auto}
 .bul{margin:0;padding-left:14px;font-size:10.5px;line-height:1.5;color:var(--ink)}

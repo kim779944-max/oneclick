@@ -405,16 +405,13 @@
   function savePng() {
     try {
       var cv = buildPng();
-      cv.toBlob(function (b) {
-        if (!b) { toast('PNG를 만들지 못했습니다'); return; }
-        var url = URL.createObjectURL(b);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = (txt('#p-title') || '물건포스터').replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_포스터.png';
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function () { try { URL.revokeObjectURL(url) } catch (e) { } }, 6000);
-        toast('A4 포스터 PNG를 저장했습니다 (1240×1754)', 3200);
-      }, 'image/png');
+      /* data URL 로 바로 내려받기 — 카톡·문자·인쇄 어디서든 같은 파일 */
+      var url = cv.toDataURL('image/png');
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = (txt('#p-title') || '물건포스터').replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_포스터.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('A4 포스터 PNG를 저장했습니다 (1240×1754)', 3200);
     } catch (e) { toast('이 기기에서는 PNG 저장이 어렵습니다'); }
   }
 

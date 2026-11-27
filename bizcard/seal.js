@@ -55,7 +55,7 @@
   function geom(shape, S) {
     /* S = 도장 가로 크기(px) · 타원은 세로가 1.3배 */
     var H = shape === 'oval' ? Math.round(S * 1.3) : S;
-    var box = shape === 'oval' ? 0.60 : (shape === 'square' ? 0.66 : 0.60);
+    var box = shape === 'oval' ? 0.64 : (shape === 'square' ? 0.66 : 0.60);
     var qr = Math.round(S * box);            /* QR 한 변(흰 여백 포함) */
     var cx = S / 2, cy = H / 2;
     return { W: S, H: H, qr: qr, cx: cx, cy: cy };
@@ -177,16 +177,22 @@
       ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     }
 
-    /* 5) 타원 도장 위·아래 글귀 */
+    /* 5) 타원 도장 위·아래 글귀 — 테두리 안쪽으로 넣어 겹치지 않게 */
     if (shape === 'oval') {
       ctx.fillStyle = color;
       ctx.textAlign = 'center';
-      var fs2 = S * 0.052;
-      ctx.font = '800 ' + fs2 + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif';
+      var fs2 = S * 0.05;
+      var maxW2 = S * 0.56;
       var top = o.top || '원클릭 · 교환급매물';
       var bot = o.bottom || '부동산 교환 전문가';
-      ctx.fillText(top, G.cx, S * 0.115, S * 0.72);
-      ctx.fillText(bot, G.cx, H - S * 0.075, S * 0.72);
+      function tag(str, yy) {
+        ctx.font = '800 ' + fs2 + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif';
+        var w2 = ctx.measureText(str).width;
+        if (w2 > maxW2) { ctx.font = '800 ' + (fs2 * maxW2 / w2) + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif'; }
+        ctx.fillText(str, G.cx, yy);
+      }
+      tag(top, S * 0.175);
+      tag(bot, H - S * 0.135);
       ctx.textAlign = 'left';
     }
     ctx.restore();
