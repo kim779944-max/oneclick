@@ -76,7 +76,7 @@ main{padding:10px 12px 0}
 .legend i.in{background:rgba(226,58,46,.28);border:2px solid var(--red)}
 .legend i.out{background:rgba(140,160,190,.14);border:1.5px dashed #8FA6C4}
 .legend i.none{background:transparent;border:1px solid #fff}
-.legend i.edge{background:transparent;border:3px solid #FF6B00}
+.legend i.edge{background:transparent;border:3px solid #E53935}
 /* 합계 */
 .tot{display:flex;gap:10px;align-items:stretch;margin-top:10px;background:linear-gradient(135deg,rgba(255,107,0,.16),rgba(18,32,60,.9));border:1px solid rgba(255,107,0,.5);border-radius:14px;padding:11px 12px}
 .totL{flex:1;min-width:0}
@@ -132,9 +132,9 @@ main{padding:10px 12px 0}
   #sheet .sh .d{font-size:9pt}
   #sheet .sum{margin:0 0 3mm;font-size:11pt}
   #sheet .sum b{font-size:14pt}
-  #sheet img{width:auto;height:auto;max-width:100%;max-height:90mm;object-fit:contain;display:block;margin:0 auto 3mm;border:1px solid #000}
-  #sheet table{width:100%;border-collapse:collapse;font-size:9.5pt}
-  #sheet th,#sheet td{border:1px solid #000;padding:1.1mm 1.6mm;text-align:left}
+  #sheet img{width:auto;height:auto;max-width:100%;max-height:88mm;object-fit:contain;display:block;margin:0 auto 3mm;border:1px solid #000}
+  #sheet table{width:auto;min-width:118mm;max-width:142mm;margin:0 auto;border-collapse:collapse;font-size:9pt;table-layout:fixed}
+  #sheet th,#sheet td{border:1px solid #000;padding:1mm 2.5mm;text-align:left}
   #sheet th{background:#EDEDED!important;font-weight:900}
   #sheet td.n{text-align:right;font-variant-numeric:tabular-nums}
   #sheet tr.stot td{font-weight:900;background:#F4F4F4!important}
@@ -414,6 +414,46 @@ var tileCache={};
 function getTile(v,z,x,y){ var k=v+'|'+z+'|'+x+'|'+y; if(tileCache[k]) return tileCache[k];
   var p=loadImg(tileUrl(v,z,x,y)); tileCache[k]=p; return p }
 var drawSeq=0;
+var EDGE_COL='#E53935';
+var _egOff=null,_egCv=null;
+/* 테두리만: 담은 필지(state==='in') 전체를 하나로 합친 바깥 외곽선만 남긴 캔버스를 만든다 */
+function unionEdge(z,t){
+  var i,any=false;
+  for(i=0;i<S.order.length;i++){ var s0=S.sel[S.order[i]]; if(s0&&s0.state==='in'){ any=true; break } }
+  if(!any) return null;
+  if(!_egOff){ _egOff=document.createElement('canvas'); _egOff.width=MAPW; _egOff.height=MAPH;
+               _egCv=document.createElement('canvas'); _egCv.width=MAPW; _egCv.height=MAPH; }
+  var oc=_egOff.getContext('2d');
+  oc.clearRect(0,0,MAPW,MAPH);
+  oc.fillStyle=EDGE_COL; oc.strokeStyle=EDGE_COL; oc.lineWidth=2; oc.lineJoin='round'; oc.lineCap='round';
+  for(i=0;i<S.order.length;i++){
+    var s=S.sel[S.order[i]]; if(!s||s.state!=='in') continue;
+    oc.beginPath();
+    for(var q=0;q<s.rings.length;q++){
+      var r=s.rings[q], started=false;
+      for(var j=0;j<r.length;j++){
+        var p=r[j]; if(!p||!isFinite(p[0])||!isFinite(p[1])) continue;
+        var X=lon2x(p[0],z)-t.x, Y=lat2y(p[1],z)-t.y;
+        if(!started){ oc.moveTo(X,Y); started=true } else oc.lineTo(X,Y);
+      }
+      if(started) oc.closePath();
+    }
+    oc.fill(); oc.stroke();
+  }
+  var ec=_egCv.getContext('2d');
+  ec.setTransform(1,0,0,1,0,0); ec.globalCompositeOperation='source-over'; ec.clearRect(0,0,MAPW,MAPH);
+  /* 화면에서 3.5~4px 굵기로 보이도록 캔버스 픽셀 반지름을 환산 */
+  var cssW=0; try{ cssW=$('#map').getBoundingClientRect().width||0 }catch(e){}
+  var rr=cssW>0?3.6*MAPW/cssW:7; rr=Math.max(6,Math.min(9,rr));
+  var N=12;
+  for(var k=0;k<N;k++){ var ang=k*2*Math.PI/N;
+    ec.drawImage(_egOff,Math.round(Math.cos(ang)*rr*100)/100,Math.round(Math.sin(ang)*rr*100)/100);
+  }
+  ec.globalCompositeOperation='destination-out';
+  ec.drawImage(_egOff,0,0);
+  ec.globalCompositeOperation='source-over';
+  return _egCv;
+}
 function render(){
   var cv=$('#map'), ctx=cv.getContext('2d'), my=++drawSeq;
   ctx.setTransform(1,0,0,1,0,0);
@@ -480,17 +520,16 @@ function render(){
       ctx.fillStyle=dark?'#EAF1FB':'#16233D';
       ctx.fillText(g.jibun,mxx,myy);
     }
-    /* 3) 뺀 필지 / 담은 필지 */
+    /* 3) 뺀 필지 / 담은 필지 — 면·선 */
     for(var a=0;a<S.order.length;a++){
       var it=S.sel[S.order[a]]; if(!it) continue;
       var isIn=it.state==='in';
       path(it.rings);
       if(S.edge){
-        /* 테두리만: 안쪽은 채우지 않고 굵고 선명한 선만 */
+        /* 테두리만: 담은 필지는 배경과 같은 얇은 선만 남기고, 합집합 바깥 선은 아래에서 한 번에 */
         if(isIn){
-          ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=10; ctx.stroke();
-          ctx.strokeStyle='#FF6B00'; ctx.lineWidth=7; ctx.stroke();
-          ctx.strokeStyle='#FFD24D'; ctx.lineWidth=2.6; ctx.stroke();
+          ctx.fillStyle=dark?'rgba(255,255,255,.16)':'rgba(255,255,255,.34)'; ctx.fill();
+          ctx.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)'; ctx.lineWidth=1.2; ctx.stroke();
         }else{
           ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=7; ctx.stroke();
           ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4; ctx.setLineDash([9,6]); ctx.stroke(); ctx.setLineDash([]);
@@ -512,20 +551,50 @@ function render(){
         ctx.fillStyle=dark?'rgba(10,18,36,.55)':'rgba(120,135,158,.30)'; ctx.fill();
         ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=1.4; ctx.setLineDash([7,5]); ctx.stroke(); ctx.setLineDash([]);
       }
-      var bc=centroid(it.rings);
+    }
+    /* 3-1) 테두리만: 담은 필지 전체를 하나로 합친 가장 바깥 외곽선만 굵은 빨간 선으로 얹는다 */
+    if(S.edge){
+      var eg=unionEdge(z,t);
+      if(eg){ ctx.drawImage(eg,0,0); ctx.drawImage(eg,0,0) }
+    }
+    /* 3-2) 담은·뺀 필지의 지번 (테두리만 모드는 색 박스 없이 배경과 같은 얇은 글씨) */
+    ctx.font='900 25px system-ui,sans-serif';
+    for(var a2=0;a2<S.order.length;a2++){
+      var it2=S.sel[S.order[a2]]; if(!it2) continue;
+      var isIn2=it2.state==='in';
+      var bc=centroid(it2.rings);
       var lx=lon2x(bc[0],z)-t.x, ly=lat2y(bc[1],z)-t.y;
-      if(lx>-40&&lx<MAPW+40&&ly>-30&&ly<MAPH+30){
-        var lab=it.jibun||'';
-        var lb=it.bb||bboxOf(it.rings), bw=lon2x(lb.maxx,z)-lon2x(lb.minx,z), bh=lat2y(lb.miny,z)-lat2y(lb.maxy,z);
-        var fs=25; ctx.font='900 '+fs+'px system-ui,sans-serif';
-        var w3=ctx.measureText(lab).width;
-        /* 필지 폭보다 라벨이 넓으면 이웃 라벨과 겹치므로 폭에 맞게 줄인다 */
-        if(bw>34&&bh>18){ while(fs>13&&w3+14>bw){ fs-=2; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width } }
-        var bh2=Math.round(fs*1.35);
-        ctx.fillStyle=isIn?(S.edge?'#FF6B00':'#E23A2E'):'#4A5C7A';
-        ctx.fillRect(lx-w3/2-7,ly-bh2/2,w3+14,bh2);
-        ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
+      if(!(lx>-40&&lx<MAPW+40&&ly>-30&&ly<MAPH+30)) continue;
+      var lab=it2.jibun||''; if(!lab) continue;
+      var lb=it2.bb||bboxOf(it2.rings), bw=lon2x(lb.maxx,z)-lon2x(lb.minx,z), bh=lat2y(lb.miny,z)-lat2y(lb.maxy,z);
+      var fs=25; ctx.font='900 '+fs+'px system-ui,sans-serif';
+      var w3=ctx.measureText(lab).width;
+      /* 필지 폭보다 라벨이 넓으면 이웃 라벨·경계선과 겹치므로 폭에 맞게 줄인다 */
+      if(bw>34&&bh>18){ while(fs>13&&w3+14>bw){ fs-=2; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width } }
+      if(S.edge){
+        var le=13;
+        while(fs>11&&w3+14>bw){ fs-=1; le=fs; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width }
+        var bh2e=Math.round(fs*1.35);
+        if(w3+14<=bw){
+          ctx.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
+          ctx.fillRect(lx-w3/2-7,ly-bh2e/2,w3+14,bh2e);
+          ctx.fillStyle=dark?'#EAF1FB':'#16233D';
+          ctx.fillText(lab,lx,ly);
+        }else if(w3<=bw*1.4){
+          /* 좁은 필지는 박스 없이 흰 테두리를 두른 글씨만 (배경 경계선을 가리지 않게) */
+          ctx.lineWidth=3.2; ctx.lineJoin='round';
+          ctx.strokeStyle=dark?'rgba(8,16,34,.85)':'rgba(247,243,234,.95)';
+          ctx.strokeText(lab,lx,ly);
+          ctx.fillStyle=dark?'#EAF1FB':'#16233D';
+          ctx.fillText(lab,lx,ly);
+          ctx.lineWidth=1.2;
+        }
+        continue;
       }
+      var bh2=Math.round(fs*1.35);
+      ctx.fillStyle=isIn2?'#E23A2E':'#4A5C7A';
+      ctx.fillRect(lx-w3/2-7,ly-bh2/2,w3+14,bh2);
+      ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
     }
     /* 4) 출처 */
     ctx.textAlign='right'; ctx.textBaseline='alphabetic';
@@ -859,7 +928,7 @@ function buildSheet(){
   h.push('<div class="sum">담은 필지 <b>'+ins.length+'</b>필지 · 합계 <b>'+num(totA,0)+'㎡</b> ('+num(pyeong(totA))+'평)'
     +(outs.length?' · 뺀 필지 '+outs.length+'필지':'')+'</div>');
   if(img) h.push('<img src="'+img+'" alt="선택 필지 지적도">');
-  h.push('<table><thead><tr><th style="width:34%">지번</th><th style="width:14%">지목</th><th style="width:26%">면적(㎡)</th><th style="width:26%">면적(평)</th></tr></thead><tbody>');
+  h.push('<table><thead><tr><th style="width:30%">지번</th><th style="width:12%">지목</th><th style="width:32%">면적(㎡)</th><th style="width:26%">면적(평)</th></tr></thead><tbody>');
   var LIM=20;
   ins.slice(0,LIM).forEach(function(r){
     h.push('<tr><td>'+esc(r.jibun)+'</td><td>'+esc(r.jmok)+'</td><td class="n">'+num(r.a,0)+'</td><td class="n">'+num(pyeong(r.a))+'</td></tr>');
@@ -946,10 +1015,10 @@ $('#edgeBtn').addEventListener('click',function(){
   this.classList.toggle('on',S.edge);
   this.setAttribute('aria-pressed',S.edge?'true':'false');
   var lg=$('#lgIn'), sw=$('#lgInI');
-  if(lg) lg.textContent=S.edge?'담은 필지(주황 굵은 선)':'담은 필지(빨강)';
+  if(lg) lg.textContent=S.edge?'담은 필지(바깥 빨간 선)':'담은 필지(빨강)';
   if(sw){ sw.classList.toggle('edge',S.edge); sw.classList.toggle('in',!S.edge) }
   render();
-  toast(S.edge?'테두리만 그립니다 (안쪽 채우기 없이 굵은 선)':'면을 채워 그립니다');
+  toast(S.edge?'테두리만: 담은 필지 전체의 바깥 빨간 선만 그립니다':'면을 채워 그립니다');
 });
 Array.prototype.forEach.call($('#mapMode').querySelectorAll('button'),function(b){
   b.addEventListener('click',function(){
