@@ -140,10 +140,33 @@
     tb.innerHTML = g.map(function (r) {
       return '<tr><th>' + r[0] + '</th><td contenteditable="true">' + (r[1] || '미확인') + '</td></tr>';
     }).join('');
-    if (fa.behind) {
-      var ul = $('#p-loc');
-      ul.insertAdjacentHTML('afterbegin', '<li contenteditable="true">배후: ' + fa.behind + '</li>');
+    /* 입지·권리·실거래가는 매물에서 아는 것만 새로 채운다(예시 문구 남기지 않음) */
+    var locBits = [];
+    if (fa.behind) locBits.push('배후 상권: ' + fa.behind);
+    if (L.floors) locBits.push('규모: ' + L.floors);
+    if (L.site || fa.site) locBits.push('대지 ' + (fa.site || L.site) + ' · 연면적 ' + (fa.gross || fa.gross || '미확인'));
+    if (L.moveIn) locBits.push('입주: ' + L.moveIn);
+    locBits.push('상세 입지는 현장 확인 후 한 줄씩 고쳐 주세요');
+    $('#p-loc').innerHTML = locBits.map(function (t) {
+      return '<li contenteditable="true">' + t + '</li>';
+    }).join('');
+
+    var rightBits = [];
+    if (p.loanAmount) rightBits.push('을구: 근저당 ' + money(p.loanAmount) + '(승계 가능) — 매도인 승계 또는 말소 선택');
+    rightBits.push('갑구: 소유권 이외 제한 — 계약 전 등기부 원본으로 확인');
+    rightBits.push('토지거래허가구역·토지이용계획은 토지이음에서 확인');
+    if (p.appraisal && p.sale) {
+      var gap = p.appraisal - p.sale;
+      rightBits.push('감정가 ' + money(p.appraisal) + ' 대비 ' + money(gap) + ' 낮은 가격');
     }
+    $('#p-right').innerHTML = rightBits.map(function (t) {
+      return '<li contenteditable="true">' + t + '</li>';
+    }).join('');
+
+    /* 주변 실거래가는 공개 자료를 넣기 전까지 비워 둔다 */
+    var txb = document.querySelector('#p-tx tbody');
+    txb.innerHTML = '<tr><td contenteditable="true">—</td><td contenteditable="true">—</td><td contenteditable="true">—</td>'
+      + '<td contenteditable="true">—</td><td contenteditable="true">실거래가 확인 후 입력</td></tr>';
     if (L.photos && L.photos.length) L.photos.slice(0, 3).forEach(function (p2, i) {
       if (typeof p2 === 'string') setPhoto(i, p2);
     });
