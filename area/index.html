@@ -76,6 +76,7 @@ main{padding:10px 12px 0}
 .legend i.in{background:rgba(226,58,46,.28);border:2px solid var(--red)}
 .legend i.out{background:rgba(140,160,190,.14);border:1.5px dashed #8FA6C4}
 .legend i.none{background:transparent;border:1px solid #fff}
+.legend i.edge{background:transparent;border:3px solid #FF6B00}
 /* 합계 */
 .tot{display:flex;gap:10px;align-items:stretch;margin-top:10px;background:linear-gradient(135deg,rgba(255,107,0,.16),rgba(18,32,60,.9));border:1px solid rgba(255,107,0,.5);border-radius:14px;padding:11px 12px}
 .totL{flex:1;min-width:0}
@@ -190,7 +191,7 @@ main{padding:10px 12px 0}
       </div>
       <div class="mapst" id="mapSt">주소를 넣으면 지도가 열립니다</div>
     </div>
-    <div class="legend"><span><i class="in"></i>담은 필지(빨강)</span><span><i class="out"></i>뺀 필지</span><span><i class="none"></i>아직 안 고른 필지</span></div>
+    <div class="legend"><span><i class="in" id="lgInI"></i><span id="lgIn">담은 필지(빨강)</span></span><span><i class="out"></i>뺀 필지</span><span><i class="none"></i>아직 안 고른 필지</span></div>
     <div class="btnrow">
       <button class="btn" type="button" id="addAll">이 화면 필지 모두 담기</button>
       <button class="btn" type="button" id="clearAll">선택 모두 비우기</button>
@@ -886,12 +887,12 @@ function captureFit(){
     var pad=0.25, cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
     var w=Math.max(b.maxx-b.minx,1e-9)*(1+pad*2), h=Math.max(b.maxy-b.miny,1e-9)*(1+pad*2);
     var z=19;
-    for(;z>12;z-=0.25){
+    for(;z>9;z-=0.25){
       var px=lon2x(cx+w/2,z)-lon2x(cx-w/2,z);
       var py=lat2y(cy-h/2,z)-lat2y(cy+h/2,z);
       if(px<MAPW*0.9&&py<MAPH*0.9) break;
     }
-    S.V={cx:cx,cy:cy,z:Math.max(14,Math.min(19,z))};
+    S.V={cx:cx,cy:cy,z:Math.max(9,Math.min(19,z))};
   }
   return Promise.resolve(render())
     .then(function(){ return new Promise(function(r){ setTimeout(r,40) }) })
@@ -937,6 +938,9 @@ $('#edgeBtn').addEventListener('click',function(){
   S.edge=!S.edge;
   this.classList.toggle('on',S.edge);
   this.setAttribute('aria-pressed',S.edge?'true':'false');
+  var lg=$('#lgIn'), sw=$('#lgInI');
+  if(lg) lg.textContent=S.edge?'담은 필지(주황 굵은 선)':'담은 필지(빨강)';
+  if(sw){ sw.classList.toggle('edge',S.edge); sw.classList.toggle('in',!S.edge) }
   render();
   toast(S.edge?'테두리만 그립니다 (안쪽 채우기 없이 굵은 선)':'면을 채워 그립니다');
 });
