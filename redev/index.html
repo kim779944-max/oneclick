@@ -103,9 +103,14 @@ main{padding:12px 14px 0}
 #panel{position:fixed;inset:0;z-index:60;display:none;justify-content:center;background:rgba(4,8,18,.72)}
 #panel.on{display:flex}
 .sheet{width:100%;max-width:460px;background:linear-gradient(180deg,#0F1B33,#0A1128 40%);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 104px}
-.shd{position:sticky;top:0;z-index:2;background:rgba(10,17,40,.96);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 14px;display:flex;align-items:center;gap:8px}
-.shd button{border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:900;cursor:pointer}
-.shd span{font-size:11px;font-weight:900;color:var(--gray);margin-left:auto}
+.shd{position:sticky;top:0;z-index:3;background:rgba(10,17,40,.97);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:8px 12px 7px;display:flex;flex-direction:column;gap:6px}
+.shd .r1{display:flex;align-items:center;gap:8px}
+.shd button{border:1px solid var(--line2);background:#0E1A33;color:#CBD8E8;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+.shd span{font-size:11px;font-weight:900;color:var(--gray);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 258 (2026-11-27) 상세 3단 스위치 */
+.dsw{display:flex;gap:4px}
+.dsw button{flex:1;min-width:0;border:1px solid var(--line2);background:#0E1A33;color:#9FB0C8;border-radius:9px;padding:8px 1px;font-family:inherit;font-size:11px;font-weight:900;cursor:pointer;line-height:1.15;white-space:nowrap;letter-spacing:-.3px}
+.dsw button.on{border-color:var(--amber);color:#0A1224;background:linear-gradient(135deg,var(--amber),var(--amber2));box-shadow:0 5px 12px rgba(255,107,0,.22)}
 .sbody{padding:12px 14px 0}
 .dt h3{margin:0;font-size:17px;font-weight:900;letter-spacing:-.6px;line-height:1.35}
 .dt .lo{font-size:11.5px;color:var(--ink2);margin-top:3px;word-break:break-all}
@@ -212,8 +217,39 @@ main{padding:12px 14px 0}
 .spin{display:flex;align-items:center;justify-content:center;gap:8px;padding:26px 0;font-size:12px;color:#8FA1B8;font-weight:800}
 .spin i{width:14px;height:14px;border:2px solid #2E4370;border-top-color:var(--amber2);border-radius:50%;animation:sp .8s linear infinite;font-style:normal}
 @keyframes sp{to{transform:rotate(360deg)}}
+/* 258 검색 버튼 · 첫 결과 강조 */
+.srch .go{flex:0 0 auto;border:0;border-radius:11px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:900;color:var(--on);cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber2));white-space:nowrap;box-shadow:0 6px 14px rgba(255,107,0,.24)}
+.srch .go:active{transform:translateY(1px)}
+.item.hit{border-color:var(--amber);outline:2px solid rgba(255,107,0,.55);outline-offset:1px;background:linear-gradient(180deg,rgba(255,107,0,.16),rgba(255,107,0,.04))}
+.item.hit .nm{color:#fff}
+/* 258 공개데이터 표 · 동의율 안내 · 주체 상자 · 접이식 현장정보 */
+.spec{margin-top:10px;border:1px solid #1D2C49;border-radius:12px;overflow:hidden;background:#0B1729}
+.spec div{display:flex;align-items:baseline;gap:8px;padding:8px 10px;border-bottom:1px solid #16233D}
+.spec div:last-child{border-bottom:0}
+.spec span{flex:0 0 78px;color:#9FB0C8;font-weight:800;font-size:11px}
+.spec b{color:#F3F6FA;font-weight:900;font-size:13px;letter-spacing:-.2px;word-break:keep-all;line-height:1.4}
+.spec b.nv{color:#93A5BD;font-weight:800;font-size:11.5px}
+.nonebox{margin-top:10px;border:1px solid rgba(255,107,0,.32);background:rgba(255,107,0,.07);border-radius:12px;padding:10px}
+.nonebox .nh{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:900;color:#FFD9A6}
+.nonebox .nh b{font-size:10px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:6px;padding:2px 7px}
+.nonebox p{margin:5px 0 0;font-size:11px;color:#C9D6E6;line-height:1.55}
+.nonebox p b{color:#fff}
+.nonebox a{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;background:#12203C;border:1px solid var(--line2);border-radius:10px;padding:9px;font-size:12px;font-weight:900;color:#FFD9A6}
+.kv1{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kv1 div{background:#0B1729;border:1px solid #1D2C49;border-radius:10px;padding:7px 9px}
+.kv1 span{display:block;font-size:9.5px;font-weight:800;color:var(--gray)}
+.kv1 b{font-size:13.5px;font-weight:900;color:#F3F6FA}
+.kv1 b.nv{font-size:11.5px;color:#93A5BD}
+.xmore{margin-top:12px;border:1px solid var(--line);border-radius:13px;background:#0E1A33;padding:9px 12px}
+.xmore summary{font-size:11.5px;font-weight:900;color:#B9C8DA;cursor:pointer;list-style:none}
+.xmore summary::-webkit-details-marker{display:none}
+.xmore summary small{color:var(--amber2);font-weight:900;margin-left:4px}
+.xmore .card{margin-top:9px}
+.vline{margin-top:12px;text-align:center;font-size:10px;font-weight:800;color:#6E82A1}
+.vline b{color:#C9D6E6}
 @media(max-width:400px){.hero h1{font-size:19px}.stats b{font-size:15px}}
 </style><script>function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}</script>
+<link rel="canonical" href="https://autooneclick.com/redev/">
 <link rel="manifest" href="/shared/pwa/redev.webmanifest"></head>
 <body><div id="app">
 <header>
@@ -238,7 +274,8 @@ main{padding:12px 14px 0}
   <div class="card">
     <h2><i>1</i>구역 찾기 <small id="totline">불러오는 중</small></h2>
     <div class="srch">
-      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="지번·구역명·자치구·동 (예: 개포동 138, 미아동 476)">
+      <input id="q" type="search" inputmode="search" autocomplete="off" enterkeyhint="search" placeholder="지번·구역명·자치구·동 (예: 개포동 138, 미아동 476)">
+      <button class="go" id="go" type="button" aria-label="검색">검색</button>
       <button class="clr" id="clr">지움</button>
     </div>
     <div class="tabs" id="tabs">
@@ -274,6 +311,7 @@ main{padding:12px 14px 0}
   경기: 경기데이터드림 일반 정비사업 추진현황 (2025-09-30 기준 · 지연 있음)<br>
   전국: 국토교통부 전국 도시정비사업 통합 데이터 (2026-05-18 기준 · 연 1회 갱신)<br>
   매물: <a href="https://autooneclick.com/exchange/" target="_blank" rel="noopener">교환·급매 전문관</a> · 문의 <a href="tel:01020022899">010-2002-2899</a></p>
+  <p class="vline" data-kts-visit>이 페이지 방문 기록을 불러오는 중…</p>
 </main>
 
 <div id="panel"><div class="sheet" id="sheet"></div></div>
@@ -619,80 +657,152 @@ function zoneName(r){
   var n = String(r.n || '').replace(/\s*(주택)?(재건축|재개발|도시정비|정비사업)\s*(정비사업)?\s*$/,'').replace(/\s*(조합|추진위원회)\s*$/,'').trim();
   return n || String(r.n || '');
 }
-function civicLinks(r){
-  var z = zoneName(r), q = encodeURIComponent(z);
-  var role = r.im || r.os || '';
-  var tel = r.tel ? ' · <b>' + esc(r.tel) + '</b>' : '';
-  var roleLine = (role || r.tel)
-    ? '<div class="note"><b>지금 단계 주체</b> ' + (role ? esc(role) : '공개 자료에 미기재') + tel +
-      '<br>조합·추진위 <b>이름·연락처</b>는 공개 자료에 있는 것만 적습니다. 비어 있으면 아래 사업장 원문에서 확인하세요.</div>'
-    : '<div class="note"><b>조합·추진위 이름과 연락처는 공개 자료에 없습니다.</b> 아래 사업장 원문이나 기사 검색으로 바로 확인하세요.</div>';
-  return roleLine +
-    '<a href="https://search.naver.com/search.naver?where=news&amp;sort=1&amp;query=' + q + '" target="_blank" rel="noopener"><i>📰</i>「' + esc(z.slice(0, 16)) + '」 관련 기사<em>네이버 뉴스 실시간</em></a>' +
-    '<a href="https://search.naver.com/search.naver?where=article&amp;query=' + encodeURIComponent(z + ' 조합 추진위') + '" target="_blank" rel="noopener"><i>💬</i>카페·블로그 — 조합·추진위 소식<em>검색</em></a>' +
-    '<a href="https://www.eum.go.kr/web/ar/lu/luLandDetailPop.jsp" target="_blank" rel="noopener"><i>🗺</i>토지이움 — 용도지역·공부 확인<em>국가 공식</em></a>';
+function roleName(r){ return r.im || r.os || ''; }
+function baseNote(r){
+  return r.__tab==='seoul'?'서울 26.6 (정보몽땅은 수시 갱신)':r.__tab==='gyeonggi'?'경기 25.9 — 원본이 2025-09-30 기준이라 최근 1년 변경분이 빠져 있습니다':'전국 26.5 — 연 1회 갱신';
 }
+function srcLinksHTML(r){
+  var out='';
+  if(r.__tab==='seoul'){
+    out += r.cu
+      ? '<a href="https://cleanup.seoul.go.kr/cafe/mainIndx.do?cafeUrl='+encodeURIComponent(r.cu)+'" target="_blank" rel="noopener"><i>📄</i>정보몽땅 사업장 원문<em>사업개요·공개자료</em></a>'
+      : '<a href="https://cleanup.seoul.go.kr/cleanup/bsnsstus/lscrMainIndx.do" target="_blank" rel="noopener"><i>🔎</i>정보몽땅에서 「'+esc(String(r.n).slice(0,14))+'」 검색<em>원문</em></a>';
+  }else if(r.__tab==='gyeonggi'){
+    out += '<a href="https://data.gg.go.kr/" target="_blank" rel="noopener"><i>📄</i>경기데이터드림 원문 확인<em>25.9 기준</em></a>';
+  }else{
+    out += '<a href="https://www.data.go.kr/data/15160169/fileData.do" target="_blank" rel="noopener"><i>📄</i>국토부 전국 데이터 원문<em>26.5 기준</em></a>';
+  }
+  out += '<a href="https://www.eum.go.kr/web/ar/lu/luLandDetailPop.jsp" target="_blank" rel="noopener"><i>🗺</i>토지이음 — 용도지역·공부 확인<em>국가 공식</em></a>';
+  return out;
+}
+function newsLinksHTML(r){
+  var z = zoneName(r), q = encodeURIComponent(z);
+  return '<a href="https://search.naver.com/search.naver?where=news&amp;sort=1&amp;query=' + q + '" target="_blank" rel="noopener"><i>📰</i>「' + esc(z.slice(0, 16)) + '」 관련 기사<em>네이버 뉴스 실시간</em></a>' +
+    '<a href="https://search.naver.com/search.naver?where=article&amp;query=' + encodeURIComponent(z + ' 조합 추진위') + '" target="_blank" rel="noopener"><i>💬</i>카페·블로그 — 조합·추진위 소식<em>검색</em></a>' +
+    '<a href="https://search.naver.com/search.naver?where=news&amp;query=' + encodeURIComponent(z + ' 구청 고시') + '" target="_blank" rel="noopener"><i>🏗</i>구청 고시·공고 검색<em>검색</em></a>';
+}
+function civicLinks(r){   /* 옛 호출명 유지 */
+  return '<div class="note"><b>지금 단계 주체</b> ' + (roleName(r) ? esc(roleName(r)) : '공개 자료에 미기재') + '</div>' + newsLinksHTML(r) + srcLinksHTML(r);
+}
+
+/* ---------- 258 (2026-11-27) 상세 3단 스위치 ---------- */
+var DTAB='1';
+function dswHTML(){
+  function b(n,nm){
+    var on = DTAB===n;
+    return '<button type="button" role="tab" data-dt="'+n+'" aria-selected="'+(on?'true':'false')+'"'+(on?' class="on"':'')+'>'+nm+'</button>';
+  }
+  return '<div class="dsw" role="tablist" aria-label="구역 확인 항목 — 단계·일정 / 조합·원문 / 뉴스·소식">'+b('1','① 단계·일정')+b('2','② 조합·원문')+b('3','③ 뉴스·소식')+'</div>';
+}
+function dpAttrs(n){ return DTAB===n ? '' : ' hidden'; }
+function paintDTab(n){
+  if(n) DTAB=String(n);
+  var sheet=$('sheet'); if(!sheet) return;
+  Array.prototype.forEach.call(sheet.querySelectorAll('[data-dp]'), function(p){ p.hidden = p.getAttribute('data-dp')!==DTAB; });
+  Array.prototype.forEach.call(sheet.querySelectorAll('.dsw button'), function(b){
+    var on = b.getAttribute('data-dt')===DTAB; b.classList.toggle('on',on); b.setAttribute('aria-selected', on?'true':'false');
+  });
+  if(sheet.scrollTop>8) sheet.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* 공개 데이터 표 — 추진단계·인가일·구역면적·세대수·소유자·조합원·연락처 (없으면 숨기지 않고 '공개자료 없음') */
+function latestDate(r){
+  var d=r.dt||{}, best='', lab='';
+  DATE_KEYS.forEach(function(k,i){ if(d[k] && (!best || String(d[k])>best)){ best=String(d[k]); lab=DATE_LABELS[i]; } });
+  return best ? {val:best, lab:lab} : null;
+}
+function specHTML(r){
+  var ld=latestDate(r), rows=[];
+  function put(lab,val){ rows.push([lab, val==null||val==='' ? '공개자료 없음' : String(val)]); }
+  put('추진단계', stageLabel(r)==='단계 미기재' ? '' : stageLabel(r));
+  put('최근 인가일', ld ? (ld.val+' · '+ld.lab) : '');
+  put('구역면적', r.ar ? won(Math.round(r.ar))+'㎡' : '');
+  var hv='';
+  if(r.hs && r.hn) hv='기존 '+won(r.hs)+' → 건립 '+won(r.hn)+'세대';
+  else if(r.hn) hv='건립 '+won(r.hn)+'세대';
+  else if(r.hs) hv='기존 '+won(r.hs)+'세대';
+  put('세대수', hv);
+  put('토지등소유자', r.own ? won(r.own)+'명' : '');
+  put('조합원', r.un ? won(r.un)+'명' : '');
+  put('조합 연락처', r.tel ? r.tel : (r.__tab==='gyeonggi' ? '' : '경기 자료에만 있음'));
+  var body = rows.map(function(x){
+    var none = (x[1]==='공개자료 없음' || x[1]==='경기 자료에만 있음');
+    return '<div><span>'+x[0]+'</span><b'+(none?' class="nv"':'')+'>'+esc(x[1])+'</b></div>';
+  }).join('');
+  return '<div class="spec">'+body+'</div>';
+}
+function consentHTML(r){
+  var href = (r.__tab==='seoul' && r.cu)
+    ? 'https://cleanup.seoul.go.kr/cafe/mainIndx.do?cafeUrl='+encodeURIComponent(r.cu)
+    : r.__tab==='seoul' ? 'https://cleanup.seoul.go.kr/cleanup/bsnsstus/lscrMainIndx.do'
+    : r.__tab==='gyeonggi' ? 'https://data.gg.go.kr/'
+    : 'https://www.data.go.kr/data/15160169/fileData.do';
+  return '<div class="nonebox"><div class="nh">동의율 <b>공개자료 없음</b></div>'+
+    '<p>추진위원회·조합 <b>동의율</b>은 공개 데이터에 들어 있지 않습니다. <b>정보몽땅 사업개요 원문</b>에서 확인하세요.</p>'+
+    '<a href="'+href+'" target="_blank" rel="noopener">정보몽땅 원문 바로가기 →</a></div>';
+}
+function priceHTML(r){
+  var addr=addrOf(r), priceQ=encodeURIComponent(addr);
+  return '<div class="lnklist">'+
+      '<a href="https://map.naver.com/p/search/'+priceQ+'" target="_blank" rel="noopener"><i>🏠</i>네이버 지도로 이 자리 보기<em>주변</em></a>'+
+      '<a href="https://rt.molit.go.kr/" target="_blank" rel="noopener"><i>📊</i>국토부 실거래가 공개시스템<em>실거래</em></a>'+
+      '<a href="https://www.realtyprice.kr/" target="_blank" rel="noopener"><i>📋</i>부동산공시가격 알리미<em>공시지가</em></a>'+
+    '</div>'+
+    '<div class="note">위 세 곳은 주소를 직접 넣어 확인하는 곳입니다(이 화면은 금액을 계산·표시하지 않습니다).</div>'+
+    '<div class="warn"><b>감정평가액·비례율은 관리처분 전 비공개입니다.</b> 공식 감정평가액·비례율·분담금은 관리처분계획 인가 때 공개됩니다. 위 링크의 시세·공시지가는 <b>참고 값</b>이고, 이 화면은 어떤 금액도 계산해 드리지 않습니다.</div>';
+}
+function navCardHTML(r){
+  return '<div class="card"><h2><i>→</i>현장 내비 <small>바로 열기</small></h2>'+navHTML(r)+
+    '<div class="note">티맵은 앱이 설치된 폰에서 바로 열립니다. 앱이 없으면 주소를 복사해 쓰세요.</div></div>';
+}
+function priceCardHTML(r){
+  return '<div class="card"><h2><i>₩</i>참고 시세·공시지가 <small>참고용</small></h2>'+priceHTML(r)+'</div>';
+}
+
 
 function sheetHTML(r){
   if(r.__tab==='moa') return moaSheetHTML(r);
-  var t=r.__tab, tags='';
+  var tags='';
   function tag(v,cls){ if(!v) return ''; tags+='<span class="'+(cls||'')+'">'+esc(v)+'</span>'; }
-  tag(r.__tab==='seoul'?r.t:(r.__tab==='gyeonggi'?r.t:r.t));
   tag(stageLabel(r),'hot');
   if(r.o==='일시중단') tag('일시중단','stop');
-  tag(r.__tab==='nation'?'전국 통합':'추진단계 사다리');
-  var kvs='';
-  function kv(lab,val,unit){ if(val==null||val==='') return; kvs+='<div><span>'+lab+'</span><b>'+won(val)+(unit?'<small>'+unit+'</small>':'')+'</b></div>'; }
-  if(r.__tab==='seoul'){
-    kv('기존 세대수',r.hs,'세대'); kv('건립 세대수',r.hn,'세대');
-    kv('분양',r.sa,'세대'); kv('임대',r.re,'세대');
-  }else if(r.__tab==='gyeonggi'){
-    kv('구역면적',r.ar,'㎡'); kv('기존 세대수',r.hs,'세대');
-    kv('사업시행 세대수',r.hn,'세대'); kv('임대',r.re,'세대');
-    kv('기존 용적률',r.fo,'%'); kv('신축 용적률',r.fn,'%');
-    kv('토지등소유자',r.own,'명'); kv('조합원',r.un,'명');
-  }else{
-    kv('공급 예정 세대수',r.hn,'세대');
-  }
-  var srcLinks='';
-  if(r.__tab==='seoul'){
-    if(r.cu){
-      srcLinks+='<a href="https://cleanup.seoul.go.kr/cafe/mainIndx.do?cafeUrl='+encodeURIComponent(r.cu)+'" target="_blank" rel="noopener"><i>📄</i>정보몽땅 사업장 원문<em>사업개요·공개자료</em></a>';
-    }else{
-      srcLinks+='<a href="https://cleanup.seoul.go.kr/cleanup/bsnssttus/lscrMainIndx.do" target="_blank" rel="noopener"><i>🔎</i>정보몽땅에서 「'+esc(r.n.slice(0,14))+'」 검색<em>원문</em></a>';
-    }
-  }else if(r.__tab==='gyeonggi'){
-    srcLinks+='<a href="https://data.gg.go.kr/" target="_blank" rel="noopener"><i>📄</i>경기데이터드림 원문 확인<em>25.9 기준</em></a>';
-  }else{
-    srcLinks+='<a href="https://www.data.go.kr/data/15160169/fileData.do" target="_blank" rel="noopener"><i>📄</i>국토부 전국 데이터 원문<em>26.5 기준</em></a>';
-  }
-  var addr=addrOf(r);
-  var priceQ=encodeURIComponent(addr);
-  var telLine=r.tel? '<div class="note"><b>구역 담당</b> '+esc(r.tel)+'</div>':'';
+  tag(r.t);
+  tag(r.__tab==='nation'?'전국 통합':'공개자료');
+  var addr=addrOf(r), role=roleName(r);
+  var srcHead=(r.__tab==='seoul'?'서울':r.__tab==='gyeonggi'?'경기':'전국');
 
-  return '<div class="shd"><button data-act="close">← 목록</button><span>'+(r.__tab==='seoul'?'서울':r.__tab==='gyeonggi'?'경기':'전국')+' · '+esc(stageLabel(r))+'</span></div>'+
+  return '<div class="shd"><div class="r1"><button data-act="close">← 목록</button><span>'+srcHead+' · '+esc(stageLabel(r))+'</span></div>'+dswHTML()+'</div>'+
   '<div class="sbody">'+
     '<div class="dt"><h3>'+esc(r.n)+'</h3><div class="lo">'+esc(addr)+'</div><div class="tags">'+tags+'</div></div>'+
-    ladderHTML(r)+
-    datesHTML(r)+
-    (kvs?'<div class="kv">'+kvs+'</div>':'')+
-    telLine+
-    '<div class="card"><h2><i>→</i>현장 내비 <small>바로 열기</small></h2>'+navHTML(r)+
-      '<div class="note">티맵은 앱이 설치된 폰에서 바로 열립니다. 앱이 없으면 주소를 복사해 쓰세요.</div></div>'+
-    '<div class="card"><h2><i>₩</i>참고 시세·공시지가 <small>참고용</small></h2>'+
-      '<div class="lnklist">'+
-        '<a href="https://map.naver.com/p/search/'+priceQ+'" target="_blank" rel="noopener"><i>🏠</i>네이버 지도로 이 자리 보기<em>주변</em></a>'+
-        '<a href="https://rt.molit.go.kr/" target="_blank" rel="noopener"><i>📊</i>국토부 실거래가 공개시스템<em>실거래</em></a>'+
-        '<a href="https://www.realtyprice.kr/" target="_blank" rel="noopener"><i>📋</i>부동산공시가격 알리미<em>공시지가</em></a>'+
-      '</div>'+
-      '<div class="note">위 세 곳은 주소를 직접 넣어 확인하는 곳입니다(이 화면은 금액을 계산·표시하지 않습니다).</div>'+
-      '<div class="warn"><b>감정평가액·비례율은 관리처분 전 비공개입니다.</b> 공식 감정평가액·비례율·분담금은 관리처분계획 인가 때 공개됩니다. 위 링크의 시세·공시지가는 <b>참고 값</b>이고, 이 화면은 어떤 금액도 계산해 드리지 않습니다.</div>'+
+    /* ① 단계·일정 */
+    '<div class="dp" data-dp="1"'+dpAttrs('1')+'>'+
+      ladderHTML(r)+
+      datesHTML(r)+
+      specHTML(r)+
+      consentHTML(r)+
     '</div>'+
-    dealHTML(r)+
-    alertHTML(r)+
-    '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+srcLinks+civicLinks(r)+'</div>'+
-      '<div class="note"><b>도면</b> 정비구역 도면·고시문은 정보몽땅 원문의 공개자료에서 내려받습니다. (공개자료가 없는 구역은 구청 도시정비과로 문의)<br><b>기준일</b> '+(r.__tab==='seoul'?'서울 26.6 (정보몽땅은 수시 갱신)':r.__tab==='gyeonggi'?'경기 25.9 — 원본이 2025-09-30 기준이라 최근 1년 변경분이 빠져 있습니다':'전국 26.5 — 연 1회 갱신')+'<br>공개 데이터를 그대로 모은 참고 자료이며 <b>법적 효력이 없습니다.</b></div>'+
+    /* ② 조합·원문 */
+    '<div class="dp" data-dp="2"'+dpAttrs('2')+'>'+
+      '<div class="card"><h2><i>👥</i>지금 단계 주체 <small>공개자료</small></h2>'+
+        '<div class="kv1"><div><span>단계 주체</span><b'+(role?'':' class="nv"')+'>'+(role?esc(role):'공개자료 없음')+'</b></div>'+
+        '<div><span>조합·추진위 연락처</span><b'+(r.tel?'':' class="nv"')+'>'+(r.tel?esc(r.tel):(r.__tab==='gyeonggi'?'공개자료 없음':'경기 자료에만 있음'))+'</b></div></div>'+
+        '<div class="note">조합·추진위 <b>이름·연락처</b>는 공개 자료에 있는 것만 적습니다. 비어 있으면 아래 원문에서 확인하세요.</div></div>'+
+      '<div class="card"><h2><i>🔗</i>원문·공식 자료 <small>확인은 원문으로</small></h2>'+
+        '<div class="lnklist">'+srcLinksHTML(r)+'</div>'+
+        '<div class="note"><b>도면</b> 정비구역 도면·고시문은 정보몽땅 원문의 공개자료에서 내려받습니다. (공개자료가 없는 구역은 구청 도시정비과로 문의)<br><b>기준일</b> '+baseNote(r)+'<br>공개 데이터를 그대로 모은 참고 자료이며 <b>법적 효력이 없습니다.</b></div></div>'+
+      dealHTML(r)+
     '</div>'+
+    /* ③ 뉴스·소식 */
+    '<div class="dp" data-dp="3"'+dpAttrs('3')+'>'+
+      '<div class="card"><h2><i>📰</i>뉴스·소식 <small>실시간 검색</small></h2>'+
+        '<div class="lnklist">'+newsLinksHTML(r)+'</div>'+
+        '<div class="note">기사·블로그는 검색 결과로 바로 연결합니다. 이 화면은 기사 내용을 저장하거나 요약하지 않습니다.</div></div>'+
+      alertHTML(r)+
+    '</div>'+
+    /* 공통 — 현장·시세 접어 둠 */
+    '<details class="xmore"><summary>현장 내비 · 참고 시세 <small>펼치기</small></summary>'+
+      navCardHTML(r)+priceCardHTML(r)+
+    '</details>'+
     '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
   '</div>';
 }
@@ -721,30 +831,49 @@ function moaSheetHTML(r){
         return '<div class="rowr" style="display:flex;gap:6px;font-size:11px;color:#C9D6E6;padding:4px 0;border-bottom:1px solid #16233D"><b style="flex:1;font-weight:900;color:#fff">'+esc(x.n.slice(0,26))+'</b><span style="color:#9FB0C8">'+esc(x.t)+'</span><span style="color:#FFC98F;font-weight:800">'+esc(x.st||'—')+'</span></div>';
       }).join('')
     : '<div class="note" style="margin:0">같은 동에 가로주택·소규모 사업장이 공개 목록에 없습니다. 관리지역 안 개별 사업은 서울 탭에서 동 이름으로 찾아보세요.</div>';
-  return '<div class="shd"><button data-act="close">← 목록</button><span>모아타운 · 확인 결과</span></div>'+
+  var z=String(r.n||''), q=encodeURIComponent(z);
+  var newsLinks=
+    '<a href="https://search.naver.com/search.naver?where=news&amp;sort=1&amp;query='+q+'" target="_blank" rel="noopener"><i>📰</i>「'+esc(z.slice(0,16))+'」 관련 기사<em>네이버 뉴스 실시간</em></a>'+
+    '<a href="https://search.naver.com/search.naver?where=article&amp;query='+encodeURIComponent(z+' 모아타운')+'" target="_blank" rel="noopener"><i>💬</i>카페·블로그 소식<em>검색</em></a>'+
+    '<a href="https://search.naver.com/search.naver?where=news&amp;query='+encodeURIComponent((r.g||'')+' 모아타운 구청 고시')+'" target="_blank" rel="noopener"><i>🏗</i>구청 고시·공고 검색<em>검색</em></a>';
+  return '<div class="shd"><div class="r1"><button data-act="close">← 목록</button><span>모아타운 · 확인 결과</span></div>'+dswHTML()+'</div>'+
   '<div class="sbody">'+
     '<div class="dt"><h3>'+esc(r.n)+'</h3><div class="lo">'+esc(addrOf(r))+'</div>'+
       '<div class="tags"><span class="hot">'+esc(stageLabel(r))+'</span>'+flags+
         '<span>모아타운 · '+esc(r.rg||'서울')+'</span>'+(r.bl?'<span>모아주택 '+r.bl+'개 구역</span>':'')+'</div></div>'+
-    '<div class="lad"><div class="mlad">'+
-      '<div class="on"><b>1</b>대상지 선정</div><div class="on"><b>2</b>관리계획 수립</div>'+
-      '<div class="on now"><b>3</b>승인·고시</div><div><b>4</b>모아주택 착공</div></div>'+
-      '<div class="mst"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>'+
-      '<div class="note" style="margin-top:6px">승인·고시까지 확인된 상태입니다. 4단계(모아주택 착공)는 관리지역 안 개별 사업장마다 달라서, 아래 같은 동 사업장과 구청 공고로 확인하세요.</div></div>'+
-    '<div class="kv">'+kvs+'</div>'+
-    (r.scale?'<div class="note"><b>규모(원문)</b> '+esc(r.scale)+'</div>':'')+
-    '<div class="card"><h2><i>→</i>현장 내비 <small>바로 열기</small></h2>'+navHTML(r)+
-      '<div class="note">티맵은 앱이 설치된 폰에서 바로 열립니다. 앱이 없으면 주소를 복사해 쓰세요.</div></div>'+
-    '<div class="card"><h2><i>▤</i>같은 동 모아주택 후보 <small>가로주택·소규모</small></h2>'+dealHtml+
-      '<div class="note">대표지번이 같은 동인 사업장을 보여 드리는 <b>참고 목록</b>입니다. 관리지역 경계 안 필지 전체를 가리키지는 않습니다.</div></div>'+
-    '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+
-      (r.lk?'<a href="'+esc(r.lk)+'" target="_blank" rel="noopener"><i>📄</i>서울시 모아타운 아카이브 원문<em>변경 전·후 도면</em></a>':'')+
-      '<a href="https://news.seoul.go.kr/citybuild/moa-housing-town/archive" target="_blank" rel="noopener"><i>📚</i>모아주택·모아타운 아카이브 전체<em>권역별</em></a>'+
-      '<a href="https://housing.seoul.go.kr/site/main/content/sh_080003" target="_blank" rel="noopener"><i>🏠</i>서울주거포털 모아주택·모아타운<em>정책·현황</em></a>'+civicLinks(r)+'</div>'+
-      '<div class="note"><b>기준일</b> 서울시 온라인 아카이브(관리계획 승인·고시분) · 26.11 수집<br>아카이브에 없는 대상지(선정·계획 수립 중)는 이 화면에 없습니다. 공개 자료를 모은 <b>참고용</b>이고 법적 효력은 없습니다.</div></div>'+
+    /* ① 승인·규모 */
+    '<div class="dp" data-dp="1"'+dpAttrs('1')+'>'+
+      '<div class="lad"><div class="mlad">'+
+        '<div class="on"><b>1</b>대상지 선정</div><div class="on"><b>2</b>관리계획 수립</div>'+
+        '<div class="on now"><b>3</b>승인·고시</div><div><b>4</b>모아주택 착공</div></div>'+
+        '<div class="mst"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>'+
+        '<div class="note" style="margin-top:6px">승인·고시까지 확인된 상태입니다. 4단계(모아주택 착공)는 관리지역 안 개별 사업장마다 달라서, 아래 같은 동 사업장과 구청 공고로 확인하세요.</div></div>'+
+      '<div class="kv">'+kvs+'</div>'+
+      (r.scale?'<div class="note"><b>규모(원문)</b> '+esc(r.scale)+'</div>':'')+
+    '</div>'+
+    /* ② 같은 동·원문 */
+    '<div class="dp" data-dp="2"'+dpAttrs('2')+'>'+
+      '<div class="card"><h2><i>▤</i>같은 동 모아주택 후보 <small>가로주택·소규모</small></h2>'+dealHtml+
+        '<div class="note">대표지번이 같은 동인 사업장을 보여 드리는 <b>참고 목록</b>입니다. 관리지역 경계 안 필지 전체를 가리키지는 않습니다.</div></div>'+
+      '<div class="card"><h2><i>🔗</i>원문·출처 <small>확인은 원문으로</small></h2><div class="lnklist">'+
+        (r.lk?'<a href="'+esc(r.lk)+'" target="_blank" rel="noopener"><i>📄</i>서울시 모아타운 아카이브 원문<em>변경 전·후 도면</em></a>':'')+
+        '<a href="https://news.seoul.go.kr/citybuild/moa-housing-town/archive" target="_blank" rel="noopener"><i>📚</i>모아주택·모아타운 아카이브 전체<em>권역별</em></a>'+
+        '<a href="https://housing.seoul.go.kr/site/main/content/sh_080003" target="_blank" rel="noopener"><i>🏠</i>서울주거포털 모아주택·모아타운<em>정책·현황</em></a>'+
+        '<a href="https://www.eum.go.kr/web/ar/lu/luLandDetailPop.jsp" target="_blank" rel="noopener"><i>🗺</i>토지이음 — 용도지역·공부 확인<em>국가 공식</em></a></div>'+
+        '<div class="note"><b>기준일</b> 서울시 온라인 아카이브(관리계획 승인·고시분) · 26.11 수집<br>아카이브에 없는 대상지(선정·계획 수립 중)는 이 화면에 없습니다. 공개 자료를 모은 <b>참고용</b>이고 법적 효력은 없습니다.</div></div>'+
+    '</div>'+
+    /* ③ 뉴스·소식 */
+    '<div class="dp" data-dp="3"'+dpAttrs('3')+'>'+
+      '<div class="card"><h2><i>📰</i>뉴스·소식 <small>실시간 검색</small></h2>'+
+        '<div class="lnklist">'+newsLinks+'</div>'+
+        '<div class="note">기사·블로그는 검색 결과로 바로 연결합니다. 이 화면은 기사 내용을 저장하거나 요약하지 않습니다.</div></div>'+
+      alertHTML(r)+
+    '</div>'+
+    '<details class="xmore"><summary>현장 내비 <small>펼치기</small></summary>'+navCardHTML(r)+'</details>'+
     '<p class="foot">KTS 원클릭 · 재개발 진행조회기<br><a href="tel:01020022899">010-2002-2899</a></p>'+
   '</div>';
 }
+
 /* ---------- 확인 결과 바닥(저장·공유) — 모든 탭 공통 ---------- */
 function paidUser(){ return !!(window.KTS&&window.KTS.isMaster&&window.KTS.isMaster()) }
 function actBar(){
@@ -797,6 +926,7 @@ function openSheet(k){ /* k = [자료 탭, 행 번호] — 통합 모드에서�
   var r=rows(k[0])[k[1]]; if(!r) return;
   CURDATA=r; CURKEY=k;
   $('sheet').innerHTML=sheetHTML(r)+actBar();
+  paintDTab();
   $('sheet').scrollTop=0;
   $('panel').classList.add('on');
   document.body.style.overflow='hidden';
@@ -994,7 +1124,36 @@ function pickTab(t){
   TAB=t; LAST=t; PIN=!!Q.trim(); FILT='all'; SHOWN=40;
   buildChips(); render();
 }
+/* 258 — [검색] 버튼·엔터: 목록 맨 위로 내려가 첫 결과를 바로 강조 */
+function firstItem(){
+  var box=$('list'); return box ? box.querySelector('.item') : null;
+}
+function markFirst(){
+  var f=firstItem(); if(!f) return;
+  f.classList.remove('hit');
+  void f.offsetWidth;
+  f.classList.add('hit');
+  setTimeout(function(){ f.classList.remove('hit'); }, 2800);
+}
+function goListTop(){
+  var box=$('list'); if(!box) return;
+  var hd=document.querySelector('header');
+  var off=(hd?hd.getBoundingClientRect().height:0)+6;
+  var y=box.getBoundingClientRect().top+window.pageYOffset-off;
+  try{ window.scrollTo({top:Math.max(0,y),behavior:'smooth'}); }catch(e){ window.scrollTo(0,Math.max(0,y)); }
+  try{ box.setAttribute('tabindex','-1'); }catch(e){}
+}
+function runSearch(){
+  var v=String(($('q')||{}).value||'').trim();
+  Q=v; SHOWN=40;
+  $('clr').style.display=v?'block':'none';
+  syncMode(); render();
+  markFirst(); goListTop();
+}
 $('q').addEventListener('input',function(){ Q=this.value; SHOWN=40; $('clr').style.display=Q?'block':'none'; syncMode(); render(); });
+$('q').addEventListener('keydown',function(e){ if(e.key==='Enter'||e.keyCode===13){ e.preventDefault(); runSearch(); this.blur(); } });
+$('q').addEventListener('search',function(){ runSearch(); });
+$('go').addEventListener('click',runSearch);
 $('clr').addEventListener('click',function(){ $('q').value=''; Q=''; this.style.display='none'; SHOWN=40; syncMode(); render(); });
 $('tabs').addEventListener('click',function(e){
   var b=e.target.closest('button'); if(!b) return;
@@ -1013,6 +1172,8 @@ $('list').addEventListener('click',function(e){
 });
 $('panel').addEventListener('click',function(e){
   if(e.target===this){ closeSheet(); return; }
+  var tb=e.target.closest('[data-dt]');
+  if(tb){ paintDTab(tb.getAttribute('data-dt')); return; }
   var b=e.target.closest('[data-act]'); if(!b) return;
   var a=b.dataset.act;
   if(a==='close') closeSheet();
@@ -1021,7 +1182,7 @@ $('panel').addEventListener('click',function(e){
   if(a==='alertSave') saveAlert();
   if(a==='alertDel'){ store(ALERT_KEY,[]); openSheet(CURKEY); toast('알림 신청을 취소했습니다'); }
   if(a==='alertDelOne'){ var l=alerts(); l.splice(Number(b.dataset.i),1); store(ALERT_KEY,l); openSheet(CURKEY); }
-  if(a==='alert'){ var ac=$('alertcard'); if(ac) ac.scrollIntoView({behavior:'smooth',block:'center'}); }
+  if(a==='alert'){ paintDTab('3'); var ac=$('alertcard'); if(ac) ac.scrollIntoView({behavior:'smooth',block:'center'}); }
   if(a==='smsAlert') smsAlert();
   if(a==='gate') gate();
   var cp=b.getAttribute('data-copy');
@@ -1037,6 +1198,6 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModa
 load();
 })();
 </script>
-<script src="../helper.js?v=20261125c"></script>
+<script src="../helper.js?v=20261127a"></script>
 <script src="/shared/pwa-install.js?v=20261126" data-name="재개발" data-start="/redev/" data-manifest="/shared/pwa/redev.webmanifest" defer></script>
 </body></html>

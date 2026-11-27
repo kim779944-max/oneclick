@@ -857,3 +857,15 @@
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();
 })(window, document);
+
+/* ============================================================================
+   256 (2026-11-27) 방문 카운트 — 이 파일을 쓰는 모든 페이지에서 한 번만
+   ========================================================================== */
+(function () {
+  if (window.__ktsVisit || window.__ktsVisitLoader) return;
+  window.__ktsVisitLoader = 1;
+  var s = document.createElement('script');
+  s.src = '/shared/visit.js?v=20261127a';
+  s.async = true;
+  (document.head || document.documentElement).appendChild(s);
+})();

@@ -309,6 +309,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 </style>
 <link rel="stylesheet" href="shared/kts-print.css?v=20261124a">
 <script src="shared/kts-ui.js?v=20261124a" defer></script>
+<link rel="canonical" href="https://autooneclick.com/">
 <link rel="manifest" href="/shared/pwa/home.webmanifest"></head>
 <body>
 <div id="app">
@@ -389,7 +390,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 
   <!-- 171: 5대 대문 — 누르면 그 구역 상품만 -->
   <div class="gatesLb">🗂 <b>분류로 찾기</b> — 도구 <span id="gateN">26</span>종</div>
-  <nav class="gates" id="gates" aria-label="도구 분류 5가지"></nav>
+  <nav class="gates" id="gates" aria-label="도구 분류 — 1~4호 세트 · 사업장 · 생활기록 · 준비 중"></nav>
   <div class="homeRow" id="homeRow">
     <button type="button" class="hbtn" id="helpBtn2"><b>?</b> 사용법</button>
     <button type="button" class="hbtn" id="cpnBtn">이용권</button>
@@ -427,7 +428,8 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
     <b>케이티에스 원클릭</b> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>
     올린 파일은 서버로 보내지 않고 브라우저 안에서만 처리합니다.<br>
     <a href="detail.html?k=viewer">도구 소개</a> · <a href="navi2/">독심술</a> · <a href="saycap/">세이캡</a> · <a href="exchange/">교환급매물</a><br>
-    이용약관 · 개인정보처리방침 — 준비 중(결제·회원가입이 없어 따로 모으는 개인정보가 없습니다)
+    이용약관 · 개인정보처리방침 — 준비 중(결제·회원가입이 없어 따로 모으는 개인정보가 없습니다)<br>
+    <span data-kts-visit style="display:inline-block;margin-top:6px;color:#93A5BD;font-size:10.5px;font-weight:800"></span>
   </div>
   </div><!-- /.tail -->
 </div>
@@ -435,7 +437,7 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 <button class="totop" id="toTop" type="button">↑ 위로</button>
 
 <script src="shared/kts-edge.js?v=20261124a"></script><!-- 173 내 메뉴 편집 — 아래 render() 가 첫 그림부터 저장값을 읽어야 해서 defer 없이 -->
-<script src="master.js?v=20261121k"></script>
+<script src="master.js?v=20261127a"></script>
 <script src="products.js?v=20261123c"></script>
 <script src="pay.js?v=20261124e"></script>
 <script src="slots.js?v=20261124c"></script>
@@ -460,6 +462,7 @@ window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
    ② 쓰는 순서 — 직업/용도별 묶음. 여기 순서만 바꾸면 화면이 그대로 따라옵니다.
    ========================================================================== */
 var LOCAL = {
+  area:{nm:'면적 그리기', sub:'필지 포함·제외 → 면적(㎡·평) 자동 합산', link:'area/', ico:'▱', badge:'NEW'},
   bizcard:{nm:'전자명함·매물장', sub:'문자 하나로 5초 매물장 · 내 명함 홈피', link:'bizcard/', ico:'👤', badge:'NEW', free:1},
   gongbu:{nm:'4대 공부', sub:'토지대장·건축물대장·지적도·토지이용계획 한 장', link:'gongbu/', ico:'▤', badge:'NEW'},
   thescan:{nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', ico:'▣', badge:'NEW'},
@@ -473,17 +476,23 @@ var UNIT = {theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:
 
 /* 마인드맵(2026-11-23 확정 · 쓰는 순서 축)과 1:1 — K0612766940K-/output/서비스_마인드맵_20261123/쇼룸_버튼구조.md */
 /* 2026-11-24 대표님 최종 분류표(188번) — 01 부동산 중개 · 02 부동산 2 · 03 사업장 · 04 생활기록 (+준비 중 선반) */
+/* 255 (2026-11-27) 대표님 확정 1~4호 세트 흐름 — 1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션,
+   그 뒤에 사업장·생활기록·준비 중을 그대로 이어 붙인다(도구 하나도 빼지 않음). */
 var GROUPS = [
-  {no:'01', cat:'realty',  t:'부동산 중개', s:'전자명함 → 더뷰 → 양식만들기 → 표준계약서 → 매물', ks:['bizcard','viewer','theform','contract','realty','listing','redev','sign']},
-  {no:'02', cat:'realty2', t:'부동산 2',    s:'경사도 토지정보 · 4대 공부 · 교환급매물',      ks:['slope','gongbu','exchange']},
-  {no:'03', cat:'biz',     t:'사업장',      s:'상품·판매·자금·인테리어',                      ks:['thedetail','seller','commerce','keyword','sale','gagebu','loan','interior','homepage','thescan','theeraser']},
-  {no:'04', cat:'life',    t:'생활기록',    s:'정리·사진·휴대폰·취미',                        ks:['organizer','saycap','navi','hogang','golf','petmind','tongyeok']},
-  {no:'05', cat:'soon',    t:'준비 중',     s:'나오면 맨 위에 알려 드립니다 (보기만)',        ks:['append','youtube','travel']}
+  {no:'01', cat:'set1', t:'1호 땅·공부',  s:'면적그리기 · 경사도 · 4대 공부',              ks:['area','slope','gongbu']},
+  {no:'02', cat:'set2', t:'2호 계약·서명', s:'5초계약서 · 양식만들기 · 더싸인 · 더뷰',       ks:['contract','theform','sign','viewer']},
+  {no:'03', cat:'set3', t:'3호 영업·매물', s:'전자명함 · 매물장 · 매물수집기 · 교환급매물',   ks:['bizcard','listing','realty','exchange']},
+  {no:'04', cat:'set4', t:'4호 옵션',     s:'경공매 · 재개발 · 사업자 대출',                ks:['hogang','redev','loan']},
+  {no:'05', cat:'biz',  t:'사업장',       s:'상품·판매·자금·인테리어',                      ks:['thedetail','seller','commerce','keyword','sale','gagebu','interior','homepage','thescan','theeraser']},
+  {no:'06', cat:'life', t:'생활기록',     s:'정리·사진·휴대폰·취미',                        ks:['organizer','saycap','navi','golf','petmind','tongyeok']},
+  {no:'07', cat:'soon', t:'준비 중',      s:'나오면 맨 위에 알려 드립니다 (보기만)',         ks:['append','youtube','travel']}
 ];
-var CHIPS = [{c:'all', t:'전체'},{c:'realty', t:'부동산 중개'},{c:'realty2', t:'부동산 2'},{c:'biz', t:'사업장'},{c:'life', t:'생활기록'},{c:'soon', t:'준비 중'}];
+/* 옛 주소(?g=realty·#cat-realty2)로 들어와도 같은 자리로 — 404 없이 */
+var CAT_ALIAS = {realty:'set1', realty2:'set3', doc:'set2'};
+var CHIPS = [{c:'all', t:'전체'},{c:'set1', t:'1호 땅·공부'},{c:'set2', t:'2호 계약·서명'},{c:'set3', t:'3호 영업·매물'},{c:'set4', t:'4호 옵션'},{c:'biz', t:'사업장'},{c:'life', t:'생활기록'},{c:'soon', t:'준비 중'}];
 /* 185: 부동산 구역은 아이콘 중심 정사각 타일 — 타일 이름은 390px 에서 잘리지 않는 짧은 이름 */
-var TILE_NM = {viewer:'더뷰', theform:'양식만들기', contract:'표준계약서', realty:'매물수집기', listing:'매물장 뷰어', redev:'재개발 조회', sign:'더싸인', slope:'경사도·토지정보', gongbu:'4대 공부', exchange:'교환급매물', bizcard:'전자명함'};
-var TILE_CAT = {realty:1, realty2:1};
+var TILE_NM = {area:'면적그리기', viewer:'더뷰', theform:'양식만들기', contract:'5초 계약서', sign:'더싸인', bizcard:'전자명함', listing:'매물장·포스터', realty:'매물수집기', exchange:'교환급매물', hogang:'경공매 내비', redev:'재개발 조회', loan:'사업자 대출', slope:'경사도·토지정보', gongbu:'4대 공부'};
+var TILE_CAT = {set1:1, set2:1, set3:1, set4:1};
 var CHIP_KEY = 'kts_cat_chip';
 /* 대표 3종 — 강조용 복제(목록 완전성 검사에서 제외) */
 var FEATURED = [
@@ -600,10 +609,11 @@ function renderGates(menu){
 /* 대문(home) ↔ 구역(cat) — 주소 끝 #cat-realty 로 기억(뒤로 가기 = 대문으로) */
 var GATE = 'home';
 function gateFromHash(){
-  var h = location.hash || '', m = h.match(/^#cat-(\w+)$/) || h.match(/^#sec(0[1-5])$/);
+  var h = location.hash || '', m = h.match(/^#cat-(\w+)$/) || h.match(/^#sec(0[1-7])$/);
   if (!m) return 'home';
   if (/^0/.test(m[1])) { var g = GROUPS.filter(function(x){ return x.no === m[1]; })[0]; return g ? g.cat : 'home'; }
-  return GROUPS.some(function(x){ return x.cat === m[1]; }) ? m[1] : 'home';
+  var c = CAT_ALIAS[m[1]] || m[1];
+  return GROUPS.some(function(x){ return x.cat === c; }) ? c : 'home';
 }
 function showGate(c, push){
   GATE = GROUPS.some(function(x){ return x.cat === c; }) ? c : 'home';
@@ -656,7 +666,7 @@ document.addEventListener('click', function(e){
 var HELP_HTML =
   '<p><b>설치 없이 · 로그인 없이 · 결제 없이</b></p>' +
   '<p><b>반복 업무, 클릭 한 번으로 끝내세요.</b><br>설치 없이 바로 쓰는 사업자용 업무 도구입니다. 매물 정리부터 상품 콘텐츠·서명까지.</p>' +
-  '<p>① 위의 <b>5대 분류</b> 중 하나를 누르면 그 구역 도구만 나옵니다. <b>[← 전체 분류]</b>로 돌아옵니다.<br>' +
+  '<p>① 위의 <b>분류</b> 중 하나를 누르면 그 구역 도구만 나옵니다. <b>1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션</b> 순서입니다. <b>[← 전체 분류]</b>로 돌아옵니다.<br>' +
   '② 오른쪽 위 <b>[편집]</b>에서 내가 쓰는 도구만 남기고 순서를 바꿉니다. 뺀 도구는 [+ 추가하기]로 되살립니다.<br>' +
   '③ <b>어두운</b>(남색 바탕) · <b>밝은</b>(흰 바탕)을 고를 수 있습니다. 인쇄는 항상 흰 바탕입니다.</p>' +
   '<p>설치·로그인·결제 없이 씁니다. 무료 이용권은 아래 <b>[이용권]</b>에서.</p>' +
@@ -677,7 +687,7 @@ $('#payNoteBtn').onclick = function(){
   if (window.KTSPay) { KTSPay.open({label:'이용권 · 열쇠'}); return; }
   var _m = $('#payNoteMsg'); _m.hidden = false; _m.style.display = 'block';   /* 인라인 display:none 이 hidden 속성을 이기므로 둘 다 푼다 */
 };
-$('#startBtn').onclick = function(){ showGate('realty', true); };
+$('#startBtn').onclick = function(){ showGate('set1', true); };
 document.addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('[data-cpn]') : null; if (b) { e.preventDefault(); showCoupon(); } });
 
 function renderFeat(){
@@ -846,6 +856,7 @@ render();
 function gateFromQuery(){
   var g = ''; try{ g = String(new URLSearchParams(location.search).get('g') || ''); }catch(e){}
   g = g.replace(/[^a-z0-9]/gi, '');
+  g = CAT_ALIAS[g] || g;
   return GROUPS.some(function(x){ return x.cat === g; }) ? g : '';
 }
 showGate(gateFromQuery() || gateFromHash(), false);
@@ -859,7 +870,7 @@ window.addEventListener('hashchange', function(){ if (location.hash === '#coupon
   window.addEventListener('scroll', function(){ btn.classList.toggle('on', window.scrollY>420); }, {passive:true});
 })();
 </script>
-<script src="helper.js?v=20261125c"></script>
+<script src="helper.js?v=20261127a"></script>
 <script src="/shared/pwa-install.js?v=20261126" data-name="원클릭" data-start="/" data-manifest="/shared/pwa/home.webmanifest" defer></script>
 </body>
 </html>
