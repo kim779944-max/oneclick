@@ -129,6 +129,7 @@
     $('#k1').textContent = p.sale ? money(p.sale) : $('#k1').textContent;
     $('#k2').textContent = p.loanAmount ? money(p.loanAmount) : $('#k2').textContent;
     $('#k3').textContent = p.realInvest ? money(p.realInvest) : $('#k3').textContent;
+    $('#k4').textContent = '협의';
     /* 4대 공부 */
     var g = [
       ['토지대장', [fa.site ? '대지 ' + fa.site : '', fa.zone ? fa.zone : '', fa.landPrice ? '공시지가 ' + fa.landPrice + '원/㎡' : ''].filter(Boolean).join(' · ')],
