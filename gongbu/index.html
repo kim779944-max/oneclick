@@ -667,6 +667,16 @@ function unitsOf(ex){
     if(!u.strct&&x.strctCdNm) u.strct=String(x.strctCdNm).trim();
     if(String(x.exposPubuseGbCd)==='1') u.excl+=(+x.area||0); else u.comm+=(+x.area||0);
   }
+  function nat(a,b){
+    var na=parseFloat(a), nb=parseFloat(b);
+    if(isFinite(na)&&isFinite(nb)&&na!==nb) return na-nb;
+    return String(a).localeCompare(String(b),'ko');
+  }
+  order.sort(function(k1,k2){
+    var u1=map[k1], u2=map[k2], c=nat(u1.dong||'',u2.dong||'');
+    if(c) return c;
+    return nat(u1.ho||'',u2.ho||'');
+  });
   return order.map(function(k){return map[k]});
 }
 function bldTotalExcl(){ var s=0; (S.unitsAll||[]).forEach(function(u){ s+=u.excl||0 }); return s }
@@ -807,7 +817,8 @@ function p2(a,b){ var x=[a,b].filter(function(s){return s&&String(s).trim()&&Str
 function row4(k1,v1,k2,v2){ return '<tr><th>'+esc(k1)+'</th><td>'+esc(v1==null?'—':v1)+'</td><th>'+esc(k2)+'</th><td>'+esc(v2==null?'—':v2)+'</td></tr>' }
 function unitWrap(u){
   var tot=S.bldTotExcl||bldTotalExcl();
-  var plat=+(((S.bld&&S.bld.items&&S.bld.items[0])||{}).platArea||0);
+  var plat=+(((S.bld&&S.bld.items&&S.bld.items[0])||{}).platArea||0)
+    || +(S.toji&&S.toji.lndpclAr||0) || +(S.area||0);
   var ratio=tot?u.excl/tot*100:0;
   var share=plat?plat*u.excl/tot:0;
   return {excl:u.excl,comm:u.comm,all:u.excl+u.comm,ratio:ratio,share:share,plat:plat,tot:tot,complete:!!S.bldTotComplete};
@@ -848,12 +859,23 @@ function paperInner(b){
   h.push('<h3>② 층별 개요<em>층·구조·용도·면적</em></h3>');
   if(!fl.length) h.push('<div class="none">층별 개요 자료가 없습니다.</div>');
   else{
-    h.push('<table><thead><tr><th style="width:26%">층</th><th style="width:24%">구조</th><th style="width:30%">용도</th><th style="width:20%">면적(㎡)</th></tr></thead><tbody>');
+    var many=fl.some(function(x){ return String(x.dongNm||'').trim() && String(x.dongNm||'').trim()!==' ' });
+    fl=fl.slice().sort(function(a,b){
+      var da=String(a.dongNm||'').trim(), db=String(b.dongNm||'').trim();
+      if(da!==db) return da.localeCompare(db,'ko');
+      var fa=(+a.flrGbCd||0)*1000-(+a.flrNo||0), fb=(+b.flrGbCd||0)*1000-(+b.flrNo||0);
+      if(fa!==fb) return fa-fb;
+      return String(a.flrNoNm||'').localeCompare(String(b.flrNoNm||''),'ko');
+    });
+    h.push('<table><thead><tr>'+(many?'<th style="width:13%">동</th>':'')
+      +'<th style="width:'+(many?'21%':'27%')+'">층</th><th style="width:'+(many?'22%':'23%')+'">구조</th>'
+      +'<th style="width:'+(many?'26%':'31%')+'">용도</th><th style="width:18%">면적(㎡)</th></tr></thead><tbody>');
     fl.slice(0,40).forEach(function(x){
-      h.push('<tr><td>'+esc(x.flrNoNm||x.flrNo||'')+'</td><td>'+esc(x.strctCdNm||'')+'</td><td>'
+      h.push('<tr>'+(many?'<td>'+esc(String(x.dongNm||'').trim()||'—')+'</td>':'')
+        +'<td>'+esc(x.flrNoNm||x.flrNo||'')+'</td><td>'+esc(x.strctCdNm||'')+'</td><td>'
         +esc((x.mainPurpsCdNm||'')+(x.etcPurps&&String(x.etcPurps).trim()?'·'+String(x.etcPurps).trim():''))+'</td><td class="n">'+num(x.area,2)+'</td></tr>');
     });
-    if(fl.length>40) h.push('<tr><td colspan="4">외 '+(fl.length-40)+'개 층</td></tr>');
+    if(fl.length>40) h.push('<tr><td colspan="'+(many?5:4)+'">외 '+(fl.length-40)+'개 층</td></tr>');
     h.push('</tbody></table>');
   }
   var us=(S.units&&S.units.length?S.units:(S.unitsAll||[]))||[];

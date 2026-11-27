@@ -460,6 +460,7 @@ function render(){
     ctx.textAlign='center'; ctx.textBaseline='middle';
     for(var k=0;k<items.length;k++){
       var g=items[k]; if(!g.jibun) continue;
+      if(S.sel[g.pnu]) continue;            /* 담은 필지는 아래에서 빨강 라벨로 한 번만 */
       var bb=g.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
       if(w<56||hh<26) continue;
       var mxx=(lon2x(bb.minx,z)+lon2x(bb.maxx,z))/2-t.x, myy=(lat2y(bb.miny,z)+lat2y(bb.maxy,z))/2-t.y;
@@ -514,8 +515,16 @@ function centroid(rings){
     }
     a=a/2; if(Math.abs(a)>ba){ ba=Math.abs(a); best=[cx/(6*a),cy/(6*a)] }
   }
-  if(best) return best;
-  var b=bboxOf(rings); return [(b.minx+b.maxx)/2,(b.miny+b.maxy)/2];
+  var b=bboxOf(rings), mid=[(b.minx+b.maxx)/2,(b.miny+b.maxy)/2];
+  if(best&&inRings(rings,best[0],best[1])) return best;
+  if(inRings(rings,mid[0],mid[1])) return mid;
+  /* 그래도 밖이면 꼭짓점 평균 주변을 격자로 훑어 안쪽 점을 고른다 */
+  var bestIn=null;
+  for(var gx=0.15;gx<1&&!bestIn;gx+=0.1) for(var gy=0.2;gy<1&&!bestIn;gy+=0.1){
+    var p1=[b.minx+(b.maxx-b.minx)*gx,b.miny+(b.maxy-b.miny)*gy];
+    if(inRings(rings,p1[0],p1[1])) bestIn=p1;
+  }
+  return bestIn||best||mid;
 }
 /* 화면 안 필지 다시 받기 */
 var fetchT=0;
