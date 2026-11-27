@@ -171,7 +171,7 @@ main{padding:10px 12px 0}
       <button type="button" data-m="out" class="out">빼기<em>점선</em></button>
     </div>
     <div class="mapwrap">
-      <canvas id="map" width="760" height="560" aria-label="필지 지도"></canvas>
+      <canvas id="map" width="760" height="700" aria-label="필지 지도"></canvas>
       <div class="mapmode" id="mapMode">
         <button type="button" data-v="line" class="on">지적도</button>
         <button type="button" data-v="sat">위성</button>
@@ -238,7 +238,7 @@ var S={
   order:[],                        /* pnu order */
   official:{}                      /* pnu -> {area,jmok,...} */
 };
-var MAPW=760,MAPH=560;
+var MAPW=760,MAPH=700;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 var toT=0; function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toT);toT=setTimeout(function(){t.classList.remove('on')},2600)}
@@ -412,10 +412,10 @@ function render(){
   var t=topLeft(), z=S.V.z;
   ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,MAPW,MAPH);
   if(!(S.F.items||[]).length&&!S.order.length){
-    ctx.fillStyle='#16233D'; ctx.font='900 20px system-ui,sans-serif'; ctx.textAlign='center';
-    ctx.fillText('주소를 넣으면 지도가 열립니다',MAPW/2,MAPH/2-6);
-    ctx.font='800 14px system-ui,sans-serif'; ctx.fillStyle='#41597F';
-    ctx.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',MAPW/2,MAPH/2+22);
+    ctx.fillStyle='#16233D'; ctx.font='900 32px system-ui,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('주소를 넣으면 지도가 열립니다',MAPW/2,MAPH/2-10);
+    ctx.font='800 21px system-ui,sans-serif'; ctx.fillStyle='#41597F';
+    ctx.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',MAPW/2,MAPH/2+30);
     ctx.textAlign='left';
     return;
   }
@@ -461,13 +461,13 @@ function render(){
     for(var k=0;k<items.length;k++){
       var g=items[k]; if(!g.jibun) continue;
       var bb=g.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
-      if(w<38||hh<16) continue;
+      if(w<56||hh<26) continue;
       var mxx=(lon2x(bb.minx,z)+lon2x(bb.maxx,z))/2-t.x, myy=(lat2y(bb.miny,z)+lat2y(bb.maxy,z))/2-t.y;
       if(mxx<-20||mxx>MAPW+20||myy<-20||myy>MAPH+20) continue;
-      ctx.font='900 11px system-ui,sans-serif';
+      ctx.font='900 20px system-ui,sans-serif';
       var tw=ctx.measureText(g.jibun).width;
-      ctx.fillStyle=dark?'rgba(6,14,30,.66)':'rgba(255,255,255,.82)';
-      ctx.fillRect(mxx-tw/2-3,myy-7,tw+6,14);
+      ctx.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
+      ctx.fillRect(mxx-tw/2-5,myy-13,tw+10,26);
       ctx.fillStyle=dark?'#EAF1FB':'#16233D';
       ctx.fillText(g.jibun,mxx,myy);
     }
@@ -479,7 +479,7 @@ function render(){
       if(isIn){
         ctx.fillStyle='rgba(226,58,46,.20)'; ctx.fill();
         ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=7; ctx.stroke();
-        ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4; ctx.stroke();
+        ctx.strokeStyle='#E23A2E'; ctx.lineWidth=6; ctx.stroke();
       }else{
         ctx.fillStyle=dark?'rgba(10,18,36,.55)':'rgba(120,135,158,.30)'; ctx.fill();
         ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=1.4; ctx.setLineDash([7,5]); ctx.stroke(); ctx.setLineDash([]);
@@ -488,17 +488,17 @@ function render(){
       var lx=lon2x(bc[0],z)-t.x, ly=lat2y(bc[1],z)-t.y;
       if(lx>-40&&lx<MAPW+40&&ly>-30&&ly<MAPH+30){
         var lab=it.jibun||'';
-        ctx.font='900 13px system-ui,sans-serif';
+        ctx.font='900 25px system-ui,sans-serif';
         var w3=ctx.measureText(lab).width;
         ctx.fillStyle=isIn?'#E23A2E':'#4A5C7A';
-        ctx.fillRect(lx-w3/2-5,ly-10,w3+10,20);
+        ctx.fillRect(lx-w3/2-8,ly-17,w3+16,34);
         ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
       }
     }
     /* 4) 출처 */
     ctx.textAlign='right'; ctx.textBaseline='alphabetic';
-    ctx.font='800 10px system-ui,sans-serif';
-    ctx.fillStyle=dark?'rgba(255,255,255,.75)':'rgba(26,39,69,.75)';
+    ctx.font='800 17px system-ui,sans-serif';
+    ctx.fillStyle=dark?'rgba(255,255,255,.8)':'rgba(26,39,69,.8)';
     ctx.fillText('연속지적도 © Vworld · 참고용',MAPW-10,MAPH-9);
     ctx.textAlign='left';
   });
@@ -774,7 +774,7 @@ function addMany(q){
     $('#go').disabled=false; $('#go').textContent='담기';
     if(first&&first.g){
       S.V={cx:first.g.lon,cy:first.g.lat,z:S.V.z||17};
-      fitBox(expandBox(bboxOf(first.it.rings),4.2));
+      fitBox(expandBox(bboxOf(first.it.rings),1.7));
     }
     if(ok) toast(ok+'필지 담았습니다'+(fail.length?' · 못 찾은 주소 '+fail.length+'개':''))
     else toast('주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 넣어 보세요');
