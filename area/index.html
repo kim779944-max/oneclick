@@ -817,10 +817,11 @@ function buildSheet(){
     +(outs.length?' · 뺀 필지 '+outs.length+'필지':'')+'</div>');
   if(img) h.push('<img src="'+img+'" alt="선택 필지 지적도">');
   h.push('<table><thead><tr><th style="width:34%">지번</th><th style="width:14%">지목</th><th style="width:26%">면적(㎡)</th><th style="width:26%">면적(평)</th></tr></thead><tbody>');
-  ins.slice(0,26).forEach(function(r){
+  var LIM=20;
+  ins.slice(0,LIM).forEach(function(r){
     h.push('<tr><td>'+esc(r.jibun)+'</td><td>'+esc(r.jmok)+'</td><td class="n">'+num(r.a,0)+'</td><td class="n">'+num(pyeong(r.a))+'</td></tr>');
   });
-  if(ins.length>26) h.push('<tr><td colspan="4">외 '+(ins.length-26)+'필지</td></tr>');
+  if(ins.length>LIM) h.push('<tr><td colspan="4">외 '+(ins.length-LIM)+'필지</td></tr>');
   h.push('<tr class="tot"><td>합계 '+ins.length+'필지</td><td></td><td class="n">'+num(totA,0)+'</td><td class="n">'+num(pyeong(totA))+'</td></tr>');
   h.push('</tbody></table>');
   if(outs.length){

@@ -160,7 +160,8 @@ canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0
   #psheet *{color:#000!important;box-shadow:none!important}
   #psheet .paper{padding:0;margin:0;overflow:visible;background:#fff}
   #psheet .ph{border-bottom:2px solid #000}
-  #psheet table{font-size:9pt}
+  #psheet table{font-size:9pt;page-break-inside:avoid}
+  #psheet h3{page-break-after:avoid}
   #psheet th,#psheet td{border:1px solid #000;padding:1mm 1.4mm}
   #psheet h3{font-size:10pt;margin:2.5mm 0 1mm}
   #psheet .pf{font-size:7.5pt;margin-top:1.5mm}
@@ -323,7 +324,7 @@ var S={key:(function(){var v=LS.get('kts_gongbu_vk',null);return v==null?VW_DEF:
             return v })(),
        mode:'sat', lat:0,lon:0,addr:'',pnu:'',jibun:'',area:0,rings:null,
        toji:null,ch:null,price:null,use:null,bld:null,box:null,zoomed:false,busy:false,
-       flr:null,expo:null,units:null,unitsAll:null,hoSel:'',bldTotExcl:0,bldTotComplete:false,
+       flr:null,expo:null,units:null,unitsAll:null,hoSel:'',bldTotExcl:0,bldTotComplete:false,bldTotArea:0,
        cands:null,geoNote:'',sang:null};
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -632,11 +633,13 @@ function dgPaged(path,pnu,extra,rows,maxPages){
 }
 function bldFetch(pnu){
   if(!dgKeyOk(S.dgk)) return Promise.resolve({st:'NOKEY'});
-  return dgTry(dgUrl('/getBrTitleInfo',pnu,20,1,''));
+  return dgTry(dgUrl('/getBrTitleInfo',pnu,100,1,''));
 }
 /* 층별개요 + 전유부(구분등기) */
 function bldDetail(pnu){
   S.flr=[]; S.expo={items:[],total:0,complete:false}; S.units=[]; S.hoSel='';
+  S.bldTotArea=0;
+  if(S.bld&&S.bld.items) for(var i0=0;i0<S.bld.items.length;i0++) S.bldTotArea+=(+S.bld.items[i0].totArea||0);
   return Promise.all([
     dgPaged('/getBrFlrOulnInfo',pnu,'',60,3),
     dgPaged('/getBrExposPubuseAreaInfo',pnu,'',100,6)
@@ -816,12 +819,17 @@ function cnt(v){ return (v==null||v==='')?'—':String(v) }
 function p2(a,b){ var x=[a,b].filter(function(s){return s&&String(s).trim()&&String(s).trim()!==' '}); return x.join(' · ')||'—' }
 function row4(k1,v1,k2,v2){ return '<tr><th>'+esc(k1)+'</th><td>'+esc(v1==null?'—':v1)+'</td><th>'+esc(k2)+'</th><td>'+esc(v2==null?'—':v2)+'</td></tr>' }
 function unitWrap(u){
-  var tot=S.bldTotExcl||bldTotalExcl();
+  var ex=S.bldTotExcl||bldTotalExcl();
+  var ar=S.bldTotArea||0;
+  /* 전유부를 다 받았으면 전유 합계, 일부만 받았으면 연면적 합계(모든 동)를 분모로 쓴다 */
+  var complete=!!S.bldTotComplete;
+  var tot=complete?ex:Math.max(ex,ar);
+  var basis=complete?'전유':'연면적';
   var plat=+(((S.bld&&S.bld.items&&S.bld.items[0])||{}).platArea||0)
     || +(S.toji&&S.toji.lndpclAr||0) || +(S.area||0);
   var ratio=tot?u.excl/tot*100:0;
   var share=plat?plat*u.excl/tot:0;
-  return {excl:u.excl,comm:u.comm,all:u.excl+u.comm,ratio:ratio,share:share,plat:plat,tot:tot,complete:!!S.bldTotComplete};
+  return {excl:u.excl,comm:u.comm,all:u.excl+u.comm,ratio:ratio,share:share,plat:plat,tot:tot,complete:complete,basis:basis};
 }
 function unitBox(){
   var u=selUnit(); if(!u) return '';
@@ -836,12 +844,15 @@ function unitBox(){
     +'<div><span>대지지분율</span><b>'+num(w.ratio,3)+'%</b></div>'
     +'<div><span>대지지분</span><b>'+num(w.share,2)+'㎡</b></div>'
     +'</div>'
-    +'<p class="note" style="margin-top:6px">대지지분 = 대지면적 '+num(w.plat,2)+'㎡ × (이 호 전용면적 ÷ 건물 전체 전유면적 '
-    +num(w.tot,2)+'㎡'+(w.complete?'':' · 수집 분')+'). 등기부 대지권 비율과 다를 수 있어 <b>등기사항전부증명서</b> 확인이 기준입니다.</p></div>'];
+    +'<p class="note" style="margin-top:6px">대지지분 = 대지면적 '+num(w.plat,2)+'㎡ × (이 호 전용면적 ÷ 건물 전체 '
+    +(w.complete?'전유면적 ':'연면적(추정) ')+num(w.tot,2)+'㎡).'
+    +(w.complete?'':' 전유부가 많아 일부만 받아 <b>연면적 합계</b>를 분모로 썼습니다.')
+    +' 등기부 대지권 비율과 다를 수 있어 <b>등기사항전부증명서</b> 확인이 기준입니다.</p></div>'];
   return h.join('');
 }
-function paperInner(b){
+function paperInner(b,forPrint){
   var it=(b&&b.items&&b.items[0])||{};
+  var LIM=forPrint?{flr:13,unit:9}:{flr:40,unit:26};
   var h=['<div class="ph"><b>건축물대장 (표제부·층별개요·전유부)</b><span>'
     +esc(p2(it.regstrGbCdNm,it.regstrKindCdNm))+' · '+esc(String(it.mgmBldrgstPk||''))+'</span></div>'];
   h.push('<h3>① 표제부<em>대지·연면적·건폐율·용적률·구조·용도·층수</em></h3>');
@@ -870,12 +881,12 @@ function paperInner(b){
     h.push('<table><thead><tr>'+(many?'<th style="width:13%">동</th>':'')
       +'<th style="width:'+(many?'21%':'27%')+'">층</th><th style="width:'+(many?'22%':'23%')+'">구조</th>'
       +'<th style="width:'+(many?'26%':'31%')+'">용도</th><th style="width:18%">면적(㎡)</th></tr></thead><tbody>');
-    fl.slice(0,40).forEach(function(x){
+    fl.slice(0,LIM.flr).forEach(function(x){
       h.push('<tr>'+(many?'<td>'+esc(String(x.dongNm||'').trim()||'—')+'</td>':'')
         +'<td>'+esc(x.flrNoNm||x.flrNo||'')+'</td><td>'+esc(x.strctCdNm||'')+'</td><td>'
         +esc((x.mainPurpsCdNm||'')+(x.etcPurps&&String(x.etcPurps).trim()?'·'+String(x.etcPurps).trim():''))+'</td><td class="n">'+num(x.area,2)+'</td></tr>');
     });
-    if(fl.length>40) h.push('<tr><td colspan="'+(many?5:4)+'">외 '+(fl.length-40)+'개 층</td></tr>');
+    if(fl.length>LIM.flr) h.push('<tr><td colspan="'+(many?5:4)+'">외 '+(fl.length-LIM.flr)+'개 층</td></tr>');
     h.push('</tbody></table>');
   }
   var us=(S.units&&S.units.length?S.units:(S.unitsAll||[]))||[];
@@ -884,12 +895,12 @@ function paperInner(b){
   if(!us.length) h.push('<div class="none">전유부가 없는 건물입니다(단독·일반건물).</div>');
   else{
     h.push('<table><thead><tr><th style="width:22%">동</th><th style="width:20%">호</th><th style="width:18%">층</th><th style="width:20%">전용(㎡)</th><th style="width:20%">공용(㎡)</th></tr></thead><tbody>');
-    us.slice(0,26).forEach(function(u){
+    us.slice(0,LIM.unit).forEach(function(u){
       var on=su&&u.key===su.key;
       h.push('<tr'+(on?' class="sel"':'')+'><td>'+esc(u.dong||'—')+'</td><td>'+esc(u.ho||'—')+'</td><td>'+esc(u.flr||'—')
         +'</td><td class="n">'+num(u.excl,2)+'</td><td class="n">'+num(u.comm,2)+'</td></tr>');
     });
-    if(us.length>26) h.push('<tr><td colspan="5">외 '+(us.length-26)+'호</td></tr>');
+    if(us.length>LIM.unit) h.push('<tr><td colspan="5">외 '+(us.length-LIM.unit)+'호</td></tr>');
     h.push('</tbody></table>');
   }
   if(su){
@@ -899,8 +910,8 @@ function paperInner(b){
       +row4('동·호수',(su.dong?su.dong+'동 ':'')+(su.ho||''),'층',su.flr||'—')
       +row4('전용면적',m2(w.excl),'공용면적',m2(w.comm))
       +row4('계약면적',m2(w.all),'전용 환산',num(Math.round(w.excl/3.305785))+'평')
-      +row4('대지면적',m2(w.plat),'건물 전유 합계',m2(w.tot))
-      +row4('대지지분율',num(w.ratio,3)+'%'+((w.complete)?'':' (수집 분 기준)'),'대지지분(추정)',m2(w.share))
+      +row4('대지면적',m2(w.plat),'건물 '+(w.complete?'전유':'연면적')+' 합계',m2(w.tot))
+      +row4('대지지분율',num(w.ratio,3)+'%'+((w.complete)?'':' (추정)'),'대지지분(추정)',m2(w.share))
       +'</tbody></table>');
     h.push('<div class="pf">대지지분은 전유면적 비율로 계산한 추정값입니다. 등기부 대지권 비율과 다를 수 있으니 등기사항전부증명서로 확인하세요.</div>');
   }
@@ -957,7 +968,7 @@ function findHo(d,ho){
 function printBld(){
   if(!S.bld||S.bld.st!=='OK'){ toast('먼저 주소를 조회해 주세요'); return }
   var it=(S.bld.items&&S.bld.items[0])||{};
-  $('#psheet').innerHTML='<div class="paper">'+paperInner(S.bld)
+  $('#psheet').innerHTML='<div class="paper">'+paperInner(S.bld,true)
     +'<div class="pf">' +esc((it.platPlc||'')+' · '+(it.newPlatPlc||''))+' · 출력 '+todayStr()
     +' · KTS 원클릭 4대 공부 — 참고용입니다. 발급용(법적 효력) 문서는 정부24·세움터에서 발급받으세요.</div></div>';
   setTimeout(function(){ try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다') } },120);
