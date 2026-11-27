@@ -192,8 +192,8 @@
         if (w2 > maxW2) { ctx.font = '800 ' + (fs2 * maxW2 / w2) + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif'; }
         ctx.fillText(str, G.cx, yy);
       }
-      tag(top, S * 0.175);
-      tag(bot, H - S * 0.135);
+      tag(top, S * 0.19);
+      tag(bot, H - S * 0.175);
       ctx.textAlign = 'left';
     }
     ctx.restore();
