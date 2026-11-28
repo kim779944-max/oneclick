@@ -9,6 +9,7 @@
 :root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;
  --ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;--amber:#FF6B00;--amber2:#FFA24D;--on-amber:#0A1224;--red:#FF5A5A;--green:#2ED47A}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}          /* hidden 속성이 CSS display 에 먹히지 않던 문제 방지 */
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
  background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:block;min-height:100vh;word-break:keep-all}
@@ -2650,6 +2651,13 @@ function renderInputs(){
   updNavPos(-1);
   guideSyncSoon();
   dockFit();
+  syncValBar();
+}
+/* 278 — 값이 하나도 없을 때는 [값 모두 지우기]를 숨김 */
+function syncValBar(){
+  const b = $('#clearVals'); if (!b) return;
+  const any = Object.keys(VALS).some(k => String(VALS[k] == null ? '' : VALS[k]).trim());
+  b.hidden = !any;
 }
 $('#valList').addEventListener('focusin', e => { if (e.target.dataset.f != null || e.target.dataset.nav != null) LAST_INPUT = e.target; });
 $('#valList').addEventListener('input', e => {
@@ -2825,7 +2833,8 @@ function bindSig(cv, f){
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
 }
 $('#clearVals').onclick = () => { VALS = {}; saveVals(); renderInputs(); toast('값을 모두 지웠습니다'); };
-const SAMPLE = {text:'홍길동', number:'150000', date:new Date().toISOString().slice(0, 10)};
+$('#valList').addEventListener('input', syncValBar);
+$('#valList').addEventListener('change', syncValBar);const SAMPLE = {text:'홍길동', number:'150000', date:new Date().toISOString().slice(0, 10)};
 const SAMPLE_BY = {'품목1':'A4 복사용지','규격1':'80g 500매','수량1':'10','단가1':'4800','품목2':'볼펜(흑)','규격2':'0.7mm','수량2':'24','단가2':'500','품목3':'스테이플러','규격3':'중형','수량3':'2','단가3':'8500',
   '공급받는자':'(주)한빛상사','공급자':'KTS 문구','번호':'2026-1118-01','비고':'납품 후 7일 내 결제','인수자':'김민수','수신':'(주)한빛상사','담당자':'이서연','연락처':'010-1234-5678','유효기간':'견적일로부터 30일',
   '견적처':'KTS 문구','사업장':'KTS 카페','대표자':'박대표','근로자 성명':'최지우','근로자 주소':'서울시 마포구 독막로 1','근무 장소':'KTS 카페 본점','업무 내용':'매장 운영 · 고객 응대',
