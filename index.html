@@ -273,11 +273,11 @@ html[data-kts-theme="light"] .ks-strip .c.lk{border-color:var(--k-line-2);color:
   border:1px solid var(--k-line-2);background:var(--k-panel-2);color:var(--k-ink)}
 .homeRow .hbtn b{color:var(--k-accent)}
 .homeRow .hbtn.txt{border:0;background:transparent;color:var(--k-tog-on);text-decoration:underline;text-underline-offset:3px}
-/* 대문 화면(home) ↔ 구역 화면(cat) */
-body[data-gate="home"] #allGroups,body[data-gate="home"] #tail{display:none}
-body[data-gate="home"][data-tail="on"] #tail{display:block}
-body[data-gate="home"] #app{padding-bottom:20px}
-body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"] .hero1{display:none}
+/* 대문 화면(home) ↔ 구역 화면(cat) — 2026-11-28: 첫 화면은 1~4호 카드만, 푸터는 늘 보인다(U-2) */
+body[data-gate="home"] #allGroups{display:none}
+body[data-gate="cat"] #home4,body[data-gate="cat"] #hub{display:none}
+body[data-gate="cat"] .lnk{display:none}
+@media print{.home4 .tl,.hub{break-inside:avoid}}
 /* 구역 화면 윗줄 — [← 전체 분류] + 나머지 4구역 칩 + [편집] */
 .chips{margin-top:12px}
 .chips button.back{color:var(--k-ink);background:transparent;border-color:var(--k-line-2)}
@@ -306,6 +306,52 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
 .tl .tbd.soon{background:#FCD34D}
 .tl .tbox{bottom:2px;left:2px;color:#0B2C1B;background:#4ADE80}
 @media (min-width:480px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* ===== 2026-11-28 (278 · 첫 화면 단순화) — 1~4호 카드 + 접기 + 작은 안내 ===== */
+.hd .ibtn{flex:0 0 auto;width:44px;height:44px;padding:0;border-radius:12px;font-family:inherit;font-size:16px;font-weight:900;
+  line-height:1;cursor:pointer;border:1px solid var(--k-line-2);background:var(--k-panel-2);color:var(--k-ink)}
+.hd .ibtn:active{border-color:var(--k-accent)}
+.hd .kbtn{min-height:44px}
+.hd .home{flex:0 0 auto}
+.home4{margin-top:12px}
+.h4{border:1px solid var(--k-line);border-radius:16px;padding:8px 8px 9px;margin-top:8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.h4:first-child{margin-top:0}
+.h4h{display:flex;align-items:center;gap:7px;padding:0 3px 7px}
+.h4no{flex:0 0 auto;font-size:10px;font-weight:900;color:var(--k-accent);letter-spacing:.06em}
+.h4h b{flex:1;min-width:0;font-size:14px;font-weight:900;letter-spacing:-.4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h4all{flex:0 0 auto;font-family:inherit;font-size:11px;font-weight:900;color:#93A4BC;background:transparent;border:0;padding:7px 5px;cursor:pointer;line-height:1}
+.h4 .tiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.h4 .tl{aspect-ratio:auto;min-height:74px;border-radius:13px;padding:7px 3px;gap:4px}
+.h4 .tl .ti{width:40px;height:40px;max-width:none;flex:0 0 auto;border-radius:11px}
+.h4 .tl .ti b{font-size:18px}
+.h4 .tl .tn{font-size:10.5px;line-height:1.16}
+.h4 .tl .tbd,.h4 .tl .tbox{font-size:8px;padding:0 4px;border-radius:999px}
+.h4 .tl .tbd{display:none}   /* 첫 화면 타일에는 NEW 띠지를 달지 않는다(278 — 장식 최소) */
+@media (max-width:339px){.h4 .tl{min-height:68px;padding:6px 2px}.h4 .tl .ti{width:36px;height:36px}.h4 .tl .tn{font-size:10px}}
+.h4 .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+.h4none{margin:2px 4px 8px;font-size:11.5px;line-height:1.5;color:#8FA0B8}
+.hub{margin-top:10px;border:1px solid var(--k-line);border-radius:14px;background:rgba(255,255,255,.02)}
+.hub>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;min-height:48px;padding:0 12px;font-size:12.5px;font-weight:900;color:var(--k-ink)}
+.hub>summary::-webkit-details-marker{display:none}
+.hub>summary:after{content:"\25BE";margin-left:auto;color:#8FA0B8}
+.hub[open]>summary:after{content:"\25B4"}
+.hub>summary span{font-size:10.5px;font-weight:800;color:#7F8FA8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub .hbd{padding:0 7px 10px}
+.hub .secH{margin:10px 4px 5px}
+.lnk{display:flex;align-items:center;justify-content:center;gap:3px;flex-wrap:wrap;margin-top:14px}
+.lnk button,.lnk a{font-family:inherit;font-size:11.5px;font-weight:900;color:#C7D3E3;background:transparent;border:0;
+  border-bottom:1px solid #2C3F66;padding:8px 3px;cursor:pointer;text-decoration:none;line-height:1}
+.lnk i{font-style:normal;color:#4A5C7A;padding:0 1px}
+.mrows{display:grid;gap:6px}
+.mrows .mrow{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:10px 12px;text-align:left;
+  font-family:inherit;font-size:13px;font-weight:900;color:var(--k-ink);text-decoration:none;
+  border:1px solid var(--k-line);border-radius:12px;background:var(--k-panel-2);cursor:pointer}
+.mrows .mrow:active{border-color:var(--k-accent)}
+.mrows .mrow em{font-style:normal;margin-left:auto;font-size:11px;font-weight:800;color:#8FA0B8}
+.mnote{margin:10px 4px 0;font-size:10.5px;line-height:1.6;color:#7C8DA6}
+/* 도우미 둥근 버튼은 홈에서는 띄우지 않는다(U-1) — 머리글 [?]가 그 자리를 맡는다 */
+#kts-helper-btn{display:none!important}
 </style>
 <link rel="stylesheet" href="shared/kts-print.css?v=20261124a">
 <script src="shared/kts-ui.js?v=20261124a" defer></script>
@@ -320,16 +366,13 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
         <div class="brand">KTS <span>원클릭</span></div>
       </a>
       <div class="sp"></div>
-      <button class="ebtn" id="editBtn" type="button" aria-label="내 메뉴 편집 — 쓰는 도구만 골라 순서 정하기">편집</button>
-      <span class="k-theme2" role="group" aria-label="화면 어두운·밝은 고르기"><button type="button" data-kts-theme-set="dark" aria-pressed="true" title="어두운 화면 — 남색 바탕에 주황" aria-label="어두운 화면 — 남색 바탕에 주황">어두운</button><button type="button" data-kts-theme-set="light" aria-pressed="false" title="밝은 화면 — 흰 바탕에 남색" aria-label="밝은 화면 — 흰 바탕에 남색">밝은</button></span>
       <button class="kbtn" id="kBtn" type="button" data-kk-badge>🔑 0</button>
-      <button class="mkey" id="mKey" type="button" aria-label="대표님 마스터 모드">⚙</button>
-    </div>
-    <div class="nb" id="nb">
-      <b>11/21</b><span id="nbTxt">🔑 열쇠 4개 지급 · 내 박스 4칸 · [해주세요] 창 열렸습니다</span>
-      <button type="button" id="nbX" aria-label="공지 접기">✕</button>
+      <button class="ibtn" id="helpBtn2" type="button" aria-label="사용법 · 도우미 열기">?</button>
+      <button class="ibtn" id="menuBtn" type="button" aria-label="더 보기 — 편집 · 화면 · 안내">⋯</button>
     </div>
   </header>
+  <!-- 대표님 마스터 모드 — 첫 화면에서는 숨기고 [⋯ → 대표님 마스터 모드]로만 열린다 -->
+  <button id="mKey" type="button" hidden aria-hidden="true" tabindex="-1" style="display:none">⚙</button>
 
   <section class="mst" id="mst" hidden>
     <div class="mstTop">
@@ -352,50 +395,20 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
     <p class="merr" id="mErr" hidden>PIN이 맞지 않습니다</p>
   </div>
 
-  <!-- 171: 히어로 → 한 줄 질문 + [?] (소개문·키커는 [?] 시트 안으로 — 아래 HELP_HTML) -->
-  <div class="hero hero1">
-    <h1>무엇을 하시겠어요?</h1>
-  </div>
-
-  <!-- 231·개선 1 (토스 대문): 손님 상황별 입구 3개 — 누르면 그 도구가 바로 열립니다 -->
-  <nav class="paths" id="paths" aria-label="지금 하시는 일로 바로 들어가기">
-    <div class="plb">🕐 <b>지금 하시는 일</b>로 바로 들어가기</div>
-    <button class="path" type="button" data-open="contract" data-k="contract" aria-label="계약서 쓸 때 — 표준계약서 열기">
-      <span class="pno">01</span>
-      <span class="pt"><span class="pn">계약서 쓸 때</span><span class="ps">종류 고르고 금액만 넣으면 3부 인쇄까지</span></span>
-      <span class="pa" aria-hidden="true">→</span>
-    </button>
-    <button class="path" type="button" data-open="listing" data-k="listing" aria-label="매물 올릴 때 — 매물장 열기">
-      <span class="pno">02</span>
-      <span class="pt"><span class="pn">매물 올릴 때</span><span class="ps">사진 4장 → 명함 붙은 A4 한 장</span></span>
-      <span class="pa" aria-hidden="true">→</span>
-    </button>
-    <button class="path" type="button" data-open="thedetail" data-k="thedetail" aria-label="권리분석 할 때 — 설명서 제작기 열기">
-      <span class="pno">03</span>
-      <span class="pt"><span class="pn">권리분석 할 때</span><span class="ps">등기·임대차 확인하고 3줄 브리핑</span></span>
-      <span class="pa" aria-hidden="true">→</span>
-    </button>
-  </nav>
-
-  <!-- 178-2: 대표 3종은 첫 화면에서 뺌(코드는 남겨 둠 — 되살릴 때 hidden 만 지우면 됨) -->
-  <section class="feat" id="feat" aria-label="대표 도구 3종" hidden>
-    <div class="rows" id="featRows"></div>
-  </section>
-
-  <!-- 178-3: 내 박스 — 담은 도구가 1개 이상일 때만 -->
+  <!-- 178-3: 내 박스 — 담은 도구가 1개 이상일 때만 (필요할 때만 보이는 줄) -->
   <div class="boxwrap" id="boxStripWrap" hidden>
-    <div class="lbl">🔑 <b>내 박스</b> — 담은 도구는 계속 열립니다</div>
+    <div class="lbl">🔑 <b>내 박스</b></div>
     <div id="boxStrip"></div>
   </div>
 
-  <!-- 171: 5대 대문 — 누르면 그 구역 상품만 -->
-  <div class="gatesLb">🗂 <b>분류로 찾기</b> — 도구 <span id="gateN">26</span>종</div>
-  <nav class="gates" id="gates" aria-label="도구 분류 — 1~4호 세트 · 사업장 · 생활기록 · 준비 중"></nav>
-  <div class="homeRow" id="homeRow">
-    <button type="button" class="hbtn" id="helpBtn2"><b>?</b> 사용법</button>
-    <button type="button" class="hbtn" id="cpnBtn">이용권</button>
-    <button type="button" class="hbtn txt" id="startBtn">무료로 시작하기 →</button>
-  </div>
+  <!-- 2026-11-28 · 첫 화면: 1~4호 카드만 (1번 누르면 바로 열림) -->
+  <div id="home4" class="home4" aria-label="1~4호 도구 — 한 번 누르면 바로 열립니다"></div>
+
+  <!-- 그 밖의 도구 — 필요할 때만 펼침 (278번) -->
+  <details class="hub" id="hub">
+    <summary><b>그 밖의 도구</b> <span>사업장 · 생활기록 · 준비 중</span></summary>
+    <div class="hbd" id="hubBody"></div>
+  </details>
 
   <div id="allGroups">
   <nav class="chips" id="catChips" aria-label="카테고리"></nav>
@@ -403,6 +416,21 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
   </div>
 
   <div class="tail" id="tail">
+  <!-- U-2: 사업자 정보·문의·약관을 첫 화면에 — 카드 바로 아래 -->
+  <div class="foot k-foot">
+    <b>케이티에스 원클릭</b> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>
+    결제·회원가입 없이 씁니다 · 올린 파일은 서버로 보내지 않고 이 기기 안에서만 처리합니다.<br>
+    이용약관 · 개인정보처리방침 — 준비 중<br>
+    <span data-kts-visit style="display:inline-block;margin-top:3px;color:#93A5BD;font-size:10.5px;font-weight:800"></span>
+  </div>
+
+  <div class="lnk">
+    <button type="button" id="cpnBtn">무료 이용권</button><i>·</i>
+    <button type="button" id="askOpen">해주세요</button><i>·</i>
+    <a href="detail.html?k=viewer">도구 소개</a><i>·</i>
+    <a href="exchange/">교환급매물</a>
+  </div>
+
   <section class="cpn" id="coupon">
     <a class="cpnbar" href="sms:01020022899?body=%5BKTS%20%EC%9B%90%ED%81%B4%EB%A6%AD%5D%20%EB%AC%B4%EB%A3%8C%20%EC%9D%B4%EC%9A%A9%EA%B6%8C%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%20(%EC%97%85%EC%A2%85%2F%EC%97%B0%EB%9D%BD%EC%B2%98%3A%20)">
       <span class="t"><b><i>이용권</i>무료 이용권 · 사전예약</b>
@@ -410,27 +438,6 @@ body[data-gate="cat"] #gates,body[data-gate="cat"] #homeRow,body[data-gate="cat"
       <span class="a">신청 →</span>
     </a>
   </section>
-
-  <section class="ask">
-    <div class="h"><em>의뢰</em><b>해주세요 · Q&amp;A</b></div>
-    <p>필요한 도구를 적어 주세요. <b style="color:#FFD9A6">10표가 모이면 만듭니다.</b> 맞춤 제작은 5:5, 외부 제작자 입점은 3:7로 정산합니다.</p>
-    <button type="button" id="askOpen">해주세요 · Q&amp;A 열기</button>
-  </section>
-
-  <div class="note">
-    <b>결제는 이 사이트에서 하지 않습니다.</b> 무료로 열어 보고, 더 쓸 때의 안내는 각 도구 안 [그 이상 쓰기] 버튼 안쪽에만 있습니다.<br>
-    결제는 <b>① 크몽·스마트스토어 ② 계좌이체 ③ 이용권 코드</b> 셋 중 하나입니다.
-    <button type="button" id="payNoteBtn" style="margin-top:8px;border:1px solid rgba(255,162,77,.5);background:rgba(255,107,0,.12);color:#FFC98F;border-radius:9px;padding:7px 11px;font-family:inherit;font-size:11px;font-weight:900;cursor:pointer">계좌이체 · 이용권 코드 안내</button>
-    <span id="payNoteMsg" hidden style="display:none;margin-top:6px;color:#FFA24D;font-size:11px;font-weight:800">결제 안내를 열지 못했습니다 — 문자 010-2002-2899 로 문의해 주세요.</span>
-  </div>
-
-  <div class="foot k-foot">
-    <b>케이티에스 원클릭</b> · 문의 <a href="tel:01020022899">010-2002-2899</a><br>
-    올린 파일은 서버로 보내지 않고 브라우저 안에서만 처리합니다.<br>
-    <a href="detail.html?k=viewer">도구 소개</a> · <a href="navi2/">독심술</a> · <a href="saycap/">세이캡</a> · <a href="exchange/">교환급매물</a><br>
-    이용약관 · 개인정보처리방침 — 준비 중(결제·회원가입이 없어 따로 모으는 개인정보가 없습니다)<br>
-    <span data-kts-visit style="display:inline-block;margin-top:6px;color:#93A5BD;font-size:10.5px;font-weight:800"></span>
-  </div>
   </div><!-- /.tail -->
 </div>
 <div class="toast" id="toast"></div>
@@ -453,15 +460,17 @@ window.KTS_KEYS && (KTS_KEYS.toast = toastMsg);
    ========================================================================== */
 (function(){
   var KEY='kts_nb_20261121';
+  var nb=$('#nb'); if(!nb) return;
   var off=false; try{ off = localStorage.getItem(KEY)==='1'; }catch(e){}
-  if (off) $('#nb').classList.add('nbOff');
-  $('#nbX').onclick=function(){ $('#nb').classList.add('nbOff'); try{ localStorage.setItem(KEY,'1'); }catch(e){} };
+  if (off) nb.classList.add('nbOff');
+  var x=$('#nbX'); if(x) x.onclick=function(){ nb.classList.add('nbOff'); try{ localStorage.setItem(KEY,'1'); }catch(e){} };
 })();
 
 /* ============================================================================
    ② 쓰는 순서 — 직업/용도별 묶음. 여기 순서만 바꾸면 화면이 그대로 따라옵니다.
    ========================================================================== */
 var LOCAL = {
+  land:{nm:'1호 통합', sub:'면적·경사도·4대 공부를 한 화면에서', link:'land/', ico:'◈', badge:'NEW'},
   area:{nm:'면적 그리기', sub:'필지 포함·제외 → 면적(㎡·평) 자동 합산', link:'area/', ico:'▱', badge:'NEW'},
   bizcard:{nm:'전자명함·매물장', sub:'문자 하나로 5초 매물장 · 내 명함 홈피', link:'bizcard/', ico:'👤', badge:'NEW', free:1},
   gongbu:{nm:'4대 공부', sub:'토지대장·건축물대장·지적도·토지이용계획 한 장', link:'gongbu/', ico:'▤', badge:'NEW'},
@@ -479,7 +488,7 @@ var UNIT = {theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:
 /* 255 (2026-11-27) 대표님 확정 1~4호 세트 흐름 — 1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션,
    그 뒤에 사업장·생활기록·준비 중을 그대로 이어 붙인다(도구 하나도 빼지 않음). */
 var GROUPS = [
-  {no:'01', cat:'set1', t:'1호 땅·공부',  s:'면적그리기 · 경사도 · 4대 공부',              ks:['area','slope','gongbu']},
+  {no:'01', cat:'set1', t:'1호 땅·공부',  s:'면적 · 경사도 · 4대 공부',                 ks:['land','area','slope','gongbu']},
   {no:'02', cat:'set2', t:'2호 계약·서명', s:'5초계약서 · 양식만들기 · 더싸인 · 더뷰',       ks:['contract','theform','sign','viewer']},
   {no:'03', cat:'set3', t:'3호 영업·매물', s:'전자명함 · 매물장 · 매물수집기 · 교환급매물',   ks:['bizcard','listing','realty','exchange']},
   {no:'04', cat:'set4', t:'4호 옵션',     s:'경공매 · 재개발 · 사업자 대출',                ks:['hogang','redev','loan']},
@@ -491,7 +500,7 @@ var GROUPS = [
 var CAT_ALIAS = {realty:'set1', realty2:'set3', doc:'set2'};
 var CHIPS = [{c:'all', t:'전체'},{c:'set1', t:'1호 땅·공부'},{c:'set2', t:'2호 계약·서명'},{c:'set3', t:'3호 영업·매물'},{c:'set4', t:'4호 옵션'},{c:'biz', t:'사업장'},{c:'life', t:'생활기록'},{c:'soon', t:'준비 중'}];
 /* 185: 부동산 구역은 아이콘 중심 정사각 타일 — 타일 이름은 390px 에서 잘리지 않는 짧은 이름 */
-var TILE_NM = {area:'면적그리기', viewer:'더뷰', theform:'양식만들기', contract:'5초 계약서', sign:'더싸인', bizcard:'전자명함', listing:'매물장·포스터', realty:'매물수집기', exchange:'교환급매물', hogang:'경공매 내비', redev:'재개발 조회', loan:'사업자 대출', slope:'경사도·토지정보', gongbu:'4대 공부'};
+var TILE_NM = {land:'1호 통합', area:'면적그리기', viewer:'더뷰', theform:'양식만들기', contract:'5초 계약서', sign:'더싸인', bizcard:'전자명함', listing:'매물장·포스터', realty:'매물수집기', exchange:'교환급매물', hogang:'경공매', redev:'재개발', loan:'사업자 대출', slope:'경사도', gongbu:'4대 공부'};
 var TILE_CAT = {set1:1, set2:1, set3:1, set4:1};
 var CHIP_KEY = 'kts_cat_chip';
 /* 대표 3종 — 강조용 복제(목록 완전성 검사에서 제외) */
@@ -581,6 +590,8 @@ function render(){
       body + '</section>';
   });
   $('#sections').innerHTML = html;
+  renderHome4(menu);
+  renderHub(menu);
   renderGates(menu);
   renderChips();
   renderFeat();
@@ -592,7 +603,88 @@ function render(){
   }
 }
 
-/* 171: 5대 대문 — 개수는 내 메뉴 반영 후 GROUPS 에서 계산(하드코딩 없음) */
+/* ============================================================================
+   2026-11-28 · 첫 화면 = 1~4호 카드만 (278 · 대표님 "쇼룸 처음 들어가는 것도 복잡해")
+   카드 안의 타일을 한 번 누르면 그 도구가 바로 열립니다(1번 터치 실행).
+   사업장·생활기록·준비 중은 아래 [그 밖의 도구] 접기 안으로 내립니다.
+   ========================================================================== */
+var HOME_SETS = ['set1','set2','set3','set4'];
+function renderHome4(menu){
+  var box = $('#home4'); if (!box) return;
+  var m = menu || menuNow();
+  box.innerHTML = GROUPS.filter(function(g){ return HOME_SETS.indexOf(g.cat) >= 0; }).map(function(g){
+    var ks = groupKs(g, m);
+    return '<section class="h4" id="h' + g.no + '" data-cat="' + g.cat + '">' +
+      '<div class="h4h"><span class="h4no">' + g.no + '</span><b>' + g.t + '</b></div>' +
+      (ks.length ? '<div class="tiles">' + ks.map(tileOf).join('') + '</div>'
+                 : '<p class="h4none">이 구역 도구를 모두 뺐습니다 — [⋯ → 편집]로 되살릴 수 있습니다.</p>') +
+      '</section>';
+  }).join('');
+  if (window.__KTS_LAND === false) hideLandTile();
+}
+function hideLandTile(){
+  var t = document.querySelector('#home4 .tl[data-k="land"]');
+  if (t) t.parentNode.removeChild(t);
+}
+function renderHub(menu){
+  var box = $('#hubBody'); if (!box) return;
+  var m = menu || menuNow(), html = '';
+  GROUPS.forEach(function(g){
+    if (HOME_SETS.indexOf(g.cat) >= 0) return;
+    var ks = groupKs(g, m); if (!ks.length) return;
+    html += '<div class="secH"><span class="no">' + g.no + '</span><h2>' + g.t + '</h2><p>' + g.s + '</p></div>' +
+      '<div class="rows">' + ks.map(rowOf).join('') + '</div>';
+  });
+  box.innerHTML = html || '<p class="h4none">보여 드릴 도구가 없습니다.</p>';
+}
+
+/* land/ 은 트랙1이 새로 올리는 통합 앱 — 아직 없으면 타일을 숨겨 라이브 404를 만들지 않는다 */
+(function(){
+  var KEY = 'kts_land_ok_v1';
+  var memo = null; try { memo = sessionStorage.getItem(KEY); } catch(e){}
+  if (memo === '0') { window.__KTS_LAND = false; return; }
+  if (memo === '1') { window.__KTS_LAND = true; return; }
+  if (!window.fetch) { window.__KTS_LAND = true; return; }
+  try{
+    fetch('land/index.html', { method: 'HEAD', cache: 'no-store' })
+      .then(function(r){
+        window.__KTS_LAND = !!r.ok;
+        try { sessionStorage.setItem(KEY, r.ok ? '1' : '0'); } catch(e){}
+        if (!r.ok) hideLandTile();
+      })
+      .catch(function(){ window.__KTS_LAND = null; });
+  }catch(e){ window.__KTS_LAND = null; }
+})();
+
+/* ============================================================================
+   ⋯ 더 보기 — 첫 화면에서 뺀 것들(편집·화면·전체 목록·안내)을 한 시트에 모음
+   ========================================================================== */
+function openMenu(){
+  if (!window.KTSEdge) return;
+  var light = document.documentElement.getAttribute('data-kts-theme') === 'light';
+  var html =
+    '<div class="mrows">' +
+      '<button type="button" class="mrow" id="mEdit">편집 — 쓰는 도구만 고르기 · 순서 <em>내 메뉴</em></button>' +
+      '<button type="button" class="mrow" id="mAll">전체 목록 — 분류로 찾기 <em>30종</em></button>' +
+      '<button type="button" class="mrow" id="mTheme">화면 바꾸기 <em>' + (light ? '지금 밝은 화면 → 어두운' : '지금 어두운 화면 → 밝은') + '</em></button>' +
+      '<button type="button" class="mrow" id="mHelp">사용법 보기 <em>?</em></button>' +
+      '<button type="button" class="mrow" id="mCoupon">무료 이용권 · 사전예약 <em>결제 없음</em></button>' +
+      '<button type="button" class="mrow" id="mAsk">해주세요 · Q&amp;A <em>의뢰</em></button>' +
+      '<button type="button" class="mrow" id="mMst">대표님 마스터 모드 <em>PIN</em></button>' +
+    '</div>' +
+    '<p class="mnote">설치·로그인·결제 없이 씁니다. 올린 파일은 서버로 보내지 않고 이 기기 안에서만 처리합니다.</p>';
+  KTSEdge.sheet('더 보기', html);
+  var q = function(id){ return document.getElementById(id); };
+  var e;
+  if ((e = q('mEdit'))) e.onclick = function(){ KTSEdge.closeSheet(); openEdit(); };
+  if ((e = q('mAll'))) e.onclick = function(){ KTSEdge.closeSheet(); try{ localStorage.setItem(CHIP_KEY,'all'); }catch(err){} showGate('set1', true); };
+  if ((e = q('mTheme'))) e.onclick = function(){ if (window.KTSUI) KTSUI.toggle(); openMenu(); };
+  if ((e = q('mHelp'))) e.onclick = function(){ KTSEdge.closeSheet(); openHelp(); };
+  if ((e = q('mCoupon'))) e.onclick = function(){ KTSEdge.closeSheet(); showCoupon(); };
+  if ((e = q('mAsk'))) e.onclick = function(){ KTSEdge.closeSheet(); askModal(); };
+  if ((e = q('mMst'))) e.onclick = function(){ KTSEdge.closeSheet(); var k = document.getElementById('mKey'); if (k) k.click(); };
+}
+/* 171: 분류 대문 — ⋯ [전체 목록]에서만 열립니다(개수는 내 메뉴 반영 후 계산) */
 function renderGates(menu){
   var box = $('#gates'); if (!box) return;
   var mm = menu || menuNow();
@@ -665,11 +757,10 @@ document.addEventListener('click', function(e){
 /* 171보강: 히어로 소개문 → [?] 시트 안으로 · 전화번호도 여기(+ 아래 하단 안내) */
 var HELP_HTML =
   '<p><b>설치 없이 · 로그인 없이 · 결제 없이</b></p>' +
-  '<p><b>반복 업무, 클릭 한 번으로 끝내세요.</b><br>설치 없이 바로 쓰는 사업자용 업무 도구입니다. 매물 정리부터 상품 콘텐츠·서명까지.</p>' +
-  '<p>① 위의 <b>분류</b> 중 하나를 누르면 그 구역 도구만 나옵니다. <b>1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션</b> 순서입니다. <b>[← 전체 분류]</b>로 돌아옵니다.<br>' +
-  '② 오른쪽 위 <b>[편집]</b>에서 내가 쓰는 도구만 남기고 순서를 바꿉니다. 뺀 도구는 [+ 추가하기]로 되살립니다.<br>' +
-  '③ <b>어두운</b>(남색 바탕) · <b>밝은</b>(흰 바탕)을 고를 수 있습니다. 인쇄는 항상 흰 바탕입니다.</p>' +
-  '<p>설치·로그인·결제 없이 씁니다. 무료 이용권은 아래 <b>[이용권]</b>에서.</p>' +
+  '<p>첫 화면에 <b>1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션</b> 순서로 놓았습니다. <b>타일을 한 번 누르면</b> 그 도구가 바로 열립니다.</p>' +
+  '<p>사업장·생활기록·준비 중 도구는 아래 <b>[그 밖의 도구]</b>를 펼치면 나옵니다. 오른쪽 위 <b>[⋯]</b>에는 편집·화면 바꾸기·전체 목록·이용권이 모여 있습니다.</p>' +
+  '<p>쓸 도구만 남기고 순서를 바꾸려면 <b>[⋯ → 편집]</b>. 뺈 도구는 [+ 추가하기]로 되살립니다. 고른 것은 이 기기에만 저장됩니다.</p>' +
+  '<p>올린 파일은 서버로 보내지 않고 이 기기 안에서만 처리합니다.</p>' +
   '<div class="homeRow" style="justify-content:flex-start;margin:4px 4px 0"><button type="button" class="hbtn" data-cpn>이용권 · 해주세요 보기</button>' +
   '<a class="hbtn" href="tel:01020022899" style="display:inline-flex;align-items:center;text-decoration:none">전화 010-2002-2899</a></div>';
 function openHelp(){ if (window.KTSEdge) KTSEdge.sheet('KTS 원클릭 사용법', HELP_HTML); }
@@ -680,14 +771,21 @@ function showCoupon(){
   var hd = document.querySelector('header'), off = hd ? hd.getBoundingClientRect().height + 8 : 0;
   window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - off, behavior:'smooth'});
 }
-$('#helpBtn2').onclick = openHelp;
+$('#helpBtn2').onclick = function(){
+  if (window.KTS_HELPER && KTS_HELPER.open) { try{ KTS_HELPER.open(0); return; }catch(e){} }
+  openHelp();
+};
+$('#menuBtn').onclick = openMenu;
 $('#cpnBtn').onclick = showCoupon;
 /* 수익 구조: 이용권 코드 + 계좌이체 안내 (pay.js) — 결제 단계에서만 금액·부가세를 보입니다 */
-$('#payNoteBtn').onclick = function(){
-  if (window.KTSPay) { KTSPay.open({label:'이용권 · 열쇠'}); return; }
-  var _m = $('#payNoteMsg'); _m.hidden = false; _m.style.display = 'block';   /* 인라인 display:none 이 hidden 속성을 이기므로 둘 다 푼다 */
-};
-$('#startBtn').onclick = function(){ showGate('set1', true); };
+(function(){
+  var b = $('#payNoteBtn'); if (!b) return;
+  b.onclick = function(){
+    if (window.KTSPay) { KTSPay.open({label:'이용권 · 열쇠'}); return; }
+    var _m = $('#payNoteMsg'); if (_m) { _m.hidden = false; _m.style.display = 'block'; }
+  };
+})();
+(function(){ var b = $('#startBtn'); if (b) b.onclick = function(){ showGate('set1', true); }; })();
 document.addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('[data-cpn]') : null; if (b) { e.preventDefault(); showCoupon(); } });
 
 function renderFeat(){
@@ -846,7 +944,7 @@ function masterGrid(){
 try {
   if (window.KTSSlots && KTSSlots.ref && /[?&]invite=/.test(location.search)) {
     var t=$('#nbTxt'); if (t) t.textContent = '초대 링크로 들어오셨습니다 · 본인 인증하면 열쇠 4개를 드립니다';
-    $('#nb').classList.remove('nbOff');
+    var nb=$('#nb'); if (nb) nb.classList.remove('nbOff');
   }
 } catch(e){}
 
@@ -871,6 +969,7 @@ window.addEventListener('hashchange', function(){ if (location.hash === '#coupon
 })();
 </script>
 <script src="helper.js?v=20261127a"></script>
+<script src="shared/visit.js?v=20261128a" defer></script>
 <script src="/shared/pwa-install.js?v=20261126" data-name="원클릭" data-start="/" data-manifest="/shared/pwa/home.webmanifest" defer></script>
 </body>
 </html>

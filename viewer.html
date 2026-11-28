@@ -164,6 +164,24 @@ body.docopen .kipfoot{display:none}
 .banner a{background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on-amber);font-weight:900;font-size:12.5px;padding:10px 13px;border-radius:10px;white-space:nowrap}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:rgba(10,17,40,.97);border:1px solid rgba(255,107,0,.5);color:#fff;font-size:12px;font-weight:700;padding:10px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:60;max-width:calc(100vw - 36px);text-align:center;line-height:1.5;letter-spacing:-.2px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .toast.on{opacity:1}
+/* ---------- 2026-11-28 (264·279) 저장 전 확대 미리보기 ---------- */
+#ppPrev{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;background:rgba(4,8,18,.82)}
+#ppPrev.on{display:flex}
+#ppPrev .pv{width:100%;max-width:560px;max-height:94vh;display:flex;flex-direction:column;background:#0F1B33;color:#F3F6FA;
+  border:1px solid #2E4370;border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -12px 30px rgba(0,0,0,.5);overflow:hidden}
+#ppPrev .pvh{display:flex;align-items:center;gap:8px;padding:12px 14px 8px;border-bottom:1px solid #26375F}
+#ppPrev .pvh b{flex:1;min-width:0;font-size:14px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ppPrev .pvh span{flex:0 0 auto;font-size:11px;font-weight:800;color:#93A4BC}
+#ppPrev .pvx{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid #2E4370;background:#0B1729;color:#CBD8E8;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit}
+#ppPrev .pvb{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;background:#08101F;padding:10px;text-align:center}
+#ppPrev .pvb canvas,#ppPrev .pvb img{display:block;margin:0 auto;width:100%;height:auto;background:#fff;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+#ppPrev.zoom .pvb{text-align:left}
+#ppPrev.zoom .pvb canvas,#ppPrev.zoom .pvb img{width:200%;max-width:none;margin:0}
+#ppPrev .pvf{display:grid;grid-template-columns:auto 1fr 1fr;gap:7px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #26375F}
+#ppPrev .pvf button{font-family:inherit;font-size:13px;font-weight:900;border-radius:11px;padding:12px 10px;cursor:pointer;
+  border:1px solid #2E4370;background:#12203C;color:#E6EDF7}
+#ppPrev .pvf button.p{background:linear-gradient(135deg,#FF6B00,#FFA24D);border-color:#FF6B00;color:#0A1224}
+#ppPrev .pvw{font-size:10.5px;color:#8FA1B8;padding:0 12px 8px;line-height:1.5}
 body.has-badge .banner{bottom:58px}
 body.has-badge .toast{bottom:150px}
 /* ---------- 파일 선택 후: 큰 박스 접기 + 로딩 + 흰 종이 ---------- */
@@ -380,6 +398,20 @@ body.docopen .toast{bottom:calc(var(--pb,66px) + 14px)}
 </div>
 
 <div class="banner" id="banner" hidden style="display:none"></div><!-- (2026-11-25 · 232번) 가격 배너는 띄우지 않는다 — 뷰어는 광고·배너 0 -->
+
+<!-- 2026-11-28 (264·279) 저장 전 확대 미리보기 → PNG·PDF 같이 -->
+<div id="ppPrev" role="dialog" aria-modal="true" aria-label="저장 전 미리보기">
+  <div class="pv">
+    <div class="pvh"><b id="pvT">저장 전 미리보기</b><span id="pvP"></span><button type="button" class="pvx" id="pvX" aria-label="닫기">✕</button></div>
+    <div class="pvb" id="pvB"></div>
+    <div class="pvw" id="pvW">화면을 눌러 크게 볼 수 있습니다 · Esc 로 닫기</div>
+    <div class="pvf">
+      <button type="button" id="pvZ" aria-pressed="false">확대</button>
+      <button type="button" class="p" id="pvPng">PNG 저장</button>
+      <button type="button" id="pvPdf">PDF 저장</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="window.pdfjsLib=undefined"></script>
 <!-- PDF 직접 만들기 — CDN 없이 이 저장소에서 바로 (213번) · 구형 한글(.hwp)은 사무실 PC 변환 서버에서만 PDF로 (212번 이전 방식으로 복원) -->
@@ -1104,9 +1136,19 @@ async function hwpUpgrade(file, nm){
   try{
     await paintDoc({kind: 'pdf', buf: pb, note: '구형 한글 → PDF(원본)'}, file, PP.name || nm);
     const fm = document.getElementById('fmeta');
-    if (fm) fm.textContent = Math.round(file.size / 1024) + 'KB · 구형 한글 → 원본 PDF';
+    if (fm) fm.textContent = fmtSize(file.size) + ' · 구형 한글 → 원본 PDF';
     showToast('사무실 PC에서 원본 그대로 열었습니다');
   }catch(e){ console.warn('hwp upgrade fail', e); }
+}
+
+/* 2026-11-28 (U-9) — 44바이트 파일이 '0KB' 로 보이던 것: 1KB 미만은 그대로 적는다 */
+function fmtSize(bytes){
+  const n = Number(bytes) || 0;
+  if (n <= 0) return '0KB';
+  if (n < 1024) return '1KB 미만';
+  if (n < 1048576) return Math.max(1, Math.round(n / 1024)) + 'KB';
+  const mb = n / 1048576;
+  return (mb < 10 ? mb.toFixed(1) : Math.round(mb)) + 'MB';
 }
 
 /* ---------- 조립 ---------- */
@@ -1266,7 +1308,7 @@ async function showFile(file){
   document.getElementById('vtName').textContent = nm;
   dropEl.classList.add('mini');
   document.getElementById('mName').textContent = nm;
-  document.getElementById('mMeta').textContent = Math.round(file.size / 1024) + 'KB';
+  document.getElementById('mMeta').textContent = fmtSize(file.size);
   window.scrollTo(0, 0);
   /* (232번) 중간 단계 0 — 마스코트 로딩 카드 없이 곧바로 종이 화면을 연다.
      첫 장이 그려지는 동안에도 화면은 이미 문서 상태이고, 상태는 위 막대의 파일 정보 줄에만 짧게 쓴다. */
@@ -1274,7 +1316,7 @@ async function showFile(file){
   docEl.classList.add('paper');
   document.body.classList.add('docopen');
   document.getElementById('fname').textContent = nm;
-  document.getElementById('fmeta').textContent = Math.round(file.size / 1024) + 'KB · 여는 중…';
+  document.getElementById('fmeta').textContent = fmtSize(file.size) + ' · 여는 중…';
   fitStage();
   const name = nm.toLowerCase();
   try{
@@ -1300,7 +1342,7 @@ async function showFile(file){
     } else {
       r = {kind: 'html', html: '<div class="hw"><p>지원하지 않는 형식입니다. 한글(.hwp/.hwpx)·엑셀(.xlsx)·워드(.docx)·PDF·사진·텍스트를 지원합니다.</p></div>', note: ''}
     }
-    document.getElementById('fmeta').textContent = Math.round(file.size / 1024) + 'KB' + (r.note ? ' · ' + r.note : '');
+    document.getElementById('fmeta').textContent = fmtSize(file.size) + (r.note ? ' · ' + r.note : '');
     await paintDoc(r, file, nm);
     const bn = document.getElementById('banner'); if (bn) bn.classList.add('hide');
     if (typeof vOpen === 'function') vOpen();
@@ -1440,12 +1482,12 @@ function mfName(){
   document.getElementById('vtName').textContent = '파일 ' + (g.fi + 1) + '/' + MF.items.length + ' · ' + g.it.name;
 }
 function mfMeta(){
-  const mb = MF.items.reduce((a, it) => a + (it.size || 0), 0) / 1048576;
+  const bytes = MF.items.reduce((a, it) => a + (it.size || 0), 0);
   const t = '묶음 ' + MF.items.length + '개 · ' + MF.total + '장';
   document.getElementById('mName').textContent = t;
-  document.getElementById('mMeta').textContent = mb.toFixed(1) + 'MB';
+  document.getElementById('mMeta').textContent = fmtSize(bytes);
   document.getElementById('fname').textContent = t;
-  document.getElementById('fmeta').textContent = mb.toFixed(1) + 'MB';
+  document.getElementById('fmeta').textContent = fmtSize(bytes);
 }
 
 /* 파일 → 빌더 입력(r). showFile 의 판별 순서·문구 그대로 */
@@ -1939,13 +1981,86 @@ async function mfSavePdf(){
 
 /* 그림 저장 메뉴 · 버튼 배선 · 끌어다 놓기 */
 function mfMenu(on){ const m = document.getElementById('mfMenu'); if (m) m.classList.toggle('on', !!on); }
+
+/* ============================================================================
+   2026-11-28 (264·279) — [그림 저장]·[PDF 저장]은 바로 받지 않고
+   '확대 미리보기' 모달을 거쳐 확인하고 PNG·PDF로 같이 받습니다.
+   Esc · 배경 누름 · ✕ 로 닫힙니다.
+   ========================================================================== */
+let pvBusy = false;
+function pvClose(){
+  const m = document.getElementById('ppPrev'); if (!m) return;
+  m.classList.remove('on'); m.classList.remove('zoom');
+  const b = document.getElementById('pvB'); if (b) b.innerHTML = '';   /* 캔버스 메모리 해제 */
+}
+function pvSetZoom(on){
+  const m = document.getElementById('ppPrev'), z = document.getElementById('pvZ');
+  if (m) m.classList.toggle('zoom', !!on);
+  if (z) { z.setAttribute('aria-pressed', on ? 'true' : 'false'); z.textContent = on ? '맞춤' : '확대'; }
+}
+async function pvMake(){
+  if (PP.kind === 'pdf') return await pdfPageCanvas(PP.cur);
+  if (PP.kind === 'img'){
+    const img = new Image();
+    img.alt = '미리보기';
+    const url = URL.createObjectURL(PP.file);
+    await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = url; });
+    return img;
+  }
+  return await sheetPageCanvas(PP.cur);
+}
+async function openSavePreview(kind){
+  if (!PP.kind || PP.kind === 'frame'){ showToast('이 형식은 그림으로 저장할 수 없습니다 · [출력]에서 PDF로 저장하세요'); return; }
+  if (pvBusy) return;
+  const m = document.getElementById('ppPrev'); if (!m) return;
+  pvBusy = true;
+  const box = document.getElementById('pvB'), tt = document.getElementById('pvT'), pp = document.getElementById('pvP');
+  m.classList.add('on'); pvSetZoom(false);
+  if (tt) tt.textContent = '저장 전 미리보기';
+  if (pp) pp.textContent = MF.multi ? ('묶음 ' + ((PP.cur || 0) + 1) + ' / ' + (MF.total || 1) + '장') : ('현재 ' + ((PP.cur || 0) + 1) + '장');
+  if (box) box.innerHTML = '<p style="color:#8FA1B8;font-size:12px;padding:24px 8px">미리보기를 그리는 중…</p>';
+  try{
+    const node = await pvMake();
+    if (box) { box.innerHTML = ''; box.appendChild(node); }
+    if (tt) tt.textContent = kind === 'pdf' ? 'PDF로 저장할 내용' : 'PNG로 저장할 내용';
+  }catch(e){
+    console.warn('preview fail', e);
+    if (box) box.innerHTML = '<p style="color:#FFC98F;font-size:12px;padding:24px 8px">미리보기를 지울 수 없습니다 — 바로 저장하거나 [출력]으로 인쇄해 주세요.</p>';
+  }
+  pvBusy = false;
+}
+function bindSavePreview(){
+  const q = id => document.getElementById(id);
+  if (!q('ppPrev')) return;
+  q('pvX').onclick = pvClose;
+  q('ppPrev').addEventListener('click', ev => { if (ev.target === ev.currentTarget) pvClose(); });
+  q('pvZ').onclick = () => pvSetZoom(!q('ppPrev').classList.contains('zoom'));
+  q('pvPng').onclick = async () => { pvClose(); if (MF.multi) mfSaveCur(); else saveImage(); };
+  q('pvPdf').onclick = () => { pvClose(); mfSavePdf(); };
+}
+bindSavePreview();
+
+/* Esc — 위에 뜬 창을 차례대로 닫습니다(미리보기 → 그림 메뉴 → 파일 목록 → 더편집) */
+document.addEventListener('keydown', ev => {
+  if (ev.key !== 'Escape') return;
+  const pv = document.getElementById('ppPrev');
+  if (pv && pv.classList.contains('on')) { ev.preventDefault(); pvClose(); return; }
+  const mm = document.getElementById('mfMenu');
+  if (mm && mm.classList.contains('on')) { ev.preventDefault(); mfMenu(false); return; }
+  const ml = document.getElementById('mfList');
+  if (ml && ml.classList.contains('on')) { ev.preventDefault(); mfListShow(false); return; }
+  const ss = document.getElementById('edSignSheet');
+  if (ss && ss.classList.contains('on')) { ev.preventDefault(); ss.classList.remove('on'); return; }
+  if (document.body.classList.contains('editing')) { ev.preventDefault(); const d = document.getElementById('edDone'); if (d) d.click(); }
+});
+
 (function bindMF(){
   const q = id => document.getElementById(id);
-  q('vtSaveImg').onclick = () => (MF.multi ? mfSaveCur() : saveImage());
+  q('vtSaveImg').onclick = () => openSavePreview('png');
   q('mfSaveMore').onclick = ev => { ev.stopPropagation(); mfMenu(!q('mfMenu').classList.contains('on')); };
   q('mfSaveCur').onclick = () => { mfMenu(false); MF.multi ? mfSaveCur() : saveImage(); };
   q('mfSaveZip').onclick = () => { mfMenu(false); mfSaveZip(); };
-  q('mfPdfBtn').onclick = () => { mfMenu(false); mfSavePdf(); };
+  q('mfPdfBtn').onclick = () => openSavePreview('pdf');
   q('mfToForm').onclick = () => { mfMenu(false); sendToForm(); };
   q('mfAddBtn').onclick = () => mfPick(true);
   q('mfListAdd').onclick = () => { mfListShow(false); mfPick(true); };
@@ -2440,5 +2555,6 @@ async function sendToForm(){
 </script>
 <script src="ux.js?v=20261125a"></script>
 <script src="helper.js?v=20261125c"></script>
+<script src="shared/visit.js?v=20261128a" defer></script>
 <script src="/shared/pwa-install.js?v=20261126" data-name="더뷰" data-start="/viewer.html" data-manifest="/shared/pwa/viewer.webmanifest" defer></script>
 </body></html>

@@ -29,6 +29,10 @@ body{background:radial-gradient(120% 50% at 50% -8%,#132A4E 0%,transparent 60%),
 .hd .sp{flex:1}
 .hd a{font-size:11.5px;font-weight:800;color:#9DAEC5;text-decoration:none;border:1px solid var(--line2);
   border-radius:999px;padding:6px 10px}
+.hd .q{flex:0 0 auto;width:44px;height:44px;padding:0;border-radius:12px;font-family:inherit;font-size:16px;font-weight:900;
+  line-height:1;cursor:pointer;border:1px solid var(--line2);background:var(--card2);color:var(--ink)}
+.hd .q:active{border-color:var(--amber)}
+#kts-helper-btn{display:none!important}   /* 고정 [도우미]는 머리글 [?]가 대신한다 — 도크를 가리지 않게 */
 .shop{display:flex;gap:13px;margin-top:8px;align-items:flex-start}
 .shop .ico{width:64px;height:64px;border-radius:16px;overflow:hidden;border:1px solid rgba(198,160,84,.4);flex:0 0 auto;background:#0B1730}
 .shop .ico img{width:100%;height:100%;object-fit:cover;display:block}
@@ -123,6 +127,7 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
     <img src="icon.png" alt="">
     <b>KTS <span>원클릭</span></b>
     <div class="sp"></div>
+    <button class="q" id="helpBtn" type="button" aria-label="사용법 · 도우미 열기">?</button>
     <a href="index.html">← 전체 도구</a>
   </div>
   <div id="doc"></div>
@@ -143,6 +148,99 @@ h2.sec:before{content:"";width:5px;height:5px;border-radius:99px;background:var(
 const $ = s => document.querySelector(s);
 const BADGE = {NEW:'new', '무료':'free', PRO:'pro', '준비':'soon'};
 
+/* ============================================================================
+   2026-11-28 (U-5) — products.js 에 없는 도구(면적·4대 공부·전자명함·1호 통합 …)를
+   'k=area' 같은 주소로 들어와도 빈 카드가 아니라 안내 + 바로가기로 받아 준다.
+   ========================================================================== */
+const LOCAL_INFO = {
+  land: {nm:'1호 통합', sub:'면적 · 경사도 · 4대 공부를 한 화면에서', link:'land/', glyph:'◈', badge:'NEW',
+    blurb:'주소 하나로 필지를 담고, 담은 필지의 <b>면적·경사도·토지대장·건축물대장·토지이용계획·공시지가</b>를 한 화면에서 봅니다. 아래 [A4 1장 저장]을 거쳐 PDF·PNG로 받습니다.',
+    bullets:[['면적','필지 포함·제외를 눌러 면적(㎡·평) 자동 합산'],['경사도','담은 필지 안쪽만 계산 · 단면 보기'],['4대 공부','토지대장 · 건축물대장 · 토지이용계획 · 공시지가를 한 번에'],['저장','A4 1장 PDF·PNG (저장 전 확대 미리보기)']],
+    how:['주소·지번을 넣고 [찾기]를 누릅니다.','지도에서 필지를 누르면 담기고, 다시 누르면 뺍니다.','아래 [A4 1장 저장]에서 미리보기를 확인하고 PDF·PNG로 받습니다.'],
+    notes:['자료는 공공 데이터(브이월드·국토교통부·정부24)를 그때그때 읽어 옵니다.','경사도는 지형 타일에서 계산한 참고값입니다 — 인허가 판단은 원문 확인이 필요합니다.']},
+  area: {nm:'면적 그리기', sub:'필지 포함·제외 → 면적(㎡·평) 자동 합산', link:'area/', glyph:'▱', badge:'NEW',
+    blurb:'지도에서 필지를 눌러 담으면 <b>면적이 자동으로 합산</b>됩니다. 담은 필지의 주소·지번·지목·용도지역·면적·평·공시지가를 A4 한 장 표로 만들고, 지도 그림과 표 폭을 맞춰 인쇄합니다.',
+    bullets:[['담기','지도에서 필지를 누르면 담기 · 다시 누르면 빼기'],['합산','담은 필지 면적(㎡)과 평을 바로 계산'],['A4','지도 + 표(주소·지번·지목·용도지역·㎡·평·공시지가·합계)'],['저장','PDF·PNG 동시 (확대 미리보기)']],
+    how:['주소·지번으로 찾거나 지도를 움직여 필지를 고릅니다.','필지를 눌러 담습니다. 잘못 담았으면 다시 누릅니다.','[A4 1장]으로 미리보기를 열고 PDF·PNG로 받습니다.'],
+    notes:['면적은 공부상 면적과 지도 도형 면적이 다를 수 있습니다 — 계약·인허가에는 공부상 면적을 쓰십시오.']},
+  gongbu: {nm:'4대 공부', sub:'토지대장 · 건축물대장 · 토지이용계획 · 공시지가', link:'gongbu/', glyph:'▤', badge:'NEW',
+    blurb:'주소 하나로 <b>토지대장·건축물대장·토지이용계획·개별공시지가</b>를 한 화면에 모읍니다. 건폐율·용적률·허가일·위반건축물·층별현황까지 표로 보여 주고, 정부24 법정 서식 그대로 A4 가로 한 장으로 저장합니다.',
+    bullets:[['5탭','기본정보 · 토지대장 · 건축물대장 · 토지이용계획 · 공시지가'],['법정 서식','A4 가로(297×210mm) 표 그대로'],['짧은 주소','「신하리 162-9」처럼 짧게 넣어도 19자리 PNU부터 확정'],['저장','PDF·PNG 동시 (확대 미리보기)']],
+    how:['주소·지번을 넣습니다(짧은 주소도 됩니다).','탭을 넘겨 가며 4대 공부를 확인합니다.','[A4 저장]으로 미리보기를 확인하고 PDF·PNG로 받습니다.'],
+    notes:['자료는 정부24·국토교통부 공개 데이터를 그때그때 읽어 옵니다.','토지이용계획은 시·군 조례에 따라 달라집니다 — 최종 판단은 구청 확인이 필요합니다.']},
+  bizcard: {nm:'전자명함 · 매물장', sub:'문자 하나로 5초 매물장 · 내 명함 홈피', link:'bizcard/', glyph:'👤', badge:'무료',
+    blurb:'받은 문자를 붙여넣으면 <b>매물장 한 장</b>이 되고, 내 명함을 붙인 <b>단독 홈피</b>로 손님에게 보낼 수 있습니다. 주인 화면(편집·내보내기)과 손님 화면(저장·바로가기)이 나뉘어 있습니다.',
+    bullets:[['문자 파싱','주소·금액·면적을 문장에서 자동으로 집어냅니다'],['명함','상호·직책·이름·연락처를 크게'],['나누기','주인은 편집, 손님은 저장·바로가기만'],['무료','열쇠 없이 바로 열립니다']],
+    how:['[문자 붙여넣기]에 받은 매물 문자를 넣습니다.','값이 맞는지 확인하고 내 명함을 올립니다.','[보내기]로 링크를 만들어 손님에게 문자로 보냅니다.'],
+    notes:['손님에게는 주인용 편집·금액 메모가 보이지 않습니다.']},
+  thescan: {nm:'더스캔', sub:'서류·영수증 찍으면 바로 스캔', link:'thescan/', glyph:'▣', badge:'NEW',
+    blurb:'종이에 폰을 대고 찍으면 <b>경계를 찾아 자동으로 반듯하게</b> 만듭니다. 여러 장을 한 파일(PDF)로 묶거나, 장을 나누어 저장합니다.',
+    bullets:[['자동 보정','찍으면 네 모서리를 찾아 펴 줍니다'],['묶기','여러 장을 한 PDF로'],['저장','PDF·PNG'],['기기 안','파일은 서버로 보내지 않습니다']],
+    how:['[찍기]로 종이를 찍거나 사진첩에서 고릅니다.','필요 없는 장을 지우고 순서를 맞춥니다.','[전체 저장]으로 PDF로 받습니다.'],
+    notes:['어두운 곳에서는 조명을 켜고 찍으면 글자가 더 살아납니다.']},
+  theeraser: {nm:'더지우개', sub:'사진 글씨·얼룩 지우기', link:'theeraser/', glyph:'⌫', badge:'NEW',
+    blurb:'사진에서 <b>글씨·로고·얼룩</b>을 문질러 지웁니다. 지운 자리는 주변 색으로 메워 원본처럼 남습니다. 매물 사진의 개인정보를 가릴 때 씁니다.',
+    bullets:[['문지르기','지울 곳을 손가락으로 칠합니다'],['메우기','주변 색으로 자연스럽게 채움'],['저장','PNG·JPG'],['기기 안','사진은 서버로 가지 않습니다']],
+    how:['사진을 엽니다.','지울 곳을 문지릅니다.','[저장]으로 내려받습니다.'],
+    notes:['원본은 덮어쓰지 않습니다 — 새 파일로 저장됩니다.']},
+  seller: {nm:'원클릭 셀러', sub:'담기 → 올리기 → 발주', link:'seller/', glyph:'▦', badge:'NEW',
+    blurb:'도매 상품을 <b>담고, 상품명·태그·상세를 만들어 올리고, 발주서까지</b> 한 흐름으로 처리합니다.',
+    bullets:[['담기','상품 링크·사진을 모읍니다'],['만들기','상품명·키워드·상세 문구'],['발주','주문을 발주서로 정리']],
+    how:['상품을 담습니다.','상품명·태그·상세를 만듭니다.','주문이 들어오면 발주서로 정리합니다.'],
+    notes:['판매처 규정(금지어·상표)은 올리기 전에 한 번 더 확인하십시오.']},
+  homepage: {nm:'홈페이지', sub:'사장님 단독 홈페이지 — 준비 중', link:'', glyph:'🌐', badge:'준비', soon:true,
+    blurb:'사장님 가게의 <b>단독 홈페이지</b>를 만들어 드리는 상품입니다. 지금은 준비 중이고, 원하시면 [해주세요]에 적어 주시면 먼저 만듭니다.',
+    bullets:[['준비 중','문의로 순서를 앞당길 수 있습니다']], how:['쇼룸 [무료 이용권]이나 문자로 문의해 주세요.'], notes:[]}
+};
+
+function renderLocal(key, lp){
+  document.title = lp.nm + ' — KTS 원클릭';
+  $('#doc').innerHTML = `
+    <div class="shop" style="margin-top:14px">
+      <div class="ico">${lp.icon ? `<img src="${lp.icon}" alt="">` : '<b style="display:grid;place-items:center;width:100%;height:100%;font-size:26px;color:#FFA24D;line-height:1">' + (lp.glyph || '◆') + '</b>'}</div>
+      <div><h1>${lp.nm}</h1><div class="sub">${lp.sub}</div></div>
+    </div>
+    ${lp.badge ? `<div style="margin-top:9px"><span style="font-size:10px;font-weight:900;border-radius:999px;padding:3px 9px;color:#0B2C1B;background:${lp.badge==='준비'?'#FCD34D':(lp.badge==='무료'?'#4ADE80':'linear-gradient(90deg,#FF8A2B,#FFA24D)')}">${lp.badge}</span></div>` : ''}
+    <p class="lead">${lp.blurb}</p>
+    ${lp.link ? `<a class="lock" href="${lp.link}" rel="noopener"><span class="t"><b>${lp.soon ? '지금 열어 보기' : '바로 열기 — 설치·로그인 없이'}</b><span>${lp.sub}</span></span><em>열기 →</em></a>` : ''}
+    ${lp.bullets && lp.bullets.length ? `<h2 class="sec">무엇이 되나요</h2><table class="tbl"><tbody>${lp.bullets.map(([a,b]) => `<tr><th>${a}</th><td>${b}</td></tr>`).join('')}</tbody></table>` : ''}
+    ${lp.how && lp.how.length ? `<h2 class="sec">쓰는 순서</h2><div class="steps">${lp.how.map(t => `<div class="st"><div class="c">${t}</div></div>`).join('')}</div>` : ''}
+    ${lp.notes && lp.notes.length ? `<h2 class="sec">알아 두실 것</h2><ul class="notes">${lp.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : ''}
+    <h2 class="sec">다른 도구</h2>
+    <div class="others">
+      <a href="index.html"><b>쇼룸 홈</b><span>1호 땅·공부 → 4호 옵션까지 한눈에</span></a>
+      ${window.PRODUCTS.filter(x => x.status === 'live' && x.link).slice(0, 3).map(x => `<a href="${x.link}"><img src="${x.icon}" alt=""><div><b>${x.nm}</b><span>${x.sub}</span></div></a>`).join('')}
+    </div>
+    <div class="note-block"><p>이 화면은 도구 소개입니다. 실제 도구는 위 [바로 열기]로 들어가 씁니다 — 결제·회원가입 없이 열립니다.</p></div>`;
+}
+
+function renderMissing(key){
+  const LIST = [
+    ['land','1호 통합','면적+경사도+4대 공부를 한 화면에서'],
+    ['area','면적 그리기','필지 담아 면적(㎡·평) 합산 → A4 한 장'],
+    ['gongbu','4대 공부','토지대장·건축물대장·이용계획·공시지가'],
+    ['bizcard','전자명함·매물장','문자 하나로 매물장·내 명함 홈피'],
+    ['thescan','더스캔','서류·영수증 찍으면 바로 스캔'],
+    ['theeraser','더지우개','사진 글씨·얼룩 지우기'],
+    ['seller','원클릭 셀러','담기 → 올리기 → 발주']];
+  document.title = '도구 안내 — KTS 원클릭';
+  $('#doc').innerHTML = `
+    <div style="margin-top:16px;border:1px solid rgba(255,107,0,.4);border-radius:16px;padding:14px 15px;background:linear-gradient(150deg,rgba(255,107,0,.12),rgba(255,255,255,.015) 62%)">
+      <h1 style="margin:0;font-size:18px;font-weight:900;letter-spacing:-.6px">이 주소의 도구를 찾지 못했습니다</h1>
+      <p class="lead" style="margin:8px 0 0">주소 끝의 <b>?k=${escHtml(key)}</b> 가 지금 목록에 없습니다. 아래에서 고르시거나 쇼룸 홈으로 돌아가 주세요. (주소가 바뀐 도구는 <b>detail.html</b> 이 새 주소로 넘겨 줍니다.)</p>
+      <a class="lock" href="index.html" rel="noopener" style="margin-top:10px"><span class="t"><b>쇼룸 홈으로</b><span>1호 땅·공부 → 4호 옵션</span></span><em>홈 →</em></a>
+    </div>
+    <h2 class="sec">이런 도구를 찾으셨나요</h2>
+    <div class="others">
+      ${LIST.map(([k,nm,sub]) => `<a href="detail.html?k=${k}"><b>${nm}</b><span>${sub}</span></a>`).join('')}
+    </div>
+    <h2 class="sec">전체 도구</h2>
+    <div class="others">
+      ${window.PRODUCTS.filter(x => x.status === 'live' && x.link).map(x => `<a href="${x.link}"><img src="${x.icon}" alt=""><div><b>${x.nm}</b><span>${x.sub}</span></div></a>`).join('')}
+    </div>`;
+}
+function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
 function faqFor(p){
   const base = [
     ['설치가 필요한가요?', '아니요. 브라우저에서 바로 열립니다. 일부 도구는 앱(.apk)으로도 쓸 수 있습니다.'],
@@ -158,8 +256,11 @@ function faqFor(p){
 function renderDetail(){
 const key = new URLSearchParams(location.search).get('k') || 'theform';
 const p = window.PRODUCTS.find(x => x.k === key);
-if (!p){
-  $('#doc').innerHTML = '<div class="missing">상품을 찾지 못했습니다.<br><a href="index.html" style="color:#FFA24D">전체 도구로 돌아가기</a></div>';
+const lp = (!p && LOCAL_INFO[key]) ? LOCAL_INFO[key] : null;
+if (lp){
+  renderLocal(key, lp);
+} else if (!p){
+  renderMissing(key);
 } else {
   document.title = p.nm + ' — KTS 원클릭';
   const pkgs = (p.price2 || '').split('·').map(s => s.trim()).filter(Boolean);
@@ -302,6 +403,17 @@ document.addEventListener('kts:catalog', () => { renderDetail(); });
   }, true);
 })();
 </script>
+<script>
+/* 머리글 [?] — 고정 도우미 버튼을 대신한다(U-1: 도크·버튼을 가리지 않게) */
+(function(){
+  var b = document.getElementById('helpBtn'); if (!b) return;
+  b.onclick = function(){
+    if (window.KTS_HELPER && KTS_HELPER.open) { try { KTS_HELPER.open(0); return; } catch(e){} }
+    location.href = 'index.html';
+  };
+})();
+</script>
 <script src="helper.js?v=20261125c"></script>
+<script src="shared/visit.js?v=20261128a" defer></script>
 </body>
 </html>
