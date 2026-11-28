@@ -480,7 +480,7 @@ body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣�
  <div class="body" id="pvmBody"></div>
  <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
 </div></div>
-<script src="forms.js"></script>
+<script src="forms.js?v=20261128a"></script>
 <script src="forms_consult.js"></script>
 <script>
 /* ===================== 표준계약서 (표준계약서 원본 사진식) ===================== */
@@ -1088,6 +1088,49 @@ function wrapText(g, text, maxW){
   });
   return out;
 }
+/* 303 — 한글 금액 뒤에 숫자를 붙인다: 28억 → 이십팔억 (2,800,000,000)
+   (이미 숫자가 붙어 있으면 그대로 둔다 · 숫자를 못 읽으면 빈 문자열) */
+function korAmtWithNum(raw){
+  const s = String(raw == null ? '' : raw).trim();
+  if (!s) return '';
+  if (/\(\s*[₩]?\s*[\d,]{4,}\s*원?\s*\)/.test(s)) return s;
+  const n = moneyValue(s);
+  if (!n || n < 1000) return '';
+  return korNum(n) + ' (' + comma(n) + ')';
+}
+/* 303 — 대상물건처럼 넓은 한 칸: 첫 줄에 소재지(풀주소), 아래 줄에 4대 공부를 작게
+   한 칸 높이 안에 다 들어가게 크기를 줄여 가며 앉힌다. ' · '로 나뉜 조각을 쓴다. */
+function drawStacked(g, t, x, y, w, h, fs0, font, pad){
+  const segs = String(t == null ? '' : t).split(/\s*[·ㆍ|]\s*/).filter(Boolean);
+  const head = segs.shift() || '';
+  const det = segs.join(' · ');
+  const avail = Math.max(10, w - pad * 2);
+  const setFs = s => { g.font = '400 ' + s.toFixed(1) + 'px ' + font; };
+  let f1 = Math.max(8, fs0); setFs(f1);
+  while (f1 > 8 && g.measureText(head).width > avail){ f1 -= .5; setFs(f1); }
+  let f2 = Math.max(7, f1 * 0.78), dl = [];
+  if (det){
+    for (let k = 0; k < 80; k++){
+      setFs(f2); dl = wrapText(g, det, avail);
+      const need = f1 * 1.08 + dl.length * f2 * 1.2;
+      if (dl.length <= 3 && need <= h - pad * 0.4) break;
+      if (f2 <= 7){ dl = dl.slice(0, 3); break; }
+      f2 = Math.max(7, f2 - .4);
+    }
+  }
+  const lh1 = f1 * 1.08, lh2 = f2 * 1.2;
+  const tot = lh1 + (dl.length ? dl.length * lh2 : 0);
+  const top = y + Math.max(0.5, (h - tot) / 2);
+  g.save();
+  g.beginPath(); g.rect(x + .5, y + .5, Math.max(2, w - 1), Math.max(2, h - 1)); g.clip();
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#000';
+  setFs(f1); g.fillText(head, x + pad, top + f1 * 0.82);
+  if (dl.length){
+    setFs(f2);
+    dl.forEach((ln, i) => g.fillText(ln, x + pad, top + lh1 + (i + 1) * lh2 - lh2 * 0.22));
+  }
+  g.restore();
+}
 /* 종이에 찍혀 있는 점선(밑줄)의 위치 — 양식 그림에서 직접 읽어 캐시한다(%-좌표)
    특약 글자가 원본 점선을 관통하지 않게, 한 줄씩 이 선 위에 앉힌다. */
 const RULE_CACHE = {};
@@ -1160,13 +1203,20 @@ function pageInkLines(IM, key){
         if (strong && s2 < 0) s2 = y;
         if (!strong && s2 >= 0){
           const h = y - s2;
-          if (h >= 4 && h <= maxH) out.push({ t: s2 / ch, b: (y - 1) / ch, h: h / ch });
+          if (h >= 4 && h <= maxH){
+            let w2 = 0; for (let yy = s2; yy < y; yy++) if (rows[yy] > w2) w2 = rows[yy];
+            out.push({ t: s2 / ch, b: (y - 1) / ch, h: h / ch, w: w2 });
+          }
           s2 = -1;
         }
       }
     });
     const hs = out.map(l => l.h).sort((x, y) => x - y);
     if (hs.length) out.med = hs[hs.length >> 1];
+    /* 303 — 본문 문단 줄(한 줄이 종이 폭의 12% 이상을 차지하는 띠)의 높이 = 본문 글씨 크기.
+       표 라벨('대 상 물 건' 등)은 본문보다 굵고 커서, 값이 라벨 크기로 커지지 않게 이 값을 기준으로 삼는다 */
+    const bhs = out.filter(l => (l.w || 0) >= 0.12).map(l => l.h).sort((x, y) => x - y);
+    out.body = bhs.length ? bhs[bhs.length >> 1] : (out.med || 0.02);
   }catch(e){}
   return out;
 }
@@ -1197,8 +1247,10 @@ async function composite(maxW, pg){
   const g = cv.getContext('2d');
   g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
   if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
-  const FONT_P = '"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR","NanumGothic","Batang",sans-serif';
+  /* 303 — 종이 본문(명조)과 같은 글꼴·굵기로 찍는다. 굵은 고딕으로 뜨면 종이와 따로 논다 */
+  const FONT_P = '"Batang","바탕","Nanum Myeongjo","NanumMyeongjo","Noto Serif KR","Noto Serif CJK KR","AppleMyungjo","Gungsuh","HYMyeongJo",serif';
   const lines = pageInkLines(IM, curForm().id + '|' + bgSrcFor(pg));
+  const BODY_H = (lines.body || lines.med || 0.02);   /* 종이 본문 글씨 높이(비율) */
   for (const f of curForm().fields){
     if (f.page && f.page !== pg) continue;
     let v = getV(f.id); if (v == null || v === '') continue;
@@ -1211,19 +1263,27 @@ async function composite(maxW, pg){
       g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r);
       continue;
     }
-    const t = f.money ? (/^\d+$/.test(String(v)) ? comma(v) : String(v)) : String(v);
+    let t = f.money ? (/^\d+$/.test(String(v)) ? comma(v) : String(v)) : String(v);
+    /* 303 — 한글 금액 뒤에 숫자를 함께: '이십팔억 (2,800,000,000)' */
+    if (isKorMoneyField(f) && !moneyTwinOf(f)) t = korAmtWithNum(v) || t;
     const ink = inkFor(lines, f, cv.height);
     const para = !!(f.top || f.multi);
-    const FWB = '700';
+    const FWB = '400';
     g.fillStyle = '#000';
     const medH = (lines.med || 0.02) * cv.height;
-    /* 종이 본문 글씨 크기(중앙값)를 기본으로, 이 줄에서 잰 크기가 있으면 그 크기 */
+    /* 종이 본문 글씨 크기를 기본으로, 이 줄에서 잰 크기가 있으면 그 크기 */
     let fs = ink ? ink.h / 0.735 : (medH / 0.735);
+    if (!f.fs){ const bodyFs = BODY_H * cv.height / 0.735; fs = Math.min(fs, bodyFs); }   /* 303 — 라벨 크기에 끌려 커지지 않게 */
     if (f.fs) fs = Math.min(fs, f.fs * (cv.width / 1489));
     const MINFS = Math.max(6.5, 8 * cv.width / 1489);
     fs = Math.max(MINFS, fs);
     const pad = Math.max(1.5, fs * 0.18);
     g.font = FWB + ' ' + fs + 'px ' + FONT_P;
+    /* 303 — 대상물건 같은 넓은 한 칸: 첫 줄 소재지, 아래 줄 4대 공부(작게)로 칸 안에 앉힌다 */
+    if (f.stack){
+      drawStacked(g, t, x, y, w, h, fs, FONT_P, pad);
+      continue;
+    }
     if (para){
       /* ---- 여러 줄(특약 등): 종이의 점선에 한 줄씩 앉힌다 ---- */
       const rules = ruleLinesOf(IM, pg, f).map(p => p / 100 * cv.height);
@@ -2127,7 +2187,8 @@ document.addEventListener('change', e => {
   if (el && el.dataset && el.dataset.f && !PCL_WRITE){
     const f0 = byId(el.dataset.f);
     if (f0 && isPropField(f0) && /소재지|대상물건|물건\s*표시|부동산의\s*표시|목적물|물건지/.test(LBL(f0))){
-      const v = String(el.value || '').trim();
+      /* 303 — 대상물건 칸에는 '소재지 · 4대 공부'가 함께 들어 있으니, 주소 부분만으로 다시 찾는다 */
+      const v = String(el.value || '').trim().split(/\s*[·ㆍ]\s*/)[0];
       if (v.length >= 4 && v !== f0._enriched){
         const scope = f0.grp || 'x';
         f0._enriched = v;
@@ -2763,11 +2824,18 @@ function fillProp(scope, d, onlyEmpty){
   };
   const areaTxt = v => v ? (s5fmtNum(s5cut(+v, 2)) + '㎡') : '';
   if (t.combo){
+    /* 303 — 넓은 칸 하나에 소재지 + 4대 공부 전체(지목·면적(평)·건물·용도지역·공시지가) */
     const parts = [String(d.addr || '').trim()];
-    if (d.jimok) parts.push(String(d.jimok));
-    if (areaTxt(d.land)) parts.push('토지 ' + areaTxt(d.land));
-    if (d.struct) parts.push(String(d.struct));
-    if (areaTxt(d.bldg)) parts.push('건물 ' + areaTxt(d.bldg));
+    const landTxt = d.land ? (s5fmtNum(s5cut(+d.land, 2)) + '㎡ (' + s5fmtNum(s5cut(m2ToPy(+d.land), 2)) + '평)') : '';
+    if (d.jimok && landTxt) parts.push(d.jimok + ' ' + landTxt);
+    else if (landTxt) parts.push('토지 ' + landTxt);
+    else if (d.jimok) parts.push(String(d.jimok));
+    const bd = [];
+    if (d.struct) bd.push(String(d.struct));
+    if (areaTxt(d.bldg)) bd.push('연면적 ' + areaTxt(d.bldg));
+    if (bd.length) parts.push('건물 ' + bd.join(' '));
+    if (d.use && d.use.length) parts.push(d.use.slice(0, 3).join('/'));
+    if (d.jiga) parts.push('공시지가 ' + comma(+d.jiga) + '원/㎡' + (d.jigaYr ? ' (' + d.jigaYr + '년)' : ''));
     const txt = parts.filter(Boolean).join(' · ');
     if (txt) set(t.combo, txt, false, true);
   } else {
@@ -2852,7 +2920,11 @@ async function propEnrich(scope, addr){
       jimok: ch.lndcgrCodeNm || toji.lndcgrCodeNm || '',
       land: toji.lndpclAr ? +toji.lndpclAr : (ch.lndpclAr ? +ch.lndpclAr : 0),
       bldg: b && b.totArea ? +b.totArea : 0,
-      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
+      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : '',
+      /* 303 — 이용계획(용도지역) · 공시지가도 넓은 칸(대상물건)에 함께 */
+      use: (r.use || []).filter(u => /포함|접함/.test(u.cnflc || '')).map(u => u.nm).filter(Boolean),
+      jiga: (r.price && r.price.pblntfPclnd) ? +r.price.pblntfPclnd : (ch.pblntfPclnd ? +ch.pblntfPclnd : 0),
+      jigaYr: (r.price && r.price.stdrYear) ? String(r.price.stdrYear) : (ch.lastUpdtDt ? String(ch.lastUpdtDt).slice(0, 4) : '')
     };
     const done = fillProp(scope, d, true);
     gbRender(r, addr);
@@ -2908,7 +2980,10 @@ async function propEnrichForce(scope, addr){
     const done = fillProp(scope, {
       addr: r.addr || addr, jimok: ch.lndcgrCodeNm || toji.lndcgrCodeNm || '',
       land: toji.lndpclAr ? +toji.lndpclAr : 0, bldg: b && b.totArea ? +b.totArea : 0,
-      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
+      struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : '',
+      use: (r.use || []).filter(u => /포함|접함/.test(u.cnflc || '')).map(u => u.nm).filter(Boolean),
+      jiga: (r.price && r.price.pblntfPclnd) ? +r.price.pblntfPclnd : (ch.pblntfPclnd ? +ch.pblntfPclnd : 0),
+      jigaYr: (r.price && r.price.stdrYear) ? String(r.price.stdrYear) : (ch.lastUpdtDt ? String(ch.lastUpdtDt).slice(0, 4) : '')
     }, true);
     refreshWrite();
     gbRender(r, addr);
