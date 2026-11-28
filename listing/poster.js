@@ -328,7 +328,7 @@
 
     h += '<div class="grp"><b>물건표에 넣기 (283번)</b><div class="row" id="tSec">'
       + [['right', '권리분석'], ['tx', '주변 실거래'], ['appraisal', '감정가']].map(function (x) {
-        return '<button class="btn sm' + ((sec[x[0]] !== 0) ? ' on' : '') + '" data-s="' + x[0] + '">' + x[1] + '</button>';
+        return '<button class="btn sm' + (((x[0] === 'tx') ? sec.tx !== 0 : sec[x[0]] === 1) ? ' on' : '') + '" data-s="' + x[0] + '">' + x[1] + '</button>';
       }).join('')
       + '</div><p class="note">기본은 빼 두고, 필요할 때만 켭니다.</p></div>';
 
@@ -382,9 +382,9 @@
       btn.addEventListener('click', function () {
         var k = btn.getAttribute('data-s');
         M.sections = M.sections || {};
-        M.sections[k] = M.sections[k] === 0 ? 1 : 0;
+        M.sections[k] = (k === 'tx') ? (M.sections.tx === 0 ? 1 : 0) : (M.sections[k] === 1 ? 0 : 1);
         rebuildExtras();
-        btn.classList.toggle('on', M.sections[k] !== 0);
+        btn.classList.toggle('on', (k === 'tx') ? M.sections.tx !== 0 : M.sections[k] === 1);
         persist(); render();
       });
     });
@@ -422,13 +422,13 @@
   function rebuildExtras() {
     var s = M.sections || {};
     var out = [];
-    if (s.right !== 0) out.push({ t: '권리분석', lines: ['등기부 갑구·을구 확인', '토지·건축물대장 원본 확인', '국세·지방세 완납 확인'] });
+    if (s.right === 1) out.push({ t: '권리분석', lines: ['등기부 갑구·을구 확인', '토지·건축물대장 원본 확인', '국세·지방세 완납 확인'] });
     if (s.tx !== 0 && M.tx && M.tx.length) {
       out.push({ t: '주변 실거래', lines: M.tx.slice(0, 3).map(function (r) {
         return [r.ym || '', r.jibun || '', r.area || '', B.won(r.amount)].filter(Boolean).join(' · ');
       }) });
     }
-    if (s.appraisal !== 0 && M.appraisal) out.push({ t: '감정가', lines: ['감정가 ' + B.won(M.appraisal)] });
+    if (s.appraisal === 1 && M.appraisal) out.push({ t: '감정가', lines: ['감정가 ' + B.won(M.appraisal)] });
     M.extras = out;
   }
 
@@ -548,6 +548,8 @@
       if (st && st.m) { M = st.m; orient = st.orient === 'port' ? 'port' : 'land'; }
     }
     if (!M) M = demo();
+    /* 휴대폰에서는 세로(9:16)가 먼저 보이게 — 한 번 고르면 그 선택을 기억한다 */
+    if (!itemId && !code && !listId && !LS(STATE, null) && (window.innerWidth || 390) < 620) orient = 'port';
     if (!M.sections) M.sections = { right: 0, tx: 1, appraisal: 0 };
     rebuildExtras();
 

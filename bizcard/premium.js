@@ -220,7 +220,7 @@
 
     var show = it.sections || opt.sections || {};
     var extras = [];
-    if (show.right !== 0) {
+    if (show.right === 1) {
       extras.push({ t: '권리분석', lines: ['등기부 갑구·을구 확인', '토지·건축물대장 원본 확인', '국세·지방세 완납 확인'] });
     }
     if (show.tx !== 0 && it.tx && it.tx.length) {
@@ -228,7 +228,7 @@
         return [r.ym || r.date || '', r.jibun || r.addr || '', r.area || '', r.amount ? won(r.amount) : (r.amt || '')].filter(Boolean).join(' · ');
       }) });
     }
-    if (show.appraisal !== 0 && it.appraisal) {
+    if (show.appraisal === 1 && it.appraisal) {
       extras.push({ t: '감정가', lines: ['감정가 ' + won(it.appraisal) + (sale ? ' · 매매가 ' + won(sale) : '')] });
     }
 
@@ -287,7 +287,7 @@
       var h2 = 58 + m.points.length * p.p + ex + 6 + (lines.length * p.sl + 20) + 16;
       var h3 = 58 + mh + 14;
       pick = { rowH: p.r, ptH: p.p, storySize: p.ss, storyLH: p.sl, storyLines: lines, moneyH: mh, c1: h1, c2: h2, c3: h3 };
-      if (h1 + h2 + h3 + 20 <= avail) { pick.gap = Math.min(30, (avail - h1 - h2 - h3) / 2); return pick; }
+      if (h1 + h2 + h3 + 20 <= avail) { pick.gap = Math.min(56, (avail - h1 - h2 - h3) / 2); return pick; }
     }
     pick.gap = Math.max(7, (avail - pick.c1 - pick.c2 - pick.c3) / 2);
     return pick;
@@ -313,7 +313,7 @@
     y += F.c1 + F.gap;
     cards.push({ k: 'c2', num: '02', t: '핵심 포인트', x: RX, y: y, w: RW, h: F.c2 });
     y += F.c2 + F.gap;
-    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: RX, y: y, w: RW, h: Math.max(220, bottom - y) });
+    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: RX, y: y, w: RW, h: F.c3 });
     return {
       W: W, H: H, orient: 'land', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },
@@ -343,7 +343,7 @@
     y += F.c1 + F.gap;
     cards.push({ k: 'c2', num: '02', t: '핵심 포인트', x: PAD, y: y, w: cw, h: F.c2 });
     y += F.c2 + F.gap;
-    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: PAD, y: y, w: cw, h: Math.max(240, bottom - y) });
+    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: PAD, y: y, w: cw, h: F.c3 });
     return {
       W: W, H: H, orient: 'port', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },

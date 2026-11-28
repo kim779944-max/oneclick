@@ -1440,9 +1440,9 @@
       + '</div>'
       + erow('e-tags', '특징 (쉼표로 구분)', (it.tags || []).join(', '), '예) 도로접, 평지')
       + '<div class="sec-toggles"><b>물건표에 넣기</b>'
-      + sw('right', '권리분석', sec.right !== 0)
+      + sw('right', '권리분석', sec.right === 1)
       + sw('tx', '주변 실거래', sec.tx !== 0)
-      + sw('appraisal', '감정가', sec.appraisal !== 0)
+      + sw('appraisal', '감정가', sec.appraisal === 1)
       + '</div>'
       + '<div class="row2"><button class="btn sm main" id="edSave">저장</button>'
       + '<button class="btn sm" id="edCancel">취소</button></div>'
