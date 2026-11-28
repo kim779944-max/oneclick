@@ -1500,7 +1500,7 @@ function buildSlope(){
     }
     SL.avg=totN?totS/totN:null;
     SL.busy=false;
-    $('#mapSt').textContent=(S.F.items||[]).length+'필지 표시 중 · 경사도 겹침';
+    $('#mapSt').textContent=((S.F.items||[]).length?((S.F.items||[]).length+'필지 표시 중 · '):'')+'경사도 겹침';
     paintList(); render();
   });
 }
