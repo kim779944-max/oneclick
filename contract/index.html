@@ -396,7 +396,7 @@ body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣�
   <!-- 304 — 교환계약서에서는 물건이 둘(갑·을)이다. 그때만 이 두 칸이 나온다 -->
   <div id="exProp" hidden>
    <div class="pclrow"><div class="pcltop"><span class="pn">갑</span><input id="exAddrA" placeholder="갑 물건 — 동·지번만 넣어도 됩니다 (예: 신하리 162-9)"><button type="button" class="pd" data-exp="a" style="width:auto;padding:0 10px;background:var(--amber2);border-color:var(--amber);color:#0A1224;font-size:12.5px;font-weight:900">4대 공부</button></div></div>
-   <div class="pclrow"><div class="pcltop"><span class="pn">을</span><input id="exAddrB" placeholder="을 물건 — 동·지번만 넣어도 됩니다 (예: 호평동 24-35)"><button type="button" class="pd" data-exp="b" style="width:auto;padding:0 10px;background:var(--amber2);border-color:var(--amber);color:#0A1224;font-size:12.5px;font-weight:900">4대 공부</button></div></div>
+   <div class="pclrow"><div class="pcltop"><span class="pn">을</span><input id="exAddrB" placeholder="을 물건 — 동·지번만 넣어도 됩니다 (예: 호평동 24-16)"><button type="button" class="pd" data-exp="b" style="width:auto;padding:0 10px;background:var(--amber2);border-color:var(--amber);color:#0A1224;font-size:12.5px;font-weight:900">4대 공부</button></div></div>
   </div>
   <p class="sub2" id="pclTip">주소만 넣으면 4대 공부(지목·면적·소재지)를 이 기기에서 바로 찾아 채웁니다. 2필지부터 인쇄물 뒤에 별지가 붙습니다.</p>
   <div id="pclList"></div>
@@ -3104,6 +3104,8 @@ function syncExProp(){
   if (tip) tip.style.display = on ? 'none' : '';
   if (list) list.style.display = on ? 'none' : '';
   if (tot) tot.style.display = on ? 'none' : '';
+  const sumT = $('#pclSumT');
+  if (sumT) sumT.textContent = on ? '갑 · 을' : (pclList().length ? pclList().length + '필지' : '아직 없음');
   if (!on) return;
   const a = curForm().fields.find(x => x.grp === 'a' && x.stack);
   const b = curForm().fields.find(x => x.grp === 'b' && x.stack);
