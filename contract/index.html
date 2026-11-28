@@ -1393,6 +1393,10 @@ async function pvRefreshPage(pg, now){
   if (now) await run(); else PVREFRESH = setTimeout(run, 260);
 }
 function pvEditInput(el){
+  window.__pvinfo = { pvedit: PVEDIT, found: !!byId(PVEDit) };
+  try{ pvEditInput2(el); }catch(err){ window.__pverr = String((err && err.stack) || err); }
+}
+function pvEditInput2(el){
   const f = byId(PVEDit); if (!f) return;
   const raw = el.value;
   if (f.dg || (isDateGrouped(f) && !f.money)){
