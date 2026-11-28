@@ -283,6 +283,7 @@ body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣�
    좁은 폭에서 입력칸이 밋밋하게 줄지 않도록 이름은 첫 줄, 칸·버튼은 둘째 줄에 둔다 */
 #pveBar .pvl{flex:1 0 100%;max-width:none}
 #pveBar .pvf{flex:1 1 160px;display:flex;align-items:stretch;gap:6px;min-width:0}
+#pveBar.long .pvf{flex:1 1 100%}   /* 여러 줄 칸은 혼자 한 줄을 다 써서 넓게 */
 #pveBar .pvf input,#pveBar .pvf textarea{flex:1 1 auto;min-width:0;width:auto;border-radius:10px 0 0 10px}
 #pveBar .pvmic{flex:0 0 auto;width:46px;min-height:40px;font-size:19px;line-height:1;display:grid;place-items:center;margin-left:-6px;
  border:1px solid var(--amber);border-radius:0 10px 10px 0;background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224}
@@ -1384,6 +1385,7 @@ function pvEditStart(fid){
   if (inp) inp.dataset.fid = fid;
   if (ta) ta.dataset.fid = fid;
   lab.textContent = isDate ? (grp.k + ' (달력)') : LBL(f);
+  bar.classList.toggle('long', long);
   if (ta){ ta.hidden = !long; }
   inp.hidden = long;
   if (long){
