@@ -3315,7 +3315,7 @@ function ensureOvFont(){
 const TF_INK = {};
 function tfInkLines(IM, key){
   if (TF_INK[key]) return TF_INK[key];
-  const out = []; TF_INK[key] = out;
+  const out = []; out.med = 0.02; TF_INK[key] = out;
   try{
     if (!IM) return out;
     const W = IM.naturalWidth || IM.width, H = IM.naturalHeight || IM.height;
@@ -3330,25 +3330,42 @@ function tfInkLines(IM, key){
       for (let x = 0; x < cw; x++){ const i = o + x * 4; if (d[i + 3] > 40 && (d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114) < 170) n++; }
       rows[y] = n / cw;
     }
-    let st = -1; const maxH = Math.max(8, Math.round(ch * 0.05));
+    const bands = []; let st = -1;
     for (let y = 0; y <= ch; y++){
       const rule = y < ch && rows[y] > 0.5;
-      const on = y < ch && !rule && rows[y] > 0.004;
+      const on = y < ch && !rule && rows[y] > 0.003;
       if (on && st < 0) st = y;
-      if (!on && st >= 0){ const h = y - st; if (h >= 3 && h <= maxH) out.push({ t: st / ch, b: (y - 1) / ch, h: h / ch }); st = -1; }
+      if (!on && st >= 0){ bands.push([st, y - 1]); st = -1; }
     }
+    const maxH = Math.max(8, Math.round(ch * 0.05));
+    bands.forEach(([a, b]) => {
+      let maxc = 0; for (let y = a; y <= b; y++) if (rows[y] > maxc) maxc = rows[y];
+      const thr = Math.max(0.006, maxc * 0.35);
+      let s2 = -1;
+      for (let y = a; y <= b + 1; y++){
+        const strong = y <= b && rows[y] >= thr;
+        if (strong && s2 < 0) s2 = y;
+        if (!strong && s2 >= 0){ const h = y - s2; if (h >= 4 && h <= maxH) out.push({ t: s2 / ch, b: (y - 1) / ch, h: h / ch }); s2 = -1; }
+      }
+    });
+    const hs = out.map(l => l.h).sort((x, y) => x - y);
+    if (hs.length) out.med = hs[hs.length >> 1];
   }catch(e){}
   return out;
 }
 function tfInkFor(lines, f, Hpx){
   if (!lines || !lines.length) return null;
-  const cy = (f.y + f.h / 2) / 100;
+  const y0 = f.y / 100, y1 = (f.y + f.h) / 100, cy = (y0 + y1) / 2, med = lines.med || 0.02;
   let best = null, bd = 9;
   for (let i = 0; i < lines.length; i++){
-    const L = lines[i], c = (L.t + L.b) / 2, d = Math.abs(c - cy);
+    const L = lines[i];
+    if (L.h < med * 0.5 || L.h > med * 1.8) continue;
+    const c = (L.t + L.b) / 2;
+    if (c < y0 - (y1 - y0) * 0.35 || c > y1 + (y1 - y0) * 0.35) continue;
+    const d = Math.abs(c - cy);
     if (d < bd){ bd = d; best = L; }
   }
-  if (!best || bd > Math.max(f.h / 100 * 1.3, 0.015)) return null;
+  if (!best) return null;
   return { top: best.t * Hpx, bot: best.b * Hpx, h: best.h * Hpx };
 }
 async function composite(maxW, pg){
@@ -3382,8 +3399,9 @@ async function composite(maxW, pg){
     }
     const t = shown(f);
     const ink = tfInkFor(IMLINES, f, cv.height);
+    const medH = (IMLINES.med || 0.02) * cv.height;
     const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
-    let fs = fsz || (ink ? ink.h / 0.735 : Math.min(h * 0.78, FS0));
+    let fs = fsz || (ink ? ink.h / 0.735 : (medH ? medH / 0.735 : Math.min(h * 0.78, FS0)));
     const fw = 700;
     const pad = Math.max(2, Math.min(fs * 0.24, w * 0.05));
     const innerW = Math.max(6, w - pad * 2);
@@ -3403,7 +3421,9 @@ async function composite(maxW, pg){
       /* 면적은 뒤의 ㎡ 기호에 붙게 오른쪽 정렬 */
       const right = f.type === 'number' || /면적/.test(f.label || '');
       g.textAlign = cent ? 'center' : (right ? 'right' : 'left');
-      const by = ink ? (ink.bot - fs * 0.03) : (y + h / 2);
+      let by = ink ? (ink.bot - fs * 0.03) : (y + h / 2);
+      by = Math.min(Math.max(by, y + fs * 0.55), y + h - fs * 0.05);
+      if (!isFinite(by)) by = y + h / 2;
       g.fillText(t, cent ? x + w / 2 : (right ? x + w - pad : x + pad), by);
     } else {
       /* 높은 칸·특약란·여러 줄 글 — 줄바꿈을 살리고 줄 수에 맞춰 글자를 줄인다 */

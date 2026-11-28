@@ -1109,7 +1109,7 @@ function ruleLinesOf(IM, pg, f){
 const PGLINE_CACHE = {};
 function pageInkLines(IM, key){
   if (PGLINE_CACHE[key]) return PGLINE_CACHE[key];
-  const out = []; PGLINE_CACHE[key] = out;
+  const out = []; out.med = 0.02; PGLINE_CACHE[key] = out;
   try{
     if (!IM) return out;
     const W = IM.naturalWidth || IM.width, H = IM.naturalHeight || IM.height;
@@ -1124,29 +1124,50 @@ function pageInkLines(IM, key){
       for (let x = 0; x < cw; x++){ const i = o + x * 4; if (d[i + 3] > 40 && (d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114) < 170) n++; }
       rows[y] = n / cw;
     }
-    let st = -1; const maxH = Math.max(8, Math.round(ch * 0.045));
+    /* 표 괘선·긴 밑줄(한 줄이 거의 다 검정)은 글자 줄이 아니다 */
+    const bands = []; let st = -1;
     for (let y = 0; y <= ch; y++){
-      const rule = y < ch && rows[y] > 0.5;              /* 표 괘선·긴 밑줄은 글자 줄이 아니다 */
-      const on = y < ch && !rule && rows[y] > 0.004;
+      const rule = y < ch && rows[y] > 0.5;
+      const on = y < ch && !rule && rows[y] > 0.003;
       if (on && st < 0) st = y;
-      if (!on && st >= 0){
-        const h = y - st;
-        if (h >= 3 && h <= maxH) out.push({ t: st / ch, b: (y - 1) / ch, h: h / ch });
-        st = -1;
-      }
+      if (!on && st >= 0){ bands.push([st, y - 1]); st = -1; }
     }
+    /* 세로 라벨('중 도 금'처럼 두 줄에 걸친 글자)로 붙어 버린 띠를 다시 글자 줄로 쪼갠다 */
+    const maxH = Math.max(8, Math.round(ch * 0.045));
+    bands.forEach(([a, b]) => {
+      let maxc = 0; for (let y = a; y <= b; y++) if (rows[y] > maxc) maxc = rows[y];
+      const thr = Math.max(0.006, maxc * 0.35);
+      let s2 = -1;
+      for (let y = a; y <= b + 1; y++){
+        const strong = y <= b && rows[y] >= thr;
+        if (strong && s2 < 0) s2 = y;
+        if (!strong && s2 >= 0){
+          const h = y - s2;
+          if (h >= 4 && h <= maxH) out.push({ t: s2 / ch, b: (y - 1) / ch, h: h / ch });
+          s2 = -1;
+        }
+      }
+    });
+    const hs = out.map(l => l.h).sort((x, y) => x - y);
+    if (hs.length) out.med = hs[hs.length >> 1];
   }catch(e){}
   return out;
 }
+/* 값이 앉을 글자 줄 — 칸과 실제로 겹치는 줄만 쓰고, 크기는 그 종이의 본문 글씨 크기로 맞춘다 */
 function inkFor(lines, f, Hpx){
   if (!lines || !lines.length) return null;
-  const cy = (f.y + f.h / 2) / 100;
+  const y0 = f.y / 100, y1 = (f.y + f.h) / 100, cy = (y0 + y1) / 2;
+  const med = lines.med || 0.02;
   let best = null, bd = 9;
   for (let i = 0; i < lines.length; i++){
-    const L = lines[i], c = (L.t + L.b) / 2, d = Math.abs(c - cy);
+    const L = lines[i];
+    if (L.h < med * 0.5 || L.h > med * 1.8) continue;
+    const c = (L.t + L.b) / 2;
+    if (c < y0 - (y1 - y0) * 0.35 || c > y1 + (y1 - y0) * 0.35) continue;
+    const d = Math.abs(c - cy);
     if (d < bd){ bd = d; best = L; }
   }
-  if (!best || bd > Math.max(f.h / 100 * 1.3, 0.015)) return null;
+  if (!best) return null;
   return { top: best.t * Hpx, bot: best.b * Hpx, h: best.h * Hpx };
 }
 async function composite(maxW, pg){
@@ -1178,7 +1199,9 @@ async function composite(maxW, pg){
     const para = !!(f.top || f.multi);
     const FWB = '700';
     g.fillStyle = '#000';
-    let fs = ink ? ink.h / 0.735 : Math.min(h * 0.5, cv.width * 0.028);
+    const medH = (lines.med || 0.02) * cv.height;
+    /* 종이 본문 글씨 크기(중앙값)를 기본으로, 이 줄에서 잰 크기가 있으면 그 크기 */
+    let fs = ink ? ink.h / 0.735 : (medH / 0.735);
     if (f.fs) fs = Math.min(fs, f.fs * (cv.width / 1489));
     const MINFS = Math.max(6.5, 8 * cv.width / 1489);
     fs = Math.max(MINFS, fs);
@@ -1212,7 +1235,10 @@ async function composite(maxW, pg){
     const avail = w - pad * 2;
     while (fs > MINFS && g.measureText(t).width > avail / 0.86){ fs = Math.max(MINFS, fs - .5); g.font = FWB + ' ' + fs + 'px ' + FONT_P; }
     const tw = g.measureText(t).width, scx = tw > avail ? Math.max(0.42, avail / tw) : 1;
-    const baseY = ink ? (ink.bot - fs * 0.03) : (y + h * 0.5 + fs * 0.35);
+    let baseY = ink ? (ink.bot - fs * 0.03) : (y + h * 0.5 + fs * 0.35);
+    /* 종이 줄과 칸이 살짝 어긋나도 글자가 칸 밖으로 떠내려가지 않게 */
+    baseY = Math.min(Math.max(baseY, y + fs * 0.72), y + h - fs * 0.06);
+    if (!isFinite(baseY)) baseY = y + h * 0.72;
     g.textBaseline = 'alphabetic';
     g.textAlign = (f.al === 'c') ? 'center' : (f.al === 'r' ? 'right' : 'left');
     const bx = (f.al === 'c') ? x + w / 2 : (f.al === 'r' ? x + w - pad : x + pad);
@@ -3079,9 +3105,9 @@ function renderOpts(){
 }
 function toggleOpt(k){
   if (k === 'pv'){
-    const pv = $('#pvWrap2');
-    pv.hidden = !pv.hidden;
-    if (!pv.hidden) renderPreview();
+    /* 288-④ 미리보기는 곧바로 확대 미리보기(칸을 터치해 고치는 화면)로 연다 */
+    pvShowCurrent();
+    return;
   } else {
     const sg = $('#sigWrap');
     sg.hidden = !sg.hidden;
