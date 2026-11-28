@@ -2049,32 +2049,39 @@ document.addEventListener('input', e => {
   }
   let v = el.value;
   if (f.money || isKorMoneyField(f)){
-    /* 숫자·한글·'28억' 어느 표기로 써도 값으로 확정하고, 한글 칸·숫자 칸을 함께 맞춘다 */
     const raw = String(v).trim();
-    const pureNum = /^[\d,]*$/.test(raw);
-    const complete = pureNum || /(원|억|만|조)\s*$/.test(raw);
-    const n = complete ? moneyValue(raw) : null;
     const kor = el.parentNode ? el.parentNode.querySelector('.kor') : null;
-    if (n){
-      v = isKorMoneyField(f) ? korNum(n) : String(n);
-      const show = isKorMoneyField(f) ? v : comma(n);
-      if (el.value !== show) el.value = show;
-      if (kor) kor.textContent = isKorMoneyField(f) ? comma(n) + '원' : korWon(n);
-      const tw = moneyTwinOf(f);
-      if (tw){
-        const tv = isKorMoneyField(tw) ? korNum(n) : String(n);
-        setV(tw.id, tv);
-        const ti = document.querySelector(`input[data-f="${tw.id}"]`);
-        if (ti && ti !== el){
-          ti.value = isKorMoneyField(tw) ? tv : comma(n);
-          const tk = ti.parentNode ? ti.parentNode.querySelector('.kor') : null;
-          if (tk) tk.textContent = isKorMoneyField(tw) ? comma(n) + '원' : korWon(n);
-        }
-      }
-      if (f.kor) setV(f.kor, korNum(n));
-    } else {
+    const unitTyped = /[억만천원]/.test(raw) || (hasKorNumeral(raw) && !/^[\d,]*$/.test(raw));
+    if (unitTyped){
+      /* '1억2천만'처럼 단위로 적는 중에는 글자를 건드리지 않는다 — 아래에 계산된 금액만 보여 준다.
+         (글자를 고쳐 쓰면 이어 치는 글자가 엉뚱한 숫자 뒤에 붙는다) */
+      const n1 = moneyValue(raw);
+      if (kor) kor.textContent = n1 ? (isKorMoneyField(f) ? comma(n1) + '원' : korWon(n1)) : '금액을 마저 적어 주세요';
       v = raw;
-      if (kor) kor.textContent = (complete || !raw) ? '' : '금액을 마저 적어 주세요 (예: 28억)';
+    } else {
+      const pureNum = /^[\d,]*$/.test(raw);
+      const n = pureNum ? moneyValue(raw) : null;
+      if (n){
+        v = isKorMoneyField(f) ? korNum(n) : String(n);
+        const show = isKorMoneyField(f) ? v : comma(n);
+        if (el.value !== show) el.value = show;
+        if (kor) kor.textContent = isKorMoneyField(f) ? comma(n) + '원' : korWon(n);
+        const tw = moneyTwinOf(f);
+        if (tw){
+          const tv = isKorMoneyField(tw) ? korNum(n) : String(n);
+          setV(tw.id, tv);
+          const ti = document.querySelector(`input[data-f="${tw.id}"]`);
+          if (ti && ti !== el){
+            ti.value = isKorMoneyField(tw) ? tv : comma(n);
+            const tk = ti.parentNode ? ti.parentNode.querySelector('.kor') : null;
+            if (tk) tk.textContent = isKorMoneyField(tw) ? comma(n) + '원' : korWon(n);
+          }
+        }
+        if (f.kor) setV(f.kor, korNum(n));
+      } else {
+        v = raw;
+        if (kor) kor.textContent = raw ? '금액을 마저 적어 주세요 (예: 28억)' : '';
+      }
     }
   }
   setV(fid, v);

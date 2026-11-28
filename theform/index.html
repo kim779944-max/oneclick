@@ -2651,7 +2651,14 @@ $('#valList').addEventListener('input', e => {
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
   if (f.type === 'date'){ VALS[f.label] = e.target.value; e.target.classList.toggle('has', !!e.target.value); saveVals(); return; }
   if (isNumMoney(f)){
-    VALS[f.label] = e.target.value.replace(/[^\d.-]/g, '');
+    const raw = String(e.target.value || '');
+    /* '1억2천만'처럼 단위로 적는 중에는 글자를 건드리지 않는다 — 확정(blur) 때 숫자로 바꾼다 */
+    if (/[억만천원]/.test(raw) || /[영일이삼사오육칠팔구십백조]/.test(raw)){
+      VALS[f.label] = raw;
+      e.target.classList.toggle('has', !!raw);
+      syncMoney(+i); saveVals(); updNavPos(+i); return;
+    }
+    VALS[f.label] = raw.replace(/[^\d.-]/g, '');
     e.target.classList.toggle('has', !!e.target.value);
     syncMoney(+i); runCalc(f.label); saveVals(); updNavPos(+i); return;
   }
@@ -2663,7 +2670,16 @@ $('#valList').addEventListener('input', e => {
 $('#valList').addEventListener('change', e => {
   const dg = e.target.dataset.dg; if (dg){ setDateGroup(dg, e.target.value); return; }
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
-  if (f.type === 'number' || isNumMoney(f)){ e.target.value = fmtNum(VALS[f.label]); return; }
+  if (f.type === 'number' || isNumMoney(f)){
+    const raw = String(VALS[f.label] == null ? '' : VALS[f.label]).trim();
+    if (raw && (/[억만천원]/.test(raw) || /[영일이삼사오육칠팔구십백조]/.test(raw))){
+      const n0 = parseKorAmount(raw);
+      if (isFinite(n0) && n0 > 0) VALS[f.label] = String(n0);
+    }
+    e.target.value = f.type === 'number' ? fmtNum(VALS[f.label]) : (VALS[f.label] == null ? '' : VALS[f.label]);
+    syncMoney(+i);
+    return;
+  }
   if (isKorMoney(f.label)){
     const raw = String(VALS[f.label] == null ? '' : VALS[f.label]).trim();
     const n = parseKorAmount(raw);
