@@ -739,6 +739,8 @@
   }
 
   function persist() {
+    /* 304 — 물건이 바뀌면 저장 캔버스(미리보기·PNG)를 비운다. 안 비우면 고치기 전 그림이 저장된다 */
+    canvases = {};
     if (guest) return;
     LSSet(STATE, { orient: orient, m: M });
   }
