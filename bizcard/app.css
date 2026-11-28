@@ -629,3 +629,8 @@ body.guestmode #app{padding-top:10px}
 .biz .nm b{display:inline}
 .biz .nm{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
 .guest-item{margin-top:12px}
+
+/* 두 칸 폼이 화면 밖으로 밀리지 않게(390px 실측) */
+.two-col{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.two-col>*{min-width:0}
+.fl input{width:100%;min-width:0;box-sizing:border-box}
