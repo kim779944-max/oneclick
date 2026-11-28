@@ -51,6 +51,34 @@ main{padding:10px 12px 0}
 .chips button b{color:var(--amber2)}
 .note{margin:8px 0 0;font-size:11px;color:var(--ink2);line-height:1.5}
 .note b{color:#fff}
+/* 목록·사진 일괄담기 */
+.bulk{margin-top:9px}
+.bulkT{display:flex;align-items:center;gap:6px;width:100%;min-height:44px;border:1px dashed var(--line2);border-radius:11px;
+ background:#0B1729;color:var(--ink2);font-size:12.5px;font-weight:900;cursor:pointer;padding:0 11px;text-align:left;letter-spacing:-.4px}
+.bulkT b{color:#fff;white-space:nowrap}
+.bulkT em{font-style:normal;font-size:10.5px;font-weight:800;color:#8FA3BF;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bulkT i{margin-left:auto;font-style:normal;color:var(--amber2);font-size:11px;transition:transform .18s}
+.bulkT[aria-expanded="true"]{border:1px solid var(--amber);background:rgba(255,107,0,.12);color:#fff}
+.bulkT[aria-expanded="true"] em{color:#FFD9B8}
+.bulkT[aria-expanded="true"] i{transform:rotate(180deg)}
+.bulkBody{margin-top:7px}
+.bulkBody textarea{display:block;width:100%;min-height:98px;resize:vertical;background:#0B1729;border:1px solid var(--line2);border-radius:11px;
+ color:#fff;font-size:13px;line-height:1.55;padding:9px 10px;font-family:inherit;outline:0}
+.bulkBody textarea:focus{border-color:rgba(255,107,0,.75)}
+.bulkBody textarea::placeholder{color:#7E93B0}
+.bulkBase{margin-top:6px}
+.bulkBase input{display:block;width:100%;background:#0B1729;border:1px solid var(--line2);border-radius:10px;color:#fff;
+ font-size:12.5px;padding:10px 10px;font-family:inherit;outline:0}
+.bulkBase input:focus{border-color:rgba(255,107,0,.75)}
+.bulkBase input::placeholder{color:#7E93B0}
+.bulkRow{display:flex;gap:6px;margin-top:7px}
+.bulkB{flex:1;min-height:44px;border:1px solid var(--line2);border-radius:10px;background:#0F1B33;color:#fff;font-size:12.5px;font-weight:900;cursor:pointer;padding:0 8px;letter-spacing:-.4px}
+.bulkB.main{flex:1.4;border:0;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--on)}
+.bulkB[disabled]{opacity:.6}
+.bulkSt{margin:7px 0 0;font-size:10.5px;font-weight:800;color:#8FA3BF;line-height:1.5;overflow-wrap:anywhere}
+.bulkSt b{color:var(--amber2)}
+.bulkFh{display:block;margin-top:7px;border-radius:10px;overflow:hidden;border:1px solid var(--line2);background:#0B1729}
+.bulkFh img{display:block;width:100%;height:140px;object-fit:contain;background:#0B1729}
 /* 모드 */
 .mode{display:flex;gap:6px;margin:0 0 8px}
 .mode button{flex:1;min-height:40px;border:1px solid var(--line2);border-radius:10px;background:#0B1729;color:var(--ink2);font-size:12.5px;font-weight:900;cursor:pointer}
@@ -179,6 +207,24 @@ body:not(.has-items) .need-items{display:none!important}
     </form>
     <div class="chips" id="chips" aria-label="예시 지번"></div>
     <p class="note">여러 필지는 <b>쉼표</b>로 한 번에: <b>신하리 162-9, 162-10, 산 12-1</b> · 뒷 필지는 앞 주소의 동·리를 이어받습니다.</p>
+    <div class="bulk">
+      <button type="button" class="bulkT" id="bulkTgl" aria-expanded="false" aria-controls="bulkBody">
+        <b>목록·사진 일괄담기</b><em>문자 붙여넣기 · 지번표 사진</em><i>▾</i>
+      </button>
+      <div class="bulkBody" id="bulkBody" hidden>
+        <textarea id="bulkTa" rows="4" aria-label="지번 목록"
+          placeholder="여러 줄 지번 목록을 붙여넣으세요&#10;예) 조종면 신하리 162-9&#10;162-10, 162-11, 산 12-1&#10;(표를 복사해 붙여도 됩니다)"></textarea>
+        <div class="bulkBase"><input id="bulkBase" type="text" autocomplete="off"
+          placeholder="기준 주소(목록에 동·리가 없을 때) · 예) 가평군 조종면 신하리" aria-label="기준 주소"></div>
+        <div class="bulkRow">
+          <button type="button" class="bulkB main" id="bulkGo">일괄 담기</button>
+          <button type="button" class="bulkB" id="bulkPic">사진으로 담기</button>
+          <input type="file" id="bulkFile" accept="image/*" hidden>
+        </div>
+        <p class="bulkSt" id="bulkSt">사진·그림은 이 기기 안에서만 읽습니다(서버 전송 없음).</p>
+        <span class="bulkFh" id="bulkFh" hidden><img id="bulkThumb" alt="올린 사진"></span>
+      </div>
+    </div>
   </section>
 
   <section class="card">
@@ -996,6 +1042,217 @@ function addMany(q){
     paintList();
   });
 }
+/* =====================================================================
+   목록·사진 일괄담기 — 문자/표 복사 텍스트와 지번표 사진에서 지번을 줄줄이 찾아 한 번에 담는다.
+   · 텍스트: 동·리 이름이 붙은 지번을 먼저 잡고, 뒤에 붙는 번지(162-10, 162-11)는 앞 동·리를 이어받는다.
+   · 사진: 기기 안에서 도는 무료 OCR(tesseract.js)로 글자를 읽어 같은 목록으로 만든다. 서버 전송 0건.
+   ===================================================================== */
+var BULK={items:[],busy:false,ocr:false};
+var BULK_MAX=60;
+/* 전각 숫자·여러 가지 붙임표·'162의9'를 다듬고, 1,234 같은 금액·면적은 지번으로 보지 않도록 가린다 */
+function bNorm(s){
+  s=String(s==null?'':s);
+  s=s.replace(/[\uFF01-\uFF5E]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0)});
+  s=s.replace(/[\u2010-\u2015\u2212\u30FC\u3163]/g,'-');
+  s=s.replace(/(\d)\s*의\s*(\d)/g,'$1-$2');
+  s=s.replace(/(\d)\s*-\s*(\d)/g,'$1-$2');
+  s=s.replace(/(\d),(\d{3})(?!\d)/g,'$1\u2007$2');
+  return s;
+}
+/* 낱말 하나가 지번인지 — 앞머리는 동·리·읍·면·시·군·구·도로 끝나는 말만 인정한다 */
+function bTok(tk){
+  var m=String(tk||'').match(/^(.*?)(산\s?)?(\d{1,5}(?:-\d{1,5})?)$/);
+  if(!m) return null;
+  var pre=(m[1]||'').replace(/\s+$/,'').trim();
+  if(pre&&!/(리|동|가|읍|면|군|구|시|도)$/.test(pre)) return null;
+  return {pre:pre,jm:m[2]?'산':'',no:m[3]};
+}
+function bParse(text,base){
+  var lines=bNorm(text).split(/\r?\n/);
+  var out=[],seen={},zh=[],ctx=base?String(base).replace(/\s+/g,' ').trim():'';
+  /* 동·리·읍·면 낱말은 다음 지번의 앞머리로 기억해 둔다 */
+  function word(w){
+    if(/^[가-힣]{2,}(도|시|군|구|읍|면)$/.test(w)){ zh.push(w); while(zh.length>3) zh.shift() }
+    else if(/^[가-힣0-9]{1,10}(리|동|가)$/.test(w)){ ctx=(zh.concat([w])).join(' '); zh=[] }
+  }
+  for(var li=0;li<lines.length;li++){
+    var line=String(lines[li]||'').replace(/[\[\]{}()<>"'“”‘’*]/g,' ');
+    if(!line.trim()) continue;
+    var toks=line.split(/[ \t\u00A0,;|·•ㆍ\/\\>→]+/), i, p;
+    toks=toks.filter(function(t){return t});
+    if(!toks.length) continue;
+    /* 홀로 선 '산'은 바로 뒤 번지의 임야 표시 — '산 12-1'을 '산12-1'로 붙인다 */
+    for(i=0;i<toks.length-1;i++) if(toks[i]==='산'&&/^\d/.test(toks[i+1])){ toks[i+1]='산'+toks[i+1]; toks.splice(i,1); i-- }
+    var parsed=toks.map(bTok);
+    var anyJ=parsed.some(function(x){return !!x});
+    if(!anyJ){ for(i=0;i<toks.length;i++) word(toks[i]); continue }
+    var allJ=parsed.every(function(x){return !!x});
+    var hasStrong=parsed.some(function(x){return !!x&&(!!x.pre||!!x.jm||/-/.test(x.no))});
+    for(i=0;i<toks.length;i++){
+      p=parsed[i];
+      if(!p){ word(toks[i]); continue }
+      /* 담을지: 동·리가 붙었거나 · 줄이 지번만이거나 · '-'나 '산'이 붙은 번지 ·
+         이런 게 하나도 없는 줄의 첫 낱말 (연번·면적 같은 옆 칸 숫자는 걸러진다) */
+      var take=!!p.pre||!!p.jm||/-/.test(p.no)||allJ||(!hasStrong&&i===0);
+      if(!take) continue;
+      var pre=p.pre?(zh.concat([p.pre])).join(' '):ctx;
+      if(p.pre){ ctx=pre; zh=[] }
+      var jb=(p.jm?'산 ':'')+p.no;
+      var q=((pre?pre+' ':'')+jb).replace(/\s+/g,' ').trim();
+      if(seen[q]) continue;
+      seen[q]=1;
+      out.push({q:q,jb:jb,pre:pre,no:p.no,jm:p.jm});
+      if(out.length>=BULK_MAX) return {items:out,cut:true};
+    }
+  }
+  return {items:out,cut:false};
+}
+function bulkUpdate(){
+  if(!$('#bulkTa')) return;
+  var res=bParse($('#bulkTa').value,$('#bulkBase').value);
+  BULK.items=res.items;
+  var st=$('#bulkSt'), btn=$('#bulkGo');
+  btn.textContent=res.items.length?('일괄 담기 ('+res.items.length+')'):'일괄 담기';
+  if(!res.items.length){
+    st.innerHTML='지번을 아직 찾지 못했습니다 · 예) <b>조종면 신하리 162-9, 162-10</b>'; return;
+  }
+  var noPre=0;
+  for(var i=0;i<res.items.length;i++) if(!res.items[i].pre) noPre++;
+  var head=res.items.slice(0,3).map(function(x){return esc(x.q)}).join(' / ')+(res.items.length>3?' 외':'');
+  st.innerHTML='<b>'+res.items.length+'필지</b> 인식 · '+head+
+    (noPre?'<br>동·리가 없는 '+noPre+'필지는 <b>기준 주소</b>를 위에 써 주세요':'');
+}
+function bulkRun(){
+  if(BULK.busy) return;
+  var res=bParse($('#bulkTa').value,$('#bulkBase').value);
+  BULK.items=res.items;
+  if(!res.items.length){ toast('지번을 찾지 못했습니다 — 동·리 이름을 함께 넣어 보세요'); return }
+  var list=res.items, i=0, ok=0, fail=[], first=null;
+  BULK.busy=true;
+  $('#bulkGo').disabled=true; $('#go').disabled=true; $('#go').textContent='담는 중';
+  var st=$('#bulkSt');
+  function done(){
+    BULK.busy=false;
+    $('#bulkGo').disabled=false; $('#go').disabled=false; $('#go').textContent='담기';
+    bulkUpdate();
+    if(first&&first.g){ S.V={cx:first.g.lon,cy:first.g.lat,z:S.V.z||17} }
+    if(ok) fitSel();
+    paintList();
+    st.innerHTML=(ok?('<b>'+ok+'필지 담았습니다</b>'):'담은 필지가 없습니다')+
+      (fail.length?(' · 못 찾음 '+fail.length+'개: '+esc(fail.slice(0,4).join(', '))+(fail.length>4?' 외':'')):'');
+    toast(ok?(ok+'필지 담았습니다'+(fail.length?' · 못 찾은 곳 '+fail.length:'')):'주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 넣어 보세요');
+    if(fail.length) $('#mapSt').textContent='못 찾음: '+fail.join(' / ');
+  }
+  function step(){
+    if(i>=list.length){ done(); return }
+    var it=list[i++];
+    st.textContent='담는 중… '+i+'/'+list.length+' · '+it.q;
+    addOne({q:it.q}).then(function(r){ if(r){ ok++; if(!first) first=r } else fail.push(it.q) })
+      .catch(function(){ fail.push(it.q) }).then(step);
+  }
+  step();
+}
+/* ---------- 사진·그림 → 기기 안 무료 OCR ---------- */
+var BOCR={w:null,loading:null,step:null};
+function bOcrStep(t){ if(BOCR.step) BOCR.step(t) }
+function bOcrScript(){
+  if(window.Tesseract) return Promise.resolve();
+  var srcs=['https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+            'https://unpkg.com/tesseract.js@5.1.1/dist/tesseract.min.js'];
+  function next(i){
+    if(window.Tesseract) return Promise.resolve();
+    if(i>=srcs.length) return Promise.reject(new Error('SCRIPT'));
+    return new Promise(function(res,rej){
+      var s=document.createElement('script'); s.src=srcs[i]; s.async=true;
+      s.onload=function(){res()}; s.onerror=function(){rej()};
+      document.head.appendChild(s);
+    }).catch(function(){ return next(i+1) });
+  }
+  return next(0);
+}
+function bOcrWorker(){
+  if(BOCR.w) return Promise.resolve(BOCR.w);
+  if(BOCR.loading) return BOCR.loading;
+  bOcrStep('글자 인식 엔진 불러오는 중…');
+  BOCR.loading=bOcrScript().then(function(){
+    return window.Tesseract.createWorker('kor',1,{
+      workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',
+      corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.0',
+      langPath:'https://tessdata.projectnaptha.com/4.0.0_fast',
+      logger:function(m){
+        if(!m) return;
+        if(m.status==='loading language traineddata'||m.status==='initializing api'||m.status==='loading tesseract core')
+          bOcrStep('글자 인식 준비 중… '+Math.round((m.progress||0)*100)+'%');
+      },
+      errorHandler:function(){}
+    });
+  }).then(function(w){
+    BOCR.w=w;
+    return w.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'}).then(function(){ return w });
+  }).catch(function(e){ BOCR.loading=null; BOCR.w=null; throw e });
+  return BOCR.loading;
+}
+function bOcrPrep(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file), im=new Image();
+    im.onload=function(){ URL.revokeObjectURL(url); res(im) };
+    im.onerror=function(){ URL.revokeObjectURL(url); rej(new Error('IMG')) };
+    im.src=url;
+  }).then(function(im){
+    var m=Math.max(im.width,im.height);
+    var sc=m>2200?(2200/m):(m<1400?Math.min(2.4,1700/m):1);
+    var cv=document.createElement('canvas');
+    cv.width=Math.max(1,Math.round(im.width*sc)); cv.height=Math.max(1,Math.round(im.height*sc));
+    var g=cv.getContext('2d');
+    g.fillStyle='#fff'; g.fillRect(0,0,cv.width,cv.height);
+    g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
+    g.drawImage(im,0,0,cv.width,cv.height);
+    try{
+      var d=g.getImageData(0,0,cv.width,cv.height), p=d.data, v;
+      for(var i=0;i<p.length;i+=4){
+        v=(p[i]*299+p[i+1]*587+p[i+2]*114)/1000;
+        v=v<128?Math.max(0,v*0.55):Math.min(255,255-(255-v)*0.55);
+        p[i]=p[i+1]=p[i+2]=v;
+      }
+      g.putImageData(d,0,0);
+    }catch(e){}
+    return cv;
+  });
+}
+function bOcrRun(file){
+  if(BULK.ocr) return;
+  BULK.ocr=true;
+  var st=$('#bulkSt'), pic=$('#bulkPic'), fh=$('#bulkFh'), th=$('#bulkThumb');
+  pic.disabled=true;
+  if(fh&&th){ try{ th.src=URL.createObjectURL(file); fh.hidden=false }catch(e){} }
+  BOCR.step=function(t){ st.textContent=t };
+  st.textContent='사진 여는 중…';
+  bOcrPrep(file).then(function(cv){
+    return bOcrWorker().then(function(w){
+      bOcrStep('사진에서 글자를 읽는 중… (처음엔 30초쯤 걸립니다)');
+      return w.recognize(cv.toDataURL('image/png')).then(function(r){
+        var txt=String((r&&r.data&&r.data.text)||'').replace(/[ \t]+/g,' ');
+        var ta=$('#bulkTa');
+        var prev=ta.value.replace(/\s*$/,'');
+        ta.value=(prev?prev+'\n':'')+txt.trim();
+        bulkUpdate();
+        var n=BULK.items.length;
+        if(n){
+          $('#bulkSt').innerHTML='사진에서 <b>'+n+'필지</b> 인식 — 아래 목록에서 확인·수정한 뒤 <b>일괄 담기</b>';
+          toast('사진에서 '+n+'필지 인식');
+        }else{
+          $('#bulkSt').innerHTML='사진에서 지번을 찾지 못했습니다 · 읽은 글자는 위 칸에 넣어 두었습니다 — 고치거나 기준 주소를 넣어 보세요';
+          toast('지번을 찾지 못했습니다');
+        }
+      });
+    });
+  }).catch(function(e){
+    $('#bulkSt').innerHTML=(e&&e.message==='SCRIPT')
+      ? '글자 인식 엔진을 불러오지 못했습니다(인터넷 확인) — 목록에 직접 붙여넣어 주세요'
+      : '사진에서 지번을 읽지 못했습니다 — 목록에 직접 붙여넣어 주세요';
+  }).then(function(){ BULK.ocr=false; pic.disabled=false });
+}
+
 function expandBox(b,f){
   var cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2, w=(b.maxx-b.minx)*f, h=(b.maxy-b.miny)*f;
   var ww=Math.max(w,h*1.4), hh=Math.max(h,w/1.4);
@@ -1300,6 +1557,35 @@ function buildChips(){
   });
 }
 $('#sf').addEventListener('submit',function(e){e.preventDefault();addMany($('#q').value)});
+/* 목록·사진 일괄담기 — 펼침·붙여넣기·사진 */
+(function(){
+  var tgl=$('#bulkTgl'), body=$('#bulkBody'), ta=$('#bulkTa'), baseEl=$('#bulkBase');
+  if(!tgl||!body) return;
+  var t=0, later=function(){ clearTimeout(t); t=setTimeout(bulkUpdate,200) };
+  tgl.addEventListener('click',function(){
+    var open=body.hidden;
+    body.hidden=!open;
+    tgl.setAttribute('aria-expanded',open?'true':'false');
+    if(!open) return;
+    if(baseEl&&!baseEl.value){
+      var m=String($('#q').value||'').match(/^(.{2,30}?[가-힣0-9]{1,10}(?:리|동|가))(?:\s|$)/);
+      if(m&&m[1]&&!/\d$/.test(m[1])) baseEl.value=m[1];
+    }
+    bulkUpdate();
+    if(ta){ try{ ta.focus() }catch(e){} }
+  });
+  if(ta) ta.addEventListener('input',later);
+  if(baseEl) baseEl.addEventListener('input',later);
+  if(ta) ta.addEventListener('paste',function(){ setTimeout(bulkUpdate,30) });
+  $('#bulkGo').addEventListener('click',bulkRun);
+  $('#bulkPic').addEventListener('click',function(){ $('#bulkFile').click() });
+  $('#bulkFile').addEventListener('change',function(){
+    var f=this.files&&this.files[0];
+    if(!f) return;
+    if(!/^image\//.test(f.type||'')){ toast('사진 파일만 읽을 수 있습니다'); this.value=''; return }
+    bOcrRun(f); this.value='';
+  });
+})();
 Array.prototype.forEach.call($('#mode').querySelectorAll('button'),function(b){
   b.addEventListener('click',function(){
     Array.prototype.forEach.call($('#mode').querySelectorAll('button'),function(x){x.classList.remove('on')});
@@ -1396,6 +1682,7 @@ if(pq){
 }else{
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
+window.__KTS_BULK=function(t,b){ var r=bParse(t==null?($('#bulkTa')||{}).value:t,b==null?($('#bulkBase')||{}).value:b); return {n:r.items.length,cut:!!r.cut,items:r.items.map(function(x){return x.q})} };
 window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,hideNum:!!S.hideNum,cx:S.V.cx,cy:S.V.cy} };
 window.__KTS_SHEET=function(){ return buildAreaSheet() };
 window.__KTS_PV=function(){ return {open:!!($('#pv')&&$('#pv').classList.contains('on')),z:PV.z,cv:!!PV.cv} };
