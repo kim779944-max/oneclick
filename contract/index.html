@@ -3118,6 +3118,7 @@ function toggleOpt(k){
 }
 window.KC_MIC = { start: micStart, stop: micStop, show: function(){ micBarEl(); MIC.on = true; micSetTarget(voicePick()); micShow(true); micAnim(true); setTimeout(function(){ MIC.on = false; stopLevel(); micShow(false); }, 6000); }, get on(){ return MIC.on; } };
 window.KC_WRITE = { render: renderWrite, dates: dateGroups, propLoad: propLoad, fillProp: fillProp };
+window.KCDBG = function(){ return { pvedit: PVEDIT, form: S.form, p3: S.v['sale.p3'], pve: !!(document.getElementById('pveIn')), hot: document.querySelectorAll('#pvmBody .hot').length }; };
 
 /* ============================================================================
    248 (2026-11-27) ① 다필지 — 주소 한 줄 → 4대 공부 · 총면적 합계 · 별지
