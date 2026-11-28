@@ -396,7 +396,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
   <p class="sub">파일은 이 기기 안에서 만들어집니다. 서버로 올라가지 않습니다.</p>
   <label class="lb">파일 이름</label>
   <input id="outName">
-  <div class="card" id="sealCard">
+  <div class="row"><button class="btn sec sm" id="sealToggle" style="width:100%;justify-content:center">✍️ 사인·도장 넣기 (선택)</button></div>
+  <div class="card" id="sealCard" hidden>
    <h2><span class="n">✎</span>사인 · 도장 · 간인</h2>
    <p class="sub">한 번 만든 사인·도장은 이 기기에 담아 두고 다시 꺼내 씁니다. 간인은 쪽과 쪽이 맞닿는 자리에 반씩 걸쳐 찍힙니다.</p>
    <div class="row"><button class="btn sec sm" id="sealPhoto">도장 사진 올리기</button><button class="btn sec sm" id="sealName">이름 도장 만들기</button></div>
@@ -3984,6 +3985,14 @@ if ($('#sealBox')){
     var b = e.target.closest('[data-seal]'); if (b) sealPick(b.getAttribute('data-seal'));
   });
   $('#sealSlots').addEventListener('click', function(e){ var b = e.target.closest('[data-slot]'); if (b) sealStampSlot(+b.getAttribute('data-slot')); });
+  /* 304 — 사인·도장은 기본으로 접어 두고, 필요할 때만 연다 */
+  var stg = document.getElementById('sealToggle'), scd = document.getElementById('sealCard');
+  if (stg && scd){
+    stg.onclick = function(){
+      scd.hidden = !scd.hidden;
+      stg.textContent = scd.hidden ? '✍️ 사인·도장 넣기 (선택)' : '사인·도장 접기';
+    };
+  }
   $('#sealPhoto').onclick = function(){ $('#sealIn').click(); };
   $('#sealIn').onchange = async function(e){
     var fl = e.target.files && e.target.files[0]; e.target.value = ''; if (!fl) return;
