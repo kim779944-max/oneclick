@@ -2141,7 +2141,9 @@ document.addEventListener('input', e => {
       if (n){
         v = isKorMoneyField(f) ? korNum(n) : String(n);
         const show = isKorMoneyField(f) ? v : comma(n);
-        if (el.value !== show) el.value = show;
+        /* 303 — 한글 금액 칸은 치는 중에 글자를 바꾸지 않는다('28억'이 '이8억'이 되던 문제).
+           아래에 계산된 금액만 보여 주고, 칸을 나갈 때(setMoneyPair) 정리한다 */
+        if (!isKorMoneyField(f) && el.value !== show) el.value = show;
         if (kor) kor.textContent = isKorMoneyField(f) ? comma(n) + '원' : korWon(n);
         const tw = moneyTwinOf(f);
         if (tw){
