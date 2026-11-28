@@ -548,6 +548,7 @@ function paint(g,W,H,sc,my){
   var k=W>MAPW?Math.pow(W/MAPW,0.7):1;            /* 인쇄용 큰 캔버스에서 글씨·선 굵기 보정 */
   g.setTransform(sc,0,0,sc,0,0);
   var t=topLeft(W,H), z=S.V.z;
+  var slBox=(SL.on?selectedBox():null);   /* 경사도를 켠 상태 — 담은 필지 전체 영역 */
   g.fillStyle='#F7F3EA'; g.fillRect(0,0,W,H);
   if(!(S.F.items||[]).length&&!S.order.length){
     g.fillStyle='#16233D'; g.font='900 '+Math.round(32*k)+'px '+MAPFONT; g.textAlign='center';
@@ -609,17 +610,11 @@ function paint(g,W,H,sc,my){
       var tw=g.measureText(gi.jibun).width;
       /* 지번 라벨이 지도 밖으로 잘리지 않도록 — 라벨 박스가 완전히 들어올 때만 그린다 */
       if(mxx-tw/2-5*k<0||mxx+tw/2+5*k>W||myy-13*k<0||myy+13*k>H) continue;
-      /* 담은 필지 자리(픽셀 사각형)에 걸리는 이웃 지번은 경사 색 위에 비쳐 보이므로 그리지 않는다 */
-      var covered=false;
-      for(var ci=0;ci<S.order.length&&!covered;ci++){
-        var sit=S.sel[S.order[ci]];
-        if(!sit||sit.state!=='in') continue;
-        var sb=sit.bb||bboxOf(sit.rings); if(!sb) continue;
-        var sx0=lon2x(sb.minx,z)-t.x, sx1=lon2x(sb.maxx,z)-t.x;
-        var sy0=lat2y(sb.maxy,z)-t.y, sy1=lat2y(sb.miny,z)-t.y;
-        if(mxx+tw/2+5*k>sx0&&mxx-tw/2-5*k<sx1&&myy+13*k>sy0&&myy-13*k<sy1) covered=true;
+      /* 경사도를 켜면 담은 필지가 차지한 영역(합집합) 안의 이웃 지번은 색 위에 비쳐 보이므로 그리지 않는다 */
+      if(slBox){
+        var llon=x2lon(t.x+mxx,z), llat=y2lat(t.y+myy,z);
+        if(llon>=slBox.minx&&llon<=slBox.maxx&&llat>=slBox.miny&&llat<=slBox.maxy) continue;
       }
-      if(covered) continue;
       g.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
       g.fillRect(mxx-tw/2-5*k,myy-13*k,tw+10*k,26*k);
       g.fillStyle=dark?'#EAF1FB':'#16233D';
