@@ -360,7 +360,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 <section class="scr" id="s3">
  <div class="card">
   <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
-  <p class="sub">아래에 늘 붙어 있는 <b style="color:#FFC08A">[🎤 말해서 넣기]</b>로 지금 칸에 말해 넣고 <b style="color:#FFC08A">[다음 칸]</b>으로 넘어갑니다. 옆의 <b style="color:#FFC08A">[?]</b> 도우미가 넣을 칸을 가리킵니다.</p>
+  <p class="sub">값을 넣을 칸을 누르면 칸 옆에 <b style="color:#FFC08A">🎤</b> 하나가 붙습니다 — 말하면 그 칸에 들어가고, 아래 <b style="color:#FFC08A">[▶]</b>로 다음 칸으로 넘어갑니다. 옆의 <b style="color:#FFC08A">[?]</b> 도우미가 넣을 칸을 가리킵니다.</p>
   <div class="row" style="margin-top:6px"><button class="btn sec sm" id="clearVals">값 모두 지우기</button></div>
   <div id="fillInfo">사진 자동 채우기: AI 열쇠가 있으면 정확하게, 없으면 기기 안 무료 글자 인식으로 읽습니다.</div>
   <div id="valList"></div>
@@ -2562,6 +2562,10 @@ function setDateGroup(base, val){
   if (g.y) VALS[g.y.lab] = p[0];
   if (g.m) VALS[g.m.lab] = String(+p[1]);
   if (g.d) VALS[g.d.lab] = String(+p[2]);
+  if (/^잔금/.test(base)){
+    const gi = DATE_GROUPS['인도일'];
+    if (gi){ if (gi.y) VALS[gi.y.lab] = p[0]; if (gi.m) VALS[gi.m.lab] = String(+p[1]); if (gi.d) VALS[gi.d.lab] = String(+p[2]); }
+  }
   saveVals();
   const el = $$('#valList input[data-dg]').find(x => x.dataset.dg === base);
   const dm = el && el.parentNode ? el.parentNode.querySelector('.dm') : null;
@@ -2598,7 +2602,7 @@ function renderInputs(){
     if (f.type === 'sign') return hd + `<label class="lb">${escH(f.label)}<em>서명</em></label><canvas class="sig" data-sig="${i}" width="680" height="220"></canvas><div class="ba"><button class="btn sec sm" data-sigclr="${i}">서명 지우기</button></div>`;
     /* 날짜 묶음 — '년·월·일' 세 칸이 함께 있을 때만 달력 하나로 (한 칸짜리 '작성일'은 그대로) */
     const dp = datePart(f.label);
-    if (dp && DATE_GROUPS[dp.base] && DATE_GROUPS[dp.base].y && (DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
+    if (dp && !/인도일/.test(dp.base) && DATE_GROUPS[dp.base] && DATE_GROUPS[dp.base].y && (DATE_GROUPS[dp.base].m || DATE_GROUPS[dp.base].d)){
       if (done['d:' + dp.base]) return ''; done['d:' + dp.base] = 1;
       const g = DATE_GROUPS[dp.base], val = dateVal(dp.base);
       const anchor = Math.max.apply(null, ['y', 'm', 'd'].filter(k2 => g[k2]).map(k2 => g[k2].i));
