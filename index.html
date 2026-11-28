@@ -620,11 +620,6 @@ function renderHome4(menu){
                  : '<p class="h4none">이 구역 도구를 모두 뺐습니다 — [⋯ → 편집]로 되살릴 수 있습니다.</p>') +
       '</section>';
   }).join('');
-  if (window.__KTS_LAND === false) hideLandTile();
-}
-function hideLandTile(){
-  var t = document.querySelector('#home4 .tl[data-k="land"]');
-  if (t) t.parentNode.removeChild(t);
 }
 function renderHub(menu){
   var box = $('#hubBody'); if (!box) return;
@@ -638,22 +633,28 @@ function renderHub(menu){
   box.innerHTML = html || '<p class="h4none">보여 드릴 도구가 없습니다.</p>';
 }
 
-/* land/ 은 트랙1이 새로 올리는 통합 앱 — 아직 없으면 타일을 숨겨 라이브 404를 만들지 않는다 */
+/* land/ 은 트랙1이 새로 올리는 통합 앱 — 첫 화면에서는 미리 찌르지 않고(콘솔 404 0건),
+   누를 때 있는지 확인한 뒤 엽니다. 아직 없으면 '준비 중' 안내만 하고 끝냅니다. */
 (function(){
   var KEY = 'kts_land_ok_v1';
-  var memo = null; try { memo = sessionStorage.getItem(KEY); } catch(e){}
-  if (memo === '0') { window.__KTS_LAND = false; return; }
-  if (memo === '1') { window.__KTS_LAND = true; return; }
-  if (!window.fetch) { window.__KTS_LAND = true; return; }
-  try{
-    fetch('land/index.html', { method: 'HEAD', cache: 'no-store' })
-      .then(function(r){
-        window.__KTS_LAND = !!r.ok;
-        try { sessionStorage.setItem(KEY, r.ok ? '1' : '0'); } catch(e){}
-        if (!r.ok) hideLandTile();
-      })
-      .catch(function(){ window.__KTS_LAND = null; });
-  }catch(e){ window.__KTS_LAND = null; }
+  try { var memo = sessionStorage.getItem(KEY); if (memo === '1') window.__KTS_LAND = true; else if (memo === '0') window.__KTS_LAND = false; } catch(e){}
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('#home4 .tl[data-k="land"]') : null;
+    if (!b) return;
+    if (window.__KTS_LAND === true) return;                 /* 있음 — 그대로 열기 */
+    if (!window.fetch) return;
+    e.preventDefault(); e.stopImmediatePropagation();       /* 아래 [열기] 관문보다 먼저 판단 */
+    if (window.__KTS_LAND === false){
+      toastMsg('1호 통합은 준비 중입니다 — 면적·경사도·4대 공부를 따로 쓰실 수 있습니다');
+      return;
+    }
+    fetch('land/index.html', { method: 'HEAD', cache: 'no-store' }).then(function(r){
+      if (r.ok) { window.__KTS_LAND = true; try{ sessionStorage.setItem(KEY,'1'); }catch(err){}
+        var t = byK('land'); location.href = (t && t.link) || 'land/'; return; }
+      window.__KTS_LAND = false; try{ sessionStorage.setItem(KEY,'0'); }catch(err){}
+      toastMsg('1호 통합은 준비 중입니다 — 면적·경사도·4대 공부를 따로 쓰실 수 있습니다');
+    }).catch(function(){ window.__KTS_LAND = null; location.href = 'land/'; });
+  }, true);
 })();
 
 /* ============================================================================
