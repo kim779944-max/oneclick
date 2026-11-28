@@ -450,7 +450,7 @@
     if (!drew) {
       x.fillStyle = 'rgba(255,255,255,.06)'; rr(x, ph.x, ph.y, ph.w, ph.h, 10); x.fill();
       x.fillStyle = '#7d90aa'; x.font = f(land ? 26 : 30, 800); x.textAlign = 'center';
-      x.fillText('대표 사진을 넣어 주세요', ph.x + ph.w / 2, ph.y + ph.h / 2);
+      x.fillText('현장 사진 준비 중', ph.x + ph.w / 2, ph.y + ph.h / 2);
       x.textAlign = 'left';
     }
     if (m.polygon && m.polygon.photo === 0) polygon(x, m.polygon.points, ph.x, ph.y, ph.w, ph.h);
@@ -681,7 +681,7 @@
     h += '<div style="' + abs(P.photo.x, P.photo.y, P.photo.w, P.photo.h) + 'border-radius:10px;overflow:hidden;background:' + C.navy2 + '">';
     if (m.photos[0]) h += '<img src="' + esc(m.photos[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
     else if (m.map) h += '<img src="' + esc(m.map) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
-    else h += '<div style="display:grid;place-items:center;height:100%;color:#7d90aa;font-size:26px;font-weight:800">대표 사진을 넣어 주세요</div>';
+    else h += '<div style="display:grid;place-items:center;height:100%;color:#7d90aa;font-size:26px;font-weight:800">현장 사진 준비 중</div>';
     if (m.polygon && m.polygon.photo === 0) h += polySvg(m.polygon.points);
     h += '</div>';
 
