@@ -268,7 +268,7 @@
     var im = document.createElement('img');
     im.alt = '';
     im.src = info.src;
-    im.style.cssText = 'position:absolute;left:5px;top:5px;right:5px;bottom:5px;width:auto;height:auto;object-fit:cover;border-radius:8px;display:block';
+    im.style.cssText = 'position:absolute;left:5px;top:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:cover;border-radius:8px;display:block;max-width:none';
     im.addEventListener('error', function () {
       if (info.slot === 'photo:1' && M.cad && im.src !== M.cad) im.src = M.cad;
       else if (info.slot === 'sat' && M.cad && im.src !== M.cad) im.src = M.cad;
