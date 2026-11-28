@@ -480,7 +480,7 @@ body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣�
  <div class="body" id="pvmBody"></div>
  <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
 </div></div>
-<script src="forms.js?v=20261128a"></script>
+<script src="forms.js?v=20261128b"></script>
 <script src="forms_consult.js"></script>
 <script>
 /* ===================== 표준계약서 (표준계약서 원본 사진식) ===================== */
@@ -1247,8 +1247,11 @@ async function composite(maxW, pg){
   const g = cv.getContext('2d');
   g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
   if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
-  /* 303 — 종이 본문(명조)과 같은 글꼴·굵기로 찍는다. 굵은 고딕으로 뜨면 종이와 따로 논다 */
-  const FONT_P = '"Batang","바탕","Nanum Myeongjo","NanumMyeongjo","Noto Serif KR","Noto Serif CJK KR","AppleMyungjo","Gungsuh","HYMyeongJo",serif';
+  /* 303 — 값은 그 서식의 종이 본문과 같은 글꼴·굵기로 찍는다.
+     스캔한 원본(교환계약서 당사자용)은 명조, 저희가 그린 서식은 돋보기(고딕) */
+  const FONT_SERIF = '"Batang","바탕","Nanum Myeongjo","NanumMyeongjo","Noto Serif KR","Noto Serif CJK KR","AppleMyungjo","Gungsuh","HYMyeongJo",serif';
+  const FONT_SANS = '"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR","NanumGothic",sans-serif';
+  const FONT_P = (curForm().fam === 'serif') ? FONT_SERIF : FONT_SANS;
   const lines = pageInkLines(IM, curForm().id + '|' + bgSrcFor(pg));
   const BODY_H = (lines.body || lines.med || 0.02);   /* 종이 본문 글씨 높이(비율) */
   for (const f of curForm().fields){
