@@ -88,7 +88,9 @@
   function geocode(addr) {
     var q = String(addr || '').trim();
     if (!q) return Promise.resolve(null);
-    var bare = q.replace(/\s*\d{1,5}(-\d{1,5})?\s*$/, '').trim();
+    /* 304 — '동·리 + 번지'까지 적혀 있으면 번지를 떼지 않는다(다른 필지를 찾아오는 일 방지) */
+    var hasJibun = /(?:동|리|읍|면|가|산)\s*\d{1,5}(?:-\d{1,5})?\s*$/.test(q);
+    var bare = hasJibun ? '' : q.replace(/\s*\d{1,5}(-\d{1,5})?\s*$/, '').trim();
     var variants = [q];
     if (bare && bare !== q) variants.push(bare);
     var i = 0;
@@ -125,6 +127,7 @@
   function bySearch(q) {
     var s0 = String(q || '').replace(/\s+/g, ' ').trim();
     if (!s0) return Promise.resolve(null);
+    LAST_NEAR = [];
     var want = jibunTail(s0);
     var m = s0.match(/^(.*?)\s*(산?\s*\d+(?:-\d+)?)\s*(?:번지|필지)?$/);
     var body = m ? String(m[1] || '').trim() : s0;
@@ -155,7 +158,17 @@
         return { lat: pick.lat, lon: pick.lon, text: pick.addr };
       });
     }
-    return next();
+    return next().then(function (hit) {
+      if (hit) return hit;
+      /* 비슷한 주소를 보여 줄 수 있게 '동·리'만으로 한 번 더 */
+      if (LAST_NEAR.length) return null;
+      var near = body || (s0.match(/^([가-힣0-9]{1,}(?:동|리|가|읍|면))/) || [])[1];
+      if (!near) return null;
+      return searchAddr(near).then(function (items) {
+        if (items) LAST_NEAR = items.slice(0, 5).map(function (x) { return ((x.address && x.address.parcel) || x.title || ''); });
+        return null;
+      });
+    });
   }
 
   /* ---------- 2) 좌표 → 필지 ---------- */
@@ -302,20 +315,22 @@
     var m = String(q || '').match(/(\d{1,5}(?:-\d{1,5})?)\s*(?:\uBC88\uC9C0|\uD544\uC9C0)?\s*$/);
     return m ? m[1] : '';
   }
+  /* 지번 주소인가(도로명 주소의 끝 숫자는 필지 번지가 아니다) */
+  function isJibunAddr(q){ return /(?:동|리|읍|면|가|산)\s*\d{1,5}(?:-\d{1,5})?\s*$/.test(String(q || '')); }
   function jibunOfPc(pc) { return String((pc && pc.jibun) || '').replace(/[^0-9-]/g, ''); }
   function lookupParcel(q, pt) {
     return parcelAt(pt.lat, pt.lon).then(function (pc) {
       var want = wantJibun(q);
-      if (!want || !pc) return { pt: pt, pc: pc };
+      if (!want || !isJibunAddr(q) || !pc) return { pt: pt, pc: pc };
       var got = jibunOfPc(pc);
       if (got === want || got.indexOf(want) === 0) return { pt: pt, pc: pc };
       var ref = pc.addr || '';
-      if (!ref) return { pt: pt, pc: pc };
+      if (!ref) return { pt: pt, pc: null, bad: 1 };
       return geocodeOne(ref, 'parcel').then(function (p2) {
-        if (!p2) return { pt: pt, pc: pc };
+        if (!p2) return { pt: pt, pc: null, bad: 1 };
         return parcelAt(p2.lat, p2.lon).then(function (pc2) {
           var ok = pc2 && jibunOfPc(pc2) === want;
-          return ok ? { pt: p2, pc: pc2 } : { pt: pt, pc: pc };
+          return ok ? { pt: p2, pc: pc2 } : { pt: pt, pc: null, bad: 1 };
         });
       }).catch(function () { return { pt: pt, pc: pc } });
     });
@@ -326,6 +341,7 @@
     return first.then(function (pt) {
       if (!pt) return { st: 'NOT_FOUND', near: LAST_NEAR.slice(0, 5), ms: Date.now() - t0 };
       return lookupParcel(addr, pt).then(function (lp) {
+        if (lp.bad) return { st: 'NOT_FOUND', near: LAST_NEAR.slice(0, 5), ms: Date.now() - t0 };
         var pc = lp.pc, ptn = lp.pt || pt;
         var pnu = pc && pc.pnu || '';
         var base = {
