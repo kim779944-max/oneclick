@@ -10,7 +10,7 @@
   'use strict';
 
   var VW = 'https://api.vworld.kr', DATA = VW + '/req/data', NED = VW + '/ned/data',
-    API = VW + '/req/address', IMG = VW + '/req/image',
+    API = VW + '/req/address', SRCH = VW + '/req/search', IMG = VW + '/req/image',
     DG = 'https://apis.data.go.kr/1613000/BldRgstHubService';
 
   var VW_DEF = '0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';                       /* 대표님 발급 키(autooneclick.com) */
@@ -93,13 +93,69 @@
     if (bare && bare !== q) variants.push(bare);
     var i = 0;
     function step() {
-      if (i >= variants.length) return Promise.resolve(null);
+      if (i >= variants.length) return bySearch(q);   /* 304 — 동·리+지번만 있는 주소도 찾는다 */
       var v = variants[i++];
       return geocodeOne(v, 'parcel').then(function (r) { return r || geocodeOne(v, 'road') }).then(function (r) {
         return r || step();
       });
     }
     return step();
+  }
+
+  /* ---------- 1-2) 304 — 시·군이 빠진 '동·지번'·'리·지번' 주소 찾기 ----------
+     브이월드 주소검색(search)은 '호평동 24-35'·'신하리 162-9' 같은 낱개 주소도 찾아 준다.
+     번지가 꼭 맞는 것만 쓴다(다른 필지를 계약서에 넣지 않기 위해). */
+  var LAST_NEAR = [];
+  function jibunTail(s){ var m = String(s || '').match(/(산?\s*\d+(?:-\d+)?)\s*(?:번지|필지)?\s*$/); return m ? m[1].replace(/\s+/g, '') : ''; }
+  function jibunOfItem(it){
+    var a = (it && it.address) || {};
+    var p = String(a.parcel || it.title || '');
+    return jibunTail(p);
+  }
+  function searchAddr(q){
+    var url = SRCH + '?service=search&request=search&version=2.0&crs=EPSG:4326&size=10&page=1'
+      + '&type=address&category=parcel&format=json&errorformat=json&key=' + encodeURIComponent(key())
+      + '&domain=' + DOMAIN + '&query=' + encodeURIComponent(q);
+    return http(url, 9000).then(function (r) {
+      if (!r || r.__err || !r.response || r.response.status !== 'OK') return null;
+      var it = (r.response.result && r.response.result.items) || [];
+      return it.length ? it : null;
+    }).catch(function () { return null });
+  }
+  function bySearch(q) {
+    var s0 = String(q || '').replace(/\s+/g, ' ').trim();
+    if (!s0) return Promise.resolve(null);
+    var want = jibunTail(s0);
+    var m = s0.match(/^(.*?)\s*(산?\s*\d+(?:-\d+)?)\s*(?:번지|필지)?$/);
+    var body = m ? String(m[1] || '').trim() : s0;
+    var num = m ? String(m[2] || '').replace(/\s+/g, '') : '';
+    var tries = [s0];
+    if (body && num && (body + ' ' + num) !== s0) tries.push(body + ' ' + num);
+    if (body && body.indexOf(' ') > 0 && !/(시|군|구|도|동|리|읍|면|가)\s*$/.test(body)){
+      var tok = body.split(' ').filter(Boolean);
+      if (tok.length > 1 && num) tries.push(tok[tok.length - 1] + ' ' + num);   /* 마지막 '동·리' + 번지 */
+    }
+    var i = 0;
+    function next() {
+      if (i >= tries.length) return Promise.resolve(null);
+      var t = tries[i++];
+      return searchAddr(t).then(function (items) {
+        if (!items) return next();
+        var cands = items.map(function (x) {
+          return { addr: ((x.address && x.address.parcel) || x.title || ''), jibun: jibunOfItem(x),
+            lat: x.point ? +x.point.y : null, lon: x.point ? +x.point.x : null };
+        });
+        var exact = want ? cands.filter(function (x) { return x.jibun === want; }) : [];
+        var pick = exact[0] || (cands.length === 1 ? cands[0] : null);
+        if (!pick){
+          if (cands.length) LAST_NEAR = cands.slice(0, 5).map(function (x) { return x.addr; });
+          return next();
+        }
+        if (!pick.addr || !isFinite(pick.lat) || !isFinite(pick.lon)) return next();
+        return { lat: pick.lat, lon: pick.lon, text: pick.addr };
+      });
+    }
+    return next();
   }
 
   /* ---------- 2) 좌표 → 필지 ---------- */
@@ -268,7 +324,7 @@
     var t0 = Date.now();
     var first = (cached && cached.lat && cached.lon) ? Promise.resolve(cached) : geocode(addr);
     return first.then(function (pt) {
-      if (!pt) return { st: 'NOT_FOUND', ms: Date.now() - t0 };
+      if (!pt) return { st: 'NOT_FOUND', near: LAST_NEAR.slice(0, 5), ms: Date.now() - t0 };
       return lookupParcel(addr, pt).then(function (lp) {
         var pc = lp.pc, ptn = lp.pt || pt;
         var pnu = pc && pc.pnu || '';
@@ -290,5 +346,60 @@
     });
   }
 
-  g.KTS_GB = { lookup: lookup, geo: geo, mapUrl: mapUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse };
+  g.KTS_GB = { lookup: lookup, geo: geo, mapUrl: mapUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse,
+    /* 304 — 매물 글·낱개 주소 한 줄로 4대 공부까지 (양식만들기·계약서 공통) */
+    addrOf: addrOf, combo: comboText, fill: fillAddr };
+
+  /* 매물 문자·카톡에서 주소만 골라낸다 */
+  function addrOf(t) {
+    var s = String(t || '').replace(/\s+/g, ' ').trim();
+    var pats = [
+      /((?:[가-힣]{2,}(?:특별시|광역시|시|도))\s+[가-힣]{1,}(?:시|군|구)\s+(?:[가-힣]{1,}(?:읍|면)\s+)?[가-힣0-9]{1,}(?:동|리|가)\s+산?\s*\d+(?:-\d+)?)/,
+      /((?:[가-힣]{1,}(?:시|군|구))\s+(?:[가-힣]{1,}(?:읍|면)\s+)?[가-힣0-9]{1,}(?:동|리|가)\s+산?\s*\d+(?:-\d+)?)/,
+      /([가-힣]{1,}(?:읍|면)\s+[가-힣0-9]{1,}(?:리)\s+산?\s*\d+(?:-\d+)?)/,
+      /([가-힣0-9]{1,}(?:동|리|가)\s+산?\s*\d+(?:-\d+)?)/
+    ];
+    for (var i = 0; i < pats.length; i++){ var m = s.match(pats[i]); if (m && m[1]) return m[1].trim(); }
+    return '';
+  }
+  function fx(n){ return Math.round(n * 100) / 100; }
+  function cm(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  /* 4대 공부를 계약서 '내 용' 칸에 넣을 한 덩어리 글로 */
+  function comboText(d) {
+    d = d || {}; var parts = [];
+    if (d.addr) parts.push(String(d.addr).trim());
+    var landTxt = d.land ? (fx(d.land) + '㎡ (' + fx(d.land / 3.305785) + '평)') : '';
+    if (d.jimok && landTxt) parts.push(d.jimok + ' ' + landTxt);
+    else if (landTxt) parts.push('토지 ' + landTxt);
+    else if (d.jimok) parts.push(String(d.jimok));
+    var bd = [];
+    if (d.struct) bd.push(String(d.struct));
+    if (d.bldg) bd.push('연면적 ' + fx(d.bldg) + '㎡');
+    if (bd.length) parts.push('건물 ' + bd.join(' '));
+    if (d.use && d.use.length) parts.push(d.use.slice(0, 3).join('/'));
+    if (d.jiga) parts.push('공시지가 ' + cm(d.jiga) + '원/㎡' + (d.jigaYr ? ' (' + d.jigaYr + '년)' : ''));
+    return parts.filter(Boolean).join(' · ');
+  }
+  /* 주소(또는 매물 글) → {st, addr, text, data, near} */
+  function fillAddr(q) {
+    var addr = String(q || '').trim();
+    if (addr && !/\d/.test(addr)) addr = addr;               /* 번지 없으면 그대로 시도 */
+    return lookup(addr).then(function (r) {
+      if (!r || r.st !== 'OK') return r || { st: 'ERR' };
+      var toji = r.toji || {}, ch = r.char || {};
+      var b = (r.bld && r.bld.st === 'OK' && r.bld.items && r.bld.items[0]) || null;
+      var d = {
+        addr: r.addr || addr,
+        jimok: ch.lndcgrCodeNm || toji.lndcgrCodeNm || '',
+        land: toji.lndpclAr ? +toji.lndpclAr : (ch.lndpclAr ? +ch.lndpclAr : 0),
+        bldg: b && b.totArea ? +b.totArea : 0,
+        struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : '',
+        use: (r.use || []).filter(function (u) { return /포함|접함/.test(u.cnflc || '') }).map(function (u) { return u.nm }).filter(Boolean),
+        jiga: (r.price && r.price.pblntfPclnd) ? +r.price.pblntfPclnd : (ch.pblntfPclnd ? +ch.pblntfPclnd : 0),
+        jigaYr: (r.price && r.price.stdrYear) ? String(r.price.stdrYear) : (ch.lastUpdtDt ? String(ch.lastUpdtDt).slice(0, 4) : '')
+      };
+      r.data = d; r.text = comboText(d);
+      return r;
+    });
+  }
 })(window);

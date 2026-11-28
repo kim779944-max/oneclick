@@ -501,6 +501,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 </div>
 <script src="../shared/kts-handoff.js?v=20261124b"></script>
 <script src="../shared/kts-seal.js?v=20261124b"></script>
+<script src="../contract/prop.js?v=20261128c"></script>
 <script>
 /* ===== 아래 엔진은 oneclick/converter.html 에서 그대로 가져온 복사본입니다(수정 금지·동기화 대상) ===== */
 const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
@@ -1590,14 +1591,15 @@ const PRESET_POWER_FIELDS = [
     {id:'p11', label:'위임인 서명·날인', type:'sign', x:67.159, y:67.696, w:21.827, h:8.314}
   ];
 const PRESET_EXCHANGE_FIELDS = [
-    {id:'p0', sec:'1. 부동산의 표시', label:'갑 대상물건', type:'text', x:24.513, y:11.829, w:70.181, h:2.375},
-    {id:'p1', label:'갑 평가액', type:'number', x:24.513, y:14.394, w:29.617, h:2.328},
-    {id:'p2', label:'갑 승계채무액', type:'number', x:65.212, y:14.394, w:29.416, h:2.328},
-    {id:'p3', label:'갑 순가액', type:'number', x:24.513, y:16.912, w:70.181, h:2.328},
-    {id:'p4', label:'을 대상물건', type:'text', x:24.513, y:19.477, w:70.181, h:2.328},
-    {id:'p5', label:'을 평가액', type:'number', x:24.513, y:21.995, w:29.617, h:2.328},
-    {id:'p6', label:'을 승계채무액', type:'number', x:65.212, y:21.995, w:29.416, h:2.328},
-    {id:'p7', label:'을 순가액', type:'number', x:24.513, y:24.513, w:70.181, h:2.328},
+    /* 304 — 갑·을 세 칸(평가액·승계채무액·순가액)을 넓은 '내 용' 한 칸으로 묶었다 */
+    {id:'p0', sec:'1. 부동산의 표시', label:'갑 대상물건', type:'text', x:24.514, y:11.876, w:70.248, h:7.412, stack:1},
+    {id:'p1', label:'갑 평가액', type:'number', nop:1, x:24.513, y:14.394, w:29.617, h:2.328},
+    {id:'p2', label:'갑 승계채무액', type:'number', nop:1, x:65.212, y:14.394, w:29.416, h:2.328},
+    {id:'p3', label:'갑 순가액', type:'number', nop:1, x:24.513, y:16.912, w:70.181, h:2.328},
+    {id:'p4', label:'을 대상물건', type:'text', x:24.514, y:19.477, w:70.248, h:7.364, stack:1},
+    {id:'p5', label:'을 평가액', type:'number', nop:1, x:24.513, y:21.995, w:29.617, h:2.328},
+    {id:'p6', label:'을 승계채무액', type:'number', nop:1, x:65.212, y:21.995, w:29.416, h:2.328},
+    {id:'p7', label:'을 순가액', type:'number', nop:1, x:24.513, y:24.513, w:70.181, h:2.328},
     {id:'p8', sec:'2. 교환대금 · 지급', label:'교환대금(한글)', type:'text', x:19.208, y:30.831, w:29.147, h:2.280},
     {id:'p9', label:'계약금(한글)', type:'text', x:19.208, y:33.302, w:29.147, h:2.328},
     {id:'p10', label:'중도금(한글)', type:'text', x:19.208, y:35.819, w:29.147, h:2.328},
@@ -1751,8 +1753,12 @@ const PRESET_CONSULT_FIELDS = [
 const PRESETS = [
   {id:'p_sale',  name:'부동산 매매계약서', builtin:true, bgUrl:'tpl_sale.png',  fields:PRESET_SALE_FIELDS},
   {id:'p_power', name:'등기 위임장',       builtin:true, bgUrl:'tpl_power.png', fields:PRESET_POWER_FIELDS},
-  {id:'p_exchange', name:'부동산 교환계약서(당사자용)', builtin:true, bgUrl:'tpl_exchange.png', fields:PRESET_EXCHANGE_FIELDS},
-  {id:'p_exbroker', name:'부동산 교환계약서(중개사용)', builtin:true, bgUrl:'tpl_exbroker.png', themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_EXBROKER_FIELDS},
+  {id:'p_exchange', name:'부동산 교환계약서(당사자용)', builtin:true, bgUrl:'tpl_exchange.png', fields:PRESET_EXCHANGE_FIELDS,
+   paper:{patch:[[15.175,11.876,9.067,7.412],[24.513,11.876,70.248,7.412],[15.175,19.477,9.067,7.364],[24.513,19.477,70.248,7.364]],
+          label:[{t:'내  용',x:15.043,w:9.335,y:11.781,h:7.601,fs:26},{t:'내  용',x:15.043,w:9.335,y:19.382,h:7.554,fs:26}], fam:'serif'}},
+  {id:'p_exbroker', name:'부동산 교환계약서(중개사용)', builtin:true, bgUrl:'tpl_exbroker.png', themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_EXBROKER_FIELDS,
+   paper:{patch:[[18.000,15.487,9.670,3.371],[18.000,19.050,9.670,3.371]],
+          label:[{t:'내  용',x:17.797,w:10.074,y:15.392,h:3.563,fs:22},{t:'내  용',x:17.797,w:10.074,y:18.955,h:3.563,fs:22}]}},
   {id:'p_lease', name:'부동산 임대차계약서', builtin:true, bgUrl:'tpl_lease.png', themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_LEASE_FIELDS},
   {id:'p_consult', name:'부동산 컨설팅 전속 거래 약정서', builtin:true, bgUrls:['tpl_consult_p1.png','tpl_consult_p2.png'], themes:['mono','sky','green','gray'], theme:'sky', fields:PRESET_CONSULT_FIELDS}
 ];
@@ -2028,7 +2034,7 @@ function showPreview(id){
   PVF = clone(f); PVF._theme = f.theme || (f.themes ? (f.themes[1] || f.themes[0]) : '');
   renderPreviewModal(); $('#pvModal').classList.add('on');
 }
-function renderPreviewModal(){
+async function renderPreviewModal(){
   const f = PVF; if (!f) return;
   $('#pvName').textContent = f.name;
   const n = (f.bgUrls && f.bgUrls.length) ? f.bgUrls.length : 1, th = pvThemeOf();
@@ -2036,7 +2042,16 @@ function renderPreviewModal(){
   for (let p = 1; p <= n; p++){
     const base = (f.bgUrls && f.bgUrls[p - 1]) ? f.bgUrls[p - 1] : f.bgUrl;
     if (base){
-      h += `<img src="${themed(base, th)}" alt="A4 ${p}쪽 원본 양식">`;
+      if (f.paper){
+        /* 304 — 빈 양식 미리보기에도 '내  용' 한 칸으로 보이게 */
+        const im = await loadUrlImg(themed(base, th));
+        const W = im ? (im.naturalWidth || im.width) : 1489, H = im ? (im.naturalHeight || im.height) : 2105;
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+        if (im) g.drawImage(im, 0, 0, W, H);
+        try{ tfPaperPrep(g, cv, f); }catch(e){}
+        h += `<img src="${cv.toDataURL('image/png')}" alt="A4 ${p}쪽 원본 양식">`;
+      } else h += `<img src="${themed(base, th)}" alt="A4 ${p}쪽 원본 양식">`;
     } else {
       /* S-1(268) — 종이 그림이 없는 기본 양식(블록으로 그리는 5종)은 직접 그린 종이를 보여 준다 */
       const cv = renderBlank(f);
@@ -2634,7 +2649,9 @@ function renderInputs(){
     return hd + `<label class="lb">${escH(f.label)}<em>${TYPE_NM[f.type]}</em>${auto}</label>`
       + `<div class="dwrap"><input data-f="${i}" class="${v ? 'has' : ''}" type="${tp}"${im} value="${escH(vv)}">${unit}</div>`
       + (f.type === 'date' ? `<div class="dline">${v ? fmtDate(v) : ''}</div>` : '')
-      + (korM ? `<div class="dline" data-hint="${i}"></div>` : '');
+      + (korM ? `<div class="dline" data-hint="${i}"></div>` : '')
+      /* 304 — 물건 주소 칸: 동·지번만 넣어도 4대 공부를 찾아 그 칸에 넣는다 */
+      + (isPropLabel(f.label) ? `<div class="dline"><button type="button" class="btn sec sm" data-gb="${i}" style="font-size:12px">🏛 4대 공부로 채우기</button><span class="dm" data-gbst="${i}"></span></div>` : '');
   }).join('');
   /* 288-⑨ 계약서와 같은 카드 틀 — 섹션마다 .wsec 카드로 나눈다 */
   let hh = h.replace(/<div class="sechd">([\s\S]*?)<\/div>/g, function(m0, t){
@@ -2654,6 +2671,46 @@ function renderInputs(){
   syncValBar();
 }
 /* 278 — 값이 하나도 없을 때는 [값 모두 지우기]를 숨김 */
+/* 304 — 물건 주소가 들어가는 칸인가 */
+const PROP_LBL_RE = /소재지|대상물건|물건\s*표시|부동산의\s*표시|목적물|물건지|^주소$|^갑\s*주소$|^을\s*주소$/;
+function isPropLabel(l){ return PROP_LBL_RE.test(String(l || '').replace(/\s+/g, ' ').trim()); }
+/* 304 — 주소(또는 매물 글) → 4대 공부까지 찾아 그 칸에 넣는다 */
+async function tfGb(i, quiet){
+  const f = CUR && CUR.fields[i]; if (!f) return;
+  const st = document.querySelector(`[data-gbst="${i}"]`);
+  if (!window.KTS_GB) return toast('4대 공부를 불러오지 못했습니다 — 주소를 직접 넣어 주세요');
+  const raw = String(VALS[f.label] || '').trim();
+  if (!raw) return toast('주소나 매물 글을 먼저 넣어 주세요');
+  const q = window.KTS_GB.addrOf(raw) || raw;
+  if (st) st.textContent = '찾는 중…';
+  if (!quiet) busyOn('4대 공부 확인 중…');
+  try{
+    const r = await window.KTS_GB.fill(q);
+    if (!quiet) busyOff();
+    if (!r || r.st !== 'OK'){
+      if (st) st.textContent = '';
+      const near = (r && r.near && r.near.length) ? (' — 비슷한 주소: ' + r.near[0]) : '';
+      if (!quiet) toast('4대 공부에서 찾지 못했습니다' + near);
+      return;
+    }
+    VALS[f.label] = r.text || r.addr || raw;
+    saveVals(); renderInputs();
+    const s2 = document.querySelector(`[data-gbst="${i}"]`);
+    if (s2) s2.textContent = '완료';
+    toast('4대 공부로 채웠습니다' + (r.addr ? ' · ' + r.addr : ''));
+  }catch(e){ if (!quiet) busyOff(); if (st) st.textContent = ''; if (!quiet) toast('4대 공부를 불러오지 못했습니다'); }
+}
+/* 304 — 매물 글을 붙여넣으면 주소·4대 공부를 바로 찾아 넣는다 */
+function tfAutoFillProp(i, val){
+  const f = CUR && CUR.fields[i]; if (!f || !isPropLabel(f.label)) return false;
+  const t = String(val || '').trim();
+  if (t.length < 12 || !/(㎡|평|억|만원|매매|전세|월세|대지|임야)/.test(t)) return false;
+  if (f._gbTry === t || !window.KTS_GB) return false;
+  f._gbTry = t;
+  setTimeout(() => { tfGb(i, true); }, 60);
+  return true;
+}
+
 function syncValBar(){
   const b = $('#clearVals'); if (!b) return;
   const any = Object.keys(VALS).some(k => String(VALS[k] == null ? '' : VALS[k]).trim());
@@ -2684,6 +2741,8 @@ $('#valList').addEventListener('input', e => {
 $('#valList').addEventListener('change', e => {
   const dg = e.target.dataset.dg; if (dg){ setDateGroup(dg, e.target.value); return; }
   const i = e.target.dataset.f; if (i == null) return; const f = CUR.fields[+i];
+  /* 304 — 주소 칸에 매물 글을 붙여넣으면 곧바로 4대 공부 */
+  if (f.type === 'text' && isPropLabel(f.label)) tfAutoFillProp(+i, VALS[f.label]);
   if (f.type === 'number' || isNumMoney(f)){
     const raw = String(VALS[f.label] == null ? '' : VALS[f.label]).trim();
     if (raw && (/[억만천원]/.test(raw) || /[영일이삼사오육칠팔구십백조]/.test(raw))){
@@ -2706,6 +2765,8 @@ $('#valList').addEventListener('change', e => {
   }
 });
 $('#valList').addEventListener('click', e => {
+  const gb = e.target.closest('[data-gb]');
+  if (gb){ e.preventDefault(); tfGb(+gb.dataset.gb); return; }
   const sp = e.target.closest('[data-sp]');
   if (sp && CUR){
     const ta = sp.parentNode.parentNode.querySelector('textarea[data-f]');
@@ -3303,6 +3364,63 @@ $('#keyDel').onclick = () => { try{ localStorage.removeItem('kts_ai_key'); }catc
 /* ---------- ④ 미리보기(배경 + 값 얹기) ---------- */
 /* 명조 글꼴은 캔버스에서만 쓰므로, 그리기 전에 미리 받아 둔다(안 받으면 고딕으로 찍힘) */
 let OVFONT_P = null;
+/* 304 — 교환계약서 갑·을의 세 칸(평가액·승계채무액·순가액)을 지우고 '내  용' 한 칸을 그린다 */
+function tfPaperPrep(g, cv, form){
+  const pp = (form || CUR) && (form || CUR).paper; if (!pp) return;
+  (pp.patch || []).forEach(r => {
+    g.fillStyle = '#fff';
+    g.fillRect(r[0] / 100 * cv.width, r[1] / 100 * cv.height, r[2] / 100 * cv.width, r[3] / 100 * cv.height);
+  });
+  const fam = (pp.fam === 'serif')
+    ? '"Batang","바탕","Nanum Myeongjo","NanumMyeongjo","Noto Serif KR","Noto Serif CJK KR","AppleMyungjo","Gungsuh",serif'
+    : FONT;
+  const K = cv.width / 1489;
+  (pp.label || []).forEach(t => {
+    g.fillStyle = '#000'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '400 ' + ((t.fs || 24) * K).toFixed(1) + 'px ' + fam;
+    g.fillText(t.t, (t.x + t.w / 2) / 100 * cv.width, (t.y + t.h / 2) / 100 * cv.height);
+  });
+}
+/* 304 — 넓은 '내 용' 한 칸: 첫 줄 소재지, 아래 줄 4대 공부·가액을 칸 안에 앉힌다 */
+function tfStack(g, t, x, y, w, h, fs0, font, pad){
+  const paras = String(t == null ? '' : t).split('\n');
+  const segs = String(paras[0] || '').split(/\s*[·ㆍ|]\s*/).filter(Boolean);
+  const head = segs.shift() || '';
+  const det = segs.join(' · ') + (paras.length > 1 ? '\n' + paras.slice(1).join('\n') : '');
+  const avail = Math.max(10, w - pad * 2);
+  const setFs = s => { g.font = '400 ' + s.toFixed(1) + 'px ' + font; };
+  let f1 = Math.max(8, fs0); setFs(f1);
+  while (f1 > 8 && g.measureText(head).width > avail){ f1 -= .5; setFs(f1); }
+  let f2 = Math.max(7, f1 * 0.78), dl = [];
+  if (det){
+    for (let k = 0; k < 80; k++){
+      setFs(f2); dl = wrapText(g, det, avail);
+      const need = f1 * 1.08 + dl.length * f2 * 1.2;
+      if (dl.length <= 3 && need <= h - pad * 0.4) break;
+      if (f2 <= 7){ dl = dl.slice(0, 3); break; }
+      f2 = Math.max(7, f2 - .4);
+    }
+  }
+  const lh1 = f1 * 1.08, lh2 = f2 * 1.2;
+  const tot = lh1 + (dl.length ? dl.length * lh2 : 0);
+  const top = y + Math.max(0.5, (h - tot) / 2);
+  g.save();
+  g.beginPath(); g.rect(x + .5, y + .5, Math.max(2, w - 1), Math.max(2, h - 1)); g.clip();
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#000';
+  setFs(f1); g.fillText(head, x + pad, top + f1 * 0.82);
+  if (dl.length){ setFs(f2); dl.forEach((ln, i) => g.fillText(ln, x + pad, top + lh1 + (i + 1) * lh2 - lh2 * 0.22)); }
+  g.restore();
+}
+/* 304 — '내 용'에 가액(평가액·승계채무액·순가액)까지 함께 적는다 */
+function tfCombo(f, t){
+  const pre = /^갑/.test(f.label || '') ? '갑 ' : (/^을/.test(f.label || '') ? '을 ' : '');
+  if (!pre) return t;
+  const num = k => { const n = parseKorAmount(VALS[pre + k]); return isFinite(n) ? n : 0; };
+  const ev = num('평가액'), dt = num('승계채무액');
+  if (!ev && !dt) return t;
+  const line = '평가액 ' + fmtNum(ev) + '원 · 승계채무액 ' + fmtNum(dt) + '원 · 순가액 ' + fmtNum(Math.max(0, ev - dt)) + '원';
+  return t ? (t + '\n' + line) : line;
+}
 function ensureOvFont(){
   if (!OVFONT_P){
     OVFONT_P = (document.fonts && document.fonts.load)
@@ -3375,6 +3493,7 @@ async function composite(maxW, pg){
   const W = IM ? (IM.naturalWidth || IM.width) : bgW(), H = IM ? (IM.naturalHeight || IM.height) : bgH(), s = maxW ? Math.min(2, maxW / W) : Math.max(1, 1588 / W);
   const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
   const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
+  try{ tfPaperPrep(g, cv); }catch(e){}         /* 304 — 세 칸을 지우고 '내  용' 한 칸 */
   /* 그림·로고·도장 지운 자리 — 종이 배경부터 깨끗하게 지우고 그 위에 값을 올린다 */
   for (const f of CUR.fields){
     if (f.page && f.page !== pg) continue;
@@ -3390,6 +3509,7 @@ async function composite(maxW, pg){
   const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.78, cv.width * 0.046);
   for (const f of CUR.fields){
     if (f.type === 'erase') continue;
+    if (f.nop) continue;                      /* 304 — 값만 받고 종이에는 안 찍는 칸(가액 3칸) */
     if (f.page && f.page !== pg) continue;
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     const v = VALS[f.label]; if (v == null || v === '') continue;
@@ -3398,6 +3518,11 @@ async function composite(maxW, pg){
       const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
     }
     const t = shown(f);
+    /* 304 — 교환 '내 용' 넓은 칸: 소재지 + 4대 공부 + 가액을 칸 안에 앉힌다 */
+    if (f.stack){
+      tfStack(g, tfCombo(f, t), x, y, w, h, 26 * (cv.width / 1489), OVF, Math.max(2, 4 * cv.width / 1489));
+      continue;
+    }
     const ink = tfInkFor(IMLINES, f, cv.height);
     const medH = (IMLINES.med || 0.02) * cv.height;
     const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
