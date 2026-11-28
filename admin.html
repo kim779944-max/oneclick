@@ -51,7 +51,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
   padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#DCE6F2;margin:8px 0 0;line-height:1.7}
 .note{font-size:10.5px;color:#7C8DA6;line-height:1.65;margin:8px 0 0;word-break:keep-all}
 .pin{display:flex;gap:60px;justify-content:center;margin-top:14px}
-/* ---------- 방문자 현황판 (267번 · 2026-11-28) ---------- */
+/* ---------- 방문자 현황판 ---------- */
 .vhd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:2px 0 8px}
 .vhd .vs{border:1px solid #1E2C4A;border-radius:11px;background:#0B1729;padding:8px 9px}
 .vhd .vs span{display:block;font-size:10px;font-weight:800;color:var(--gray)}
@@ -84,7 +84,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
 </div>
 
 <script src="master.js?v=20261121k"></script>
-<script src="pay.js?v=20261124d"></script>
+<script src="pay.js?v=20261128a"></script>
 <script src="shared/visit.js?v=20261128a"></script>
 <script>
 (function(){
@@ -250,7 +250,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
       var body = '[KTS 계좌] ' + t + ' — pay-config.js 에 넣어 주세요(사이트 전체 적용).';
       location.href = 'sms:01020022899?body=' + encodeURIComponent(body);
     };
-    /* ---------- ④ 방문자 현황 (267번) ---------- */
+    /* ---------- ④ 방문자 현황 ---------- */
     var vb = document.getElementById('vLoad');
     if (vb) vb.onclick = function(){ vLoad(true); };
     var vc = document.getElementById('vClear');

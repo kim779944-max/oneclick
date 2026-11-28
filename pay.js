@@ -1,14 +1,14 @@
 /* =============================================================================
    KTS 원클릭 — 수익 구조 안내 (결제 단계) · 2026-11-24
    -----------------------------------------------------------------------------
-   대표님 확정 원칙 그대로만 담았습니다.
+   지켜야 할 선만 담았습니다.
    · 가격은 부가세 별도가 원칙이되, 화면 가격표에는 '부가세 별도'를 쓰지 않고
      이 결제 단계(이 시트)에서 공급가·부가세·입금액으로 자연스럽게 보여 줍니다.
    · 결제수단은 ① 크몽·스마트스토어(플랫폼 결제) ② 계좌이체 ③ 이용권 코드.
      카드 PG 직접 결제는 없습니다 — 없는 결제수단을 만들지 않습니다.
    · 이용권 코드는 문자로 받은 KS+YYMM-4자리, 그 달에만 열립니다(이 기기에서 확인).
    · 돈 이야기는 여기(결제 단계) 안에서만. 도구 화면에는 [그 이상 쓰기] 버튼만.
-   · 계좌 정보는 대표님이 채우는 3칸(은행·계좌번호·예금주)입니다. 코드가 지어내지
+   · 계좌 정보는 채워 넣는 3칸(은행·계좌번호·예금주)입니다. 코드가 지어내지
      않습니다. 비어 있으면 시트는 '계좌 미설정' 상태로 문자 안내로 바뀝니다.
      채우는 길은 둘 — ① admin.html 에서 3칸 저장(이 기기에 바로) ② pay-config.js
      한 줄을 커밋(모든 손님 기기에 적용). 읽는 순서도 그 순서입니다.
@@ -16,7 +16,7 @@
 (function (w, d) {
   'use strict';
 
-  /* ---------- 대표님이 채우실 자리: 은행 · 계좌번호 · 예금주 3칸 ----------
+  /* ---------- 계좌 3칸(은행 · 계좌번호 · 예금주) ----------
      읽는 순서
        ① admin.html 에서 저장한 값 → 이 기기 localStorage (kts_pay_account_v1)
        ② pay-config.js 의 window.KTS_PAY_ACCOUNT → 사이트 전체(모든 손님 기기)
@@ -34,7 +34,7 @@
   /* pay-config.js 위치 — 이 파일과 같은 폴더 */
   var SELF = (function () { try { return (d.currentScript && d.currentScript.src) || ''; } catch (e) { return ''; } })();
   var BASE = SELF ? SELF.replace(/pay\.js(\?.*)?$/, '') : '';
-  var CFG_SRC = SELF ? BASE + 'pay-config.js?v=20261124a' : '';
+  var CFG_SRC = SELF ? BASE + 'pay-config.js?v=20261128a' : '';
 
   function clean(v) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
   function pick(a) { a = a || {}; return { bank: clean(a.bank), no: clean(a.no), holder: clean(a.holder) }; }
@@ -121,6 +121,8 @@
       '.kpay-sec .acct{margin:6px 0 4px;border:1px dashed #2E4370;border-radius:9px;padding:7px 9px;font-size:11px;color:#DCE6F2;line-height:1.75}' +
       '.kpay-sec .acct .k{color:#8FA1B8;display:inline-block;min-width:52px}' +
       '.kpay-sec .acct .v{font-weight:900;color:#FFC98F;word-break:break-all}' +
+      '.kpay-sec .acct .v.big{font-size:14px;letter-spacing:.2px}' +
+      '.kpay-sec .cp,.kpay-sec .acct .cp{margin-left:6px;border:1px solid rgba(255,162,77,.5);background:rgba(255,107,0,.12);color:#FFC98F;border-radius:7px;padding:2px 6px;font-family:inherit;font-size:10px;font-weight:900;cursor:pointer;vertical-align:1px}' +
       '.kpay-row{display:flex;gap:6px;margin-top:7px}' +
       '.kpay-row input{flex:1;min-width:0;box-sizing:border-box;background:#0B1729;border:1px solid #26375F;border-radius:10px;color:#F3F6FA;font-size:13px;padding:10px;font-family:inherit;text-transform:uppercase}' +
       '.kpay-b{display:flex;align-items:center;justify-content:center;border:0;border-radius:11px;padding:11px 12px;font-size:13px;font-weight:900;cursor:pointer;text-decoration:none;font-family:inherit;box-sizing:border-box;width:100%}' +
@@ -170,13 +172,35 @@
       (master() ? '<div class="ln" style="margin-top:6px;color:#FFA24D">계좌 미설정 — ' + (BASE ? '<a href="' + esc(BASE) + 'admin.html" style="color:#FFC98F">admin.html</a>' : 'admin.html') + ' 에서 3칸을 넣으면 여기에 바로 인쇄됩니다.</div>' : '');
     var box = ok ?
       '<div class="acct"><div><span class="k">은행</span> <span class="v">' + esc(a.bank) + '</span></div>' +
-      '<div><span class="k">계좌번호</span> <span class="v">' + esc(a.no) + '</span></div>' +
-      '<div><span class="k">예금주</span> <span class="v">' + esc(a.holder) + '</span></div></div>' : '';
+      '<div><span class="k">계좌번호</span> <span class="v big">' + esc(a.no) + '</span></div>' +
+      '<div><span class="k">예금주</span> <span class="v">' + esc(a.holder) + '</span></div></div>' +
+      '<div class="ln" style="margin-top:2px"><button type="button" class="cp" data-cp-acct="1">계좌 복사</button> <span style="color:#8FA1B8">은행 앱에 그대로 붙여 넣으시면 됩니다.</span></div>' : '';
     return '<div class="kpay-sec"><b class="t"><em>②</em>계좌이체</b>' + box + who +
       '<div class="ln" style="margin-top:6px"><b>입금자명</b>은 신청하신 성함 그대로 넣어 주세요. 다른 이름으로 넣으시면 확인이 늦어집니다.</div>' +
       '<div class="ln">입금하신 뒤 <b>[입금 알림]</b> 문자를 보내 주시면, 그 달 <b>이용권 코드</b>(KS+연월-4자리)를 문자로 보내 드립니다.</div>' +
       '<a class="kpay-b g" style="margin-top:7px" href="' + smsHref('[KTS 원클릭] ' + (opt.label || '이용권') + ' 입금했습니다. 입금자명: / 금액: ') + '">입금 알림 문자 보내기</a></div>';
   }
+
+  /* 계좌번호 복사 — 손님이 은행 앱에 그대로 붙여 넣게 */
+  function copyText(t){
+    try {
+      if (w.navigator && w.navigator.clipboard && w.navigator.clipboard.writeText) { w.navigator.clipboard.writeText(t); return true; }
+    } catch (e) {}
+    try {
+      var ta = d.createElement('textarea'); ta.value = t; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.left = '-9999px'; d.body.appendChild(ta); ta.select();
+      var okc = d.execCommand('copy'); d.body.removeChild(ta); return okc;
+    } catch (e) { return false; }
+  }
+  d.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-cp-acct]') : null;
+    if (!b) return;
+    e.preventDefault();
+    var cur = acct();
+    if (!has3(cur)) return;
+    var okc = copyText(cur.bank + ' ' + cur.no + ' ' + cur.holder);
+    toast(okc ? '계좌를 복사했습니다 — 은행 앱에 붙여 넣으세요' : '복사가 안 되면 계좌번호를 길게 눌러 복사하세요');
+  });
 
   /* 전체 결제 안내 시트 */
   function open(opt) {
@@ -192,11 +216,15 @@
     }
     var html =
       '<div class="kpay-hd"><b>결제 안내 · <i>' + esc(label) + '</i></b><button type="button" class="x" aria-label="닫기">✕</button></div>' +
-      '<p class="kpay-lead">이 화면에서는 카드 결제를 받지 않습니다. 아래 셋 중 편한 방법으로 쓰시면 됩니다.</p>' +
+      '<p class="kpay-lead">이용권 <b>하나</b>로 이번 달 도구를 다 씁니다. 내는 방법은 셋 — <b>카드</b>는 ①, 계좌는 ②, 이미 코드가 있으면 ③입니다.</p>' +
       amtHtml +
-      '<div class="kpay-sec"><b class="t"><em>①</em>크몽 · 스마트스토어에서 결제</b>' +
-      '<div class="ln">같은 상품이 <b>크몽</b>·<b>스마트스토어</b>에 올라와 있습니다. 그쪽에서 결제하시면 카드영수증·현금영수증이 그 자리에서 남습니다.</div>' +
-      '<div class="ln">결제 뒤 받으신 <b>이용권 코드</b>를 아래 ③에 넣으시면 이 화면에서 바로 열립니다.</div></div>' +
+      '<div class="kpay-sec"><b class="t"><em>✓</em>이용권 하나로 이번 달</b>' +
+      '<div class="ln">계약서·양식·매물장·4대 공부·경사도까지, 이번 달 내내 다시 뽑을 수 있습니다.</div>' +
+      '<div class="ln">서류 한 부 다시 만드시던 <b>30분</b>이 현장에서 <b>5초</b>로 줄어드는 셈입니다.</div></div>' +
+      '<div class="kpay-sec"><b class="t"><em>①</em>카드 결제 — 크몽</b>' +
+      '<div class="ln"><b>카드</b>로 내시려면 <b>크몽</b>에서 같은 상품을 결제하시면 됩니다. 카드영수증·현금영수증이 그 자리에서 발급됩니다.</div>' +
+      '<div class="ln">크몽에서 <b>‘KTS 원클릭’</b>을 검색하시면 나옵니다. 결제 뒤 받으신 <b>이용권 코드</b>를 ③에 넣으면 이 화면에서 바로 열립니다.</div>' +
+      '<div class="ln">스마트스토어에서도 같은 상품을 팝니다.</div></div>' +
       accountHtml({ label: label }) +
       '<div class="kpay-sec"><b class="t"><em>③</em>이용권 코드 넣기</b>' +
       '<div class="ln">문자로 받은 코드(KS+연월-4자리)를 넣으면 이번 달 이용권이 열립니다. 지난달 코드는 열리지 않습니다.</div>' +

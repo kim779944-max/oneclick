@@ -299,6 +299,9 @@ body[data-gate="cat"] .lnk{display:none}
   background:var(--k-panel-2);border:1px solid var(--k-line-2)}
 .tl .ti img{width:100%;height:100%;object-fit:cover;display:block}
 .tl .ti b{font-size:24px;color:var(--k-accent);line-height:1}
+.tl .ti svg{display:block;width:100%;height:100%}
+.row .ico svg{display:block;width:100%;height:100%}
+.row.big .ico svg{border-radius:11px}
 .tl .tn{display:block;width:100%;font-size:11px;font-weight:900;line-height:1.18;letter-spacing:-.4px;
   word-break:keep-all;overflow-wrap:anywhere;white-space:normal}
 .tl .tbd,.tl .tbox{position:absolute;font-style:normal;font-size:10px;font-weight:900;line-height:1.35;border-radius:999px;padding:1px 5px;letter-spacing:-.2px}
@@ -331,6 +334,21 @@ body[data-gate="cat"] .lnk{display:none}
 @media (max-width:339px){.h4 .tl{min-height:68px;padding:6px 2px}.h4 .tl .ti{width:36px;height:36px}.h4 .tl .tn{font-size:10px}}
 .h4 .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
 .h4none{margin:2px 4px 8px;font-size:11.5px;line-height:1.5;color:#8FA0B8}
+/* 2026-11-28 · 손님 입장 한 줄(상황→지금) + 결제 동선 한 줄 — 첫 화면에서 망설이지 않게 */
+.pitch{margin:12px 0 0;padding:11px 13px;border:1px solid rgba(255,107,0,.42);border-radius:14px;
+  background:linear-gradient(140deg,rgba(255,107,0,.14),rgba(255,255,255,.012) 66%)}
+.pitch .p1{margin:0;font-size:13.5px;font-weight:900;letter-spacing:-.4px;color:#fff;line-height:1.35;word-break:keep-all}
+.pitch .p2{margin:5px 0 0;font-size:11.5px;line-height:1.6;color:#C7D3E3;word-break:keep-all}
+.pitch .p2 b{color:#FFA24D}
+.paybar{display:flex;align-items:center;gap:9px;margin-top:10px;padding:9px 11px;border:1px solid var(--k-line);
+  border-radius:13px;background:var(--k-panel-2)}
+.paybar .t{flex:1;min-width:0}
+.paybar .t b{display:block;font-size:12px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.paybar .t span{display:block;margin-top:2px;font-size:10.5px;color:#93A4BC;line-height:1.45}
+.paybar button{flex:0 0 auto;min-height:44px;padding:0 12px;font-family:inherit;font-size:11.5px;font-weight:900;cursor:pointer;
+  border:1px solid rgba(255,162,77,.55);border-radius:11px;background:rgba(255,107,0,.12);color:#FFC98F}
+html[data-kts-theme="light"] .paybar .t b{color:var(--k-ink)}
+html[data-kts-theme="light"] .pitch .p1{color:var(--k-ink)}
 .hub{margin-top:10px;border:1px solid var(--k-line);border-radius:14px;background:rgba(255,255,255,.02)}
 .hub>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;min-height:48px;padding:0 12px;font-size:12.5px;font-weight:900;color:var(--k-ink)}
 .hub>summary::-webkit-details-marker{display:none}
@@ -401,10 +419,22 @@ body[data-gate="cat"] .lnk{display:none}
     <div id="boxStrip"></div>
   </div>
 
-  <!-- 2026-11-28 · 첫 화면: 1~4호 카드만 (1번 누르면 바로 열림) -->
+  <!-- 2026-11-28 · 손님 자리에서 한 줄 — 상황 → 지금 (기능 나열 아님) -->
+  <div class="pitch" id="pitch">
+    <p class="p1">현장에서 서류 만들다 사무실로 돌아가신 적, 있으시죠.</p>
+    <p class="p2">주소 하나, 받은 문자 하나 넣으면 <b>5초</b> — 설치·회원가입 없이 폰에서 바로. <b>먼저 무료</b>로 써 보세요.</p>
+  </div>
+
+  <!-- 첫 화면: 1~4호 카드 — 타일을 한 번 누르면 그 도구가 열립니다 -->
   <div id="home4" class="home4" aria-label="1~4호 도구 — 한 번 누르면 바로 열립니다"></div>
 
-  <!-- 그 밖의 도구 — 필요할 때만 펼침 (278번) -->
+  <!-- 결제 동선 한 줄 — 무엇으로 내는지 첫 화면에서 보이게 -->
+  <div class="paybar" id="payBar">
+    <span class="t"><b>쓸 때만 냅니다</b><span>이용권 1장으로 이번 달 내내 · 카드(크몽) · 계좌이체 · 코드</span></span>
+    <button type="button" id="payOpen">결제 안내</button>
+  </div>
+
+  <!-- 그 밖의 도구 — 필요할 때만 펼침 -->
   <details class="hub" id="hub">
     <summary><b>그 밖의 도구</b> <span>사업장 · 생활기록 · 준비 중</span></summary>
     <div class="hbd" id="hubBody"></div>
@@ -446,7 +476,7 @@ body[data-gate="cat"] .lnk{display:none}
 <script src="shared/kts-edge.js?v=20261124a"></script><!-- 173 내 메뉴 편집 — 아래 render() 가 첫 그림부터 저장값을 읽어야 해서 defer 없이 -->
 <script src="master.js?v=20261127a"></script>
 <script src="products.js?v=20261123c"></script>
-<script src="pay.js?v=20261124e"></script>
+<script src="pay.js?v=20261128a"></script>
 <script src="slots.js?v=20261124c"></script>
 <script src="status.js?v=20261121k"></script>
 <script>
@@ -484,9 +514,9 @@ var UNIT = {theform:'장', contract:'부', sign:'장', thedetail:'장', thescan:
   seller:'회', commerce:'회', keyword:'회'};
 
 /* 마인드맵(2026-11-23 확정 · 쓰는 순서 축)과 1:1 — K0612766940K-/output/서비스_마인드맵_20261123/쇼룸_버튼구조.md */
-/* 2026-11-24 대표님 최종 분류표(188번) — 01 부동산 중개 · 02 부동산 2 · 03 사업장 · 04 생활기록 (+준비 중 선반) */
-/* 255 (2026-11-27) 대표님 확정 1~4호 세트 흐름 — 1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션,
-   그 뒤에 사업장·생활기록·준비 중을 그대로 이어 붙인다(도구 하나도 빼지 않음). */
+/* 분류 — 1호 땅·공부 · 2호 계약·서명 · 3호 영업·매물 · 4호 옵션 · 사업장 · 생활기록 (+준비 중) */
+/* 1~4호 세트 흐름 — 1호 땅·공부 → 2호 계약·서명 → 3호 영업·매물 → 4호 옵션,
+   그 뒤에 사업장·생활기록·준비 중을 이어 붙인다(도구 하나도 빼지 않음). */
 var GROUPS = [
   {no:'01', cat:'set1', t:'1호 땅·공부',  s:'면적 · 경사도 · 4대 공부',                 ks:['land','area','slope','gongbu']},
   {no:'02', cat:'set2', t:'2호 계약·서명', s:'5초계약서 · 양식만들기 · 더싸인 · 더뷰',       ks:['contract','theform','sign','viewer']},
@@ -503,6 +533,57 @@ var CHIPS = [{c:'all', t:'전체'},{c:'set1', t:'1호 땅·공부'},{c:'set2', t
 var TILE_NM = {land:'1호 통합', area:'면적그리기', viewer:'더뷰', theform:'양식만들기', contract:'5초 계약서', sign:'더싸인', bizcard:'전자명함', listing:'매물장·포스터', realty:'매물수집기', exchange:'교환급매물', hogang:'경공매', redev:'재개발', loan:'사업자 대출', slope:'경사도', gongbu:'4대 공부'};
 var TILE_CAT = {set1:1, set2:1, set3:1, set4:1};
 var CHIP_KEY = 'kts_cat_chip';
+/* KTS 원클릭 — 도구 아이콘 한 벌
+   · 딥네이비 바탕 위에서 한눈에 알아보는 기능별 선명한 색
+   · 굵기 1.7~2.4 · 둥근 모서리(rx 2~3) · 캡 round 로 전부 같은 손맛
+   · viewBox 0 0 24 24 안쪽 1~23까지 꽉 채워 그림 (프레임 꽉 찬 비율)
+   · 외부 파일 없이 이 글자만으로 그려집니다(도구 설명·원리 없음) */
+var KSICO = {
+  /* ── 1호 땅·공부 ── */
+  land: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 6.4 9 3.6l6 2.8 6.4-2.8v13.2L15 19.6l-6-2.8-6.4 2.8z" fill="#123C66" stroke="#38BDF8" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 5.8a3.9 3.9 0 0 1 3.9 3.9c0 2.6-3.9 6.3-3.9 6.3S8.1 12.3 8.1 9.7A3.9 3.9 0 0 1 12 5.8z" fill="#FF7A1A"/><circle cx="12" cy="9.6" r="1.5" fill="#0A1224"/></svg>',
+  area: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 13.2h8.2v8.2H2.6z" fill="#0E3B5E" stroke="#38BDF8" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.6 13.2h8.2" stroke="#38BDF8" stroke-width="1.8"/><path d="M4.4 21.4 21.4 4.4" stroke="#FDE68A" stroke-width="2.6" stroke-linecap="round"/><path d="M12.6 11.2l2-2M15.4 8.4l2-2M9.8 14l2-2M18.2 5.6l2-2" stroke="#0A1224" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  slope: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 19.6 11.6 6.2l9.8 13.4z" fill="#34D399"/><path d="M5.8 19.6a6.2 6.2 0 0 1 3.6-5.4" stroke="#0A1224" stroke-width="1.8" stroke-linecap="round"/><circle cx="17.2" cy="15.4" r="2" fill="#FDE68A"/></svg>',
+  gongbu: '<svg viewBox="0 0 24 24" fill="none"><rect x="8.4" y="2.4" width="11.4" height="13.4" rx="2.2" fill="#7C3AED" opacity=".55"/><rect x="5.2" y="5.2" width="11.4" height="13.4" rx="2.2" fill="#8B5CF6" opacity=".8"/><rect x="2" y="8" width="11.4" height="13.4" rx="2.2" fill="#C4B5FD"/><path d="M4.8 12.2h5.8M4.8 15.4h5.8M4.8 18.6h3.6" stroke="#0A1224" stroke-width="1.7" stroke-linecap="round"/></svg>',
+  /* ── 2호 계약·서명 ── */
+  contract: '<svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="2.6" width="17.2" height="18.8" rx="2.6" fill="#22D3EE"/><path d="M6.4 7h10.2M6.4 10.8h10.2M6.4 14.4h5.8" stroke="#0A1224" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.4" cy="17.4" r="3.2" fill="#FF6B00"/><circle cx="16.4" cy="17.4" r="1.4" fill="#0A1224"/></svg>',
+  theform: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="3" width="18.8" height="18" rx="2.6" fill="#FBBF24"/><path d="M2.6 8.6h18.8M2.6 14.2h18.8M9.2 3v18M15.4 3v18" stroke="#0A1224" stroke-width="1.6"/><path d="M14.6 21.6l1.4-3.6 3 3z" fill="#0A1224"/></svg>',
+  sign: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 19.6c3 0 3.4-8.4 6-8.4s.8 6.4 3.8 6.4 2.6-4.6 4.6-4.6" stroke="#F472B6" stroke-width="2.6" stroke-linecap="round"/><path d="M17.4 2.8l3.8 3.8-7.6 7.6-4.4 1 1-4.4z" fill="#FDE68A"/><path d="M15.6 5.4l3 3" stroke="#0A1224" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  viewer: '<svg viewBox="0 0 24 24" fill="none"><path d="M2 12S5.8 5.4 12 5.4 22 12 22 12s-3.8 6.6-10 6.6S2 12 2 12z" fill="#60A5FA"/><circle cx="12" cy="12" r="3.8" fill="#0A1224"/><circle cx="12" cy="12" r="1.9" fill="#DBEAFE"/><path d="M12 2.4v1.6M4.2 4.6l1.2 1.2M19.8 4.6l1.2 1.2" stroke="#93C5FD" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  /* ── 3호 영업·매물 ── */
+  bizcard: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.2" y="5.6" width="19.6" height="12.8" rx="2.8" fill="#38BDF8"/><circle cx="8.2" cy="10.6" r="2.1" fill="#0A1224"/><path d="M5 16c.5-1.9 1.7-2.9 3.2-2.9s2.7 1 3.2 2.9" fill="#0A1224"/><path d="M13.8 10.2h5.4M13.8 13.4h4" stroke="#0A1224" stroke-width="1.7" stroke-linecap="round"/></svg>',
+  listing: '<svg viewBox="0 0 24 24" fill="none"><rect x="12.4" y="4.6" width="8.4" height="17" rx="2.2" fill="#FDBA74" opacity=".75"/><rect x="3.2" y="2.4" width="13.6" height="19.2" rx="2.4" fill="#FB923C"/><rect x="5.4" y="4.8" width="9.2" height="3.6" rx="1.1" fill="#0A1224"/><path d="M5.4 17.8l3.6-4 3 3 2.6-2.4v4.8H5.4z" fill="#0A1224"/></svg>',
+  realty: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 3.6h18.8l-7 8.6v6.6l-4.8 2.6v-9.2z" fill="#4ADE80"/><rect x="8.6" y="6.4" width="2.6" height="2.6" rx=".8" fill="#0A1224"/><rect x="12.4" y="6.4" width="2.6" height="2.6" rx=".8" fill="#0A1224"/></svg>',
+  exchange: '<svg viewBox="0 0 24 24" fill="none"><path d="M4.4 10.2a7.6 7.6 0 0 1 12.4-4.4" stroke="#C084FC" stroke-width="2.6" stroke-linecap="round"/><path d="M18.6 2.4l.6 4.4-4.4.4" fill="#C084FC"/><path d="M19.6 13.8a7.6 7.6 0 0 1-12.4 4.4" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/><path d="M5.4 21.6l-.6-4.4 4.4-.4" fill="#F59E0B"/></svg>',
+  /* ── 4호 옵션 ── */
+  hogang: '<svg viewBox="0 0 24 24" fill="none"><path d="M12.6 2.6l8.8 8.8-3 3-8.8-8.8z" fill="#F87171"/><path d="M10.6 8.6 2.8 16.4a2.2 2.2 0 0 0 0 3.1l1.7 1.7a2.2 2.2 0 0 0 3.1 0l7.8-7.8z" fill="#FCD34D"/></svg>',
+  redev: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="12.2" width="7.6" height="9.2" rx="1.8" fill="#FBBF24"/><rect x="11.8" y="6.4" width="7.6" height="15" rx="1.8" fill="#F59E0B"/><path d="M18.4 2.6v3.4M18.4 3h3.4" stroke="#FDE68A" stroke-width="1.8" stroke-linecap="round"/><path d="M4.8 15.4h3.2M4.8 18.4h3.2M14 9.6h3.2M14 12.8h3.2M14 16h3.2" stroke="#0A1224" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  loan: '<svg viewBox="0 0 24 24" fill="none"><circle cx="10.6" cy="13.4" r="7.6" fill="#34D399"/><path d="M7.2 9.8l1.9 7 1.5-5.2 1.5 5.2 1.9-7" stroke="#0A1224" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 5.4l2.6-2.6M19.2 2.8h2.2v2.2" stroke="#6EE7B7" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  /* ── 사업장 ── */
+  thedetail: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="2.8" fill="#1E3A8A"/><rect x="5" y="5" width="14" height="7.4" rx="1.6" fill="#FB923C"/><path d="M5 15.6h9.4M5 18.4h6.4" stroke="#93C5FD" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  seller: '<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.2 12 3l9 4.2v9.6L12 21 3 16.8z" fill="#F97316"/><path d="M3 7.2 12 11.4l9-4.2M12 11.4V21" stroke="#0A1224" stroke-width="1.7" stroke-linejoin="round"/><circle cx="19" cy="6.4" r="3.4" fill="#4ADE80"/></svg>',
+  commerce: '<svg viewBox="0 0 24 24" fill="none"><path d="M3.4 9.4h17.2l-1.4 11H4.8z" fill="#F472B6"/><path d="M8.2 9.4V7a3.8 3.8 0 0 1 7.6 0v2.4" stroke="#F9A8D4" stroke-width="2.2" stroke-linecap="round"/><circle cx="9.4" cy="14" r="1.3" fill="#0A1224"/><circle cx="14.6" cy="14" r="1.3" fill="#0A1224"/></svg>',
+  keyword: '<svg viewBox="0 0 24 24" fill="none"><circle cx="10.2" cy="10.2" r="7" fill="#0C4A6E" stroke="#38BDF8" stroke-width="2"/><path d="M15.4 15.4 21 21" stroke="#38BDF8" stroke-width="2.6" stroke-linecap="round"/><path d="M7.6 7.4l2 5.6 2-4 2 4 2-5.6" stroke="#FDE68A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  sale: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 3.4h8.8L21.8 13.8 13.8 21.8 2.6 10.6z" fill="#EF4444"/><circle cx="7.2" cy="8.2" r="1.7" fill="#FDE68A"/><path d="M12.4 10.6l3.6 3.6M16 10.6l-3.6 3.6" stroke="#FDE68A" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  gagebu: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="2.6" width="18" height="18.8" rx="2.6" fill="#0EA5E9"/><rect x="6" y="5.6" width="12" height="4.6" rx="1.4" fill="#0A1224"/><path d="M7.4 13.4h2.4M12.2 13.4h2.4M16.8 13.4h1.8M7.4 17.6h2.4M12.2 17.6h2.4M16.8 17.6h1.8" stroke="#E0F2FE" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  interior: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="9.4" width="18" height="9.4" rx="2.6" fill="#A78BFA"/><rect x="5" y="6.6" width="14" height="4" rx="1.8" fill="#C4B5FD"/><path d="M6.4 18.8v2M17.6 18.8v2" stroke="#A78BFA" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  homepage: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.4" y="3.4" width="19.2" height="17.2" rx="2.6" fill="#0F766E"/><path d="M2.4 8.4h19.2" stroke="#5EEAD4" stroke-width="1.8"/><circle cx="5.4" cy="5.9" r="1" fill="#5EEAD4"/><circle cx="8.6" cy="5.9" r="1" fill="#5EEAD4"/><path d="M6 12h8M6 15.4h5" stroke="#99F6E4" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  thescan: '<svg viewBox="0 0 24 24" fill="none"><rect x="4.4" y="2.6" width="15.2" height="18.8" rx="2.2" fill="#E2E8F0"/><path d="M2 6.4V2.6h3.8M18.2 2.6H22v3.8M22 17.6v3.8h-3.8M5.8 21.4H2v-3.8" stroke="#22D3EE" stroke-width="2.2" stroke-linecap="round"/><path d="M7.8 8.4h8.4M7.8 12h8.4M7.8 15.6h5" stroke="#64748B" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  theeraser: '<svg viewBox="0 0 24 24" fill="none"><path d="M14.2 2.8 21.2 9.8 11 20H5.4l-2.6-2.6z" fill="#F9A8D4"/><path d="M9.6 7.4l7 7" stroke="#0A1224" stroke-width="1.8" stroke-linecap="round"/><path d="M2.6 20.4h18.8" stroke="#F472B6" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  /* ── 생활기록 ── */
+  organizer: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="2.6" width="8" height="8" rx="2.2" fill="#60A5FA"/><rect x="13.4" y="2.6" width="8" height="8" rx="2.2" fill="#FBBF24"/><rect x="2.6" y="13.4" width="8" height="8" rx="2.2" fill="#34D399"/><rect x="13.4" y="13.4" width="8" height="8" rx="2.2" fill="#F472B6"/></svg>',
+  saycap: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="6" width="14.8" height="12" rx="2.6" fill="#FB923C"/><circle cx="10" cy="12" r="3.4" fill="#0A1224"/><circle cx="10" cy="12" r="1.5" fill="#FDBA74"/><path d="M15 4.2h6.4v6.6H18l-2.4 2.2V10.8H15z" fill="#4ADE80"/></svg>',
+  navi: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.4" fill="#1D4ED8"/><path d="M15.8 8.2l-2.4 6-5.4 1.6 2.4-6z" fill="#FDE68A"/><circle cx="12" cy="12" r="1.1" fill="#0A1224"/></svg>',
+  golf: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 20.4c3.6-2.6 7.2-2.6 10.8 0 3.6 2.6 7.2 2.6 8 2.6H2.6z" fill="#22C55E" transform="translate(0,-2)"/><path d="M9 3.4v14.2" stroke="#E2E8F0" stroke-width="2.2" stroke-linecap="round"/><path d="M9.6 4.2 16.6 6.6 9.6 9z" fill="#EF4444"/><circle cx="15.4" cy="17.4" r="1.6" fill="#F8FAFC"/></svg>',
+  petmind: '<svg viewBox="0 0 24 24" fill="none"><ellipse cx="7" cy="8.4" rx="2.2" ry="2.6" fill="#FBBF24"/><ellipse cx="12" cy="6.6" rx="2.2" ry="2.6" fill="#FBBF24"/><ellipse cx="17" cy="8.4" rx="2.2" ry="2.6" fill="#FBBF24"/><path d="M12 11.6c3.6 0 6.6 2.6 6.6 5.4 0 2.2-2.6 3.6-6.6 3.6s-6.6-1.4-6.6-3.6c0-2.8 3-5.4 6.6-5.4z" fill="#F59E0B"/></svg>',
+  tongyeok: '<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 5.4h10.8v7.4H7.6L4.4 15.6V12.8H2.6z" fill="#38BDF8"/><path d="M21.4 11.4H10.6v7.4h5.8l3.2 2.8v-2.8h1.8z" fill="#4ADE80"/></svg>',
+  /* ── 준비 중 ── */
+  append: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.4" fill="#1E3A8A"/><path d="M12 7.4v9.2M7.4 12h9.2" stroke="#FBBF24" stroke-width="2.8" stroke-linecap="round"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4.4" fill="#EF4444"/><path d="M10 9.2l5.4 3.2L10 15.6z" fill="#FFF7ED"/></svg>',
+  travel: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="14" rx="3" fill="#38BDF8"/><path d="M8.4 7V5.6A1.6 1.6 0 0 1 10 4h4a1.6 1.6 0 0 1 1.6 1.6V7" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round"/><path d="M3 12.6h18" stroke="#0A1224" stroke-width="1.8"/><circle cx="8" cy="19.6" r="1.4" fill="#0A1224"/><circle cx="16" cy="19.6" r="1.4" fill="#0A1224"/></svg>',
+  /* 그 밖(목록에만 있는 키) */
+  hwp: '<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="2.8" fill="#2563EB"/><path d="M6.6 8h10.8M6.6 12h10.8M6.6 16h6" stroke="#DBEAFE" stroke-width="1.9" stroke-linecap="round"/></svg>'
+};
+
 /* 대표 3종 — 강조용 복제(목록 완전성 검사에서 제외) */
 var FEATURED = [
   {k:'listing', one:'매물 하나가 영업하는 홈페이지가 됩니다'},
@@ -511,6 +592,14 @@ var FEATURED = [
 ];
 window.__KTS_GROUPS = GROUPS;  /* 읽기 전용 노출 — 목록 완전성 검사용 */
 
+/* 도구 하나에 색 있는 그림 하나 — KSICO 가 있으면 그것,
+   없으면 예전 썸네일(icon) → 마지막으로 글자(ico). 틀 크기에 꽉 차게 그립니다. */
+function icoOf(k, t){
+  if (window.KSICO && KSICO[k]) return KSICO[k];
+  t = t || {};
+  if (t.icon) return '<img src="' + t.icon + '" alt="" loading="lazy">';
+  return '<b>' + (t.ico || '·') + '</b>';
+}
 function byK(k){
   var p = (window.PRODUCTS||[]).filter(function(x){ return x.k===k; })[0];
   if (p) return {k:k, nm:String(p.nm).split(' — ')[0], sub:p.sub||'', link:p.link||('detail.html?k='+k),
@@ -554,7 +643,7 @@ function tileOf(k){
   var nm = TILE_NM[k] || String(t.nm).split(' — ')[0];
   var mine = (!soon && window.KTS_KEYS && KTS_KEYS.inBox(k)) ? '<i class="tbox">내 박스</i>' : '';
   var bd = soon ? '<i class="tbd soon">준비중</i>' : (t.badge ? '<i class="tbd">' + t.badge + '</i>' : '');
-  var icon = '<span class="ti">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : '<b>' + (t.ico || '·') + '</b>') + bd + mine + '</span>';
+  var icon = '<span class="ti">' + icoOf(k, t) + bd + mine + '</span>';
   return soon
     ? '<button type="button" class="tl soon" data-k="' + k + '" disabled aria-disabled="true">' + icon + '<span class="tn">' + nm + '</span></button>'
     : '<button type="button" class="tl" data-k="' + k + '" data-open="' + k + '" aria-label="' + nm + ' 열기">' + icon + '<span class="tn">' + nm + '</span></button>';
@@ -572,7 +661,7 @@ function rowOf(k){
            : (t.local ? '<div class="main" data-open="' + k + '" style="cursor:pointer">' + inner + '</div>'
                       : '<a class="main" href="detail.html?k=' + encodeURIComponent(k) + '">' + inner + '</a>');
   return '<div class="row' + (soon ? ' soon' : '') + '" data-k="' + k + '"' + (soon ? ' aria-disabled="true"' : '') + '>' +
-    '<div class="ico">' + (t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy">' : (t.ico || '·')) + '</div>' +
+    '<div class="ico">' + icoOf(k, t) + '</div>' +
     main +
     '<div class="act">' + mine +
       (soon ? '<button class="go soonb" type="button" disabled>준비 중</button>'
@@ -604,7 +693,7 @@ function render(){
 }
 
 /* ============================================================================
-   2026-11-28 · 첫 화면 = 1~4호 카드만 (278 · 대표님 "쇼룸 처음 들어가는 것도 복잡해")
+   첫 화면 = 1~4호 카드만 — 들어가자마자 복잡하지 않게
    카드 안의 타일을 한 번 누르면 그 도구가 바로 열립니다(1번 터치 실행).
    사업장·생활기록·준비 중은 아래 [그 밖의 도구] 접기 안으로 내립니다.
    ========================================================================== */
@@ -633,7 +722,7 @@ function renderHub(menu){
   box.innerHTML = html || '<p class="h4none">보여 드릴 도구가 없습니다.</p>';
 }
 
-/* land/ 은 트랙1이 새로 올리는 통합 앱 — 첫 화면에서는 미리 찌르지 않고(콘솔 404 0건),
+/* land/ 은 통합 앱 — 첫 화면에서는 미리 찌르지 않고(콘솔 404 0건),
    누를 때 있는지 확인한 뒤 엽니다. 아직 없으면 '준비 중' 안내만 하고 끝냅니다. */
 (function(){
   var KEY = 'kts_land_ok_v1';
@@ -780,6 +869,14 @@ $('#helpBtn2').onclick = function(){
 $('#menuBtn').onclick = openMenu;
 $('#cpnBtn').onclick = showCoupon;
 /* 수익 구조: 이용권 코드 + 계좌이체 안내 (pay.js) — 결제 단계에서만 금액·부가세를 보입니다 */
+/* 결제 동선 한 줄(첫 화면) — 누르면 결제 안내 시트 */
+(function(){
+  var b = $('#payOpen'); if (!b) return;
+  b.onclick = function(){
+    if (window.KTSPay) { KTSPay.open({label:'이용권 · 열쇠'}); return; }
+    location.href = 'admin.html';
+  };
+})();
 (function(){
   var b = $('#payNoteBtn'); if (!b) return;
   b.onclick = function(){
