@@ -3496,6 +3496,8 @@ function zEditStart(k){
   if (!bar || !inp) return;
   const long = !!(f.multi || f.h >= 3.2);
   bar.hidden = false;
+  if (inp) inp.dataset.fid = String(k);
+  if (ta) ta.dataset.fid = String(k);
   lab.textContent = f.label || '칸';
   if (ta) ta.hidden = !long;
   inp.hidden = long;
@@ -3519,14 +3521,16 @@ function zPollStart(){
   Z_POLL = setInterval(() => {
     const el = $('#zEditIn'), ta = $('#zEditTa');
     const act = (ta && !ta.hidden) ? ta : el;
-    if (!act || ZEDIT < 0) return;
+    if (!act || !act.dataset || act.dataset.fid == null) return;
     const v = String(act.value == null ? '' : act.value);
     if (v !== Z_LAST){ zEditInput(act); }
   }, 350);
 }
 function zPollStop(){ clearInterval(Z_POLL); Z_POLL = 0; }
 function zEditInput(el){
-  const f = CUR && CUR.fields[ZEDIT]; if (!f) return;
+  const k = (el && el.dataset && el.dataset.fid != null) ? +el.dataset.fid : ZEDIT;
+  const f = CUR && CUR.fields[k]; if (!f) return;
+  ZEDIT = k;
   Z_LAST = String(el.value == null ? '' : el.value);
   let v = String(el.value == null ? '' : el.value);
   if (isNumMoney(f) || f.type === 'number'){

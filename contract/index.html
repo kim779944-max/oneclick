@@ -1363,6 +1363,8 @@ function pvEditStart(fid){
   const isDate = !!grp;
   const long = !isDate && !!(f.multi || f.top || f.h >= 4);
   bar.hidden = false;
+  if (inp) inp.dataset.fid = fid;
+  if (ta) ta.dataset.fid = fid;
   lab.textContent = isDate ? (grp.k + ' (달력)') : LBL(f);
   if (ta){ ta.hidden = !long; }
   inp.hidden = long;
@@ -1386,7 +1388,7 @@ function pvPollStart(){
   PV_POLL = setInterval(() => {
     const el = $('#pveIn'), ta = $('#pveTa');
     const act = (ta && !ta.hidden) ? ta : el;
-    if (!act || !PVEDIT) return;
+    if (!act || !act.dataset || !act.dataset.fid) return;
     const v = String(act.value == null ? '' : act.value);
     if (v !== PV_LAST){ pvEditInput(act); }
   }, 350);
@@ -1406,7 +1408,9 @@ async function pvRefreshPage(pg, now){
   if (now) await run(); else PVREFRESH = setTimeout(run, 260);
 }
 function pvEditInput(el){
-  const f = byId(PVEDit); if (!f) return;
+  const fid = (el && el.dataset && el.dataset.fid) || PVEDIT;
+  const f = byId(fid); if (!f) return;
+  PVEDIT = fid;
   PV_LAST = String(el.value == null ? '' : el.value);
   const raw = el.value;
   if (f.dg || (isDateGrouped(f) && !f.money)){
@@ -1427,7 +1431,9 @@ function pvEditInput(el){
   pvRefreshPage(pvPageOf(PVEDit));
 }
 function pvEditNext(){
-  const f = byId(PVEDit); if (!f) return;
+  const inp = $('#pveIn'), ta = $('#pveTa');
+  const fid = (inp && inp.dataset && inp.dataset.fid) || (ta && ta.dataset && ta.dataset.fid) || PVEDIT;
+  const f = byId(fid); if (!f) return;
   const pg = f.page || 1;
   const list = curForm().fields.filter(x => (x.page || 1) === pg && x.type !== 'sign' && !/특약/.test(LBL(x)));
   const i = list.findIndex(x => x.id === f.id);
