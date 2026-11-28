@@ -923,7 +923,7 @@ function bldDetailTable(it){
   h.push(r('주차대수',cnt(it.totPkngCnt)+'대','승강기','승용 '+cnt(it.riderUtcnt)+' · 비상 '+cnt(it.emerUtcnt)));
   h.push(r('주차(자주식)','실내 '+cnt(it.indrAutoUtcnt)+' / 실외 '+cnt(it.oudrAutoUtcnt),'주차(기계식)','실내 '+cnt(it.indrMechUtcnt)+' / 실외 '+cnt(it.oudrMechUtcnt)));
   h.push(r('허가일',it.pmsDay||it.archPermitDay||'—','착공일',it.stcnsDay||'—'));
-  h.push(r('사용승인일',it.useAprDay||'—','위반건축물',viol||'—',/해당\\s*없/.test(viol)?'':'hi'));
+  h.push(r('사용승인일',it.useAprDay||'—','위반건축물',viol||'—',/해당\s*없/.test(viol)?'':'hi'));
   h.push('</tbody></table>');
   return h.join('');
 }
@@ -989,7 +989,7 @@ function paintPrice(){
   if(!p&&!c){ el.innerHTML=state('err','개별공시지가를 받지 못했습니다 · 잠시 뒤 다시 조회해 주세요.'); return }
   var unit=+(p.pblntfPclnd||c.pblntfPclnd||0), ar=+(t.lndpclAr||S.area||0);
   var yd='';
-  (S.use||[]).forEach(function(x){ var nm=String(x.nm||'').replace(/\\s+/g,''); if(/지역$/.test(nm)&&!yd) yd=x.nm });
+  (S.use||[]).forEach(function(x){ var nm=String(x.nm||'').replace(/\s+/g,''); if(/지역$/.test(nm)&&!yd) yd=x.nm });
   var h=['<div class="pbig" style="margin-bottom:4px"><b>'+num(unit)+'원/㎡</b><span>'
     +(p.stdrYear?(p.stdrYear+'년 기준'):'기준연도 미확인')+'</span></div>'];
   h.push('<table class="dt"><tbody>');
