@@ -99,16 +99,19 @@
     var me = p.me || {};
     var o = splitOrg(me);
     var hasPhoto = !!me.photo;
-    var h = '<div class="biz guest' + (hasPhoto ? '' : ' nophoto') + '">';
-    h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="QR 크게 보기"><canvas id="sealCv"></canvas></button>';
-    h += '<div class="biz-top">';
-    if (hasPhoto) h += '<div class="av has-photo"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
-    h += '<div class="who">';
+    /* 304번 — 그림(사진)을 명함의 주인공으로 크게. 도장은 빼고 QR만 코너 맨 구석에 */
+    var h = '<div class="biz guest hasphoto' + (hasPhoto ? '' : ' nophoto') + '">';
+    h += '<button class="biz-qr" id="btnSeal" type="button" aria-label="QR 크게 보기"><canvas id="sealCv"></canvas></button>';
+    h += '<div class="biz-hero">';
+    if (hasPhoto) h += '<img class="hero-img" src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진">';
+    else h += '<b class="hero-mono" aria-hidden="true">' + esc(String(me.name || '?').slice(0, 1)) + '</b>';
+    h += '<div class="hero-cap">';
     h += '<div class="co">' + esc(o.org || '전자명함') + '</div>';
     h += '<div class="nm">' + (o.title ? '<em>' + esc(o.title) + '</em> ' : '') + '<b>' + esc(me.name || '이름') + '</b></div>';
     if (me.field) h += '<span class="role">' + esc(me.field) + '</span>';
     h += '</div></div>';
 
+    h += '<div class="biz-body">';
     h += '<div class="clines">';
     h += '<a class="cline tel" href="tel:' + esc(tel(me)) + '">' + ICON.phone + '<b>' + (me.phone ? esc(me.phone) : '전화번호') + '</b></a>';
     if (me.fax) h += '<div class="cline">' + ICON.fax + '<span>' + esc(me.fax) + '</span><i>FAX</i></div>';
@@ -118,6 +121,7 @@
 
     if (me.strength) h += '<div class="edge-line">' + ICON.spark + '<span>' + esc(me.strength) + '</span></div>';
     if (me.intro) h += '<p class="intro"><em>“</em>' + esc(me.intro) + '</p>';
+    h += '</div>';
     h += '</div>';
 
     h += strip(p, opts);
@@ -151,13 +155,15 @@
     if (cv && g.KTS && KTS.Seal) {
       var paint = function () {
         try {
-          KTS.Seal.paint(cv, opts.sealSize || 92, {
-            style: me.style || 'seal', shape: me.stamp || 'circle', name: me.name || '',
+          /* 304번 — 명함 위 QR은 테두리·도장 없이 깔끔하게(plain) */
+          KTS.Seal.paint(cv, opts.sealSize || 76, {
+            style: 'plain',
+            name: me.name || '',
             photo: me.photo || '', code: me.code || (p && p.n ? String(p.n) : ''),
             value: KTS.Seal.payload(me), onload: function () { paint(); }
           });
-          cv.style.width = (opts.sealSize || 92) + 'px';
-          cv.style.height = 'auto';
+          cv.style.width = '100%';
+          cv.style.height = '100%';
         } catch (e) { }
       };
       paint();

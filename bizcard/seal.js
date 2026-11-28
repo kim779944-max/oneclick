@@ -1,9 +1,10 @@
 /* ==========================================================================
    KTS 명함 QR — 세 가지 격(格)  (250 · 295 · 297번)
    --------------------------------------------------------------------------
-   ① 직인 도장 QR   style:'seal'  — 원형·사각·타원 도장 안에 QR (기본)
+   ① 직인 도장 QR   style:'seal'  — 원형·사각·타원 도장 안에 QR (인쇄용)
    ② 관공서 문서형   style:'gov'   — 굵은 정사각 틀 + 가운데 심볼 + 짧은 코드
    ③ 내 사진 QR     style:'photo' — 사진 가운데 초점, 바깥은 점점 흐려짐(radial fade)
+   ④ 깔끔 QR        style:'plain' — 테두리·도장 없이 QR만 (전자명함 기본 · 304번)
    --------------------------------------------------------------------------
    화면·명함 PNG·물건표 어디에 찍어도 스캔이 되도록
      ① 오류정정 H(30%) ② QR 둘레 흰 여백 ③ 기둥(파인더) 또렷 ④ 바탕 흰색 고정.
@@ -70,6 +71,7 @@
     return { W: S, H: H, qr: qr, cx: S / 2, cy: H / 2, shape: shape };
   }
   function geomOf(style, shape, S) {
+    if (style === 'plain') return { W: S, H: S, qr: Math.round(S * 0.94), cx: S / 2, cy: S / 2, style: style };
     if (style === 'gov') return { W: S, H: S, qr: Math.round(S * 0.60), cx: S / 2, cy: S / 2, style: style };
     if (style === 'photo') return { W: S, H: S, qr: Math.round(S * 0.46), cx: S / 2, cy: S / 2, style: style };
     return geom(shape, S);
@@ -216,6 +218,21 @@
     return G;
   }
 
+  /* ---------------- ④ 깔끔 QR — 테두리·도장·이름판 없이 QR만 (304번) ----------------
+     흰 바탕(스캔 여백) 위에 남색 모듈만. 둘레 선·도장 테두리를 두르지 않는다. */
+  function drawPlain(ctx, S, o) {
+    var color = o.color || NAVY;
+    var value = o.value || payload(o.me || {});
+    var q = makeQR(value, hasHangul(value));
+    var W = S, H = S;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    roundRect(ctx, 0, 0, W, H, Math.max(1, Math.round(S * 0.035))); ctx.fill();
+    var box = S * 0.94;
+    qrIn(ctx, q, W / 2, H / 2, box, color, false);
+    return { W: W, H: H, qr: box, cx: W / 2, cy: H / 2, style: 'plain' };
+  }
+
   /* ---------------- ② 관공서 문서형 — 굵은 정사각 틀 + 가운데 심볼 + 짧은 코드 ---------------- */
   function drawGov(ctx, S, o) {
     var color = o.color || NAVY;
@@ -351,17 +368,18 @@
   /* ---------------- 그리기 입구 ---------------- */
   function draw(ctx, S, o) {
     o = o || {};
-    var style = (o.style === 'gov' || o.style === 'photo') ? o.style : 'seal';
+    var style = (o.style === 'gov' || o.style === 'photo' || o.style === 'plain') ? o.style : 'seal';
     ctx.save();
     if (style === 'gov') drawGov(ctx, S, o);
     else if (style === 'photo') drawPhoto(ctx, S, o);
+    else if (style === 'plain') drawPlain(ctx, S, o);
     else drawSeal(ctx, S, o);
     ctx.restore();
     return geomOf(style, o.shape, S);
   }
 
   /* ---------------- 공개 API ---------------- */
-  function styleOf(o) { return (o && (o.style === 'gov' || o.style === 'photo')) ? o.style : 'seal'; }
+  function styleOf(o) { return (o && (o.style === 'gov' || o.style === 'photo' || o.style === 'plain')) ? o.style : 'seal'; }
 
   function paint(canvas, size, o) {
     var G = geomOf(styleOf(o), (o && o.shape) || 'circle', size);

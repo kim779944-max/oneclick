@@ -246,17 +246,20 @@
     var o = splitOrg(me);
     var tel = (me.phone || '').replace(/[^0-9+]/g, '');
     var hasPhoto = !!me.photo;
-    var h = '<div class="biz' + (hasPhoto ? '' : ' nophoto') + (guest ? ' guest' : '') + '">';
-    h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="직인 도장 QR 크게 보기"><canvas id="sealCv"></canvas></button>';
-    h += '<div class="biz-top">';
-    if (hasPhoto) h += '<div class="av has-photo"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
-    h += '<div class="who">';
+    /* 304번 — 그림(사진)을 명함의 주인공으로 크게. 도장은 빼고 QR만 코너 맨 구석에 */
+    var h = '<div class="biz hasphoto' + (hasPhoto ? '' : ' nophoto') + (guest ? ' guest' : '') + '">';
+    h += '<button class="biz-qr" id="btnSeal" type="button" aria-label="QR 크게 보기"><canvas id="sealCv"></canvas></button>';
+    h += '<div class="biz-hero">';
+    if (hasPhoto) h += '<img class="hero-img" src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진">';
+    else h += '<b class="hero-mono" aria-hidden="true">' + esc(String(me.name || '?').slice(0, 1)) + '</b>';
+    h += '<div class="hero-cap">';
     h += '<div class="co">' + esc(o.org || '전자명함') + '</div>';
     h += '<div class="nm">' + (o.title ? '<em>' + esc(o.title) + '</em> ' : '') + '<b>' + esc(me.name || '이름') + '</b></div>';
     if (me.field) h += '<span class="role">' + esc(me.field) + '</span>';
     h += '</div></div>';
 
     /* 연락 — 전화는 바로 누를 수 있게 가장 크게, 팩스·메일·주소는 한 줄씩 */
+    h += '<div class="biz-body">';
     h += '<div class="clines">';
     h += '<a class="cline tel" href="tel:' + esc(tel) + '">' + IC.phone + '<b>' + (me.phone ? esc(me.phone) : '전화번호를 넣어 주세요') + '</b></a>';
     if (me.fax) h += '<div class="cline">' + IC.fax + '<span>' + esc(me.fax) + '</span><i>FAX</i></div>';
@@ -281,7 +284,7 @@
       h += '<button class="pact" id="btnInbox" type="button">' + IC.bell + '<span>문의</span>' + (unreadCount() ? '<i class="cnt">' + unreadCount() + '</i>' : '') + '</button>';
     }
     h += '</div>';
-    h += '</div>';
+    h += '</div></div>';
     return h;
   }
 
@@ -321,7 +324,7 @@
     $('#btnSeal').addEventListener('click', openSeal);
     var bk = $('#btnKakao');
     if (bk) bk.addEventListener('click', function (e) { e.preventDefault(); openKakao(); });
-    paintSeal($('#sealCv'), 92);
+    paintSeal($('#sealCv'), 76);
 
     LS.set(K.seen, Date.now());
     updateBadge();
@@ -447,7 +450,8 @@
   function sealOpts(extra) {
     var me = S.me || {};
     var o = { shape: sealShape(), name: me.name || '', me: me,
-              style: me.style || 'seal', photo: me.photo || '',
+              style: (me.style === 'gov' || me.style === 'photo') ? me.style : 'plain',
+              photo: me.photo || '',
               code: me.slug ? String(me.slug) : (me.shortNo ? String(me.shortNo) : ''),
               value: (g.KTS && KTS.Seal) ? KTS.Seal.payload(me) : '' };
     if (extra) for (var k in extra) o[k] = extra[k];
@@ -455,14 +459,11 @@
   }
   function paintSeal(cv, size) {
     if (!cv || !g.KTS || !KTS.Seal) return;
-    /* 명함 위 QR은 세로가 길어지지 않게 — 타원은 가로를 줄여 높이를 92px 안에 맞춘다 */
-    var style = (S.me && S.me.style) || 'seal';
-    var s2 = (style === 'seal' && sealShape() === 'oval') ? Math.round(size * 0.76) : size;
+    /* 304번 — 명함 위 QR은 테두리·도장 없이 깔끔하게(plain), 크기는 칸에 맞춘다 */
     try {
-      KTS.Seal.paint(cv, s2, sealOpts({ onload: function () { paintSeal(cv, size); } }));
-      /* 화면에서는 CSS 크기로 — 캔버스 속성(기기 배율)이 그대로 쓰이면 도장이 커진다 */
-      cv.style.width = size + 'px';
-      cv.style.height = 'auto';
+      KTS.Seal.paint(cv, size, sealOpts({ style: 'plain' }));
+      cv.style.width = '100%';
+      cv.style.height = '100%';
     } catch (e) { }
   }
   function openSeal() {
@@ -472,8 +473,11 @@
     stage.innerHTML = '';
     var cv = document.createElement('canvas');
     stage.appendChild(cv);
-    try { KTS.Seal.paint(cv, w, sealOpts()) } catch (e) { stage.innerHTML = '<p class="tiny">QR을 만들지 못했습니다.</p>' }
-    $('#sealShape').textContent = '모양 바꾸기 (' + ({ circle: '원형', square: '사각', oval: '타원' })[sealShape()] + ')';
+    /* 명함 QR은 도장 없는 깔끔 QR — 관공서형·사진형을 골랐으면 그 격으로 크게 보여 준다 */
+    var st = (S.me && (S.me.style === 'gov' || S.me.style === 'photo')) ? S.me.style : 'plain';
+    try { KTS.Seal.paint(cv, w, sealOpts({ style: st })) } catch (e) { stage.innerHTML = '<p class="tiny">QR을 만들지 못했습니다.</p>' }
+    var sh = $('#sealShape');
+    if (sh) sh.style.display = 'none';
     box.hidden = false;
   }
   function closeSeal() { var b = $('#sealBox'); if (b) b.hidden = true; }
@@ -1786,11 +1790,12 @@
     h += field('kakao', '카톡 ID나 오픈채팅 주소 (선택)', me.kakao, '예) open.kakao.com/o/abcd');
     h += '</div>';
 
-    /* 명함 QR — 세 가지 격(直) 295·297번 */
-    h += '<div class="seal-set"><div class="ss-h"><b>명함 QR</b><em>명함·물건표에 찍히는 격</em></div>';
+    /* 명함 QR — 테두리 없는 깔끔 QR(기본) · 관공서형 · 사진형 (304번: 도장은 뺐다) */
+    h += '<div class="seal-set"><div class="ss-h"><b>명함 QR</b><em>명함 위 QR은 테두리 없는 깔끔 QR — 인쇄·확대용 격은 여기서</em></div>';
     h += '<div class="seal-styles" id="sealStyles">';
-    [['seal', '직인 도장', '도장 안에 QR'], ['gov', '관공서형', '굵은 틀·짧은 번호'], ['photo', '내 사진', '가운데 초점']].forEach(function (p2) {
-      h += '<button type="button" class="sl-btn' + ((me.style || 'seal') === p2[0] ? ' on' : '') + '" data-style="' + p2[0] + '">'
+    [['plain', '깔끔 QR', '테두리 없이'], ['gov', '관공서형', '굵은 틀·짧은 번호'], ['photo', '내 사진', '가운데 초점']].forEach(function (p2) {
+      var cur2 = (me.style === 'gov' || me.style === 'photo') ? me.style : 'plain';
+      h += '<button type="button" class="sl-btn' + (cur2 === p2[0] ? ' on' : '') + '" data-style="' + p2[0] + '">'
         + '<i class="sl-ico ' + p2[0] + '"></i><b>' + p2[1] + '</b><em>' + p2[2] + '</em></button>';
     });
     h += '</div>';
@@ -1835,9 +1840,9 @@
       cur.photo = ''; paintPv(); toast('사진을 지웠습니다 — 이름 첫 글자로 표시됩니다');
     });
 
-    /* QR 미리보기 — 모양·격·이름을 바꾸면 바로 다시 그린다 */
+    /* QR 미리보기 — 격·이름을 바꾸면 바로 다시 그린다 */
     var previewShape = sealShape();
-    var previewStyle = (me.style || 'seal');
+    var previewStyle = (me.style === 'gov' || me.style === 'photo') ? me.style : 'plain';
     function paintPreview() {
       var box = $('#sealPrev'); if (!box) return;
       box.innerHTML = '';

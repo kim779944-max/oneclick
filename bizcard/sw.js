@@ -1,5 +1,5 @@
 /* KTS 전자명함 · 매물장 — 오프라인에서도 명함이 열리게 (네트워크 우선, 없으면 캐시) */
-var CACHE = 'kts-bizcard-20261128e';
+var CACHE = 'kts-bizcard-20261128f';
 var SHELL = ['./', './index.html', './app.css', './app.js', './parse.js', './gongbu.js',
   './premium.js', './terrain.js', './realtx.js', './seal.js', './vendor/qrcode.js',
   './assistant.js', './guest.js', './shorturl.js', '../shared/profile-sync.js',
