@@ -742,7 +742,7 @@ function autoNetWorth(f){
 function renderPick(){
   $('#pickGrid').innerHTML = FORMS.map(f => `<div class="pk${f.id === S.form ? ' on' : ''}" data-pkrow="${escH(f.id)}">`
     + `<button type="button" class="nm" data-form="${escH(f.id)}">${escH(f.name)}</button>`
-    + `<button type="button" class="zm" data-pkz="${escH(f.id)}" aria-label="${escH(f.name)} 크게 미리보기" title="크게 보기">🔍</button></div>`).join('');
+    + `<button type="button" class="zm" data-pkz="${escH(f.id)}" aria-label="${escH(f.name)} 미리보기" title="원본 양식 미리보기">미리보기</button></div>`).join('');
   $('#legalTop').textContent = curForm().legal || '';
   renderThemeChips();
 }
@@ -2067,13 +2067,13 @@ document.addEventListener('input', e => {
         }
       }
       if (f.kor) setV(f.kor, korNum(n));
-      if (/평가액|승계채무액/.test(LBL(f))) autoNetWorth(f);
     } else {
       v = raw;
       if (kor) kor.textContent = (complete || !raw) ? '' : '금액을 마저 적어 주세요 (예: 28억)';
     }
   }
   setV(fid, v);
+  if ((f.money || isKorMoneyField(f)) && /평가액|승계채무액/.test(LBL(f))) autoNetWorth(f);
   if (S.step === 1 && (f.dg || isDateField(f))) markDates();
   if (S.step === 2) renderPreview();
 });
