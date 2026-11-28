@@ -358,7 +358,7 @@
     x.save();
     x.scale(dev / size, dev / size);
     x.fillStyle = '#ffffff';
-    rrect(x, 0, 0, size, size, size * 0.10); x.fill();
+    rrect(x, 0, 0, size, size, size * 0.035); x.fill();
     x.restore();
     var n = q.getModuleCount(), QZ = 3;
     var mDev = Math.max(1, Math.floor(dev / (n + QZ * 2)));
