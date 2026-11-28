@@ -1349,7 +1349,7 @@ function pvBuildPages(blank){
   }).join('');
 }
 function pvClose(){ const m = $('#pvModal'); if (!m) return; m.classList.remove('on'); m.setAttribute('aria-hidden', 'true');
-  const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; }
+  const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop(); }
 function pvHotMark(fid){
   $$('#pvmBody .hot').forEach(b => b.classList.toggle('on', b.dataset.hot === fid));
 }
@@ -1374,11 +1374,24 @@ function pvEditStart(fid){
     else { inp.type = 'text'; inp.inputMode = ''; inp.value = getV(f.id) || ''; }
     try{ inp.focus(); if (inp.select && inp.type !== 'date') inp.select(); }catch(e){}
   }
+  PV_LAST = String((long ? (ta ? ta.value : '') : (inp.value == null ? '' : inp.value)));
+  pvPollStart();
   pvHotMark(fid);
   const hit = document.querySelector(`#pvmBody .hot[data-hot="${fid}"]`);
   if (hit) try{ hit.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){ hit.scrollIntoView(); }
 }
-let PVREFRESH = 0;
+let PVREFRESH = 0, PV_LAST = '', PV_POLL = 0;
+function pvPollStart(){
+  clearInterval(PV_POLL);
+  PV_POLL = setInterval(() => {
+    const el = $('#pveIn'), ta = $('#pveTa');
+    const act = (ta && !ta.hidden) ? ta : el;
+    if (!act || !PVEDIT) return;
+    const v = String(act.value == null ? '' : act.value);
+    if (v !== PV_LAST){ pvEditInput(act); }
+  }, 350);
+}
+function pvPollStop(){ clearInterval(PV_POLL); PV_POLL = 0; }
 async function pvRefreshPage(pg, now){
   if (!PVPAGES[pg - 1]) return;
   clearTimeout(PVREFRESH);
@@ -1393,11 +1406,8 @@ async function pvRefreshPage(pg, now){
   if (now) await run(); else PVREFRESH = setTimeout(run, 260);
 }
 function pvEditInput(el){
-  window.__pvinfo = { pvedit: PVEDIT, found: !!byId(PVEDit) };
-  try{ pvEditInput2(el); }catch(err){ window.__pverr = String((err && err.stack) || err); }
-}
-function pvEditInput2(el){
   const f = byId(PVEDit); if (!f) return;
+  PV_LAST = String(el.value == null ? '' : el.value);
   const raw = el.value;
   if (f.dg || (isDateGrouped(f) && !f.money)){
     /* 달력 — 고른 날짜를 년·월·일 세 칸에 나눠 넣는다 */
@@ -2144,7 +2154,7 @@ document.addEventListener('click', e => {
   const hot = e.target.closest('.hot');
   if (hot && hot.dataset.hot != null){ e.preventDefault(); pvEditStart(hot.dataset.hot); return; }
   if (e.target.closest('#pveNext')){ e.preventDefault(); pvEditNext(); return; }
-  if (e.target.closest('#pveDone')){ e.preventDefault(); const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvHotMark(''); return; }
+  if (e.target.closest('#pveDone')){ e.preventDefault(); const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop(); pvHotMark(''); return; }
   /* 288-⑩ 특약 — 목록 안에서 추가·수정·삭제 */
   if (e.target.closest('#spAddOpen')){
     e.preventDefault();

@@ -3507,12 +3507,27 @@ function zEditStart(k){
     if (isNumMoney(f)) inp.inputMode = 'numeric';
     try{ inp.focus(); if (inp.select && inp.type !== 'date') inp.select(); }catch(e){}
   }
+  Z_LAST = String((long ? (ta ? ta.value : '') : (inp.value == null ? '' : inp.value)));
+  zPollStart();
   zHotMark(k);
   const hit = document.querySelector(`#zBody .hot[data-zhot="${k}"]`);
   if (hit) try{ hit.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){ hit.scrollIntoView(); }
 }
+let Z_LAST = '', Z_POLL = 0;
+function zPollStart(){
+  clearInterval(Z_POLL);
+  Z_POLL = setInterval(() => {
+    const el = $('#zEditIn'), ta = $('#zEditTa');
+    const act = (ta && !ta.hidden) ? ta : el;
+    if (!act || ZEDIT < 0) return;
+    const v = String(act.value == null ? '' : act.value);
+    if (v !== Z_LAST){ zEditInput(act); }
+  }, 350);
+}
+function zPollStop(){ clearInterval(Z_POLL); Z_POLL = 0; }
 function zEditInput(el){
   const f = CUR && CUR.fields[ZEDIT]; if (!f) return;
+  Z_LAST = String(el.value == null ? '' : el.value);
   let v = String(el.value == null ? '' : el.value);
   if (isNumMoney(f) || f.type === 'number'){
     const n = parseKorAmount(v);
@@ -3571,7 +3586,7 @@ $('#zX2').onclick = zClose;
 document.addEventListener('click', e => {
   const hot = e.target.closest && e.target.closest('[data-zhot]');
   if (hot && hot.dataset.zhot != null){ e.preventDefault(); zEditStart(+hot.dataset.zhot); return; }
-  if (e.target.closest && e.target.closest('#zEditDone')){ const eb = $('#zEdit'); if (eb) eb.hidden = true; ZEDIT = -1; zHotMark(-1); return; }
+  if (e.target.closest && e.target.closest('#zEditDone')){ const eb = $('#zEdit'); if (eb) eb.hidden = true; ZEDIT = -1; zPollStop(); zHotMark(-1); return; }
   const z = e.target.closest && e.target.closest('[data-z]');
   if (z){
     const k = z.dataset.z;
