@@ -115,7 +115,41 @@
   }
 
   function cleanToken(t) {
-    return String(t || '').replace(/^[[(<{（「『"'·•▲▶■□\-–—*]+/, '').replace(/[\[\](){}（）「」『"'·•▲▶■□~,.;:!?]+$/, '');
+    var s = String(t || '');
+    /* 266번 — ● ○ ★ ◆ ◇ ※ ◎ ☎ ✓ ✔ ▸ ▹ ♣ ♠ ♥ ♦ 같은 장식 기호는 통째로 지운다.
+       (기호가 글자에 붙어 와도 「●가평군」→「가평군」처럼 남는다) */
+    try {
+      s = s.replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{20E3}]/gu, '');
+    } catch (e) {
+      s = s.replace(/[\u2600-\u27BF]/g, '');
+    }
+    s = s.replace(/[●○◎◯◉★☆✦✧✩✪◆◇◈※☎☏☜☞✓✔✕✖×▸▹▶▷►▻■□▪▫◼◾◻◽♣♠♥♦♤♡♧§¶†‡•‥…「」『』【】〔〕《》〈〉“”‘’"'`^*_=+|\\!?#%&$@]/g, '');
+    /* 앞뒤에 남은 괄호·쉼표·마침표만 정리(주소 안의 - 와 번지는 살린다) */
+    return s.replace(/^[[(<{（]+/, '').replace(/[\](){}）》,.;:!?]+$/, '').trim();
+  }
+
+  /* 266번 — 「삼회리599」·「가평군청평면삼회리599」처럼 붙여 쓴 주소를 낱말로 나눈다 */
+  function splitGlued(t, depth) {
+    depth = depth || 0;
+    if (depth > 4 || !t) return [t];
+    var m = t.match(/^([\uAC00-\uD7A3]{1,10}?(?:읍|면|동|리))(\d{1,5}(?:-\d{1,5})?)$/);
+    if (m) return [m[1]].concat(splitGlued(m[2], depth + 1));
+    var m2 = t.match(/^([\uAC00-\uD7A3]{2,8}?(?:시|군))(.+)$/);
+    if (m2 && /(읍|면|동|리|\d)/.test(m2[2])) return [m2[1]].concat(splitGlued(m2[2], depth + 1));
+    var m3 = t.match(/^([\uAC00-\uD7A3]{1,8}?(?:읍|면))([\uAC00-\uD7A3].*)$/);
+    if (m3) return [m3[1]].concat(splitGlued(m3[2], depth + 1));
+    return [t];
+  }
+
+  /* U-4 — [카톡]·open.kakao.com·www.… 처럼 적어도 열리게 보정 */
+  function normUrl(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!s) return '';
+    s = s.replace(/^[\[【(（]?\s*(카톡|카카오톡|카카오|kakao)\s*[\]】)）]?\s*[:：]?\s*/i, '').trim();
+    if (/^https?:\/\//i.test(s)) return s;
+    if (/^(open\.kakao\.com|pf\.kakao\.com|talk\.open\.kakao\.com|kakao\.com|www\.)/i.test(s)) return 'https://' + s;
+    if (/^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(s)) return 'https://' + s;
+    return s;   /* 아이디만 적은 경우는 그대로 */
   }
 
   /* 머리말 [발신자] · [한빛부동산] — 통째로 괄호에 싸인 맨 앞 토막은 이름표다.
@@ -132,7 +166,7 @@
       var t = cleanToken(raw);
       if (!t) return;
       if (isLabelTok(raw) && (i === 0 || NAME_STOP.test(t))) return;
-      out.push(t);
+      splitGlued(t).forEach(function (p) { if (p) out.push(p) });
     });
     return out;
   }
@@ -285,5 +319,5 @@
     };
   }
 
-  g.KTS_PARSE = { parse: parse, parseMoney: parseMoney, parseArea: parseArea, normAddr: normAddr };
+  g.KTS_PARSE = { parse: parse, parseMoney: parseMoney, parseArea: parseArea, normAddr: normAddr, normUrl: normUrl, cleanToken: cleanToken };
 })(window);

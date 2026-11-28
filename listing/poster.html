@@ -3,145 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>물건 포스터 — A4 한 장 (사진·4대 공부·입지·권리·실거래가) | KTS</title>
-<meta name="description" content="사진·4대 공부·입지정보·권리분석·주변 실거래가 5가지를 한 장에 자동 배치. 포스터 글자를 그 자리에서 고쳐 A4 인쇄·PNG 저장.">
-<meta name="theme-color" content="#0f1b2d">
+<title>물건표 · 프리미엄 1장 브리핑 (가로 16:9 · 세로 9:16) | KTS</title>
+<meta name="description" content="대표 사진·전체 제원·핵심 포인트·감동의 글·투자 조건을 한 장에. 가로 16:9 · 세로 9:16으로 바로 저장(PNG·PDF)하고 카톡·문자로 보냅니다.">
+<meta name="theme-color" content="#0B1526">
 <meta name="robots" content="noindex">
 <link rel="icon" href="../icon.png">
 <link rel="canonical" href="https://autooneclick.com/listing/poster.html">
-<link rel="stylesheet" href="../shared/kts-tokens.css">
-<link rel="stylesheet" href="../shared/kts-ui.css">
-<link rel="stylesheet" href="poster.css?v=20261127c">
+<link rel="stylesheet" href="poster.css?v=20261128a">
 </head>
 <body>
 
-<div class="bar">
-  <span class="brandicon" aria-hidden="true"><i></i><i></i><i></i></span>
-  <b>물건 포스터</b>
+<div class="topbar noprint">
+  <a class="back" href="./" aria-label="매물장으로">‹</a>
+  <b>물건표</b>
   <span class="sp"></span>
-  <a class="bar-btn" href="./">매물장</a>
+  <div class="oswitch" id="oswitch">
+    <button type="button" data-o="land" class="on">가로</button>
+    <button type="button" data-o="port">세로</button>
+  </div>
+  <button type="button" class="save" id="btnSave">저장</button>
+  <button type="button" class="dots" id="btnTools" aria-label="도구">⋯</button>
 </div>
 
-<main class="wrap">
-
-  <!-- ── 위: 입력·도구 ─────────────────────────────────────── -->
-  <section class="tools noprint">
-    <div class="tool-row">
-      <button type="button" class="btn or" id="btnPrint">A4 인쇄 · PDF</button>
-      <button type="button" class="btn" id="btnPng">PNG 저장</button>
-    </div>
-    <div class="tool-row">
-      <label class="file">사진 넣기<input type="file" id="ph" accept="image/*" multiple></label>
-      <button type="button" class="btn" id="btnSample">예시 물건</button>
-      <button type="button" class="btn" id="btnRealty">매물장에서 가져오기</button>
-      <button type="button" class="btn" id="btnShape">직인 모양</button>
-    </div>
-    <p class="hint"><b>포스터 안 글자를 그대로 눌러 고치세요.</b> 인쇄·저장 전에 현장에서 바로 고칠 수 있습니다. (제목·가격·4대 공부·입지·권리·실거래가 전부)</p>
-  </section>
-
-  <!-- ── 포스터 (A4 210×297) ─────────────────────────────── -->
-  <article id="poster" class="paper" aria-label="물건 포스터 A4">
-
-    <header class="p-top">
-      <div class="p-brand"><b>교환급매물</b><i>.com</i><span>부동산 1:1 맞교환 · 급매물 전문</span></div>
-      <div class="p-meta">
-        <span id="p-date" contenteditable="true">2026.11.27</span>
-        <span id="p-no" contenteditable="true">#260</span>
-      </div>
-    </header>
-
-    <div class="p-title">
-      <h1 id="p-title" contenteditable="true">가평 조종면 신하리 대지 300평</h1>
-      <p class="addr" id="p-addr" contenteditable="true">경기도 가평군 조종면 신하리 162-9 (도로접 · 평지)</p>
-      <div class="p-pricebox">
-        <b class="price" id="p-price" contenteditable="true">5억 2,000만</b>
-        <span class="pn" id="p-price-note" contenteditable="true">교환 가능 · 감정가 6억</span>
-      </div>
-    </div>
-
-    <!-- ① 사진 -->
-    <section class="p-photos" aria-label="① 사진">
-      <figure class="ph big"><img id="ph0" alt="현장 사진"><i class="tag">① 현장 사진</i></figure>
-      <figure class="ph"><img id="ph1" alt="사진 2"></figure>
-      <figure class="ph"><img id="ph2" alt="사진 3"></figure>
-    </section>
-
-    <section class="p-keys" aria-label="핵심 조건">
-      <div class="k"><span>매매가</span><b id="k1" contenteditable="true">8.2억</b></div>
-      <div class="k hot"><span>승계 대출</span><b id="k2" contenteditable="true">5.0억</b></div>
-      <div class="k red"><span>실투자금</span><b id="k3" contenteditable="true">3.2억</b></div>
-      <div class="k"><span>교환 조건</span><b id="k4" contenteditable="true">임야·토지 1:1</b></div>
-    </section>
-
-    <!-- ② 4대 공부 -->
-    <section class="p-sec" aria-label="② 4대 공부">
-      <h2><i>②</i>4대 공부 <em>(토지대장 · 건축물대장 · 등기부 · 토지이용계획)</em></h2>
-      <table class="tb" id="p-gongbu">
-        <colgroup><col class="c1"><col></colgroup>
-        <tbody>
-          <tr><th>토지대장</th><td contenteditable="true">지목 답 · 6,612㎡(2,000평) · 소유 김○○ · 취득 2015.04</td></tr>
-          <tr><th>건축물대장</th><td contenteditable="true">건축물 없음(나대지) · 건폐율 20% · 용적률 40%</td></tr>
-          <tr><th>등기부</th><td contenteditable="true">소유자 김○○ · 근저당 3.2억(승계) · 가압류 없음</td></tr>
-          <tr><th>토지이용계획</th><td contenteditable="true">계획관리지역 · 가축사육제한 · 문화재보호구역 아님</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ③ 입지 정보 -->
-    <section class="p-sec" aria-label="③ 입지 정보">
-      <h2><i>③</i>입지 정보</h2>
-      <ul class="bul" id="p-loc">
-        <li contenteditable="true">국도 37호선 300m · 조종 IC까지 8분 — 서울 강남 1시간 10분</li>
-        <li contenteditable="true">바로 앞 왕복 2차선 도로접(자동차 통행 가능) · 상하수도 50m</li>
-        <li contenteditable="true">배후 수요: 펜션 22곳 · 골프장 2곳 · 신하리 관광지구 인접</li>
-      </ul>
-    </section>
-
-    <!-- ④ 권리 분석 -->
-    <section class="p-sec" aria-label="④ 권리 분석">
-      <h2><i>④</i>권리 분석</h2>
-      <ul class="bul" id="p-right">
-        <li contenteditable="true">등기부 갑구: 소유권 이외 제한 없음(가압류·가처분 0건)</li>
-        <li contenteditable="true">을구: 신한은행 근저당 3.2억 — 매도인이 승계 또는 말소 선택 가능</li>
-        <li contenteditable="true">토지거래허가구역 아님 · 토지분할 가능(대지 300평 이상)</li>
-        <li contenteditable="true">교환 시 김○○ 소유 임야(경기 가평 1,200평)와 1:1 검토</li>
-      </ul>
-    </section>
-
-    <!-- ⑤ 주변 실거래가 -->
-    <section class="p-sec" aria-label="⑤ 주변 실거래가">
-      <h2><i>⑤</i>주변 실거래가 <em>(국토부 실거래 공개 기준 · 최근 6개월)</em></h2>
-      <table class="tb tx" id="p-tx">
-        <thead><tr><th>거래 시점</th><th>소재지</th><th>면적</th><th>거래 금액</th><th>거리</th></tr></thead>
-        <tbody>
-          <tr><td contenteditable="true">2026.08</td><td contenteditable="true">신하리 156-4</td><td contenteditable="true">280평</td><td contenteditable="true">4억 9,000만</td><td contenteditable="true">450m</td></tr>
-          <tr><td contenteditable="true">2026.06</td><td contenteditable="true">신하리 174-2</td><td contenteditable="true">310평</td><td contenteditable="true">5억 3,000만</td><td contenteditable="true">900m</td></tr>
-          <tr><td contenteditable="true">2026.04</td><td contenteditable="true">방일리 88-1</td><td contenteditable="true">300평</td><td contenteditable="true">5억 1,000만</td><td contenteditable="true">1.4km</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <footer class="p-foot">
-      <div class="who">
-        <b id="p-name" contenteditable="true">김태수</b>
-        <span id="p-role" contenteditable="true">부동산 교환 전문가</span>
-        <em id="p-phone" contenteditable="true">010-2002-2899</em>
-        <p class="fine">본 포스터는 매도인·중개사 제공 자료와 공개 실거래가를 기준으로 작성했습니다. 권리관계는 계약 전 등기부·토지대장 원본으로 다시 확인해 드립니다.</p>
-      </div>
-      <div class="qrbox">
-        <canvas id="pSeal" aria-label="직인 도장 QR"></canvas>
-        <span>찍으면 전자명함</span>
-      </div>
-    </footer>
-  </article>
-
-  <p class="tip noprint">도장 QR을 눌러 크게 볼 수 있습니다. · 부동산 교환 전문가 김태수 · 010-2002-2899</p>
+<main class="stage" id="stage">
+  <div class="pwrap" id="pwrap"></div>
+  <p class="hint noprint" id="hint">글자를 누르면 그 자리에서 고칠 수 있습니다</p>
 </main>
 
-<div id="toast" role="status" aria-live="polite"></div>
+<!-- 손님 화면 — 도구 없이 「이미지 받기」와 전화만 -->
+<div class="guestbar noprint" id="guestbar" hidden>
+  <a class="gbtn call" id="gCall" href="#">전화</a>
+  <button class="gbtn get" id="gGet" type="button">이미지 받기</button>
+</div>
 
-<script src="../bizcard/vendor/qrcode.js?v=20261127b"></script>
-<script src="../bizcard/seal.js?v=20261127b"></script>
-<script src="poster.js?v=20261127d"></script>
+<!-- 도구 시트 -->
+<div class="sheet noprint" id="sheet" hidden>
+  <div class="sh-in">
+    <div class="grip"></div>
+    <div class="sh-h"><b>물건표 도구</b><button class="x" id="shX" type="button" aria-label="닫기">✕</button></div>
+    <div class="sh-b" id="shBody"></div>
+  </div>
+</div>
+
+<!-- 저장 — 규격 선택 + 확대 미리보기(264번) -->
+<div class="modal noprint" id="modal" hidden>
+  <div class="md-in">
+    <div class="md-h"><b>저장</b><button class="x" id="mdX" type="button" aria-label="닫기">✕</button></div>
+    <div class="md-scroll" id="mdScroll"><div class="md-stage" id="mdStage"></div></div>
+    <div class="md-b">
+      <div class="oswitch wide" id="mdOrient">
+        <button type="button" data-r="land" class="on">가로 16:9</button>
+        <button type="button" data-r="port">세로 9:16</button>
+        <button type="button" data-r="both">둘 다</button>
+      </div>
+      <div class="md-acts">
+        <button type="button" class="btn main" id="mdPng">PNG 저장</button>
+        <button type="button" class="btn" id="mdPdf">PDF 저장</button>
+      </div>
+      <p class="md-note" id="mdNote">손가락으로 벌려 크게 확인한 뒤 저장하세요.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div class="edov" id="edov" hidden><textarea id="edta" spellcheck="false"></textarea></div>
+
+<script src="../bizcard/vendor/qrcode.js?v=20261128a"></script>
+<script src="../bizcard/seal.js?v=20261128a"></script>
+<script src="../bizcard/premium.js?v=20261128a"></script>
+<script src="../shared/visit.js?v=20261128a" defer></script>
+<script src="poster.js?v=20261128a"></script>
 </body>
 </html>

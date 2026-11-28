@@ -1,508 +1,606 @@
 /* ==========================================================================
-   물건 포스터 (260번) — 5대 항목 자동 배치 · 그 자리에서 고치기 · A4/PNG
+   물건표 스튜디오 (285·271·281·282·283·284번)
    --------------------------------------------------------------------------
-   화면: A4 종이 그대로(글자 눌러 바로 수정)
-   PNG : 같은 내용을 A4 150dpi(1240×1754) 캔버스에 다시 그린다
+   · 화면은 배치도 그대로(가로 16:9 / 세로 9:16), 저장은 같은 배치로 캔버스.
+   · 글자를 누르면 그 자리에 입력칸이 떠서 바로 고친다(260번).
+   · 주인: 도구(사진·가격 기준·항목 넣고 빼기·경계 찍기).
+     손님(?m= 링크): 도구 없이 「이미지 받기」와 전화만.
    ========================================================================== */
 (function () {
   'use strict';
 
+  var B = window.KTS_BRIEF;
   var $ = function (s) { return document.querySelector(s) };
-  var C = {
-    navy: '#0f1b2d', navy2: '#16233a', org: '#f97316',
-    ink: '#111111', ink2: '#333333', ink3: '#4b5563',
-    line: '#d6dbe4', soft: '#f2f4f8', white: '#ffffff'
-  };
-  var FONT = '"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR",sans-serif';
-  function f(px, w) { return (w || 400) + ' ' + Math.round(px) + 'px ' + FONT; }
+  var VW_KEY = '0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
+  var STATE = 'kts_poster_state';
 
-  var photos = [];   /* [{src, img}] 최대 3장 */
+  var M = null, orient = 'land', guest = false, marking = false, scale = 1;
+  var canvases = {};
 
-  /* ---------------- 값 읽기 ---------------- */
-  function txt(sel) {
-    var el = $(sel);
-    return el ? (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+  function st_qs_orient() { return /[?&]o=(land|port)/.test(location.search) }
+  function qs(k) {
+    var m = location.search.match(new RegExp('[?&]' + k + '=([^&]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
   }
-  function lines(sel) {
-    return Array.prototype.map.call(document.querySelectorAll(sel + ' li'), function (li) {
-      return (li.innerText || li.textContent || '').replace(/\s+/g, ' ').trim();
-    }).filter(Boolean);
-  }
-  function rows(sel) {
-    return Array.prototype.map.call(document.querySelectorAll(sel + ' tbody tr'), function (tr) {
-      return Array.prototype.map.call(tr.children, function (c) {
-        return (c.innerText || c.textContent || '').replace(/\s+/g, ' ').trim();
-      });
-    });
-  }
-  function head(sel) {
-    return Array.prototype.map.call(document.querySelectorAll(sel + ' thead th'), function (c) {
-      return (c.innerText || c.textContent || '').replace(/\s+/g, ' ').trim();
-    });
-  }
-  function model() {
-    return {
-      date: txt('#p-date'), no: txt('#p-no'),
-      title: txt('#p-title'), addr: txt('#p-addr'),
-      price: txt('#p-price'), pnote: txt('#p-price-note'),
-      keys: [txt('#k1'), txt('#k2'), txt('#k3'), txt('#k4')],
-      gongbu: rows('#p-gongbu'),
-      loc: lines('#p-loc'), right: lines('#p-right'),
-      txHead: head('#p-tx'), tx: rows('#p-tx'),
-      name: txt('#p-name'), role: txt('#p-role'), phone: txt('#p-phone'),
-      fine: (document.querySelector('.p-foot .fine') || {}).innerText || ''
-    };
-  }
-
-  /* ---------------- 직인 도장 ---------------- */
-  function sealOpts() {
-    var name = txt('#p-name') || '김태수';
-    var phone = txt('#p-phone') || '';
-    var shape = localStorage.getItem('kts_poster_seal') || 'circle';
-    return {
-      shape: shape, name: name,
-      value: KTS.Seal.payload({ name: name, org: 'KTS 교환급매물', phone: phone, qrKind: 'url' })
-    };
-  }
-  function paintSeal() {
-    var cv = $('#pSeal');
-    if (!cv || !window.KTS || !KTS.Seal) return;
-    try { KTS.Seal.paint(cv, 78, sealOpts()) } catch (e) { }
-  }
-
-  /* ---------------- 사진 ---------------- */
-  function setPhoto(i, src) {
-    var img = $('#ph' + i);
-    if (!img) return;
-    if (!src) { img.removeAttribute('src'); return; }
-    img.src = src;
-  }
-  function loadPhotos(list) {
-    Array.prototype.forEach.call(list, function (file, k) {
-      var slot = findEmptySlot();
-      if (slot < 0) return;
-      shrink(file, 1400, function (data) { setPhoto(slot, data) });
-    });
-  }
-  function findEmptySlot() {
-    for (var i = 0; i < 3; i++) { var im = $('#ph' + i); if (im && !im.getAttribute('src')) return i }
-    return -1;
-  }
-  function shrink(file, max, cb) {
-    var fr = new FileReader();
-    fr.onload = function () {
-      var im = new Image();
-      im.onload = function () {
-        var s = Math.min(1, max / Math.max(im.width, im.height));
-        var w = Math.round(im.width * s), h = Math.round(im.height * s);
-        var c = document.createElement('canvas'); c.width = w; c.height = h;
-        c.getContext('2d').drawImage(im, 0, 0, w, h);
-        try { cb(c.toDataURL('image/jpeg', 0.86)) } catch (e) { cb(fr.result) }
-      };
-      im.onerror = function () { cb(fr.result) };
-      im.src = fr.result;
-    };
-    fr.readAsDataURL(file);
-  }
-
-  /* ---------------- 불러오기 ---------------- */
-  var DEMO_PHOTOS = ['../bizcard/img/sample_land.jpg', 'img/ex4.jpg', '../bizcard/img/sample_house.jpg'];
-
-  function sample() {
-    DEMO_PHOTOS.forEach(function (p, i) { setPhoto(i, p) });
-    toast('예시 물건입니다 — 글자를 눌러 고치고 사진을 바꿔 보세요');
-  }
-
-  function fromListing(L) {
-    if (!L) return;
-    function money(man) {
-      if (man == null) return '';
-      var eok = Math.floor(man / 10000), m = man % 10000;
-      return (eok ? eok + '억 ' : '') + (m ? m.toLocaleString('ko-KR') + '만' : (eok ? '' : '0'));
-    }
-    var p = L.price || {}, fa = L.facts || {};
-    if (L.title) $('#p-title').textContent = [L.address && L.address.split(' ').slice(0, 2).join(' '), L.title].filter(Boolean).join(' ');
-    if (L.address) $('#p-addr').textContent = L.address;
-    if (p.sale) $('#p-price').textContent = money(p.sale);
-    if (p.note) $('#p-price-note').textContent = p.note;
-    if (L.id) $('#p-no').textContent = L.id;
-    $('#k1').textContent = p.sale ? money(p.sale) : $('#k1').textContent;
-    $('#k2').textContent = p.loanAmount ? money(p.loanAmount) : $('#k2').textContent;
-    $('#k3').textContent = p.realInvest ? money(p.realInvest) : $('#k3').textContent;
-    $('#k4').textContent = '협의';
-    /* 4대 공부 */
-    var g = [
-      ['토지대장', [fa.site ? '대지 ' + fa.site : '', fa.zone ? fa.zone : '', fa.landPrice ? '공시지가 ' + fa.landPrice + '원/㎡' : ''].filter(Boolean).join(' · ')],
-      ['건축물대장', [fa.built ? '준공 ' + fa.built : '', fa.structure || '', fa.use || '', fa.gross ? '연면적 ' + fa.gross : '', fa.lift != null ? '승강기 ' + fa.lift + '대' : ''].filter(Boolean).join(' · ')],
-      ['등기부', '소유자·근저당은 계약 전 등기부 원본으로 확인'],
-      ['토지이용계획', fa.zone || '토지이음에서 확인']
-    ];
-    var tb = document.querySelector('#p-gongbu tbody');
-    tb.innerHTML = g.map(function (r) {
-      return '<tr><th>' + r[0] + '</th><td contenteditable="true">' + (r[1] || '미확인') + '</td></tr>';
-    }).join('');
-    /* 입지·권리·실거래가는 매물에서 아는 것만 새로 채운다(예시 문구 남기지 않음) */
-    var locBits = [];
-    if (fa.behind) locBits.push('배후 상권: ' + fa.behind);
-    if (L.floors) locBits.push('규모: ' + L.floors);
-    if (L.site || fa.site) locBits.push('대지 ' + (fa.site || L.site) + ' · 연면적 ' + (fa.gross || L.gross || '미확인'));
-    if (L.moveIn) locBits.push('입주: ' + L.moveIn);
-    locBits.push('상세 입지는 현장 확인 후 한 줄씩 고쳐 주세요');
-    $('#p-loc').innerHTML = locBits.map(function (t) {
-      return '<li contenteditable="true">' + t + '</li>';
-    }).join('');
-
-    var rightBits = [];
-    if (p.loanAmount) rightBits.push('을구: 근저당 ' + money(p.loanAmount) + '(승계 가능) — 매도인 승계 또는 말소 선택');
-    rightBits.push('갑구: 소유권 이외 제한 — 계약 전 등기부 원본으로 확인');
-    rightBits.push('토지거래허가구역·토지이용계획은 토지이음에서 확인');
-    if (p.appraisal && p.sale) {
-      var gap = p.appraisal - p.sale;
-      rightBits.push('감정가 ' + money(p.appraisal) + ' 대비 ' + money(gap) + ' 낮은 가격');
-    }
-    $('#p-right').innerHTML = rightBits.map(function (t) {
-      return '<li contenteditable="true">' + t + '</li>';
-    }).join('');
-
-    /* 주변 실거래가는 공개 자료를 넣기 전까지 비워 둔다 */
-    var txb = document.querySelector('#p-tx tbody');
-    txb.innerHTML = '<tr><td contenteditable="true">—</td><td contenteditable="true">—</td><td contenteditable="true">—</td>'
-      + '<td contenteditable="true">—</td><td contenteditable="true">실거래가 확인 후 입력</td></tr>';
-    if (L.photos && L.photos.length) L.photos.slice(0, 3).forEach(function (p2, i) {
-      if (typeof p2 === 'string') setPhoto(i, p2);
-    });
-    toast('매물 정보를 불러왔습니다 — 빈 칸은 눌러서 채워 주세요');
-  }
-
-  function fromSession() {
-    try {
-      var raw = sessionStorage.getItem('kts_realty_hand') || sessionStorage.getItem('kts_poster_hand');
-      if (!raw) return false;
-      fromListing(JSON.parse(raw));
-      return true;
-    } catch (e) { return false }
-  }
-
-  function fromId(id) {
-    fetch('data/listings.json', { cache: 'no-store' }).then(function (r) { return r.json() }).then(function (j) {
-      var L = (j.listings || []).filter(function (x) { return x.id === id })[0];
-      if (L) fromListing(L); else toast('매물 ' + id + '을 찾지 못했습니다');
-    }).catch(function () { });
-  }
-
-  /* ======================================================================
-     PNG — A4 150dpi 캔버스에 다시 그린다
-     ====================================================================== */
-  var W = 1240, H = 1754, M = 54;
-
-  function wrap(ctx, text, maxW) {
-    var words = String(text || '').split(/\s+/).filter(Boolean), out = [], line = '';
-    for (var i = 0; i < words.length; i++) {
-      var cand = line ? line + ' ' + words[i] : words[i];
-      if (ctx.measureText(cand).width > maxW && line) { out.push(line); line = words[i]; }
-      else line = cand;
-    }
-    if (line) out.push(line);
-    return out.length ? out : [''];
-  }
-
-  function drawPoster(scale, fill) {
-    fill = fill || 0;
-    var c = drawPoster.cv;
-    var ctx = c.getContext('2d');
-    var m = model();
-    var S = scale;
-    var pad = M;
-
-    ctx.save();
-    ctx.fillStyle = C.white; ctx.fillRect(0, 0, W, H);
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-
-    /* ---- 머리 ---- */
-    var y = pad;
-    ctx.fillStyle = C.navy; ctx.font = f(34 * S, 900);
-    ctx.fillText('교환급매물', pad, y + 30 * S);
-    var bw = ctx.measureText('교환급매물').width;
-    ctx.fillStyle = C.org; ctx.font = f(19 * S, 900);
-    ctx.fillText('.com', pad + bw + 3, y + 30 * S);
-    ctx.fillStyle = C.ink2; ctx.font = f(15 * S, 500);
-    ctx.fillText('부동산 1:1 맞교환 · 급매물 전문', pad, y + 50 * S);
-    ctx.textAlign = 'right'; ctx.font = f(15 * S, 800); ctx.fillStyle = C.ink2;
-    ctx.fillText(m.date, W - pad, y + 18 * S);
-    ctx.fillStyle = C.org; ctx.fillText(m.no, W - pad, y + 38 * S);
-    ctx.textAlign = 'left';
-    y += 60 * S;
-    ctx.fillStyle = C.navy; ctx.fillRect(pad, y, W - pad * 2, 2.5);
-    y += 14 * S;
-
-    /* ---- 제목·가격 ---- */
-    var priceW = 330 * S;
-    var titleMax = W - pad * 2 - priceW;
-    ctx.fillStyle = C.ink; ctx.font = f(40 * S, 900);
-    var tl = wrap(ctx, m.title, titleMax).slice(0, 2);
-    tl.forEach(function (ln, i) { ctx.fillText(ln, pad, y + 34 * S + i * 44 * S) });
-    var ty = y + 34 * S + (tl.length - 1) * 44 * S;
-    ctx.fillStyle = C.ink2; ctx.font = f(17 * S, 600);
-    var al = wrap(ctx, m.addr, titleMax).slice(0, 1);
-    ctx.fillText(al[0] || '', pad, ty + 26 * S);
-    /* 가격 오른쪽 */
-    ctx.textAlign = 'right';
-    ctx.fillStyle = C.ink; ctx.font = f(44 * S, 900);
-    ctx.fillText(m.price, W - pad, y + 40 * S);
-    ctx.fillStyle = '#b45309'; ctx.font = f(16 * S, 800);
-    ctx.fillText(m.pnote, W - pad, y + 64 * S);
-    ctx.textAlign = 'left';
-    y = ty + 40 * S;
-    ctx.fillStyle = C.line; ctx.fillRect(pad, y, W - pad * 2, 1.5);
-    y += 12 * S;
-
-    /* ---- ① 사진 ---- */
-    var availW = W - pad * 2;
-    var phH = 380 * S, gap = 8 * S;
-    var bigW = Math.round((availW - gap) * 0.62), smW = availW - gap - bigW;
-    function drawImg(im, x, yy, w, h) {
-      ctx.fillStyle = C.soft; ctx.fillRect(x, yy, w, h);
-      if (!im || !im.complete || !im.naturalWidth) return;
-      var s = Math.max(w / im.naturalWidth, h / im.naturalHeight);
-      var dw = im.naturalWidth * s, dh = im.naturalHeight * s;
-      ctx.save(); ctx.beginPath(); ctx.rect(x, yy, w, h); ctx.clip();
-      ctx.drawImage(im, x + (w - dw) / 2, yy + (h - dh) / 2, dw, dh);
-      ctx.restore();
-    }
-    drawImg(photos[0], pad, y, bigW, phH);
-    drawImg(photos[1], pad + bigW + gap, y, smW, (phH - gap) / 2);
-    drawImg(photos[2], pad + bigW + gap, y + (phH + gap) / 2, smW, (phH - gap) / 2);
-    /* 사진 라벨 */
-    ctx.fillStyle = 'rgba(15,27,45,.9)'; ctx.fillRect(pad, y + phH - 28 * S, 104 * S, 28 * S);
-    ctx.fillStyle = '#fff'; ctx.font = f(14 * S, 900);
-    ctx.fillText('① 현장 사진', pad + 10 * S, y + phH - 9 * S);
-    y += phH + 12 * S + fill;
-
-    /* ---- 핵심 4칸 ---- */
-    var kw = (availW - 3 * 8 * S) / 4, kh = 78 * S;
-    m.keys.forEach(function (k, i) {
-      var x = pad + i * (kw + 8 * S);
-      ctx.fillStyle = i === 1 ? '#fff8ef' : (i === 2 ? '#fff4f4' : '#fbfcfe');
-      ctx.fillRect(x, y, kw, kh);
-      ctx.strokeStyle = i === 1 ? '#f6c58e' : (i === 2 ? '#f3c1c1' : C.line);
-      ctx.lineWidth = 1.5; ctx.strokeRect(x, y, kw, kh);
-      ctx.fillStyle = C.ink3; ctx.font = f(14 * S, 800);
-      ctx.fillText(['매매가', '승계 대출', '실투자금', '교환 조건'][i], x + 12 * S, y + 26 * S);
-      ctx.fillStyle = C.ink; ctx.font = f(24 * S, 900);
-      var val = k || '—';
-      while (ctx.measureText(val).width > kw - 24 * S && val.length > 2) val = val.slice(0, -2) + '…';
-      ctx.fillText(val, x + 12 * S, y + 58 * S);
-    });
-    y += kh + 16 * S + fill;
-
-    /* ---- 섹션 머리 ---- */
-    function secHead(num, title, note) {
-      ctx.fillStyle = C.org; ctx.fillRect(pad, y + 2 * S, 4 * S, 20 * S);
-      ctx.fillStyle = C.navy; ctx.font = f(21 * S, 900);
-      var label = num + ' ' + title;
-      ctx.fillText(label, pad + 12 * S, y + 19 * S);
-      var lw = ctx.measureText(label).width;
-      if (note) {
-        ctx.fillStyle = '#6b7280'; ctx.font = f(13 * S, 600);
-        ctx.fillText(note, pad + 12 * S + lw + 8 * S, y + 19 * S);
-      }
-      y += 28 * S;
-    }
-    function table(rowsData, opts) {
-      var c1 = (opts && opts.c1) || 130 * S;
-      var fs2 = (opts && opts.fs) || 16 * S;
-      var lh = fs2 * 1.5;
-      rowsData.forEach(function (r, ri) {
-        ctx.font = f(fs2, ri === 0 && opts && opts.headRow ? 900 : 600);
-        var valLines = wrap(ctx, r[1], availW - c1 - 24 * S);
-        var rowH = Math.max(34 * S, valLines.length * lh + 12 * S);
-        ctx.fillStyle = (ri === 0 && opts && opts.headRow) ? '#eef1f6' : C.soft;
-        ctx.fillRect(pad, y, c1, rowH);
-        ctx.fillStyle = C.white; ctx.fillRect(pad + c1, y, availW - c1, rowH);
-        ctx.strokeStyle = C.line; ctx.lineWidth = 1;
-        ctx.strokeRect(pad, y, availW, rowH);
-        ctx.beginPath(); ctx.moveTo(pad + c1, y); ctx.lineTo(pad + c1, y + rowH); ctx.stroke();
-        ctx.fillStyle = C.ink; ctx.font = f(fs2, 900);
-        ctx.fillText(r[0], pad + 10 * S, y + 12 * S + fs2);
-        ctx.fillStyle = C.ink; ctx.font = f(fs2, 600);
-        valLines.forEach(function (ln, i) { ctx.fillText(ln, pad + c1 + 12 * S, y + 12 * S + fs2 + i * lh) });
-        y += rowH;
-      });
-    }
-    function bullets(arr) {
-      var fs2 = 16 * S, lh = fs2 * 1.5;
-      arr.forEach(function (t) {
-        var ls = wrap(ctx, t, availW - 22 * S);
-        ctx.fillStyle = C.org;
-        ctx.beginPath(); ctx.arc(pad + 5 * S, y + fs2 * 0.55, 3.2 * S, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = C.ink; ctx.font = f(fs2, 500);
-        ls.forEach(function (ln, i) { ctx.fillText(ln, pad + 16 * S, y + fs2 + i * lh - 2 * S) });
-        y += ls.length * lh + 4 * S;
-      });
-    }
-
-    /* ---- ② 4대 공부 ---- */
-    secHead('②', '4대 공부', '(토지대장 · 건축물대장 · 등기부 · 토지이용계획)');
-    table(m.gongbu);
-    y += 14 * S + fill;
-
-    /* ---- ③ 입지 정보 ---- */
-    secHead('③', '입지 정보');
-    bullets(m.loc);
-    y += 10 * S + fill;
-
-    /* ---- ④ 권리 분석 ---- */
-    secHead('④', '권리 분석');
-    bullets(m.right);
-    y += 10 * S + fill;
-
-    /* ---- ⑤ 주변 실거래가 ---- */
-    secHead('⑤', '주변 실거래가', '(국토부 실거래 공개 기준 · 최근 6개월)');
-    /* 5칸 표 */
-    (function txTable() {
-      var fs2 = 15 * S, lh = fs2 * 1.45;
-      var cols = [0.16, 0.28, 0.16, 0.24, 0.16].map(function (r) { return r * availW });
-      var head2 = m.txHead.length === 5 ? m.txHead : ['거래 시점', '소재지', '면적', '거래 금액', '거리'];
-      function row(cells, isHead) {
-        ctx.font = f(fs2, isHead ? 900 : 600);
-        var hgt = 32 * S;
-        var x = pad;
-        for (var i = 0; i < 5; i++) {
-          ctx.fillStyle = isHead ? '#eef1f6' : C.white;
-          ctx.fillRect(x, y, cols[i], hgt);
-          ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.strokeRect(x, y, cols[i], hgt);
-          ctx.fillStyle = C.ink;
-          var v = String(cells[i] == null ? '' : cells[i]);
-          while (ctx.measureText(v).width > cols[i] - 14 * S && v.length > 2) v = v.slice(0, -2) + '…';
-          ctx.fillText(v, x + 8 * S, y + hgt / 2 + fs2 * 0.36);
-          x += cols[i];
-        }
-        y += hgt;
-      }
-      row(head2, true);
-      m.tx.forEach(function (r) { row(r, false) });
-    })();
-
-    /* ---- 발 ---- */
-    var footH = 186 * S;
-    drawPoster.lastContent = y;
-    var fy = Math.max(y + 18 * S, H - footH);
-    ctx.fillStyle = C.navy; ctx.fillRect(0, fy, W, H - fy);
-    /* 직인 */
-    try {
-      var sealSize = 200 * S;
-      var sc = document.createElement('canvas');
-      KTS.Seal.paint(sc, sealSize, sealOpts());
-      var sh = sealSize * sc.height / Math.max(1, sc.width);
-      ctx.drawImage(sc, W - pad - sealSize, fy + 18 * S, sealSize, sh);
-    } catch (e) { }
-    ctx.fillStyle = C.white; ctx.font = f(28 * S, 900);
-    ctx.fillText(m.name, pad, fy + 42 * S);
-    ctx.fillStyle = '#c7d4e8'; ctx.font = f(17 * S, 600);
-    ctx.fillText(m.role, pad, fy + 68 * S);
-    ctx.fillStyle = '#ffb066'; ctx.font = f(32 * S, 900);
-    ctx.fillText(m.phone, pad, fy + 108 * S);
-    ctx.fillStyle = '#9db0ca'; ctx.font = f(13 * S, 500);
-    var fl = wrap(ctx, m.fine, availW - 190 * S).slice(0, 3);
-    fl.forEach(function (ln, i) { ctx.fillText(ln, pad, fy + 134 * S + i * 19 * S) });
-    ctx.fillStyle = '#6f819c'; ctx.font = f(12 * S, 700);
-    ctx.fillText('교환급매물.com · KTS 원클릭', pad, fy + footH - 14 * S);
-
-    ctx.restore();
-    return y;
-  }
-
-  function buildPng() {
-    var cv = document.createElement('canvas');
-    cv.width = W; cv.height = H;
-    drawPoster.cv = cv;
-    var scale = 1, fill = 0;
-    for (var i = 0; i < 9; i++) {
-      drawPoster(scale, fill);
-      /* 본문 끝이 발(footer) 자리를 넘으면 글자를 줄여 다시 그린다 */
-      if (drawPoster.lastContent <= H - 186 * scale - M) break;
-      fill = 0; scale -= 0.045;
-      if (scale < 0.68) break;
-    }
-    /* 내용이 짧아 아래가 비면 섹션 사이 여백을 고르게 늘려 A4를 채운다 */
-    var rest = (H - 186 * scale - M) - drawPoster.lastContent;
-    if (rest > 24) {
-      fill = Math.min(46, Math.round(rest / 6));
-      drawPoster(scale, fill);
-    }
-    return cv;
-  }
-
-  function savePng() {
-    try {
-      var cv = buildPng();
-      /* data URL 로 바로 내려받기 — 카톡·문자·인쇄 어디서든 같은 파일 */
-      var url = cv.toDataURL('image/png');
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = (txt('#p-title') || '물건포스터').replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_포스터.png';
-      document.body.appendChild(a); a.click(); a.remove();
-      toast('A4 포스터 PNG를 저장했습니다 (1240×1754)', 3200);
-    } catch (e) { toast('이 기기에서는 PNG 저장이 어렵습니다'); }
-  }
-
-  /* ---------------- 준비 ---------------- */
   function toast(msg, ms) {
     var t = $('#toast'); if (!t) return;
     t.textContent = msg; t.classList.add('on');
     clearTimeout(toast._t);
     toast._t = setTimeout(function () { t.classList.remove('on') }, ms || 2600);
   }
+  function LS(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch (e) { return d } }
+  function LSSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } }
 
-  function collectPhotos() {
-    photos = [];
-    for (var i = 0; i < 3; i++) {
-      var im = $('#ph' + i);
-      var src = im && im.getAttribute('src');
-      if (!src) { photos.push(null); continue; }
-      if (im.complete && im.naturalWidth) photos.push(im);
-      else {
-        var n = new Image(); n.src = src;
-        photos.push(n.complete && n.naturalWidth ? n : null);
-      }
-    }
+  function mapUrl(lat, lon) {
+    if (!lat || !lon) return '';
+    return 'https://api.vworld.kr/req/image?service=image&request=getmap&key=' + encodeURIComponent(VW_KEY)
+      + '&domain=autooneclick.com&format=png&basemap=PHOTO_HYBRID'
+      + '&center=' + (+lon).toFixed(6) + ',' + (+lat).toFixed(6) + '&zoom=16&size=1000,700&crs=EPSG:4326';
   }
 
-  function boot() {
-    if (window.KTS && KTS.Seal) paintSeal();
-    var id = (location.search.match(/[?&]id=([^&]+)/) || [])[1];
-    if (!fromSession() && id) fromId(decodeURIComponent(id));
-    else if (!fromSession()) {
-      /* 처음 열면 예시 사진으로 모양을 보여 준다 */
-      DEMO_PHOTOS.forEach(function (p, i) { setPhoto(i, p) });
+  /* ---------------- 모델 만들기 ---------------- */
+  function fromStore(id) {
+    var items = LS('kts_bc_items', []) || [];
+    var me = LS('kts_bc_me', {}) || {};
+    var it = null;
+    for (var i = 0; i < items.length; i++) if (items[i].id === id) it = items[i];
+    if (!it) return null;
+    var m = B.build(it, me);
+    m.map = it.map || mapUrl(it.lat, it.lon);
+    m.itemId = it.id;
+    m.polygon = it.polygon || null;
+    return m;
+  }
+
+  /* 매물장(listing) 매물 → 물건표 모델 */
+  function fromListing(L, broker) {
+    if (!L) return null;
+    var p = L.price || {}, f = L.facts || {};
+    var site = parseFloat(String(f.site || L.site || '').replace(/[^\d.]/g, ''));
+    var gross = parseFloat(String(f.gross || L.gross || '').replace(/[^\d.]/g, ''));
+    var it = {
+      id: L.id,
+      title: L.title || '매물',
+      addr: L.address || '',
+      kind: L.type || '',
+      areaM2: site || null,
+      areaP: site ? Math.round(site / 3.305785) : null,
+      price: p.sale ? p.sale * 1e4 : null,
+      loan: p.loanAmount ? p.loanAmount * 1e4 : null,
+      residual: p.realInvest ? p.realInvest * 1e4 : null,
+      appraisal: p.appraisal ? p.appraisal * 1e4 : null,
+      deposit: p.deposit ? p.deposit * 1e4 : null,
+      tags: (L.points || []).map(function (x) { return x.t }).filter(Boolean).slice(0, 3),
+      photos: (L.photos || []).slice(0, 4),
+      lat: L.lat, lon: L.lng,
+      gb: {
+        char: {
+          lndcgrCodeNm: L.type || '',
+          lndpclAr: site || null,
+          roadSideCodeNm: f.road || '',
+          pblntfPclnd: f.landPrice ? +String(f.landPrice).replace(/[^\d]/g, '') : null
+        },
+        use: f.zone ? [{ nm: f.zone }] : [],
+        bld: (f.built || f.use) ? { st: 'OK', items: [{ mainPurpsCdNm: f.use || '', strctCdNm: f.structure || '', grndFlrCnt: f.floors || null, totArea: gross || null }] } : { st: 'EMPTY' }
+      }
+    };
+    it.map = mapUrl(L.lat, L.lng);
+    var me = broker || {};
+    var m = B.build(it, {
+      org: me.office || me.org || me.company || 'KTS 원클릭 공인중개사',
+      title: me.title || '대표',
+      name: me.name || '김태수',
+      phone: me.phone || '010-2002-2899',
+      fax: me.fax || '', email: me.email || '', addr: me.address || '',
+      stamp: 'circle'
+    });
+    m.use = (L.points || []).map(function (x) { return x.t }).filter(Boolean).slice(0, 3).join(' · ') || '용도 협의';
+    return m;
+  }
+
+  function demo() {
+    var it = {
+      id: 'demo', title: '가평 신하리 사계절 풀빌라 부지', titleAccent: '매매 브리핑',
+      point: '계곡 150m · 도로접 15필지 일괄',
+      addr: '경기도 가평군 조종면 신하리 162-9 외 14필지',
+      kind: '대지', areaM2: 5434, areaP: 1644, price: 950000000, residual: 950000000,
+      tags: ['도로접', '평지', '계곡'],
+      photos: ['../bizcard/img/sample_land.jpg', '../bizcard/img/sample_house.jpg', 'img/ex4.jpg', 'img/ex2.jpg'],
+      gb: {
+        char: { lndcgrCodeNm: '대지', lndpclAr: 5434, roadSideCodeNm: '중로한면', tpgrphHgCodeNm: '완경사', pblntfPclnd: 51700, prposArea1Nm: '계획관리지역' },
+        use: [{ nm: '계획관리지역' }],
+        price: { pblntfPclnd: 51700, stdrYear: '2026' },
+        bld: { st: 'EMPTY' }
+      }
+    };
+    var me = {
+      org: 'KTS 원클릭 공인중개사', title: '대표', name: '김태수', phone: '010-2002-2899',
+      fax: '031-585-0000', email: 'kts@autooneclick.com',
+      intro: '숫자만 보여 드리지 않겠습니다. 계약 전 등기부와 토지대장 원본으로 권리관계를 다시 확인하고, 현장까지 함께 걸어 보겠습니다.'
+    };
+    var m = B.build(it, me);
+    m.use = '풀빌라 단지 · 연수원 · 수익형 분할 매각';
+    return m;
+  }
+
+  function applyMode(m, mode) {
+    var money = m.money || (m.money = {});
+    money.mode = mode;
+    money.label = mode === 'sale' ? '매 매 가' : (mode === 'exchange' ? '교 환 가' : '실인수 잔가');
+    money.value = mode === 'sale' ? B.won(money.sale) : (mode === 'exchange' ? (money.exchange ? B.won(money.exchange) : '협의') : B.won(money.residual));
+    money.note = mode === 'sale' ? '(부가세·취득세 별도)' : (mode === 'exchange' ? '(교환 조건 협의)' : '(보증금·대출 승계 제외)');
+    money.sub = [
+      money.sale ? '매매 ' + B.eok(money.sale) : '',
+      money.residual && mode !== 'residual' ? '잔가 ' + B.eok(money.residual) : '',
+      money.exchange ? '교환 ' + B.eok(money.exchange) : ''
+    ].filter(Boolean).join(' · ');
+  }
+
+  /* ---------------- 그리기 ---------------- */
+  function render() {
+    var wrap = $('#pwrap');
+    var html = B.dom(M, orient);
+    wrap.innerHTML = '<div class="pbs" style="transform-origin:top left">' + html + '</div>';
+    var P = B.plan(M, orient);
+    var avail = Math.max(280, ($('#stage').clientWidth || 380) - 20);
+    scale = Math.min(1, avail / P.W);
+    var inner = wrap.firstChild;
+    inner.style.transform = 'scale(' + scale + ')';
+    inner.style.width = P.W + 'px';
+    inner.style.height = P.H + 'px';
+    wrap.style.width = Math.round(P.W * scale) + 'px';
+    wrap.style.height = Math.round(P.H * scale) + 'px';
+    wrap.style.margin = '0 auto';
+    window.KTS_POSTER = { model: M, plan: P, orient: orient };
+    if (marking && !guest) addMarkOverlay(P);
+    bindEdit();
+    bindSeal();
+  }
+
+  function bindSeal() {
+    var slot = $('.pb-seal');
+    if (!slot || !window.KTS || !KTS.Seal) return;
+    var cv = document.createElement('canvas');
+    cv.width = 200; cv.height = 200;
+    try {
+      KTS.Seal.paint(cv, 200, {
+        shape: (M.broker && M.broker.stamp) || 'circle',
+        name: M.broker.name || '',
+        value: KTS.Seal.payload({ name: M.broker.name, phone: M.broker.phone, org: M.broker.org, qrKind: 'url' })
+      });
+      cv.style.width = '100%';
+      cv.style.height = '100%';
+      slot.innerHTML = '';
+      slot.appendChild(cv);
+    } catch (e) { }
+  }
+
+  /* ---------------- 글자 직접 고치기 ---------------- */
+  function bindEdit() {
+    if (guest) return;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-edit]'), function (el) {
+      el.addEventListener('click', function (ev) {
+        if (marking) return;
+        ev.preventDefault(); ev.stopPropagation();
+        openEditor(el, el.getAttribute('data-edit'));
+      });
+    });
+  }
+
+  function getField(key) {
+    var p = key.split(':');
+    if (p[0] === 'spec') return M.specs[+p[1]] ? M.specs[+p[1]][1] : '';
+    if (p[0] === 'point') return M.points[+p[1]] || '';
+    if (key === 'title') return M.title;
+    if (key === 'titleAccent') return M.titleAccent;
+    if (key === 'point') return M.point;
+    if (key === 'addr') return M.addr;
+    if (key === 'price') return M.money.value;
+    if (key === 'use') return M.use;
+    if (key === 'org') return M.broker.org;
+    if (key === 'who') return ((M.broker.title ? M.broker.title + ' ' : '') + M.broker.name).trim();
+    if (key === 'phone') return M.broker.phone;
+    return '';
+  }
+  function setField(key, v) {
+    var p = key.split(':');
+    if (p[0] === 'spec') { if (M.specs[+p[1]]) M.specs[+p[1]][1] = v; return; }
+    if (p[0] === 'point') { M.points[+p[1]] = v; return; }
+    if (key === 'title') M.title = v;
+    else if (key === 'titleAccent') M.titleAccent = v;
+    else if (key === 'point') M.point = v;
+    else if (key === 'addr') M.addr = v;
+    else if (key === 'price') M.money.value = v;
+    else if (key === 'use') M.use = v;
+    else if (key === 'org') M.broker.org = v;
+    else if (key === 'who') {
+      var t = v.trim().split(/\s+/);
+      if (t.length > 1) { M.broker.title = t[0]; M.broker.name = t.slice(1).join(' '); }
+      else M.broker.name = v;
+    }
+    else if (key === 'phone') M.broker.phone = v;
+  }
+
+  function openEditor(el, key) {
+    var r = el.getBoundingClientRect();
+    var box = $('#edov'), ta = $('#edta');
+    var fs = parseFloat(getComputedStyle(el).fontSize) * scale;
+    var w = Math.max(120, Math.min(window.innerWidth - 24, r.width + 8));
+    var h = Math.max(38, Math.min(window.innerHeight * 0.4, r.height + 12));
+    ta.value = getField(key);
+    ta.style.fontSize = Math.max(13, Math.min(28, fs)) + 'px';
+    ta.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left - 4)) + 'px';
+    ta.style.top = Math.max(8, Math.min(window.innerHeight - h - 8, r.top - 4)) + 'px';
+    ta.style.width = w + 'px';
+    ta.style.height = h + 'px';
+    box.hidden = false;
+    ta.focus(); ta.select();
+    ta.oninput = function () { setField(key, ta.value); };
+    ta.onblur = closeEditor;
+    ta.onkeydown = function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); ta.value = getField(key); closeEditor(); }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); closeEditor(); }
+    };
+    box.onclick = function (e) { if (e.target === box) closeEditor(); };
+  }
+  function closeEditor() {
+    var box = $('#edov'); if (!box || box.hidden) return;
+    box.hidden = true;
+    $('#edta').oninput = $('#edta').onblur = $('#edta').onkeydown = null;
+    persist(); render();
+  }
+
+  /* ---------------- 사진·경계 ---------------- */
+  function addPhotos(files) {
+    var list = Array.prototype.slice.call(files || []).slice(0, 4 - (M.photos.length || 0));
+    if (!list.length) { toast('사진은 4장까지 넣습니다'); return; }
+    var left = list.length;
+    list.forEach(function (f) {
+      var fr = new FileReader();
+      fr.onload = function () {
+        var im = new Image();
+        im.onload = function () {
+          var max = 1500, s = Math.min(1, max / Math.max(im.width, im.height));
+          var c = document.createElement('canvas');
+          c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          try { M.photos.push(c.toDataURL('image/jpeg', 0.86)) } catch (e) { M.photos.push(fr.result) }
+          if (--left <= 0) { persist(); render(); toast('사진을 넣었습니다'); }
+        };
+        im.onerror = function () { if (--left <= 0) { persist(); render(); } };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(f);
+    });
+  }
+
+  function addMarkOverlay(P) {
+    var page = $('.pb-page');
+    if (!page) return;
+    var ph = P.map && false ? P.map : P.photo;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:absolute;left:' + ph.x + 'px;top:' + ph.y + 'px;width:' + ph.w + 'px;height:' + ph.h + 'px;'
+      + 'z-index:20;cursor:crosshair;background:rgba(255,122,0,.06);border:2px dashed rgba(255,122,0,.7);border-radius:10px';
+    ov.title = '땅 모서리를 차례로 찍으세요';
+    ov.addEventListener('click', function (e) {
+      var r = ov.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      if (!M.polygon) M.polygon = { photo: 0, points: [] };
+      M.polygon.photo = 0;
+      M.polygon.points.push([Math.max(0, Math.min(1, x)), Math.max(0, Math.min(1, y))]);
+      persist(); render();
+      toast(M.polygon.points.length + '점 — 3점 이상이면 빨간 테두리로 닫힙니다', 1600);
+    });
+    page.appendChild(ov);
+  }
+
+  /* ---------------- 도구 시트 ---------------- */
+  function openTools() {
+    var b = $('#shBody');
+    var money = M.money || {};
+    var sec = M.sections || {};
+    var items = LS('kts_bc_items', []) || [];
+    var h = '';
+    h += '<div class="grp"><b>사진 (앞의 1장이 대표)</b><div class="row">'
+      + '<label class="btn sm file">사진 넣기<input type="file" id="tPhoto" accept="image/*" multiple></label>'
+      + (M.photos.length ? '<button class="btn sm" id="tPhotoClear">사진 비우기</button>' : '')
+      + '</div><p class="note">보조 사진은 아래 줄에 자동으로 작게 정렬됩니다(282번).</p></div>';
+
+    if (items.length) {
+      h += '<div class="grp"><b>매물장에서 가져오기</b><div class="inp"><select id="tItem"><option value="">— 매물 고르기 —</option>';
+      items.forEach(function (it) {
+        h += '<option value="' + it.id + '">' + ((it.title || '매물') + ' · ' + (it.addr || '')).slice(0, 40) + '</option>';
+      });
+      h += '</select></div></div>';
     }
 
-    $('#btnPrint').addEventListener('click', function () { collectPhotos(); window.print() });
-    $('#btnPng').addEventListener('click', function () { collectPhotos(); savePng() });
-    $('#ph').addEventListener('change', function () { loadPhotos(this.files); this.value = '' });
-    $('#btnSample').addEventListener('click', sample);
-    $('#btnRealty').addEventListener('click', function () { location.href = '../realty/' });
-    $('#btnShape').addEventListener('click', function () {
-      var order = ['circle', 'square', 'oval'];
-      var cur = localStorage.getItem('kts_poster_seal') || 'circle';
-      var nx = order[(order.indexOf(cur) + 1) % 3];
-      localStorage.setItem('kts_poster_seal', nx);
-      paintSeal();
-      toast('직인 모양 — ' + ({ circle: '원형', square: '사각', oval: '타원' })[nx]);
+    h += '<div class="grp"><b>가격 기준 (주인만 · 284번)</b><div class="row" id="tMode">'
+      + ['residual', 'sale', 'exchange'].map(function (k) {
+        var nm = k === 'residual' ? '잔가' : (k === 'sale' ? '매가' : '교환가');
+        return '<button class="btn sm' + ((money.mode || 'residual') === k ? ' on' : '') + '" data-m="' + k + '">' + nm + '</button>';
+      }).join('')
+      + '</div><div class="two" style="margin-top:8px">'
+      + '<div class="inp"><span>매가(만원)</span><input id="tSale" type="number" inputmode="numeric" value="' + (money.sale ? Math.round(money.sale / 1e4) : '') + '"></div>'
+      + '<div class="inp"><span>잔가(만원)</span><input id="tRes" type="number" inputmode="numeric" value="' + (money.residual ? Math.round(money.residual / 1e4) : '') + '"></div>'
+      + '</div>'
+      + '<div class="inp"><span>교환가(만원)</span><input id="tEx" type="number" inputmode="numeric" value="' + (money.exchange ? Math.round(money.exchange / 1e4) : '') + '"></div>'
+      + '<p class="note">손님에게는 지금 고른 기준 한 가지만 크게 보입니다.</p></div>';
+
+    h += '<div class="grp"><b>물건표에 넣기 (283번)</b><div class="row" id="tSec">'
+      + [['right', '권리분석'], ['tx', '주변 실거래'], ['appraisal', '감정가']].map(function (x) {
+        return '<button class="btn sm' + ((sec[x[0]] !== 0) ? ' on' : '') + '" data-s="' + x[0] + '">' + x[1] + '</button>';
+      }).join('')
+      + '</div><p class="note">기본은 빼 두고, 필요할 때만 켭니다.</p></div>';
+
+    h += '<div class="grp"><b>경계 찍기 (271번)</b><div class="row">'
+      + '<button class="btn sm' + (marking ? ' on' : '') + '" id="tMark">' + (marking ? '찍기 끝내기' : '드론 사진 위에 찍기') + '</button>'
+      + (M.polygon && M.polygon.points && M.polygon.points.length ? '<button class="btn sm" id="tMarkClear">선 지우기</button>' : '')
+      + '</div><p class="note">대표 사진 위에서 땅 모서리를 차례로 톡톡 찍으면 빨간 테두리로 닫힙니다.</p></div>';
+
+    h += '<div class="grp"><b>추천 용도 · 연락처</b>'
+      + '<div class="inp"><span>추천 용도</span><input id="tUse" type="text" value="' + esc(M.use) + '" placeholder="예) 풀빌라 단지 · 연수원"></div>'
+      + '<div class="inp"><span>상호</span><input id="tOrg" type="text" value="' + esc(M.broker.org) + '"></div>'
+      + '<div class="two"><div class="inp"><span>직책 · 이름</span><input id="tWho" type="text" value="' + esc(((M.broker.title ? M.broker.title + ' ' : '') + M.broker.name)) + '"></div>'
+      + '<div class="inp"><span>전화</span><input id="tPhone" type="text" value="' + esc(M.broker.phone) + '"></div></div>'
+      + '</div>';
+
+    h += '<div class="grp"><div class="row"><button class="btn sm" id="tReset">예시로 되돌리기</button></div></div>';
+    b.innerHTML = h;
+
+    $('#tPhoto').addEventListener('change', function () { addPhotos(this.files); });
+    var pc = $('#tPhotoClear');
+    if (pc) pc.addEventListener('click', function () { M.photos = []; persist(); render(); openTools(); });
+    var sel = $('#tItem');
+    if (sel) sel.addEventListener('change', function () {
+      if (!this.value) return;
+      var m2 = fromStore(this.value);
+      if (!m2) { toast('매물을 찾지 못했습니다'); return; }
+      var keep = { use: M.use };
+      M = m2;
+      if (keep.use) M.use = keep.use;
+      persist(); render(); closeTools(); toast('매물을 불러왔습니다');
     });
-    $('#pSeal').addEventListener('click', function () {
-      /* 크게 보기 — 새 창 없이 화면에 크게 */
+    Array.prototype.forEach.call(b.querySelectorAll('#tMode [data-m]'), function (btn) {
+      btn.addEventListener('click', function () {
+        applyMode(M, btn.getAttribute('data-m'));
+        persist(); render(); openTools();
+      });
+    });
+    ['tSale', 'tRes', 'tEx'].forEach(function (id) {
+      var el = $('#' + id);
+      if (!el) return;
+      el.addEventListener('change', function () {
+        var v = parseFloat(el.value) * 1e4;
+        if (id === 'tSale') M.money.sale = isFinite(v) && v > 0 ? v : null;
+        if (id === 'tRes') M.money.residual = isFinite(v) && v > 0 ? v : null;
+        if (id === 'tEx') M.money.exchange = isFinite(v) && v > 0 ? v : null;
+        applyMode(M, M.money.mode || 'residual');
+        persist(); render();
+      });
+    });
+    Array.prototype.forEach.call(b.querySelectorAll('#tSec [data-s]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var k = btn.getAttribute('data-s');
+        M.sections = M.sections || {};
+        M.sections[k] = M.sections[k] === 0 ? 1 : 0;
+        rebuildExtras();
+        btn.classList.toggle('on', M.sections[k] !== 0);
+        persist(); render();
+      });
+    });
+    var mk = $('#tMark');
+    if (mk) mk.addEventListener('click', function () {
+      marking = !marking;
+      if (marking && !M.photos.length) { toast('먼저 드론·항공뷰 사진을 넣어 주세요'); marking = false; }
+      closeTools(); render();
+      if (marking) toast('사진 위 땅 모서리를 차례로 찍으세요', 3000);
+    });
+    var mc = $('#tMarkClear');
+    if (mc) mc.addEventListener('click', function () { M.polygon = null; persist(); render(); openTools(); });
+    ['tUse', 'tOrg', 'tWho', 'tPhone'].forEach(function (id) {
+      var el = $('#' + id);
+      if (!el) return;
+      el.addEventListener('change', function () {
+        if (id === 'tUse') M.use = el.value.trim();
+        if (id === 'tOrg') M.broker.org = el.value.trim();
+        if (id === 'tPhone') M.broker.phone = el.value.trim();
+        if (id === 'tWho') {
+          var t = el.value.trim().split(/\s+/);
+          if (t.length > 1) { M.broker.title = t[0]; M.broker.name = t.slice(1).join(' '); }
+          else M.broker.name = el.value.trim();
+        }
+        persist(); render();
+      });
+    });
+    $('#tReset').addEventListener('click', function () {
+      M = demo(); persist(); render(); closeTools(); toast('예시 물건으로 되돌렸습니다');
+    });
+    $('#sheet').hidden = false;
+  }
+  function closeTools() { $('#sheet').hidden = true; }
+
+  function rebuildExtras() {
+    var s = M.sections || {};
+    var out = [];
+    if (s.right !== 0) out.push({ t: '권리분석', lines: ['등기부 갑구·을구 확인', '토지·건축물대장 원본 확인', '국세·지방세 완납 확인'] });
+    if (s.tx !== 0 && M.tx && M.tx.length) {
+      out.push({ t: '주변 실거래', lines: M.tx.slice(0, 3).map(function (r) {
+        return [r.ym || '', r.jibun || '', r.area || '', B.won(r.amount)].filter(Boolean).join(' · ');
+      }) });
+    }
+    if (s.appraisal !== 0 && M.appraisal) out.push({ t: '감정가', lines: ['감정가 ' + B.won(M.appraisal)] });
+    M.extras = out;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function persist() {
+    if (guest) return;
+    LSSet(STATE, { orient: orient, m: M });
+  }
+
+  /* ---------------- 저장 ---------------- */
+  function openSave() {
+    var modal = $('#modal');
+    modal.hidden = false;
+    $('#mdOrient').querySelectorAll('button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-r') === orient);
+    });
+    paintPreview(orient);
+    $('#mdNote').textContent = '손가락으로 벌려 크게 확인한 뒤 저장하세요.';
+  }
+  function paintPreview(o) {
+    var stage = $('#mdStage');
+    stage.innerHTML = '<p style="color:#71829b;font-size:13px">이미지를 만드는 중…</p>';
+    var job = canvases[o] ? Promise.resolve(canvases[o]) : renderCanvas(o);
+    job.then(function (cv) {
+      canvases[o] = cv;
+      stage.innerHTML = '';
+      var img = new Image();
+      img.src = cv.toDataURL('image/png');
+      img.style.maxWidth = '100%';
+      stage.appendChild(img);
+    }).catch(function () {
+      stage.innerHTML = '<p style="color:#ffb877;font-size:13px">이미지를 만들지 못했습니다 — 사진을 줄여 다시 시도해 주세요.</p>';
+    });
+  }
+  function renderCanvas(o) {
+    return new Promise(function (res, rej) {
+      try {
+        B.toCanvas(M, o, o === 'port' ? 1.6 : 1.2, function (cv) { res(cv) });
+      } catch (e) { rej(e) }
+    });
+  }
+
+  function fileName(o) {
+    var t = String(M.title || '물건표').replace(/[\\/:*?"<>|]/g, '').slice(0, 22);
+    return t + (o === 'port' ? '_세로' : '_가로');
+  }
+  function downloadCv(cv, name) {
+    cv.toBlob(function (b) {
+      if (!b) { toast('저장하지 못했습니다'); return; }
+      var url = URL.createObjectURL(b);
+      var a = document.createElement('a');
+      a.href = url; a.download = name + '.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { try { URL.revokeObjectURL(url) } catch (e) { } }, 6000);
+    }, 'image/png');
+  }
+  function currentTargets() {
+    var sel = $('#mdOrient').querySelector('button.on');
+    var r = sel ? sel.getAttribute('data-r') : orient;
+    return r === 'both' ? ['land', 'port'] : [r];
+  }
+  function savePng() {
+    var list = currentTargets();
+    var done = 0;
+    list.forEach(function (o) {
+      var go = function (cv) { downloadCv(cv, fileName(o)); if (++done === list.length) toast('PNG를 저장했습니다 — 카톡·문자로 그대로 보내세요', 3400); };
+      if (canvases[o]) go(canvases[o]); else renderCanvas(o).then(go);
+    });
+  }
+  function savePdf() {
+    var o = currentTargets()[0];
+    var go = function (cv) {
+      var data = cv.toDataURL('image/png');
+      var wmm = o === 'port' ? 167 : 297, hmm = o === 'port' ? 297 : 167;
       var w = window.open('', '_blank');
-      if (!w) { toast('팝업이 막혔습니다'); return }
-      var url = KTS.Seal.dataUrl(700, sealOpts());
-      w.document.write('<title>직인 QR</title><body style="margin:0;display:grid;place-items:center;height:100vh"><img src="' + url + '" style="width:88vw;max-width:600px">');
+      if (!w) { toast('팝업이 막혔습니다 — PNG로 저장해 주세요', 3200); return; }
+      w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + fileName(o) + '</title>'
+        + '<style>@page{size:' + wmm + 'mm ' + hmm + 'mm;margin:0}html,body{margin:0;padding:0}'
+        + 'img{width:' + wmm + 'mm;height:' + hmm + 'mm;object-fit:contain;display:block}</style></head>'
+        + '<body><img src="' + data + '"></body></html>');
+      w.document.close();
+      setTimeout(function () { try { w.focus(); w.print() } catch (e) { } }, 700);
+      toast('인쇄 창에서 「PDF로 저장」을 고르세요', 3600);
+    };
+    if (canvases[o]) go(canvases[o]); else renderCanvas(o).then(go);
+  }
+
+  /* ---------------- 시작 ---------------- */
+  function boot() {
+    var code = qs('m'), itemId = qs('item'), listId = qs('id');
+    if (qs('g') === '1') guest = true;
+    if (code) {
+      var d = null;
+      try { d = B.dec(code) } catch (e) { d = null }
+      if (d) { M = d; guest = true; }
+    }
+    if (!M && itemId) M = fromStore(itemId);
+    if (!M && listId) {
+      fetch('data/listings.json', { cache: 'no-store' }).then(function (r) { return r.json() }).then(function (j) {
+        var L = (j.listings || []).filter(function (x) { return x.id === listId })[0];
+        fetch('data/broker.json', { cache: 'no-store' }).then(function (r) { return r.json() }).then(function (b) {
+          var m2 = fromListing(L, b);
+          if (m2) { M = m2; rebuildExtras(); render(); }
+        }).catch(function () {
+          var m3 = fromListing(L, null);
+          if (m3) { M = m3; rebuildExtras(); render(); }
+        });
+      }).catch(function () { });
+    }
+    if (!M) {
+      var st = LS(STATE, null);
+      if (st && st.m) { M = st.m; orient = st.orient === 'port' ? 'port' : 'land'; }
+    }
+    if (!M) M = demo();
+    if (!M.sections) M.sections = { right: 0, tx: 1, appraisal: 0 };
+    rebuildExtras();
+
+    if (guest) {
+      if (!st_qs_orient()) orient = 'port';   /* 손님 휴대폰에서는 세로가 먼저 */
+      document.body.classList.add('guest');
+      $('#guestbar').hidden = false;
+      $('#btnTools').hidden = true;
+      $('#btnSave').textContent = '이미지';
+      $('#hint').textContent = '보내 드린 물건표입니다 · 이미지로 저장해 두세요';
+      $('#gCall').href = 'tel:' + String((M.broker && M.broker.phone) || '').replace(/[^0-9+]/g, '');
+      $('#gCall').hidden = !(M.broker && M.broker.phone);
+    }
+    $('#oswitch').querySelectorAll('button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-o') === orient);
+      b.addEventListener('click', function () {
+        orient = b.getAttribute('data-o');
+        $('#oswitch').querySelectorAll('button').forEach(function (o) { o.classList.toggle('on', o === b); });
+        persist(); render();
+      });
     });
-    document.addEventListener('input', function () { });
-    /* 발 이름·전화를 고치면 도장 이름도 따라간다 */
-    ['#p-name'].forEach(function (s) {
-      var el = $(s); if (el) el.addEventListener('blur', paintSeal);
+    $('#btnSave').addEventListener('click', function () { openSave(); });
+    $('#btnTools').addEventListener('click', openTools);
+    $('#shX').addEventListener('click', closeTools);
+    $('#sheet').addEventListener('click', function (e) { if (e.target === this) closeTools(); });
+    $('#mdX').addEventListener('click', function () { $('#modal').hidden = true; });
+    $('#mdOrient').querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var r = b.getAttribute('data-r');
+        if (r !== 'both') { orient = r; persist(); }
+        $('#mdOrient').querySelectorAll('button').forEach(function (o) { o.classList.toggle('on', o === b); });
+        paintPreview(r === 'both' ? (orient === 'port' ? 'port' : 'land') : r);
+      });
     });
-    collectPhotos();
+    $('#mdPng').addEventListener('click', savePng);
+    $('#mdPdf').addEventListener('click', savePdf);
+    $('#gGet').addEventListener('click', function () {
+      openSave();
+      $('#mdOrient').hidden = false;
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeEditor();
+      if (!$('#sheet').hidden) closeTools();
+      else if (!$('#modal').hidden) $('#modal').hidden = true;
+    });
+    var rz = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(rz);
+      rz = setTimeout(function () { if (!guest || true) render(); }, 160);
+    });
+    render();
+    if (guest) setTimeout(function () { $('#hint').textContent = '보내 드린 물건표 · 크게 보려면 두 손가락으로 벌리세요'; }, 100);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
