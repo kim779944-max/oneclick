@@ -168,6 +168,24 @@
       };
       paint();
     }
+    /* QR 크게 보기 — 명함 QR과 같은 깔끔 QR로 (도장·틀 없이, 304번) */
+    var qb = root.querySelector('#btnSeal');
+    if (qb) qb.addEventListener('click', function (e) {
+      var big = document.getElementById('sealBig') || document.getElementById('sealBox');
+      var stage = document.getElementById('sealStage');
+      if (!big || !stage) return;
+      e.preventDefault();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      var w = Math.min(330, Math.max(210, Math.round((window.innerWidth || 390) * 0.74)));
+      stage.innerHTML = '';
+      var c2 = document.createElement('canvas');
+      stage.appendChild(c2);
+      try {
+        KTS.Seal.paint(c2, w, { style: 'plain', code: me.code || (p && p.n ? String(p.n) : ''),
+          value: KTS.Seal.payload(me) });
+      } catch (err) { }
+      if (big.id === 'sealBig') big.classList.add('on'); else big.hidden = false;
+    });
     var bs = root.querySelector('#btnSaveCard');
     if (bs) bs.addEventListener('click', function () { saveContact(me); });
     var sms = root.querySelector('#btnSms');
