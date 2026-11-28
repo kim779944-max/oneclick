@@ -8,7 +8,7 @@
 <title>KTS 전자명함</title>
 <!-- 짧은 주소 — autooneclick.com/1, /2, /3 …  (404.html 이 번호를 읽어 손님 명함을 그린다) -->
 <link rel="icon" href="/icon.png">
-<link rel="stylesheet" href="/bizcard/app.css?v=20261128b">
+<link rel="stylesheet" href="/bizcard/app.css?v=20261128c">
 <style>
   html,body{margin:0;min-height:100%}
   body{background:#0B132B;color:#e8eef8;font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
@@ -38,10 +38,10 @@
 <div id="sealBig"><div class="in"><div id="sealStage"></div><p>휴대폰 카메라로 찍으면 전자명함이 열립니다.</p><button type="button" id="sealX">닫기</button></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="/bizcard/vendor/qrcode.js?v=20261128b"></script>
-<script src="/bizcard/seal.js?v=20261128b"></script>
-<script src="/bizcard/guest.js?v=20261128b"></script>
-<script src="/bizcard/shorturl.js?v=20261128b"></script>
+<script src="/bizcard/vendor/qrcode.js?v=20261128c"></script>
+<script src="/bizcard/seal.js?v=20261128c"></script>
+<script src="/bizcard/guest.js?v=20261128c"></script>
+<script src="/bizcard/shorturl.js?v=20261128c"></script>
 <script>
 (function () {
   'use strict';
@@ -55,8 +55,16 @@
   }
   function pathNo() {
     var p = location.pathname.replace(/\/+$/, '');
-    var m = p.match(/\/(\d{1,6})$/);
-    return m ? m[1] : '';
+    var seg = p.split('/').pop() || '';
+    try { seg = decodeURIComponent(seg); } catch (e) { }
+    seg = String(seg || '').trim();
+    if (/^\d{1,6}$/.test(seg)) return seg;
+    /* 302수리C — 이름 주소(autooneclick.com/김중개). 한글은 퍼센트 인코딩으로 들어온다 */
+    if (window.KTS_SHORT && KTS_SHORT.slugify) {
+      var slug = KTS_SHORT.slugify(seg);
+      if (slug === seg && !KTS_SHORT.slugProblem(slug)) return slug;
+    }
+    return '';
   }
 
   var n = pathNo();
@@ -72,14 +80,15 @@
   KTS_SHORT.load(n).then(function (r) {
     if (!r || !r.ok) {
       if (r && (r.why === 'busy' || r.why === 'net')) {
-        none('명함을 불러오지 못했습니다', '지금 접속이 잠시 몰렸습니다.<br>잠깐 뒤 다시 열어 주세요. (번호 ' + esc(n) + ')'
+        none('명함을 불러오지 못했습니다', '지금 접속이 잠시 몰렸습니다.<br>잠깐 뒤 다시 열어 주세요. (' + esc(n) + ')'
           + '<br><a href="javascript:location.reload()">다시 시도</a>');
       } else {
-        none('아직 없는 명함입니다', '이 번호로 발급된 명함이 없습니다.<br>주소를 다시 확인해 주세요. (번호 ' + esc(n) + ')');
+        none('아직 없는 명함입니다', '이 주소로 발급된 명함이 없습니다.<br>주소를 다시 확인해 주세요. (' + esc(n) + ')');
       }
       return;
     }
     var p = r.p;
+    var num = /^\d{1,6}$/.test(n);
     /* 물건표를 누르면 그 물건표로 — 번호는 그대로 두고 물건만 고른다 */
     var i = qs('i');
     if (i !== '' && p.items && p.items[parseInt(i, 10)]) {
@@ -87,9 +96,13 @@
       return;
     }
     p.n = p.n || n;
-    if (p.me) p.me.shortNo = n;   /* QR은 이 짧은 주소를 담는다 */
+    if (p.me) {
+      if (num) p.me.shortNo = n;                 /* QR은 이 짧은 주소를 담는다 */
+      else p.me.slug = n;                        /* 이름 주소는 슬러그로 */
+    }
     document.title = ((p.me && p.me.name) ? p.me.name + ' ' : '') + (p.me && p.me.org ? p.me.org + ' · ' : '') + 'KTS 전자명함';
-    var base = location.origin + '/' + n;
+    var base = location.origin + '/' + (num ? n : encodeURIComponent(n));
+    if (p.me) p.me.shortUrl = base;              /* 도장 QR·물건표 링크가 이 주소를 따른다 */
     root.innerHTML = '<div class="brandline"><img src="/bizcard/icon-192.png" alt="">KTS 원클릭 · 전자명함</div>'
       + KTS_GUEST.card(p, { posterBase: base });
     document.body.classList.add('guestmode');
@@ -117,6 +130,6 @@
   });
 })();
 </script>
-<script src="/shared/visit.js?v=20261128b" defer></script>
+<script src="/shared/visit.js?v=20261128c" defer></script>
 </body>
 </html>

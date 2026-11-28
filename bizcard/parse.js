@@ -108,6 +108,59 @@
     return out;
   }
 
+  /* ---------- 상가·건물 물건 문자 (302수리C · 2026-11-28) ----------------------
+     「대205 건266(5층)융자9억3천 /보)1억2천/월800. =매23억」처럼 기호로 붙여 쓴
+     상가·건물 매물에서 대지·건물·층수·융자·보증금·월세·매매가를 라벨 단위로 갈라 낸다.
+     라벨이 있는 값만 만든다 — 없는 것을 만들지 않는다. */
+  var UNIT_FROM_PY = 3.305785;
+  function moneyChunk(s) {
+    var m = String(s || '').match(/((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/);
+    if (!m) { m = String(s || '').match(/^\s*([\d,]{1,9})/); if (!m) return null; }
+    return parseMoney(m[1]);
+  }
+  function areaChunk(num, unit) {
+    var v = parseFloat(cleanNum(num));
+    if (!isFinite(v) || v <= 0) return null;
+    if (unit === '평') return Math.round(v * UNIT_FROM_PY * 10) / 10;
+    return Math.round(v * 10) / 10;
+  }
+  function marked(text) {
+    var s = ' ' + String(text || '').replace(/[\u00a0]/g, ' ').replace(/[\r\n]+/g, ' ') + ' ';
+    var out = {};
+    var m;
+    /* 대지 — 「대205」·「대지 205㎡」·「대 205평」 (임대·지대 같은 낱말 속의 대는 뺀다) */
+    m = s.match(/(?:^|[\s\/,.()\[\]{}（）【】])(?:대지|대)\s*(?:면적)?\s*[:：]?\s*([\d,]+(?:\.\d+)?)\s*(㎡|m2|m²|제곱미터|평)?/);
+    if (m) { var lm = areaChunk(m[1], m[2]); if (lm) { out.landM2 = lm; } }
+    /* 건물 — 「건266」·「건물 266㎡」·「건평 80평」 */
+    m = s.match(/(?:^|[\s\/,.()\[\]{}（）【】])(?:건물|건평|건축면적|건)\s*[:：]?\s*([\d,]+(?:\.\d+)?)\s*(㎡|m2|m²|제곱미터|평)?/);
+    if (m) { var bm = areaChunk(m[1], m[2]); if (bm) out.buildM2 = bm; }
+    /* 층수 — 「(5층)」·「지상 5층」 — 20층을 넘는 숫자는 연도·금액으로 본다 */
+    m = s.match(/(?:지상|지층)?\s*\(?\s*(\d{1,2})\s*층/);
+    if (m) { var fl = parseInt(m[1], 10); if (fl > 0 && fl < 100) out.floor = fl; }
+    /* 융자 — 「융자9억3천」·「융자 9억 3천만」 */
+    m = s.match(/(?:융자금|융자|근저당|저당|대출)\s*(?:승계|금액|잔액)?\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/);
+    if (m) { var ln = moneyChunk(m[1]); if (ln) out.loan = ln; }
+    /* 보증금 — 「/보)1억2천」·「보증금 3,000만」 */
+    m = s.match(/(?:보증금|보증|보)\s*[)\]）]?\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/);
+    if (m) { var dp = moneyChunk(m[1]); if (dp) out.deposit = dp; }
+    /* 월세 — 「/월800.」= 800만 · 「월세 500만」 */
+    m = s.match(/(?:월세|월)\s*[:：]?\s*([\d,]+(?:\.\d+)?)\s*(억|천만|백만|만|천)?/);
+    if (m) {
+      var mv = parseFloat(cleanNum(m[1])), u2 = m[2];
+      if (isFinite(mv) && mv > 0) {
+        if (u2 === '억') out.monthly = mv * 1e8;
+        else if (u2 === '천만') out.monthly = mv * 1e7;
+        else if (u2 === '만') out.monthly = mv * 1e4;
+        else if (u2 === '천') out.monthly = mv * 1e3;
+        else if (mv < 100000) out.monthly = mv * 1e4;      /* 단위 없이 「월800」 = 800만 */
+      }
+    }
+    /* 매매가 — 「=매23억」·「매매 23억」 (매년·매입 같은 낱말은 뺀다) */
+    m = s.match(/(?:^|[\s=\/,])(?:매매가|매매|매가|매)\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/);
+    if (m) { var sl = moneyChunk(m[1]); if (sl) out.sale = sl; }
+    return out;
+  }
+
   /* ---------- 주소 ---------- */
   function isSido(tok) {
     for (var i = 0; i < SIDO.length; i++) if (tok === SIDO[i]) return true;
@@ -205,6 +258,7 @@
   var NAME_STOP = /부동산|공인중개|중개|대표|사장|팀장|실장|과장|부장|이사|님$|입니다|드림|문의|연락/;
 
   function addrLoose(tokens) {
+    var bare = '';                    /* 번지 없는 후보 — 번지 붙은 후보가 나오면 그것을 쓴다 */
     for (var i = 0; i < tokens.length; i++) {
       if (!/^[가-힣]{1,7}(읍|면|동|리)$/.test(tokens[i])) continue;
       if (/^[가-힣]{0,3}가$/.test(tokens[i]) && !/\d가$/.test(tokens[i])) continue;
@@ -216,17 +270,20 @@
         back.unshift(tokens[k]);
       }
       if (!back.length) continue;
-      var parts = back.slice(), j = i, guard = 0;
+      var parts = back.slice(), j = i, guard = 0, hasNo = false;
       while (j < tokens.length && guard++ < 4) {
         var t = tokens[j];
-        if (/^\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
+        if (/^\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); hasNo = true; break; }
         if (/^[가-힣0-9]{1,7}(읍|면|동|리|\d가)$/.test(t)) { parts.push(t); j++; continue; }
-        if (/^[가-힣]{1,8}\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); break; }
+        if (/^[가-힣]{1,8}\d{1,5}(-\d{1,5})?$/.test(t)) { parts.push(t); hasNo = true; break; }
         break;
       }
-      if (parts.length >= 2) return parts.join(' ');
+      if (parts.length >= 2) {
+        if (hasNo) return parts.join(' ');
+        if (!bare) bare = parts.join(' ');
+      }
     }
-    return '';
+    return bare;
   }
 
   function normAddr(a) {
@@ -258,6 +315,7 @@
   function parse(raw) {
     var text = String(raw || '');
     var lines = text.split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    var mk = marked(text);
 
     var addrRaw = addrFromTokens(text);
     var addr = normAddr(addrRaw);
@@ -266,17 +324,24 @@
     var noArea = text.replace(/[\d,]+(?:\.\d+)?\s*(?:㎡|m2|m²|제곱미터|평)/gi, ' ');
     var area = parseArea(text);
 
+    /* 면적 — 「대205 건266」처럼 단위 없이 붙여 쓴 상가·건물 문자 */
+    if (mk.landM2) { area.m2 = mk.landM2; area.p = Math.round(mk.landM2 / UNIT_FROM_PY); }
+
     /* 보증금 / 월세 */
     var dep = null, mon = null;
     var dm = noArea.match(/보증금?\s*([\d,]+(?:\.\d+)?)\s*(?:만)?\s*\/?\s*(?:월세?|월)\s*([\d,]+(?:\.\d+)?)/);
     if (dm) {
       dep = parseMoney(dm[1] + '만'); mon = parseMoney(dm[2] + '만');
     }
+    if (mk.deposit) dep = mk.deposit;
+    if (mk.monthly) mon = mk.monthly;
 
-    /* 매매가 — 가격 문맥이 있는 줄을 우선 본다 */
-    var deal = /월세/.test(noArea) ? '월세' : (/전세/.test(noArea) ? '전세' : '매매');
+    /* 매매가 — 가격 문맥이 있는 줄을 우선 본다. 「=매23억」처럼 매매 표시가 있으면 그것이 매가 */
+    var deal = (mk.sale || /매매|매가/.test(noArea)) ? '매매'
+      : ((mk.deposit || mk.monthly || /월세/.test(noArea)) ? '월세' : (/전세/.test(noArea) ? '전세' : '매매'));
     var price = null;
-    if (deal === '매매') {
+    if (mk.sale) price = mk.sale;
+    if (deal === '매매' && !price) {
       var cand = lines.filter(function (l) { return /매매|매가|급매|분양|가격|매도/.test(l); });
       if (!cand.length) cand = lines.filter(function (l) { return /억|만원|천만/.test(l) && !/㎡|평/.test(l); });
       if (!cand.length) cand = [noArea];
@@ -314,6 +379,7 @@
     return {
       kind: kind, addr: addr, addrRaw: addrRaw, areaM2: area.m2, areaP: area.p,
       price: price, dealType: deal, deposit: dep, monthly: mon,
+      landM2: mk.landM2 || null, buildM2: mk.buildM2 || null, floor: mk.floor || null, loan: mk.loan || null,
       tags: tags, phone: phone, title: title, region: region,
       raw: text, missing: missing
     };

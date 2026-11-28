@@ -122,8 +122,9 @@
     if (addr) out.push(['소 재 지', addr + (it.jibun && addr.indexOf(it.jibun) < 0 ? ' (' + it.jibun + ')' : '')]);
     var areaM2 = it.areaM2 || (ch.lndpclAr ? +ch.lndpclAr : null) || (toji.lndpclAr ? +toji.lndpclAr : null);
     if (areaM2) out.push(['대지면적', num(areaM2, 1) + '㎡ / ' + num(Math.round(areaM2 / 3.305785)) + '평']);
-    var jimok = ch.lndcgrCodeNm || toji.lndcgrCodeNm || it.kind;
+    var jimok = ch.lndcgrCodeNm || toji.lndcgrCodeNm;
     if (jimok) out.push(['지 목', jimok]);
+    else if (it.kind) out.push(['종 류', it.kind]);
     var zone = zoneOf(gb);
     if (zone) out.push(['용도지역', zone + (ZONE[zone] ? ' (건폐 ' + ZONE[zone][0] + '%·용적 ' + ZONE[zone][1] + '%)' : '')]);
     var jiga = jigaOf(gb);
@@ -133,8 +134,11 @@
       var bits = [b0.mainPurpsCdNm || '', b0.strctCdNm || '', (b0.grndFlrCnt ? '지상 ' + b0.grndFlrCnt + '층' : ''), (b0.ugrndFlrCnt ? '지하 ' + b0.ugrndFlrCnt + '층' : '')].filter(Boolean);
       if (bits.length) out.push(['건 축 물', bits.join(' · ')]);
       if (b0.totArea) out.push(['연 면 적', num(b0.totArea, 1) + '㎡']);
-    } else if (b.st === 'EMPTY') {
+    } else if (b.st === 'EMPTY' && /^(대지|임야|답|전|전답|농지|과수원|토지|야적장|잡종지)$/.test(String(it.kind || ''))) {
+      /* 건축물대장이 비었다고 무조건 「나대지」라 적지 않는다 — 땅인 물건일 때만 (302수리C) */
       out.push(['건 축 물', '없음 (나대지)']);
+    } else if (b.st === 'EMPTY' && it.kind) {
+      out.push(['건 축 물', it.kind + ' — 건축물대장 확인 전']);
     }
     if (ch.roadSideCodeNm) out.push(['도 로', ch.roadSideCodeNm + (ch.tpgrphHgCodeNm ? ' · ' + ch.tpgrphHgCodeNm : '')]);
     var py = pyPrice(it);
@@ -251,6 +255,7 @@
       addr: it.addr || '',
       photos: (it.photos || []).filter(Boolean).slice(0, 4),
       map: it.map || '',
+      cad: it.cad || '',
       polygon: it.polygon || null,
       specs: specs,
       points: points.slice(0, 3),
@@ -280,23 +285,26 @@
   /* 카드 3장의 세로 배분 — 남는 자리에 맞춰 제원 줄·포인트 줄·감동의 글을 차례로 조인다 */
   function fit(m, avail, cw, land) {
     var mh = land ? 206 : 226;                     /* 03 투자조건 고정 높이 */
+    /* 302수리C — 줄 높이를 글씨 크기에서 뽑는다. 예전에는 글씨는 그대로 두고 줄만 줄여
+       01카드 줄이 서로 겹치는 일이 있었다. */
     var plays = [
-      { r: 37, p: 37, ss: 21, sl: 29 },
-      { r: 34, p: 35, ss: 20, sl: 28 },
-      { r: 32, p: 34, ss: 19, sl: 27 },
-      { r: 30, p: 33, ss: 18, sl: 26 },
-      { r: 28, p: 31, ss: 17, sl: 25 },
-      { r: 26, p: 30, ss: 16, sl: 23 },
-      { r: 24, p: 28, ss: 15, sl: 22 }
+      { sf: 20, pf: 24, ss: 21 },
+      { sf: 19, pf: 23, ss: 20 },
+      { sf: 18, pf: 22, ss: 19 },
+      { sf: 17, pf: 21, ss: 18 },
+      { sf: 16, pf: 20, ss: 17 },
+      { sf: 15, pf: 19, ss: 16 }
     ];
     /* 감동의 글은 끝을 잘라 「…」를 붙이지 않는다 — 글이 다 들어가는 크기를 찾는다 */
-    function comp(p) {
-      var lines = wrap(m.story, f(p.ss, 500), cw - 76, 0);
+    function comp(k) {
+      var r = k.sf + 15, pt = k.pf + 10, sl = k.ss + 6;
+      var lines = wrap(m.story, f(k.ss, 500), cw - 76, 0);
       var ex = m.extras.length ? 32 : 0;
-      var h1 = 58 + m.specs.length * p.r + 14;
-      var h2 = 58 + m.points.length * p.p + ex + 6 + (lines.length * p.sl + 20) + 16;
+      var h1 = 58 + m.specs.length * r + 14;
+      var h2 = 58 + m.points.length * pt + ex + 6 + (lines.length * sl + 20) + 16;
       var h3 = 58 + mh + 14;
-      return { rowH: p.r, ptH: p.p, storySize: p.ss, storyLH: p.sl, storyLines: lines, moneyH: mh, c1: h1, c2: h2, c3: h3 };
+      return { rowH: r, ptH: pt, specSize: k.sf, pointSize: k.pf, storySize: k.ss, storyLH: sl,
+               storyLines: lines, moneyH: mh, c1: h1, c2: h2, c3: h3 };
     }
     var pick = null;
     for (var i = 0; i < plays.length; i++) {
@@ -304,14 +312,15 @@
       pick = t;
       if (t.c1 + t.c2 + t.c3 + 20 <= avail) { t.gap = Math.min(56, (avail - t.c1 - t.c2 - t.c3) / 2); return t; }
     }
-    /* 가장 작은 크기로도 넘치면 글씨만 더 줄여 종이 안에 다 넣는다 */
+    /* 가장 작은 크기로도 넘치면 글씨·줄을 함께 더 줄여 종이 안에 다 넣는다 */
     var q = comp(plays[plays.length - 1]);
-    var ss = plays[plays.length - 1].ss - 1;
-    while (ss > 11) {
-      var t2 = comp({ r: 22, p: 26, ss: ss, sl: ss + 6 });
+    var k0 = plays[plays.length - 1];
+    for (var step = 1; step <= 3; step++) {
+      var k2 = { sf: k0.sf - step, pf: k0.pf - step, ss: Math.max(11, k0.ss - step) };
+      if (k2.sf < 12) break;
+      var t2 = comp(k2);
       q = t2;
       if (t2.c1 + t2.c2 + t2.c3 + 12 <= avail) break;
-      ss -= 1;
     }
     q.gap = Math.max(6, (avail - q.c1 - q.c2 - q.c3) / 2);
     return q;
@@ -321,35 +330,57 @@
     return land ? { title: 46, ty: 68, pointY: 56, addrY: 88 } : { title: 52, ty: 104, pointY: 0, addrY: 0 };
   }
 
-  /* 가로 16:9 — 사진 0장(위치도 한 장만) · 1장(꽉) · 2장 이상(썸네일 줄) */
+  /* ---------- 미디어 배치 (사진 · 위성 · 지적도) — 302수리C 2026-11-28 ----------
+     대표님 확정 시안(final_poster_landscape·portrait) 기준:
+       · 사진 0장 — 위성 1장 크게. 위성·지적도가 둘 다 있으면 나란히 두 칸(라벨로 구분)
+       · 사진 1장 — 썸네일 줄 없이 한 장 꽉
+       · 사진 2장 이상 — 큰 사진 + 밑에 썸네일 줄,
+         가로는 썸네일 줄 아래 지적도 큰 칸, 세로는 썸네일 줄 마지막 칸에 지적도 */
+  function mediaPlan(m, box, o) {
+    o = o || {};
+    var gap = 12, thH = o.thH || 112;
+    var nPh = (m.photos || []).length;
+    var hasSat = !!m.map, hasCad = !!m.cad;
+    var out = { photo: null, thumbs: null, blocks: [] };
+    function place(k, x, y, w, h) { return { k: k, x: x, y: y, w: w, h: h }; }
+    if (!nPh) {
+      var kinds = [];
+      if (hasSat) kinds.push('sat');
+      if (hasCad) kinds.push('cad');
+      if (!kinds.length) return out;
+      var n = kinds.length, w1 = (box.w - gap * (n - 1)) / n;
+      for (var i = 0; i < n; i++) out.blocks.push(place(kinds[i], box.x + i * (w1 + gap), box.y, w1, box.h));
+      return out;
+    }
+    if (nPh === 1) { out.photo = { x: box.x, y: box.y, w: box.w, h: box.h, idx: 0 }; return out; }
+    var cells = [];
+    for (var j = 1; j < nPh && cells.length < 3; j++) cells.push({ k: 'photo', idx: j });
+    if (o.cadInRow && hasCad && cells.length < 4) cells.push({ k: 'cad', idx: -1 });
+    var blockH = 0;
+    if (!o.cadInRow && hasCad && box.h > 520) blockH = Math.max(210, Math.round(box.h * 0.30));
+    var bigH = box.h - (cells.length ? thH + gap : 0) - (blockH ? blockH + gap : 0);
+    out.photo = { x: box.x, y: box.y, w: box.w, h: bigH, idx: 0 };
+    var yy = box.y + bigH + gap;
+    if (cells.length) {
+      out.thumbs = { x: box.x, y: yy, w: box.w, h: thH, gap: 10, cells: cells };
+      yy += thH + gap;
+    }
+    if (blockH) out.blocks.push(place('cad', box.x, yy, box.w, blockH));
+    return out;
+  }
+
+  /* 가로 16:9 — 왼쪽: 큰 그림 + 썸네일 줄 + 지적도 / 오른쪽: 01·02·03 */
   function planLand(m) {
     var W = LAND.W, H = LAND.H, PAD = 44;
     var headH = 104, footH = 100;
     var top = headH, bottom = H - footH;
     var LW = 884, LX = PAD, RX = PAD + LW + 20, RW = W - PAD - RX;
-    var nPh = (m.photos || []).length;
-    var hasMap = !!m.map;
-    var hasTh = nPh >= 2;
-    var gap = 12, thH = hasTh ? 106 : 0;
-    var bigH = hasTh ? 420 : 486;
-    var photo = null, mapBlock = null, thumbs = null;
+    var MP = mediaPlan(m, { x: LX, y: top, w: LW, h: bottom - top }, { thH: 112, cadInRow: false });
     var cardsX = RX, cardsW = RW;
-
-    if (!nPh && !hasMap) {
+    if (!MP.photo && !MP.blocks.length) {
       /* 사진도 위치도도 없을 때 — 빈 네이비 박스를 두지 않고 3단이 종이를 꽉 채운다 */
       cardsX = PAD; cardsW = W - PAD * 2;
-    } else if (!nPh && hasMap) {
-      /* 사진 0장 — 위치도(위성·지적) 한 장만 크게. 위성사진 3중 중복 없음 */
-      mapBlock = { x: LX, y: top, w: LW, h: bottom - top, big: 1 };
-    } else {
-      photo = { x: LX, y: top, w: LW, h: bigH };
-      if (hasTh) thumbs = { x: LX, y: top + bigH + gap, w: LW, h: thH, n: Math.min(4, nPh - 1 + (hasMap ? 1 : 0)), gap: 10 };
-      if (hasMap) {
-        var mapY = top + bigH + (hasTh ? gap + thH + gap : gap);
-        mapBlock = { x: LX, y: mapY, w: LW, h: bottom - mapY };
-      }
     }
-
     var F = fit(m, bottom - top, cardsW, true);
     var usedL = F.c1 + F.c2 + F.c3 + F.gap * 2, exL = Math.max(0, (bottom - top) - usedL);
     F.c1 += exL * 0.18; F.c2 += exL * 0.64; F.c3 += exL * 0.18;
@@ -363,42 +394,62 @@
       W: W, H: H, orient: 'land', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },
       foot: { x: 0, y: bottom, w: W, h: footH },
-      photo: photo,
-      thumbs: thumbs || { x: LX, y: 0, w: LW, h: 0, n: 0, gap: 10 },
-      map: mapBlock,
+      photo: MP.photo,
+      thumbs: MP.thumbs || { x: LX, y: 0, w: LW, h: 0, gap: 10, cells: [] },
+      blocks: MP.blocks,
+      map: MP.blocks.length ? MP.blocks[0] : null,
       cards: cards,
-      rowH: F.rowH, ptH: F.ptH, storySize: F.storySize, storyLH: F.storyLH,
+      rowH: F.rowH, ptH: F.ptH, specSize: F.specSize, pointSize: F.pointSize,
+      storySize: F.storySize, storyLH: F.storyLH,
       storyLines: F.storyLines, moneyH: F.moneyH
     };
   }
 
-  /* 세로 9:16 */
+  /* 세로 9:16 — 위에서부터 큰 그림 · 썸네일 줄(지적도 포함) · 01·02·03 */
   function planPort(m) {
     var W = PORT.W, H = PORT.H, PAD = 40;
     var headH = 236, footH = 176;
     var top = headH, bottom = H - footH;
     var cw = W - PAD * 2;
     var nPh = (m.photos || []).length;
-    var hasMap = !!m.map;
-    var hasTh = nPh >= 2;
-    var gap = 12, thH = hasTh ? 134 : 0;
-    var bigH = hasTh ? 420 : 486;
-    var photo = null, mapBlock = null, thumbs = null, cardsTop;
-
-    if (nPh) {
-      photo = { x: PAD, y: top, w: cw, h: bigH };
-      if (hasTh) thumbs = { x: PAD, y: top + bigH + gap, w: cw, h: thH, n: Math.min(4, nPh - 1 + (hasMap ? 1 : 0)), gap: 10 };
-      cardsTop = top + bigH + (hasTh ? gap + thH + 18 : 18);
-    } else if (hasMap) {
-      /* 사진 0장 — 위치도 한 장만 크게 */
-      mapBlock = { x: PAD, y: top, w: cw, h: 560, big: 1 };
-      cardsTop = top + 560 + 18;
-    } else {
-      /* 사진도 위치도도 없음 — 빈 박스 없이 바로 3단 */
-      cardsTop = top + 6;
+    var hasLoc = !!(m.map || m.cad);
+    var availAll = bottom - top;
+    /* 미디어는 목표 비율만큼, 단 카드(01·02·03)가 다 들어갈 자리를 먼저 뺀다 — 종이 밖으로 넘치지 않게 */
+    var mediaMax = nPh >= 2 ? 700 : (nPh === 1 ? 660 : (hasLoc ? 680 : 0));
+    var mediaMin = nPh >= 2 ? 540 : (nPh === 1 ? 420 : (hasLoc ? 460 : 0));
+    var mediaH = mediaMax ? Math.min(mediaMax, Math.round(availAll * 0.46)) : 0;
+    if (mediaH && mediaH < mediaMin) mediaH = Math.min(mediaMax, mediaMin);
+    var F = null, guard = 0;
+    while (true) {
+      var cardsAvail = availAll - (mediaH ? mediaH + 18 : 6);
+      F = fit(m, cardsAvail, cw, false);
+      var need = F.c1 + F.c2 + F.c3 + F.gap * 2;
+      var slack = cardsAvail - need;
+      if (guard++ > 8) break;
+      if (need > cardsAvail + 0.5) {
+        if (mediaH <= mediaMin) break;
+        mediaH = Math.max(mediaMin, mediaH - Math.ceil(need - cardsAvail) - 8);
+        continue;
+      }
+      if (F.specSize < 15 || F.storySize < 16) {
+        if (mediaH <= mediaMin) break;
+        mediaH = Math.max(mediaMin, mediaH - 40);
+        continue;
+      }
+      /* 글·카드가 다 들어가고도 자리가 남으면 그림이 그 자리를 먹는다 — 카드 안에 빈 구멍을 두지 않는다 */
+      if (slack > 24 && mediaH < mediaMax) {
+        mediaH = Math.min(mediaMax, mediaH + Math.ceil(slack) - 8);
+        continue;
+      }
+      break;
     }
+    var MP = mediaH
+      ? mediaPlan(m, { x: PAD, y: top, w: cw, h: mediaH }, { thH: 148, cadInRow: true })
+      : { photo: null, thumbs: null, blocks: [] };
+    var cardsTop = top + (mediaH ? mediaH + 18 : 6);
+    if (!MP.photo && !MP.blocks.length) cardsTop = top + 6;
 
-    var F = fit(m, bottom - cardsTop, cw, false);
+    F = fit(m, bottom - cardsTop, cw, false);
     var usedP = F.c1 + F.c2 + F.c3 + F.gap * 2, exP = Math.max(0, (bottom - cardsTop) - usedP);
     F.c1 += exP * 0.18; F.c2 += exP * 0.64; F.c3 += exP * 0.18;
     var y = cardsTop, cards = [];
@@ -411,11 +462,13 @@
       W: W, H: H, orient: 'port', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },
       foot: { x: 0, y: bottom, w: W, h: footH },
-      photo: photo,
-      thumbs: thumbs || { x: PAD, y: 0, w: cw, h: 0, n: 0, gap: 10 },
-      map: mapBlock,
+      photo: MP.photo,
+      thumbs: MP.thumbs || { x: PAD, y: 0, w: cw, h: 0, gap: 10, cells: [] },
+      blocks: MP.blocks,
+      map: MP.blocks.length ? MP.blocks[0] : null,
       cards: cards,
-      rowH: F.rowH, ptH: F.ptH, storySize: F.storySize, storyLH: F.storyLH,
+      rowH: F.rowH, ptH: F.ptH, specSize: F.specSize, pointSize: F.pointSize,
+      storySize: F.storySize, storyLH: F.storyLH,
       storyLines: F.storyLines, moneyH: F.moneyH
     };
   }
@@ -520,55 +573,67 @@
       if (m.polygon && m.polygon.photo === 0) polygon(x, m.polygon.points, ph.x, ph.y, ph.w, ph.h);
     }
 
-    /* ---------- 썸네일 줄(보조 사진 + 위치도) ---------- */
-    var subs = imgs.subs || [];
-    var T = P.thumbs, nCell = T.n || 0, cellW = nCell ? (T.w - T.gap * (nCell - 1)) / nCell : 0;
-    var mapCell = imgs.map ? nCell - 1 : -1;
-    for (var k = 0; k < nCell; k++) {
-      var cx = T.x + k * (cellW + T.gap), cy = T.y;
-      x.fillStyle = C.navy2; rr(x, cx, cy, cellW, T.h, 8); x.fill();
-      var sub = subs[k];
-      if (sub && sub.img) {
-        cover(x, sub.img, cx, cy, cellW, T.h, 8);
-        if (m.polygon && m.polygon.photo === sub.idx) polygon(x, m.polygon.points, cx, cy, cellW, T.h);
-      } else if (k === mapCell && imgs.map) {
-        cover(x, imgs.map, cx, cy, cellW, T.h, 8);
-        x.fillStyle = 'rgba(11,21,38,.78)'; rr(x, cx + 8, cy + 7, 74, 26, 6); x.fill();
-        x.fillStyle = '#dbe6f4'; x.font = f(land ? 16 : 18, 800);
-        x.fillText('위치도', cx + 16, cy + 25);
-      } else if (!sub) {
-        x.fillStyle = '#556883'; x.font = f(16, 700); x.textAlign = 'center';
-        x.fillText('사진', cx + cellW / 2, cy + T.h / 2 + 5); x.textAlign = 'left';
-      }
-    }
-
-    /* ---------- 위치도 — 사진 0장이면 이 한 장이 대표 ---------- */
-    if (P.map) {
-      var M = P.map;
-      x.fillStyle = '#fff'; rr(x, M.x, M.y, M.w, M.h, 10); x.fill();
-      x.save(); rr(x, M.x, M.y, M.w, M.h, 10); x.clip();
-      x.fillStyle = C.soft; x.fillRect(M.x, M.y, M.w, M.h);
-      if (imgs.map) cover(x, imgs.map, M.x, M.y, M.w, M.h, 0);
+    /* ---------- 큰 위치 칸 (사진이 없을 때는 위성·지적도가 이 자리를 쓴다) ---------- */
+    function locLabel(b) { return b.k === 'cad' ? '지적도' : '위성사진'; }
+    function locImg(b) { return b.k === 'cad' ? imgs.cad : imgs.map; }
+    function drawLoc(b) {
+      x.save();
+      x.fillStyle = '#fff'; rr(x, b.x, b.y, b.w, b.h, 10); x.fill();
+      rr(x, b.x, b.y, b.w, b.h, 10); x.clip();
+      x.fillStyle = '#eef3f9'; x.fillRect(b.x, b.y, b.w, b.h);
+      var im = locImg(b);
+      if (im) cover(x, im, b.x, b.y, b.w, b.h, 0);
       else {
-        /* 위치도를 아직 못 받았을 때 — 빈 칸 대신 「지적도 자리」로 단정하게 */
-        x.fillStyle = '#eef3f9'; x.fillRect(M.x, M.y, M.w, M.h);
         x.strokeStyle = '#d7e0ec'; x.lineWidth = 2;
-        for (var gx2 = 0; gx2 < M.w; gx2 += 46) { x.beginPath(); x.moveTo(M.x + gx2, M.y); x.lineTo(M.x + gx2, M.y + M.h); x.stroke(); }
-        for (var gy2 = 0; gy2 < M.h; gy2 += 46) { x.beginPath(); x.moveTo(M.x, M.y + gy2); x.lineTo(M.x + M.w, M.y + gy2); x.stroke(); }
-        var ccx = M.x + M.w / 2, ccy = M.y + M.h / 2 - 18;
+        for (var gx2 = 0; gx2 < b.w; gx2 += 46) { x.beginPath(); x.moveTo(b.x + gx2, b.y); x.lineTo(b.x + gx2, b.y + b.h); x.stroke(); }
+        for (var gy2 = 0; gy2 < b.h; gy2 += 46) { x.beginPath(); x.moveTo(b.x, b.y + gy2); x.lineTo(b.x + b.w, b.y + gy2); x.stroke(); }
+        var ccx = b.x + b.w / 2, ccy = b.y + b.h / 2 - 18;
         x.fillStyle = 'rgba(255,122,0,.14)'; x.beginPath(); x.arc(ccx, ccy, 34, 0, Math.PI * 2); x.fill();
         x.fillStyle = C.org; x.beginPath(); x.arc(ccx, ccy - 4, 9, 0, Math.PI * 2); x.fill();
         x.beginPath(); x.moveTo(ccx - 9, ccy + 4); x.lineTo(ccx, ccy + 24); x.lineTo(ccx + 9, ccy + 4); x.closePath(); x.fill();
         x.fillStyle = '#5d7189'; x.font = f(21, 800); x.textAlign = 'center';
-        x.fillText('주소를 넣으면 지적·항공 위치도가 자동으로 붙습니다', ccx, ccy + 62);
-        if (m.addr) { x.fillStyle = '#8296ad'; x.font = f(18, 600); x.fillText(clip(m.addr, f(18, 600), M.w - 60), ccx, ccy + 92); }
+        x.fillText('주소를 넣으면 ' + (b.k === 'cad' ? '지적도' : '위성사진') + '가 자동으로 붙습니다', ccx, ccy + 62);
         x.textAlign = 'left';
       }
-      if (m.polygon && (m.polygon.photo == null || m.polygon.photo === -1)) polygon(x, m.polygon.points, M.x, M.y, M.w, M.h);
+      if (m.polygon && m.polygon.photo === -1 && b.k === 'cad') polygon(x, m.polygon.points, b.x, b.y, b.w, b.h);
       x.restore();
-      var lbl = '위치도 · 지적', lbW = measure(lbl, f(18, 800)) + 24;
-      x.fillStyle = 'rgba(11,21,38,.78)'; rr(x, M.x + 12, M.y + 12, lbW, 34, 8); x.fill();
-      x.fillStyle = '#dbe6f4'; x.font = f(18, 800); x.fillText(lbl, M.x + 24, M.y + 35);
+      /* 라벨 — 위성이냐 지적도냐를 분명히. 왼쪽 아래에 두면 브이월드 워터마크도 가려진다 */
+      var lbl = locLabel(b), lbW = measure(lbl, f(18, 800)) + 26;
+      x.fillStyle = b.k === 'cad' ? 'rgba(11,21,38,.84)' : 'rgba(11,21,38,.78)';
+      rr(x, b.x + 12, b.y + b.h - 46, lbW, 34, 8); x.fill();
+      x.fillStyle = '#ffd9b3'; x.font = f(18, 900);
+      x.fillText(lbl, b.x + 25, b.y + b.h - 23);
+    }
+    (P.blocks || []).forEach(drawLoc);
+
+    /* ---------- 썸네일 줄(보조 사진 + 지적도) ---------- */
+    var subs = imgs.subs || [];
+    var T = P.thumbs, cellsT = (T && T.cells) || [], nCell = cellsT.length;
+    var cellW = nCell ? (T.w - T.gap * (nCell - 1)) / nCell : 0;
+    for (var k = 0; k < nCell; k++) {
+      var cx = T.x + k * (cellW + T.gap), cy = T.y, cell = cellsT[k];
+      x.save();
+      x.fillStyle = '#fff'; rr(x, cx, cy, cellW, T.h, 8); x.fill();
+      rr(x, cx, cy, cellW, T.h, 8); x.clip();
+      if (cell.k === 'photo') {
+        var sub = null;
+        for (var s2 = 0; s2 < subs.length; s2++) if (subs[s2].idx === cell.idx) sub = subs[s2];
+        x.fillStyle = C.navy2; x.fillRect(cx, cy, cellW, T.h);
+        if (sub && sub.img) {
+          cover(x, sub.img, cx, cy, cellW, T.h, 0);
+          if (m.polygon && m.polygon.photo === sub.idx) polygon(x, m.polygon.points, cx, cy, cellW, T.h);
+        }
+      } else {
+        var imT = cell.k === 'cad' ? imgs.cad : imgs.map;
+        x.fillStyle = '#eef3f9'; x.fillRect(cx, cy, cellW, T.h);
+        if (imT) cover(x, imT, cx, cy, cellW, T.h, 0);
+      }
+      x.restore();
+      if (cell.k !== 'photo') {
+        var cl = cell.k === 'cad' ? '지적도' : '위성사진';
+        x.fillStyle = 'rgba(11,21,38,.82)'; rr(x, cx + 8, cy + T.h - 34, measure(cl, f(16, 800)) + 20, 26, 6); x.fill();
+        x.fillStyle = '#ffd9b3'; x.font = f(16, 900); x.fillText(cl, cx + 18, cy + T.h - 15);
+      }
     }
 
     P.cards.forEach(function (cd) { drawCard(x, m, P, cd, land); });
@@ -593,28 +658,34 @@
     x.beginPath(); x.moveTo(cd.x + pad + (land ? 78 : 80) + tW, cd.y + 36);
     x.lineTo(cd.x + cd.w - pad, cd.y + 36); x.stroke();
 
+    var pfs = P.pointSize || (land ? 24 : 25);
     if (cd.k === 'c1') {
       var lx = cd.x + pad + 8, labW = 0;
-      m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(land ? 20 : 21, 800))); });
+      var sfs = P.specSize || (land ? 20 : 21);
+      m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(sfs, 800))); });
       var vx = cd.x + pad + 8 + Math.min(land ? 116 : 122, labW + 16);
       var top0 = cd.y + 58 + Math.max(0, (cd.h - 58 - m.specs.length * P.rowH - 8) / 2);
       m.specs.forEach(function (sp, i) {
         var ry = top0 + i * P.rowH;
         if (ry + P.rowH > cd.y + cd.h - 4) return;
         if (i) { x.strokeStyle = '#eef2f7'; x.lineWidth = 1; x.beginPath(); x.moveTo(cd.x + pad, ry); x.lineTo(cd.x + cd.w - pad, ry); x.stroke(); }
-        x.fillStyle = C.ink3; x.font = f(land ? 20 : 21, 800);
+        x.fillStyle = C.ink3; x.font = f(sfs, 800);
         x.fillText(sp[0], lx, ry + P.rowH - 11);
-        x.fillStyle = C.ink; x.font = f(land ? 22 : 23, 700);
-        x.fillText(clip(sp[1], f(land ? 22 : 23, 700), cd.x + cd.w - pad - vx), vx, ry + P.rowH - 10);
+        x.fillStyle = C.ink; x.font = f(sfs + 2, 700);
+        x.fillText(clip(sp[1], f(sfs + 2, 700), cd.x + cd.w - pad - vx), vx, ry + P.rowH - 10);
       });
     } else if (cd.k === 'c2') {
-      var iy = cd.y + 58;
+      /* 302수리C — 포인트와 감동의 글을 한 덩어리로 보고 카드 안에서 세로 가운데에 둔다(가운데 빈 구멍 방지) */
+      var exH = m.extras.length ? 32 : 0;
+      var sh0 = P.storyLines.length * P.storyLH + 20;
+      var groupH = m.points.length * P.ptH + exH + 14 + sh0;
+      var iy = cd.y + 58 + Math.max(0, (cd.h - 58 - groupH - 8) / 2);
       m.points.forEach(function (p) {
         x.fillStyle = C.org; x.beginPath(); x.arc(cd.x + pad + 12, iy + 12, 12, 0, Math.PI * 2); x.fill();
         x.strokeStyle = '#fff'; x.lineWidth = 2.6; x.lineCap = 'round';
         x.beginPath(); x.moveTo(cd.x + pad + 6, iy + 12); x.lineTo(cd.x + pad + 10.5, iy + 17); x.lineTo(cd.x + pad + 18.5, iy + 7); x.stroke();
-        x.fillStyle = C.ink; x.font = f(land ? 24 : 25, 700);
-        x.fillText(clip(p, f(land ? 24 : 25, 700), cd.w - pad * 2 - 46), cd.x + pad + 36, iy + 20);
+        x.fillStyle = C.ink; x.font = f(pfs, 700);
+        x.fillText(clip(p, f(pfs, 700), cd.w - pad * 2 - 46), cd.x + pad + 36, iy + Math.min(20, pfs));
         iy += P.ptH;
       });
       if (m.extras.length) {
@@ -624,7 +695,7 @@
         x.fillText(clip(ex0, f(land ? 17 : 18, 800), cd.w - pad * 2 - 16), cd.x + pad + 8, iy + 20);
         iy += 32;
       }
-      var sy = iy + 6 + Math.max(0, (cd.y + cd.h - iy - P.storyLines.length * P.storyLH - 20 - 14) / 2);
+      var sy = iy + 10;
       var sLines = P.storyLines;
       var sh = sLines.length * P.storyLH + 20;
       x.fillStyle = '#f2f6fc'; rr(x, cd.x + pad, sy, cd.w - pad * 2, sh, 8); x.fill();
@@ -648,7 +719,8 @@
         x.fillStyle = C.ink3; x.font = f(land ? 17 : 18, 700);
         x.fillText(clip(m.money.sub, f(land ? 17 : 18, 700), cd.w - pad * 2), cd.x + pad + 6, cd.y + 92 + bigS * 1.10 + 16);
       }
-      var by = cd.y + cd.h - (land ? 50 : 56);
+      var by = cd.y + 92 + Math.round(bigS * 1.10) + 34;
+      if (by + (land ? 36 : 40) > cd.y + cd.h - 8) by = cd.y + cd.h - (land ? 46 : 52);
       x.fillStyle = C.org; rr(x, cd.x + pad, by, land ? 92 : 100, land ? 36 : 40, 5); x.fill();
       x.fillStyle = '#fff'; x.font = f(land ? 17 : 18, 900); x.textAlign = 'center';
       x.fillText('추천 용도', cd.x + pad + (land ? 46 : 50), by + (land ? 24 : 27));
@@ -741,40 +813,46 @@
 
     /* 사진 (사진이 있을 때만 — 없으면 빈 네이비 박스를 두지 않는다) */
     if (P.photo) {
-      h += '<div style="' + abs(P.photo.x, P.photo.y, P.photo.w, P.photo.h) + 'border-radius:10px;overflow:hidden;background:' + C.navy2 + '">';
+      h += '<div class="pb-slot" data-slot="photo:0" style="' + abs(P.photo.x, P.photo.y, P.photo.w, P.photo.h) + 'border-radius:10px;overflow:hidden;background:' + C.navy2 + '">';
       if (m.photos[0]) h += '<img src="' + esc(m.photos[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
       else h += '<div style="display:grid;place-items:center;height:100%;color:#7d90aa;font-size:26px;font-weight:800">현장 사진 준비 중</div>';
       if (m.polygon && m.polygon.photo === 0) h += polySvg(m.polygon.points);
       h += '</div>';
     }
 
-    /* 썸네일 + 위치도 */
+    /* 큰 위치 칸 — 위성사진 / 지적도 (사진 0장일 때는 이 칸이 대표) */
+    (P.blocks || []).forEach(function (b) {
+      var lbl = b.k === 'cad' ? '지적도' : '위성사진';
+      var src = b.k === 'cad' ? (m.cad || '') : (m.map || '');
+      h += '<div class="pb-slot" data-slot="' + b.k + '" style="' + abs(b.x, b.y, b.w, b.h) + 'border-radius:10px;overflow:hidden;background:#eef3f9">';
+      if (src) h += '<img src="' + esc(src) + '" alt="' + lbl + '" style="width:100%;height:100%;object-fit:cover;display:block">';
+      else {
+        h += '<div style="position:absolute;inset:0;display:grid;place-items:center;background:#eef3f9;color:#8296ad;font-size:24px;font-weight:800;text-align:center;line-height:1.5">'
+          + '주소를 넣으면<br>' + lbl + '가 자동으로 붙습니다</div>';
+      }
+      if (m.polygon && m.polygon.photo === -1 && b.k === 'cad') h += polySvg(m.polygon.points);
+      h += '<span style="position:absolute;left:12px;bottom:12px;font-size:18px;font-weight:900;color:#ffd9b3;background:rgba(11,21,38,.84);padding:4px 12px;border-radius:8px">' + lbl + '</span>';
+      h += '</div>';
+    });
+
+    /* 썸네일 줄 — 보조 사진 + (세로는) 지적도 */
     var subs = [];
     for (var s = 1; s < m.photos.length && subs.length < 3; s++) subs.push({ src: m.photos[s], idx: s });
-    var T = P.thumbs, nCell = T.n || 0, cellW = nCell ? (T.w - T.gap * (nCell - 1)) / nCell : 0;
-    var mapCellD = m.map ? nCell - 1 : -1;
+    var T = P.thumbs, cellsT = (T && T.cells) || [], nCell = cellsT.length;
+    var cellW = nCell ? (T.w - T.gap * (nCell - 1)) / nCell : 0;
     for (var k = 0; k < nCell; k++) {
-      var cell = subs[k];
-      h += '<div style="' + abs(T.x + k * (cellW + T.gap), T.y, cellW, T.h) + 'border-radius:8px;overflow:hidden;background:' + C.navy2 + '">';
-      if (cell) {
-        h += '<img src="' + esc(cell.src) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
+      var cell = cellsT[k];
+      h += '<div class="pb-slot" data-slot="' + (cell.k === 'photo' ? ('photo:' + cell.idx) : cell.k) + '" style="' + abs(T.x + k * (cellW + T.gap), T.y, cellW, T.h) + 'border-radius:8px;overflow:hidden;background:' + (cell.k === 'photo' ? C.navy2 : '#eef3f9') + '">';
+      if (cell.k === 'photo') {
+        var srcP = m.photos[cell.idx] || '';
+        if (srcP) h += '<img src="' + esc(srcP) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
         if (m.polygon && m.polygon.photo === cell.idx) h += polySvg(m.polygon.points);
-      } else if (k === mapCellD) {
-        h += '<img src="' + esc(m.map) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">'
-          + '<span style="position:absolute;left:8px;top:7px;font-size:17px;font-weight:800;color:#dbe6f4;background:rgba(11,21,38,.78);padding:3px 10px;border-radius:6px">위치도</span>';
+      } else {
+        var srcL = cell.k === 'cad' ? (m.cad || '') : (m.map || '');
+        var lblL = cell.k === 'cad' ? '지적도' : '위성사진';
+        if (srcL) h += '<img src="' + esc(srcL) + '" alt="' + lblL + '" style="width:100%;height:100%;object-fit:cover;display:block">';
+        h += '<span style="position:absolute;left:8px;bottom:6px;font-size:16px;font-weight:900;color:#ffd9b3;background:rgba(11,21,38,.82);padding:3px 9px;border-radius:6px">' + lblL + '</span>';
       }
-      h += '</div>';
-    }
-
-    if (P.map) {
-      h += '<div style="' + abs(P.map.x, P.map.y, P.map.w, P.map.h) + 'border-radius:10px;overflow:hidden;background:#fff">';
-      if (m.map) h += '<img src="' + esc(m.map) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
-      else {
-        h += '<div style="position:absolute;inset:0;display:grid;place-items:center;background:#eef3f9;color:#8296ad;font-size:26px;font-weight:800;text-align:center;line-height:1.5">'
-          + '주소를 넣으면<br>지적·항공 위치도가 자동으로 붙습니다</div>';
-      }
-      if (m.polygon && (m.polygon.photo == null || m.polygon.photo === -1)) h += polySvg(m.polygon.points);
-      h += '<span style="position:absolute;left:12px;top:12px;font-size:18px;font-weight:800;color:#dbe6f4;background:rgba(11,21,38,.78);padding:4px 12px;border-radius:8px">위치도 · 지적</span>';
       h += '</div>';
     }
 
@@ -814,29 +892,34 @@
     h += '<div style="' + abs(ruleLeft, 36, cd.w - pad - ruleLeft, 2) + 'background:#d7dfea"></div>';
 
     if (cd.k === 'c1') {
+      var pfsD = P.pointSize || (land ? 24 : 25);
+      var sfsD = P.specSize || (land ? 20 : 21);
       var lx = pad + 8, labW = 0;
-      m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(land ? 20 : 21, 800))); });
+      m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(sfsD, 800))); });
       var vx = pad + 8 + Math.min(land ? 116 : 122, labW + 16);
       var top0 = 58 + Math.max(0, (cd.h - 58 - m.specs.length * P.rowH - 8) / 2);
       m.specs.forEach(function (sp, i) {
         var ry = top0 + i * P.rowH;
         if (ry + P.rowH > cd.h - 4) return;
         if (i) h += '<div style="' + abs(pad, ry, cd.w - pad * 2, 1) + 'background:#eef2f7"></div>';
-        h += '<div style="' + abs(lx, ry + P.rowH - 11 - (land ? 20 : 21), 110, land ? 20 : 21) + 'font-size:' + (land ? 20 : 21) + 'px;line-height:' + (land ? 20 : 21) + 'px;font-weight:800;color:' + C.ink3 + ';white-space:nowrap">' + esc(sp[0]) + '</div>';
-        h += '<div class="edt" style="' + abs(vx, ry + P.rowH - 10 - (land ? 22 : 23), cd.w - pad - vx, land ? 22 : 23) + 'font-size:' + (land ? 22 : 23) + 'px;line-height:' + (land ? 22 : 23) + 'px;font-weight:700;color:' + C.ink + ';white-space:nowrap;overflow:hidden"' + ed('spec:' + i) + '>' + esc(sp[1]) + '</div>';
+        h += '<div style="' + abs(lx, ry + P.rowH - 11 - sfsD, 110, sfsD) + 'font-size:' + sfsD + 'px;line-height:' + sfsD + 'px;font-weight:800;color:' + C.ink3 + ';white-space:nowrap">' + esc(sp[0]) + '</div>';
+        h += '<div class="edt" style="' + abs(vx, ry + P.rowH - 10 - (sfsD + 2), cd.w - pad - vx, sfsD + 2) + 'font-size:' + (sfsD + 2) + 'px;line-height:' + (sfsD + 2) + 'px;font-weight:700;color:' + C.ink + ';white-space:nowrap;overflow:hidden"' + ed('spec:' + i) + '>' + esc(sp[1]) + '</div>';
       });
     } else if (cd.k === 'c2') {
-      var iy = 58;
+      var exH2 = m.extras.length ? 32 : 0;
+      var sh02 = P.storyLines.length * P.storyLH + 20;
+      var grp2 = m.points.length * P.ptH + exH2 + 14 + sh02;
+      var iy = 58 + Math.max(0, (cd.h - 58 - grp2 - 8) / 2);
       m.points.forEach(function (p, i) {
         h += '<div style="' + abs(pad, iy, 24, 24) + 'border-radius:50%;background:' + C.org + ';color:#fff;font-size:14px;line-height:24px;font-weight:900;text-align:center">✓</div>';
-        h += '<div class="edt" style="' + abs(pad + 36, iy - 2, cd.w - pad * 2 - 46, land ? 26 : 27) + 'font-size:' + (land ? 24 : 25) + 'px;line-height:' + (land ? 26 : 27) + 'px;font-weight:700;color:' + C.ink + ';white-space:nowrap;overflow:hidden"' + ed('point:' + i) + '>' + esc(p) + '</div>';
+        h += '<div class="edt" style="' + abs(pad + 36, iy - 2, cd.w - pad * 2 - 46, pfsD + 2) + 'font-size:' + pfsD + 'px;line-height:' + (pfsD + 2) + 'px;font-weight:700;color:' + C.ink + ';white-space:nowrap;overflow:hidden"' + ed('point:' + i) + '>' + esc(p) + '</div>';
         iy += P.ptH;
       });
       if (m.extras.length) {
         h += '<div style="' + abs(pad, iy + 2, cd.w - pad * 2, 26) + 'background:#eef2f8;border-radius:6px;font-size:' + (land ? 17 : 18) + 'px;line-height:26px;font-weight:800;color:' + C.ink2 + ';padding:0 8px;white-space:nowrap;overflow:hidden">' + esc(m.extras.map(function (e) { return e.t + ' ' + (e.lines[0] || ''); }).join('  ·  ')) + '</div>';
         iy += 32;
       }
-      var sy = iy + 6 + Math.max(0, (cd.h - iy - P.storyLines.length * P.storyLH - 20 - 14) / 2);
+      var sy = iy + 10;
       var sLines = P.storyLines;
       var sh = sLines.length * P.storyLH + 20;
       h += '<div style="' + abs(pad, sy, cd.w - pad * 2, sh) + 'background:#f2f6fc;border-radius:8px">';
@@ -852,7 +935,8 @@
       while (measure(m.money.value || '—', f(bigS, 900)) > maxW && bigS > 40) bigS -= 4;
       h += '<div class="edt" style="' + abs(pad + 4, 92, cd.w - pad * 2 - 8, bigS) + 'font-size:' + bigS + 'px;line-height:' + bigS + 'px;font-weight:900;color:' + C.org + ';white-space:nowrap"' + ed('price') + '>' + esc(m.money.value || '—') + '</div>';
       if (m.money.sub) h += '<div style="' + abs(pad + 6, 92 + Math.round(bigS * 1.10) + 6, cd.w - pad * 2, land ? 18 : 19) + 'font-size:' + (land ? 17 : 18) + 'px;line-height:' + (land ? 18 : 19) + 'px;font-weight:700;color:' + C.ink3 + ';white-space:nowrap">' + esc(m.money.sub) + '</div>';
-      var by = cd.h - (land ? 50 : 56);
+      var by = 92 + Math.round(bigS * 1.10) + 34;
+      if (by + (land ? 36 : 40) > cd.h - 8) by = cd.h - (land ? 46 : 52);
       h += '<div style="' + abs(pad, by, land ? 92 : 100, land ? 36 : 40) + 'border-radius:5px;background:' + C.org + ';color:#fff;font-size:' + (land ? 17 : 18) + 'px;line-height:' + (land ? 36 : 40) + 'px;font-weight:900;text-align:center">추천 용도</div>';
       h += '<div class="edt" style="' + abs(pad + (land ? 100 : 108), by, cd.w - pad * 2 - (land ? 100 : 108), land ? 36 : 40) + 'border-radius:5px;background:rgba(255,122,0,.10);font-size:' + (land ? 19 : 20) + 'px;line-height:' + (land ? 36 : 40) + 'px;font-weight:900;color:#7a3b00;padding:0 14px;white-space:nowrap;overflow:hidden"' + ed('use') + '>' + esc(m.use) + '</div>';
     }
@@ -892,19 +976,20 @@
     var k = scale || 1;
     var photoSrc = m.photos.slice(0, 4);
     var jobs = photoSrc.map(function (s) { return loadImg(s, true) })
-      .concat([loadImg(m.map || '', true)]);
+      .concat([loadImg(m.map || '', true), loadImg(m.cad || '', true)]);
     Promise.all(jobs).then(function (imgs) {
       var cv = document.createElement('canvas');
       cv.width = Math.round(P0.W * k);
       cv.height = Math.round(P0.H * k);
       var ctx = cv.getContext('2d');
       ctx.scale(k, k);
-      var map = imgs[imgs.length - 1];
-      var ph = imgs.slice(0, -1);
+      var cad = imgs[imgs.length - 1];
+      var map = imgs[imgs.length - 2];
+      var ph = imgs.slice(0, -2);
       var subs = [];
       for (var i = 1; i < ph.length; i++) if (ph[i]) subs.push({ img: ph[i], idx: i });
       draw(ctx, m, orient, {
-        main: ph[0] || map, subs: subs, map: map,
+        main: ph[0] || map, subs: subs, map: map, cad: cad,
         seal: sealCanvas(m, orient === 'port' ? 200 : 150)
       }, {});
       done(cv);

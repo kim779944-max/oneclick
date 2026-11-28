@@ -37,6 +37,49 @@
       + '&domain=autooneclick.com&format=png&basemap=PHOTO_HYBRID'
       + '&center=' + (+lon).toFixed(6) + ',' + (+lat).toFixed(6) + '&zoom=16&size=1000,700&crs=EPSG:4326';
   }
+  /* 302수리C — 지적도(연속지적도 WMS 레이어를 이미지로) — 위성과 다른 그림 */
+  function cadUrl(lat, lon) {
+    if (!lat || !lon) return '';
+    return 'https://api.vworld.kr/req/image?service=image&request=getmap&key=' + encodeURIComponent(VW_KEY)
+      + '&domain=autooneclick.com&format=png&basemap=GRAPHIC_WHITE&layers=lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun'
+      + '&center=' + (+lon).toFixed(6) + ',' + (+lat).toFixed(6) + '&zoom=17&size=1000,700&crs=EPSG:4326';
+  }
+
+  /* 302수리C — 주소만 넘어온 매물(매물수집기 → 물건표)도 위성·지적도를 갖게 좌표를 한 번 찍는다 */
+  function jsonpVW(url) {
+    return new Promise(function (res) {
+      var cb = '__ktsp' + Math.floor(Math.random() * 1e7);
+      var s = document.createElement('script'), done = false;
+      function fin(v) { if (done) return; done = true; try { delete window[cb] } catch (e) { window[cb] = null } if (s.parentNode) s.parentNode.removeChild(s); res(v); }
+      var tm = setTimeout(function () { fin(null) }, 9000);
+      window[cb] = function (d) { clearTimeout(tm); fin(d) };
+      s.onerror = function () { clearTimeout(tm); fin(null) };
+      s.src = url + '&callback=' + cb;
+      document.head.appendChild(s);
+    });
+  }
+  function geocodeAddr(addr) {
+    var q = String(addr || '').trim();
+    if (!q) return Promise.resolve(null);
+    var url = 'https://api.vworld.kr/req/address?service=address&request=getcoord&version=2.0&crs=EPSG:4326&format=json'
+      + '&type=parcel&key=' + encodeURIComponent(VW_KEY) + '&domain=autooneclick.com&address=' + encodeURIComponent(q);
+    return jsonpVW(url).then(function (r) {
+      if (r && r.response && r.response.status === 'OK' && r.response.result && r.response.result.point) {
+        return { lat: +r.response.result.point.y, lon: +r.response.result.point.x };
+      }
+      return null;
+    }).catch(function () { return null });
+  }
+  function ensureGeo(m) {
+    if (!m || (m.map && m.cad) || !m.addr) return;
+    geocodeAddr(m.addr).then(function (pt) {
+      if (!pt || !M) return;
+      m.lat = pt.lat; m.lon = pt.lon;
+      if (!m.map) m.map = mapUrl(pt.lat, pt.lon);
+      if (!m.cad) m.cad = cadUrl(pt.lat, pt.lon);
+      if (M === m) { persist(); render(); }
+    });
+  }
 
   /* ---------------- 모델 만들기 ---------------- */
   function fromStore(id) {
@@ -47,10 +90,14 @@
     if (!it) return null;
     var m = B.build(it, me);
     m.map = it.map || mapUrl(it.lat, it.lon);
+    m.cad = it.cad || cadUrl(it.lat, it.lon);
+    m.lat = it.lat; m.lon = it.lon;
     m.itemId = it.id;
     m.polygon = it.polygon || null;
     return m;
   }
+
+  function numTxt(v) { return (Math.round(+v * 10) / 10).toLocaleString('ko-KR'); }
 
   /* 매물장(listing) 매물 → 물건표 모델 */
   function fromListing(L, broker) {
@@ -58,6 +105,14 @@
     var p = L.price || {}, f = L.facts || {};
     var site = parseFloat(String(f.site || L.site || '').replace(/[^\d.]/g, ''));
     var gross = parseFloat(String(f.gross || L.gross || '').replace(/[^\d.]/g, ''));
+    var isLandKind = /^(대지|임야|답|전|전답|농지|과수원|토지|야적장|잡종지)$/.test(String(L.type || ''));
+    /* 302수리C — 문자에서 넘어온 숫자만으로 핵심 포인트를 세운다(안 채워진 빈 말 금지) */
+    var pts = [];
+    if (site) pts.push('대지 ' + numTxt(site) + '㎡' + (gross ? ' · 건물 ' + numTxt(gross) + '㎡' : ''));
+    if (!site && gross) pts.push('건물 ' + numTxt(gross) + '㎡' + (L.floors ? ' · ' + L.floors : ''));
+    if (p.loanAmount) pts.push('융자 ' + B.eok(p.loanAmount * 1e4) + ' 승계 — 실인수 잔가로 계산');
+    if (p.deposit || p.rent) pts.push([p.deposit ? '보증금 ' + B.eok(p.deposit * 1e4) : '', p.rent ? '월세 ' + B.eok(p.rent * 1e4) : ''].filter(Boolean).join(' / ') + ' (임대 조건)');
+    if (L.floors && site) pts.push(L.floors);
     var it = {
       id: L.id,
       title: L.title || '매물',
@@ -70,12 +125,14 @@
       residual: p.realInvest ? p.realInvest * 1e4 : null,
       appraisal: p.appraisal ? p.appraisal * 1e4 : null,
       deposit: p.deposit ? p.deposit * 1e4 : null,
-      tags: (L.points || []).map(function (x) { return x.t }).filter(Boolean).slice(0, 3),
+      monthly: p.rent ? p.rent * 1e4 : null,
+      tags: [],
+      points: pts.slice(0, 3),
       photos: (L.photos || []).slice(0, 4),
       lat: L.lat, lon: L.lng,
       gb: {
         char: {
-          lndcgrCodeNm: L.type || '',
+          lndcgrCodeNm: isLandKind ? (L.type || '') : '',
           lndpclAr: site || null,
           roadSideCodeNm: f.road || '',
           pblntfPclnd: f.landPrice ? +String(f.landPrice).replace(/[^\d]/g, '') : null
@@ -85,6 +142,7 @@
       }
     };
     it.map = mapUrl(L.lat, L.lng);
+    it.cad = cadUrl(L.lat, L.lng);
     var me = broker || {};
     var m = B.build(it, {
       org: me.office || me.org || me.company || 'KTS 원클릭 공인중개사',
@@ -94,7 +152,8 @@
       fax: me.fax || '', email: me.email || '', addr: me.address || '',
       stamp: 'circle'
     });
-    m.use = (L.points || []).map(function (x) { return x.t }).filter(Boolean).slice(0, 3).join(' · ') || '용도 협의';
+    m.use = ((L.points || []).map(function (x) { return x.t }).filter(Boolean).slice(0, 3).join(' · ')) || '용도 협의';
+    m.lat = L.lat; m.lon = L.lng;
     return m;
   }
 
@@ -154,7 +213,58 @@
     window.KTS_POSTER = { model: M, plan: P, orient: orient };
     if (marking && !guest) addMarkOverlay(P);
     bindEdit();
+    bindSlots();
     bindSeal();
+  }
+
+  /* 302수리C — 큰 사진·위성·지적도 칸을 누르면 그 칸만 골라 바꾼다 */
+  function bindSlots() {
+    if (guest) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.pb-slot'), function (el) {
+      el.style.cursor = 'pointer';
+      el.title = '눌러서 이 칸 그림 바꾸기';
+      el.addEventListener('click', function (ev) {
+        if (marking) return;
+        ev.preventDefault(); ev.stopPropagation();
+        pickSlot(el.getAttribute('data-slot'));
+      });
+    });
+  }
+  function pickSlot(slot) {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      if (!f) return;
+      var fr = new FileReader();
+      fr.onload = function () {
+        var im = new Image();
+        im.onload = function () {
+          var max = 1400, s = Math.min(1, max / Math.max(im.width, im.height));
+          var c = document.createElement('canvas');
+          c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          var data = fr.result;
+          try { data = c.toDataURL('image/jpeg', 0.86); } catch (e) { }
+          applySlot(slot, data);
+        };
+        im.onerror = function () { applySlot(slot, fr.result); };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(f);
+    });
+    inp.click();
+  }
+  function applySlot(slot, data) {
+    var p = String(slot || '').split(':');
+    if (p[0] === 'photo') {
+      var i = parseInt(p[1], 10) || 0;
+      while (M.photos.length <= i) M.photos.push('');
+      M.photos[i] = data;
+    } else if (slot === 'cad') { M.cad = data; M.cadOwn = 1; }
+    else if (slot === 'sat') { M.map = data; M.satOwn = 1; }
+    else return;
+    persist(); render(); toast('이 칸의 그림을 바꿨습니다');
   }
 
   function bindSeal() {
@@ -277,7 +387,8 @@
   function addMarkOverlay(P) {
     var page = $('.pb-page');
     if (!page) return;
-    var ph = P.map && false ? P.map : P.photo;
+    var ph = P.photo || (P.blocks && P.blocks[0]);
+    if (!ph) return;
     var ov = document.createElement('div');
     ov.style.cssText = 'position:absolute;left:' + ph.x + 'px;top:' + ph.y + 'px;width:' + ph.w + 'px;height:' + ph.h + 'px;'
       + 'z-index:20;cursor:crosshair;background:rgba(255,122,0,.06);border:2px dashed rgba(255,122,0,.7);border-radius:10px';
@@ -304,7 +415,12 @@
     h += '<div class="grp"><b>사진 (앞의 1장이 대표)</b><div class="row">'
       + '<label class="btn sm file">사진 넣기<input type="file" id="tPhoto" accept="image/*" multiple></label>'
       + (M.photos.length ? '<button class="btn sm" id="tPhotoClear">사진 비우기</button>' : '')
-      + '</div><p class="note">보조 사진은 아래 줄에 자동으로 작게 정렬됩니다(282번).</p></div>';
+      + '</div><p class="note">큰 사진·위성·지적도 칸을 눌러도 그 칸만 바로 바꿀 수 있습니다(302).</p></div>';
+
+    h += '<div class="grp"><b>위치 그림</b><div class="row">'
+      + '<button class="btn sm" id="tCadAuto">지적도 다시 받기</button>'
+      + '<button class="btn sm" id="tSatAuto">위성사진 다시 받기</button>'
+      + '</div><p class="note">주소를 넣고 4대 공부를 받으면 지적도·위성사진이 자동으로 붙습니다. 사진이 0장이면 이 두 장이 대표가 됩니다.</p></div>';
 
     if (items.length) {
       h += '<div class="grp"><b>매물장에서 가져오기</b><div class="inp"><select id="tItem"><option value="">— 매물 고르기 —</option>';
@@ -348,6 +464,13 @@
     b.innerHTML = h;
 
     $('#tPhoto').addEventListener('change', function () { addPhotos(this.files); });
+    var cadA = $('#tCadAuto'), satA = $('#tSatAuto');
+    if (cadA) cadA.addEventListener('click', function () {
+      M.cad = cadUrl(M.lat, M.lon); persist(); render(); toast(M.cad ? '지적도를 다시 받았습니다' : '주소가 있어야 지적도를 받습니다');
+    });
+    if (satA) satA.addEventListener('click', function () {
+      M.map = mapUrl(M.lat, M.lon); persist(); render(); toast(M.map ? '위성사진을 다시 받았습니다' : '주소가 있어야 위성사진을 받습니다');
+    });
     var pc = $('#tPhotoClear');
     if (pc) pc.addEventListener('click', function () { M.photos = []; persist(); render(); openTools(); });
     var sel = $('#tItem');
@@ -536,6 +659,7 @@
           var it0 = pl.items[pi];
           var m0 = B.build(it0, pl.me || {});
           m0.map = it0.map || mapUrl(it0.lat, it0.lon);
+          m0.cad = it0.cad || cadUrl(it0.lat, it0.lon);
           m0.itemId = it0.id; m0.polygon = it0.polygon || null;
           shortP = { m: m0, n: pno };
         }
@@ -549,6 +673,16 @@
       if (d) { M = d; guest = true; }
     }
     if (!M && shortP) { M = shortP.m; guest = true; }
+    /* 매물수집기(realty)에서 「물건 포스터」를 누르고 온 매물 — 예시가 아니라 그 물건으로 */
+    if (!M && qs('from') === 'realty') {
+      var hand = null;
+      try { hand = JSON.parse(sessionStorage.getItem('kts_poster_hand') || 'null'); } catch (e) { }
+      if (hand) {
+        try { sessionStorage.removeItem('kts_poster_hand'); } catch (e) { }
+        M = fromListing(hand, null);
+        if (M) { M.lat = hand.lat; M.lon = hand.lng; }
+      }
+    }
     if (!M && itemId) M = fromStore(itemId);
     if (!M && listId) {
       fetch('data/listings.json', { cache: 'no-store' }).then(function (r) { return r.json() }).then(function (j) {
@@ -571,6 +705,7 @@
     if (!itemId && !code && !listId && !LS(STATE, null) && !st_qs_orient() && (window.innerWidth || 390) < 620) orient = 'port';
     if (!M.sections) M.sections = { right: 0, tx: 1, appraisal: 0 };
     rebuildExtras();
+    ensureGeo(M);
 
     if (guest) {
       if (!st_qs_orient()) orient = 'port';   /* 손님 휴대폰에서는 세로가 먼저 */

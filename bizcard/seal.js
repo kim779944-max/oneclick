@@ -52,15 +52,14 @@
   }
   function cardUrl(me) {
     me = me || {};
+    var host = (g.location && g.location.origin) || 'https://autooneclick.com';
+    if (!/^https?:/.test(host)) host = 'https://autooneclick.com';
+    host = host.replace(/\/$/, '');
+    /* 302수리C — 이름 주소(autooneclick.com/김중개)는 QR에 인코딩해 담는다 */
+    if (me.slug) return host + '/' + encodeURIComponent(me.slug);
     if (me.shortUrl && /^https?:\/\/[^\s]+$/.test(me.shortUrl)) return me.shortUrl;
-    if (me.shortNo) {
-      var host0 = (g.location && g.location.origin) || 'https://autooneclick.com';
-      if (!/^https?:/.test(host0)) host0 = 'https://autooneclick.com';
-      return host0.replace(/\/$/, '') + '/' + me.shortNo;
-    }
-    var o = (g.location && g.location.origin) || 'https://autooneclick.com';
-    if (!/^https?:/.test(o)) o = 'https://autooneclick.com';
-    return o.replace(/\/$/, '') + '/bizcard/';
+    if (me.shortNo) return host + '/' + me.shortNo;
+    return host + '/bizcard/';
   }
 
   /* ---------------- 모양별 판(版) 계산 ---------------- */

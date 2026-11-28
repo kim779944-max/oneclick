@@ -79,6 +79,8 @@
   .area{font-size:12px; color:var(--muted)}
   .phone{margin-left:auto; font-size:12px; color:var(--muted); text-decoration:none}
   .sum{margin:7px 0 0; font-size:12.5px; color:#C3CDDF}
+  .spec1{margin:6px 0 0; font-size:12px; color:#9FB0C8}
+  .spec2{margin:3px 0 0; font-size:12px; color:var(--orange-soft)}
   details.raw{margin-top:8px}
   details.raw summary{font-size:11px; color:var(--muted); cursor:pointer; list-style:none}
   details.raw summary::-webkit-details-marker{display:none}
@@ -253,6 +255,73 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
   var RE_EUP = /([가-힣]{1,5}?(?:읍|면|동))/;
   var RE_RI = /(?:^|\s)([가-힣]{2,3}리)(?![조])/;
 
+  /* ── 302수리C (2026-11-28) — 상가·건물 문자를 라벨 단위로 갈라낸다 ──────────
+     대표님 실제 문자:
+       남양주시 호평동23-46 대205 건266(5층)융자9억3천
+       /보)1억2천/월800. =매23억
+     → 지번 · 대지 205 · 건물 266 · 5층 · 융자 9억3천 · 보 1억2천 · 월 800만 · 매 23억 */
+  var B_ = '(?:^|[\\s\\/,.()\\[\\]{}（）【】])';
+  var RE_B_LAND = new RegExp(B_ + '(?:대지|대)\\s*(?:면적)?\\s*[:：]?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(㎡|m2|m²|제곱미터|평)?');
+  var RE_B_BUILD = new RegExp(B_ + '(?:건물|건평|건축면적|건)\\s*[:：]?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(㎡|m2|m²|제곱미터|평)?');
+  var RE_B_FLOOR = /(?:지상)?\s*\(?\s*(\d{1,2})\s*층/;
+  var RE_B_LOAN = /(?:융자금|융자|근저당|저당|대출)\s*(?:승계|금액|잔액)?\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/;
+  var RE_B_DEP = /(?:보증금|보증|보)\s*[)\]）]?\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/;
+  var RE_B_MON = /(?:월세|월)\s*[:：]?\s*([\d,]+(?:\.\d+)?)\s*(억|천만|백만|만|천)?/;
+  var RE_B_SALE = /(?:^|[\s=\/,.()\[\]{}（）【】])(?:매매가|매매|매가|매)\s*[:：]?\s*((?:[\d,]+(?:\.\d+)?\s*(?:억|천만|백만|만|천)\s*)+)/;
+  var RE_JIBUN = /([가-힣]{1,10}(?:읍|면|동|리|가))\s*(\d{1,5}(?:-\d{1,5})?)/;
+
+  function wonNum(s){
+    var re = /([\d,.]+)\s*(억|천만|백만|만|천)/g, m, total = 0, last = 0, hit = false;
+    while((m = re.exec(String(s || '')))){
+      var v = parseFloat(String(m[1]).replace(/,/g, ''));
+      if(!isFinite(v)) continue;
+      var u = m[2];
+      if(u === '억'){ total += v * 1e8; last = 1e8; }
+      else if(u === '천만'){ total += v * 1e7; last = 1e7; }
+      else if(u === '백만'){ total += v * 1e6; last = 1e6; }
+      else if(u === '만'){ total += v * 1e4; last = 1e4; }
+      else if(u === '천'){ var un = last >= 1e8 ? 1e7 : 1e3; total += v * un; last = un; }
+      hit = true;
+    }
+    return hit ? Math.round(total) : null;
+  }
+  /* 금액 표기 — 9억3천은 「9억 3천」, 1억2천은 「1억 2천」, 800만은 「800만」 */
+  function wonText(v){
+    v = Math.round(v || 0);
+    if(!v) return '';
+    var eok = Math.floor(v / 1e8), man = Math.round((v % 1e8) / 1e4);
+    if(!eok) return (man >= 1000 && man % 1000 === 0) ? (man / 1000) + '천만' : man.toLocaleString('ko-KR') + '만';
+    var s = eok + '억';
+    if(man) s += ' ' + ((man % 1000 === 0) ? (man / 1000) + '천' : man.toLocaleString('ko-KR') + '만');
+    return s;
+  }
+  function areaVal(num, unit){
+    var v = parseFloat(String(num).replace(/,/g, ''));
+    if(!isFinite(v) || v <= 0) return null;
+    return unit === '평' ? Math.round(v * 3.305785 * 10) / 10 : Math.round(v * 10) / 10;
+  }
+  function briefOf(t){
+    var s = ' ' + String(t || '') + ' ', m, o = {};
+    m = s.match(RE_B_LAND); if(m){ o.landM2 = areaVal(m[1], m[2]); }
+    m = s.match(RE_B_BUILD); if(m){ o.buildM2 = areaVal(m[1], m[2]); }
+    m = s.match(RE_B_FLOOR); if(m){ var f = parseInt(m[1], 10); if(f > 0 && f < 100) o.floor = f; }
+    m = s.match(RE_B_LOAN); if(m){ var l = wonNum(m[1]); if(l) o.loan = l; }
+    m = s.match(RE_B_DEP); if(m){ var d = wonNum(m[1]); if(d) o.deposit = d; }
+    m = s.match(RE_B_MON);
+    if(m){
+      var mv = parseFloat(String(m[1]).replace(/,/g, '')), u = m[2];
+      if(isFinite(mv) && mv > 0){
+        if(u === '억') o.monthly = mv * 1e8;
+        else if(u === '천만') o.monthly = mv * 1e7;
+        else if(u === '만') o.monthly = mv * 1e4;
+        else if(u === '천') o.monthly = mv * 1e3;
+        else if(mv < 100000) o.monthly = mv * 1e4;      /* 단위 없이 「월800」 = 800만 */
+      }
+    }
+    m = s.match(RE_B_SALE); if(m){ var sl = wonNum(m[1]); if(sl) o.sale = sl; }
+    return o;
+  }
+
   function clean(raw){
     var t = String(raw || "").replace(/\r/g," ").replace(/\n/g," ");
     t = t.replace(/\[Web발신\]/g," ").replace(/\(광고\)/g," ");
@@ -270,6 +339,10 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
   }
   function hasDealWord(t){
     for(var i=0;i<DEAL_GATE.length;i++){ if(t.indexOf(DEAL_GATE[i]) > -1) return true; }
+    /* 302수리C — DEAL_GATE 낱말이 없어도 「=매23억」 같은 매 표시 + 물건 명사면 매물 */
+    if(/(?:^|[\s=\/])매\s*[\d,]/.test(t) && hasKindNoun(t)) return true;
+    /* 「융자9억3천 … /보)1억2천/월800」처럼 임대 조건을 붙여 보낸 상가·건물 문자 */
+    if(/(?:융자|근저당)\s*[\d,]/.test(t) && /(?:보\)|보증금)\s*[\d,]/.test(t) && hasKindNoun(t)) return true;
     return false;
   }
   function hasKindNoun(t){
@@ -291,6 +364,13 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     var noise = ["매매시","교환시","임대시","전세시","월세시","급매시","부동산","문의","가능","완료","진행"];
     for(var i=0;i<noise.length;i++){ if(v === noise[i] || v.indexOf(noise[i]) === 0) return true; }
     return false;
+  }
+  function jibunOf(t){
+    var m = String(t || '').match(RE_JIBUN);
+    if(!m) return '';
+    var head = String(t).slice(0, m.index + m[0].length);
+    var pre = head.match(/([가-힣]{2,6}(?:시|군|구))/);
+    return (pre ? pre[1] + ' ' : '') + m[1] + ' ' + m[2];
   }
   function regionOf(t){
     var out = [], m;
@@ -383,10 +463,15 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
   }
   function parseOne(text, src, from, when){
     var t = clean(text);
+    var b = briefOf(t);
+    var areaTxt = areaOf(t) || (b.landM2 ? b.landM2.toLocaleString('ko-KR') + '㎡' : '');
+    var priceTxt = (b.sale != null) ? wonText(b.sale) : priceOf(t);
     var l = {
       key: keyOf(String(text||"")), src: src || "문자", from: from || "", time: when || "",
-      type: dealType(t), kind: kindOf(t), region: regionOf(t), price: priceOf(t),
-      area: areaOf(t), phone: phoneOf(t), summary: summaryOf(t), text: String(text||"").trim()
+      type: dealType(t) || (b.sale ? '매매' : ''), kind: kindOf(t), region: regionOf(t), price: priceTxt,
+      area: areaTxt, phone: phoneOf(t), summary: summaryOf(t), text: String(text||"").trim(),
+      addr: jibunOf(t), landM2: b.landM2 || null, buildM2: b.buildM2 || null, floor: b.floor || null,
+      loan: b.loan || null, deposit: b.deposit || null, monthly: b.monthly || null, sale: b.sale || null
     };
     if(!l.type && !l.kind && !l.price && !l.area) l.type = "";
     return l;
@@ -453,7 +538,7 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
       var text = o.text || o.body || o.content || o.summary || o["내용"] || o["원문"] || "";
       if(!text) return;
       var l = parseOne(text, o.src || o.source || "수집기", o.from || o.sender || o["발신"] || "", o.time || o["시각"] || "");
-      ["type","kind","region","price","area","phone","summary"].forEach(function(f){
+      ["type","kind","region","price","area","phone","summary","addr","landM2","buildM2","floor","loan","deposit","monthly","sale"].forEach(function(f){
         if(o[f] && String(o[f]).length) l[f] = o[f];
       });
       if(o.key) l.key = o.key;
@@ -462,11 +547,26 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     return out;
   }
   function fromText(blob){
-    var out = [];
+    var out = [], buf = [];
+    /* 302수리C — 한 물건이 여러 줄로 끊겨 온 문자(「상가건물 / 남양주시 호평동23-46 대205 … /
+       /보)1억2천/월800. =매23억」)는 앞 줄을 모아 한 건으로 읽는다. 스팸 줄은 모으지 않는다. */
     String(blob).split(/\r?\n/).forEach(function(line){
-      var v = stripChatPrefix(line.trim());
-      if(!v || !isRealty(v)) return;
-      out.push(parseOne(v));
+      var v = stripChatPrefix(String(line || '').trim());
+      if(!v) { buf = []; return; }
+      var low = v.toLowerCase();
+      for(var i=0;i<HARD_NO.length;i++){ if(low.indexOf(String(HARD_NO[i]).toLowerCase()) > -1) return; }
+      var cand = buf.length ? (buf.join(' ') + ' ' + v) : v;
+      if(isRealty(cand)){
+        var multi = buf.length > 0;
+        var l = parseOne(cand);
+        /* 여러 줄을 모아 읽은 건은 요약에 같은 내용을 다시 늘어놓지 않는다(카드는 제목·지번·조건으로 이미 말한다) */
+        if(multi && l.price) l.summary = '';
+        out.push(l);
+        buf = [];
+        return;
+      }
+      buf.push(v);
+      if(buf.length > 6) buf.shift();
     });
     if(!out.length){
       // 줄바꿈 없이 길게 붙인 경우: 문장 단위로 한 번 더 시도
@@ -595,13 +695,21 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     var o = {
       id: "TX-" + String(x.key || "").slice(0, 6).toUpperCase(),
       title: [x.region, x.kind].filter(Boolean).join(" ") || (x.summary || "문자 매물").slice(0, 24),
-      deal: x.type || "매매", type: x.kind || "", address: x.region || "", floors: "", moveIn: "",
+      deal: x.type || "매매", type: x.kind || "", address: x.addr || x.region || "", floors: "", moveIn: "",
       price: {}, facts: {}, leases: [], private: false, broker: {},
       points: [{ icon: "bulb", t: "문자로 접수한 매물", s: (x.summary || "").slice(0, 90) }], photos: []
     };
-    if(man != null){ if(rent) o.price.deposit = man; else o.price.sale = man; }
+    if(man != null){ if(rent && !x.sale) o.price.deposit = man; else o.price.sale = man; }
+    /* 302수리C — 대지·건물·층·융자·보증금·월세를 물건표(만원) 단위로 넘긴다 */
+    if(x.sale) o.price.sale = Math.round(x.sale / 1e4);
+    if(x.loan) o.price.loanAmount = Math.round(x.loan / 1e4);
+    if(x.deposit) o.price.deposit = Math.round(x.deposit / 1e4);
+    if(x.monthly) o.price.rent = Math.round(x.monthly / 1e4);
+    if(x.landM2){ o.site = x.landM2; o.facts.site = x.landM2.toLocaleString('ko-KR') + '㎡'; }
+    if(x.buildM2){ o.gross = x.buildM2; o.facts.gross = x.buildM2.toLocaleString('ko-KR') + '㎡'; }
+    if(x.floor) o.floors = '지상 ' + x.floor + '층';
     if(x.price) o.price.note = "원문 표기 " + x.price;
-    if(x.area) o.facts.gross = x.area;
+    if(x.area && !o.facts.gross) o.facts.gross = x.area;
     return o;
   }
   function handPoster(x){
@@ -633,6 +741,19 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
       money.appendChild(a);
     }
     if(money.childNodes.length) c.appendChild(money);
+    /* 302수리C — 지번·대지·건물·층과 융자·보증금·월세를 따로 보인다 */
+    var spec1 = [];
+    if(x.addr) spec1.push(x.addr);
+    if(x.landM2) spec1.push('대지 ' + x.landM2.toLocaleString('ko-KR') + '㎡');
+    if(x.buildM2) spec1.push('건물 ' + x.buildM2.toLocaleString('ko-KR') + '㎡');
+    if(x.floor) spec1.push(x.floor + '층');
+    if(spec1.length) c.appendChild(el("p","spec1", spec1.join(' · ')));
+    var spec2 = [];
+    if(x.sale && wonText(x.sale) !== x.price) spec2.push('매 ' + wonText(x.sale));
+    if(x.loan) spec2.push('융자 ' + wonText(x.loan));
+    if(x.deposit) spec2.push('보 ' + wonText(x.deposit));
+    if(x.monthly) spec2.push('월 ' + wonText(x.monthly));
+    if(spec2.length) c.appendChild(el("p","spec2", spec2.join(' · ')));
     if(x.summary) c.appendChild(el("p","sum", x.summary));
 
     var d = el("details","raw");
@@ -654,10 +775,12 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
   }
 
   // ── 내보내기 ────────────────────────────────────────────────
-  var HEAD = ["번호","거래유형","물건종류","지역","가격","면적","연락처","출처","시각","요약"];
+  var HEAD = ["번호","거래유형","물건종류","지역","지번","대지(㎡)","건물(㎡)","층","매매가","융자","보증금","월세","가격","면적","연락처","출처","시각","요약"];
   function rows(){
     return items.map(function(x, i){
-      return [i+1, x.type, x.kind, x.region, x.price, x.area, x.phone, x.src, x.time, x.summary];
+      return [i+1, x.type, x.kind, x.region, x.addr || '', x.landM2 || '', x.buildM2 || '', x.floor ? x.floor + '층' : '',
+        x.sale ? wonText(x.sale) : '', x.loan ? wonText(x.loan) : '', x.deposit ? wonText(x.deposit) : '',
+        x.monthly ? wonText(x.monthly) : '', x.price, x.area, x.phone, x.src, x.time, x.summary];
     });
   }
   function toCsv(){
@@ -672,6 +795,12 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
     items.forEach(function(x, i){
       out.push("### " + (i+1) + ". [" + (x.type || "매물") + "] " + [x.kind, x.region].filter(Boolean).join(" "));
       out.push("- 가격: " + (x.price || "-") + " / 면적: " + (x.area || "-") + " / 연락: " + (x.phone || "-"));
+      if(x.addr || x.landM2 || x.buildM2 || x.floor || x.loan || x.deposit || x.monthly){
+        out.push("- 지번: " + (x.addr || "-") + " · 대지 " + (x.landM2 ? x.landM2 + "㎡" : "-")
+          + " · 건물 " + (x.buildM2 ? x.buildM2 + "㎡" : "-") + " · " + (x.floor ? x.floor + "층" : "층 -") );
+        out.push("- 조건: 융자 " + (x.loan ? wonText(x.loan) : "-") + " · 보증금 " + (x.deposit ? wonText(x.deposit) : "-")
+          + " · 월세 " + (x.monthly ? wonText(x.monthly) : "-"));
+      }
       out.push("- 출처: " + (x.src || "-") + (x.time ? " · " + x.time : ""));
       out.push("- 요약: " + (x.summary || "-"));
       out.push("");
@@ -685,7 +814,9 @@ function ktsYMD(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()
       count: items.length,
       items: items.map(function(x){
         return { key:x.key, src:x.src, from:x.from, time:x.time, type:x.type, kind:x.kind,
-                 region:x.region, price:x.price, area:x.area, phone:x.phone, summary:x.summary, text:x.text };
+                 region:x.region, price:x.price, area:x.area, phone:x.phone, summary:x.summary, text:x.text,
+                 addr:x.addr || '', landM2:x.landM2 || null, buildM2:x.buildM2 || null, floor:x.floor || null,
+                 loan:x.loan || null, deposit:x.deposit || null, monthly:x.monthly || null, sale:x.sale || null };
       })
     }, null, 1);
   }

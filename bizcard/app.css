@@ -99,6 +99,14 @@ img{display:block;max-width:100%}
   background:linear-gradient(155deg,#ffa04d,#ff6b00);color:#2a1500;font-size:26px;font-weight:900;
   box-shadow:0 0 0 1px rgba(226,186,122,.4),0 5px 12px rgba(0,0,0,.36)}
 .av img{width:100%;height:100%;object-fit:cover}
+/* 302수리C — 사진을 넣은 명함: 사각 테두리 없이 카드 배경으로 스며들고 가장자리로 갈수록 흐려진다 */
+.av.has-photo,.biz .av.has-photo{width:84px;height:104px;border-radius:0;background:none;box-shadow:none;
+  overflow:visible;position:relative;display:block}
+.av.has-photo img{border-radius:0;filter:saturate(1.05) contrast(1.02);
+  -webkit-mask-image:radial-gradient(ellipse farthest-side at 50% 44%,#000 38%,rgba(0,0,0,.82) 62%,rgba(0,0,0,.34) 84%,transparent 100%);
+  mask-image:radial-gradient(ellipse farthest-side at 50% 44%,#000 38%,rgba(0,0,0,.82) 62%,rgba(0,0,0,.34) 84%,transparent 100%)}
+.av.has-photo::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:42%;pointer-events:none;
+  background:linear-gradient(180deg,rgba(26,40,70,0) 0%,rgba(24,37,66,.30) 55%,rgba(22,34,60,.66) 100%)}
 .who{flex:1;min-width:0;padding-right:22px}
 .nmrow{display:flex;align-items:center;gap:8px}
 .who b{display:block;font-size:19.5px;font-weight:900;letter-spacing:.4px;line-height:1.15}
@@ -537,8 +545,8 @@ body.guestmode #toast{bottom:24px}
 
 /* 지도 4종 선택(280번) */
 .mapbox{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:8px}
-.mswitch{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#0d1730;border-radius:10px;padding:3px}
-.mswitch button{min-height:34px;border:0;border-radius:8px;background:none;color:var(--ink3);font-size:12px;font-weight:800}
+.mswitch{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:#0d1730;border-radius:10px;padding:3px}
+.mswitch button{min-height:34px;padding:0 2px;border:0;border-radius:8px;background:none;color:var(--ink3);font-size:12px;font-weight:800}
 .mswitch button.on{background:var(--panel2);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.06) inset}
 .mstage{margin-top:7px;border-radius:10px;overflow:hidden;background:#0b1428;min-height:170px;display:grid;place-items:center}
 .mstage img{width:100%;height:auto;display:block}
@@ -717,3 +725,16 @@ body.guestmode{padding-bottom:84px}
 .ex-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .ex-row .btn{flex:1 1 30%}
 .ex-note{margin:10px 0 0;font-size:11px;color:#8ea3bd;line-height:1.5}
+/* 302수리C — 내 이름으로 주소 정하기 */
+.ex-slug{margin:2px 0 10px;padding:11px 12px;border-radius:13px;background:rgba(255,122,0,.08);border:1px solid rgba(255,122,0,.34)}
+.ex-slug-h{display:flex;align-items:baseline;gap:7px;margin-bottom:8px}
+.ex-slug-h b{font-size:12.5px;font-weight:900;color:#ffd9b3}
+.ex-slug-h span{font-size:10.5px;color:#b8a48f}
+.ex-slug-in{display:flex;align-items:center;gap:6px;background:#0b1526;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:5px 6px 5px 10px}
+.ex-slug-in .host{font-size:11px;color:#8ea3bd;white-space:nowrap}
+.ex-slug-in input{flex:1;min-width:0;height:32px;border:0;background:transparent;color:#fff;font:inherit;font-size:14px;font-weight:800;letter-spacing:-.2px;outline:none}
+.ex-slug-in input::placeholder{color:#5d6f88;font-weight:700}
+.ex-slug-in .btn.sm{min-height:32px;padding:0 11px;white-space:nowrap}
+.ex-slug-note{margin:7px 0 0;font-size:10.8px;color:#9fb0c8;line-height:1.45;word-break:break-all}
+.ex-slug-note.good{color:#8ff0b4}
+.ex-slug-note.bad{color:#ff9d8a}

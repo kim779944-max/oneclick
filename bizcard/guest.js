@@ -102,7 +102,7 @@
     var h = '<div class="biz guest' + (hasPhoto ? '' : ' nophoto') + '">';
     h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="QR 크게 보기"><canvas id="sealCv"></canvas></button>';
     h += '<div class="biz-top">';
-    if (hasPhoto) h += '<div class="av"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
+    if (hasPhoto) h += '<div class="av has-photo"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
     h += '<div class="who">';
     h += '<div class="co">' + esc(o.org || '전자명함') + '</div>';
     h += '<div class="nm">' + (o.title ? '<em>' + esc(o.title) + '</em> ' : '') + '<b>' + esc(me.name || '이름') + '</b></div>';

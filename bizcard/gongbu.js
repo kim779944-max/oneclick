@@ -217,12 +217,20 @@
   }
 
   /* ---------- 6) 지적항공도(사진 없을 때 대표사진) ---------- */
-  function mapUrl(lat, lon, w, h, zoom) {
+  function mapUrl(lat, lon, w, h, zoom, base) {
     if (!isFinite(lat) || !isFinite(lon)) return '';
     return IMG + '?service=image&request=getmap&key=' + encodeURIComponent(key())
-      + '&domain=' + DOMAIN + '&format=png&basemap=PHOTO_HYBRID'
+      + '&domain=' + DOMAIN + '&format=png&basemap=' + (base || 'PHOTO_HYBRID')
       + '&center=' + (+lon).toFixed(6) + ',' + (+lat).toFixed(6)
       + '&zoom=' + (zoom || 16) + '&size=' + (w || 800) + ',' + (h || 520) + '&crs=EPSG:4326';
+  }
+  /* 302수리C — 지적도: 브이월드 이미지 API 에 연속지적도 레이어를 얹어 받는다(위성과 다른 그림) */
+  function cadUrl(lat, lon, w, h, zoom) {
+    if (!isFinite(lat) || !isFinite(lon)) return '';
+    return IMG + '?service=image&request=getmap&key=' + encodeURIComponent(key())
+      + '&domain=' + DOMAIN + '&format=png&basemap=GRAPHIC_WHITE&layers=lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun'
+      + '&center=' + (+lon).toFixed(6) + ',' + (+lat).toFixed(6)
+      + '&zoom=' + (zoom || 17) + '&size=' + (w || 900) + ',' + (h || 560) + '&crs=EPSG:4326';
   }
 
   /* ---------- 전체 묶음 ---------- */
@@ -251,5 +259,5 @@
     });
   }
 
-  g.KTS_GB = { lookup: lookup, geo: geo, mapUrl: mapUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse };
+  g.KTS_GB = { lookup: lookup, geo: geo, mapUrl: mapUrl, cadUrl: cadUrl, geocode: geocode, bld: bld, char: nedChar, use: nedUse };
 })(window);

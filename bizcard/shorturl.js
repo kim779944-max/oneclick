@@ -14,9 +14,55 @@
      KTS_SHORT.publish(me, items) → Promise<{ok, n, url} | {ok:false, why, msg}>
      KTS_SHORT.load(n)            → Promise<payload|null>
      KTS_SHORT.url(n)             → 글자 주소
+     KTS_SHORT.slugify(이름)        → 주소에 쓸 수 있게 다듬은 슬러그
+     KTS_SHORT.publish(me, items, {slug:'김중개'})  → autooneclick.com/김중개
    ========================================================================== */
 (function (g) {
   'use strict';
+
+  /* ---------- 이름 주소(슬러그) — 2026-11-28 · 302수리C ----------
+     중개사가 원하는 이름·상호를 그대로 주소로 쓴다: autooneclick.com/김중개
+     · 저장소 열쇠는 영문·숫자만 받으므로 이름을 해시해 열쇠를 만들고,
+       담긴 payload 에 원래 이름(slug)을 같이 넣어 읽을 때 대조한다(충돌 방지). */
+  var RESERVED = ['bizcard', 'listing', 'realty', 'land', 'slope', 'area', 'contract', 'theform',
+    'admin', 'index', 'api', 'shared', 'products', 'detail', 'longtail', 'loan', 'gongbu',
+    'interior', 'golf', 'bungee', 'exchange', 'navi2', 'ops', 'petmind', 'organizer', 'hogang',
+    'gagebu', 'missed', 'ecommerce', 'converter', 'catalog', 'ux', 'img', 'data', 'vendor',
+    'manifest', 'favicon', 'icon', 'sw', 'home', 'new', 'list', 'card', 'price', 'setup', 'kts'];
+
+  function slugify(raw) {
+    var s = String(raw == null ? '' : raw);
+    try { s = decodeURIComponent(s); } catch (e) { }
+    try { if (s.normalize) s = s.normalize('NFC'); } catch (e) { }
+    s = s.trim().toLowerCase().replace(/\s+/g, '-');
+    s = s.replace(/[^0-9a-z\uAC00-\uD7A3\-_]/g, '');
+    s = s.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+    return s.slice(0, 20);
+  }
+  /* 못 쓰는 이유 — 없으면 '' */
+  function slugProblem(slug) {
+    if (!slug) return 'empty';
+    if (/^\d+$/.test(slug)) return 'digit';
+    if (slug.length < 2) return 'short';
+    if (RESERVED.indexOf(slug) >= 0) return 'reserved';
+    return '';
+  }
+  function slugMsg(p) {
+    if (p === 'digit') return '숫자만으로는 주소를 만들 수 없습니다 — 이름이나 상호를 넣어 주세요';
+    if (p === 'short') return '두 글자 이상 넣어 주세요';
+    if (p === 'reserved') return '이 이름은 사이트 주소로 쓰고 있습니다 — 다른 이름을 넣어 주세요';
+    if (p === 'empty') return '주소로 쓸 이름을 넣어 주세요';
+    return '';
+  }
+  function slugKey(slug) {
+    var h1 = 0x811c9dc5, h2 = 0x01000193;
+    for (var i = 0; i < slug.length; i++) {
+      var c = slug.charCodeAt(i);
+      h1 = (h1 ^ c) * 16777619 >>> 0;
+      h2 = (((h2 + c * (i + 7)) >>> 0) * 16777619) >>> 0;
+    }
+    return 'n' + ('00000000' + h1.toString(16)).slice(-8) + ('00000000' + h2.toString(16)).slice(-8);
+  }
 
   var CFG = {
     pantry: '603308a5-cffb-4166-999a-40e9600ef37e',          /* KTS 전자명함 저장소 */
@@ -34,6 +80,9 @@
     return /^https:\/\/(www\.)?autooneclick\.com$/.test(o) ? o : CFG.home;
   }
   function url(n) { return home() + '/' + n; }
+  /* QR·메시지에 담는 주소 — 이름 주소는 브라우저가 읽도록 퍼센트 인코딩 */
+  function qrUrl(n) { return home() + '/' + encodeURIComponent(n); }
+  function isNo(n) { return /^\d{1,6}$/.test(String(n || '')); }
 
   /* 상대 주소(예: img/photo.jpg)는 손님 화면(/)에서 깨진다 — 절대 주소로 바꿔 담는다 */
   function abs(src) {
@@ -87,7 +136,8 @@
       bizAddr: me.bizAddr || '', kakao: me.kakao || '', field: me.field || '',
       strength: me.strength || '', intro: me.intro || '',
       photo: abs(me.photo), stamp: me.stamp || 'circle',
-      style: me.style || 'seal', qrKind: me.qrKind || 'url'
+      style: me.style || 'seal', qrKind: me.qrKind || 'url',
+      slug: me.slug || ''
     };
   }
 
@@ -149,7 +199,12 @@
     });
   }
 
-  function publish(me, items) {
+  function publish(me, items, opts) {
+    opts = opts || {};
+    var want = opts.slug ? slugify(opts.slug) : '';
+    if (opts.slug && slugProblem(want)) {
+      return Promise.resolve({ ok: false, why: 'slug', msg: slugMsg(slugProblem(want)) });
+    }
     return build(me, items).then(function (payload) {
       var size = 0;
       try { size = JSON.stringify(payload).length; } catch (e) { }
@@ -169,6 +224,16 @@
       }
       return payload;
     }).then(function (payload) {
+      /* 이름 주소를 지정했으면 그 열쇠에 담고, 아니면 번호(기존 번호가 있으면 그 번호) */
+      if (want) {
+        payload.n = want; payload.slug = want;
+        var sizeS = 0;
+        try { sizeS = JSON.stringify(payload).length; } catch (e) { }
+        if (sizeS > 1440000) return { ok: false, why: 'big', msg: '사진이 많아 주소에 담지 못했습니다 — 사진을 1~2장으로 줄여 주세요' };
+        return put(slugKey(want), payload).then(function () {
+          return { ok: true, n: 0, slug: want, url: url(want), qr: qrUrl(want), bytes: sizeS };
+        });
+      }
       var known = parseInt((me && me.shortNo) || 0, 10);
       var job = known > 0 ? Promise.resolve(known) : alloc();
       return job.then(function (n) {
@@ -177,7 +242,7 @@
         try { size = JSON.stringify(payload).length; } catch (e) { }
         if (size > 1440000) return { ok: false, why: 'big', msg: '사진이 많아 짧은 주소에 담지 못했습니다 — 사진을 1~2장으로 줄여 주세요' };
         return put(n, payload).then(function () {
-          return { ok: true, n: n, url: url(n), bytes: size };
+          return { ok: true, n: n, url: url(n), qr: qrUrl(n), bytes: size };
         });
       });
     }).catch(function (e) {
@@ -207,31 +272,45 @@
   function wait(ms) { return new Promise(function (res) { setTimeout(res, ms) }); }
 
   function load(n, tries) {
-    n = String(n || '').replace(/[^0-9]/g, '');
+    var orig = String(n == null ? '' : n).trim();
+    var raw = orig;
+    var slug = '';
+    if (!isNo(raw)) {
+      slug = slugify(raw);
+      if (!slug || slugProblem(slug)) return Promise.resolve({ ok: false, why: 'miss', p: null });
+      raw = slugKey(slug);
+    }
+    n = raw;
     if (!n) return Promise.resolve({ ok: false, why: 'miss', p: null });
     var hit = cacheGet(n);
-    if (hit) return Promise.resolve({ ok: true, why: 'cache', p: hit });
+    if (hit && (!slug || hit.slug === slug)) return Promise.resolve({ ok: true, why: 'cache', p: hit });
     if (tries == null) tries = 2;
     return fetch(CFG.api + CFG.pantry + '/basket/' + CFG.basket + n, { cache: 'no-store' })
       .then(function (r) {
         if (r.status === 404) return { ok: false, why: 'miss', p: null };
         if (r.status === 429) {
-          if (tries > 0) return wait(1400).then(function () { return load(n, tries - 1) });
+          if (tries > 0) return wait(1400).then(function () { return load(orig, tries - 1) });
           return { ok: false, why: 'busy', p: null };
         }
         if (!r.ok) throw new Error(String(r.status));
         return r.json().then(function (j) {
           if (!j || !j.me) return { ok: false, why: 'miss', p: null };
+          /* 해시가 겹쳤는데 다른 이름이 담겨 있으면 없는 명함으로 본다 */
+          if (slug && j.slug && j.slug !== slug) return { ok: false, why: 'miss', p: null };
           delete j._metadata;
           cacheSet(n, j);
           return { ok: true, why: 'net', p: j };
         });
       })
       .catch(function () {
-        if (tries > 0) return wait(900).then(function () { return load(n, tries - 1) });
+        if (tries > 0) return wait(900).then(function () { return load(orig, tries - 1) });
         return { ok: false, why: 'net', p: null };
       });
   }
 
-  g.KTS_SHORT = { build: build, publish: publish, load: load, put: put, url: url, CFG: CFG, home: home };
+  g.KTS_SHORT = {
+    build: build, publish: publish, load: load, put: put, url: url, qrUrl: qrUrl,
+    slugify: slugify, slugProblem: slugProblem, slugMsg: slugMsg, slugKey: slugKey, isNo: isNo,
+    CFG: CFG, home: home
+  };
 })(window);

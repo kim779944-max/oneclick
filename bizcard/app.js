@@ -51,8 +51,11 @@
       LS.set(K.me, S.me); LS.set(K.items, S.items); LS.set(K.plan, S.plan);
       /* 295·297번 — 명함 정보는 공용 프로필에도 적어 매물장·물건표·계약서가 따라 바뀌게 */
       if (S.me && g.KTSProfile) { try { KTSProfile.set(S.me); } catch (e) { } }
-      /* 297번 — 짧은 주소가 있으면 QR은 그 주소를 담는다 */
-      if (S.me) { S.me.shortUrl = S.me.shortNo ? (location.origin + '/' + S.me.shortNo) : (S.me.shortUrl || ''); }
+      /* 297번 — 짧은 주소가 있으면 QR은 그 주소를 담는다. 302수리C — 이름 주소가 있으면 그것이 먼저 */
+      if (S.me) {
+        S.me.shortUrl = S.me.slug ? (location.origin + '/' + encodeURIComponent(S.me.slug))
+          : (S.me.shortNo ? (location.origin + '/' + S.me.shortNo) : (S.me.shortUrl || ''));
+      }
     }, 120);
   }
 
@@ -122,8 +125,9 @@
       createdAt: Date.now(), starred: false, demo: 0,
       kind: p.kind || '', title: p.title || '', addr: p.addr || '',
       areaM2: p.areaM2 || null, areaP: p.areaP || null,
+      landM2: p.landM2 || null, buildM2: p.buildM2 || null, floor: p.floor || null,
       price: p.price || null, dealType: p.dealType || '매매',
-      deposit: p.deposit || null, monthly: p.monthly || null,
+      deposit: p.deposit || null, monthly: p.monthly || null, loan: p.loan || null,
       tags: p.tags || [], phone: p.phone || '', raw: p.raw || '', note: '',
       photos: [], lat: null, lon: null, pnu: '', gb: null, gbSt: 'none'
     };
@@ -245,7 +249,7 @@
     var h = '<div class="biz' + (hasPhoto ? '' : ' nophoto') + (guest ? ' guest' : '') + '">';
     h += '<button class="biz-stamp" id="btnSeal" type="button" aria-label="직인 도장 QR 크게 보기"><canvas id="sealCv"></canvas></button>';
     h += '<div class="biz-top">';
-    if (hasPhoto) h += '<div class="av"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
+    if (hasPhoto) h += '<div class="av has-photo"><img src="' + esc(me.photo) + '" alt="' + esc(me.name || '') + ' 사진"></div>';
     h += '<div class="who">';
     h += '<div class="co">' + esc(o.org || '전자명함') + '</div>';
     h += '<div class="nm">' + (o.title ? '<em>' + esc(o.title) + '</em> ' : '') + '<b>' + esc(me.name || '이름') + '</b></div>';
@@ -330,13 +334,14 @@
     var items = S.items.filter(function (x) { return x.starred })
       .sort(function (a, b) { return b.createdAt - a.createdAt });
     return {
-      v: 3, at: Date.now(), n: me.shortNo || 0,
+      v: 3, at: Date.now(), n: me.slug || me.shortNo || 0,
       me: {
         org: me.org || '', title: me.title || '', name: me.name || '', phone: me.phone || '',
         fax: me.fax || '', email: me.email || '', bizAddr: me.bizAddr || '', kakao: me.kakao || '',
         field: me.field || '', strength: me.strength || '', intro: me.intro || '',
         photo: me.photo || '', stamp: me.stamp || 'circle', style: me.style || 'seal',
-        qrKind: me.qrKind || 'url', shortNo: me.shortNo || 0
+        qrKind: me.qrKind || 'url', shortNo: me.shortNo || 0, slug: me.slug || '',
+        shortUrl: me.slug ? (location.origin + '/' + encodeURIComponent(me.slug)) : (me.shortUrl || '')
       },
       items: items.map(function (it) { return slimForGuest(it); })
     };
@@ -443,7 +448,7 @@
     var me = S.me || {};
     var o = { shape: sealShape(), name: me.name || '', me: me,
               style: me.style || 'seal', photo: me.photo || '',
-              code: me.shortNo ? String(me.shortNo) : '',
+              code: me.slug ? String(me.slug) : (me.shortNo ? String(me.shortNo) : ''),
               value: (g.KTS && KTS.Seal) ? KTS.Seal.payload(me) : '' };
     if (extra) for (var k in extra) o[k] = extra[k];
     return o;
@@ -543,16 +548,34 @@
   /* ---------------- [내보내기] — ① 이미지 ② 짧은 주소 (2026-11-28) ---------------- */
   function shareCard() { openExport(); }
 
+  /* 손님 링크·QR이 함께 쓰는 밑주소 — 이름 주소가 있으면 그것, 없으면 번호 */
+  function shortBase() {
+    var me = S.me || {};
+    if (me.slug) return location.origin + '/' + encodeURIComponent(me.slug);
+    if (me.shortNo) return location.origin + '/' + me.shortNo;
+    return '';
+  }
+
   function openExport() {
     var me = S.me || {};
     var starred = S.items.filter(function (x) { return x.starred });
+    var nowAddr = shortBase() ? shortBase().replace(/^https?:\/\//, '') : '';
     var box = document.createElement('div');
     box.className = 'exwrap';
     box.innerHTML = '<div class="exbox" role="dialog" aria-label="내보내기">'
       + '<div class="ex-h"><b>내보내기</b><button type="button" class="x" data-ex="close" aria-label="닫기">✕</button></div>'
       + '<p class="ex-sub">손님에게 보낼 방법을 고르세요. 둘 다 됩니다.</p>'
       + '<button type="button" class="exo img" data-ex="png"><i>' + IC.down + '</i><span><b>① 명함 이미지로 보내기</b><em>카톡·문자에 사진 한 장으로 바로</em></span></button>'
-      + '<button type="button" class="exo short" data-ex="short"><i>' + IC.copy + '</i><span><b>② 짧은 주소 만들기</b><em>' + (me.shortNo ? 'autooneclick.com/' + me.shortNo + ' — 다시 만들면 같은 번호로 갱신' : 'autooneclick.com/1 처럼 1번부터 차례로') + '</em></span></button>'
+      + '<button type="button" class="exo short" data-ex="short"><i>' + IC.copy + '</i><span><b>② 짧은 주소 만들기</b><em>' + (nowAddr ? esc(nowAddr) + ' — 다시 만들면 같은 주소로 갱신' : 'autooneclick.com/1 처럼 1번부터 차례로') + '</em></span></button>'
+      + '<div class="ex-slug">'
+      + '  <div class="ex-slug-h"><b>내 이름으로 주소 정하기</b><span>이름·상호를 그대로</span></div>'
+      + '  <div class="ex-slug-in">'
+      + '    <span class="host">autooneclick.com/</span>'
+      + '    <input id="exSlug" type="text" inputmode="text" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="김중개" value="' + esc(me.slug || '') + '">'
+      + '    <button type="button" class="btn sm" data-ex="slug">이 주소로</button>'
+      + '  </div>'
+      + '  <p class="ex-slug-note" id="exSlugNote">한글·영문·숫자 2~20자. 띄어쓰기는 「-」가 됩니다.</p>'
+      + '</div>'
       + '<div class="ex-out" id="exOut" hidden></div>'
       + '<p class="ex-note">짧은 주소에는 지금 켜 둔 별표 매물 ' + starred.length + '건이 함께 담깁니다.</p>'
       + '</div>';
@@ -561,29 +584,57 @@
     box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('[data-ex="close"]')) close(); });
     box.querySelector('[data-ex="png"]').addEventListener('click', function () { pngMode = 'share'; close(); saveCardImage(); });
     box.querySelector('[data-ex="short"]').addEventListener('click', function () { makeShort(box); });
+    box.querySelector('[data-ex="slug"]').addEventListener('click', function () {
+      var el = box.querySelector('#exSlug');
+      makeShort(box, el ? el.value : '');
+    });
+    var sg = box.querySelector('#exSlug');
+    if (sg) {
+      sg.addEventListener('input', function () {
+        var note = box.querySelector('#exSlugNote');
+        if (!note || !g.KTS_SHORT) return;
+        var s = KTS_SHORT.slugify(sg.value), why = s ? KTS_SHORT.slugProblem(s) : '';
+        note.textContent = s ? (why ? KTS_SHORT.slugMsg(why) : 'autooneclick.com/' + s + ' 로 열립니다')
+          : '한글·영문·숫자 2~20자. 띄어쓰기는 「-」가 됩니다.';
+        note.className = 'ex-slug-note' + (why ? ' bad' : (s ? ' good' : ''));
+      });
+      sg.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); makeShort(box, sg.value); } });
+    }
   }
 
-  function makeShort(box) {
+  function makeShort(box, slugRaw) {
     if (!g.KTS_SHORT) { toast('잠시 후 다시 시도해 주세요'); return; }
+    /* 이름 주소를 넣었으면 그 이름으로, 안 넣었으면 지금 주소(번호)로 */
+    var want = slugRaw == null ? '' : KTS_SHORT.slugify(slugRaw);
+    if (want) {
+      var why = KTS_SHORT.slugProblem(want);
+      if (why) {
+        var nn = box.querySelector('#exSlugNote');
+        if (nn) { nn.textContent = KTS_SHORT.slugMsg(why); nn.className = 'ex-slug-note bad'; }
+        toast(KTS_SHORT.slugMsg(why));
+        return;
+      }
+    }
     var out = box.querySelector('#exOut');
     var btn = box.querySelector('[data-ex="short"]');
     btn.disabled = true;
     out.hidden = false;
-    out.innerHTML = '<p class="ex-wait"><i></i>짧은 주소를 만드는 중입니다</p>';
+    out.innerHTML = '<p class="ex-wait"><i></i>' + (want ? '「' + esc(want) + '」 주소를 만드는 중입니다' : '짧은 주소를 만드는 중입니다') + '</p>';
     var starred = S.items.filter(function (x) { return x.starred });
-    KTS_SHORT.publish(S.me, starred).then(function (r) {
+    KTS_SHORT.publish(S.me, starred, want ? { slug: want } : null).then(function (r) {
       btn.disabled = false;
       if (!r || !r.ok) {
-        out.innerHTML = '<p class="ex-err">짧은 주소를 만들지 못했습니다' + (r && r.msg ? ' — ' + esc(r.msg) : '') + '.</p>'
+        out.innerHTML = '<p class="ex-err">주소를 만들지 못했습니다' + (r && r.msg ? ' — ' + esc(r.msg) : '') + '.</p>'
           + '<button type="button" class="btn sm" data-ex="long">긴 주소로 보내기</button>';
         var lb = out.querySelector('[data-ex="long"]');
         if (lb) lb.addEventListener('click', function () { longShare(); });
         return;
       }
-      S.me.shortNo = r.n; S.me.shortUrl = r.url; save();
+      if (r.slug) { S.me.slug = r.slug; } else { S.me.shortNo = r.n; S.me.slug = ''; }
+      S.me.shortUrl = r.url; save();
       if ($('#sealCv')) paintSeal($('#sealCv'), 92);
       var text = (S.me.name || '') + (S.me.org ? ' · ' + S.me.org : '') + ' 전자명함\n' + r.url;
-      out.innerHTML = '<div class="ex-done"><span>짧은 주소</span><b>' + esc(r.url.replace(/^https?:\/\//, '')) + '</b></div>'
+      out.innerHTML = '<div class="ex-done"><span>' + (r.slug ? '내 이름 주소' : '짧은 주소') + '</span><b>' + esc(r.url.replace(/^https?:\/\//, '')) + '</b></div>'
         + '<div class="ex-row"><button type="button" class="btn sm main" data-ex="copy">주소 복사</button>'
         + '<button type="button" class="btn sm" data-ex="send">카톡·문자로 보내기</button>'
         + '<button type="button" class="btn sm ghost" data-ex="long">긴 주소</button></div>';
@@ -996,15 +1047,30 @@
     viewNewPreview();
   }
 
+  function areaTxt(m2) {
+    if (!m2) return '';
+    return num(m2, 1) + '㎡ (' + num(Math.round(m2 / 3.305785)) + '평)';
+  }
   function tableRows(p) {
+    var land = p.landM2 || p.areaM2;
+    var priceTxt = p.dealType !== '매매' && p.deposit
+      ? '보증금 ' + money(p.deposit) + (p.monthly ? ' / 월 ' + money(p.monthly) : '')
+      : money(p.price);
     var rows = [
       ['종류', p.kind || '—'],
-      ['소재지', p.addr || '—'],
-      ['면적', p.areaM2 ? num(p.areaM2, 1) + '㎡ (' + num(p.areaP) + '평)' : '—'],
-      ['가격', p.dealType !== '매매' && p.deposit ? '보증금 ' + money(p.deposit) + (p.monthly ? ' / 월 ' + money(p.monthly) : '') : money(p.price)],
-      ['특징', (p.tags || []).join(' ') || '—'],
-      ['연락처', p.phone || '—']
+      ['소재지', p.addr || '—']
     ];
+    /* 302수리C — 상가·건물은 대지·건물·층을 가려 적는다(없는 칸은 만들지 않는다) */
+    if (p.buildM2) { rows.push(['대지', land ? areaTxt(land) : '—']); rows.push(['건물', areaTxt(p.buildM2)]); }
+    else rows.push(['면적', land ? areaTxt(land) : '—']);
+    if (p.floor) rows.push(['층수', p.floor + '층']);
+    rows.push(['가격', priceTxt]);
+    if (p.loan) rows.push(['융자', money(p.loan) + ' 승계']);
+    if (p.buildM2 && (p.deposit || p.monthly)) {
+      rows.push(['임대', [p.deposit ? '보증금 ' + money(p.deposit) : '', p.monthly ? '월 ' + money(p.monthly) : ''].filter(Boolean).join(' / ')]);
+    }
+    rows.push(['특징', (p.tags || []).join(' ') || '—']);
+    rows.push(['연락처', p.phone || '—']);
     return rows.map(function (r) {
       return '<tr><th>' + r[0] + '</th><td>' + esc(r[1]) + '</td></tr>';
     }).join('');
@@ -1125,7 +1191,7 @@
     /* ---- 지도: 일반·위성·경사도·3D 선택(280번) ---- */
     h += '<div class="mapbox">';
     h += '<div class="mswitch" id="mswitch">';
-    ['지도', '위성', '경사도', '3D'].forEach(function (v) {
+    ['지도', '위성', '지적', '경사도', '3D'].forEach(function (v) {
       h += '<button type="button" data-map="' + v + '"' + (mapView[it.id] === v ? ' class="on"' : '') + '>' + v + '</button>';
     });
     h += '</div>';
@@ -1237,24 +1303,25 @@
     if (it.tx === undefined) it.tx = null;
   }
 
-  /* 지도 그림 주소 */
+  /* 지도 그림 주소 — 302수리C: 위성과 지적도는 다른 그림(같은 그림이 두 번 나오지 않게) */
   function mapImg(it, kind) {
     if (!it.lat || !it.lon || !g.KTS_GB) return '';
-    var base = kind === '위성' ? 'PHOTO' : (kind === '지적' ? 'PHOTO_HYBRID' : 'GRAPHIC');
-    return KTS_GB.mapUrl(it.lat, it.lon, 900, 560, 16, base);
+    if (kind === '지적') return KTS_GB.cadUrl(it.lat, it.lon, 900, 560, 17);
+    var base = kind === '위성' ? 'PHOTO_HYBRID' : 'GRAPHIC';
+    return KTS_GB.mapUrl(it.lat, it.lon, 900, 560, kind === '위성' ? 16 : 16, base);
   }
 
   function paintMap(it) {
     var stage = $('#mstage'), note = $('#mnote');
     if (!stage) return;
     var v = mapView[it.id] || '지도';
-    if (v === '지도' || v === '위성') {
+    if (v === '지도' || v === '위성' || v === '지적') {
       var src = mapImg(it, v);
       stage.className = 'mstage';
       stage.innerHTML = src
         ? '<img src="' + src + '" alt="' + v + '">'
         : '<div class="mhint">주소를 넣으면 ' + v + '가 자동으로 붙습니다</div>';
-      if (note) note.textContent = v === '위성' ? '항공·위성 사진 (브이월드)' : '일반 지도 (브이월드)';
+      if (note) note.textContent = v === '지적' ? '지적도 (브이월드 연속지적도)' : (v === '위성' ? '항공·위성 사진 (브이월드)' : '일반 지도 (브이월드)');
       return;
     }
     if (!it.lat || !it.lon) {
@@ -1303,6 +1370,9 @@
     if (isKakao && !isIOS) { toast('카톡 안에서는 저장이 막힙니다 — 크롬에서 저장합니다', 2400); setTimeout(openChrome, 700); return; }
     toast('물건표 이미지를 만드는 중입니다', 2000);
     var m = KTS_BRIEF.build(it, S.me);
+    /* 302수리C — 위성과 지적도를 따로 넘긴다(사진이 없으면 두 칸으로, 사진이 있으면 지적도 칸으로) */
+    m.map = it.map || (g.KTS_GB && it.lat && it.lon ? KTS_GB.mapUrl(it.lat, it.lon, 1000, 700, 16) : '');
+    m.cad = it.cad || (g.KTS_GB && it.lat && it.lon ? KTS_GB.cadUrl(it.lat, it.lon, 1000, 700, 17) : '');
     KTS_BRIEF.toCanvas(m, 'port', 2, function (cv) {
       cv.toBlob(function (bum) {
         if (!bum) { toast('이미지를 만들지 못했습니다'); return; }
@@ -1547,7 +1617,11 @@
       + erow('e-title', '제목', it.title, '예) 임야 1,200평 · 북면')
       + erow('e-addr', '소재지', it.addr, '예) 경기도 가평군 북면 목동리 271')
       + '<div class="two">'
-      + erow('e-m2', '면적(㎡)', it.areaM2 || '', '예) 3967')
+      + erow('e-m2', '대지(㎡)', it.landM2 || it.areaM2 || '', '예) 3967')
+      + erow('e-build', '건물(㎡)', it.buildM2 || '', '예) 266')
+      + '</div>'
+      + '<div class="two">'
+      + erow('e-floor', '층수', it.floor || '', '예) 5')
       + erow('e-price', '매매가(만원)', it.price ? Math.round(it.price / 1e4) : '', '예) 38000')
       + '</div>'
       + '<div class="two">'
@@ -1576,6 +1650,8 @@
     };
     var addr = v('e-addr').trim();
     var m2 = parseFloat(String(v('e-m2')).replace(/[^\d.]/g, ''));
+    var b2 = parseFloat(String(v('e-build')).replace(/[^\d.]/g, ''));
+    var fl = parseInt(String(v('e-floor')).replace(/[^\d]/g, ''), 10);
     it.title = v('e-title').trim() || it.title;
     if (addr !== it.addr) {
       it.addr = addr; it.gb = null; it.lat = null; it.lon = null; it.pnu = ''; it.jibun = ''; it.gbSt = 'none';
@@ -1583,6 +1659,9 @@
     }
     it.areaM2 = (isFinite(m2) && m2 > 0) ? m2 : null;
     it.areaP = it.areaM2 ? Math.round(it.areaM2 / 3.305785) : null;
+    it.landM2 = it.areaM2;
+    it.buildM2 = (isFinite(b2) && b2 > 0) ? b2 : null;
+    it.floor = (isFinite(fl) && fl > 0) ? fl : null;
     it.price = man('e-price');
     it.loan = man('e-loan');
     it.residual = man('e-residual');
@@ -1602,11 +1681,12 @@
   function shareItem(it) {
     var pr = priceOf(it);
     var url = '';
-    /* 짧은 주소가 있으면 그 번호의 물건표로 (손님 폰에서도 열린다) */
-    if (S.me && S.me.shortNo) {
+    /* 짧은 주소가 있으면 그 번호의 물건표로 (손님 폰에서도 열린다). 302수리C — 이름 주소가 먼저 */
+    var base = shortBase();
+    if (base) {
       var star = S.items.filter(function (x) { return x.starred }).sort(function (a, b) { return b.createdAt - a.createdAt });
       var idx = star.map(function (x) { return x.id }).indexOf(it.id);
-      if (idx >= 0) url = location.origin + '/' + S.me.shortNo + '?i=' + idx;
+      if (idx >= 0) url = base + '?i=' + idx;
     }
     if (!url) {
       var code = posterModelCode(it);
@@ -1772,7 +1852,7 @@
           photo: cur.photo || '', code: S.me && S.me.shortNo ? String(S.me.shortNo) : '',
           onload: paintPreview,
           value: KTS.Seal.payload({ name: nameV, phone: phoneV, org: orgV, qrKind: kind,
-            shortNo: S.me && S.me.shortNo, shortUrl: S.me && S.me.shortUrl }) });
+            shortNo: S.me && S.me.shortNo, slug: S.me && S.me.slug, shortUrl: S.me && S.me.shortUrl }) });
       } catch (e) { }
       var shp = $('#sealShapes');
       if (shp) shp.style.display = previewStyle === 'seal' ? '' : 'none';
@@ -1819,6 +1899,7 @@
         style: previewStyle,
         qrKind: ($('#f-qr') && $('#f-qr').value) || 'url',
         shortNo: (S.me && S.me.shortNo) || 0,
+        slug: (S.me && S.me.slug) || '',
         shortUrl: (S.me && S.me.shortUrl) || ''
       };
       save(); toast('저장했습니다 — 매물장·물건표·계약서에도 같이 반영됩니다');
