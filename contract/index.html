@@ -168,7 +168,7 @@ label.lb i{font-style:normal;color:#C9D6E6;font-weight:700;margin-left:4px;font-
 .optlink button{font-size:11.5px;font-weight:900;color:var(--amber2);padding:8px}
 body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 /* 마이크 배너 — 지금 듣고 있어요 · 이퀄라이저 · 실시간 글자 */
-#micBar{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:calc(86px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:436px;z-index:88;background:linear-gradient(160deg,#1B2C52,#101C36);border:1px solid var(--amber);border-radius:16px;padding:9px 12px 11px;box-shadow:0 14px 34px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+#micBar{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:calc(86px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:436px;z-index:260;background:linear-gradient(160deg,#1B2C52,#101C36);border:1px solid var(--amber);border-radius:16px;padding:9px 12px 11px;box-shadow:0 14px 34px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
 #micBar.on{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
 .mbTop{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:900;color:#fff}
 .mbDot{width:8px;height:8px;border-radius:50%;background:#FF4D4D;flex:0 0 auto;animation:mbPulse 1.1s infinite}
@@ -179,7 +179,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 #micLive{font-size:15px;font-weight:900;color:#fff;line-height:1.35;min-height:38px;max-height:62px;overflow:hidden;word-break:keep-all}
 #micLive small{display:block;font-size:10.5px;font-weight:800;color:#C9D6E6;margin-bottom:1px}
 /* 마이크 — 빈칸 옆을 따라다니는 버튼과, 그 빈칸 옆에 붙는 듣기 판 (248) */
-#micChip{position:fixed;z-index:87;width:34px;height:34px;border-radius:50%;display:none;place-items:center;font-size:16px;line-height:1;
+#micChip{position:fixed;z-index:261;width:34px;height:34px;border-radius:50%;display:none;place-items:center;font-size:16px;line-height:1;
  background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224;border:0;box-shadow:0 6px 16px rgba(0,0,0,.45);padding:0}
 #micChip.on{display:grid}
 #micChip.busy{background:#FF4D4D;color:#fff}
@@ -230,7 +230,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 .picks .pk.on .nm{color:#fff}
 .picks .pk .zm{flex:0 0 34px;display:grid;place-items:center;font-size:14px;color:var(--amber2);border-left:1px solid var(--line2);background:rgba(255,107,0,.06)}
 /* 264·279·U-3 — 저장 전 확대 미리보기 (손가락으로 확대·스크롤) */
-#pvModal{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,7,18,.9)}
+#pvModal{position:fixed;inset:0;z-index:300;display:none;background:rgba(3,7,18,.9)}   /* 도우미 버튼(240)·시트(250)보다 위 */
 #pvModal.on{display:block}
 #pvModal .pvm{position:absolute;inset:0;display:flex;flex-direction:column;background:#0C1730}
 #pvModal .hd2{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0F1B33}
