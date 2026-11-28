@@ -87,6 +87,7 @@
       return;
     }
     p.n = p.n || n;
+    if (p.me) p.me.shortNo = n;   /* QR은 이 짧은 주소를 담는다 */
     document.title = ((p.me && p.me.name) ? p.me.name + ' ' : '') + (p.me && p.me.org ? p.me.org + ' · ' : '') + 'KTS 전자명함';
     var base = location.origin + '/' + n;
     root.innerHTML = '<div class="brandline"><img src="/bizcard/icon-192.png" alt="">KTS 원클릭 · 전자명함</div>'

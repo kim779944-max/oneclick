@@ -647,7 +647,7 @@ body.guestmode #app{padding-top:10px}
 .pact.kakao{background:#fee500;border-color:#fee500;color:#2a2200}
 .pact.save{background:linear-gradient(180deg,#ffd48a,#f0b455);border-color:#ffd48a;color:#2a1a00}
 .pact.out{background:#e2762a;border-color:#e2762a;color:#fff}
-.pact.img{background:#8a6a2f;border-color:#a8813c;color:#ffe9c4}
+.pact.img{background:linear-gradient(180deg,#f2c47c,#d69a3c);border-color:#e0b166;color:#2a1a00}
 .pact.edit{background:#33455f;border-color:#41546f;color:#dbe6f4}
 .pact.inst{border:1px dashed rgba(226,186,122,.6);background:rgba(226,186,122,.12);color:#ffe3b0}
 
