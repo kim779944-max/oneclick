@@ -574,7 +574,10 @@
       b.classList.toggle('on', b.getAttribute('data-r') === orient);
     });
     paintPreview(orient);
-    $('#mdNote').textContent = '손가락으로 벌려 크게 확인한 뒤 저장하세요.';
+    /* 302수리C — 브이월드 위성사진은 CORS가 없어 저장 캔버스에 담기지 않는다(지적도로 대신) */
+    $('#mdNote').textContent = (M && M.map && !(M.photos || []).length)
+      ? '위성사진은 저장 이미지에 담을 수 없어 지적도로 대신 들어갑니다 · 손가락으로 벌려 확인하세요'
+      : '손가락으로 벌려 크게 확인한 뒤 저장하세요.';
   }
   function paintPreview(o) {
     var stage = $('#mdStage');

@@ -19,6 +19,119 @@
   };
   var LAND = { W: 1920, H: 1080 }, PORT = { W: 1080, H: 1920 };
 
+  /* ============================ 지적도 직접 그리기 ============================
+     302수리C — 브이월드 지도 그림(req/image)은 CORS 머리를 주지 않아 저장용 캔버스를
+     오염시키므로(실측: crossOrigin 로드는 실패, 그냥 로드하면 SecurityError)
+     저장 이미지에는 지적도를 연속지적도 데이터(JSONP)로 직접 그린다.
+     화면(DOM)에서는 지도 그림을 그대로 쓰고, 캔버스 미리보기·저장에서 그림을 못 받으면
+     이 그림(지적도)으로 채운다 — 빈 칸을 남기지 않는다. */
+  var VW_KEY = '0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F', VW_DOMAIN = 'autooneclick.com';
+  function jsonpVW(url, ms) {
+    return new Promise(function (res) {
+      if (typeof document === 'undefined') return res(null);
+      var cb = '__ktspt' + Math.floor(Math.random() * 1e7);
+      var s = document.createElement('script'), done = false;
+      function fin(v) { if (done) return; done = true; try { delete window[cb] } catch (e) { window[cb] = null } if (s.parentNode) s.parentNode.removeChild(s); res(v); }
+      var tm = setTimeout(function () { fin(null) }, ms || 12000);
+      window[cb] = function (d) { clearTimeout(tm); fin(d) };
+      s.onerror = function () { clearTimeout(tm); fin(null) };
+      s.src = url + (url.indexOf('?') < 0 ? '?' : '&') + 'callback=' + cb;
+      document.head.appendChild(s);
+    });
+  }
+  function merc(lat, lon, z) {
+    var S = 256 * Math.pow(2, z);
+    var s = Math.sin(lat * Math.PI / 180);
+    return { x: (lon + 180) / 360 * S, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * S };
+  }
+  function invMerc(x, y, z) {
+    var S = 256 * Math.pow(2, z);
+    var n = Math.PI - 2 * Math.PI * y / S;
+    return { lon: x / S * 360 - 180, lat: 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))) };
+  }
+  function ringsOf(gm) {
+    if (!gm) return [];
+    if (gm.type === 'Polygon') return gm.coordinates || [];
+    if (gm.type === 'MultiPolygon') {
+      var out = [];
+      (gm.coordinates || []).forEach(function (p) { (p || []).forEach(function (r) { out.push(r) }) });
+      return out;
+    }
+    return [];
+  }
+  function inRing(ring, lon, lat) {
+    var inside = false;
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var xi = +ring[i][0], yi = +ring[i][1], xj = +ring[j][0], yj = +ring[j][1];
+      if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  }
+  /* 지적도 캔버스 — lat/lon 주변 필지를 받아 선·지번을 그린다. 실패하면 null */
+  function cadVector(lat, lon, W, H, z) {
+    return new Promise(function (res) {
+      lat = +lat; lon = +lon; z = z || 17;
+      if (!isFinite(lat) || !isFinite(lon)) return res(null);
+      var c = merc(lat, lon, z);
+      var a = invMerc(c.x - W / 2, c.y - H / 2, z), b = invMerc(c.x + W / 2, c.y + H / 2, z);
+      var box = [a.lon.toFixed(6), b.lat.toFixed(6), b.lon.toFixed(6), a.lat.toFixed(6)].join(',');
+      var url = 'https://api.vworld.kr/req/data?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
+        + '&key=' + encodeURIComponent(VW_KEY) + '&domain=' + VW_DOMAIN
+        + '&format=json&size=200&page=1&geometry=true&attribute=true&crs=EPSG:4326'
+        + '&geomFilter=' + encodeURIComponent('BOX(' + box + ')');
+      jsonpVW(url, 12000).then(function (r) {
+        var fs = [];
+        try { fs = r.response.result.featureCollection.features || []; } catch (e) { fs = []; }
+        if (!fs.length) return res(null);
+        try {
+          var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+          var x = cv.getContext('2d');
+          x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+          function px(p) { var q = merc(+p[1], +p[0], z); return [q.x - c.x + W / 2, q.y - c.y + H / 2]; }
+          var labels = [], mine = null;
+          fs.forEach(function (f) {
+            var pr = f.properties || {}, rings = ringsOf(f.geometry);
+            if (!rings.length) return;
+            if (!mine && rings[0] && inRing(rings[0], lon, lat)) mine = f;
+          });
+          fs.forEach(function (f) {
+            var pr = f.properties || {}, rings = ringsOf(f.geometry);
+            var hot = (f === mine);
+            rings.forEach(function (ring) {
+              if (!ring || ring.length < 3) return;
+              x.beginPath();
+              ring.forEach(function (p, i) { var q = px(p); if (i) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); });
+              x.closePath();
+              if (hot) { x.fillStyle = 'rgba(255,122,0,.10)'; x.fill(); }
+              x.strokeStyle = hot ? '#e11d2e' : '#e0a03a';
+              x.lineWidth = hot ? 4 : 2.4;
+              x.lineJoin = 'round'; x.stroke();
+            });
+            var jb = String(pr.jibun || '').replace(/\s+/g, '');
+            if (jb && rings[0]) {
+              var sx = 0, sy = 0, n0 = 0;
+              rings[0].forEach(function (p) { var q = px(p); sx += q[0]; sy += q[1]; n0++; });
+              if (n0) labels.push({ t: jb, x: sx / n0, y: sy / n0 });
+            }
+          });
+          labels.forEach(function (l) {
+            if (l.x < 16 || l.x > W - 16 || l.y < 16 || l.y > H - 16) return;
+            x.font = '600 17px ' + FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
+            x.fillStyle = 'rgba(255,255,255,.82)';
+            var tw = x.measureText(l.t).width;
+            x.fillRect(l.x - tw / 2 - 3, l.y - 10, tw + 6, 20);
+            x.fillStyle = '#2b62c9'; x.fillText(l.t, l.x, l.y);
+          });
+          /* 중심점 표시 */
+          x.fillStyle = '#FF7A00'; x.beginPath(); x.arc(W / 2, H / 2, 7, 0, Math.PI * 2); x.fill();
+          x.strokeStyle = '#fff'; x.lineWidth = 2.5; x.stroke();
+          x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+          res(cv);
+        } catch (e) { res(null); }
+      }).catch(function () { res(null); });
+    });
+  }
+
   function f(px, w) { return (w || 400) + ' ' + Math.round(px) + 'px ' + FONT; }
 
   /* ---------------- 글자 재기 ---------------- */
@@ -340,7 +453,7 @@
     o = o || {};
     var gap = 12, thH = o.thH || 112;
     var nPh = (m.photos || []).length;
-    var hasSat = !!m.map, hasCad = !!m.cad;
+    var hasSat = !!m.map && !o.noSat, hasCad = !!m.cad;
     var out = { photo: null, thumbs: null, blocks: [] };
     function place(k, x, y, w, h) { return { k: k, x: x, y: y, w: w, h: h }; }
     if (!nPh) {
@@ -370,12 +483,13 @@
   }
 
   /* 가로 16:9 — 왼쪽: 큰 그림 + 썸네일 줄 + 지적도 / 오른쪽: 01·02·03 */
-  function planLand(m) {
+  function planLand(m, o) {
+    o = o || {};
     var W = LAND.W, H = LAND.H, PAD = 44;
     var headH = 104, footH = 100;
     var top = headH, bottom = H - footH;
     var LW = 884, LX = PAD, RX = PAD + LW + 20, RW = W - PAD - RX;
-    var MP = mediaPlan(m, { x: LX, y: top, w: LW, h: bottom - top }, { thH: 112, cadInRow: false });
+    var MP = mediaPlan(m, { x: LX, y: top, w: LW, h: bottom - top }, { thH: 112, cadInRow: false, noSat: o.noSat });
     var cardsX = RX, cardsW = RW;
     if (!MP.photo && !MP.blocks.length) {
       /* 사진도 위치도도 없을 때 — 빈 네이비 박스를 두지 않고 3단이 종이를 꽉 채운다 */
@@ -406,7 +520,8 @@
   }
 
   /* 세로 9:16 — 위에서부터 큰 그림 · 썸네일 줄(지적도 포함) · 01·02·03 */
-  function planPort(m) {
+  function planPort(m, o) {
+    o = o || {};
     var W = PORT.W, H = PORT.H, PAD = 40;
     var headH = 236, footH = 176;
     var top = headH, bottom = H - footH;
@@ -444,7 +559,7 @@
       break;
     }
     var MP = mediaH
-      ? mediaPlan(m, { x: PAD, y: top, w: cw, h: mediaH }, { thH: 148, cadInRow: true })
+      ? mediaPlan(m, { x: PAD, y: top, w: cw, h: mediaH }, { thH: 148, cadInRow: true, noSat: o.noSat })
       : { photo: null, thumbs: null, blocks: [] };
     var cardsTop = top + (mediaH ? mediaH + 18 : 6);
     if (!MP.photo && !MP.blocks.length) cardsTop = top + 6;
@@ -472,7 +587,7 @@
       storyLines: F.storyLines, moneyH: F.moneyH
     };
   }
-  function plan(m, orient) { return orient === 'port' ? planPort(m) : planLand(m); }
+  function plan(m, orient, o) { return orient === 'port' ? planPort(m, o) : planLand(m, o); }
 
   /* ============================ 그림 도구 ============================ */
   function rr(x, px, py, w, h, r) {
@@ -518,7 +633,7 @@
   /* ============================ 캔버스 ============================ */
   function draw(ctx, m, orient, imgs, opts) {
     opts = opts || {};
-    var P = plan(m, orient);
+    var P = plan(m, orient, opts);
     var land = orient !== 'port';
     var x = ctx;
     x.save();
@@ -972,27 +1087,34 @@
   }
 
   function toCanvas(m, orient, scale, done) {
-    var P0 = plan(m, orient);
     var k = scale || 1;
     var photoSrc = m.photos.slice(0, 4);
     var jobs = photoSrc.map(function (s) { return loadImg(s, true) })
       .concat([loadImg(m.map || '', true), loadImg(m.cad || '', true)]);
     Promise.all(jobs).then(function (imgs) {
-      var cv = document.createElement('canvas');
-      cv.width = Math.round(P0.W * k);
-      cv.height = Math.round(P0.H * k);
-      var ctx = cv.getContext('2d');
-      ctx.scale(k, k);
+      var sat = imgs[imgs.length - 2];
       var cad = imgs[imgs.length - 1];
-      var map = imgs[imgs.length - 2];
       var ph = imgs.slice(0, -2);
-      var subs = [];
-      for (var i = 1; i < ph.length; i++) if (ph[i]) subs.push({ img: ph[i], idx: i });
-      draw(ctx, m, orient, {
-        main: ph[0] || map, subs: subs, map: map, cad: cad,
-        seal: sealCanvas(m, orient === 'port' ? 200 : 150)
-      }, {});
-      done(cv);
+      /* 브이월드 그림은 CORS가 없어 캔버스에 못 들어온다 → 지적도를 데이터로 직접 그려 채운다 */
+      var needVec = !cad && m.lat && m.lon;
+      var job = needVec ? cadVector(m.lat, m.lon, 1100, orient === 'port' ? 700 : 460, 17) : Promise.resolve(null);
+      job.then(function (vcv) {
+        if (vcv) cad = vcv;
+        var opt = { noSat: !sat };
+        var P0 = plan(m, orient, opt);
+        var cv = document.createElement('canvas');
+        cv.width = Math.round(P0.W * k);
+        cv.height = Math.round(P0.H * k);
+        var ctx = cv.getContext('2d');
+        ctx.scale(k, k);
+        var subs = [];
+        for (var i = 1; i < ph.length; i++) if (ph[i]) subs.push({ img: ph[i], idx: i });
+        draw(ctx, m, orient, {
+          main: ph[0] || null, subs: subs, map: sat, cad: cad,
+          seal: sealCanvas(m, orient === 'port' ? 200 : 150)
+        }, opt);
+        done(cv);
+      });
     });
   }
 
@@ -1014,6 +1136,6 @@
     build: build, plan: plan, draw: draw, dom: dom, toCanvas: toCanvas,
     specsOf: specsOf, storyOf: storyOf, enc: enc, dec: dec, eok: eok, won: won,
     zoneOf: zoneOf, jigaOf: jigaOf, C: C, FONT: FONT, clip: clip, measure: measure,
-    sealCanvas: sealCanvas, loadImg: loadImg, wrap: wrap
+    sealCanvas: sealCanvas, loadImg: loadImg, wrap: wrap, cadVector: cadVector, merc: merc
   };
 })(window);
