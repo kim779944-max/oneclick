@@ -465,7 +465,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 <div id="pvModal" aria-hidden="true"><div class="pvm">
  <div class="hd2"><b id="pvmTitle">A4 미리보기</b><button type="button" id="pvmX">닫기</button></div>
  <div class="tools"><button type="button" data-pvz="-" aria-label="작게">−</button><b id="pvmZ">100%</b><button type="button" data-pvz="+" aria-label="크게">＋</button><button type="button" data-pvz="fit" class="on" style="font-size:12px">화면 폭</button></div>
- <div id="pveBar" hidden><span class="pvl" id="pveLab">칸</span><input id="pveIn" autocomplete="off" autocapitalize="off"><textarea id="pveTa" rows="3" hidden placeholder="여러 줄로 적으세요"></textarea><button type="button" class="pvn" id="pveNext">다음 칸</button><button type="button" class="pvx" id="pveDone">완료</button></div>
+ <div id="pveBar" hidden><span class="pvl" id="pveLab">칸</span><input id="pveIn" autocomplete="off" autocapitalize="off" oninput="pvEditInput(this)" onchange="pvEditInput(this)"><textarea id="pveTa" rows="3" hidden placeholder="여러 줄로 적으세요" oninput="pvEditInput(this)" onchange="pvEditInput(this)"></textarea><button type="button" class="pvn" id="pveNext">다음 칸</button><button type="button" class="pvx" id="pveDone">완료</button></div>
  <div class="body" id="pvmBody"></div>
  <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
 </div></div>
@@ -3118,7 +3118,6 @@ function toggleOpt(k){
 }
 window.KC_MIC = { start: micStart, stop: micStop, show: function(){ micBarEl(); MIC.on = true; micSetTarget(voicePick()); micShow(true); micAnim(true); setTimeout(function(){ MIC.on = false; stopLevel(); micShow(false); }, 6000); }, get on(){ return MIC.on; } };
 window.KC_WRITE = { render: renderWrite, dates: dateGroups, propLoad: propLoad, fillProp: fillProp };
-window.KCDBG = function(){ return { pvedit: PVEDIT, form: S.form, p3: S.v['sale.p3'], pve: !!(document.getElementById('pveIn')), hot: document.querySelectorAll('#pvmBody .hot').length }; };
 
 /* ============================================================================
    248 (2026-11-27) ① 다필지 — 주소 한 줄 → 4대 공부 · 총면적 합계 · 별지
