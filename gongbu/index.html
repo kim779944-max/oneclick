@@ -517,7 +517,12 @@ function geocode(q){
     return next();
   }
   if(isShortAddr(t)){
-    return vwSearch(t).then(function(list){
+    /* 검색이 느리면 6초에서 끊고 기존 경로로 — 짧은 주소가 오래 매달리지 않게 */
+    var quick=Promise.race([
+      vwSearch(t),
+      new Promise(function(res){ setTimeout(function(){ res(null) },6000) })
+    ]);
+    return quick.then(function(list){
       S.cands=list||[];
       if(list&&list.length&&/^\d{19}$/.test(list[0].pnu||'')) return list[0];
       return chain();
