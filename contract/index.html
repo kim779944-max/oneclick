@@ -1427,8 +1427,8 @@ function pvEditInput(el){
   } else {
     setV(f.id, raw);
   }
-  syncSpecial();
-  pvRefreshPage(pvPageOf(PVEDit));
+  pvRefreshPage(pvPageOf(fid));
+  try{ syncSpecial(); }catch(e){}
 }
 function pvEditNext(){
   const inp = $('#pveIn'), ta = $('#pveTa');

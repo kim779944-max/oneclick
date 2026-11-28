@@ -3539,9 +3539,8 @@ function zEditInput(el){
   }
   VALS[f.label] = v;
   saveVals();
-  runCalc(f.label);
-  updNavPos(ZEDIT);
   zRefreshPage(f.page || 1);
+  try{ runCalc(f.label); updNavPos(ZEDIT); }catch(e){}
 }
 async function zRefreshPage(pg, now){
   if (!ZPAGES[pg - 1]) return;
