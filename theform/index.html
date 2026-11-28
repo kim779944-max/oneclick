@@ -27,11 +27,29 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(10,17,40,.95);border
 .brand small{font-size:9.5px;font-weight:700;color:#7C8DA6}
 .sp{flex:1}
 .keyb{font-size:11px;font-weight:800;color:var(--amber2);border:1px solid rgba(255,107,0,.45);border-radius:999px;padding:6px 10px}
-.steps{display:flex;gap:4px;padding:0 14px 10px}
-.steps button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#7C8DA6}
-.steps button i{display:block;width:100%;height:4px;border-radius:4px;background:#22335A}
-.steps button.done i{background:rgba(255,107,0,.5)}
-.steps button.on{color:#fff}.steps button.on i{background:var(--amber)}
+/* 계약서와 같은 진행 막대 (288-⑨ 통일) */
+.prog{padding:0 14px 10px}
+.prog .track{height:6px;border-radius:6px;background:#22335A;overflow:hidden}
+.prog .fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:6px;transition:width .25s}
+.prog .lbls{display:flex;margin-top:6px;gap:4px}
+.prog .lbls button{flex:1;font-size:11.5px;font-weight:800;color:#C9D6E6;text-align:center;padding:2px 0}
+.prog .lbls button.on{color:#fff}
+.prog .lbls button.done{color:var(--amber2)}
+/* 288-② 마이크는 칸 옆 🎤 하나 — 아래 바·중복 버튼 제거 */
+#tfMicBar{display:none!important}
+#fillDock #voiceBtn{display:none!important}
+#tfMicChip{width:30px;height:30px;font-size:15px;background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224;border:0;box-shadow:0 4px 12px rgba(0,0,0,.45)}
+#tfMicChip.rec{background:#FF4D4D;color:#fff}
+/* 288-④ 미리보기 칸 터치 수정 */
+#zBody .pgi{position:relative;margin:0 auto 10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45);width:var(--zw,100%)}
+#zBody .pgi img{width:100%!important;margin:0!important;box-shadow:none!important;background:transparent}
+#zBody .hot{position:absolute;border:1px dashed rgba(255,163,77,.85);background:rgba(255,163,77,.12);border-radius:3px}
+#zBody .hot.on{border:2px solid #FF6B00;background:rgba(255,107,0,.28)}
+#zEdit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;background:#12203C;border-bottom:1px solid var(--amber)}
+#zEdit[hidden]{display:none}
+#zEdit .zl{font-size:11px;font-weight:900;color:var(--amber2);max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#zEdit input,#zEdit textarea{flex:1;min-width:110px;font-size:15px;padding:8px 9px;border-color:var(--amber)}
+#zEdit button{flex:0 0 auto;font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:8px;padding:8px 10px;min-height:36px}
 main{padding:12px 14px 120px}
 .scr{display:none}.scr.on{display:block}
 .hero{background:linear-gradient(150deg,rgba(255,107,0,.14) 0%,rgba(18,32,60,.96) 58%);border:1px solid rgba(255,107,0,.42);border-radius:18px;padding:14px}
@@ -265,9 +283,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
   <button type="button" data-tab="form" aria-pressed="true">① 종이 양식 채우기<b>사진 위 빈칸 → 한글·엑셀·PDF</b></button>
   <button type="button" data-tab="convert" aria-pressed="false">② 표 사진 → 한글·엑셀<b>구 문서변환기 · 원본 서식 유지</b></button>
  </nav>
- <nav class="steps" id="steps">
-  <button data-s="1"><i></i>등록</button><button data-s="2"><i></i>빈칸 지정</button><button data-s="3"><i></i>값 입력</button><button data-s="4"><i></i>미리보기</button><button data-s="5"><i></i>내보내기</button>
- </nav>
+ <div class="prog"><div class="track"><div class="fill" id="tfill"></div></div>
+  <div class="lbls" id="steps"><button data-s="1">양식</button><button data-s="3">작성</button><button data-s="4">출력</button></div></div>
 </header>
 
 <section id="cvPane" aria-label="표 사진 → 한글·엑셀"><iframe id="cvFrame" title="표 사진 → 한글·엑셀 변환" loading="lazy"></iframe></section>
@@ -344,7 +361,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
  <div class="card">
   <h2><span class="n">3</span><span id="s3name">값 입력</span></h2>
   <p class="sub">아래에 늘 붙어 있는 <b style="color:#FFC08A">[🎤 말해서 넣기]</b>로 지금 칸에 말해 넣고 <b style="color:#FFC08A">[다음 칸]</b>으로 넘어갑니다. 옆의 <b style="color:#FFC08A">[?]</b> 도우미가 넣을 칸을 가리킵니다.</p>
-  <div class="row" style="margin-top:6px"><button class="btn sec sm" id="sampleVals">예시 값 넣기</button><button class="btn sec sm" id="clearVals">값 모두 지우기</button></div>
+  <div class="row" style="margin-top:6px"><button class="btn sec sm" id="clearVals">값 모두 지우기</button></div>
   <div id="fillInfo">사진 자동 채우기: AI 열쇠가 있으면 정확하게, 없으면 기기 안 무료 글자 인식으로 읽습니다.</div>
   <div id="valList"></div>
  </div>
@@ -366,11 +383,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
   <canvas class="pv" id="pvCv"></canvas>
   <div id="tfThm"></div>
  </div>
-</section>
-
-<!-- ⑤ 내보내기 -->
-<section class="scr" id="s5">
- <div class="card">
+<div class="card">
   <h2><span class="n">5</span>내보내기</h2>
   <p class="sub">파일은 이 기기 안에서 만들어집니다. 서버로 올라가지 않습니다.</p>
   <label class="lb">파일 이름</label>
@@ -399,8 +412,10 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
   </div>
   <p class="kv" id="exInfo">저장한 파일은 더뷰(<a href="../viewer.html">viewer.html</a>)로 바로 열어 확인할 수 있습니다.</p>
   <p class="kv">[도장 찍으러 가기]를 누르면 방금 작성한 계약서가 더싸인에 그대로 올라갑니다. 사인·도장을 찍어 내려받으세요. (파일은 이 기기 안에서만 넘어갑니다)</p>
- </div>
-</section>
+ </div></section>
+
+<!-- ⑤ 내보내기 -->
+
 
 <p class="foot">양식만들기 · KTS 원클릭 · 서버 0 · 유료 API 0<br>모든 사진·양식·값은 이 기기 브라우저 안에만 저장됩니다.</p>
 </main>
@@ -433,6 +448,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
  <div id="tfMicEq"></div><div id="tfMicLive"><small id="tfMicWhere"></small><b id="tfMicTxt">말씀하세요…</b></div></div>
 <div id="zModal"><div class="zhd"><b id="zTitle">A4 미리보기</b><button type="button" id="zX">닫기</button></div>
  <div class="ztools"><button type="button" data-z="-" aria-label="작게">−</button><b id="zLv">100%</b><button type="button" data-z="+" aria-label="크게">＋</button><button type="button" data-z="fit" class="on" style="font-size:12px">화면 폭</button></div>
+ <div id="zEdit" hidden><span class="zl" id="zEditLab">칸</span><input id="zEditIn" autocomplete="off"><textarea id="zEditTa" rows="2" hidden></textarea><button type="button" id="zEditDone">완료</button></div>
  <div id="zBody"></div>
  <div class="zft"><button class="btn pri" id="zPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="zPng">이미지(PNG) 저장</button><button class="btn sec" id="zX2">닫기</button></div></div>
 <div id="toast"></div>
@@ -2834,16 +2850,8 @@ function bindSig(cv, f){
 }
 $('#clearVals').onclick = () => { VALS = {}; saveVals(); renderInputs(); toast('값을 모두 지웠습니다'); };
 $('#valList').addEventListener('input', syncValBar);
-$('#valList').addEventListener('change', syncValBar);const SAMPLE = {text:'홍길동', number:'150000', date:new Date().toISOString().slice(0, 10)};
-const SAMPLE_BY = {'품목1':'A4 복사용지','규격1':'80g 500매','수량1':'10','단가1':'4800','품목2':'볼펜(흑)','규격2':'0.7mm','수량2':'24','단가2':'500','품목3':'스테이플러','규격3':'중형','수량3':'2','단가3':'8500',
-  '공급받는자':'(주)한빛상사','공급자':'KTS 문구','번호':'2026-1118-01','비고':'납품 후 7일 내 결제','인수자':'김민수','수신':'(주)한빛상사','담당자':'이서연','연락처':'010-1234-5678','유효기간':'견적일로부터 30일',
-  '견적처':'KTS 문구','사업장':'KTS 카페','대표자':'박대표','근로자 성명':'최지우','근로자 주소':'서울시 마포구 독막로 1','근무 장소':'KTS 카페 본점','업무 내용':'매장 운영 · 고객 응대',
-  '근로 시간':'09:00 ~ 18:00','휴게 시간':'12:00 ~ 13:00','근무일 휴일':'주 5일(월~금) · 주휴일 일요일','임금':'2200000','지급일 방법':'매월 10일 · 근로자 계좌 입금',
-  '동의 여부':'동의함','성명':'정하늘','수신처':'KTS 원클릭','신청인 성명':'한가람','주소':'부산시 해운대구 센텀로 10','이메일':'sample@example.com','신청 내용':'사업자 등록 증명서 2부 발급','신청 사유':'거래처 제출용','첨부 서류':'신분증 사본 1부','신청인':'한가람'};
-$('#sampleVals').onclick = () => { CUR.fields.forEach(f => { if (f.type === 'sign') return; if (CUR.calc && CUR.calc[f.label]) return;
-  VALS[f.label] = SAMPLE_BY[f.label] != null ? SAMPLE_BY[f.label] : (f.type === 'number' ? SAMPLE.number : (f.type === 'date' ? SAMPLE.date : (f.label.indexOf('이름') >= 0 || f.label.indexOf('성명') >= 0 ? '홍길동' : f.label + ' 예시'))); });
-  runCalc(''); saveVals(); renderInputs(); toast('예시 값을 넣었습니다'); };
-
+$('#valList').addEventListener('change', syncValBar);
+/* 288-⑪ 가짜 '예시' 글자(라벨 + 예시)가 종이에 찍히지 않도록 예시 값 채우기를 없앴다 — 빈칸은 빈칸으로 나간다 */
 /* 음성 입력 — 지금 칸(또는 도우미가 가리키는 칸)에 대고 말하면 그 칸에 들어가고, 다음 칸을 가리킨다 */
 function pickVoiceIdx(){
   const a = document.activeElement;
@@ -3303,6 +3311,46 @@ function ensureOvFont(){
   }
   return OVFONT_P;
 }
+/* 288-⑥⑦ — 종이(사진)에 인쇄된 글씨 줄의 위치·크기를 읽어, 채운 값도 같은 크기·굵기로 같은 줄에 앉힌다 */
+const TF_INK = {};
+function tfInkLines(IM, key){
+  if (TF_INK[key]) return TF_INK[key];
+  const out = []; TF_INK[key] = out;
+  try{
+    if (!IM) return out;
+    const W = IM.naturalWidth || IM.width, H = IM.naturalHeight || IM.height;
+    if (!W || !H) return out;
+    const cw = Math.min(W, 900), sc = cw / W, ch = Math.max(1, Math.round(H * sc));
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+    const g = cv.getContext('2d'); g.drawImage(IM, 0, 0, cw, ch);
+    const d = g.getImageData(0, 0, cw, ch).data;
+    const rows = new Float32Array(ch);
+    for (let y = 0; y < ch; y++){
+      let n = 0; const o = y * cw * 4;
+      for (let x = 0; x < cw; x++){ const i = o + x * 4; if (d[i + 3] > 40 && (d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114) < 170) n++; }
+      rows[y] = n / cw;
+    }
+    let st = -1; const maxH = Math.max(8, Math.round(ch * 0.05));
+    for (let y = 0; y <= ch; y++){
+      const rule = y < ch && rows[y] > 0.5;
+      const on = y < ch && !rule && rows[y] > 0.004;
+      if (on && st < 0) st = y;
+      if (!on && st >= 0){ const h = y - st; if (h >= 3 && h <= maxH) out.push({ t: st / ch, b: (y - 1) / ch, h: h / ch }); st = -1; }
+    }
+  }catch(e){}
+  return out;
+}
+function tfInkFor(lines, f, Hpx){
+  if (!lines || !lines.length) return null;
+  const cy = (f.y + f.h / 2) / 100;
+  let best = null, bd = 9;
+  for (let i = 0; i < lines.length; i++){
+    const L = lines[i], c = (L.t + L.b) / 2, d = Math.abs(c - cy);
+    if (d < bd){ bd = d; best = L; }
+  }
+  if (!best || bd > Math.max(f.h / 100 * 1.3, 0.015)) return null;
+  return { top: best.t * Hpx, bot: best.b * Hpx, h: best.h * Hpx };
+}
 async function composite(maxW, pg){
   pg = pg || 1;
   try{ await ensureOvFont(); }catch(e){}
@@ -3319,7 +3367,8 @@ async function composite(maxW, pg){
   }
   /* 269 — 표준계약서(contract/)와 같은 글꼴로 통일 (원본 종이에 찍힌 라벨도 고딕) */
   const OVF = FONT;
-  /* 글자 크기: 종이의 줄 높이에 맞춰 크게(칸 높이의 0.78배), 종이 너비의 4.6%를 넘지 않게 */
+  const IMLINES = tfInkLines(IM, (CUR.id || 'x') + '|' + (CUR._theme || '') + '|' + pg);
+  /* 글자 크기: 종이에 인쇄된 같은 줄의 글씨 크기를 재서 맞춘다 (못 재면 칸 높이 기준) */
   const hs = CUR.fields.filter(f => f.type !== 'erase').map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
   const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.78, cv.width * 0.046);
   for (const f of CUR.fields){
@@ -3331,14 +3380,17 @@ async function composite(maxW, pg){
       const im = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = v; }); if (!im) continue;
       const r = Math.min(w / im.width, h / im.height); g.drawImage(im, x + (w - im.width * r) / 2, y + (h - im.height * r) / 2, im.width * r, im.height * r); continue;
     }
-    const t = shown(f); const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
-    let fs = fsz || Math.min(h * 0.78, FS0); const fw = f.type === 'number' ? 600 : 500;
+    const t = shown(f);
+    const ink = tfInkFor(IMLINES, f, cv.height);
+    const fsz = f.fs ? f.fs * 1.25 * (cv.width / 1489) : 0;
+    let fs = fsz || (ink ? ink.h / 0.735 : Math.min(h * 0.78, FS0));
+    const fw = 700;
     const pad = Math.max(2, Math.min(fs * 0.24, w * 0.05));
     const innerW = Math.max(6, w - pad * 2);
     /* 좁은 칸이라도 읽을 수 있는 밑까지만 줄이고, 넘치면 줄을 바꾸고 칸 밖으로는 넘기지 않는다 */
     const minFs = Math.max(7, Math.min(fs, Math.max(h * 0.40, cv.width * 0.008)));
     const setF = v => { g.font = `${fw} ${v}px ${OVF}`; };
-    g.fillStyle = '#111111'; g.textBaseline = 'middle';
+    g.fillStyle = '#000000'; g.textBaseline = ink ? 'alphabetic' : 'middle';
     setF(fs);
     const hasNL = t.indexOf('\n') >= 0;
     let lines = wrapText(g, t, innerW);
@@ -3351,7 +3403,8 @@ async function composite(maxW, pg){
       /* 면적은 뒤의 ㎡ 기호에 붙게 오른쪽 정렬 */
       const right = f.type === 'number' || /면적/.test(f.label || '');
       g.textAlign = cent ? 'center' : (right ? 'right' : 'left');
-      g.fillText(t, cent ? x + w / 2 : (right ? x + w - pad : x + pad), y + h / 2);
+      const by = ink ? (ink.bot - fs * 0.03) : (y + h / 2);
+      g.fillText(t, cent ? x + w / 2 : (right ? x + w - pad : x + pad), by);
     } else {
       /* 높은 칸·특약란·여러 줄 글 — 줄바꿈을 살리고 줄 수에 맞춰 글자를 줄인다 */
       let lh = fs * 1.3;
@@ -3435,18 +3488,83 @@ function zApply(){
   $$('#zModal [data-z]').forEach(b => b.classList.toggle('on', b.dataset.z === 'fit' ? ZFIT : false));
 }
 function zClose(){ const m = $('#zModal'); if (m) m.classList.remove('on'); }
+let ZPAGES = [], ZEDIT = -1, ZREFRESH = 0;
+function zBuild(){
+  const body = $('#zBody'); if (!body) return;
+  body.innerHTML = ZPAGES.map((c, i) => {
+    const pg = i + 1, url = c.toDataURL('image/jpeg', 0.95);
+    const hits = CUR.fields.map((f, k) => {
+      if (f.type === 'erase' || f.type === 'sign') return '';
+      if ((f.page || 1) !== pg) return '';
+      if (!f.x && !f.y) return '';
+      return `<button type="button" class="hot" data-zhot="${k}" title="${escH(f.label || '')}" style="left:${f.x}%;top:${f.y}%;width:${f.w}%;height:${f.h}%"></button>`;
+    }).join('');
+    return `<div class="pgi" data-zpg="${pg}"><img src="${url}" alt="A4 ${pg}쪽">${hits}</div>`;
+  }).join('');
+}
+function zHotMark(k){ $$('#zBody .hot').forEach(b => b.classList.toggle('on', +b.dataset.zhot === k)); }
+function zEditStart(k){
+  const f = CUR && CUR.fields[k]; if (!f) return;
+  ZEDIT = k;
+  const bar = $('#zEdit'), lab = $('#zEditLab'), inp = $('#zEditIn'), ta = $('#zEditTa');
+  if (!bar || !inp) return;
+  const long = !!(f.multi || f.h >= 3.2);
+  bar.hidden = false;
+  lab.textContent = f.label || '칸';
+  if (ta) ta.hidden = !long;
+  inp.hidden = long;
+  const v = VALS[f.label] == null ? '' : VALS[f.label];
+  if (long){ if (ta){ ta.value = v; ta.focus(); } }
+  else {
+    inp.type = (f.type === 'date') ? 'date' : 'text';
+    inp.value = v;
+    if (isNumMoney(f)) inp.inputMode = 'numeric';
+    try{ inp.focus(); if (inp.select && inp.type !== 'date') inp.select(); }catch(e){}
+  }
+  zHotMark(k);
+  const hit = document.querySelector(`#zBody .hot[data-zhot="${k}"]`);
+  if (hit) try{ hit.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){ hit.scrollIntoView(); }
+}
+function zEditInput(el){
+  const f = CUR && CUR.fields[ZEDIT]; if (!f) return;
+  let v = String(el.value == null ? '' : el.value);
+  if (isNumMoney(f) || f.type === 'number'){
+    const n = parseKorAmount(v);
+    if (isFinite(n) && n > 0){ v = String(n); if (isKorMoney(f.label)) v = korAmount(n); }
+  }
+  VALS[f.label] = v;
+  saveVals();
+  runCalc(f.label);
+  updNavPos(ZEDIT);
+  zRefreshPage(f.page || 1);
+}
+async function zRefreshPage(pg, now){
+  if (!ZPAGES[pg - 1]) return;
+  clearTimeout(ZREFRESH);
+  const run = async () => {
+    try{
+      const c = await composite(1700, pg);
+      ZPAGES[pg - 1] = c;
+      const img = document.querySelector(`#zBody .pgi[data-zpg="${pg}"] img`);
+      if (img) img.src = c.toDataURL('image/jpeg', 0.95);
+    }catch(e){}
+  };
+  if (now) await run(); else ZREFRESH = setTimeout(run, 260);
+}
 async function zOpen(){
   if (!CUR) return;
   busyOn('A4 미리보기를 만드는 중…');
   try{
-    const n = tfPageCount(), urls = [];
-    for (let p = 1; p <= n; p++){ const cv = await composite(1700, p); urls.push(cv.toDataURL('image/jpeg', 0.95)); }
+    const n = tfPageCount(), list = [];
+    for (let p = 1; p <= n; p++) list.push(await composite(1700, p));
     busyOff();
-    const body = $('#zBody'); if (body) body.innerHTML = urls.map((u, i) => `<img src="${u}" alt="A4 ${i + 1}쪽">`).join('');
+    ZPAGES = list; ZEDIT = -1;
+    const eb = $('#zEdit'); if (eb) eb.hidden = true;
+    zBuild();
     const t = $('#zTitle'); if (t) t.textContent = (CUR.name || '양식') + ' · A4 ' + n + '쪽';
     ZFIT = true; ZZ = 1; zApply();
     const m = $('#zModal'); if (m){ m.classList.add('on'); }
-    if (body) body.scrollTop = 0;
+    const body = $('#zBody'); if (body) body.scrollTop = 0;
   }catch(e){ busyOff(); toast('미리보기를 만들지 못했습니다'); }
 }
 async function printPaper(){
@@ -3460,9 +3578,16 @@ async function printPaper(){
 $('#exPrint').onclick = () => zOpen();
 $('#zPdf').onclick = () => { zClose(); printPaper(); };
 $('#zPng').onclick = () => { zClose(); if ($('#exPng')) $('#exPng').click(); };
+['#zEditIn', '#zEditTa'].forEach(sel => { const el = $(sel); if (!el) return;
+  el.addEventListener('input', () => zEditInput(el));
+  el.addEventListener('change', () => zEditInput(el));
+});
 $('#zX').onclick = zClose;
 $('#zX2').onclick = zClose;
 document.addEventListener('click', e => {
+  const hot = e.target.closest && e.target.closest('[data-zhot]');
+  if (hot && hot.dataset.zhot != null){ e.preventDefault(); zEditStart(+hot.dataset.zhot); return; }
+  if (e.target.closest && e.target.closest('#zEditDone')){ const eb = $('#zEdit'); if (eb) eb.hidden = true; ZEDIT = -1; zHotMark(-1); return; }
   const z = e.target.closest && e.target.closest('[data-z]');
   if (z){
     const k = z.dataset.z;
@@ -3498,11 +3623,14 @@ $('#goSign').onclick = async () => {
 let GO_INIT = false;
 function go(n, noPush){
   if (n > 1 && !CUR){ toast('먼저 양식을 등록하거나 목록에서 고르세요'); n = 1; }
+  if (n >= 5) n = 4;                       /* 미리보기·내보내기는 한 화면(출력)이다 */
   STEP = n;
   $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's' + n));
-  $$('#steps button').forEach(b => { const k = +b.dataset.s; b.classList.toggle('on', k === n); b.classList.toggle('done', k < n); });
+  const stage = n <= 2 ? 1 : (n === 3 ? 3 : 4);
+  $$('#steps button').forEach(b => { const k = +b.dataset.s; b.classList.toggle('on', k === stage); b.classList.toggle('done', k < stage); });
+  const tfill = document.getElementById('tfill'); if (tfill) tfill.style.width = (stage === 1 ? 34 : (stage === 3 ? 67 : 100)) + '%';
   $('#backBtn').style.display = n === 1 ? 'none' : '';
-  $('#nextBtn').textContent = ['', '빈칸 지정으로', ro() ? '값 입력으로' : '내 양식으로 저장', '미리보기', '내보내기', '처음으로'][n];
+  $('#nextBtn').textContent = (n === 1) ? '빈칸 지정으로' : (n === 2 ? (ro() ? '값 입력으로' : '내 양식으로 저장') : (n === 3 ? '미리보기' : '처음으로'));
   document.body.classList.toggle('fill', n === 3);
   if (n !== 3) GUIDE_I = -1;
   if (n === 2){ drawEditor(); autoRunForKeep(); }
@@ -3525,7 +3653,8 @@ window.addEventListener('popstate', e => {
 $('#nextBtn').onclick = async () => {
   if (STEP === 1){ if (!CUR) return toast('양식 사진을 고르거나 목록에서 [열기]를 누르세요'); go(2); }
   else if (STEP === 2){ if (await saveCurrent()) go(3); }
-  else if (STEP < 5) go(STEP + 1);
+  else if (STEP === 3) go(4);
+  else if (STEP === 4) zOpen();                      /* 출력 — 확대 미리보기에서 확인·수정·저장 */
   else { CUR = null; REG = null; $('#regBox').style.display = 'none'; go(1); }
 };
 $('#backBtn').onclick = () => { if (STEP <= 1) return; if (history.state && history.state.tf > 1) { try{ history.back(); return; }catch(e){} } go(STEP - 1); };
