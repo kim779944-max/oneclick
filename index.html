@@ -663,10 +663,11 @@ function renderHub(menu){
 function openMenu(){
   if (!window.KTSEdge) return;
   var light = document.documentElement.getAttribute('data-kts-theme') === 'light';
+  var tot = 0; GROUPS.forEach(function(g){ if (g.cat !== 'soon') tot += groupKs(g, menuNow()).length; });
   var html =
     '<div class="mrows">' +
       '<button type="button" class="mrow" id="mEdit">편집 — 쓰는 도구만 고르기 · 순서 <em>내 메뉴</em></button>' +
-      '<button type="button" class="mrow" id="mAll">전체 목록 — 분류로 찾기 <em>30종</em></button>' +
+      '<button type="button" class="mrow" id="mAll">전체 목록 — 분류로 찾기 <em>' + tot + '종</em></button>' +
       '<button type="button" class="mrow" id="mTheme">화면 바꾸기 <em>' + (light ? '지금 밝은 화면 → 어두운' : '지금 어두운 화면 → 밝은') + '</em></button>' +
       '<button type="button" class="mrow" id="mHelp">사용법 보기 <em>?</em></button>' +
       '<button type="button" class="mrow" id="mCoupon">무료 이용권 · 사전예약 <em>결제 없음</em></button>' +
