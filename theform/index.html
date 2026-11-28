@@ -3564,10 +3564,8 @@ async function printPaper(){
 $('#exPrint').onclick = () => zOpen();
 $('#zPdf').onclick = () => { zClose(); printPaper(); };
 $('#zPng').onclick = () => { zClose(); if ($('#exPng')) $('#exPng').click(); };
-['#zEditIn', '#zEditTa'].forEach(sel => { const el = $(sel); if (!el) return;
-  el.addEventListener('input', () => zEditInput(el));
-  el.addEventListener('change', () => zEditInput(el));
-});
+document.addEventListener('input', e => { const t = e.target; if (t && (t.id === 'zEditIn' || t.id === 'zEditTa')) zEditInput(t); }, true);
+document.addEventListener('change', e => { const t = e.target; if (t && (t.id === 'zEditIn' || t.id === 'zEditTa')) zEditInput(t); }, true);
 $('#zX').onclick = zClose;
 $('#zX2').onclick = zClose;
 document.addEventListener('click', e => {

@@ -2212,12 +2212,15 @@ if ($('#s5go')) $('#s5go').onclick = s5run;
   setTimeout(sync, 0);
 })();
 $('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 2) renderPreview(); });
-/* 288-④ 미리보기 편집바 입력 → 종이에 즉시 반영 */
-['#pveIn', '#pveTa'].forEach(sel => {
-  const el = $(sel); if (!el) return;
-  el.addEventListener('input', () => pvEditInput(el));
-  el.addEventListener('change', () => pvEditInput(el));
-});
+/* 288-④ 미리보기 편집바 입력 → 종이에 즉시 반영 (문서 단계에서 받아 확실히) */
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t && (t.id === 'pveIn' || t.id === 'pveTa')) pvEditInput(t);
+}, true);
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t && (t.id === 'pveIn' || t.id === 'pveTa')) pvEditInput(t);
+}, true);
 $('#cpSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.cp = +b.dataset.cp; save(); renderCp(); };
 $('#printBtn').onclick = () => pvShowCurrent();          /* 264 — 바로 인쇄하지 않고 확대 미리보기부터 */
 $('#pngBtn').onclick = doPng;
