@@ -1,0 +1,16 @@
+{
+  "name": "KTS 1호 통합 — 필지 면적·경사도·4대 공부",
+  "short_name": "1호 통합",
+  "lang": "ko",
+  "id": "/land/manifest.webmanifest",
+  "start_url": "/land/",
+  "scope": "/land/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B1526",
+  "theme_color": "#0B1526",
+  "icons": [
+    { "src": "/shared/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -122,25 +122,31 @@ main{padding:10px 12px 0}
 .foot b{color:#fff}
 .hide{display:none!important}
 /* 인쇄(A4 1장) */
-#sheet{display:none}
+/* 278 — 필요할 때만 나타나는 보조 버튼 */
+body:not(.has-sel) .need-sel{display:none!important}
+body:not(.has-items) .need-items{display:none!important}
+/* 264 — 저장 전 확대 미리보기 모달 */
+.pv{position:fixed;inset:0;z-index:120;display:none;flex-direction:column;background:rgba(5,9,20,.96)}
+.pv.on{display:flex}
+.pvt{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #26375F;background:#0A1128}
+.pvtl{font-size:12.5px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.pvt em{font-style:normal;font-size:10.5px;font-weight:800;color:#8FA3BF}
+.pvx{margin-left:auto;width:44px;height:38px;border-radius:10px;border:1px solid #2E4370;background:#0F1B33;color:#fff;font-size:15px;font-weight:900;cursor:pointer}
+.pvs{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 10px 4px;background:#5A6780}
+#pvImg{display:block;width:100%;height:auto;margin:0 auto;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.pvb{display:flex;gap:6px;padding:9px 12px 4px;background:#0A1128;border-top:1px solid #26375F;flex-wrap:wrap}
+.pvz{flex:0 0 48px;min-height:46px;border-radius:11px;border:1px solid #2E4370;background:#0F1B33;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
+.pvbtn{flex:1 1 30%;min-height:46px;border-radius:11px;border:1px solid #2E4370;background:#0F1B33;color:#fff;font-size:12.5px;font-weight:900;cursor:pointer;padding:0 6px;letter-spacing:-.3px}
+.pvbtn.main{background:linear-gradient(135deg,var(--amber),var(--amber2));border:0;color:var(--on)}
+.pvhint{margin:0;padding:0 12px calc(8px + env(safe-area-inset-bottom));background:#0A1128;font-size:10px;font-weight:800;color:#8FA3BF;text-align:center}
+#printSheet{display:none}
 @media print{
-  @page{size:A4 portrait;margin:9mm}
+  @page{size:A4 portrait;margin:0}
   body{display:block;background:#fff}
-  body>*:not(#sheet){display:none!important}
-  #sheet{display:block!important;color:#000;background:#fff;font-size:10.5pt;line-height:1.4}
-  #sheet *{color:#000!important;background:transparent!important}
-  #sheet h1{font-size:16pt;margin:0 0 2mm;letter-spacing:-.5px}
-  #sheet .sh{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:2mm;margin-bottom:3mm}
-  #sheet .sh .d{font-size:9pt}
-  #sheet .sum{margin:0 0 3mm;font-size:11pt}
-  #sheet .sum b{font-size:14pt}
-  #sheet img{width:auto;height:auto;max-width:100%;max-height:88mm;object-fit:contain;display:block;margin:0 auto 3mm;border:1px solid #000}
-  #sheet table{width:auto;min-width:120mm;max-width:145mm;margin:0 auto;border-collapse:collapse;font-size:9pt;table-layout:fixed}
-  #sheet th,#sheet td{border:1px solid #000;padding:1mm 2.5mm;text-align:left}
-  #sheet th{background:#EDEDED!important;font-weight:900}
-  #sheet td.n{text-align:right;font-variant-numeric:tabular-nums}
-  #sheet tr.stot td{font-weight:900;background:#F4F4F4!important}
-  #sheet .shf{margin-top:2.5mm;font-size:8.5pt;border-top:1px solid #000;padding-top:1.5mm}
+  body>*:not(#printSheet){display:none!important}
+  #printSheet{display:block!important}
+  #printSheet img{display:block;width:210mm;height:297mm}
+  html,body{margin:0;padding:0;background:#fff}
 }
 </style></head>
 <body>
@@ -196,8 +202,8 @@ main{padding:10px 12px 0}
     </div>
     <div class="legend"><span><i class="in" id="lgInI"></i><span id="lgIn">담은 필지(빨강)</span></span><span><i class="out"></i>뺀 필지</span><span><i class="none"></i>아직 안 고른 필지</span></div>
     <div class="btnrow">
-      <button class="btn" type="button" id="addAll">이 화면 필지 모두 담기</button>
-      <button class="btn" type="button" id="clearAll">선택 모두 비우기</button>
+      <button class="btn need-items" type="button" id="addAll">이 화면 필지 모두 담기</button>
+      <button class="btn need-sel" type="button" id="clearAll">선택 모두 비우기</button>
     </div>
   </section>
 
@@ -210,8 +216,8 @@ main{padding:10px 12px 0}
     <div class="list" id="list"></div>
     <p class="note" id="areaNote">면적은 <b>토지대장 공부면적</b> 우선, 없으면 <b>연속지적도 도면면적</b>으로 계산합니다. 두 합계를 함께 보여 드립니다.</p>
     <div class="btnrow">
-      <button class="btn main" type="button" id="printA4">A4 1장 저장·인쇄</button>
-      <button class="btn" type="button" id="copyAddr">주소 복사</button>
+      <button class="btn main need-sel" type="button" id="printA4">A4 1장 저장·인쇄</button>
+      <button class="btn need-sel" type="button" id="copyAddr">주소 복사</button>
     </div>
   </section>
 
@@ -228,7 +234,20 @@ main{padding:10px 12px 0}
 </main>
 </div>
 <div class="toast" id="toast"></div>
-<div id="sheet"></div>
+<div id="printSheet"><img id="printImg" alt="A4 조서"></div>
+<div class="pv" id="pv" role="dialog" aria-modal="true" aria-label="A4 1장 확대 미리보기">
+  <div class="pvt"><span class="pvtl">A4 1장 미리보기</span><em id="pvInfo">확대해서 확인</em><button class="pvx" id="pvX" type="button" aria-label="닫기">✕</button></div>
+  <div class="pvs" id="pvS"><img id="pvImg" alt="A4 조서 미리보기"></div>
+  <div class="pvb">
+    <button class="pvz" id="pvOut" type="button" aria-label="축소">−</button>
+    <button class="pvz" id="pvIn" type="button" aria-label="확대">+</button>
+    <button class="pvbtn main" id="pvPdf" type="button">PDF 저장</button>
+    <button class="pvbtn" id="pvPng" type="button">이미지(PNG)</button>
+    <button class="pvbtn" id="pvPrint" type="button">인쇄</button>
+  </div>
+  <p class="pvhint">두 손가락으로 확대해 확인한 뒤 저장하세요 · Esc 닫기</p>
+</div>
+<script src="../v/ktspdf.js?v=20261125a"></script>
 <script>
 (function(){
 'use strict';
@@ -248,9 +267,14 @@ var S={
   F:{box:null,items:[],busy:false,full:false},
   sel:{},                          /* pnu -> item */
   order:[],                        /* pnu order */
-  official:{}                      /* pnu -> {area,jmok,...} */
+  official:{},                     /* pnu -> {area,jmok,...} */
+  info:{}                          /* pnu -> {yongdo,unit,year} */
 };
 var MAPW=760,MAPH=700;
+var DPR=Math.min(2,Math.max(1,Math.round((window.devicePixelRatio||1)*100)/100));
+function sizeCanvas(){ var cv=$('#map'); if(!cv) return;
+  var w=Math.round(MAPW*DPR), h=Math.round(MAPH*DPR);
+  if(cv.width!==w||cv.height!==h){ cv.width=w; cv.height=h } }
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 var toT=0; function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toT);toT=setTimeout(function(){t.classList.remove('on')},2600)}
@@ -389,17 +413,41 @@ function landInfo(pnu){
       S.official[pnu]=o; return o;
     }).catch(function(){ return null });
 }
+/* 용도지역·개별공시지가 — 조서 표의 '용도지역 / 공시지가' 열 (276번) */
+function infoPnu(pnu){
+  if(!pnu) return Promise.resolve(null);
+  if(S.info[pnu]) return Promise.resolve(S.info[pnu]);
+  var o={yongdo:'',unit:0,year:''};
+  var u1=NED+'/getLandUseAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&numOfRows=200&pageNo=1&pnu='+pnu;
+  var u2=NED+'/getIndvdLandPriceAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&numOfRows=40&pageNo=1&pnu='+pnu;
+  return Promise.all([
+    jsonp(u1,12000).then(function(r){
+      var f=arr(r&&r.landUses&&r.landUses.field), pick='';
+      for(var i=0;i<f.length;i++){ var nm=String(f[i].prposAreaDstrcCodeNm||'').replace(/\s+/g,'');
+        if(/(지역|지구|구역)$/.test(nm)){ if(/지역$/.test(nm)){ pick=String(f[i].prposAreaDstrcCodeNm).trim(); break } if(!pick) pick=String(f[i].prposAreaDstrcCodeNm).trim() } }
+      o.yongdo=pick||'';
+    }).catch(function(){}),
+    jsonp(u2,12000).then(function(r){
+      var f=arr(r&&r.indvdLandPrices&&r.indvdLandPrices.field); if(!f.length) return;
+      f.sort(function(a,b){ var ya=String(a.stdrYear||''), yb=String(b.stdrYear||''); if(ya!==yb) return yb.localeCompare(ya);
+        return String(b.pblntfDe||'').localeCompare(String(a.pblntfDe||'')) });
+      o.unit=+(f[0].pblntfPclnd||0)||0; o.year=f[0].stdrYear||'';
+    }).catch(function(){})
+  ]).then(function(){ S.info[pnu]=o; return o });
+}
 
 /* ---------- 지도 그리기 ---------- */
 function lon2x(lon,z){ return (lon+180)/360*256*Math.pow(2,z) }
 function lat2y(lat,z){ var s=Math.sin(lat*Math.PI/180); return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*256*Math.pow(2,z) }
 function x2lon(x,z){ return x/(256*Math.pow(2,z))*360-180 }
 function y2lat(y,z){ var n=Math.PI-2*Math.PI*y/(256*Math.pow(2,z)); return 180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))) }
-function topLeft(){ return {x:lon2x(S.V.cx,S.V.z)-MAPW/2, y:lat2y(S.V.cy,S.V.z)-MAPH/2} }
-function viewBox(){
-  var t=topLeft();
-  return {minx:x2lon(t.x,S.V.z),maxx:x2lon(t.x+MAPW,S.V.z),miny:y2lat(t.y+MAPH,S.V.z),maxy:y2lat(t.y,S.V.z)};
+function topLeft(W,H){ W=W||MAPW; H=H||MAPH;
+  return {x:lon2x(S.V.cx,S.V.z)-W/2, y:lat2y(S.V.cy,S.V.z)-H/2} }
+function viewBoxOf(W,H){
+  var t=topLeft(W,H);
+  return {minx:x2lon(t.x,S.V.z),maxx:x2lon(t.x+W,S.V.z),miny:y2lat(t.y+H,S.V.z),maxy:y2lat(t.y,S.V.z)};
 }
+function viewBox(){ return viewBoxOf(MAPW,MAPH) }
 function outBox(b,m){ m=m||0.06; var wx=(b.maxx-b.minx)*m, wy=(b.maxy-b.miny)*m;
   return {minx:b.minx-wx,maxx:b.maxx+wx,miny:b.miny-wy,maxy:b.maxy+wy} }
 function inside(inner,outer){ return inner.minx>=outer.minx&&inner.maxx<=outer.maxx&&inner.miny>=outer.miny&&inner.maxy<=outer.maxy }
@@ -419,16 +467,19 @@ function getTile(v,z,x,y){ var k=v+'|'+z+'|'+x+'|'+y; if(tileCache[k]) return ti
   var p=loadImg(tileUrl(v,z,x,y)); tileCache[k]=p; return p }
 var drawSeq=0;
 var EDGE_COL='#E53935';
-var _egOff=null,_egCv=null;
+var MAPFONT='"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",-apple-system,system-ui,"Apple SD Gothic Neo",sans-serif';
+var _egOff=null,_egCv=null,_egW=0,_egH=0;
 /* 테두리만: 담은 필지(state==='in') 전체를 하나로 합친 바깥 외곽선만 남긴 캔버스를 만든다 */
-function unionEdge(z,t){
+function unionEdge(z,t,W,H,sc,rr){
   var i,any=false;
   for(i=0;i<S.order.length;i++){ var s0=S.sel[S.order[i]]; if(s0&&s0.state==='in'){ any=true; break } }
   if(!any) return null;
-  if(!_egOff){ _egOff=document.createElement('canvas'); _egOff.width=MAPW; _egOff.height=MAPH;
-               _egCv=document.createElement('canvas'); _egCv.width=MAPW; _egCv.height=MAPH; }
+  var dw=Math.round(W*sc), dh=Math.round(H*sc);
+  if(!_egOff||_egW!==dw||_egH!==dh){ _egOff=document.createElement('canvas'); _egOff.width=dw; _egOff.height=dh;
+               _egCv=document.createElement('canvas'); _egCv.width=dw; _egCv.height=dh; _egW=dw; _egH=dh; }
   var oc=_egOff.getContext('2d');
-  oc.clearRect(0,0,MAPW,MAPH);
+  oc.setTransform(1,0,0,1,0,0); oc.clearRect(0,0,dw,dh);
+  oc.setTransform(sc,0,0,sc,0,0);
   oc.fillStyle=EDGE_COL; oc.strokeStyle=EDGE_COL; oc.lineWidth=2; oc.lineJoin='round'; oc.lineCap='round';
   for(i=0;i<S.order.length;i++){
     var s=S.sel[S.order[i]]; if(!s||s.state!=='in') continue;
@@ -445,57 +496,59 @@ function unionEdge(z,t){
     oc.fill(); oc.stroke();
   }
   var ec=_egCv.getContext('2d');
-  ec.setTransform(1,0,0,1,0,0); ec.globalCompositeOperation='source-over'; ec.clearRect(0,0,MAPW,MAPH);
+  ec.setTransform(1,0,0,1,0,0); ec.globalCompositeOperation='source-over'; ec.clearRect(0,0,dw,dh);
   /* 화면에서 3.5~4px 굵기로 보이도록 캔버스 픽셀 반지름을 환산 */
-  var cssW=0; try{ cssW=$('#map').getBoundingClientRect().width||0 }catch(e){}
-  var rr=cssW>0?3.6*MAPW/cssW:7; rr=Math.max(6,Math.min(9,rr));
   var N=12;
-  for(var k=0;k<N;k++){ var ang=k*2*Math.PI/N;
-    ec.drawImage(_egOff,Math.round(Math.cos(ang)*rr*100)/100,Math.round(Math.sin(ang)*rr*100)/100);
+  for(var kk=0;kk<N;kk++){ var ang=kk*2*Math.PI/N;
+    ec.drawImage(_egOff,Math.round(Math.cos(ang)*rr*sc*100)/100,Math.round(Math.sin(ang)*rr*sc*100)/100);
   }
   ec.globalCompositeOperation='destination-out';
   ec.drawImage(_egOff,0,0);
   ec.globalCompositeOperation='source-over';
   return _egCv;
 }
-function render(){
-  var cv=$('#map'), ctx=cv.getContext('2d'), my=++drawSeq;
-  ctx.setTransform(1,0,0,1,0,0);
-  var t=topLeft(), z=S.V.z;
-  ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,MAPW,MAPH);
+/* 지도 한 장을 그린다 — 화면(W=MAPW)이든 인쇄용 넓은 캔버스든 같은 코드 */
+function paint(g,W,H,sc,my){
+  var k=W>MAPW?Math.pow(W/MAPW,0.7):1;            /* 인쇄용 큰 캔버스에서 글씨·선 굵기 보정 */
+  g.setTransform(sc,0,0,sc,0,0);
+  var t=topLeft(W,H), z=S.V.z;
+  g.fillStyle='#F7F3EA'; g.fillRect(0,0,W,H);
   if(!(S.F.items||[]).length&&!S.order.length){
-    ctx.fillStyle='#16233D'; ctx.font='900 32px system-ui,sans-serif'; ctx.textAlign='center';
-    ctx.fillText('주소를 넣으면 지도가 열립니다',MAPW/2,MAPH/2-10);
-    ctx.font='800 21px system-ui,sans-serif'; ctx.fillStyle='#41597F';
-    ctx.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',MAPW/2,MAPH/2+30);
-    ctx.textAlign='left';
+    g.fillStyle='#16233D'; g.font='900 '+Math.round(32*k)+'px '+MAPFONT; g.textAlign='center';
+    g.fillText('주소를 넣으면 지도가 열립니다',W/2,H/2-10*k);
+    g.font='800 '+Math.round(21*k)+'px '+MAPFONT; g.fillStyle='#41597F';
+    g.fillText('필지를 톡 누르면 담기고, 한 번 더 누르면 빠집니다',W/2,H/2+30*k);
+    g.textAlign='left';
     return Promise.resolve();
   }
   var jobs=[];
   if(S.view!=='line'){
-    var tz=Math.min(19,Math.floor(z)), ts=Math.pow(2,z-tz), tl=256*ts;
-    var tx0=Math.floor(t.x/tl), tx1=Math.floor((t.x+MAPW)/tl), ty0=Math.floor(t.y/tl), ty1=Math.floor((t.y+MAPH)/tl), n=Math.pow(2,tz);
-    var cnt=0;
+    /* 위성·일반지도: Math.round(z)로 고레벨 타일을 우선 부르고, 남는 배율은 줄여 그려 선명하게 */
+    var tz=Math.min(19,Math.round(z)), ts=Math.pow(2,z-tz);
+    if(ts>1.12&&tz<19){ tz++; ts=Math.pow(2,z-tz) }
+    var tl=256*ts;
+    var tx0=Math.floor(t.x/tl), tx1=Math.floor((t.x+W)/tl), ty0=Math.floor(t.y/tl), ty1=Math.floor((t.y+H)/tl), n=Math.pow(2,tz);
+    var cnt=0, MAXT=(W>MAPW*1.4?150:64);
     for(var tx=tx0;tx<=tx1;tx++) for(var ty=ty0;ty<=ty1;ty++){
-      if(cnt++>26) break;
+      if(cnt++>MAXT) break;
       var mx=((tx%n)+n)%n, my2=ty; if(my2<0||my2>=n) continue;
-      (function(tx,ty,mx,my2){ jobs.push(getTile(S.view,tz,mx,my2).then(function(im){ if(im&&my===drawSeq) ctx.drawImage(im,tx*tl-t.x,ty*tl-t.y,tl,tl) })) })(tx,ty,mx,my2);
+      (function(tx,ty,mx,my2){ jobs.push(getTile(S.view,tz,mx,my2).then(function(im){ if(im&&my===drawSeq) g.drawImage(im,tx*tl-t.x,ty*tl-t.y,tl+0.6,tl+0.6) })) })(tx,ty,mx,my2);
     }
   }
   return Promise.all(jobs).then(function(){
     if(my!==drawSeq) return;
-    if(S.view==='line'){ ctx.fillStyle='#F7F3EA'; ctx.fillRect(0,0,MAPW,MAPH) }
+    if(S.view==='line'){ g.fillStyle='#F7F3EA'; g.fillRect(0,0,W,H) }
     var dark=(S.view!=='line');
     function path(rings){
-      ctx.beginPath();
+      g.beginPath();
       for(var i=0;i<rings.length;i++){
         var r=rings[i], started=false;
         for(var j=0;j<r.length;j++){
           var p=r[j]; if(!p||!isFinite(p[0])||!isFinite(p[1])) continue;
           var X=lon2x(p[0],z)-t.x, Y=lat2y(p[1],z)-t.y;
-          if(!started){ctx.moveTo(X,Y);started=true} else ctx.lineTo(X,Y);
+          if(!started){g.moveTo(X,Y);started=true} else g.lineTo(X,Y);
         }
-        if(started) ctx.closePath();
+        if(started) g.closePath();
       }
     }
     var items=S.F.items||[];
@@ -503,26 +556,26 @@ function render(){
     for(var i=0;i<items.length;i++){
       var f=items[i]; if(S.sel[f.pnu]) continue;
       path(f.rings);
-      ctx.fillStyle=dark?'rgba(255,255,255,.16)':'rgba(255,255,255,.34)';
-      ctx.fill();
-      ctx.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)';
-      ctx.lineWidth=1.2; ctx.stroke();
+      g.fillStyle=dark?'rgba(255,255,255,.16)':'rgba(255,255,255,.34)';
+      g.fill();
+      g.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)';
+      g.lineWidth=1.2*k; g.stroke();
     }
-    /* 2) 지번 라벨 (지번 숨김 상태면 그리지 않는다) */
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    if(!S.hideNum) for(var k=0;k<items.length;k++){
-      var g=items[k]; if(!g.jibun) continue;
-      if(S.sel[g.pnu]) continue;            /* 담은 필지는 아래에서 빨강 라벨로 한 번만 */
-      var bb=g.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
-      if(w<56||hh<26) continue;
+    /* 2) 지번 라벨 */
+    g.textAlign='center'; g.textBaseline='middle';
+    if(!S.hideNum) for(var li=0;li<items.length;li++){
+      var gi=items[li]; if(!gi.jibun) continue;
+      if(S.sel[gi.pnu]) continue;
+      var bb=gi.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
+      if(w<56*k||hh<26*k) continue;
       var mxx=(lon2x(bb.minx,z)+lon2x(bb.maxx,z))/2-t.x, myy=(lat2y(bb.miny,z)+lat2y(bb.maxy,z))/2-t.y;
-      if(mxx<-20||mxx>MAPW+20||myy<-20||myy>MAPH+20) continue;
-      ctx.font='900 20px system-ui,sans-serif';
-      var tw=ctx.measureText(g.jibun).width;
-      ctx.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
-      ctx.fillRect(mxx-tw/2-5,myy-13,tw+10,26);
-      ctx.fillStyle=dark?'#EAF1FB':'#16233D';
-      ctx.fillText(g.jibun,mxx,myy);
+      if(mxx<-20*k||mxx>W+20*k||myy<-20*k||myy>H+20*k) continue;
+      g.font='900 '+Math.round(20*k)+'px '+MAPFONT;
+      var tw=g.measureText(gi.jibun).width;
+      g.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
+      g.fillRect(mxx-tw/2-5*k,myy-13*k,tw+10*k,26*k);
+      g.fillStyle=dark?'#EAF1FB':'#16233D';
+      g.fillText(gi.jibun,mxx,myy);
     }
     /* 3) 뺀 필지 / 담은 필지 — 면·선 */
     for(var a=0;a<S.order.length;a++){
@@ -530,83 +583,106 @@ function render(){
       var isIn=it.state==='in';
       path(it.rings);
       if(S.edge){
-        /* 테두리만: 담은 필지는 배경과 같은 얇은 선만 남기고, 합집합 바깥 선은 아래에서 한 번에 */
         if(isIn){
-          ctx.fillStyle=dark?'rgba(255,255,255,.16)':'rgba(255,255,255,.34)'; ctx.fill();
-          ctx.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)'; ctx.lineWidth=1.2; ctx.stroke();
+          g.fillStyle=dark?'rgba(255,255,255,.16)':'rgba(255,255,255,.34)'; g.fill();
+          g.strokeStyle=dark?'rgba(255,255,255,.85)':'rgba(30,42,66,.55)'; g.lineWidth=1.2*k; g.stroke();
         }else{
-          ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=7; ctx.stroke();
-          ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4; ctx.setLineDash([9,6]); ctx.stroke(); ctx.setLineDash([]);
+          g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=7*k; g.stroke();
+          g.strokeStyle='#E23A2E'; g.lineWidth=4*k; g.setLineDash([9*k,6*k]); g.stroke(); g.setLineDash([]);
           var xb=it.bb||bboxOf(it.rings);
           var x1=lon2x(xb.minx,z)-t.x, x2=lon2x(xb.maxx,z)-t.x, y1=lat2y(xb.maxy,z)-t.y, y2=lat2y(xb.miny,z)-t.y;
-          /* 지번 라벨이 들어갈 만큼 큰 필지에만 X 표시(작은 필지는 빨간 점선만) */
-          if((x2-x1)>130&&(y2-y1)>80){
+          if((x2-x1)>130*k&&(y2-y1)>80*k){
             var mx1=x1+(x2-x1)*0.24, mx2=x1+(x2-x1)*0.76, my1=y1+(y2-y1)*0.24, my2=y1+(y2-y1)*0.76;
-            ctx.strokeStyle='#E23A2E'; ctx.lineWidth=4.5; ctx.lineCap='round';
-            ctx.beginPath(); ctx.moveTo(mx1,my1); ctx.lineTo(mx2,my2); ctx.moveTo(mx2,my1); ctx.lineTo(mx1,my2); ctx.stroke();
-            ctx.lineCap='butt';
+            g.strokeStyle='#E23A2E'; g.lineWidth=4.5*k; g.lineCap='round';
+            g.beginPath(); g.moveTo(mx1,my1); g.lineTo(mx2,my2); g.moveTo(mx2,my1); g.lineTo(mx1,my2); g.stroke();
+            g.lineCap='butt';
           }
         }
       }else if(isIn){
-        ctx.fillStyle='rgba(226,58,46,.20)'; ctx.fill();
-        ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=7; ctx.stroke();
-        ctx.strokeStyle='#E23A2E'; ctx.lineWidth=6; ctx.stroke();
+        g.fillStyle='rgba(226,58,46,.20)'; g.fill();
+        g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=7*k; g.stroke();
+        g.strokeStyle='#E23A2E'; g.lineWidth=6*k; g.stroke();
       }else{
-        ctx.fillStyle=dark?'rgba(10,18,36,.55)':'rgba(120,135,158,.30)'; ctx.fill();
-        ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=1.4; ctx.setLineDash([7,5]); ctx.stroke(); ctx.setLineDash([]);
+        g.fillStyle=dark?'rgba(10,18,36,.55)':'rgba(120,135,158,.30)'; g.fill();
+        g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=1.4*k; g.setLineDash([7*k,5*k]); g.stroke(); g.setLineDash([]);
       }
     }
     /* 3-1) 테두리만: 담은 필지 전체를 하나로 합친 가장 바깥 외곽선만 굵은 빨간 선으로 얹는다 */
     if(S.edge){
-      var eg=unionEdge(z,t);
-      if(eg){ ctx.drawImage(eg,0,0); ctx.drawImage(eg,0,0) }
+      var rr;
+      if(W>MAPW*1.4){ rr=Math.max(3.2,W*0.0042) }
+      else{ var cssW=0; try{ cssW=$('#map').getBoundingClientRect().width||0 }catch(e){}
+            rr=cssW>0?3.6*MAPW/cssW:7; rr=Math.max(6,Math.min(9,rr)) }
+      var eg=unionEdge(z,t,W,H,sc,rr);
+      if(eg){ g.drawImage(eg,0,0,W,H); g.drawImage(eg,0,0,W,H) }
     }
-    /* 3-2) 담은·뺀 필지의 지번 (테두리만 모드는 색 박스 없이 배경과 같은 얇은 글씨) */
-    ctx.font='900 25px system-ui,sans-serif';
+    /* 3-2) 담은·뺀 필지의 지번 */
+    g.font='900 '+Math.round(25*k)+'px '+MAPFONT;
     if(!S.hideNum) for(var a2=0;a2<S.order.length;a2++){
       var it2=S.sel[S.order[a2]]; if(!it2) continue;
       var isIn2=it2.state==='in';
       var bc=centroid(it2.rings);
       var lx=lon2x(bc[0],z)-t.x, ly=lat2y(bc[1],z)-t.y;
-      if(!(lx>-40&&lx<MAPW+40&&ly>-30&&ly<MAPH+30)) continue;
+      if(!(lx>-40*k&&lx<W+40*k&&ly>-30*k&&ly<H+30*k)) continue;
       var lab=it2.jibun||''; if(!lab) continue;
       var lb=it2.bb||bboxOf(it2.rings), bw=lon2x(lb.maxx,z)-lon2x(lb.minx,z), bh=lat2y(lb.miny,z)-lat2y(lb.maxy,z);
-      var fs=25; ctx.font='900 '+fs+'px system-ui,sans-serif';
-      var w3=ctx.measureText(lab).width;
-      /* 필지 폭보다 라벨이 넓으면 이웃 라벨·경계선과 겹치므로 폭에 맞게 줄인다 */
-      if(bw>34&&bh>18){ while(fs>13&&w3+14>bw){ fs-=2; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width } }
+      var fs=25*k; g.font='900 '+Math.round(fs)+'px '+MAPFONT;
+      var w3=g.measureText(lab).width;
+      if(bw>34*k&&bh>18*k){ while(fs>13*k&&w3+14*k>bw){ fs-=2*k; g.font='900 '+Math.round(fs)+'px '+MAPFONT; w3=g.measureText(lab).width } }
       if(S.edge){
-        var le=13;
-        while(fs>11&&w3+14>bw){ fs-=1; le=fs; ctx.font='900 '+fs+'px system-ui,sans-serif'; w3=ctx.measureText(lab).width }
+        while(fs>11*k&&w3+14*k>bw){ fs-=1*k; g.font='900 '+Math.round(fs)+'px '+MAPFONT; w3=g.measureText(lab).width }
         var bh2e=Math.round(fs*1.35);
-        if(w3+14<=bw){
-          ctx.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
-          ctx.fillRect(lx-w3/2-7,ly-bh2e/2,w3+14,bh2e);
-          ctx.fillStyle=dark?'#EAF1FB':'#16233D';
-          ctx.fillText(lab,lx,ly);
+        if(w3+14*k<=bw){
+          g.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
+          g.fillRect(lx-w3/2-7*k,ly-bh2e/2,w3+14*k,bh2e);
+          g.fillStyle=dark?'#EAF1FB':'#16233D';
+          g.fillText(lab,lx,ly);
         }else if(w3<=bw*1.4){
-          /* 좁은 필지는 박스 없이 흰 테두리를 두른 글씨만 (배경 경계선을 가리지 않게) */
-          ctx.lineWidth=3.2; ctx.lineJoin='round';
-          ctx.strokeStyle=dark?'rgba(8,16,34,.85)':'rgba(247,243,234,.95)';
-          ctx.strokeText(lab,lx,ly);
-          ctx.fillStyle=dark?'#EAF1FB':'#16233D';
-          ctx.fillText(lab,lx,ly);
-          ctx.lineWidth=1.2;
+          g.lineWidth=3.2*k; g.lineJoin='round';
+          g.strokeStyle=dark?'rgba(8,16,34,.85)':'rgba(247,243,234,.95)';
+          g.strokeText(lab,lx,ly);
+          g.fillStyle=dark?'#EAF1FB':'#16233D';
+          g.fillText(lab,lx,ly);
+          g.lineWidth=1.2;
         }
         continue;
       }
       var bh2=Math.round(fs*1.35);
-      ctx.fillStyle=isIn2?'#E23A2E':'#4A5C7A';
-      ctx.fillRect(lx-w3/2-7,ly-bh2/2,w3+14,bh2);
-      ctx.fillStyle='#fff'; ctx.fillText(lab,lx,ly);
+      g.fillStyle=isIn2?'#E23A2E':'#4A5C7A';
+      g.fillRect(lx-w3/2-7*k,ly-bh2/2,w3+14*k,bh2);
+      g.fillStyle='#fff'; g.fillText(lab,lx,ly);
     }
     /* 4) 출처 */
-    ctx.textAlign='right'; ctx.textBaseline='alphabetic';
-    ctx.font='800 17px system-ui,sans-serif';
-    ctx.fillStyle=dark?'rgba(255,255,255,.8)':'rgba(26,39,69,.8)';
-    ctx.fillText('연속지적도 © Vworld · 참고용',MAPW-10,MAPH-9);
-    ctx.textAlign='left';
+    g.textAlign='right'; g.textBaseline='alphabetic';
+    g.font='800 '+Math.round(17*k)+'px '+MAPFONT;
+    g.fillStyle=dark?'rgba(255,255,255,.8)':'rgba(26,39,69,.8)';
+    g.fillText('연속지적도 © Vworld · 참고용',W-10*k,H-9*k);
+    g.textAlign='left';
   });
+}
+function render(){
+  var cv=$('#map'); var my=++drawSeq;
+  return paint(cv.getContext('2d'),MAPW,MAPH,DPR,my);
+}
+/* 인쇄용 와이드 지도 — 담은 필지 전체가 여백 있게 들어오도록 임시 뷰로 1회 렌더 */
+function printMapCanvas(W,H){
+  var b=selBox(); if(!b) return Promise.resolve(null);
+  W=W||1400; H=H||Math.round(W*0.52);
+  var pad=0.07;
+  var old={cx:S.V.cx,cy:S.V.cy,z:S.V.z};
+  var cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
+  var w=(b.maxx-b.minx)*(1+pad*2), h=(b.maxy-b.miny)*(1+pad*2);
+  var z=21.2;
+  for(;z>8;z-=0.1){
+    var px=lon2x(cx+w/2,z)-lon2x(cx-w/2,z);
+    var py=lat2y(cy-h/2,z)-lat2y(cy+h/2,z);
+    if(px<=W*0.98&&py<=H*0.98) break;
+  }
+  S.V={cx:cx,cy:cy,z:Math.max(8,Math.min(21.2,z))};
+  var cv=document.createElement('canvas'); cv.width=W*2; cv.height=H*2;
+  return paint(cv.getContext('2d'),W,H,2,++drawSeq).then(function(){
+    return new Promise(function(res){ setTimeout(function(){ S.V=old; render(); res({canvas:cv,w:W,h:H}) },70) });
+  }).catch(function(){ S.V=old; render(); return null });
 }
 function centroid(rings){
   var best=null,ba=0;
@@ -643,6 +719,7 @@ function syncRange(force){
       S.F.busy=false;
       if(!list.length){ $('#mapSt').textContent='필지 자료를 받지 못했습니다 · 확대해 보세요'; return }
       S.F.items=list; S.F.box=outBox(vb,0.35); S.F.full=list.length>=299;
+      document.body.classList.toggle('has-items', list.length>0);
       $('#mapSt').textContent=list.length+'필지 표시 중'+(S.F.full?' · 확대하면 더 정확':'');
       render();
     }).catch(function(){ S.F.busy=false; $('#mapSt').textContent='필지 자료를 받지 못했습니다'; });
@@ -661,6 +738,12 @@ function selAdd(item,state){
       S.sel[pnu].official=o.area; S.sel[pnu].jmok=o.jmok||S.sel[pnu].jm;
       paintList();
     }
+  });
+  infoPnu(pnu).then(function(o){
+    var cur=S.sel[pnu]; if(!cur||!o) return;
+    if(o.yongdo) cur.yongdo=o.yongdo;
+    if(o.unit){ cur.unit=o.unit; cur.year=o.year }
+    paintList();
   });
 }
 function selSet(pnu,state){
@@ -686,11 +769,14 @@ function paintList(){
     for(var i=0;i<S.order.length;i++){
       var it=S.sel[S.order[i]]; if(!it) continue;
       var a=it.official||it.area, tag=it.official?'공부':'도면';
+      var sub2=[it.yongdo?esc(it.yongdo):'', it.unit?('공시 '+num(it.unit)+'원/㎡'+(it.year?' · '+esc(it.year):'')):'']
+        .filter(Boolean).join(' · ');
       h.push('<div class="li '+(it.state==='in'?'in':'out')+'">'
         +'<div class="lin"><b>'+esc((it.jm==='산'?'산 ':'')+it.jibun)+'</b>'
         +(it.jmok||it.jm?'<i>'+esc(it.jmok||it.jm)+'</i>':'')
         +'<span><b>'+num(a,0)+'㎡</b> · '+num(pyeong(a))+'평 <b style="font-weight:800">'+tag+'</b>'
-        +(it.official&&it.area?'<span style="font-size:10.5px"> (도면 '+num(it.area,0)+'㎡)</span>':'')+'</span></div>'
+        +(it.official&&it.area?'<span style="font-size:10.5px"> (도면 '+num(it.area,0)+'㎡)</span>':'')+'</span>'
+        +(sub2?'<span style="font-size:10.5px;color:#8FA3BF">'+sub2+'</span>':'')+'</div>'
         +'<div class="lis">'
         +'<button type="button" data-p="'+esc(it.pnu)+'" data-a="in" class="'+(it.state==='in'?'on':'')+'">담기</button>'
         +'<button type="button" data-p="'+esc(it.pnu)+'" data-a="out" class="'+(it.state==='out'?'on out':'')+'">빼기</button>'
@@ -706,6 +792,7 @@ function paintList(){
   $('#tE').textContent=s.nOut+'필지';
   $('#hdSt').textContent='필지 '+s.nIn;
   $('#qTag').textContent=s.nIn?('담음 '+s.nIn):'지번·주소';
+  document.body.classList.toggle('has-sel', s.nIn>0);
   updateNav();
 }
 function primaryAddr(){
@@ -898,10 +985,8 @@ function addMany(q){
   });
   chain.then(function(){
     $('#go').disabled=false; $('#go').textContent='담기';
-    if(first&&first.g){
-      S.V={cx:first.g.lon,cy:first.g.lat,z:S.V.z||17};
-      fitBox(expandBox(bboxOf(first.it.rings),1.7));
-    }
+    if(first&&first.g){ S.V={cx:first.g.lon,cy:first.g.lat,z:S.V.z||17} }
+    if(ok){ fitSel(); }
     if(ok) toast(ok+'필지 담았습니다'+(fail.length?' · 못 찾은 주소 '+fail.length+'개':''))
     else toast('주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 넣어 보세요');
     if(fail.length) $('#mapSt').textContent='못 찾음: '+fail.join(' / ');
@@ -914,39 +999,274 @@ function expandBox(b,f){
   return {minx:cx-ww/2,maxx:cx+ww/2,miny:cy-hh/2,maxy:cy+hh/2};
 }
 
-/* ---------- 인쇄(A4 1장) ---------- */
+/* ---------- A4 1장 조서 (276·264·279) ---------- */
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
-function buildSheet(){
-  var s=sumOf(), rows=[];
+function shortAddr(it){
+  var s=String(it.addr||'').replace(/\s+/g,' ').trim();
+  var jb=(it.jm==='산'?'산 ':'')+(it.jibun||'');
+  if(jb&&s.slice(-jb.length)===jb) s=s.slice(0,-jb.length).trim();
+  s=s.replace(/\s*(산\s*)?\d+(-\d+)?\s*$/,'').trim();
+  var tk=s.split(' '); if(tk.length>3) s=tk.slice(-3).join(' ');
+  return s;
+}
+function sheetRows(){
   var ins=[],outs=[];
   for(var i=0;i<S.order.length;i++){
     var it=S.sel[S.order[i]]; if(!it) continue;
-    var o={jibun:(it.jm==='산'?'산 ':'')+it.jibun,jmok:it.jmok||it.jm||'',a:it.official||it.area,tag:it.official?'공부':'도면'};
+    var a=it.official||it.area||0, unit=it.unit||0;
+    var o={addr:shortAddr(it), jibun:(it.jm==='산'?'산 ':'')+(it.jibun||''), jmok:it.jmok||it.jm||'',
+           yongdo:it.yongdo||'', area:a, pyeong:pyeong(a), unit:unit, val:unit*a, tag:it.official?'공부':'도면'};
     if(it.state==='in') ins.push(o); else outs.push(o);
   }
-  var totA=0;
-  ins.forEach(function(r){ totA+=r.a||0 });
-  return captureFit().then(function(img){
-  var h=[];
-  h.push('<div class="sh"><h1>필지 면적 합계표</h1><div class="d">'+todayStr()+' · KTS 원클릭</div></div>');
-  h.push('<div class="sum">담은 필지 <b>'+ins.length+'</b>필지 · 합계 <b>'+num(totA,0)+'㎡</b> ('+num(pyeong(totA))+'평)'
-    +(outs.length?' · 뺀 필지 '+outs.length+'필지':'')+'</div>');
-  if(img) h.push('<img src="'+img+'" alt="선택 필지 지적도">');
-  h.push('<table><thead><tr><th style="width:30%">지번</th><th style="width:12%">지목</th><th style="width:32%">면적(㎡)</th><th style="width:26%">면적(평)</th></tr></thead><tbody>');
-  var LIM=20;
-  ins.slice(0,LIM).forEach(function(r){
-    h.push('<tr><td>'+esc(r.jibun)+'</td><td>'+esc(r.jmok)+'</td><td class="n">'+num(r.a,0)+'</td><td class="n">'+num(pyeong(r.a))+'</td></tr>');
-  });
-  if(ins.length>LIM) h.push('<tr><td colspan="4">외 '+(ins.length-LIM)+'필지</td></tr>');
-  h.push('<tr class="stot"><td>합계 '+ins.length+'필지</td><td></td><td class="n">'+num(totA,0)+'</td><td class="n">'+num(pyeong(totA))+'</td></tr>');
-  h.push('</tbody></table>');
-  if(outs.length){
-    h.push('<p style="margin:2.5mm 0 0;font-size:9pt">제외 필지: '+outs.map(function(r){return esc(r.jibun)+'('+num(r.a,0)+'㎡)'}).join(' · ')+'</p>');
+  return {ins:ins,outs:outs};
+}
+var SHEETF='"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",-apple-system,system-ui,"Apple SD Gothic Neo",sans-serif';
+function sf(g,size,bold,color){ g.font=(bold?'900 ':'700 ')+size+'px '+SHEETF; g.fillStyle=color||'#111' }
+function fitSize(g,txt,maxW,size,min){
+  var sz=size; g.font='900 '+sz+'px '+SHEETF;
+  while(sz>(min||9)&&g.measureText(txt).width>maxW){ sz-=1; g.font='900 '+sz+'px '+SHEETF }
+  return sz;
+}
+function wrapLines(g,txt,maxW,size,bold){
+  g.font=(bold?'900 ':'700 ')+size+'px '+SHEETF;
+  var words=String(txt==null?'':txt).split(' '), lines=[], cur='';
+  for(var i=0;i<words.length;i++){
+    var t=cur?cur+' '+words[i]:words[i];
+    if(g.measureText(t).width>maxW&&cur){ lines.push(cur); cur=words[i] } else cur=t;
   }
-  h.push('<div class="shf">자료 · 브이월드 연속지적도(참고용) · 토지임야정보(토지대장 요약). 이 표는 <b>참고용</b>이며 법적 효력이 없습니다. 법적 면적·경계는 지적공부 원본(정부24)과 담당 관청 확인이 기준입니다.</div>');
-  $('#sheet').innerHTML=h.join('');
-  return img;
+  if(cur) lines.push(cur);
+  return lines.length?lines:[''];
+}
+var PV={cv:null,z:1};
+function sheetLayout(d){
+  var W=1240,H=1754,M=54,innerW=W-M*2;
+  var rows=d.ins;
+  var mapX=M+20, mapW=innerW-40;
+  var topY=M+126, rh=50, hh=50, totalH=50, gap=22, footH=64;
+  var minH=Math.round(mapW*0.46), maxH=Math.round(mapW*0.80);
+  var maxRows=Math.floor(((H-M-20)-(topY+minH+gap)-hh-totalH-footH)/rh);
+  var lim=Math.max(1,Math.min(rows.length,maxRows,20));
+  var overflow=rows.length>lim;
+  var rowsH=lim*rh+(overflow?rh:0);
+  var budget=(H-M-20)-(topY+gap)-hh-totalH-footH-rowsH;
+  var mapH=Math.max(minH,Math.min(maxH,Math.round(budget)));
+  return {W:W,H:H,M:M,innerW:innerW,rows:rows,outs:d.outs,mapX:mapX,mapW:mapW,mapH:mapH,topY:topY,
+          rh:rh,hh:hh,totalH:totalH,gap:gap,lim:lim,overflow:overflow,rowsH:rowsH,footH:footH};
+}
+function buildAreaSheet(){
+  if(!S.order.length) return Promise.resolve(null);
+  var d=sheetRows(), L=sheetLayout(d);
+  return printMapCanvas(1400,Math.round(1400*L.mapH/L.mapW)).then(function(mp){ return drawAreaSheet(d,mp,L) });
+}
+function drawAreaSheet(d,mp,L){
+  var rows=L.rows, outs=L.outs;
+  var W=L.W,H=L.H,M=L.M,innerW=L.innerW,mapX=L.mapX,mapW=L.mapW,mapH=L.mapH,topY=L.topY;
+  var rh=L.rh,hh=L.hh,totalH=L.totalH;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var g=cv.getContext('2d');
+  g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  g.strokeStyle='#111'; g.lineWidth=2; g.strokeRect(M,M,innerW,H-M*2);
+  g.textBaseline='alphabetic'; g.textAlign='left';
+  sf(g,34,1); g.fillText('필지 면적 조서',M+20,M+54);
+  sf(g,17,0,'#333'); g.textAlign='right';
+  g.fillText(todayStr()+' · KTS 원클릭',W-M-20,M+40);
+  sf(g,14,0,'#666'); g.fillText('참고용 · 법적 효력 없음',W-M-20,M+62);
+  g.textAlign='left';
+  g.strokeStyle='#111'; g.lineWidth=3; g.beginPath(); g.moveTo(M+20,M+74); g.lineTo(W-M-20,M+74); g.stroke();
+  var tot={area:0,pyeong:0,val:0};
+  rows.forEach(function(r){ tot.area+=r.area||0; tot.pyeong+=pyeong(r.area||0); tot.val+=r.val||0 });
+  sf(g,20,1); g.fillText('담은 필지 '+rows.length+'필지  ·  합계 '+num(tot.area,0)+'㎡ ('+num(pyeong(tot.area))+'평)',M+20,M+110);
+  if(tot.val){ g.textAlign='right'; sf(g,17,0,'#333'); g.fillText('공시지가 총액 '+num(Math.round(tot.val))+'원',W-M-20,M+110); g.textAlign='left' }
+  /* 지도 — A4 가로 폭에 맞춘 대형 가로 직사각형 */
+  if(mp&&mp.canvas){ try{ g.drawImage(mp.canvas,mapX,topY,mapW,mapH) }catch(e){ mp=null } }
+  if(!mp){ g.fillStyle='#F2F2F2'; g.fillRect(mapX,topY,mapW,mapH);
+    g.fillStyle='#888'; g.font='800 18px '+SHEETF; g.textAlign='center';
+    g.fillText('지도를 그리지 못했습니다',mapX+mapW/2,topY+mapH/2); g.textAlign='left' }
+  g.strokeStyle='#111'; g.lineWidth=1.5; g.strokeRect(mapX,topY,mapW,mapH);
+  /* 표 — 지도와 폭 100% 일치 */
+  var COLS=[
+    {h:['주소','(동·리)'],w:.255,a:'left'},
+    {h:['지번'],w:.095,a:'center'},
+    {h:['지목'],w:.065,a:'center'},
+    {h:['용도지역'],w:.175,a:'center'},
+    {h:['면적','(㎡)'],w:.11,a:'right'},
+    {h:['평'],w:.065,a:'right'},
+    {h:['공시지가','(원/㎡)'],w:.12,a:'right'},
+    {h:['공시지가','총액(원)'],w:.115,a:'right'}
+  ];
+  var tw=[],acc=0;
+  for(var i=0;i<COLS.length;i++){ var cw=Math.round(mapW*COLS[i].w); if(i===COLS.length-1) cw=mapW-acc; tw.push(cw); acc+=cw }
+  var ty=topY+mapH+22;
+  g.fillStyle='#EDEDED'; g.fillRect(mapX,ty,mapW,hh);
+  g.strokeStyle='#111'; g.lineWidth=1;
+  g.strokeRect(mapX+.5,ty+.5,mapW-1,hh-1);
+  var cx=mapX;
+  for(var j=0;j<COLS.length;j++){
+    if(j){ g.beginPath(); g.moveTo(cx+.5,ty); g.lineTo(cx+.5,ty+hh); g.stroke() }
+    var lab=COLS[j].h, lsz=lab.length>1?13:15;
+    sf(g,lsz,1,'#111'); g.textAlign='center';
+    if(lab.length>1){ g.fillText(lab[0],cx+tw[j]/2,ty+22); g.fillText(lab[1],cx+tw[j]/2,ty+39) }
+    else g.fillText(lab[0],cx+tw[j]/2,ty+hh/2+5);
+    cx+=tw[j];
+  }
+  var yy=ty+hh;
+  function colAt(i){ var x=mapX,a=0; for(var q=0;q<i;q++) a+=tw[q]; return {x:x+a,w:tw[i],a:COLS[i].a} }
+  function cell(text,col,size,bold){
+    var c=col; g.save(); g.beginPath(); g.rect(c.x+2,yy+1,c.w-2,rh-1); g.clip();
+    sf(g,size||15,bold?1:0,'#111');
+    var t=String(text==null?'':text);
+    if(c.a==='left'){ g.textAlign='left'; g.fillText(t,c.x+7,yy+rh/2+5) }
+    else if(c.a==='right'){ g.textAlign='right'; g.fillText(t,c.x+c.w-7,yy+rh/2+5) }
+    else { g.textAlign='center'; g.fillText(t,c.x+c.w/2,yy+rh/2+5) }
+    g.restore();
+  }
+  function rowLine(strong){
+    g.strokeStyle=strong?'#111':'#777'; g.lineWidth=strong?1.6:1;
+    g.beginPath(); g.moveTo(mapX,yy+.5); g.lineTo(mapX+mapW,yy+.5); g.stroke();
+  }
+  for(var r=0;r<L.lim;r++){
+    var q=rows[r];
+    rowLine(false);
+    var c0=colAt(0);
+    var lines=wrapLines(g,q.addr,c0.w-14,14,0);
+    sf(g,14,0,'#111'); g.textAlign='left';
+    if(lines.length>1){ g.fillText(lines[0],c0.x+7,yy+rh/2-3); g.fillText(lines[1],c0.x+7,yy+rh/2+14) }
+    else g.fillText(lines[0],c0.x+7,yy+rh/2+5);
+    cell(q.jibun,colAt(1),15,0);
+    cell(q.jmok,colAt(2),15,0);
+    var c3=colAt(3);
+    g.save(); g.beginPath(); g.rect(c3.x+2,yy+1,c3.w-2,rh-1); g.clip();
+    var ysz=fitSize(g,q.yongdo,c3.w-12,14,9);
+    g.textAlign='center'; g.fillStyle='#111'; g.fillText(q.yongdo||'—',c3.x+c3.w/2,yy+rh/2+5);
+    g.restore();
+    cell(num(q.area,0),colAt(4),15,0);
+    cell(num(q.pyeong),colAt(5),15,0);
+    cell(q.unit?num(q.unit):'—',colAt(6),15,0);
+    cell(q.val?num(Math.round(q.val)):'—',colAt(7),14,0);
+    yy+=rh;
+  }
+  if(L.overflow){
+    rowLine(false);
+    sf(g,13,0,'#333'); g.textAlign='left'; g.fillText('외 '+(rows.length-L.lim)+'필지',mapX+8,yy+rh/2+5);
+    var cc=colAt(4);
+    g.textAlign='center'; g.fillText('…',cc.x+cc.w/2,yy+rh/2+5);
+    yy+=rh;
+  }
+  rowLine(true);
+  g.fillStyle='#F4F4F4'; g.fillRect(mapX,yy,mapW,totalH);
+  var ct=colAt(0);
+  sf(g,16,1,'#111'); g.textAlign='left'; g.fillText('합계 '+rows.length+'필지',ct.x+8,yy+totalH/2+6);
+  cell(num(tot.area,0),colAt(4),16,1);
+  cell(num(pyeong(tot.area)),colAt(5),16,1);
+  cell(outs.length?('제외 '+outs.length):'—',colAt(6),13,0);
+  cell(tot.val?num(Math.round(tot.val)):'—',colAt(7),14,1);
+  yy+=totalH;
+  g.strokeStyle='#111'; g.lineWidth=1.2; g.strokeRect(mapX+.5,ty+.5,mapW-1,(yy-ty)-1);
+  /* 꼬리말 */
+  var footLines=wrapLines(g,'자료 · 브이월드 연속지적도(참고용) · 토지임야정보(토지대장 요약) · 개별공시지가·토지이용계획. 면적은 토지대장 공부면적 우선, 없으면 연속지적도 도면면적입니다. 이 조서는 참고용이며 법적 효력이 없습니다. 법적 면적·경계는 지적공부 원본(정부24)과 담당 관청 확인이 기준입니다.',mapW-8,13,0);
+  sf(g,13,0,'#333'); g.textAlign='left';
+  footLines.forEach(function(ln,i){ g.fillText(ln,mapX+2,yy+24+i*19) });
+  var footBottom=yy+24+footLines.length*19;
+  /* 필지별 면적 구성 막대 — 남는 아래 여백에 정보를 더한다 */
+  var rest=(H-M-18)-footBottom;
+  var by=footBottom+26;
+  if(rest>300&&rows.length>1){
+    sf(g,14,1,'#333'); g.textAlign='left'; g.fillText('필지별 면적 구성',mapX+2,by+2);
+    var bx0=mapX, bw0=mapW, bhh=28, bt=by+14, accx=bx0;
+    var shades=['#FF6B00','#FFA24D','#0B1526','#41597F','#C2410C','#2E4370'];
+    for(var q2=0;q2<rows.length;q2++){
+      var frac=tot.area?(rows[q2].area/tot.area):0, sw=Math.max(2,bw0*frac);
+      if(q2===rows.length-1) sw=bx0+bw0-accx;
+      g.fillStyle=shades[q2%shades.length]; g.fillRect(accx,bt,sw,bhh);
+      if(sw>90){
+        g.fillStyle='#fff'; g.font='800 12px '+SHEETF; g.textAlign='center';
+        g.fillText(rows[q2].jibun+' '+num(Math.round(frac*100))+'%',accx+sw/2,bt+19);
+      }
+      accx+=sw;
+    }
+    g.strokeStyle='#111'; g.lineWidth=1; g.strokeRect(bx0+.5,bt+.5,bw0-1,bhh-1);
+    by=bt+bhh+26;
+    rest=(H-M-18)-by;
+  }
+  /* 작성·확인란 */
+  if(rest>140){
+    var bx=mapX, bw=mapW, bh=Math.min(120,rest-26);
+    g.strokeStyle='#111'; g.lineWidth=1.2; g.strokeRect(bx+.5,by+.5,bw-1,bh-1);
+    var cells=3, cwid=Math.round(bw/cells);
+    for(var s2=1;s2<cells;s2++){
+      g.beginPath(); g.moveTo(bx+cwid*s2+.5,by); g.lineTo(bx+cwid*s2+.5,by+bh); g.stroke();
+    }
+    var heads=['작성자 (서명)','확인자 (서명)','작성일자'];
+    for(var s3=0;s3<cells;s3++){
+      sf(g,13,1,'#333'); g.textAlign='center';
+      g.fillText(heads[s3],bx+cwid*s3+cwid/2,by+24);
+      if(s3===2){ sf(g,15,0,'#111'); g.fillText(todayStr(),bx+cwid*s3+cwid/2,by+bh-22) }
+      else { g.strokeStyle='#999'; g.lineWidth=1; g.beginPath(); g.moveTo(bx+cwid*s3+24,by+bh-20); g.lineTo(bx+cwid*(s3+1)-24,by+bh-20); g.stroke() }
+    }
+  }
+  sf(g,12,0,'#666'); g.textAlign='right';
+  g.fillText('autooneclick.com/area/',W-M-20,H-M-14);
+  return cv;
+}
+/* ---- 미리보기 모달 (264) ---- */
+function openSheet(){
+  if(!S.order.length){ toast('먼저 필지를 담아 주세요'); return }
+  toast('A4 조서 만드는 중…');
+  buildAreaSheet().then(function(c){
+    if(!c){ toast('A4로 묶지 못했습니다'); return }
+    PV.cv=c; PV.z=1;
+    $('#pvImg').src=c.toDataURL('image/png');
+    $('#pvImg').style.width='100%';
+    $('#pvInfo').textContent='210×297mm · A4 1장';
+    $('#pv').classList.add('on');
+    document.body.style.overflow='hidden';
+    $('#pvS').scrollTop=0;
+  }).catch(function(){ toast('A4 조서를 만들지 못했습니다') });
+}
+function closePv(){ $('#pv').classList.remove('on'); document.body.style.overflow='' }
+function pvZoom(d){ PV.z=Math.max(0.6,Math.min(4,PV.z+d)); $('#pvImg').style.width=(PV.z*100)+'%' }
+function dlUrl(name,url,revoke){
+  try{
+    var a=document.createElement('a'); a.href=url; a.download=name; a.rel='noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    if(revoke) setTimeout(function(){ try{URL.revokeObjectURL(url)}catch(e){} },6000);
+    return true;
+  }catch(e){ return false }
+}
+function saveSheetPng(){
+  if(!PV.cv){ toast('먼저 미리보기를 열어 주세요'); return }
+  var name='KTS_면적조서_'+todayStr().replace(/-/g,'')+'.png';
+  if(PV.cv.toBlob){
+    try{ PV.cv.toBlob(function(b){
+      if(b){ if(dlUrl(name,URL.createObjectURL(b),true)) toast('이미지(PNG) 저장 · 다운로드 폴더를 보세요') }
+      else if(dlUrl(name,PV.cv.toDataURL('image/png'),false)) toast('이미지(PNG) 저장 · 다운로드 폴더를 보세요');
+    },'image/png') }catch(e){ toast('이미지 저장이 막혔습니다 · 화면을 캡처해 주세요') }
+  }else if(dlUrl(name,PV.cv.toDataURL('image/png'),false)) toast('이미지(PNG) 저장 · 다운로드 폴더를 보세요');
+}
+function canvasJpeg(cv,q){
+  return new Promise(function(res,rej){
+    if(!cv.toBlob){ rej(new Error('noblob')); return }
+    cv.toBlob(function(b){
+      if(!b){ rej(new Error('noblob')); return }
+      b.arrayBuffer().then(function(ab){ res(new Uint8Array(ab)) },function(){ rej(new Error('nobuf')) });
+    },'image/jpeg',q||0.94);
   });
+}
+function saveSheetPdf(){
+  if(!PV.cv){ toast('먼저 미리보기를 열어 주세요'); return }
+  if(!window.KTS_PDF){ toast('PDF 도구를 불러오지 못해 이미지(PNG)로 저장합니다'); saveSheetPng(); return }
+  toast('PDF로 만드는 중…');
+  canvasJpeg(PV.cv,0.95).then(function(bytes){
+    var blob=KTS_PDF.build([{bytes:bytes,w:PV.cv.width,h:PV.cv.height}],{});
+    var name='KTS_면적조서_'+todayStr().replace(/-/g,'')+'.pdf';
+    if(dlUrl(name,URL.createObjectURL(blob),true)) toast('PDF 저장 · 다운로드 폴더를 보세요');
+    else toast('PDF 저장이 막혔습니다 · 이미지(PNG)로 저장해 주세요');
+  }).catch(function(){ toast('PDF 저장이 막혔습니다 · 이미지(PNG)로 저장해 주세요') });
+}
+function printSheet(){
+  if(!PV.cv){ toast('먼저 미리보기를 열어 주세요'); return }
+  $('#printImg').src=PV.cv.toDataURL('image/png');
+  setTimeout(function(){ try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다') } },150);
 }
 /* 담은 모든 필지가 100% 들어오는 임시 뷰로 1회 렌더 → PNG 추출 → 원래 뷰 복원 */
 function selBox(){
@@ -960,36 +1280,6 @@ function selBox(){
   }
   return b;
 }
-function captureFit(){
-  if(!S.order.length) return Promise.resolve('');
-  var b=selBox(), old={cx:S.V.cx,cy:S.V.cy,z:S.V.z};
-  if(b){
-    var pad=0.25, cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
-    var w=Math.max(b.maxx-b.minx,1e-9)*(1+pad*2), h=Math.max(b.maxy-b.miny,1e-9)*(1+pad*2);
-    var z=19;
-    for(;z>9;z-=0.25){
-      var px=lon2x(cx+w/2,z)-lon2x(cx-w/2,z);
-      var py=lat2y(cy-h/2,z)-lat2y(cy+h/2,z);
-      if(px<MAPW*0.9&&py<MAPH*0.9) break;
-    }
-    S.V={cx:cx,cy:cy,z:Math.max(9,Math.min(19,z))};
-  }
-  return Promise.resolve(render())
-    .then(function(){ return new Promise(function(r){ setTimeout(r,40) }) })
-    .then(function(){
-      var img='';
-      try{ img=$('#map').toDataURL('image/png') }catch(e){ img='' }
-      S.V=old; render();
-      return img;
-    });
-}
-function printSheet(){
-  if(!S.order.length){ toast('먼저 필지를 담아 주세요'); return }
-  buildSheet().then(function(){
-    setTimeout(function(){ try{ window.print() }catch(e){ toast('인쇄 창을 열지 못했습니다') } },80);
-  });
-}
-
 /* ---------- 이벤트 ---------- */
 var EX=[
   {t:'신하리 162-9',q:'경기도 가평군 조종면 신하리 162-9',d:'전 359㎡'},
@@ -1061,7 +1351,15 @@ $('#addAll').addEventListener('click',function(){
 $('#clearAll').addEventListener('click',function(){
   S.sel={}; S.order=[]; paintList(); render(); toast('선택을 모두 비웠습니다');
 });
-$('#printA4').addEventListener('click',printSheet);
+$('#printA4').addEventListener('click',openSheet);
+$('#pvX').addEventListener('click',closePv);
+$('#pvIn').addEventListener('click',function(){ pvZoom(0.35) });
+$('#pvOut').addEventListener('click',function(){ pvZoom(-0.35) });
+$('#pvPng').addEventListener('click',saveSheetPng);
+$('#pvPdf').addEventListener('click',saveSheetPdf);
+$('#pvPrint').addEventListener('click',printSheet);
+$('#pvS').addEventListener('dblclick',function(e){ if(e.target&&e.target.id==='pvImg'){ pvZoom(PV.z>1.3?-0.6:0.8) } });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('#pv').classList.contains('on')) closePv() });
 $('#copyAddr').addEventListener('click',function(){
   var a=primaryAddr(); if(!a){ toast('먼저 필지를 담아 주세요'); return }
   copyText(a).then(function(ok){ toast(ok?'주소를 복사했습니다':'주소: '+a) });
@@ -1082,10 +1380,10 @@ function copyText(t){
     }catch(e){ return false }
   }
 }
-window.addEventListener('resize',function(){ render() });
+window.addEventListener('resize',function(){ sizeCanvas(); render() });
 
 /* 시작 */
-buildChips(); paintList(); render();
+sizeCanvas(); buildChips(); paintList(); render();
 var pq=(location.search.match(/[?&]q=([^&]*)/)||[])[1];
 if(pq){
   try{
@@ -1096,7 +1394,8 @@ if(pq){
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
 window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,hideNum:!!S.hideNum,cx:S.V.cx,cy:S.V.cy} };
-window.__KTS_SHEET=function(){ return buildSheet() };
+window.__KTS_SHEET=function(){ return buildAreaSheet() };
+window.__KTS_PV=function(){ return {open:!!($('#pv')&&$('#pv').classList.contains('on')),z:PV.z,cv:!!PV.cv} };
 window.__KTS_HIT=function(cx,cy){ var r=MAPW/$('#map').getBoundingClientRect().width, t=topLeft();
   var f=hitTest(x2lon(t.x+cx*r,S.V.z),y2lat(t.y+cy*r,S.V.z)); return f?{jibun:f.jibun,pnu:f.pnu}:null };
 })();
