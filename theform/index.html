@@ -498,42 +498,8 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
 const XLET = /^[₩$]?[\d,]+(\.\d+)?$/;
 /* ================= 사진 → 구조(JSON) ================= */
 /* 문서 전체 1:1 복제 — 표 하나가 아니라 사진 속 종이 한 장의 모든 요소를 위→아래 순서로 읽는다 */
-const PROMPT = `이미지는 한국 사업용 문서(계약서·약정서·안내문·공고문·견적서·거래명세표·정산표)를 찍은 사진입니다.
-사진 속 종이 한 장 전체를 한글/엑셀 문서로 원본과 1:1 복제하려 합니다. 표 하나만이 아니라, 종이에 보이는 모든 요소(상단 작은 표, 제목 배너, 본문 문단, 조항, 색 글자, 형광펜 줄, 메인 표, 하단 날짜·서명)를 위에서 아래 순서대로 빠짐없이 담으세요.
-아래 형식의 JSON만 출력하세요. 다른 말은 절대 쓰지 마세요.
-
-{"blocks":[블록, 블록, ...]}
-
-블록은 세 종류입니다.
-1) 표 블록
-{"t":"table","main":0또는1,"x":왼쪽위치%,"w":너비%,"y":위쪽위치%,"h":높이%,"nRows":행수,"nCols":열수,"colWidths":[각 열 너비 %, 정수, 합 100],
- "rowHeights":[각 행 높이 %, 정수, 합 100],
- "cells":[[r,c,rowSpan,colSpan,"글자",bold(0/1),align("L"/"C"/"R"),"bg #RRGGBB 또는 빈칸","color #RRGGBB 또는 빈칸",num(0/1),noBorder(0/1)], ...]}
-2) 글 블록(제목 배너·문단·조항·한 줄 안내·날짜·서명 등 표가 아닌 모든 글)
-{"t":"text","align":"L"/"C"/"R","size":글자크기pt,"bg":"배경 #RRGGBB 또는 빈칸","x":왼쪽위치%,"w":너비%,"y":쪽위치%,"h":높이%,
- "runs":[["글자",bold(0/1),"color #RRGGBB 또는 빈칸","형광펜 #RRGGBB 또는 빈칸","밑줄 #RRGGBB 또는 빈칸"], ...]}
-3) 빈 자리 블록(직인·도장·QR·로고·사진처럼 글자가 아닌 것)
-{"t":"blank","y":위쪽위치%,"h":높이%,"label":"직인 또는 로고"}
-
-규칙:
-- x, w, y, h는 종이(문서 본문) 전체를 100으로 본 비율입니다. y는 종이 맨 위에서부터의 위치입니다. 가운데 놓인 것은 좌우 여백이 같게.
-- 위→아래 순서대로 블록을 적으세요. y·h를 적으면 그 위치와 크기 그대로 A4 한 장에 되살립니다.
-- **조항이 있는 문서(계약서·약정서)는 조항 하나도 빠뜨리지 마세요.** "제1조 (제목)" 같은 조항 제목은 글 블록 하나, 그 아래 본문 문단은 각각 따로 글 블록으로 적고, ①·②·③ 번호가 붙은 줄도 각각 글 블록으로 나누세요. 조항 제목만 적고 본문을 빠뜨리는 일이 없도록, 종이 맨 마지막 줄까지 읽으세요.
-- 표와 문단이 번갈아 나오면(예: 제1조 다음 표, 제2조 다음 문단, 제3조 다음 표) 그 순서를 y 위치로 정확히 지키세요.
-- 표의 h는 그 표 전체 높이(%), rowHeights는 표 안에서 각 행이 차지하는 비율입니다. 사진에서 줄 간격을 보고 적으세요.
-- 표 칸은 비어 있어도 cells에 넣으세요(글자 ""). 병합 칸은 좌상단 칸에만 rowSpan/colSpan을 적고 덮인 칸은 넣지 마세요.
-- 표 머리글 줄은 bold 1. 머리글 칸에 옅은 파란·회색 바탕이 있으면 bg에 그 색을 적으세요(흰색이면 빈칸).
-- 직인·도장·QR·로고는 글자로 지어내지 말고 3) blank 자리 블록으로 높이만 남기세요.
-- 가장 크고 중요한 표 하나만 "main":1, 나머지 표는 0. 표가 없으면 표 블록을 만들지 마세요.
-- 같은 높이에 작은 표 두 개가 좌우로 떨어져 있으면(예: 왼쪽 '공고번호', 오른쪽 '게시기간') 하나의 표 블록으로 합치고, 가운데 빈 열을 넣어 그 칸들은 noBorder 1로 적으세요.
-- 제목이 색 띠(배너) 안에 있으면 글 블록의 bg에 띠 색을, runs 색에 글자색(흰색이면 #FFFFFF)을 적고 size를 크게(예: 20~26).
-- 문단 안에서 색이 바뀌는 부분(빨간 글씨 등)은 runs를 나눠 color를 적으세요. 검정 글씨는 color 빈칸.
-- 노란 형광펜이 칠해진 글은 형광펜에 그 색(#FFFF00 등)을, 밑줄 친 글은 밑줄에 밑줄 색을 적으세요.
-- 본문 글자 크기는 10을 기준으로 상대 크기를 적으세요(작은 글 9, 큰 제목 22 등).
-- 문단은 원본의 줄바꿈이 아니라 문단 단위로 한 블록에 이어 적으세요(띄어쓰기는 원본대로).
-- **글자는 사진에 보이는 그대로.** 한글·숫자·괄호·물결표(~)·쉼표·띄어쓰기를 원본대로 적고, 없는 글자·숫자를 지어내지 마세요. 알아보기 어려운 글자는 그럴듯한 글자로 채우지 말고 가장 비슷하게 보이는 글자로 적으세요.
-- 사진 밖 배경(벽지·액자·게시판·검은 여백)은 무시하세요.
-- 압축된 JSON(줄바꿈/공백 없이)으로 출력하세요.`;
+/* 294 — 내부 지시문은 그대로 노출하지 않는다(난독화) */
+const PROMPT = new TextDecoder().decode(Uint8Array.from(atob('7J2066+47KeA64qUIO2VnOq1rSDsgqzsl4Xsmqkg66y47IScKOqzhOyVveyEnMK37JW97KCV7IScwrfslYjrgrTrrLjCt+qzteqzoOusuMK36rKs7KCB7IScwrfqsbDrnpjrqoXshLjtkZzCt+ygleyCsO2RnCnrpbwg7LCN7J2AIOyCrOynhOyeheuLiOuLpC4K7IKs7KeEIOyGjSDsooXsnbQg7ZWcIOyepSDsoITssrTrpbwg7ZWc6riAL+yXkeyFgCDrrLjshJzroZwg7JuQ67O46rO8IDE6MSDrs7XsoJztlZjroKQg7ZWp64uI64ukLiDtkZwg7ZWY64KY66eM7J20IOyVhOuLiOudvCwg7KKF7J207JeQIOuztOydtOuKlCDrqqjrk6Ag7JqU7IaMKOyDgeuLqCDsnpHsnYAg7ZGcLCDsoJzrqqkg67Cw64SILCDrs7jrrLgg66y464uoLCDsobDtla0sIOyDiSDquIDsnpAsIO2Yleq0ke2OnCDspIQsIOuplOyduCDtkZwsIO2VmOuLqCDrgqDsp5zCt+yEnOuqhSnrpbwg7JyE7JeQ7IScIOyVhOuemCDsiJzshJzrjIDroZwg67mg7KeQ7JeG7J20IOuLtOycvOyEuOyalC4K7JWE656YIO2YleyLneydmCBKU09O66eMIOy2nOugpe2VmOyEuOyalC4g64uk66W4IOunkOydgCDsoIjrjIAg7JOw7KeAIOuniOyEuOyalC4KCnsiYmxvY2tzIjpb67iU66GdLCDruJTroZ0sIC4uLl19CgrruJTroZ3snYAg7IS4IOyiheulmOyeheuLiOuLpC4KMSkg7ZGcIOu4lOuhnQp7InQiOiJ0YWJsZSIsIm1haW4iOjDrmJDripQxLCJ4Ijrsmbzsqr3snITsuZglLCJ3IjrrhIjruYQlLCJ5IjrsnITsqr3snITsuZglLCJoIjrrhpLsnbQlLCJuUm93cyI67ZaJ7IiYLCJuQ29scyI67Je07IiYLCJjb2xXaWR0aHMiOlvqsIEg7Je0IOuEiOu5hCAlLCDsoJXsiJgsIO2VqSAxMDBdLAogInJvd0hlaWdodHMiOlvqsIEg7ZaJIOuGkuydtCAlLCDsoJXsiJgsIO2VqSAxMDBdLAogImNlbGxzIjpbW3IsYyxyb3dTcGFuLGNvbFNwYW4sIuq4gOyekCIsYm9sZCgwLzEpLGFsaWduKCJMIi8iQyIvIlIiKSwiYmcgI1JSR0dCQiDrmJDripQg67mI7Lm4IiwiY29sb3IgI1JSR0dCQiDrmJDripQg67mI7Lm4IixudW0oMC8xKSxub0JvcmRlcigwLzEpXSwgLi4uXX0KMikg6riAIOu4lOuhnSjsoJzrqqkg67Cw64SIwrfrrLjri6jCt+yhsO2VrcK37ZWcIOykhCDslYjrgrTCt+uCoOynnMK37ISc66qFIOuTsSDtkZzqsIAg7JWE64uMIOuqqOuToCDquIApCnsidCI6InRleHQiLCJhbGlnbiI6IkwiLyJDIi8iUiIsInNpemUiOuq4gOyekO2BrOq4sHB0LCJiZyI6IuuwsOqyvSAjUlJHR0JCIOuYkOuKlCDruYjsubgiLCJ4Ijrsmbzsqr3snITsuZglLCJ3IjrrhIjruYQlLCJ5Ijrsqr3snITsuZglLCJoIjrrhpLsnbQlLAogInJ1bnMiOltbIuq4gOyekCIsYm9sZCgwLzEpLCJjb2xvciAjUlJHR0JCIOuYkOuKlCDruYjsubgiLCLtmJXqtJHtjpwgI1JSR0dCQiDrmJDripQg67mI7Lm4Iiwi67CR7KSEICNSUkdHQkIg65iQ64qUIOu5iOy5uCJdLCAuLi5dfQozKSDruYgg7J6Q66asIOu4lOuhnSjsp4HsnbjCt+uPhOyepcK3UVLCt+uhnOqzoMK37IKs7KeE7LKY65+8IOq4gOyekOqwgCDslYTri4wg6rKDKQp7InQiOiJibGFuayIsInkiOuychOyqveychOy5mCUsImgiOuuGkuydtCUsImxhYmVsIjoi7KeB7J24IOuYkOuKlCDroZzqs6AifQoK6rec7LmZOgotIHgsIHcsIHksIGjripQg7KKF7J20KOusuOyEnCDrs7jrrLgpIOyghOyytOulvCAxMDDsnLzroZwg67O4IOu5hOycqOyeheuLiOuLpC4geeuKlCDsooXsnbQg66eoIOychOyXkOyEnOu2gO2EsOydmCDsnITsuZjsnoXri4jri6QuIOqwgOyatOuNsCDrhpPsnbgg6rKD7J2AIOyijOyasCDsl6zrsLHsnbQg6rCZ6rKMLgotIOychOKGkuyVhOuemCDsiJzshJzrjIDroZwg67iU66Gd7J2EIOyggeycvOyEuOyalC4gecK3aOulvCDsoIHsnLzrqbQg6re4IOychOy5mOyZgCDtgazquLAg6re464yA66GcIEE0IO2VnCDsnqXsl5Ag65CY7IK066a964uI64ukLgotICoq7KGw7ZWt7J20IOyeiOuKlCDrrLjshJwo6rOE7JW97IScwrfslb3soJXshJwp64qUIOyhsO2VrSDtlZjrgpjrj4Qg67mg65yo66as7KeAIOuniOyEuOyalC4qKiAi7KCcMeyhsCAo7KCc66qpKSIg6rCZ7J2AIOyhsO2VrSDsoJzrqqnsnYAg6riAIOu4lOuhnSDtlZjrgpgsIOq3uCDslYTrnpgg67O466y4IOusuOuLqOydgCDqsIHqsIEg65Sw66GcIOq4gCDruJTroZ3snLzroZwg7KCB6rOgLCDikaDCt+KRocK34pGiIOuyiO2YuOqwgCDrtpnsnYAg7KSE64+EIOqwgeqwgSDquIAg67iU66Gd7Jy866GcIOuCmOuIhOyEuOyalC4g7KGw7ZWtIOygnOuqqeunjCDsoIHqs6Ag67O466y47J2EIOu5oOucqOumrOuKlCDsnbzsnbQg7JeG64+E66GdLCDsooXsnbQg66eoIOuniOyngOuniSDspITquYzsp4Ag7J297Jy87IS47JqULgotIO2RnOyZgCDrrLjri6jsnbQg67KI6rCI7JWEIOuCmOyYpOuptCjsmIg6IOygnDHsobAg64uk7J2MIO2RnCwg7KCcMuyhsCDri6TsnYwg66y464uoLCDsoJwz7KGwIOuLpOydjCDtkZwpIOq3uCDsiJzshJzrpbwgeSDsnITsuZjroZwg7KCV7ZmV7Z6IIOyngO2CpOyEuOyalC4KLSDtkZzsnZggaOuKlCDqt7gg7ZGcIOyghOyytCDrhpLsnbQoJSksIHJvd0hlaWdodHPripQg7ZGcIOyViOyXkOyEnCDqsIEg7ZaJ7J20IOywqOyngO2VmOuKlCDruYTsnKjsnoXri4jri6QuIOyCrOynhOyXkOyEnCDspIQg6rCE6rKp7J2EIOuztOqzoCDsoIHsnLzshLjsmpQuCi0g7ZGcIOy5uOydgCDruYTslrQg7J6I7Ja064+EIGNlbGxz7JeQIOuEo+ycvOyEuOyalCjquIDsnpAgIiIpLiDrs5Htlakg7Lm47J2AIOyijOyDgeuLqCDsubjsl5Drp4wgcm93U3Bhbi9jb2xTcGFu7J2EIOyggeqzoCDrja7snbgg7Lm47J2AIOuEo+yngCDrp4jshLjsmpQuCi0g7ZGcIOuouOumrOq4gCDspITsnYAgYm9sZCAxLiDrqLjrpqzquIAg7Lm47JeQIOyYheydgCDtjIzrnoDCt+2ajOyDiSDrsJTtg5XsnbQg7J6I7Jy866m0IGJn7JeQIOq3uCDsg4nsnYQg7KCB7Jy87IS47JqUKO2dsOyDieydtOuptCDruYjsubgpLgotIOyngeyduMK364+E7J6lwrdRUsK366Gc6rOg64qUIOq4gOyekOuhnCDsp4DslrTrgrTsp4Ag66eQ6rOgIDMpIGJsYW5rIOyekOumrCDruJTroZ3snLzroZwg64aS7J2066eMIOuCqOq4sOyEuOyalC4KLSDqsIDsnqUg7YGs6rOgIOykkeyalO2VnCDtkZwg7ZWY64KY66eMICJtYWluIjoxLCDrgpjrqLjsp4Ag7ZGc64qUIDAuIO2RnOqwgCDsl4bsnLzrqbQg7ZGcIOu4lOuhneydhCDrp4zrk6Tsp4Ag66eI7IS47JqULgotIOqwmeydgCDrhpLsnbTsl5Ag7J6R7J2AIO2RnCDrkZAg6rCc6rCAIOyijOyasOuhnCDrlqjslrTsoLgg7J6I7Jy866m0KOyYiDog7Jm87Kq9ICfqs7Xqs6DrsojtmLgnLCDsmKTrpbjsqr0gJ+qyjOyLnOq4sOqwhCcpIO2VmOuCmOydmCDtkZwg67iU66Gd7Jy866GcIO2Vqey5mOqzoCwg6rCA7Jq0642wIOu5iCDsl7TsnYQg64Sj7Ja0IOq3uCDsubjrk6TsnYAgbm9Cb3JkZXIgMeuhnCDsoIHsnLzshLjsmpQuCi0g7KCc66qp7J20IOyDiSDrnaAo67Cw64SIKSDslYjsl5Ag7J6I7Jy866m0IOq4gCDruJTroZ3snZggYmfsl5Ag652gIOyDieydhCwgcnVucyDsg4nsl5Ag6riA7J6Q7IOJKO2dsOyDieydtOuptCAjRkZGRkZGKeydhCDsoIHqs6Agc2l6ZeulvCDtgazqsowo7JiIOiAyMH4yNikuCi0g66y464uoIOyViOyXkOyEnCDsg4nsnbQg67CU64CM64qUIOu2gOu2hCjruajqsIQg6riA7JSoIOuTsSnsnYAgcnVuc+ulvCDrgpjriKAgY29sb3Lrpbwg7KCB7Jy87IS47JqULiDqsoDsoJUg6riA7JSo64qUIGNvbG9yIOu5iOy5uC4KLSDrhbjrnoAg7ZiV6rSR7Y6c7J20IOy5oO2VtOynhCDquIDsnYAg7ZiV6rSR7Y6c7JeQIOq3uCDsg4koI0ZGRkYwMCDrk7Ep7J2ELCDrsJHspIQg7LmcIOq4gOydgCDrsJHspITsl5Ag67CR7KSEIOyDieydhCDsoIHsnLzshLjsmpQuCi0g67O466y4IOq4gOyekCDtgazquLDripQgMTDsnYQg6riw7KSA7Jy866GcIOyDgeuMgCDtgazquLDrpbwg7KCB7Jy87IS47JqUKOyekeydgCDquIAgOSwg7YGwIOygnOuqqSAyMiDrk7EpLgotIOusuOuLqOydgCDsm5Drs7jsnZgg7KSE67CU6r+I7J20IOyVhOuLiOudvCDrrLjri6gg64uo7JyE66GcIO2VnCDruJTroZ3sl5Ag7J207Ja0IOyggeycvOyEuOyalCjrnYTslrTsk7DquLDripQg7JuQ67O464yA66GcKS4KLSAqKuq4gOyekOuKlCDsgqzsp4Tsl5Ag67O07J2064qUIOq3uOuMgOuhnC4qKiDtlZzquIDCt+yIq+yekMK36rSE7Zi4wrfrrLzqsrDtkZwofinCt+yJvO2RnMK3652E7Ja07JOw6riw66W8IOybkOuzuOuMgOuhnCDsoIHqs6AsIOyXhuuKlCDquIDsnpDCt+yIq+yekOulvCDsp4DslrTrgrTsp4Ag66eI7IS47JqULiDslYzslYTrs7TquLAg7Ja066Ck7Jq0IOq4gOyekOuKlCDqt7jrn7Trk6/tlZwg6riA7J6Q66GcIOyxhOyasOyngCDrp5Dqs6Ag6rCA7J6lIOu5hOyKt+2VmOqyjCDrs7TsnbTripQg6riA7J6Q66GcIOyggeycvOyEuOyalC4KLSDsgqzsp4Qg67CWIOuwsOqyvSjrsr3sp4DCt+yVoeyekMK36rKM7Iuc7YyQwrfqsoDsnYAg7Jes67CxKeydgCDrrLTsi5ztlZjshLjsmpQuCi0g7JWV7LaV65CcIEpTT04o7KSE67CU6r+IL+qzteuwsSDsl4bsnbQp7Jy866GcIOy2nOugpe2VmOyEuOyalC4='), c => c.charCodeAt(0)));
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 

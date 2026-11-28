@@ -2327,7 +2327,8 @@ async function localText(file){
   const T = await cLoadTess(); const url = URL.createObjectURL(file);
   try{ const r = await T.recognize(url, 'kor+eng'); return (r && r.data && r.data.text) || ''; } finally{ URL.revokeObjectURL(url); }
 }
-const CPICK = '이미지는 신분증·사업자등록증·명함 사진입니다. 사진에 적힌 내용을 읽어 JSON 하나만 출력하세요(없으면 빈 문자열, 지어내지 마세요):\n{"성명":"","주민등록번호":"","주소":"","연락처":"","상호":"","사업자등록번호":"","대표자":""}';
+/* 294 — 내부 지시문은 그대로 노출하지 않는다 */
+const CPICK = new TextDecoder().decode(Uint8Array.from(atob('7J2066+47KeA64qUIOyLoOu2hOymncK37IKs7JeF7J6Q65Ox66Gd7KadwrfrqoXtlagg7IKs7KeE7J6F64uI64ukLiDsgqzsp4Tsl5Ag7KCB7Z6MIOuCtOyaqeydhCDsnb3slrQgSlNPTiDtlZjrgpjrp4wg7Lac66Cl7ZWY7IS47JqUKOyXhuycvOuptCDruYgg66y47J6Q7Je0LCDsp4DslrTrgrTsp4Ag66eI7IS47JqUKToKeyLshLHrqoUiOiIiLCLso7zrr7zrk7HroZ3rsojtmLgiOiIiLCLso7zshowiOiIiLCLsl7Drnb3sspgiOiIiLCLsg4HtmLgiOiIiLCLsgqzsl4XsnpDrk7HroZ3rsojtmLgiOiIiLCLrjIDtkZzsnpAiOiIifQ=='), c => c.charCodeAt(0)));
 function parseCText(txt){
   const t = String(txt || ''), rec = {};
   const lines = t.split(/\n/).map(x => x.trim()).filter(Boolean);
