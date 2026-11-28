@@ -282,7 +282,7 @@
     var P = B.plan(R, o);
     var land = o !== 'port';
     /* 1) 네모 테두리 없는 QR — 종이 맨 구석 */
-    var size = land ? 84 : 136, mg = 8;
+    var size = land ? 90 : 136, mg = land ? 5 : 8;
     var qx = P.W - size - mg, qy = P.foot.y + P.foot.h - size - mg;
     var off = document.createElement('canvas');
     paintQR(off, size, qrText(), k);
@@ -451,9 +451,9 @@
     var slot = $('.pb-seal');
     if (!slot) return;
     var land = orient !== 'port';
-    var size = land ? 84 : 136;
-    slot.style.left = 'auto'; slot.style.right = '8px';
-    slot.style.top = 'auto'; slot.style.bottom = '8px';
+    var size = land ? 90 : 136, mg = land ? 5 : 8;
+    slot.style.left = 'auto'; slot.style.right = mg + 'px';
+    slot.style.top = 'auto'; slot.style.bottom = mg + 'px';
     slot.style.width = size + 'px'; slot.style.height = size + 'px';
     slot.style.borderRadius = '0'; slot.style.background = 'transparent';
     var cv = document.createElement('canvas');
