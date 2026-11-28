@@ -609,6 +609,13 @@ function paint(g,W,H,sc,my){
       var tw=g.measureText(gi.jibun).width;
       /* 지번 라벨이 지도 밖으로 잘리지 않도록 — 라벨 박스가 완전히 들어올 때만 그린다 */
       if(mxx-tw/2-5*k<0||mxx+tw/2+5*k>W||myy-13*k<0||myy+13*k>H) continue;
+      /* 담은 필지 안쪽에 걸치는 이웃 지번은 경사 색 위에 비쳐 보이므로 그리지 않는다 */
+      var llon=x2lon(mxx+t.x,z), llat=y2lat(myy+t.y,z), covered=false;
+      for(var ci=0;ci<S.order.length;ci++){
+        var sit=S.sel[S.order[ci]];
+        if(sit&&sit.state==='in'&&inRings(sit.rings,llon,llat)){ covered=true; break }
+      }
+      if(covered) continue;
       g.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
       g.fillRect(mxx-tw/2-5*k,myy-13*k,tw+10*k,26*k);
       g.fillStyle=dark?'#EAF1FB':'#16233D';
