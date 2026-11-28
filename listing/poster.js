@@ -195,12 +195,191 @@
     ].filter(Boolean).join(' · ');
   }
 
+  /* ==========================================================================
+     304 — 그림 2장은 메인 사진 속 코너 인셋, QR은 네모 테두리 없이 코너 구석
+     · 2장: 큰 사진 1장으로 그리고 두 번째 그림(지적도·위치도 등)을 코너에 겹쳐 얹는다
+       (좌우 반반 쪼개기·아래 썸네일 줄 없이 한 덩어리로)
+     · 3장: 큰 1장 + 밑에 작은 2장(기존 썸네일 줄 그대로)
+     · 하단 직인 도장(테두리 두 줄) 대신, 테두리 없는 QR만 종이 맨 구석에
+     ========================================================================== */
+  function photoList(m) { return ((m && m.photos) || []).filter(Boolean); }
+
+  /* 인셋에 넣을 그림 — 그림 2장이면 두 번째 그림, 1장이면 지적도(없으면 위성) */
+  function insetInfo() {
+    var ph = photoList(M);
+    if (ph.length === 2) return { src: ph[1], slot: 'photo:1' };
+    if (ph.length === 1) {
+      if (M.cad) return { src: M.cad, slot: 'cad' };
+      if (M.map) return { src: M.map, slot: 'sat' };
+    }
+    return null;
+  }
+
+  /* 화면·저장 모두 인셋으로 옮긴 그림은 큰 칸에서 빼고 그린다(중복·빈 칸 없이) */
+  function renderModel() {
+    var ph = photoList(M);
+    var c = Object.assign({}, M);
+    if (ph.length === 2) c.photos = [ph[0]];
+    if (insetInfo()) { c.cad = ''; c.map = ''; c.lat = null; c.lon = null; }
+    return c;
+  }
+
+  /* 코너 인셋 자리 — 메인 사진 오른쪽 아래에 사진처럼 얹는다 */
+  function insetRect(ph) {
+    var ih = Math.round(ph.h * 0.42);
+    var iw = Math.round(ih * 1.36);
+    if (iw > ph.w * 0.46) { iw = Math.round(ph.w * 0.46); ih = Math.round(iw / 1.36); }
+    if (iw < 160) { iw = Math.max(120, iw); ih = Math.round(iw / 1.36); }
+    var mg = Math.max(10, Math.round(Math.min(ph.w, ph.h) * 0.018));
+    return { x: ph.x + ph.w - iw - mg, y: ph.y + ph.h - ih - mg, w: iw, h: ih, mg: mg };
+  }
+  function rrect(x, px, py, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    x.beginPath();
+    x.moveTo(px + r, py);
+    x.lineTo(px + w - r, py); x.quadraticCurveTo(px + w, py, px + w, py + r);
+    x.lineTo(px + w, py + h - r); x.quadraticCurveTo(px + w, py + h, px + w - r, py + h);
+    x.lineTo(px + r, py + h); x.quadraticCurveTo(px, py + h, px, py + h - r);
+    x.lineTo(px, py + r); x.quadraticCurveTo(px, py, px + r, py);
+    x.closePath();
+  }
+  function coverImg(x, img, dx, dy, dw, dh, radius) {
+    if (!img || !((img.naturalWidth || 0) + (img.width || 0))) return false;
+    x.save();
+    if (radius) { rrect(x, dx, dy, dw, dh, radius); x.clip(); }
+    else { x.beginPath(); x.rect(dx, dy, dw, dh); x.clip(); }
+    var iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+    var s = Math.max(dw / iw, dh / ih), w = iw * s, h = ih * s;
+    x.drawImage(img, dx + (dw - w) / 2, dy + (dh - h) / 2, w, h);
+    x.restore();
+    return true;
+  }
+
+  /* 화면 — 사진 위에 인셋 겹치기(사진 틀처럼 흰 테두리 + 그림자) */
+  function paintInsetDom(page, P) {
+    var info = insetInfo();
+    if (!info || !P.photo) return;
+    var r = insetRect(P.photo);
+    var d = document.createElement('div');
+    d.className = 'pb-slot pb-inset';
+    d.setAttribute('data-slot', info.slot);
+    d.style.cssText = 'position:absolute;z-index:5;left:' + r.x + 'px;top:' + r.y + 'px;width:' + r.w + 'px;height:' + r.h
+      + 'px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.46)';
+    var im = document.createElement('img');
+    im.alt = '';
+    im.src = info.src;
+    im.style.cssText = 'position:absolute;left:5px;top:5px;right:5px;bottom:5px;width:auto;height:auto;object-fit:cover;border-radius:8px;display:block';
+    im.addEventListener('error', function () {
+      if (info.slot === 'photo:1' && M.cad && im.src !== M.cad) im.src = M.cad;
+      else if (info.slot === 'sat' && M.cad && im.src !== M.cad) im.src = M.cad;
+    });
+    d.appendChild(im);
+    page.appendChild(d);
+  }
+
+  /* 저장 캔버스 — 직인 도장 없이(테두리 없는 QR만 코너), 사진 위에 인셋 */
+  function decorateCanvas(ctx, R, o, k) {
+    var P = B.plan(R, o);
+    var land = o !== 'port';
+    /* 1) 네모 테두리 없는 QR — 종이 맨 구석 */
+    var size = land ? 84 : 136, mg = 8;
+    var qx = P.W - size - mg, qy = P.foot.y + P.foot.h - size - mg;
+    var off = document.createElement('canvas');
+    paintQR(off, size, qrText(), k);
+    ctx.drawImage(off, qx, qy, off.width / k, off.height / k);
+    /* 2) 그림 2장 — 메인 사진 속 코너 인셋 */
+    var info = insetInfo();
+    if (!info || !P.photo) return Promise.resolve();
+    return insetImage(info).then(function (img) {
+      if (!img) return;
+      var r = insetRect(P.photo);
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 8;
+      ctx.fillStyle = '#fff';
+      rrect(ctx, r.x, r.y, r.w, r.h, 12); ctx.fill();
+      ctx.restore();
+      coverImg(ctx, img, r.x + 5, r.y + 5, r.w - 10, r.h - 10, 8);
+    }).catch(function () { });
+  }
+
+  function insetImage(info) {
+    if (info.slot === 'photo:1') {
+      return B.loadImg(info.src, true).then(function (im) {
+        if (im) return im;
+        return M.cad ? B.loadImg(M.cad, true) : null;
+      });
+    }
+    if (info.slot === 'cad') {
+      return B.loadImg(M.cad || '', true).then(function (im) {
+        if (im) return im;
+        if (M.lat && M.lon) return B.cadVector(M.lat, M.lon, 640, 470, 17);
+        return null;
+      });
+    }
+    return B.loadImg(M.map || '', true);
+  }
+
+  /* QR에 담을 글자 — 전자명함 주소(직인 도장과 같은 내용) */
+  function qrText() {
+    try {
+      if (window.KTS && KTS.Seal && KTS.Seal.payload) {
+        return KTS.Seal.payload({
+          name: (M.broker || {}).name, phone: (M.broker || {}).phone,
+          org: (M.broker || {}).org, qrKind: 'url'
+        });
+      }
+    } catch (e) { }
+    return 'https://autooneclick.com/bizcard/';
+  }
+  function qrMatrix(v) {
+    var lib = window.qrcode;
+    if (!lib || !v) return null;
+    var keep = lib.stringToBytes;
+    try {
+      if (/[^\x00-\x7F]/.test(v) && lib.stringToBytesFuncs) lib.stringToBytes = lib.stringToBytesFuncs['UTF-8'];
+      var q = lib(0, 'H');
+      q.addData(v); q.make();
+      return q;
+    } catch (e) { return null; } finally { lib.stringToBytes = keep; }
+  }
+  /* 테두리 없는 QR — 흰 바탕판 위에 모듈만(도장 테두리·박스 선 없음)
+     모듈을 장치 픽셀 정수에 맞춰 그려 흐림·깨짐 없이 선명하게 */
+  function paintQR(cv, size, value, dpr) {
+    dpr = dpr || 1;
+    var dev = Math.max(8, Math.round(size * dpr));
+    cv.width = dev;
+    cv.height = dev;
+    if (cv.style && cv.style.width !== undefined) { cv.style.width = size + 'px'; cv.style.height = size + 'px'; }
+    var x = cv.getContext('2d');
+    if (!x) return;
+    x.clearRect(0, 0, dev, dev);
+    var q = qrMatrix(value);
+    if (!q) return;
+    x.save();
+    x.scale(dev / size, dev / size);
+    x.fillStyle = '#ffffff';
+    rrect(x, 0, 0, size, size, size * 0.10); x.fill();
+    x.restore();
+    var n = q.getModuleCount(), QZ = 3;
+    var mDev = Math.max(1, Math.floor(dev / (n + QZ * 2)));
+    var span = mDev * (n + QZ * 2);
+    var oDev = Math.round((dev - span) / 2) + mDev * QZ;
+    x.fillStyle = '#0B1526';
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (q.isDark(r, c)) x.fillRect(oDev + c * mDev, oDev + r * mDev, mDev, mDev);
+      }
+    }
+  }
+
   /* ---------------- 그리기 ---------------- */
   function render() {
     var wrap = $('#pwrap');
-    var html = B.dom(M, orient);
+    var R = renderModel();
+    var html = B.dom(R, orient);
     wrap.innerHTML = '<div class="pbs" style="transform-origin:top left">' + html + '</div>';
-    var P = B.plan(M, orient);
+    var P = B.plan(R, orient);
+    paintInsetDom(wrap.querySelector('.pb-page'), P);
     var avail = Math.max(280, ($('#stage').clientWidth || 380) - 20);
     scale = Math.min(1, avail / P.W);
     var inner = wrap.firstChild;
@@ -267,22 +446,20 @@
     persist(); render(); toast('이 칸의 그림을 바꿨습니다');
   }
 
+  /* 304 — 직인 도장 대신, 테두리 없는 QR을 종이 맨 구석에 */
   function bindSeal() {
     var slot = $('.pb-seal');
-    if (!slot || !window.KTS || !KTS.Seal) return;
+    if (!slot) return;
+    var land = orient !== 'port';
+    var size = land ? 84 : 136;
+    slot.style.left = 'auto'; slot.style.right = '8px';
+    slot.style.top = 'auto'; slot.style.bottom = '8px';
+    slot.style.width = size + 'px'; slot.style.height = size + 'px';
+    slot.style.borderRadius = '0'; slot.style.background = 'transparent';
     var cv = document.createElement('canvas');
-    cv.width = 200; cv.height = 200;
-    try {
-      KTS.Seal.paint(cv, 200, {
-        shape: (M.broker && M.broker.stamp) || 'circle',
-        name: M.broker.name || '',
-        value: KTS.Seal.payload({ name: M.broker.name, phone: M.broker.phone, org: M.broker.org, qrKind: 'url' })
-      });
-      cv.style.width = '100%';
-      cv.style.height = '100%';
-      slot.innerHTML = '';
-      slot.appendChild(cv);
-    } catch (e) { }
+    paintQR(cv, size, qrText(), 3);
+    slot.innerHTML = '';
+    slot.appendChild(cv);
   }
 
   /* ---------------- 글자 직접 고치기 ---------------- */
@@ -594,10 +771,35 @@
       stage.innerHTML = '<p style="color:#ffb877;font-size:13px">이미지를 만들지 못했습니다 — 사진을 줄여 다시 시도해 주세요.</p>';
     });
   }
+  /* 저장 캔버스 — toCanvas와 같은 방식으로 그림을 모아 그리되, 직인 도장은 빼고 그린다 */
   function renderCanvas(o) {
+    var R = renderModel();
+    var k = o === 'port' ? 1.6 : 1.2;
     return new Promise(function (res, rej) {
       try {
-        B.toCanvas(M, o, o === 'port' ? 1.6 : 1.2, function (cv) { res(cv) });
+        var photos = (R.photos || []).slice(0, 4);
+        var jobs = photos.map(function (s) { return B.loadImg(s, true); })
+          .concat([B.loadImg(R.map || '', true), B.loadImg(R.cad || '', true)]);
+        Promise.all(jobs).then(function (imgs) {
+          var sat = imgs[imgs.length - 2], cad = imgs[imgs.length - 1];
+          var ph = imgs.slice(0, -2);
+          var needVec = !cad && R.lat && R.lon;
+          var job = needVec ? B.cadVector(R.lat, R.lon, o === 'port' ? 620 : 1100, o === 'port' ? 560 : 620, 17) : Promise.resolve(null);
+          job.then(function (vcv) {
+            if (vcv) cad = vcv;
+            var opt = { noSat: !sat };
+            var P0 = B.plan(R, o, opt);
+            var cv = document.createElement('canvas');
+            cv.width = Math.round(P0.W * k);
+            cv.height = Math.round(P0.H * k);
+            var ctx = cv.getContext('2d');
+            ctx.scale(k, k);
+            var subs = [];
+            for (var i = 1; i < ph.length; i++) if (ph[i]) subs.push({ img: ph[i], idx: i });
+            B.draw(ctx, R, o, { main: ph[0] || null, subs: subs, map: sat, cad: cad, seal: null }, opt);
+            decorateCanvas(ctx, R, o, k).then(function () { res(cv) }, function () { res(cv) });
+          }).catch(function () { rej(new Error('draw failed')); });
+        }).catch(function (e) { rej(e); });
       } catch (e) { rej(e) }
     });
   }
