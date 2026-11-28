@@ -2545,7 +2545,8 @@ function parseKorAmount(str){
 /* 종이의 '금 ___ 원정' 자리에 들어가는 한글 금액 칸 / 숫자 칸 */
 const isKorMoney = l => /\(한글\)/.test(l) || (/^(계약금|융자금|중도금\d*|잔금|임대보증금|교환대금)/.test(l) && /금액|총액|\(한글\)/.test(l));
 const isNumMoney = f => f.type === 'number' || /\(숫자\)/.test(f.label || '');
-const MONEY_PAIR = {'매매대금(한글)':'매매대금(숫자)', '매매대금(숫자)':'매매대금(한글)'};
+const MONEY_PAIR = {'매매대금(한글)':'매매대금(숫자)', '매매대금(숫자)':'매매대금(한글)',
+  '융자금(한글)':'융자금(숫자)', '융자금(숫자)':'융자금(한글)'};
 function moneyTwinIdx(label){ const tw = MONEY_PAIR[label]; return tw ? CUR.fields.findIndex(x => x.label === tw) : -1; }
 function syncMoney(i){
   const f = CUR.fields[i]; if (!f) return;

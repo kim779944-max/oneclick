@@ -485,7 +485,7 @@ body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣�
  <div class="body" id="pvmBody"></div>
  <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
 </div></div>
-<script src="forms.js?v=20261128d"></script>
+<script src="forms.js?v=20261128e"></script>
 <script src="forms_consult.js"></script>
 <script>
 /* ===================== 표준계약서 (표준계약서 원본 사진식) ===================== */
@@ -2181,7 +2181,22 @@ document.addEventListener('input', e => {
       /* '1억2천만'처럼 단위로 적는 중에는 글자를 건드리지 않는다 — 아래에 계산된 금액만 보여 준다.
          (글자를 고쳐 쓰면 이어 치는 글자가 엉뚱한 숫자 뒤에 붙는다) */
       const n1 = moneyValue(raw);
-      if (kor) kor.textContent = n1 ? (isKorMoneyField(f) ? comma(n1) + '원' : korWon(n1)) : '금액을 마저 적어 주세요';
+      if (kor) kor.textContent = n1 ? (isKorMoneyField(f) ? comma(n1) + '원' : korWon(n1)) : (/^0+$/.test(raw) ? '0원' : '금액을 마저 적어 주세요');
+      /* 304 — 짝 칸(숫자↔한글)은 치는 동안에도 따라간다(인쇄할 때 숫자가 9로 남던 문제) */
+      if (n1){
+        const tw1 = moneyTwinOf(f);
+        if (tw1){
+          const tv1 = isKorMoneyField(tw1) ? korNum(n1) : String(n1);
+          setV(tw1.id, tv1);
+          const ti1 = document.querySelector(`input[data-f="${tw1.id}"]`);
+          if (ti1 && ti1 !== el){
+            ti1.value = isKorMoneyField(tw1) ? korNum(n1) : comma(n1);
+            const tk1 = ti1.parentNode ? ti1.parentNode.querySelector('.kor') : null;
+            if (tk1) tk1.textContent = isKorMoneyField(tw1) ? comma(n1) + '원' : korWon(n1);
+          }
+        }
+        if (f.kor) setV(f.kor, korNum(n1));
+      }
       v = raw;
     } else {
       const pureNum = /^[\d,]*$/.test(raw);
