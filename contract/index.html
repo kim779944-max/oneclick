@@ -3,6 +3,7 @@
 <script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
 <script src="../ai.js" onerror="window.KTS_AI={key:''}"></script>
 <script src="../shared/kts-seal.js?v=20261124b"></script>
+<script src="../shared/profile-sync.js?v=20261128b"></script>
 <script src="prop.js?v=20261126a" onerror="window.KTS_GB=null"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KTS 표준계약서 — 원본 계약서 그대로, 빈칸만 채워 서명까지</title>
@@ -245,6 +246,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 #micBub{position:fixed;z-index:262;max-width:min(260px,72vw);background:#12203C;border:1px solid var(--amber);border-radius:10px;padding:6px 9px;font-size:11.5px;font-weight:800;line-height:1.4;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.5);display:none}
 #micBub.on{display:block}
 #micBub b{color:var(--amber2)}
+body.micOn #micBub{z-index:420}   /* 302 — 미리보기(300) 위에서도 듣는 중 글자가 보이게 */
 /* 288-⑪ 갑·을 가액 — 평가액·승계채무액·순가액을 한 칸(블록)으로 */
 .valblk{border:1px solid var(--line2);border-radius:11px;background:#0B1729;padding:8px 9px 9px;margin-top:7px}
 .valblk .vh{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--amber2)}
@@ -277,6 +279,12 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 #pveBar input,#pveBar textarea{flex:1;min-width:120px;font-size:15px;padding:8px 9px;border-color:var(--amber)}
 #pveBar .pvn{flex:0 0 auto;font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:8px;padding:8px 10px;min-height:36px}
 #pveBar .pvx{flex:0 0 auto;font-size:11px;font-weight:900;color:#C9D6E6;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;min-height:36px;background:#0B1729}
+/* 302 — 미리보기에서도 말로 고친다: 수정칸 오른쪽 🎤 하나(작성 화면과 같은 방식) */
+#pveBar .pvf{flex:1 1 140px;display:flex;align-items:stretch;gap:6px;min-width:0}
+#pveBar .pvf input,#pveBar .pvf textarea{flex:1 1 auto;min-width:0;width:auto;border-radius:10px 0 0 10px}
+#pveBar .pvmic{flex:0 0 auto;width:46px;min-height:40px;font-size:19px;line-height:1;display:grid;place-items:center;margin-left:-6px;
+ border:1px solid var(--amber);border-radius:0 10px 10px 0;background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224}
+#pveBar .pvmic.rec{background:#FF4D4D;border-color:#FF4D4D;color:#fff;box-shadow:0 0 0 2px rgba(255,77,77,.3)}
 /* 264·279·U-3 — 저장 전 확대 미리보기 (손가락으로 확대·스크롤) */
 #pvModal{position:fixed;inset:0;z-index:300;display:none;background:rgba(3,7,18,.9)}   /* 도우미 버튼(240)·시트(250)보다 위 */
 #pvModal.on{display:block}
@@ -465,7 +473,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 <div id="pvModal" aria-hidden="true"><div class="pvm">
  <div class="hd2"><b id="pvmTitle">A4 미리보기</b><button type="button" id="pvmX">닫기</button></div>
  <div class="tools"><button type="button" data-pvz="-" aria-label="작게">−</button><b id="pvmZ">100%</b><button type="button" data-pvz="+" aria-label="크게">＋</button><button type="button" data-pvz="fit" class="on" style="font-size:12px">화면 폭</button></div>
- <div id="pveBar" hidden><span class="pvl" id="pveLab">칸</span><input id="pveIn" autocomplete="off" autocapitalize="off" oninput="pvEditInput(this)" onchange="pvEditInput(this)"><textarea id="pveTa" rows="3" hidden placeholder="여러 줄로 적으세요" oninput="pvEditInput(this)" onchange="pvEditInput(this)"></textarea><button type="button" class="pvn" id="pveNext">다음 칸</button><button type="button" class="pvx" id="pveDone">완료</button></div>
+ <div id="pveBar" hidden><span class="pvl" id="pveLab">칸</span><span class="pvf"><input id="pveIn" autocomplete="off" autocapitalize="off" oninput="pvEditInput(this)" onchange="pvEditInput(this)"><textarea id="pveTa" rows="3" hidden placeholder="여러 줄로 적으세요" oninput="pvEditInput(this)" onchange="pvEditInput(this)"></textarea><button type="button" class="pvmic" id="pveMic" aria-label="말로 이 칸 채우기" title="말로 이 칸 채우기" hidden>🎤</button></span><button type="button" class="pvn" id="pveNext">다음 칸</button><button type="button" class="pvx" id="pveDone">완료</button></div>
  <div class="body" id="pvmBody"></div>
  <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
 </div></div>
@@ -595,6 +603,7 @@ let S; try{ S = Object.assign(fresh(), JSON.parse(localStorage.getItem(LS) || 'n
 if (!Array.isArray(S.parcels)) S.parcels = [];
 if (!S.docs || typeof S.docs !== 'object') S.docs = {confirm:false, fee:false};
 if (!Array.isArray(S.sp)) S.sp = [];
+if (!S.bf || typeof S.bf !== 'object') S.bf = {};
 let saveT; const flush = () => { clearTimeout(saveT); saveT = null; try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} };
 const save = () => { clearTimeout(saveT); saveT = setTimeout(flush, 200); };
 window.addEventListener('pagehide', () => { if (saveT) flush(); });
@@ -1354,7 +1363,9 @@ function pvBuildPages(blank){
   }).join('');
 }
 function pvClose(){ const m = $('#pvModal'); if (!m) return; m.classList.remove('on'); m.setAttribute('aria-hidden', 'true');
-  const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop(); }
+  const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop();
+  if (MIC.on && pvTabEl(MIC.el)) micStop();
+  pvMicSync(); }
 function pvHotMark(fid){
   $$('#pvmBody .hot').forEach(b => b.classList.toggle('on', b.dataset.hot === fid));
 }
@@ -1383,6 +1394,8 @@ function pvEditStart(fid){
   }
   PV_LAST = String((long ? (ta ? ta.value : '') : (inp.value == null ? '' : inp.value)));
   pvPollStart();
+  pvMicSync();
+  if (MIC.on){ const act = (ta && !ta.hidden) ? ta : inp; if (act && act.dataset && act.dataset.fid != null && act.type !== 'date') micSetTarget(act); else micStop(); }
   pvHotMark(fid);
   const hit = document.querySelector(`#pvmBody .hot[data-hot="${fid}"]`);
   if (hit) try{ hit.scrollIntoView({ block: 'center', behavior: 'smooth' }); }catch(e){ hit.scrollIntoView(); }
@@ -2041,7 +2054,7 @@ document.addEventListener('input', e => {
   const fid = el.dataset && el.dataset.f; if (!fid) return;
   if (el.dataset && el.dataset.dt) return;          /* 날짜는 달력(change)에서만 처리 */
   const f = byId(fid); if (!f) return;
-  /* ㎡ → 평 */
+  if (S.bf && S.bf[fid] != null) delete S.bf[fid];   /* 302 — 손으로 고친 중개사 칸은 명함 값으로 되돌리지 않는다 */
   if (!f.money && /면적/.test(String(f.label || ''))){
     const m2 = s5num(el.value);
     const pi = document.querySelector(`input[data-py="${fid}"]`);
@@ -2172,7 +2185,7 @@ document.addEventListener('click', e => {
   const hot = e.target.closest('.hot');
   if (hot && hot.dataset.hot != null){ e.preventDefault(); pvEditStart(hot.dataset.hot); return; }
   if (e.target.closest('#pveNext')){ e.preventDefault(); pvEditNext(); return; }
-  if (e.target.closest('#pveDone')){ e.preventDefault(); const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop(); pvHotMark(''); return; }
+  if (e.target.closest('#pveDone')){ e.preventDefault(); const bar = $('#pveBar'); if (bar) bar.hidden = true; PVEDIT = -1; pvPollStop(); pvHotMark(''); if (MIC.on && pvTabEl(MIC.el)) micStop(); pvMicSync(); return; }
   /* 288-⑩ 특약 — 목록 안에서 추가·수정·삭제 */
   if (e.target.closest('#spAddOpen')){
     e.preventDefault();
@@ -2503,7 +2516,44 @@ function fldHtml(f){
 }
 
 /* ---------- 작성 화면 ---------- */
+/* 302 — 전자명함(shared/profile-sync.js)에 적힌 중개사 정보를 중개업자 칸 기본값으로 */
+function brokerProfile(){
+  try{ return (window.KTSProfile && KTSProfile.broker) ? KTSProfile.broker() : null; }catch(e){ return null; }
+}
+function brokerKind(lb){
+  const s = String(lb || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, '').trim();
+  if (!s || /2$/.test(s)) return '';          /* 두 번째 칸(소속공인중개사 몫)은 그대로 둔다 */
+  if (/^(사무소명칭|중개사무소명칭|상호|사무소상호|업소명)$/.test(s)) return 'org';
+  if (/^(대표|대표자|성명|중개사성명|중개업자성명)$/.test(s)) return 'rep';
+  if (/^(전화|전화번호|연락처|휴대폰|핸드폰)$/.test(s)) return 'tel';
+  if (/^(사무소소재지|중개사무소소재지|사무소주소|소재지|주소)$/.test(s)) return 'addr';
+  return '';
+}
+function fillBroker(){
+  const b = brokerProfile(); if (!b) return 0;
+  const map = { org: b.org || b.office || '', rep: b.name || '', tel: b.phone || '', addr: b.address || b.bizAddr || '' };
+  if (!S.bf || typeof S.bf !== 'object') S.bf = {};
+  let n = 0;
+  curForm().fields.forEach(f => {
+    if (f.grp !== 'c' || f.type === 'sign') return;
+    const k = brokerKind(f.label); if (!k || !map[k]) return;
+    const cur = String(getV(f.id) || '').trim();
+    const auto = S.bf[f.id];
+    if (cur && !(auto != null && auto === cur)) return;   /* 손으로 적은 칸은 덮지 않는다 */
+    if (cur === map[k]) return;
+    setV(f.id, map[k]);
+    S.bf[f.id] = map[k];
+    n++;
+  });
+  return n;
+}
+try{
+  if (window.KTSProfile && KTSProfile.on) KTSProfile.on(() => {
+    try{ if (fillBroker() && S.step === 1) refreshWrite(); }catch(e){}
+  });
+}catch(e){}
 function renderWrite(){
+  try{ fillBroker(); }catch(e){}
   const f = curForm();
   const xs = f.fields.filter(x => x.grp === 'x' && x.type !== 'sign');
   const prop = xs.filter(isPropField);
@@ -2961,10 +3011,44 @@ document.addEventListener('focusin', () => setTimeout(micChipPlace, 30));
 document.addEventListener('focusout', () => setTimeout(micChipPlace, 90));
 window.addEventListener('scroll', () => { if (MIC.on) micPlace(); micChipPlace(); }, { passive: true });
 window.addEventListener('resize', () => { if (MIC.on) micPlace(); micChipPlace(); });
+/* 302 — 미리보기(《A4》) 상단 수정칸 오른쪽 🎤 — 작성 화면과 같은 SpeechRecognition 단독 점유 */
+function pvTabEl(el){ return !!(el && el.closest && el.closest('#pveBar')); }
+function pvMicBtn(){ return document.getElementById('pveMic'); }
+function pvActEl(){
+  const bar = document.getElementById('pveBar');
+  if (!bar || bar.hidden) return null;
+  const ta = document.getElementById('pveTa'), inp = document.getElementById('pveIn');
+  const a = (ta && !ta.hidden) ? ta : inp;
+  if (!a || a.dataset == null || a.dataset.fid == null) return null;
+  if (!a.getClientRects().length) return null;
+  return a;
+}
+function pvMicSync(){
+  const b = pvMicBtn(); if (!b) return;
+  const el = pvActEl(), f = el ? byId(el.dataset.fid) : null;
+  const usable = !!(el && f && el.type !== 'date');
+  const rec = !!(usable && MIC.on && MIC.el === el);
+  b.hidden = !usable;
+  b.textContent = rec ? '■' : '🎤';
+  b.classList.toggle('rec', rec);
+  b.setAttribute('aria-label', rec ? '듣기 멈추기' : '말로 이 칸 채우기');
+}
+function pvMicStart(){
+  const el = pvActEl();
+  if (!el) return toast('고칠 칸을 먼저 눌러 주세요');
+  if (MIC.on && MIC.el === el){ micStop(); return; }
+  if (MIC.on) micStop();
+  micStart(el);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('#pveMic');
+  if (b){ e.preventDefault(); e.stopPropagation(); pvMicStart(); }
+}, true);
 function micWhere(el){
   if (!el) return '';
   if (el.id === 'spFree') return '특약 — 말하면 한 줄씩 들어갑니다';
-  const f = el.dataset && el.dataset.f ? byId(el.dataset.f) : null;
+  const idv = (el.dataset && el.dataset.f != null) ? el.dataset.f : (el.dataset ? el.dataset.fid : null);
+  const f = idv != null ? (byId(idv) || curForm().fields.find(x => String(x.id) === String(idv))) : null;
   if (!f) return '';
   const g = f.grp;
   const role = g === 'a' ? curForm().roleA : g === 'b' ? curForm().roleB : g === 'c' ? (curForm().roleC || '중개업자') : '';
@@ -3037,6 +3121,7 @@ function micStart(el){
   micAnim(true);
   startRec();
   [70, 380, 900].forEach(ms => setTimeout(() => { if (MIC.on) micKillKb(); }, ms));
+  pvMicSync();
 }
 /* 확정되지 않은(interim) 글자도 정지·종료 때 칸에 넣는다 */
 function micCommitPend(){
@@ -3055,7 +3140,7 @@ function micInsert(t, keep){
   try{ el.dispatchEvent(new Event('input', { bubbles: true })); }catch(e){}
   LASTEL = el;
   micLive(t, true);
-  if (!keep && el.id !== 'spFree' && S.step === 1) setTimeout(micNext, 80);
+  if (!keep && el.id !== 'spFree' && S.step === 1 && !pvTabEl(el)) setTimeout(micNext, 80);
 }
 function micNext(){
   const els = voiceFields(); if (!els.length) return;
@@ -3070,9 +3155,9 @@ function micStop(){
   setTimeout(() => { try{ MIC.rec && MIC.rec.abort(); }catch(e){} }, 60);
   stopLevel();
   micBubHide();
-  setTimeout(() => { if (!MIC.on){ micShow(false); micChipPlace(); } }, 450);
+  setTimeout(() => { if (!MIC.on){ micShow(false); micChipPlace(); pvMicSync(); } }, 450);
 }
-function micEnd(){ micCommitPend(); MIC.on = false; MIC.want = false; stopLevel(); micBubHide(); setTimeout(() => { if (!MIC.on){ micShow(false); micChipPlace(); } }, 1400); }
+function micEnd(){ micCommitPend(); MIC.on = false; MIC.want = false; stopLevel(); micBubHide(); setTimeout(() => { if (!MIC.on){ micShow(false); micChipPlace(); pvMicSync(); } }, 1400); }
 function startRec(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return;

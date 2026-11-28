@@ -6,8 +6,10 @@
    · 같은 출처(autooneclick.com)의 화면·스크립트·이미지만 담는다. 외부 API
      (공공데이터포털·브이월드 등)와 POST 요청은 손대지 않는다.
    · /admin 은 캐시하지 않는다.
+   · 302 — 캐시 이름을 날짜판으로 올리면(예: kts-pwa-20261128c) 폰 브라우저가 새 판을
+     곧바로 설치하고, 예전 판 캐시는 activate 에서 지운다.
    ========================================================================== */
-var CACHE = 'kts-pwa-v1';
+var CACHE = 'kts-pwa-20261128c';
 var MAX = 120;
 var OK_TYPE = /(text\/html|text\/css|javascript|application\/json|manifest\+json|image\/(png|jpeg|webp|svg\+xml|gif)|font\/(woff2?|ttf))/i;
 
