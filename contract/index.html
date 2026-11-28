@@ -687,7 +687,7 @@ function inputHtml(f){
   if (f.money || korF2){
     const n2 = moneyValue(v);
     return `<label class="lb">${escH(f.label)}<em>${korF2 ? '한글·숫자' : '숫자만'}</em></label>`
-      + `<input data-f="${escH(f.id)}" value="${escH(korF2 ? v : (v ? comma(v) : ''))}" inputmode="${korF2 ? 'text' : 'numeric'}">`
+      + `<input data-f="${escH(f.id)}" value="${escH(korF2 ? v : (n2 ? comma(n2) : ''))}" inputmode="${korF2 ? 'text' : 'numeric'}">`
       + `<div class="kor">${escH(n2 ? (korF2 ? comma(n2) + '원' : korWon(n2)) : '')}</div>`;
   }
   return `<label class="lb">${escH(f.label)}</label><input data-f="${escH(f.id)}" value="${escH(v)}">`;
@@ -2433,7 +2433,7 @@ function fldHtml(f){
   if (f.money || korF){
     const n = moneyValue(v);
     return `<div class="fld${full ? ' full' : ''}"><label class="lb">${escH(lb)}<i>${korF ? '한글·숫자' : '숫자만'}</i></label>`
-      + `<input data-f="${escH(f.id)}" value="${escH(korF ? v : (v ? comma(v) : ''))}" inputmode="${korF ? 'text' : 'numeric'}"${korF ? ' placeholder="예: 28억 · 이십팔억"' : ''}>`
+      + `<input data-f="${escH(f.id)}" value="${escH(korF ? v : (n ? comma(n) : ''))}" inputmode="${korF ? 'text' : 'numeric'}"${korF ? ' placeholder="예: 28억 · 이십팔억"' : ''}>`
       + `<div class="kor">${escH(n ? (korF ? comma(n) + '원' : korWon(n)) : '')}</div></div>`;
   }
   return `<div class="fld${full ? ' full' : ''}"><label class="lb">${escH(lb)}</label>`
