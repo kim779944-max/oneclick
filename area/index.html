@@ -387,12 +387,47 @@ function geocode(q){
         +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN;
       return withRetry(function(){return jsonp(su,11000)},3,[500,1100]).then(function(r3){
         var it=(r3&&r3.response&&r3.response.result&&r3.response.result.items)||[];
-        if(!it.length) return null;
-        var a=it[0];
-        return {lat:+a.point.y,lon:+a.point.x,text:(a.address&&(a.address.parcel||a.address.road))||t,type:'search',pnu:a.id||''};
+        if(it.length){
+          var a=it[0];
+          return {lat:+a.point.y,lon:+a.point.x,text:(a.address&&(a.address.parcel||a.address.road))||t,type:'search',pnu:a.id||''};
+        }
+        return placeAddrFix(t);
       });
     });
   });
+}
+/* '호평동 24-35' 처럼 시·군을 빼고 동·리+번지만 넣은 주소 — 브이월드 장소검색으로 법정동이 속한 시·도를 찾아 붙여 다시 조회 */
+function shortDongJibun(t){
+  var m=String(t||'').replace(/\s+/g,' ').trim().match(/^([가-힣]{1,10}(?:동|리|가))\s*(\d+(?:-\d+)?)$/);
+  return m?{tok:m[1],no:m[2]}:null;
+}
+function placeAddrFix(t){
+  var sp=shortDongJibun(t); if(!sp) return Promise.resolve(null);
+  var su=VW+'/req/search?service=search&request=search&version=2.0&crs=EPSG:4326&size=8&page=1'
+    +'&query='+encodeURIComponent(sp.tok)+'&type=place&format=json&errorformat=json'
+    +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN;
+  return withRetry(function(){return jsonp(su,11000)},2,[500]).then(function(r){
+    var items=(r&&r.response&&r.response.result&&r.response.result.items)||[];
+    var base='',multi=false, want=sp.tok.replace(/\s+/g,'');
+    for(var i=0;i<items.length;i++){
+      var a=items[i]||{}, p=String((a.address&&a.address.parcel)||''), ti=String(a.title||'').replace(/\s+/g,'');
+      if(ti&&ti!==want) continue;
+      var k=p.indexOf(sp.tok); if(k<=0) continue;
+      var b=p.slice(0,k).trim(); if(!b) continue;
+      if(!base) base=b; else if(b!==base) multi=true;
+    }
+    if(!base) return null;
+    if(multi){ S.geoMsg=sp.tok+'이 여러 곳에 있습니다 — 시·군을 함께 넣어 주세요'; return null }
+    var full=base+' '+sp.tok+' '+sp.no;
+    return withRetry(function(){return once(full,'parcel')},2,[500]).then(function(r2){
+      var rs=r2&&r2.response&&r2.response.result;
+      if(st(r2)!=='OK'||!rs||!rs.point){
+        S.geoMsg=full+'로 조회했지만 지번이 없습니다 — 번지를 확인해 주세요';
+        return null;
+      }
+      return {lat:+rs.point.y,lon:+rs.point.x,text:full,type:'place'};
+    });
+  }).catch(function(){ return null });
 }
 /* ---------- 좌표 → 필지 ---------- */
 function ringAreaAbs(rings,latC){
@@ -425,10 +460,20 @@ function featToItem(ft,latC){
   if(!rings.length) return null;
   var pr=ft.properties||{}, jp=jibunParts(pr.jibun||'');
   var bb=bboxOf(rings);
-  return {pnu:pr.pnu||('x'+bb.minx.toFixed(6)+'_'+bb.miny.toFixed(6)),jibun:jp.no,jm:jp.jm,
+  return {pnu:pr.pnu||('x'+bb.minx.toFixed(6)+'_'+bb.miny.toFixed(6)),jibun:jp.no,jm:jp.jm,jmokHint:jp.jmokHint||'',
     addr:pr.addr||'',rings:rings,area:ringAreaAbs(rings,latC||(bb.miny+bb.maxy)/2),bb:bb};
 }
-function jibunParts(s){ var m=String(s||'').trim().match(/^(\d+(?:-\d+)?)\s*(.*)$/); return m?{no:m[1],jm:m[2]}:{no:String(s||'').trim(),jm:''} }
+/* 연속지적도는 임야 지번을 '산 102임'처럼 산 표시·지목 한 글자를 붙여 준다 — 지번과 지목을 떼어 낸다 */
+var JIBOK_HINT={대:'대지',전:'전',답:'답',과:'과수원',목:'목장용지',임:'임야',광:'광천지',염:'염전',장:'장',창:'창고용지',
+  철:'철도용지',구:'구거',유:'유지',무:'무',잡:'잡종지',체:'체육용지',수:'수도용지',공:'공원',원:'원',등:'등',락:'락',천:'천',
+  사:'사적지',묘:'묘지',도:'도로',제:'제방',차:'차'};
+function jibunParts(s){
+  var t=String(s||'').replace(/\s+/g,' ').trim();
+  var m=t.match(/^(산)?\s*(\d+(?:-\d+)?)\s*([가-힣]{0,2})?$/);
+  if(m) return {no:m[2],jm:m[1]?'산':'',jmokHint:JIBOK_HINT[m[3]]||''};
+  var m2=t.match(/^(\d+(?:-\d+)?)\s*(.*)$/);
+  return m2?{no:m2[1],jm:m2[2]}:{no:t,jm:''};
+}
 function bboxOf(rings){
   var b={minx:1e9,miny:1e9,maxx:-1e9,maxy:-1e9};
   for(var i=0;i<rings.length;i++) for(var j=0;j<rings[i].length;j++){
@@ -463,6 +508,31 @@ function landInfo(pnu){
       S.official[pnu]=o; return o;
     }).catch(function(){ return null });
 }
+/* ---------- 용도지역 — 본 용도지역 우선 ---------- */
+var YD_MAIN=['제1종전용주거지역','제2종전용주거지역','제1종일반주거지역','제2종일반주거지역','제3종일반주거지역','준주거지역',
+  '중심상업지역','일반상업지역','근린상업지역','유통상업지역','전용공업지역','일반공업지역','준공업지역',
+  '보전녹지지역','생산녹지지역','자연녹지지역','보전관리지역','생산관리지역','계획관리지역','농림지역','자연환경보전지역'];
+var YD_WIDE=['도시지역','관리지역'];
+var YD_ZONE=['개발제한구역','시가화조정구역','수산자원보호구역','입체복합구역'];
+function ydRank(nm){
+  var k=String(nm||'').replace(/\s+/g,'');
+  if(!k) return -1;
+  if(YD_MAIN.indexOf(k)>=0) return 0;
+  if(YD_WIDE.indexOf(k)>=0) return 1;
+  if(YD_ZONE.indexOf(k)>=0) return 2;
+  if(/지구$/.test(k)) return 3;
+  if(/(지역|구역)$/.test(k)) return 4;
+  return 5;
+}
+function ydPick(list){
+  var best='',bk=null;
+  for(var i=0;i<(list||[]).length;i++){
+    var x=list[i]||{}, r=ydRank(x.nm||x); if(r<0) continue;
+    var cn=(x.cnflc==='저촉')?0:(x.cnflc==='포함')?1:(x.cnflc==='접함')?2:3;
+    if(!bk||r<bk[0]||(r===bk[0]&&(cn<bk[1]||(cn===bk[1]&&i<bk[2])))){ bk=[r,cn,i]; best=String(x.nm||x).trim() }
+  }
+  return best;
+}
 /* 용도지역·개별공시지가 — 조서 표의 '용도지역 / 공시지가' 열 */
 function infoPnu(pnu){
   if(!pnu) return Promise.resolve(null);
@@ -472,10 +542,10 @@ function infoPnu(pnu){
   var u2=NED+'/getIndvdLandPriceAttr?key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&numOfRows=40&pageNo=1&pnu='+pnu;
   return Promise.all([
     jsonp(u1,12000).then(function(r){
-      var f=arr(r&&r.landUses&&r.landUses.field), pick='';
-      for(var i=0;i<f.length;i++){ var nm=String(f[i].prposAreaDstrcCodeNm||'').replace(/\s+/g,'');
-        if(/(지역|지구|구역)$/.test(nm)){ if(/지역$/.test(nm)){ pick=String(f[i].prposAreaDstrcCodeNm).trim(); break } if(!pick) pick=String(f[i].prposAreaDstrcCodeNm).trim() } }
-      o.yongdo=pick||'';
+      var f=arr(r&&r.landUses&&r.landUses.field).map(function(x){
+        return {nm:x.prposAreaDstrcCodeNm||'',cnflc:x.cnflcAtNm||''};
+      });
+      o.yongdo=ydPick(f);
     }).catch(function(){}),
     jsonp(u2,12000).then(function(r){
       var f=arr(r&&r.indvdLandPrices&&r.indvdLandPrices.field); if(!f.length) return;
@@ -780,12 +850,12 @@ function selAdd(item,state){
   if(!item) return;
   var pnu=item.pnu;
   if(!S.sel[pnu]){ S.order.push(pnu) }
-  S.sel[pnu]={pnu:pnu,jibun:item.jibun,jm:item.jm,addr:item.addr,rings:item.rings,area:item.area,bb:item.bb,state:state||'in'};
+  S.sel[pnu]={pnu:pnu,jibun:item.jibun,jm:item.jm,jmokHint:item.jmokHint||'',addr:item.addr,rings:item.rings,area:item.area,bb:item.bb,state:state||'in'};
   paintList(); render();
   landInfo(pnu).then(function(o){
     if(o&&o.area){
       if(!S.sel[pnu]) return;
-      S.sel[pnu].official=o.area; S.sel[pnu].jmok=o.jmok||S.sel[pnu].jm;
+      S.sel[pnu].official=o.area; S.sel[pnu].jmok=o.jmok||S.sel[pnu].jmokHint||'';
       paintList();
     }
   });
@@ -823,7 +893,7 @@ function paintList(){
         .filter(Boolean).join(' · ');
       h.push('<div class="li '+(it.state==='in'?'in':'out')+'">'
         +'<div class="lin"><b>'+esc((it.jm==='산'?'산 ':'')+it.jibun)+'</b>'
-        +(it.jmok||it.jm?'<i>'+esc(it.jmok||it.jm)+'</i>':'')
+        +(it.jmok||it.jmokHint?'<i>'+esc(it.jmok||it.jmokHint)+'</i>':'')
         +'<span><b>'+num(a,0)+'㎡</b> · '+num(pyeong(a))+'평 <b style="font-weight:800">'+tag+'</b>'
         +(it.official&&it.area?'<span style="font-size:10.5px"> (도면 '+num(it.area,0)+'㎡)</span>':'')+'</span>'
         +(sub2?'<span style="font-size:10.5px;color:#8FA3BF">'+sub2+'</span>':'')+'</div>'
@@ -1025,6 +1095,7 @@ function addOne(tok){
 function addMany(q){
   var toks=splitTokens(q);
   if(!toks.length){ toast('지번이나 주소를 한 줄 넣어 주세요'); return }
+  S.geoMsg='';
   $('#go').disabled=true; $('#go').textContent='찾는 중';
   var ok=0, fail=[], first=null, chain=Promise.resolve();
   toks.forEach(function(t){
@@ -1038,7 +1109,7 @@ function addMany(q){
     if(first&&first.g){ S.V={cx:first.g.lon,cy:first.g.lat,z:S.V.z||17} }
     if(ok){ fitSel(); }
     if(ok) toast(ok+'필지 담았습니다'+(fail.length?' · 못 찾은 주소 '+fail.length+'개':''))
-    else toast('주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 넣어 보세요');
+    else toast(S.geoMsg||'주소를 찾지 못했습니다 — 지번(예: 조종면 신하리 162-9)으로 넣어 보세요');
     if(fail.length) $('#mapSt').textContent='못 찾음: '+fail.join(' / ');
     paintList();
   });
@@ -1273,7 +1344,8 @@ function shortAddr(it){
   var s=String(it.addr||'').replace(/\s+/g,' ').trim();
   var jb=(it.jm==='산'?'산 ':'')+(it.jibun||'');
   if(jb&&s.slice(-jb.length)===jb) s=s.slice(0,-jb.length).trim();
-  s=s.replace(/\s*(산\s*)?\d+(-\d+)?\s*$/,'').trim();
+  /* '조종면 신하리 산102임'처럼 지번 끝에 지목 글자가 붙어 와도 주소만 남긴다 */
+  s=s.replace(/\s*(산\s*)?\d+(-\d+)?\s*[가-힣]?\s*$/,'').trim();
   var tk=s.split(' '); if(tk.length>3) s=tk.slice(-3).join(' ');
   return s;
 }
@@ -1282,7 +1354,7 @@ function sheetRows(){
   for(var i=0;i<S.order.length;i++){
     var it=S.sel[S.order[i]]; if(!it) continue;
     var a=it.official||it.area||0, unit=it.unit||0;
-    var o={addr:shortAddr(it), jibun:(it.jm==='산'?'산 ':'')+(it.jibun||''), jmok:it.jmok||it.jm||'',
+    var o={addr:shortAddr(it), jibun:(it.jm==='산'?'산 ':'')+(it.jibun||''), jmok:it.jmok||it.jmokHint||'',
            yongdo:it.yongdo||'', area:a, pyeong:pyeong(a), unit:unit, val:unit*a, tag:it.official?'공부':'도면'};
     if(it.state==='in') ins.push(o); else outs.push(o);
   }

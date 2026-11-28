@@ -507,7 +507,8 @@ function geocode(q){
       if(i>=tries.length){
         return vwSearch(t).then(function(list){
           S.cands=list||[];
-          return (list&&list.length)?list[0]:null;
+          if(list&&list.length) return list[0];
+          return placeAddrFix(t);
         });
       }
       var ty=tries[i++];
@@ -532,6 +533,36 @@ function geocode(q){
     }).catch(function(){ return chain() });
   }
   return chain();
+}
+/* '호평동 24-35' 처럼 시·군을 빼고 동·리+번지만 넣은 주소 — 브이월드 장소검색으로 법정동이 속한 시·도를 찾아 붙여 다시 조회 */
+function shortDongJibun(t){
+  var m=String(t||'').replace(/\s+/g,' ').trim().match(/^([가-힣]{1,10}(?:동|리|가))\s*(\d+(?:-\d+)?)$/);
+  return m?{tok:m[1],no:m[2]}:null;
+}
+function placeAddrFix(t){
+  var sp=shortDongJibun(t); if(!sp) return Promise.resolve(null);
+  var su=VW+'/req/search?service=search&request=search&version=2.0&crs=EPSG:4326&size=8&page=1'
+    +'&query='+encodeURIComponent(sp.tok)+'&type=place&format=json&errorformat=json'
+    +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN;
+  return gcRetry(function(){ return jsonp(su,11000) }).then(function(r){
+    var items=(r&&r.response&&r.response.result&&r.response.result.items)||[];
+    var base='',multi=false, want=sp.tok.replace(/\s+/g,'');
+    for(var i=0;i<items.length;i++){
+      var a=items[i]||{}, p=String((a.address&&a.address.parcel)||''), ti=String(a.title||'').replace(/\s+/g,'');
+      if(ti&&ti!==want) continue;
+      var k=p.indexOf(sp.tok); if(k<=0) continue;
+      var b=p.slice(0,k).trim(); if(!b) continue;
+      if(!base) base=b; else if(b!==base) multi=true;
+    }
+    if(!base) return null;
+    if(multi){ S.geoNote=sp.tok+'이 여러 곳에 있습니다 — 시·군을 함께 넣어 주세요'; return null }
+    var full=base+' '+sp.tok+' '+sp.no;
+    return gcRetry(function(){ return gcOnce(full,'parcel') }).then(function(r2){
+      var g=gcPick(r2,'parcel',full);
+      if(!g) S.geoNote=full+'로 조회했지만 지번이 없습니다 — 번지를 확인해 주세요';
+      return g;
+    });
+  }).catch(function(){ return null });
 }
 
 /* ---------- 2) 좌표 → 필지(PNU·경계) ---------- */
@@ -563,8 +594,17 @@ function ringAreaAbs(rings,latC){
   }
   return Math.abs(s/2);
 }
-/* 연속지적도 속성 jibun 은 '162-9 전'처럼 지번+지목이 붙어 온다 — 숫자만 지번으로 */
-function jibunParts(s){ var m=String(s||'').trim().match(/^(\d+(?:-\d+)?)\s*(.*)$/); return m?{no:m[1],jm:m[2]}:{no:String(s||''),jm:''} }
+/* 연속지적도는 임야 지번을 '산 102임'처럼 산 표시·지목 한 글자를 붙여 준다 — 지번과 지목을 떼어 낸다 */
+var JIBOK_HINT={대:'대지',전:'전',답:'답',과:'과수원',목:'목장용지',임:'임야',광:'광천지',염:'염전',장:'장',창:'창고용지',
+  철:'철도용지',구:'구거',유:'유지',무:'무',잡:'잡종지',체:'체육용지',수:'수도용지',공:'공원',원:'원',등:'등',락:'락',천:'천',
+  사:'사적지',묘:'묘지',도:'도로',제:'제방',차:'차'};
+function jibunParts(s){
+  var t=String(s||'').replace(/\s+/g,' ').trim();
+  var m=t.match(/^(산)?\s*(\d+(?:-\d+)?)\s*([가-힣]{0,2})?$/);
+  if(m) return {no:m[2],jm:m[1]?'산':'',jmokHint:JIBOK_HINT[m[3]]||''};
+  var m2=t.match(/^(\d+(?:-\d+)?)\s*(.*)$/);
+  return m2?{no:m2[1],jm:m2[2]}:{no:t,jm:''};
+}
 function bboxOf(rings){
   var b={minx:1e9,miny:1e9,maxx:-1e9,maxy:-1e9};
   for(var i=0;i<rings.length;i++) for(var j=0;j<rings[i].length;j++){
@@ -629,6 +669,31 @@ function nedPrice(pnu){                /* 개별공시지가 — 최신 연도 1
       });
       return f[0];
     }).catch(function(){return null});
+}
+/* ---------- 용도지역 — 본 용도지역 우선 ---------- */
+var YD_MAIN=['제1종전용주거지역','제2종전용주거지역','제1종일반주거지역','제2종일반주거지역','제3종일반주거지역','준주거지역',
+  '중심상업지역','일반상업지역','근린상업지역','유통상업지역','전용공업지역','일반공업지역','준공업지역',
+  '보전녹지지역','생산녹지지역','자연녹지지역','보전관리지역','생산관리지역','계획관리지역','농림지역','자연환경보전지역'];
+var YD_WIDE=['도시지역','관리지역'];
+var YD_ZONE=['개발제한구역','시가화조정구역','수산자원보호구역','입체복합구역'];
+function ydRank(nm){
+  var k=String(nm||'').replace(/\s+/g,'');
+  if(!k) return -1;
+  if(YD_MAIN.indexOf(k)>=0) return 0;      /* 계획관리지역·자연녹지지역 같은 본 용도지역 */
+  if(YD_WIDE.indexOf(k)>=0) return 1;
+  if(YD_ZONE.indexOf(k)>=0) return 2;      /* 개발제한구역 같은 용도구역 */
+  if(/지구$/.test(k)) return 3;
+  if(/(지역|구역)$/.test(k)) return 4;     /* 공장설립제한지역·가축사육제한구역 등 */
+  return 5;
+}
+function ydPick(list){
+  var best='',bk=null;
+  for(var i=0;i<(list||[]).length;i++){
+    var x=list[i]||{}, r=ydRank(x.nm||x); if(r<0) continue;
+    var cn=(x.cnflc==='저촉')?0:(x.cnflc==='포함')?1:(x.cnflc==='접함')?2:3;
+    if(!bk||r<bk[0]||(r===bk[0]&&(cn<bk[1]||(cn===bk[1]&&i<bk[2])))){ bk=[r,cn,i]; best=String(x.nm||x).trim() }
+  }
+  return best;
 }
 function nedUse(pnu){                  /* 토지이용계획 — 용도지역·지구·구역 */
   var last=null;
@@ -819,7 +884,7 @@ function setQ(t){ $('#qSt').textContent=t }
 
 function paintSum(){
   $('#cSum').classList.remove('hide');
-  $('#sumJibun').textContent=(S.jibun||'—')+(S.jm?' '+S.jm:'');
+  $('#sumJibun').textContent=(S.jm==='산'?'산 ':'')+(S.jibun||'—');
   $('#sumArea').textContent=(S.area?num(S.area)+'㎡ · '+num(pyeong(S.area))+'평':'');
   var rows=[
     ['주소', S.addr||''],
@@ -996,8 +1061,7 @@ function paintPrice(){
   if(!S.pnu){ el.innerHTML=state('err','주소를 넣으면 개별공시지가가 표시됩니다.'); return }
   if(!p&&!c){ el.innerHTML=state('err','개별공시지가를 받지 못했습니다 · 잠시 뒤 다시 조회해 주세요.'); return }
   var unit=+(p.pblntfPclnd||c.pblntfPclnd||0), ar=+(t.lndpclAr||S.area||0);
-  var yd='';
-  (S.use||[]).forEach(function(x){ var nm=String(x.nm||'').replace(/\s+/g,''); if(/지역$/.test(nm)&&!yd) yd=x.nm });
+  var yd=ydPick(S.use||[]);
   var h=['<div class="pbig" style="margin-bottom:4px"><b>'+num(unit)+'원/㎡</b><span>'
     +(p.stdrYear?(p.stdrYear+'년 기준'):'기준연도 미확인')+'</span></div>'];
   h.push('<table class="dt"><tbody>');
@@ -1089,12 +1153,7 @@ function paintUse(){
   var order={'저촉':1,'포함':2,'접함':3};
   u.sort(function(a,b){ return (order[a.cnflc]||9)-(order[b.cnflc]||9) });
   var h=[];
-  var YONGDO=['도시지역','관리지역','농림지역','자연환경보전지역',
-    '제1종전용주거지역','제2종전용주거지역','제1종일반주거지역','제2종일반주거지역','제3종일반주거지역','준주거지역',
-    '중심상업지역','일반상업지역','근린상업지역','유통상업지역',
-    '전용공업지역','일반공업지역','준공업지역',
-    '보전녹지지역','생산녹지지역','자연녹지지역',
-    '계획관리지역','생산관리지역','보전관리지역'];
+  var YONGDO=YD_MAIN.concat(YD_WIDE);
   var area=[], dist=[], etc=[];
   u.forEach(function(x){
     var nm=String(x.nm||'').replace(/\s+/g,'');
@@ -1355,8 +1414,7 @@ function buildLawSheet(){
   var it=(S.bld&&S.bld.items&&S.bld.items[0])||{};
   var t=S.toji||{}, c=S.ch||{}, p=S.price||{};
   var unit=+(p.pblntfPclnd||c.pblntfPclnd||0), ar=+(t.lndpclAr||S.area||0);
-  var yd='';
-  (S.use||[]).forEach(function(x){ var nm=String(x.nm||'').replace(/\s+/g,''); if(/지역$/.test(nm)&&!yd) yd=x.nm });
+  var yd=ydPick(S.use||[]);
   /* 머리 */
   g.textBaseline='alphabetic'; g.textAlign='left';
   g.fillStyle='#0B1526'; g.font='900 '+mm(6.2)+'px '+SHEETF;
@@ -1679,7 +1737,7 @@ function sangPaint(){
   if(head){
     if(S.addr){
       head.innerHTML='<div class="row"><div class="k">주소</div><div class="v">'+esc(S.addr)+'</div></div>'
-        +'<div class="row"><div class="k">지번</div><div class="v">'+esc((S.jibun||'—')+(S.jm?' '+S.jm:''))
+        +'<div class="row"><div class="k">지번</div><div class="v">'+esc((S.jm==='산'?'산 ':'')+(S.jibun||'—'))
         +(S.bld&&S.bld.st==='OK'&&S.bld.items[0]&&S.bld.items[0].mainPurpsCdNm?'<small>건축물 용도 '+esc(S.bld.items[0].mainPurpsCdNm)+'</small>':'')+'</div></div>';
     }else{
       head.innerHTML='<div class="row"><div class="k">주소</div><div class="v">주소를 넣으면 이 자리 기준으로 열립니다</div></div>';
