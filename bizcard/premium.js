@@ -90,7 +90,7 @@
           function px(p) { var q = merc(+p[1], +p[0], z); return [q.x - c.x + W / 2, q.y - c.y + H / 2]; }
           var labels = [], mine = null;
           fs.forEach(function (f) {
-            var pr = f.properties || {}, rings = ringsOf(f.geometry);
+            var rings = ringsOf(f.geometry);
             if (!rings.length) return;
             if (!mine && rings[0] && inRing(rings[0], lon, lat)) mine = f;
           });
@@ -104,27 +104,52 @@
               x.closePath();
               if (hot) { x.fillStyle = 'rgba(255,122,0,.10)'; x.fill(); }
               x.strokeStyle = hot ? '#e11d2e' : '#e0a03a';
-              x.lineWidth = hot ? 4 : 2.4;
+              x.lineWidth = hot ? 3 : 2;
               x.lineJoin = 'round'; x.stroke();
             });
+            var b0 = rings[0];
+            if (!b0) return;
+            var mnx = 1e9, mny = 1e9, mxx = -1e9, mxy = -1e9, sx = 0, sy = 0;
+            b0.forEach(function (p) {
+              var q = px(p);
+              if (q[0] < mnx) mnx = q[0]; if (q[0] > mxx) mxx = q[0];
+              if (q[1] < mny) mny = q[1]; if (q[1] > mxy) mxy = q[1];
+              sx += q[0]; sy += q[1];
+            });
+            var pw = mxx - mnx, ph = mxy - mny;
             var jb = String(pr.jibun || '').replace(/\s+/g, '');
-            if (jb && rings[0]) {
-              var sx = 0, sy = 0, n0 = 0;
-              rings[0].forEach(function (p) { var q = px(p); sx += q[0]; sy += q[1]; n0++; });
-              if (n0) labels.push({ t: jb, x: sx / n0, y: sy / n0 });
+            /* 302수리C — 칸이 좁은 필지는 지번을 적지 않는다(글자 겹침 방지) */
+            var fs2 = Math.max(11, Math.min(16, Math.min(pw, ph) / 2.6));
+            if (jb && pw > 34 && ph > 20) {
+              labels.push({ t: jb, x: sx / b0.length, y: sy / b0.length, s: fs2, w: pw });
             }
           });
+          var boxes = [], nearCenter = false;
+          labels.sort(function (a, b) { return b.w - a.w; });
           labels.forEach(function (l) {
-            if (l.x < 16 || l.x > W - 16 || l.y < 16 || l.y > H - 16) return;
-            x.font = '600 17px ' + FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
-            x.fillStyle = 'rgba(255,255,255,.82)';
-            var tw = x.measureText(l.t).width;
-            x.fillRect(l.x - tw / 2 - 3, l.y - 10, tw + 6, 20);
+            l.y = Math.round(l.y); l.x = Math.round(l.x);
+            if (l.x < 14 || l.x > W - 14 || l.y < 14 || l.y > H - 14) return;
+            /* 중심점(주황 점)이 지번 글자를 덮지 않게 — 중심에 붙은 지번은 조금 위로 */
+            if (Math.abs(l.x - W / 2) < 30 && Math.abs(l.y - H / 2) < 26) { l.y -= 24; nearCenter = true; }
+            x.font = '600 ' + Math.round(l.s) + 'px ' + FONT;
+            var tw = x.measureText(l.t).width + 6, th = l.s + 6;
+            var bb = { x: l.x - tw / 2, y: l.y - th / 2, w: tw, h: th }, hit = false;
+            for (var i = 0; i < boxes.length; i++) {
+              var o2 = boxes[i];
+              if (bb.x < o2.x + o2.w && bb.x + bb.w > o2.x && bb.y < o2.y + o2.h && bb.y + bb.h > o2.y) { hit = true; break; }
+            }
+            if (hit) return;
+            boxes.push(bb);
+            x.textAlign = 'center'; x.textBaseline = 'middle';
+            x.fillStyle = 'rgba(255,255,255,.85)';
+            x.fillRect(bb.x, bb.y, bb.w, bb.h);
             x.fillStyle = '#2b62c9'; x.fillText(l.t, l.x, l.y);
           });
-          /* 중심점 표시 */
-          x.fillStyle = '#FF7A00'; x.beginPath(); x.arc(W / 2, H / 2, 7, 0, Math.PI * 2); x.fill();
-          x.strokeStyle = '#fff'; x.lineWidth = 2.5; x.stroke();
+          /* 중심점 표시 — 지번 글자가 그 자리에 있으면 점을 찍지 않는다 */
+          if (!nearCenter) {
+            x.fillStyle = '#FF7A00'; x.beginPath(); x.arc(W / 2, H / 2, 7, 0, Math.PI * 2); x.fill();
+            x.strokeStyle = '#fff'; x.lineWidth = 2.5; x.stroke();
+          }
           x.textAlign = 'left'; x.textBaseline = 'alphabetic';
           res(cv);
         } catch (e) { res(null); }
@@ -1097,7 +1122,7 @@
       var ph = imgs.slice(0, -2);
       /* 브이월드 그림은 CORS가 없어 캔버스에 못 들어온다 → 지적도를 데이터로 직접 그려 채운다 */
       var needVec = !cad && m.lat && m.lon;
-      var job = needVec ? cadVector(m.lat, m.lon, 1100, orient === 'port' ? 700 : 460, 17) : Promise.resolve(null);
+      var job = needVec ? cadVector(m.lat, m.lon, orient === 'port' ? 620 : 1100, orient === 'port' ? 560 : 620, 17) : Promise.resolve(null);
       job.then(function (vcv) {
         if (vcv) cad = vcv;
         var opt = { noSat: !sat };
