@@ -605,9 +605,10 @@ function paint(g,W,H,sc,my){
       var bb=gi.bb, w=lon2x(bb.maxx,z)-lon2x(bb.minx,z), hh=lat2y(bb.miny,z)-lat2y(bb.maxy,z);
       if(w<56*k||hh<26*k) continue;
       var mxx=(lon2x(bb.minx,z)+lon2x(bb.maxx,z))/2-t.x, myy=(lat2y(bb.miny,z)+lat2y(bb.maxy,z))/2-t.y;
-      if(mxx<-20*k||mxx>W+20*k||myy<-20*k||myy>H+20*k) continue;
       g.font='900 '+Math.round(20*k)+'px '+MAPFONT;
       var tw=g.measureText(gi.jibun).width;
+      /* 지번 라벨이 지도 밖으로 잘리지 않도록 — 라벨 박스가 완전히 들어올 때만 그린다 */
+      if(mxx-tw/2-5*k<0||mxx+tw/2+5*k>W||myy-13*k<0||myy+13*k>H) continue;
       g.fillStyle=dark?'rgba(6,14,30,.72)':'rgba(255,255,255,.86)';
       g.fillRect(mxx-tw/2-5*k,myy-13*k,tw+10*k,26*k);
       g.fillStyle=dark?'#EAF1FB':'#16233D';
