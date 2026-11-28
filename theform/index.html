@@ -122,10 +122,39 @@ label.lb em{font-style:normal;color:var(--amber2);font-size:10px;margin-left:4px
 .qa{margin-top:16px}
 .qa .draft{white-space:pre-wrap;font-size:12px;line-height:1.55;background:#0B1729;border:1px dashed var(--amber2);border-radius:10px;padding:10px;margin-top:8px;color:#DCE6F2;display:none}
 .foot{font-size:10.5px;color:#6E7F99;text-align:center;margin-top:14px;line-height:1.6}
-.modal{position:fixed;inset:0;background:rgba(3,7,18,.72);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal{position:fixed;inset:0;background:rgba(3,7,18,.72);z-index:96;display:none;align-items:flex-end;justify-content:center}
 .modal.on{display:flex}
 .modal .sheet{width:100%;max-width:460px;background:#0F1B33;border-top:2px solid var(--amber);border-radius:18px 18px 0 0;padding:16px 14px 22px}
 #pvImgs img{width:100%;display:block;border-radius:8px;margin-top:8px;background:#fff;border:1px solid var(--line2)}
+/* 273 — 빈칸 옆을 따라다니는 마이크 + 듣기 판 (계약서와 같은 틀) */
+#tfMicChip{position:fixed;z-index:87;width:36px;height:36px;border-radius:50%;display:none;place-items:center;font-size:17px;line-height:1;
+ background:linear-gradient(145deg,var(--amber2),var(--amber));color:#0A1224;border:0;box-shadow:0 6px 16px rgba(0,0,0,.45);padding:0}
+#tfMicChip.on{display:grid}
+#tfMicBar{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:calc(86px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:436px;z-index:88;
+ background:linear-gradient(160deg,#1B2C52,#101C36);border:1px solid var(--amber);border-radius:16px;padding:9px 12px 11px;box-shadow:0 14px 34px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .18s}
+#tfMicBar.on{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#tfMicBar .tmt{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:900;color:#fff}
+#tfMicBar .tmd{width:8px;height:8px;border-radius:50%;background:#FF4D4D;flex:0 0 auto;animation:tfPulse 1.1s infinite}
+@keyframes tfPulse{0%{box-shadow:0 0 0 0 rgba(255,77,77,.55)}70%{box-shadow:0 0 0 8px rgba(255,77,77,0)}100%{box-shadow:0 0 0 0 rgba(255,77,77,0)}}
+#tfMicBar .tmt button{margin-left:auto;font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:5px 11px}
+#tfMicEq{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:36px;margin:6px 0 4px;overflow:hidden}
+#tfMicEq i{display:block;width:4px;height:6px;border-radius:2px;background:linear-gradient(180deg,var(--amber2),var(--amber))}
+#tfMicLive{font-size:14.5px;font-weight:900;color:#fff;line-height:1.35;min-height:22px;max-height:60px;overflow:hidden;word-break:keep-all}
+#tfMicLive small{display:block;font-size:10.5px;font-weight:800;color:#C9D6E6;margin-bottom:1px}
+/* 264 — 저장 전 확대 미리보기 */
+#zModal{position:fixed;inset:0;z-index:96;display:none;background:#0C1730}
+#zModal.on{display:flex;flex-direction:column}
+#zModal .zhd{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0F1B33}
+#zModal .zhd b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:900;color:#fff}
+#zModal .zhd button{font-size:11.5px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:7px 12px;min-height:34px}
+#zModal .ztools{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#0B1729;border-bottom:1px solid var(--line)}
+#zModal .ztools button{min-width:40px;min-height:36px;border:1px solid var(--line2);border-radius:9px;font-size:15px;font-weight:900;color:#E6EDF7;background:#12203C;padding:0 10px}
+#zModal .ztools button.on{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
+#zModal .ztools b{font-size:12px;font-weight:900;color:var(--amber2);min-width:46px;text-align:center}
+#zBody{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 0 14px;text-align:center}
+#zBody img{display:block;margin:0 auto 10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45);width:var(--zw,100%)}
+#zModal .zft{display:flex;gap:7px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#0F1B33}
+#zModal .zft .btn{padding:13px 8px;font-size:13px}
 .thm{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .thm button{flex:1;min-width:64px;font-size:12px;font-weight:800;color:#DCE6F2;background:#0B1729;border:1px solid var(--line2);border-radius:10px;padding:9px 5px;display:flex;align-items:center;gap:6px;justify-content:center}
 .thm button.on{color:var(--on-amber);border-color:var(--amber);background:linear-gradient(135deg,var(--amber),var(--amber2))}
@@ -398,6 +427,13 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
  <div class="row"><button class="btn sec sm" id="pvClose">닫기</button><button class="btn pri" id="pvStart">이 양식으로 작성하기</button></div>
 </div></div>
 <div id="busy"><div id="busyT">처리 중…</div></div>
+<button type="button" id="tfMicChip" aria-label="말로 이 칸 채우기">🎤</button>
+<div id="tfMicBar" aria-hidden="true"><div class="tmt"><span class="tmd"></span><span>지금 듣고 있어요</span><button type="button" data-tfmicstop="1">그만</button></div>
+ <div id="tfMicEq"></div><div id="tfMicLive"><small id="tfMicWhere"></small><b id="tfMicTxt">말씀하세요…</b></div></div>
+<div id="zModal"><div class="zhd"><b id="zTitle">A4 미리보기</b><button type="button" id="zX">닫기</button></div>
+ <div class="ztools"><button type="button" data-z="-" aria-label="작게">−</button><b id="zLv">100%</b><button type="button" data-z="+" aria-label="크게">＋</button><button type="button" data-z="fit" class="on" style="font-size:12px">화면 폭</button></div>
+ <div id="zBody"></div>
+ <div class="zft"><button class="btn pri" id="zPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="zPng">이미지(PNG) 저장</button><button class="btn sec" id="zX2">닫기</button></div></div>
 <div id="toast"></div>
 <div id="printArea"></div>
 <script src="../freekey.js" onerror="window.KTS_FREE=null"></script>
@@ -2008,7 +2044,13 @@ function renderPreviewModal(){
   let h = '';
   for (let p = 1; p <= n; p++){
     const base = (f.bgUrls && f.bgUrls[p - 1]) ? f.bgUrls[p - 1] : f.bgUrl;
-    h += `<img src="${themed(base, th)}" alt="A4 ${p}쪽 원본 양식">`;
+    if (base){
+      h += `<img src="${themed(base, th)}" alt="A4 ${p}쪽 원본 양식">`;
+    } else {
+      /* S-1(268) — 종이 그림이 없는 기본 양식(블록으로 그리는 5종)은 직접 그린 종이를 보여 준다 */
+      const cv = renderBlank(f);
+      h += `<img src="${cv.toDataURL('image/png')}" alt="A4 ${p}쪽 원본 양식">`;
+    }
   }
   $('#pvImgs').innerHTML = h;
   $('#pvThm').innerHTML = f.themes ? ('<div class="tl">서식 색감 — 제목줄·항목 칸·라벨에 반영</div><div class="thm">'
@@ -2803,6 +2845,25 @@ function pickVoiceIdx(){
   return empty != null ? empty : (L[0] != null ? L[0] : -1);
 }
 let VOICE_BUSY = false;
+/* 말한 글자를 그 칸에 넣는다 — 마이크 버튼과 빈칸 옆 마이크가 같이 쓴다 */
+function voiceSetValue(i, t){
+  t = String(t || '').trim(); if (!t) return false;
+  const tgt = navEl(i), f = CUR && CUR.fields[i];
+  if (!tgt || !f) return false;
+  if (isNumMoney(f) || f.type === 'number'){
+    const n = parseKorAmount(t);
+    VALS[f.label] = isFinite(n) ? String(n) : t.replace(/[^\d.-]/g, '');
+    tgt.value = f.type === 'number' ? fmtNum(VALS[f.label]) : VALS[f.label];
+    if (isKorMoney(f.label)) updMoneyHint(i);
+  } else {
+    VALS[f.label] = (tgt.value && tgt.value.trim()) ? tgt.value + ' ' + t : t;
+    tgt.value = VALS[f.label];
+  }
+  tgt.classList.add('has');
+  tgt.dispatchEvent(new Event('input', { bubbles: true }));
+  saveVals();
+  return true;
+}
 function startVoice(idx){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다 · 키보드의 마이크를 써 주세요');
@@ -2819,19 +2880,7 @@ function startVoice(idx){
   r.onresult = e => {
     const t = (e.results[0][0].transcript || '').trim();
     if (!t) return;
-    if (isNumMoney(f) || f.type === 'number'){
-      const n = parseKorAmount(t);
-      delete VALS[f.label];
-      VALS[f.label] = isFinite(n) ? String(n) : t.replace(/[^\d.-]/g, '');
-      tgt.value = f.type === 'number' ? fmtNum(VALS[f.label]) : VALS[f.label];
-      if (isKorMoney(f.label)) updMoneyHint(i);
-    } else {
-      VALS[f.label] = (tgt.value && tgt.value.trim()) ? tgt.value + ' ' + t : t;
-      tgt.value = VALS[f.label];
-    }
-    tgt.classList.add('has');
-    tgt.dispatchEvent(new Event('input', { bubbles: true }));
-    saveVals();
+    if (!voiceSetValue(i, t)) return;
     toast('"' + f.label + '" — ' + VALS[f.label]);
     /* 다음 칸을 가리킨다(초점을 옮겨 자판을 올리지 않는다) */
     const L = navIdx(), nx = L.find(k => k > i);
@@ -2849,6 +2898,118 @@ function startVoice(idx){
 function flashField(i){ const el = navEl(i); if (!el) return;
   el.classList.add('fldfocus'); setTimeout(() => { try{ el.classList.remove('fldfocus'); }catch(e){} }, 1500); }
 $('#voiceBtn').onclick = () => startVoice(null);
+
+/* ---------- 273 — 빈칸 옆을 따라다니는 마이크 + 듣기 판 (계약서와 같은 표준, SpeechRecognition 단독) ---------- */
+const TMIC = { on:false, want:false, rec:null, idx:-1, bars:[], ends:0, pend:'', pendEl:null, raf:0, e:.18 };
+function tfMicChipPlace(){
+  const b = $('#tfMicChip'); if (!b) return;
+  const a = document.activeElement;
+  const ok = !!(a && a.closest && a.closest('#valList') && a.dataset && a.dataset.f != null && a.type !== 'date' && a.getClientRects().length);
+  if (!ok || TMIC.on){ b.classList.remove('on'); return; }
+  const r = a.getBoundingClientRect();
+  b.classList.add('on');
+  b.style.left = Math.round(Math.max(6, Math.min(window.innerWidth - 44, r.right - 42))) + 'px';
+  b.style.top = Math.round(Math.min(window.innerHeight - 44, r.top + (r.height - 36) / 2)) + 'px';
+}
+function tfMicEnergy(v){ if (v > TMIC.e) TMIC.e = v; }
+function tfMicAnim(on){
+  if (!on){ if (TMIC.raf) cancelAnimationFrame(TMIC.raf); TMIC.raf = 0; TMIC.e = .18; return; }
+  if (TMIC.raf) return;
+  const eq = $('#tfMicEq');
+  if (eq && !eq.children.length) eq.innerHTML = new Array(21).fill('<i></i>').join('');
+  TMIC.bars = eq ? Array.prototype.slice.call(eq.querySelectorAll('i')) : [];
+  const t0 = performance.now();
+  const loop = t => {
+    if (!TMIC.on){ TMIC.raf = 0; return; }
+    const dt = t - t0; TMIC.e *= 0.93;
+    const e = Math.max(.16 + .09 * Math.abs(Math.sin(dt / 640)), TMIC.e);
+    TMIC.bars.forEach((b, i) => {
+      const w = Math.abs(Math.sin(dt / 210 + i * .62)) * .55 + Math.abs(Math.sin(dt / 940 + i * .27)) * .45;
+      b.style.height = (6 + Math.round(Math.min(1, e * (.45 + w)) * 32)) + 'px';
+    });
+    TMIC.raf = requestAnimationFrame(loop);
+  };
+  TMIC.raf = requestAnimationFrame(loop);
+}
+function tfMicShow(on){ const b = $('#tfMicBar'); if (b){ b.classList.toggle('on', !!on); b.setAttribute('aria-hidden', on ? 'false' : 'true'); } if (on) tfMicChipPlace(); else setTimeout(tfMicChipPlace, 260); }
+function tfMicSay(t, fin){ const b = $('#tfMicTxt'); if (!b) return; b.textContent = t; b.style.color = fin ? '#FFA24D' : '#fff'; }
+function tfMicCommit(){
+  const t = String(TMIC.pend || '').trim(); TMIC.pend = '';
+  if (!t) return;
+  const i = (TMIC.pendEl != null) ? TMIC.pendEl : TMIC.idx; TMIC.pendEl = null;
+  voiceSetValue(i, t);
+}
+function tfMicStop(){
+  tfMicCommit();
+  TMIC.want = false; TMIC.on = false;
+  try{ TMIC.rec && TMIC.rec.stop(); }catch(e){}
+  setTimeout(() => { try{ TMIC.rec && TMIC.rec.abort(); }catch(e){} }, 60);
+  tfMicAnim(false); setTimeout(() => { if (!TMIC.on) tfMicShow(false); }, 400);
+}
+function tfMicStart(i){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('이 브라우저는 음성 입력을 지원하지 않습니다 · 키보드의 마이크를 써 주세요');
+  if (i == null || i < 0) return toast('먼저 값을 넣을 칸을 눌러 주세요');
+  const tgt = navEl(i); if (!tgt) return toast('이 칸은 달력에서 골라 주세요');
+  if (tgt.dataset && tgt.dataset.dg) return toast('"' + tgt.dataset.dg + '" 는 달력에서 골라 주세요');
+  if (TMIC.on) tfMicStop();
+  TMIC.on = true; TMIC.want = true; TMIC.ends = 0; TMIC.idx = i; TMIC.pend = ''; TMIC.pendEl = null;
+  tfMicShow(true); tfMicAnim(true);
+  const w = $('#tfMicWhere'); if (w) w.textContent = '받아 적는 칸 · ' + navLabel(i) + ' (' + (i + 1) + ')';
+  tfMicSay('말씀하세요…', false);
+  try{ tgt.blur(); }catch(e){}
+  GUIDE_I = i;
+  if (window.KTS_HELPER && KTS_HELPER.guideRefresh) KTS_HELPER.guideRefresh();
+  startRec();
+  function startRec(){
+    let r; try{ r = new SR(); }catch(e){ return; }
+    TMIC.rec = r;
+    r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
+    r.onstart = () => tfMicEnergy(.34);
+    r.onsoundstart = () => tfMicEnergy(.58);
+    r.onspeechstart = () => { tfMicEnergy(.92); tfMicSay('듣고 있어요…', false); };
+    r.onresult = ev => {
+      TMIC.ends = 0;
+      let it = '', fn = '';
+      for (let k = ev.resultIndex; k < ev.results.length; k++){
+        const res = ev.results[k], t = (res[0] && res[0].transcript) || '';
+        if (res.isFinal) fn += t; else it += t;
+      }
+      if (fn.trim()) voiceSetValue(TMIC.idx, fn.trim());
+      TMIC.pend = it.trim();
+      if (TMIC.pend){ TMIC.pendEl = TMIC.idx; tfMicSay(TMIC.pend, false); tfMicEnergy(Math.min(1, .38 + TMIC.pend.length * .05)); }
+    };
+    r.onerror = ev => {
+      const er = (ev && ev.error) || '';
+      if (er === 'not-allowed' || er === 'service-not-allowed'){ tfMicSay('마이크 권한을 허용해 주세요'); setTimeout(tfMicStop, 2400); return; }
+      if (er === 'network'){ tfMicSay('음성 인식 서버에 연결하지 못했습니다'); setTimeout(tfMicStop, 2400); return; }
+      if (er === 'no-speech' || er === 'aborted'){ tfMicSay('말씀하세요…'); return; }
+      tfMicSay('다시 한 번 말씀해 주세요');
+    };
+    r.onend = () => {
+      if (!TMIC.on || !TMIC.want){ return; }
+      tfMicCommit();
+      TMIC.ends++;
+      if (TMIC.ends > 8){ tfMicSay('음성 인식을 멈췄습니다'); return tfMicStop(); }
+      setTimeout(() => { if (TMIC.on && TMIC.want) startRec(); }, 200);
+    };
+    try{ r.start(); }catch(e){ setTimeout(() => { if (TMIC.on && TMIC.want) startRec(); }, 450); }
+  }
+}
+$('#tfMicChip').onclick = e => {
+  e.preventDefault(); e.stopPropagation();
+  const a = document.activeElement;
+  const i = (a && a.closest && a.closest('#valList')) ? tfIdxOf(a) : (LAST_INPUT ? tfIdxOf(LAST_INPUT) : -1);
+  tfMicStart(i >= 0 ? i : pickVoiceIdx());
+};
+document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('[data-tfmicstop]')){ e.preventDefault(); tfMicStop(); }
+});
+function tfIdxOf(el){ const a = el && el.dataset && el.dataset.f; if (a == null || a === '') return -1; const k = +a; return isNaN(k) ? -1 : k; }
+document.addEventListener('focusin', () => setTimeout(tfMicChipPlace, 40));
+document.addEventListener('focusout', () => setTimeout(tfMicChipPlace, 140));
+window.addEventListener('scroll', () => tfMicChipPlace(), { passive: true });
+window.addEventListener('resize', () => tfMicChipPlace());
 
 /* ---------- 도우미(?) — 작성 중에는 커서(👆) → 마이크(🎤) ---------- */
 function guideTargets(){
@@ -3147,8 +3308,8 @@ async function composite(maxW, pg){
     const x = f.x / 100 * cv.width, y = f.y / 100 * cv.height, w = f.w / 100 * cv.width, h = f.h / 100 * cv.height;
     g.fillStyle = '#fff'; g.fillRect(x, y, w, h);
   }
-  /* 값 글꼴 — 원본 계약서와 같은 명조. 내가 만든 서식(그림 배경 없음)은 화면과 같은 고딕 */
-  const OVF = (CUR && (CUR.bgUrl || CUR.bgUrls)) ? '"KTSMyeongjo","바탕","Batang","HY신명조","Apple SD Gothic Neo",serif' : FONT;
+  /* 269 — 표준계약서(contract/)와 같은 글꼴로 통일 (원본 종이에 찍힌 라벨도 고딕) */
+  const OVF = FONT;
   /* 글자 크기: 종이의 줄 높이에 맞춰 크게(칸 높이의 0.78배), 종이 너비의 4.6%를 넘지 않게 */
   const hs = CUR.fields.filter(f => f.type !== 'erase').map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
   const FS0 = Math.min((hs[hs.length >> 1] || 40) * 0.78, cv.width * 0.046);
@@ -3256,13 +3417,60 @@ async function doExport(kind){
 }
 $('#exHwpx').onclick = () => doExport('hwpx');
 $('#exXlsx').onclick = () => doExport('xlsx');
-$('#exPrint').onclick = async () => { busyOn('인쇄할 종이를 만드는 중…');
+/* 264 — 인쇄·저장 전에 확대 미리보기부터 (인쇄 대창상자에서야 확인하던 문제 해결) */
+let ZFIT = true, ZZ = 1;
+function zApply(){
+  const body = $('#zBody'); if (!body) return;
+  body.style.setProperty('--zw', ZFIT ? '100%' : Math.round(ZZ * 100) + '%');
+  const lv = $('#zLv'); if (lv) lv.textContent = ZFIT ? '100%' : Math.round(ZZ * 100) + '%';
+  $$('#zModal [data-z]').forEach(b => b.classList.toggle('on', b.dataset.z === 'fit' ? ZFIT : false));
+}
+function zClose(){ const m = $('#zModal'); if (m) m.classList.remove('on'); }
+async function zOpen(){
+  if (!CUR) return;
+  busyOn('A4 미리보기를 만드는 중…');
+  try{
+    const n = tfPageCount(), urls = [];
+    for (let p = 1; p <= n; p++){ const cv = await composite(1700, p); urls.push(cv.toDataURL('image/jpeg', 0.95)); }
+    busyOff();
+    const body = $('#zBody'); if (body) body.innerHTML = urls.map((u, i) => `<img src="${u}" alt="A4 ${i + 1}쪽">`).join('');
+    const t = $('#zTitle'); if (t) t.textContent = (CUR.name || '양식') + ' · A4 ' + n + '쪽';
+    ZFIT = true; ZZ = 1; zApply();
+    const m = $('#zModal'); if (m){ m.classList.add('on'); }
+    if (body) body.scrollTop = 0;
+  }catch(e){ busyOff(); toast('미리보기를 만들지 못했습니다'); }
+}
+async function printPaper(){
+  busyOn('인쇄할 종이를 만드는 중…');
   try{ const n = tfPageCount(), cp = Math.max(1, +SEAL.cp || 1), urls = [];
     for (let c = 0; c < cp; c++) for (let p = 1; p <= n; p++){ const cv = await composite(2480, p); urls.push(cv.toDataURL('image/png')); }
     $('#printArea').innerHTML = urls.map(u => `<img src="${u}" alt="">`).join('');
     busyOff(); setTimeout(() => window.print(), 140);
     $('#exInfo').innerHTML = `<span class="dot"></span>A4 ${n}쪽${cp > 1 ? ' × ' + cp + '부' : ''} 인쇄 준비 — 인쇄 대화상자에서 [PDF로 저장]을 고르면 PDF가 됩니다.`;
-  }catch(e){ busyOff(); toast('인쇄 화면을 만들지 못했습니다'); } };
+  }catch(e){ busyOff(); toast('인쇄 화면을 만들지 못했습니다'); } }
+$('#exPrint').onclick = () => zOpen();
+$('#zPdf').onclick = () => { zClose(); printPaper(); };
+$('#zPng').onclick = () => { zClose(); if ($('#exPng')) $('#exPng').click(); };
+$('#zX').onclick = zClose;
+$('#zX2').onclick = zClose;
+document.addEventListener('click', e => {
+  const z = e.target.closest && e.target.closest('[data-z]');
+  if (z){
+    const k = z.dataset.z;
+    if (k === 'fit') ZFIT = true;
+    else { ZFIT = false; ZZ = Math.max(0.6, Math.min(3, ZZ + (k === '+' ? 0.5 : -0.5))); }
+    zApply();
+  }
+});
+/* U-10 — Esc 로 모든 창 닫기 */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  let hit = false;
+  document.querySelectorAll('.modal.on').forEach(m => { m.classList.remove('on'); hit = true; });
+  const z = $('#zModal'); if (z && z.classList.contains('on')){ z.classList.remove('on'); hit = true; }
+  if (hit) e.preventDefault();
+});
+(function(){ const cv = $('#pvCv'); if (cv) cv.addEventListener('click', () => { if (CUR) zOpen(); }); })();
 /* ⑤-2 더싸인으로 이어 찍기 — 방금 적은 계약서(값이 얹힌 그대로)를 넘긴다 */
 $('#goSign').onclick = async () => {
   if (!CUR) return toast('먼저 양식을 열어 주세요');

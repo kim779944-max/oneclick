@@ -177,10 +177,7 @@
   }
 
   /* ---------- 4) 건축물대장 ---------- */
-  function bld(pnu) {
-    if (!pnu) return Promise.resolve({ st: 'NOPNU' });
-    var k = dgk();
-    if (!k) return Promise.resolve({ st: 'NOKEY' });
+  function bldOnce(pnu, k){
     var sg = pnu.slice(0, 5), bd = pnu.slice(5, 10), pg = (pnu.charAt(10) === '2' ? '1' : '0'),
       bun = pnu.slice(11, 15), ji = pnu.slice(15, 19);
     var q = '?serviceKey=' + ((k.indexOf('%') >= 0) ? k : encodeURIComponent(k))
@@ -200,6 +197,22 @@
       if (!Array.isArray(it)) it = it ? [it] : [];
       return { st: it.length ? 'OK' : 'EMPTY', items: it };
     }).catch(function (e) { return { st: 'NET', msg: String(e && e.message || e).slice(0, 80) } });
+  }
+  /* 275 — 건축HUB는 종종 한 번에 안 온다 → 3번까지 다시 부른다 */
+  function bld(pnu) {
+    if (!pnu) return Promise.resolve({ st: 'NOPNU' });
+    var k = dgk();
+    if (!k) return Promise.resolve({ st: 'NOKEY' });
+    var n = 0;
+    function run() {
+      n++;
+      return bldOnce(pnu, k).then(function (r) {
+        var bad = !r || r.st === 'NET' || r.st === 'BADJSON' || r.st === 'ERR';
+        if (bad && n < 3) return new Promise(function (res) { setTimeout(res, 400 * n); }).then(run);
+        return r;
+      });
+    }
+    return run();
   }
 
   /* ---------- 5) 좌표만 빠르게 (목록 썸네일용) ---------- */
@@ -228,18 +241,42 @@
   }
 
   /* ---------- 전체 묶음 ---------- */
+  /* 275 — 주소의 지번과 좌표가 떨어 놓은 필지가 다르면, 확정 주소로 한 번 더 짚는다 */
+  function wantJibun(q) {
+    var m = String(q || '').match(/(\d{1,5}(?:-\d{1,5})?)\s*(?:\uBC88\uC9C0|\uD544\uC9C0)?\s*$/);
+    return m ? m[1] : '';
+  }
+  function jibunOfPc(pc) { return String((pc && pc.jibun) || '').replace(/[^0-9-]/g, ''); }
+  function lookupParcel(q, pt) {
+    return parcelAt(pt.lat, pt.lon).then(function (pc) {
+      var want = wantJibun(q);
+      if (!want || !pc) return { pt: pt, pc: pc };
+      var got = jibunOfPc(pc);
+      if (got === want || got.indexOf(want) === 0) return { pt: pt, pc: pc };
+      var ref = pc.addr || '';
+      if (!ref) return { pt: pt, pc: pc };
+      return geocodeOne(ref, 'parcel').then(function (p2) {
+        if (!p2) return { pt: pt, pc: pc };
+        return parcelAt(p2.lat, p2.lon).then(function (pc2) {
+          var ok = pc2 && jibunOfPc(pc2) === want;
+          return ok ? { pt: p2, pc: pc2 } : { pt: pt, pc: pc };
+        });
+      }).catch(function () { return { pt: pt, pc: pc } });
+    });
+  }
   function lookup(addr, cached) {
     var t0 = Date.now();
     var first = (cached && cached.lat && cached.lon) ? Promise.resolve(cached) : geocode(addr);
     return first.then(function (pt) {
       if (!pt) return { st: 'NOT_FOUND', ms: Date.now() - t0 };
-      return parcelAt(pt.lat, pt.lon).then(function (pc) {
+      return lookupParcel(addr, pt).then(function (lp) {
+        var pc = lp.pc, ptn = lp.pt || pt;
         var pnu = pc && pc.pnu || '';
         var base = {
-          st: 'OK', ms: Date.now() - t0, lat: pt.lat, lon: pt.lon,
+          st: 'OK', ms: Date.now() - t0, lat: ptn.lat, lon: ptn.lon,
           addr: (pc && pc.addr) || pt.text, pnu: pnu, jibun: pc && pc.jibun || '',
           jiga: pc && pc.jiga || null,
-          map: mapUrl(pt.lat, pt.lon)
+          map: mapUrl(ptn.lat, ptn.lon)
         };
         if (!pnu) return base;
         return Promise.all([nedChar(pnu), nedPrice(pnu), nedUse(pnu), nedToji(pnu), bld(pnu)]).then(function (r) {

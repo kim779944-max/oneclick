@@ -13,6 +13,7 @@
 :root{--bg:#0A1128;--bg2:#0A1224;--card:#0F1B33;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#DCE6F2;--gray:#DCE6F2;
  --amber:#FF6B00;--amber2:#FFA24D;--on-amber:#0A1224;--red:#FF5A5A;--green:#2ED47A}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}          /* hidden 속성이 CSS display 에 먹히지 않던 문제 방지 */
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
  background:#070D1E;color:var(--ink);font-size:15px;line-height:1.45;letter-spacing:-.2px;display:block;min-height:100vh;word-break:keep-all}
@@ -198,7 +199,8 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 .pclsub .pj{width:74px}.pclsub .pa{width:96px}
 .pclsub .unit{font-size:11px;font-weight:800;color:#C9D6E6}
 .pclsub .pyp{font-size:11.5px;font-weight:900;color:#FFD7B8}
-.pclsub .pfind{font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:8px;padding:7px 9px;min-height:30px}
+.pclsub .pfind{font-size:11px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:8px;padding:7px 9px;min-height:30px;display:none}
+.pclsub .pfind.on{display:inline-block}
 .pclsub .pst{font-size:10.5px;font-weight:800;color:#C9D6E6;margin-left:auto}
 .pcltot{margin-top:8px;border:1px solid var(--amber);border-radius:11px;padding:8px 10px;background:rgba(255,107,0,.10);font-size:12.5px;font-weight:900;color:#fff;display:none}
 .pcltot.on{display:block}
@@ -210,6 +212,46 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 .docs em{display:block;font-style:normal;font-size:11px;font-weight:800;color:#C9D6E6;margin-top:2px}
 .docs label.on{border-color:var(--amber);background:rgba(255,107,0,.10)}
 #micLive b{color:var(--amber2)}
+/* 269 — 5초 계약서 입력 화면 글씨를 크게 (읽기 좋게) */
+.wgrid input,.wgrid textarea{font-size:15px;padding:10px 10px}
+.wgrid .lb{font-size:11.5px}
+.wgrid .kor{font-size:10.5px}
+.dgrp .dgh{font-size:12.5px}
+.dpick{font-size:14px;padding:10px 10px;min-height:40px}
+.dch button{font-size:11.5px;min-height:34px}
+.pcltop input{font-size:14.5px}
+#s5txt{font-size:15px}
+.s5sum{font-size:12.5px}
+.sp-list label{font-size:13px}
+/* 274·278 — 서식 고르기 카드: 이름은 크게, 확대 미리보기는 작은 돋보기 하나 */
+.picks .pk{display:flex;align-items:stretch;gap:0;background:#0B1729;border:1px solid var(--line2);border-radius:10px;overflow:hidden;min-height:44px}
+.picks .pk.on{border-color:var(--amber);background:rgba(255,107,0,.10)}
+.picks .pk .nm{flex:1;min-width:0;text-align:left;font-size:12.5px;font-weight:800;color:#DCE6F2;padding:11px 8px 11px 10px;line-height:1.3}
+.picks .pk.on .nm{color:#fff}
+.picks .pk .zm{flex:0 0 34px;display:grid;place-items:center;font-size:14px;color:var(--amber2);border-left:1px solid var(--line2);background:rgba(255,107,0,.06)}
+/* 264·279·U-3 — 저장 전 확대 미리보기 (손가락으로 확대·스크롤) */
+#pvModal{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,7,18,.9)}
+#pvModal.on{display:block}
+#pvModal .pvm{position:absolute;inset:0;display:flex;flex-direction:column;background:#0C1730}
+#pvModal .hd2{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0F1B33}
+#pvModal .hd2 b{font-size:13.5px;font-weight:900;color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pvModal .hd2 button{flex:0 0 auto;font-size:11.5px;font-weight:900;color:#0A1224;background:var(--amber2);border-radius:999px;padding:7px 12px;min-height:34px}
+#pvModal .tools{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#0B1729;border-bottom:1px solid var(--line)}
+#pvModal .tools button{min-width:40px;min-height:36px;border:1px solid var(--line2);border-radius:9px;font-size:15px;font-weight:900;color:#E6EDF7;background:#12203C;padding:0 10px}
+#pvModal .tools button.on{color:var(--on-amber);background:linear-gradient(145deg,var(--amber2),var(--amber));border-color:var(--amber)}
+#pvModal .tools b{font-size:12px;font-weight:900;color:var(--amber2);min-width:46px;text-align:center}
+#pvModal .body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 0 14px;text-align:center}
+#pvModal .body img{display:block;margin:0 auto 10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45);width:var(--pvw,100%)}
+#pvModal .ft{display:flex;gap:7px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#0F1B33}
+#pvModal .ft .btn{padding:13px 10px;font-size:13.5px}
+/* 275 — 4대 공부 결과 (토지·건축물·이용계획·공시지가 한 눈에) */
+.gbc{margin-top:8px;border:1px solid var(--line2);border-radius:11px;background:#0B1729;padding:8px 10px}
+.gbc .gbh{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:900;color:#fff}
+.gbc .gbh em{font-style:normal;font-size:10px;font-weight:800;color:var(--amber2);margin-left:auto}
+.gbc dl{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;margin-top:6px;font-size:11.5px;line-height:1.45}
+.gbc dt{color:#C9D6E6;font-weight:800;white-space:nowrap}
+.gbc dd{color:#F3F6FA;font-weight:800;word-break:break-all}
+.gbc .pnu{font-size:10.5px;color:#C9D6E6;font-weight:800;margin-top:4px;word-break:break-all}
 /* 물건정보 불러오기 시트 */
 #propSheet{position:fixed;inset:0;z-index:92;display:none;background:rgba(3,7,18,.68)}
 #propSheet.on{display:block}
@@ -279,15 +321,9 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
  </div>
  <div class="card">
   <h2><span class="n">★</span>서식 창고 <small style="font-size:10.5px;font-weight:800;color:#DCE6F2;margin-left:2px">표준계약서 12종 · 열쇠 없이</small></h2>
+  <div id="thmBox"></div>
   <div class="picks" id="pickGrid"></div>
-  <div class="row"><button class="btn sec" id="pvBtn">양식 미리보기 (선택)</button></div>
-  <p class="kv" style="margin-top:8px">내 종이 양식(거래명세서·자체 서식)은 <a href="../theform/">양식만들기</a>에서 사진 한 장으로 등록해 그대로 씁니다.</p>
-  <div id="pvWrap" hidden>
-   <div class="tl2" id="pvTitle"></div>
-   <canvas class="pv" id="pv0"></canvas>
-   <div id="thmBox"></div>
-   <p class="kv" id="pvInfo"></p>
-  </div>
+  <p class="kv" style="margin-top:8px">각 양식의 돋보기를 누르면 종이 원본을 크게 보고 시작할 수 있습니다.<br>내 종이 양식(거래명세서·자체 서식)은 <a href="../theform/">양식만들기</a>에서 사진 한 장으로 등록해 그대로 씁니다.</p>
  </div>
 </section>
 
@@ -301,6 +337,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
   <p class="sub2" id="pclTip">주소만 넣으면 4대 공부(지목·면적·소재지)를 이 기기에서 바로 찾아 채웁니다. 2필지부터 인쇄물 뒤에 별지가 붙습니다.</p>
   <div id="pclList"></div>
   <div class="pcltot" id="pclTot"></div>
+  <div id="gbCard" hidden></div>
  </div>
  <div class="wsec">
   <h3><span class="n">1</span><span id="secMainT">물건 · 금액</span><button type="button" class="mini" id="propBtn" data-prop="x">물건정보 불러오기</button></h3>
@@ -314,8 +351,7 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
  <div class="wsec" id="secSp">
   <h3><span class="n">3</span>특약</h3>
   <div class="sp-list" id="spList"></div>
-  <div class="microw"><button type="button" data-micfree="1">🎤 말로 특약</button><button type="button" data-typefree="1">⌨️ 직접 입력</button></div>
-  <textarea id="spFree" rows="2" placeholder="줄마다 한 항목"></textarea>
+  <textarea id="spFree" rows="2" placeholder="줄마다 한 항목 — 칸을 누르면 옆에 마이크가 따라붙습니다"></textarea>
   <div class="draft" id="spPrev"></div>
  </div>
  <div class="wsec">
@@ -333,7 +369,8 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
   <h3><span class="n">출</span>인쇄 · 저장</h3>
   <div class="optrow"><button type="button" data-opt="pv">🔍 미리보기</button><button type="button" data-opt="sig">✍️ 사인·도장 넣기 (선택)</button></div>
   <div id="pvWrap2" hidden>
-   <canvas class="pv" id="pvCv"></canvas>
+   <canvas class="pv" id="pvCv" title="빈한 번 누르면 크게 봅니다"></canvas>
+   <p class="kv" id="pvBigTip">종이를 멀리서 보려면 위 미리보기를 누르세요 — 크게 · 저장 전에 확인하는 확대 미리보기가 열립니다.</p>
    <div id="thmBox2"></div>
    <div class="missbox" id="missBox"></div>
   </div>
@@ -375,6 +412,12 @@ body.micOn #toast{bottom:calc(250px + env(safe-area-inset-bottom))}
 <div id="busy"><div id="busyT">처리 중…</div></div>
 <div id="toast"></div>
 <div id="printArea"></div>
+<div id="pvModal" aria-hidden="true"><div class="pvm">
+ <div class="hd2"><b id="pvmTitle">A4 미리보기</b><button type="button" id="pvmX">닫기</button></div>
+ <div class="tools"><button type="button" data-pvz="-" aria-label="작게">−</button><b id="pvmZ">100%</b><button type="button" data-pvz="+" aria-label="크게">＋</button><button type="button" data-pvz="fit" class="on" style="font-size:12px">화면 폭</button></div>
+ <div class="body" id="pvmBody"></div>
+ <div class="ft"><button class="btn pri" id="pvmPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="pvmPng">이미지(PNG) 저장</button><button class="btn pri" id="pvmStart" hidden>이 양식으로 시작</button></div>
+</div></div>
 <script src="forms.js"></script>
 <script src="forms_consult.js"></script>
 <script>
@@ -521,8 +564,11 @@ function fieldsHtml(list){
 
 /* ---------- 1 당사자 ---------- */
 function renderPick(){
-  $('#pickGrid').innerHTML = FORMS.map(f => `<button data-form="${escH(f.id)}" class="${f.id === S.form ? 'on' : ''}">${escH(f.name)}</button>`).join('');
+  $('#pickGrid').innerHTML = FORMS.map(f => `<div class="pk${f.id === S.form ? ' on' : ''}" data-pkrow="${escH(f.id)}">`
+    + `<button type="button" class="nm" data-form="${escH(f.id)}">${escH(f.name)}</button>`
+    + `<button type="button" class="zm" data-pkz="${escH(f.id)}" aria-label="${escH(f.name)} 크게 미리보기" title="크게 보기">🔍</button></div>`).join('');
   $('#legalTop').textContent = curForm().legal || '';
+  renderThemeChips();
 }
 function renderParty(){
   const f = curForm();
@@ -864,7 +910,7 @@ async function composite(maxW, pg){
   g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
   if (IM) g.drawImage(IM, 0, 0, cv.width, cv.height);
   const fs0 = curForm().fields.filter(f => f.type !== 'sign' && (!f.page || f.page === pg)).map(f => f.h / 100 * cv.height).sort((a, b) => a - b);
-  const FS0 = Math.min((fs0[fs0.length >> 1] || 40) * 0.55, cv.width * 0.035);
+  const FS0 = Math.min((fs0[fs0.length >> 1] || 40) * 0.60, cv.width * 0.042);   /* 269 — 종이 글자를 키움 */
   for (const f of curForm().fields){
     if (f.page && f.page !== pg) continue;
     const v = getV(f.id); if (v == null || v === '') continue;
@@ -879,7 +925,7 @@ async function composite(maxW, pg){
     const t = f.money ? (/^\d+$/.test(String(v)) ? comma(v) : String(v)) : String(v);
     const fw = f.money ? 600 : 500;
     const MINFS = Math.max(7, 9 * cv.width / 1489);          /* 더 줄이면 읽을 수 없다 → 가로로만 살짝 눌러 넣는다 */
-    let fs = f.fs ? f.fs * (cv.width / 1489) : Math.min(h * 0.62, FS0);
+    let fs = f.fs ? f.fs * (cv.width / 1489) : Math.min(h * 0.72, FS0);
     let pad = Math.max(2, fs * 0.22);
   /* 248 — 종이 글자는 검정(#000)으로 찍는다 */
     g.fillStyle = '#000';
@@ -960,21 +1006,61 @@ async function renderPreview(){
     renderMiss(); renderThemeChips();
   }, 60);
 }
-/* 0단계 — A4 원본 양식 미리보기 (작성 전 서식 확인) */
+/* 0단계 — 서식 미리보기는 [확대 미리보기 모달]에서 본다 (274·278) */
 let PVT0 = null;
-async function renderSheet(){
-  const f = curForm(); if (!f) return;
-  $('#pvTitle').textContent = f.name || '원본 양식 미리보기';
-  renderThemeChips();
-  clearTimeout(PVT0);
-  PVT0 = setTimeout(async () => {
-    const all = await compositeAll(1200);
-    const c = stackCanvases(all, '#0B1729');
-    const cv = $('#pv0'); cv.width = c.width; cv.height = c.height;
-    cv.getContext('2d').drawImage(c, 0, 0);
-    const n = pageCount();
-    $('#pvInfo').innerHTML = '<span class="dot"></span>A4 ' + n + '쪽 · 빈칸 ' + f.fields.filter(x => x.type !== 'sign').length + '곳 · 넣은 값은 이 기기에만 저장됩니다';
-  }, 50);
+async function renderSheet(){ /* 첫 화면에서는 그림을 그리지 않는다 — 돋보기를 눌렀을 때만 연다 */ }
+
+/* ---------- 264·279·U-3·U-10 — 저장 전 확대 미리보기 모달 ---------- */
+let PVFIT = true, PVZ = 1, PV_FORM = '';
+async function blankPaper(form, pg){
+  const base = (form && form.pages && form.pages[pg - 1]) ? form.pages[pg - 1].bg : (form && form.bg);
+  const im = base ? await loadUrlImg(base) : null;
+  const W = im ? (im.naturalWidth || im.width) : 1489, H = im ? (im.naturalHeight || im.height) : 2105;
+  const s = Math.min(2, 1400 / W);
+  const cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s);
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+  if (im) g.drawImage(im, 0, 0, cv.width, cv.height);
+  return cv;
+}
+function pvZoomApply(){
+  const body = $('#pvmBody'); if (!body) return;
+  body.style.setProperty('--pvw', PVFIT ? '100%' : Math.round(PVZ * 100) + '%');
+  const z = $('#pvmZ'); if (z) z.textContent = PVFIT ? '100%' : Math.round(PVZ * 100) + '%';
+  $$('[data-pvz]').forEach(b => b.classList.toggle('on', b.dataset.pvz === 'fit' ? PVFIT : false));
+}
+function pvOpen(list, opt){
+  opt = opt || {};
+  const body = $('#pvmBody'); if (!body) return;
+  PV_FORM = opt.form || '';
+  const urls = list.map(c => c.toDataURL('image/jpeg', 0.95));
+  body.innerHTML = urls.map((u, i) => `<img src="${u}" alt="A4 ${i + 1}쪽">`).join('');
+  const t = $('#pvmTitle'); if (t) t.textContent = opt.title || 'A4 미리보기';
+  const bp = $('#pvmPdf'), bn = $('#pvmPng'), bs = $('#pvmStart');
+  if (bp) bp.hidden = !!opt.blank;
+  if (bn) bn.hidden = !!opt.blank;
+  if (bs) bs.hidden = !opt.blank;
+  PVFIT = true; PVZ = 1; pvZoomApply();
+  const m = $('#pvModal'); if (m){ m.classList.add('on'); m.setAttribute('aria-hidden', 'false'); }
+  body.scrollTop = 0;
+}
+function pvClose(){ const m = $('#pvModal'); if (!m) return; m.classList.remove('on'); m.setAttribute('aria-hidden', 'true'); }
+async function pvShowCurrent(){
+  busyOn('A4 미리보기를 만드는 중…');
+  try{
+    const list = await compositeAll(1800);
+    busyOff();
+    pvOpen(list, {title: (curForm().name || '계약서') + ' · A4 ' + list.length + '쪽'});
+  }catch(e){ busyOff(); toast('미리보기를 만들지 못했습니다'); }
+}
+async function pvShowForm(id){
+  const f = FORMS.find(x => x.id === id); if (!f) return;
+  busyOn('원본 양식을 불러오는 중…');
+  try{
+    const n = (f.pages && f.pages.length) ? f.pages.length : 1, list = [];
+    for (let p = 1; p <= n; p++) list.push(await blankPaper(f, p));
+    busyOff();
+    pvOpen(list, {title: f.name + ' · A4 ' + n + '쪽 원본', blank: true, form: id});
+  }catch(e){ busyOff(); toast('양식을 열지 못했습니다'); }
 }
 function empties(){
   const out = [];
@@ -1125,6 +1211,20 @@ function s5amt(t, labels) {
   const a = s5amtAll(t, labels);
   return a.length ? a[0] : null;
 }
+/* S-2 (268) — 금액이 라벨보다 먼저 오는 흔한 매물 문자 표기: "45억 매매", "4억5천 계약금" */
+const S5_MONEY_RE = '([0-9][0-9,.]*(?:\\s*(?:억|천|만)\\s*[0-9,]*)*\\s*(?:원|만원|억원)?)';
+function s5amtPre(t, labels) {
+  for (let i = 0; i < labels.length; i++) {
+    const re = new RegExp(S5_MONEY_RE + '\\s*(?:에|으로|로)?\\s*(?:' + labels[i] + ')(?![가-힣])', 'g');
+    let m;
+    while ((m = re.exec(t))) {
+      if (!/[억만천원]/.test(m[1]) && !/[\d]{3}/.test(m[1])) continue;
+      const v = s5won(m[1]);
+      if (v >= 1000) return { raw: m[1].trim(), pre: true, v: v };
+    }
+  }
+  return null;
+}
 
 /* 주소 — '시·군·구 … 동·읍·면·리 … 번지' 를 토큰으로 따라간다 */
 const S5_SIDO = /^(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|경기도|강원도|충청북도|충청남도|전라북도|전라남도|경상북도|경상남도|제주도)$/;
@@ -1149,7 +1249,7 @@ function s5addr(t) {
   if (!best) {                       /* '가평 신하리 15' 처럼 시·군·구가 빠진 매물 */
     for (let i = 0; i < toks.length; i++) {
       const tk = toks[i].replace(/^[,.()\[]+|[,.()\]]+$/g, '');
-      if (!/(읍|면|동|리)$/.test(tk)) continue;
+      if (!/(읍|면|동|리)\d*(가)?$/.test(tk)) continue;
       const nx = (toks[i + 1] || '').replace(/^[,.()\[]+|[,.()\]]+$/g, '');
       const mm2 = nx.match(/^(\d+(?:-\d+)?)(?:번지|필지)?$/);
       if (!mm2) continue;
@@ -1280,6 +1380,17 @@ function s5parse(raw) {
   A.mgmt = s5amt(t, S5_LAB.mgmt); A.earnest = s5amt(t, S5_LAB.earnest);
   A.mid = s5amt(t, S5_LAB.mid); A.balance = s5amt(t, S5_LAB.balance);
   A.loan = s5amt(t, S5_LAB.loan);
+  /* S-2 — 금액이 라벨 앞에 오는 표기("45억 매매")도 인식하고,
+     계약금·잔금이 다 있으면 매매대금을 합산해 역산한다(인쇄물 매매대금 빈칸 방지) */
+  if (!A.price) A.price = s5amtPre(t, S5_LAB.price);
+  if (!A.price && !A.deposit && A.earnest && A.balance && A.earnest.v > 0 && A.balance.v > 0){
+    const sum = A.earnest.v + A.balance.v + (A.mid ? A.mid.v : 0);
+    A.price = { raw: '계약금+잔금', sum: true, v: sum };
+  }
+  if (A.price && !A.balance && A.earnest && A.mid){
+    const rest = A.price.v - A.earnest.v - (A.mid ? A.mid.v : 0);
+    if (rest > 0) A.balance = { raw: '', sum: true, v: rest };
+  }
   A.dates = s5dates(t);
   A.form = s5detectForm(t);
   /* 교환은 갑·을 물건이 따로 — '을' 앞뒤로 나눠 각각 주소·면적을 읽는다 */
@@ -1525,6 +1636,7 @@ document.addEventListener('input', e => {
     return;
   }
   const fid = el.dataset && el.dataset.f; if (!fid) return;
+  if (el.dataset && el.dataset.dt) return;          /* 날짜는 달력(change)에서만 처리 */
   const f = byId(fid); if (!f) return;
   /* ㎡ → 평 */
   if (!f.money && /면적/.test(String(f.label || ''))){
@@ -1552,7 +1664,8 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   const el = e.target;
-  if (el.dataset && el.dataset.dpk && el.value){ datePickSet(el.dataset.dpk, el.value); el.hidden = true; el.value = ''; return; }
+  if (el.dataset && el.dataset.dpk && el.value){ datePickSet(el.dataset.dpk, el.value); return; }
+  if (el.dataset && el.dataset.dt && el.value){ dateSingleSet(el.dataset.dt, el.value); return; }
   if (el.dataset && el.dataset.sp != null){ const i = +el.dataset.sp; S.sp = (S.sp || []).filter(x => x !== i); if (el.checked) S.sp.push(i); save(); syncSpecial(); }
   /* 248 — 주소 한 줄만 넣어도 4대 공부(지목·면적·소재지)를 바로 찾아 채운다 */
   if (el && el.dataset && el.dataset.f && !PCL_WRITE){
@@ -1628,14 +1741,40 @@ document.addEventListener('click', e => {
   }
 });
 if ($('#startBtn')) $('#startBtn').onclick = () => go(1);
-if ($('#pvBtn')) $('#pvBtn').onclick = () => { const w = $('#pvWrap'); w.hidden = !w.hidden; if (!w.hidden) renderSheet(); };
+if ($('#pvBtn')) $('#pvBtn').onclick = () => pvShowForm(S.form);
 if ($('#toOpt')) $('#toOpt').onclick = () => go(2);
 if ($('#s5go')) $('#s5go').onclick = s5run;
+/* 278 — 매물 글을 붙이기 전에는 양식 고르기 칩을 숨긴다 (자동 판별이 기본) */
+(function(){
+  const t = $('#s5txt'), box = $('#s5form');
+  if (!t || !box) return;
+  const sync = () => { box.hidden = !String(t.value || '').trim(); };
+  t.addEventListener('input', sync); t.addEventListener('change', sync);
+  setTimeout(sync, 0);
+})();
 $('#spFree').addEventListener('input', e => { S.free = e.target.value; save(); syncSpecial(); if (S.step === 2) renderPreview(); });
 $('#cpSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.cp = +b.dataset.cp; save(); renderCp(); };
-$('#printBtn').onclick = doPrint;
+$('#printBtn').onclick = () => pvShowCurrent();          /* 264 — 바로 인쇄하지 않고 확대 미리보기부터 */
 $('#pngBtn').onclick = doPng;
-$('#nextBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step); if (S.step === 0) return go(1); doPrint(); };
+$('#nextBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step); if (S.step === 0) return go(1); pvShowCurrent(); };
+/* 미리보기 모달 — 확대·축소·폭 맞춤·닫기·저장 */
+document.addEventListener('click', e => {
+  const z = e.target.closest('[data-pvz]');
+  if (z){
+    const k = z.dataset.pvz;
+    if (k === 'fit'){ PVFIT = true; }
+    else { PVFIT = false; PVZ = Math.max(0.6, Math.min(3, PVZ + (k === '+' ? 0.5 : -0.5))); }
+    pvZoomApply(); return;
+  }
+  const pz = e.target.closest('[data-pkz]');
+  if (pz){ e.preventDefault(); e.stopPropagation(); pvShowForm(pz.dataset.pkz); return; }
+  if (e.target.closest('#pvmX') || e.target.id === 'pvModal'){ pvClose(); return; }
+});
+if ($('#pvmPdf')) $('#pvmPdf').onclick = () => { pvClose(); doPrint(); };
+if ($('#pvmPng')) $('#pvmPng').onclick = () => { pvClose(); doPng(); };
+if ($('#pvmStart')) $('#pvmStart').onclick = () => { const id = PV_FORM; pvClose(); if (id){ setForm(id); go(1); } };
+if ($('#pvCv')) $('#pvCv').onclick = () => pvShowCurrent();
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#pvModal') && $('#pvModal').classList.contains('on')) pvClose(); });
 $('#backBtn').onclick = () => { const list = stepList(), i = list.indexOf(S.step);
   if (i <= 0) return;
   if (history.state && history.state.kc && history.state.kc > list[0]){ try{ history.back(); return; }catch(e){} }
@@ -1922,15 +2061,27 @@ function addMonths(b, n){
   return { y: String(dt.getFullYear()), m: String(dt.getMonth() + 1), d: String(dt.getDate()) };
 }
 function sameD(a, b){ return String(+a.y) === String(+b.y) && String(+a.m) === String(+b.m) && String(+a.d) === String(+b.d); }
-function setGroup(g, d){
+function setGroup(g, d, quiet){
   g.fs.forEach(f => {
     const k = dpOf(f), v = String(+d[k]);
     setV(f.id, v);
     const inp = document.querySelector(`input[data-f="${f.id}"]`);
     if (inp) inp.value = v;
   });
+  const dp = document.querySelector(`input[data-dpk="${g.k}"]`);
+  if (dp && !quiet) dp.value = isoOfYmd(d);
   markDates();
   if (S.step === 2) renderPreview();
+}
+/* 277 — 날짜는 무조건 달력(input type=date)에서 고른다 — 년·월·일 수동 입력 없앰 */
+function isoOfYmd(o){ return o ? (String(o.y).padStart(4, '0') + '-' + pad2(o.m) + '-' + pad2(o.d)) : ''; }
+function isoFromText(v){
+  const s = String(v || '').trim(); if (!s) return '';
+  let m = s.match(/^(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})/);
+  if (m) return m[1] + '-' + pad2(m[2]) + '-' + pad2(m[3]);
+  m = s.match(/^(\d{4})[-.\/]?(\d{2})?(\d{2})?$/);
+  if (m && m[2] && m[3]) return m[1] + '-' + m[2] + '-' + m[3];
+  return '';
 }
 function markDates(){
   const base = baseDate();
@@ -1954,16 +2105,21 @@ function renderDates(){
     const isM = /중도금|잔금/.test(g.k);
     const chips = isM
       ? [1, 2, 3].map(n => `<button type="button" data-dadd="${n}" data-dk="${escH(g.k)}">${n}달</button>`).join('')
-        + `<button type="button" data-dpick="1" data-dk="${escH(g.k)}">달 정하기</button>`
       : `<button type="button" data-dadd="0" data-dk="${escH(g.k)}">오늘</button>`;
     return `<div class="dgrp"><div class="dgh">${escH(g.k)}<em data-dval="${escH(g.k)}"></em></div>`
-      + `<div class="dch">${chips}</div>`
-      + `<div class="dd2">${g.fs.map(x => `<input data-f="${escH(x.id)}" inputmode="numeric" maxlength="4" placeholder="${{y:'년',m:'월',d:'일'}[dpOf(x)] || ''}" value="${escH(getV(x.id))}">`).join('<span class="sep">.</span>')}</div>`
-      + `<input type="date" class="dpick" data-dpk="${escH(g.k)}" hidden>`
-      + `</div>`;
+      + `<input type="date" class="dpick" data-dpk="${escH(g.k)}" value="${isoOfYmd(readGroup(g))}">`
+      + `<div class="dch">${chips}</div></div>`;
   }).join('') + singles.map(x => `<div class="dgrp"><div class="dgh">${escH(LBL(x))}</div>`
-      + `<div class="fld"><input data-f="${escH(x.id)}" value="${escH(getV(x.id))}" placeholder="2026.11.26"></div></div>`).join('');
+      + `<div class="fld"><input type="date" class="dpick" data-dt="${escH(x.id)}" data-f="${escH(x.id)}" value="${isoFromText(getV(x.id))}"></div></div>`).join('');
   markDates();
+}
+function dateSingleSet(fid, val){
+  if (!fid || !val) return;
+  const p = val.split('-'); if (p.length < 3) return;
+  const s = p[0] + '.' + pad2(p[1]) + '.' + pad2(p[2]);
+  setV(fid, s);
+  if (S.step === 2) renderPreview();
+  toast(LBL(byId(fid) || {}) + ' ' + s);
 }
 function dateChip(dk, n){
   const g = dateGroups().find(x => x.k === dk); if (!g) return;
@@ -2053,13 +2209,37 @@ async function propLoad(scope){
   }
   openPropSheet(scope);
 }
+/* 275 — 토지대장으로 확정한 PNU 하나로 토지·건축물·이용계획·공시지가를 모두 붙였는지 화면에 보여 준다 */
+function gbRender(r, addr){
+  const box = $('#gbCard'); if (!box) return;
+  if (!r || r.st !== 'OK'){ box.hidden = true; box.innerHTML = ''; return; }
+  const toji = r.toji || {}, ch = r.char || {}, pr = r.price || null;
+  const b = (r.bld && r.bld.st === 'OK' && r.bld.items && r.bld.items[0]) || null;
+  const jimok = ch.lndcgrCodeNm || toji.lndcgrCodeNm || '';
+  const area = toji.lndpclAr ? +toji.lndpclAr : (ch.lndpclAr ? +ch.lndpclAr : 0);
+  const use = (r.use || []).filter(u => /포함|접함/.test(u.cnflc || '')).map(u => u.nm).filter(Boolean).slice(0, 3);
+  const jiga = (pr && pr.pblntfPclnd) ? +pr.pblntfPclnd : (ch.pblntfPclnd ? +ch.pblntfPclnd : 0);
+  const yr = (pr && pr.stdrYear) ? String(pr.stdrYear) : (ch.lastUpdtDt ? String(ch.lastUpdtDt).slice(0, 4) : '');
+  const rows = [];
+  if (jimok || area) rows.push(['토지대장', [jimok, area ? comma(s5cut(area, 2)) + '㎡' + (area ? ' (' + s5fmtNum(s5cut(m2ToPy(area), 2)) + '평)' : '') : ''].filter(Boolean).join(' · ')]);
+  if (b) rows.push(['건축물대장', [[b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' '), b.totArea ? '연면적 ' + comma(s5cut(+b.totArea, 2)) + '㎡' : ''].filter(Boolean).join(' · ')]);
+  else rows.push(['건축물대장', (r.bld && (r.bld.st === 'EMPTY' || r.bld.st === 'NOPNU')) ? '건축물 없음(나대지)' : '지금은 못 받았습니다 — [물건정보 불러오기]에서 다시']);
+  if (use.length) rows.push(['이용계획', use.join(' / ')]);
+  if (jiga) rows.push(['공시지가', comma(jiga) + '원/㎡' + (yr ? ' (' + yr + '년)' : '') + (area ? ' · 총 ' + comma(Math.round(jiga * area)) + '원' : '')]);
+  if (!rows.length){ box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  box.innerHTML = '<div class="gbc"><div class="gbh">4대 공부 확인<em>' + escH(r.addr || addr || '') + '</em></div>'
+    + '<dl>' + rows.map(q => '<dt>' + q[0] + '</dt><dd>' + escH(q[1]) + '</dd>').join('') + '</dl>'
+    + (r.pnu ? '<div class="pnu">확정 PNU ' + escH(r.pnu) + ' · 소재지·지목·면적·구조를 계약서에 넣었습니다</div>' : '')
+    + '</div>';
+}
 async function propEnrich(scope, addr){
   if (!window.KTS_GB || !addr) return;
   try{
     busyOn('4대 공부 확인 중…');
     const r = await KTS_GB.lookup(addr);
     busyOff();
-    if (!r || r.st !== 'OK'){ return; }
+    if (!r || r.st !== 'OK'){ gbRender(r, addr); return; }
     const toji = r.toji || {}, ch = r.char || {};
     const b = (r.bld && r.bld.st === 'OK' && r.bld.items && r.bld.items[0]) || null;
     const d = {
@@ -2070,6 +2250,7 @@ async function propEnrich(scope, addr){
       struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
     };
     const done = fillProp(scope, d, true);
+    gbRender(r, addr);
     if (done.length){ refreshWrite(); toast('4대 공부로 ' + done.length + '칸을 더 채웠습니다'); }
   }catch(e){ busyOff(); }
 }
@@ -2125,12 +2306,13 @@ async function propEnrichForce(scope, addr){
       struct: b ? [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ') : ''
     }, true);
     refreshWrite();
+    gbRender(r, addr);
     toast(done.length ? ('4대 공부로 ' + done.length + '칸을 채웠습니다') : '이미 다 채워져 있습니다');
   }catch(e){ busyOff(); toast('4대 공부를 불러오지 못했습니다'); }
 }
 
 /* ---------- 마이크: 지금 듣고 있어요 + 이퀄라이저 ---------- */
-const MIC = { on:false, want:false, rec:null, el:null, bars:[], ac:null, an:null, raf:0, stream:null, noLevel:false, ends:0 };
+const MIC = { on:false, want:false, rec:null, el:null, bars:[], raf:0, ends:0, pend:'', pendEl:null };
 function micKillKb(){
   try{ const a = document.activeElement; if (a && a.blur && a !== document.body) a.blur(); }catch(e){}
   try{ const a = document.activeElement; if (a && a.blur) a.blur(); }catch(e){}
@@ -2181,7 +2363,9 @@ function micChipEl(){
   b.setAttribute('aria-label', '말로 이 칸 채우기');
   b.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();
-    const el = (LASTEL && document.body.contains(LASTEL) && LASTEL.getClientRects().length) ? LASTEL : voicePick();
+    const ae = document.activeElement;
+    const el = (LASTEL && document.body.contains(LASTEL) && LASTEL.getClientRects().length && LASTEL.dataset && LASTEL.dataset.f != null) ? LASTEL
+      : (ae && ae.id === 'spFree' ? ae : voicePick());
     micStart(el);
   });
   document.body.appendChild(b);
@@ -2190,7 +2374,9 @@ function micChipEl(){
 function micChipPlace(){
   const b = micChipEl();
   const a = document.activeElement;
-  const on = !MIC.on && a && a.dataset && a.dataset.f != null && a.closest && a.closest('#s1') && a.getClientRects().length;
+  const inS1 = !!(a && a.closest && a.closest('#s1'));
+  const isField = !!(a && ((a.dataset && a.dataset.f != null) || a.id === 'spFree')) && a.type !== 'date';
+  const on = !MIC.on && inS1 && isField && a.getClientRects().length;
   if (!on){ b.classList.remove('on'); return; }
   const r = a.getBoundingClientRect();
   b.classList.add('on');
@@ -2227,7 +2413,7 @@ function micLive(t, fin){
 }
 function voiceFields(){
   return Array.prototype.slice.call(document.querySelectorAll('#s1 input[data-f], #s1 textarea[data-f]'))
-    .filter(e => e.getClientRects().length);
+    .filter(e => e.getClientRects().length && e.type !== 'date');
 }
 function voicePick(){
   const els = voiceFields();
@@ -2236,56 +2422,58 @@ function voicePick(){
     || els.find(e => !e.getAttribute('inputmode'))
     || els[0];
 }
+/* 273 — 안드로이드 크롬 버그 수리: SpeechRecognition 과 getUserMedia(이퀄라이저)가 마이크를
+   동시에 열면 음성인식이 소리를 못 받아 글자가 안 써진다. 마이크는 SpeechRecognition 하나만 점유하고,
+   이퀄라이저는 음성 수신 이벤트(onresult·speechstart·soundstart)의 세기로 움직인다. */
+let MIC_RAF = 0, MIC_E = .18;
+function micEnergy(v){ if (v > MIC_E) MIC_E = v; }
+function micAnim(on){
+  if (!on){ if (MIC_RAF) cancelAnimationFrame(MIC_RAF); MIC_RAF = 0; MIC_E = .18; return; }
+  if (MIC_RAF) return;
+  const t0 = performance.now();
+  const loop = t => {
+    if (!MIC.on){ MIC_RAF = 0; return; }
+    const dt = t - t0;
+    MIC_E *= 0.93;                                        /* 받은 세기는 천천히 잦아든다 */
+    const idle = .16 + .09 * Math.abs(Math.sin(dt / 640));
+    const e = Math.max(idle, MIC_E);
+    MIC.bars.forEach((b, i) => {
+      const w = Math.abs(Math.sin(dt / 210 + i * .62)) * .55 + Math.abs(Math.sin(dt / 940 + i * .27)) * .45;
+      const v = Math.min(1, e * (.45 + w));
+      b.style.height = (6 + Math.round(v * 32)) + 'px';
+    });
+    MIC_RAF = requestAnimationFrame(loop);
+  };
+  MIC_RAF = requestAnimationFrame(loop);
+}
+function stopLevel(){ if (MIC_RAF) cancelAnimationFrame(MIC_RAF); MIC_RAF = 0; MIC_E = .18; }
 function micStart(el){
   micKillKb();
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR){ toast('이 브라우저는 음성 입력이 안 됩니다 — 키보드 마이크를 쓰세요'); return; }
-  if (!el) el = (LASTEL && document.body.contains(LASTEL) && LASTEL.getClientRects().length) ? LASTEL : voicePick();
+  if (!el) el = (LASTEL && document.body.contains(LASTEL) && LASTEL.getClientRects().length && LASTEL.type !== 'date') ? LASTEL : voicePick();
   if (!el) return toast('먼저 채울 칸을 눌러 주세요');
+  if (el.type === 'date') return toast('날짜는 달력에서 골라 주세요');
   if (MIC.on) micStop(false);
-  MIC.on = true; MIC.want = true; MIC.ends = 0;
+  MIC.on = true; MIC.want = true; MIC.ends = 0; MIC.pend = '';
   micBarEl();
   micSetTarget(el);
   micLive('말씀하세요…', false);
   micShow(true);
+  micAnim(true);
   startRec();
-  micLevel();
   [70, 380, 900].forEach(ms => setTimeout(() => { if (MIC.on) micKillKb(); }, ms));
 }
-function startRec(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
-  let r; try{ r = new SR(); }catch(e){ return; }
-  MIC.rec = r;
-  r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
-  r.onresult = e => {
-    MIC.ends = 0;
-    let it = '', fn = '';
-    for (let i = e.resultIndex; i < e.results.length; i++){
-      const res = e.results[i], t = (res[0] && res[0].transcript) || '';
-      if (res.isFinal) fn += t; else it += t;
-    }
-    if (it.trim()) micLive(it.trim(), false);
-    if (fn.trim()) micInsert(fn.trim());
-    micKillKb();
-  };
-  r.onerror = e => {
-    const er = (e && e.error) || '';
-    if (er === 'not-allowed' || er === 'service-not-allowed'){ micSay('마이크 권한을 허용해 주세요 (주소창 자물쇠 → 마이크)'); setTimeout(() => micStop(true), 2600); return; }
-    if (er === 'network'){ micSay('음성 인식 서버에 연결하지 못했습니다 — 키보드 마이크를 쓰세요'); setTimeout(() => micStop(true), 2600); return; }
-    if (er === 'no-speech' || er === 'aborted'){ micSay('말씀하세요…'); return; }
-    if (er === 'audio-capture'){ MIC.noLevel = true; stopLevel(); return; }
-    micSay('다시 한 번 말씀해 주세요');
-  };
-  r.onend = () => {
-    if (!MIC.on || !MIC.want) return micEnd();
-    MIC.ends++;
-    if (MIC.ends > 8){ micSay('음성 인식을 멈췄습니다 — 다시 눌러 주세요'); return micEnd(); }
-    setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 200);
-  };
-  try{ r.start(); }catch(e){ setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 450); }
+/* 확정되지 않은(interim) 글자도 정지·종료 때 칸에 넣는다 */
+function micCommitPend(){
+  const t = String(MIC.pend || '').trim(); MIC.pend = '';
+  if (!t) return;
+  const el = MIC.pendEl; MIC.pendEl = null;
+  if (el && document.body.contains(el)){
+    const keep = MIC.el; MIC.el = el; micInsert(t, true); MIC.el = keep;
+  } else micInsert(t, true);
 }
-function micInsert(t){
+function micInsert(t, keep){
   const el = MIC.el; if (!el) return;
   const isTa = el.tagName === 'TEXTAREA';
   const cur = String(el.value || '');
@@ -2293,7 +2481,7 @@ function micInsert(t){
   try{ el.dispatchEvent(new Event('input', { bubbles: true })); }catch(e){}
   LASTEL = el;
   micLive(t, true);
-  if (el.id !== 'spFree' && S.step === 1) setTimeout(micNext, 80);
+  if (!keep && el.id !== 'spFree' && S.step === 1) setTimeout(micNext, 80);
 }
 function micNext(){
   const els = voiceFields(); if (!els.length) return;
@@ -2302,58 +2490,53 @@ function micNext(){
   if (nx && nx !== MIC.el) micSetTarget(nx);
 }
 function micStop(){
+  micCommitPend();
   MIC.want = false; MIC.on = false;
   try{ MIC.rec && MIC.rec.stop(); }catch(e){}
   setTimeout(() => { try{ MIC.rec && MIC.rec.abort(); }catch(e){} }, 60);
   stopLevel();
   setTimeout(() => { if (!MIC.on) micShow(false); }, 450);
 }
-function micEnd(){ MIC.on = false; MIC.want = false; stopLevel(); setTimeout(() => { if (!MIC.on) micShow(false); }, 1400); }
-function micLevel(){
-  if (MIC.noLevel || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return micWave();
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(st => {
-    if (!MIC.on){ st.getTracks().forEach(t => t.stop()); return; }
-    MIC.stream = st;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return micWave();
-    const ac = new AC(); MIC.ac = ac;
-    const src = ac.createMediaStreamSource(st);
-    const an = ac.createAnalyser(); an.fftSize = 64; an.smoothingTimeConstant = .72;
-    src.connect(an); MIC.an = an;
-    const buf = new Uint8Array(an.frequencyBinCount);
-    const loop = () => {
-      if (!MIC.on || !MIC.an) return;
-      an.getByteFrequencyData(buf);
-      const n = MIC.bars.length;
-      for (let i = 0; i < n; i++){
-        const k = Math.min(buf.length - 1, Math.round(i * buf.length / n));
-        const v = (buf[k] || 0) / 255;
-        MIC.bars[i].style.height = (6 + Math.round(Math.pow(v, 1.2) * 32)) + 'px';
-      }
-      MIC.raf = requestAnimationFrame(loop);
-    };
-    loop();
-  }).catch(() => { MIC.noLevel = true; micWave(); });
-}
-function micWave(){
-  const t0 = performance.now();
-  const loop = t => {
-    if (!MIC.on) return;
-    const dt = t - t0;
-    MIC.bars.forEach((b, i) => {
-      const v = .16 + .52 * Math.abs(Math.sin(dt / 150 + i * .62)) * Math.abs(Math.sin(dt / 820 + i * .27));
-      b.style.height = (6 + Math.round(v * 32)) + 'px';
-    });
-    MIC.raf = requestAnimationFrame(loop);
+function micEnd(){ micCommitPend(); MIC.on = false; MIC.want = false; stopLevel(); setTimeout(() => { if (!MIC.on) micShow(false); }, 1400); }
+function startRec(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  let r; try{ r = new SR(); }catch(e){ return; }
+  MIC.rec = r;
+  r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
+  r.onstart = () => { micEnergy(.34); };
+  r.onaudiostart = () => { micEnergy(.30); };
+  r.onsoundstart = () => { micEnergy(.58); };
+  r.onspeechstart = () => { micEnergy(.92); micLive('듣고 있어요…', false); };
+  r.onresult = e => {
+    MIC.ends = 0;
+    let it = '', fn = '';
+    for (let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i], t = (res[0] && res[0].transcript) || '';
+      if (res.isFinal) fn += t; else it += t;
+    }
+    if (fn.trim()) micInsert(fn.trim());        /* 확정된 말은 바로 칸에 */
+    MIC.pend = it.trim();                      /* 아직 확정 전인 말은 잠시 들고 있다가 정지 때 넣는다 */
+    if (MIC.pend){ MIC.pendEl = MIC.el; micLive(MIC.pend, false); }
+    micEnergy(Math.min(1, .38 + MIC.pend.length * .05));
+    micKillKb();
   };
-  MIC.raf = requestAnimationFrame(loop);
-}
-function stopLevel(){
-  if (MIC.raf) cancelAnimationFrame(MIC.raf); MIC.raf = 0;
-  try{ MIC.stream && MIC.stream.getTracks().forEach(t => t.stop()); }catch(e){}
-  MIC.stream = null;
-  try{ MIC.ac && MIC.ac.close(); }catch(e){}
-  MIC.ac = null; MIC.an = null;
+  r.onerror = e => {
+    const er = (e && e.error) || '';
+    if (er === 'not-allowed' || er === 'service-not-allowed'){ micSay('마이크 권한을 허용해 주세요 (주소창 자물쇠 → 마이크)'); setTimeout(() => micStop(true), 2600); return; }
+    if (er === 'network'){ micSay('음성 인식 서버에 연결하지 못했습니다 — 키보드 마이크를 쓰세요'); setTimeout(() => micStop(true), 2600); return; }
+    if (er === 'no-speech' || er === 'aborted'){ micSay('말씀하세요…'); return; }
+    if (er === 'audio-capture'){ micSay('마이크를 열지 못했습니다 — 다른 앱의 마이크를 끄고 다시 눌러 주세요'); setTimeout(() => micStop(true), 2400); return; }
+    micSay('다시 한 번 말씀해 주세요');
+  };
+  r.onend = () => {
+    if (!MIC.on || !MIC.want) return micEnd();
+    micCommitPend();                            /* 한 토막이 끝나도 들고 있던 interim 글자는 잃지 않는다 */
+    MIC.ends++;
+    if (MIC.ends > 8){ micSay('음성 인식을 멈췄습니다 — 다시 눌러 주세요'); return micEnd(); }
+    setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 200);
+  };
+  try{ r.start(); }catch(e){ setTimeout(() => { if (MIC.on && MIC.want) startRec(); }, 450); }
 }
 function micParty(g){
   const wrap = document.querySelector(`[data-pg="${g}"]`);
@@ -2393,7 +2576,7 @@ function toggleOpt(k){
   }
   renderOpts();
 }
-window.KC_MIC = { start: micStart, stop: micStop, show: function(){ micBarEl(); MIC.on = true; micSetTarget(voicePick()); micShow(true); micWave(); setTimeout(function(){ MIC.on = false; micShow(false); }, 6000); }, get on(){ return MIC.on; } };
+window.KC_MIC = { start: micStart, stop: micStop, show: function(){ micBarEl(); MIC.on = true; micSetTarget(voicePick()); micShow(true); micAnim(true); setTimeout(function(){ MIC.on = false; stopLevel(); micShow(false); }, 6000); }, get on(){ return MIC.on; } };
 window.KC_WRITE = { render: renderWrite, dates: dateGroups, propLoad: propLoad, fillProp: fillProp };
 
 /* ============================================================================
@@ -2407,7 +2590,7 @@ function pclRender(){
   const list = pclList();
   box.innerHTML = list.map((p, i) => `<div class="pclrow" data-pcl="${i}">
     <div class="pcltop"><span class="pn">${i + 1}</span><input data-paddr="${i}" value="${escH(p.addr || '')}" placeholder="주소 — 예) 신하리 162-9"><button type="button" class="pd" data-pdel="${i}" title="이 필지 빼기">✕</button></div>
-    <div class="pclsub"><input class="pj" data-pjimok="${i}" value="${escH(p.jimok || '')}" placeholder="지목"><input class="pa" data-parea="${i}" inputmode="decimal" value="${p.area ? s5fmtNum(p.area) : ''}" placeholder="면적"><span class="unit">㎡</span><span class="pyp" data-ppy="${i}">${p.area ? s5fmtNum(s5cut(m2ToPy(+p.area), 2)) + '평' : ''}</span><button type="button" class="pfind" data-pfind="${i}">4대 공부</button><span class="pst" data-pst="${i}"></span></div>
+    <div class="pclsub"><input class="pj" data-pjimok="${i}" value="${escH(p.jimok || '')}" placeholder="지목"><input class="pa" data-parea="${i}" inputmode="decimal" value="${p.area ? s5fmtNum(p.area) : ''}" placeholder="면적"><span class="unit">㎡</span><span class="pyp" data-ppy="${i}">${p.area ? s5fmtNum(s5cut(m2ToPy(+p.area), 2)) + '평' : ''}</span><button type="button" class="pfind${p.addr ? ' on' : ''}" data-pfind="${i}">4대 공부</button><span class="pst" data-pst="${i}"></span></div>
   </div>`).join('');
   const tot = pclSum();
   const sumT = $('#pclSumT');
@@ -2480,7 +2663,7 @@ async function pclFind(i){
     if (ar) p.area = ar;
     if (b && b.totArea) p.bldg = +b.totArea;
     if (b) p.struct = [b.strctCdNm, b.mainPurpsCdNm].filter(Boolean).join(' ');
-    save(); pclRender(); pclSync();
+    save(); pclRender(); pclSync(); gbRender(r, p.addr);
     if (st()) st().textContent = p.jimok ? (p.jimok + ' · 완료') : '완료';
   }catch(e){ if (st()) st().textContent = '못 찾음'; }
 }
