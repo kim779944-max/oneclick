@@ -5,7 +5,8 @@
 <meta name="description" content="주소나 지번을 한 번 넣으면 4대 공부(토지대장·건축물대장·지적도·토지이용계획)를 한 화면에 모아 보여 주고, 4대 공부 요약과 지적도를 PDF·PNG로 저장합니다.">
 <meta name="theme-color" content="#0A1128">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="../icon.png">
+<link rel="icon" href="/gongbu/icon-192.png">
+<link rel="apple-touch-icon" href="/gongbu/icon-192.png">
 <style>
 :root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
  --amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--green:#2ED47A;--red:#E23A2E;--blue:#7FB2FF}
@@ -20,6 +21,7 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.94);-webkit-ba
  border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px}
 header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px;white-space:nowrap}
 .brand{font-weight:900;font-size:14.5px;color:#fff;letter-spacing:-.4px;white-space:nowrap}.brand i{font-style:normal;color:var(--amber2)}
+.hicon{width:20px;height:20px;border-radius:6px;display:block;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 header .sp{flex:1}
 header .st{font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:999px;padding:3px 8px;white-space:nowrap}
 main{padding:12px 14px 0}
@@ -151,7 +153,7 @@ canvas.map{width:100%;height:auto;display:block;border-radius:12px;background:#0
 .cands{margin-top:8px;display:grid;gap:5px}
 .cands button{text-align:left;border:1px solid var(--line2);background:#0B1729;color:#fff;border-radius:9px;padding:8px 10px;font-size:11.5px;font-weight:800;cursor:pointer}
 .cands button b{color:var(--amber2);font-weight:900}
-/* ── 286: 5탭 (기본정보·토지대장·건축물대장·토지이용계획·개별공시지가) ── */
+/* 5탭 (기본정보·토지대장·건축물대장·토지이용계획·개별공시지가) */
 .tabs{position:sticky;top:52px;z-index:25;display:flex;gap:4px;margin:11px 0 0;padding:6px 0;overflow-x:auto;scrollbar-width:none;
  background:linear-gradient(180deg,rgba(10,17,40,.98),rgba(10,17,40,.92));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .tabs::-webkit-scrollbar{display:none}
@@ -222,6 +224,7 @@ body.has-p .empty-hint{display:none!important}
 <link rel="manifest" href="/shared/pwa/gongbu.webmanifest"></head><body><div id="app">
 <header>
   <a class="back" href="../">← 원클릭</a>
+  <img class="hicon" src="/gongbu/icon-192.png" alt="" width="20" height="20">
   <span class="brand">KTS <i>4대 공부</i></span>
   <span class="sp"></span>
   <span class="st" id="hdSt">주소 넣기</span>
@@ -368,14 +371,14 @@ body.has-p .empty-hint{display:none!important}
         <input id="sbizk" type="text" placeholder="상권정보 인증키(선택) — 활용신청 후" aria-label="상권정보 인증키" autocomplete="off" spellcheck="false">
         <button id="sbizSave" type="button">저장</button>
       </div>
-      <p class="note">② 건축물대장은 <b>발급받은 인증키가 연결되어 바로 조회</b>됩니다. 상권정보는 <b>소상공인시장진흥공단_상가(상권)정보</b> 활용신청이 필요합니다(무료).</p>
+      <p class="note">② 건축물대장과 상권정보(소상공인 상가정보)는 <b>연결된 인증키로 바로 조회</b>됩니다. 다른 키가 있으면 아래에 넣어 바꿀 수 있습니다(무료).</p>
       <p class="note" id="vkNote"></p>
     </div>
   </details>
 
   <p class="foot">자료 · 토지임야정보·토지특성·개별공시지가·토지이용계획·연속지적도 © <a href="https://www.vworld.kr/" target="_blank" rel="noopener">브이월드(Vworld)</a> · 건축물대장 © <a href="https://www.data.go.kr/" target="_blank" rel="noopener">공공데이터포털</a> / 국토교통부 건축HUB · 상권 © 소상공인시장진흥공단<br>
   이 화면은 <b>참고용 요약</b>입니다. 공부 원본(법적 효력)은 정부24·세움터·토지이음에서 발급받아 확인하세요.</p>
-</main></main>
+</main>
 </div>
 <div class="toast" id="toast"></div>
 <div id="printSheet"><img id="printImg" alt="A4 가로 조서"></div>
@@ -397,17 +400,17 @@ body.has-p .empty-hint{display:none!important}
 'use strict';
 /* =====================================================================
    KTS 4대 공부 — 주소 1회 입력 → 토지대장·건축물대장·지적도·토지이용계획
-   · ①③④는 브이월드 오픈API 만으로 동작(키는 경사도 지도와 같은 대표님 키)
-     - api.vworld.kr 은 CORS 헤더를 주지 않는다 → JSONP(callback=)로 받는다(실측)
-     - WMTS 타일은 crossOrigin 을 걸면 캔버스가 오염되지 않는다 → PNG 저장 가능(실측)
+   · ①③④는 브이월드 오픈API 로 동작(서비스 도메인 전용 키)
+     - api.vworld.kr 은 CORS 헤더를 주지 않는다 → JSONP(callback=)로 받는다
+     - WMTS 타일은 crossOrigin 을 걸면 캔버스가 오염되지 않는다 → PNG 저장 가능
    · ② 건축물대장은 공공데이터포털 인증키가 있어야 한다(무료·자동승인)
-     - apis.data.go.kr 은 CORS 를 허용한다 → 키만 있으면 브라우저에서 바로 호출(실측)
+     - apis.data.go.kr 은 CORS 를 허용한다 → 키만 있으면 브라우저에서 바로 호출
    ===================================================================== */
 var $=function(s){return document.querySelector(s)};
 var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},
         set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-var VW_DEF='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';       /* 대표님 발급 키(서비스 URL https://autooneclick.com) */
-var DG_DEF='0d89734b150bc7aa2fea54bfb25c64a1e5119fc2345dab1f047c39b84b810a3c'; /* 233번: 건축HUB 일반 인증키(2026-11-25~2028-11-25, 자동승인) */
+var VW_DEF='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';       /* 브이월드 인증키(서비스 URL https://autooneclick.com) */
+var DG_DEF='0d89734b150bc7aa2fea54bfb25c64a1e5119fc2345dab1f047c39b84b810a3c'; /* 공공데이터포털 일반 인증키(건축물대장·상권정보) */
 var DOMAIN='autooneclick.com';
 var VW='https://api.vworld.kr', DATA=VW+'/req/data', NED=VW+'/ned/data', API=VW+'/req/address',
     WMTS=VW+'/req/wmts/1.0.0', DG='https://apis.data.go.kr/1613000/BldRgstHubService';
@@ -427,7 +430,7 @@ var toT=0; function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('
 function num(n,d){ if(n==null||n===''||!isFinite(+n)) return '—'; var v=+n; return v.toLocaleString('ko-KR',{maximumFractionDigits:(d==null?0:d)}) }
 function pyeong(m2){ return m2?Math.round(+m2/3.305785):0 }
 
-/* ---------- JSONP (api.vworld.kr 은 CORS 미허용 — 실측 2026-11-25) ---------- */
+/* ---------- JSONP (api.vworld.kr 은 CORS 미허용) ---------- */
 function jsonp(url,ms){
   return new Promise(function(res){
     var cb='__ktsgb'+Math.floor(Math.random()*1e7), s=document.createElement('script'), done=false;
@@ -571,7 +574,7 @@ function bboxOf(rings){
   }
   return b;
 }
-/* 같은 화면에 담을 주변 필지들 — BOX 범위조회(실측 OK, box= 파라미터는 응답 없음) */
+/* 같은 화면에 담을 주변 필지들 — BOX 범위조회(box= 파라미터는 응답 없음) */
 function parcelRange(b){
   var url=DATA+'?service=data&request=GetFeature&version=2.0&data=LP_PA_CBND_BUBUN'
     +'&key='+encodeURIComponent(S.key)+'&domain='+DOMAIN+'&format=json&size=300&page=1&geometry=true&attribute=true&crs=EPSG:4326'
@@ -667,7 +670,7 @@ function dgKeyOk(k){
   return true;
 }
 /* 일시 장애(포털 서버 타임아웃·게이트웨이 502/503/504)와 인증키 오류를 구분한다.
-   실측 2026-11-26: 정상 키로도 SERVICETIMEOUT_ERROR(HTTP 503, reasonCode 05)가 간헐로 온다
+   정상 키로도 SERVICETIMEOUT_ERROR(HTTP 503, reasonCode 05)가 간헐로 온다
    → 인증키 오류(SERVICE_KEY_IS_NOT_REGISTERED_ERROR, HTTP 403, reasonCode 30)와 다르다 */
 function dgTransient(txt,http){
   if(http&&(http===429||http>=500)) return true;
@@ -912,7 +915,7 @@ function paintBld(){
   wireBld();
 }
 
-/* 286 — 표제부 상세(건폐율·용적률·허가·착공·사용승인·위반·주차·승강기) */
+/* 표제부 상세(건폐율·용적률·허가·착공·사용승인·위반·주차·승강기) */
 function bldDetailTable(it){
   function r(k,v1,k2,v2,cls){
     return '<tr'+(cls?' class="'+cls+'"':'')+'><th>'+esc(k)+'</th><td class="l">'+esc(v1==null||v1===''?'—':v1)+'</td>'
@@ -1290,7 +1293,7 @@ function saveCanvasPdf(cv,base,land){
 
 /* =====================================================================
    272 — 저장·인쇄는 A4 가로(297×210mm) 정부24 법정 서식표
-   · 캔버스 한 장으로 만들어 확대 미리보기 → PDF · 이미지(PNG) 저장(264·279)
+   · 캔버스 한 장으로 만들어 확대 미리보기 → PDF · 이미지(PNG) 저장
    ===================================================================== */
 var SHEETF='"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",-apple-system,system-ui,"Apple SD Gothic Neo",sans-serif';
 var PVL={cv:null,z:1};
@@ -1714,7 +1717,7 @@ function sangRv(){
   out.innerHTML='월 추정 매출 <b>'+num(Math.round(won1))+'원</b> ('+num(Math.round(won1/10000))+'만원 · 30일)'
     +(oc?'':' <span style="color:#FFB3AC;font-weight:900">· 가동률을 넣어 주세요</span>');
 }
-/* 262 — 소상공인시장진흥공단 상가(상권)정보 직접 연동 (무료·활용신청 필요) */
+/* 소상공인시장진흥공단 상가(상권)정보 직접 연동 */
 var SBIZ='https://apis.data.go.kr/B553077/api/open/sdsc2';
 function sbizKey(){
   var v=null; try{ v=localStorage.getItem('kts_sbiz_key') }catch(e){}
@@ -1724,19 +1727,31 @@ function sbizKey(){
 function sbizParse(res){
   try{ var j=JSON.parse(res.txt) }catch(e){ return {st:'BAD'} }
   if(j.OpenAPI_ServiceResponse){
-    var h=j.OpenAPI_ServiceResponse.cmmMsgHeader||{};
-    return {st:'ERR',msg:h.returnAuthMsg||h.errMsg||'',code:String(h.returnReasonCode||'')};
+    var h0=j.OpenAPI_ServiceResponse.cmmMsgHeader||{};
+    return {st:'ERR',msg:h0.returnAuthMsg||h0.errMsg||'',code:String(h0.returnReasonCode||'')};
   }
-  var b=(j.response&&j.response.body)||{}, it=(b.items&&b.items.item)||[];
-  if(!Array.isArray(it)) it=it?[it]:[];
-  return {st:it.length?'OK':'EMPTY',items:it,total:+(b.totalCount||it.length)};
+  /* 소상공인 상권정보는 {header:{resultCode}, body:{items:[...]}} 모양이다(resultCode 00 정상·03 자료없음) */
+  var h=j.header||{}, b=j.body||((j.response&&j.response.body)||{});
+  var rc=String(h.resultCode!=null?h.resultCode:((j.response&&j.response.header&&j.response.header.resultCode)||''));
+  var it=b.items||[];
+  if(it&&!Array.isArray(it)) it=Array.isArray(it.item)?it.item:(it.item?[it.item]:[]);
+  if(rc==='03') return {st:'EMPTY',items:[],total:0,stdrYm:h.stdrYm||''};
+  if(rc&&rc!=='00') return {st:'ERR',code:rc,msg:h.resultMsg||''};
+  return {st:it.length?'OK':'EMPTY',items:it,total:+(b.totalCount||it.length),stdrYm:h.stdrYm||''};
 }
-function sbizCall(path,extra){
+function sbizCall(path,extra,tries){
   var k=sbizKey();
+  tries=tries||3;
   var qs=Object.keys(extra).map(function(x){ return x+'='+encodeURIComponent(extra[x]) }).join('&');
   var url=SBIZ+path+'?serviceKey='+bldKeyParam(k)+'&pageNo=1&numOfRows=1000&type=json&'+qs;
   return fetch(url,{cache:'no-store'}).then(function(r){ return r.text().then(function(t){ return {http:r.status,txt:t} }) })
-    .catch(function(e){ return {http:0,txt:String(e&&e.message||e)} });
+    .catch(function(e){ return {http:0,txt:String(e&&e.message||e)} })
+    .then(function(res){
+      /* 포털 일시 장애(429·5xx·연결 실패)는 같은 요청을 조금 쉬었다 다시 한 번만 더 */
+      var tmp=(res.http===0||res.http===429||res.http>=500);
+      if(tmp&&tries>1){ return new Promise(function(r){ setTimeout(r,900) }).then(function(){ return sbizCall(path,extra,tries-1) }) }
+      return res;
+    });
 }
 function sbizErrBox(msg){
   return state('err',esc(msg||'상권정보를 받지 못했습니다'))
@@ -1750,21 +1765,23 @@ function sbizRun(){
   var p={'radius':500,'cx':S.lon.toFixed(6),'cy':S.lat.toFixed(6)};
   Promise.all([sbizCall('/storeListInRadius',p),sbizCall('/storeZoneInRadius',p)]).then(function(rs){
     var a=sbizParse(rs[0]), z=sbizParse(rs[1]);
+    if(a.st==='BAD'){ out.innerHTML=sbizErrBox('상권정보 포털이 잠시 응답하지 않았습니다 — 조금 뒤 다시 눌러 주세요'); return }
     if(a.st==='ERR'&&/30|등록되지/.test((a.code||'')+' '+(a.msg||''))){ out.innerHTML=sbizErrBox('상권정보 API 활용신청이 아직 등록되지 않았습니다 (등록되지 않은 서비스키)'); return }
-    if(a.st==='ERR'){ out.innerHTML=sbizErrBox(a.msg); return }
-    if(a.st!=='OK'){ out.innerHTML=state('err','반경 500m 안에 상권 자료가 없습니다 — 반경을 넓혀 보세요.'); return }
+    if(a.st==='ERR'){ out.innerHTML=sbizErrBox(a.msg||('상권정보 오류 · 코드 '+(a.code||''))); return }
+    if(a.st!=='OK'){ out.innerHTML=state('err','반경 500m 안에 상권 자료가 없습니다 — 반경을 넓히거나 다른 지번으로 확인해 보세요.'); return }
     var g={}, order=[];
     a.items.forEach(function(x){
-      var k=x.indsLclsCdNm||x.indsMclsCdNm||'기타';
+      var k=x.indsLclsNm||x.indsLclsCdNm||'기타';
       if(!g[k]){ g[k]={n:0,m:{}}; order.push(k) }
       g[k].n++;
-      var m=x.indsMclsCdNm||'';
+      var m=x.indsMclsNm||x.indsMclsCdNm||'';
       if(m) g[k].m[m]=(g[k].m[m]||0)+1;
     });
     order.sort(function(x,y){ return g[y].n-g[x].n });
-    var zones=(z.st==='OK'?z.items:[]).slice(0,3).map(function(x){ return (x.trarNm||x.zoneNm||x.trlNm||'')+(x.trarSeNm?(' · '+x.trarSeNm):'') }).filter(Boolean);
+    var zones=(z.st==='OK'?z.items:[]).slice(0,3).map(function(x){ return (x.mainTrarNm||x.trarNm||x.zoneNm||'')+(x.signguNm?(' · '+x.signguNm):'') }).filter(Boolean);
+    var tot=(a.total||a.items.length), capped=tot>a.items.length;
     var h=[];
-    h.push('<div class="rows" style="margin-top:8px"><div class="row"><div class="k">점포 수</div><div class="v"><em>'+num(a.items.length)+'</em>곳 <small>반경 500m · 소상공인 상권정보</small></div></div>'
+    h.push('<div class="rows" style="margin-top:8px"><div class="row"><div class="k">점포 수</div><div class="v"><em>'+num(tot)+'</em>곳 <small>반경 500m · 소상공인 상권정보'+(a.stdrYm?(' · '+a.stdrYm.slice(0,4)+'.'+a.stdrYm.slice(4)):'')+'</small></div></div>'
       +(zones.length?('<div class="row"><div class="k">상권</div><div class="v">'+esc(zones.join(' / '))+'</div></div>'):'')
       +'</div>');
     h.push('<table class="dt"><thead><tr><th>업종(대분류)</th><th style="text-align:right">점포</th><th>주요 중분류</th></tr></thead><tbody>');
@@ -1773,7 +1790,7 @@ function sbizRun(){
       h.push('<tr><th>'+esc(k)+'</th><td>'+num(g[k].n)+'</td><td class="l">'+esc(ms||'—')+'</td></tr>');
     });
     h.push('</tbody></table>');
-    h.push('<p class="note">점포 수는 <b>소상공인시장진흥공단 상가(상권)정보</b> 자료입니다. 업종별 <b>추정 매출</b>은 카드 승인 기반이라 공개 API에 없으니, 아래 ①·② 칸에 나이스/제출 자료로 나눠 적어 비교하세요.</p>');
+    h.push('<p class="note">'+(capped?('업종별 구성은 가까운 <b>'+num(a.items.length)+'곳</b> 표본입니다. '):'')+'점포 수는 <b>소상공인시장진흥공단 상가(상권)정보</b> 자료입니다. 업종별 <b>추정 매출</b>은 카드 승인 기반이라 공개 API에 없으니, 아래 ①·② 칸에 나이스/제출 자료로 나눠 적어 비교하세요.</p>');
     out.innerHTML=h.join('');
   });
 }
@@ -1810,7 +1827,7 @@ $('#pvPng').addEventListener('click',saveSheetPng);
 $('#pvPdf').addEventListener('click',saveSheetPdf);
 $('#pvPrint').addEventListener('click',printSheet);
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('#pv').classList.contains('on')) closePv() });
-/* 286 — 5탭 */
+/* 5탭 */
 function setTab(t){
   S.tab=t;
   Array.prototype.forEach.call($('#tabs').querySelectorAll('.tab'),function(b){ b.classList.toggle('on',b.getAttribute('data-t')===t) });
@@ -1847,8 +1864,8 @@ if(sk) sk.addEventListener('click',function(){
 });
 function paintKeyState(){
   var el=$('#keyState');
-  if(!S.dgk){ el.innerHTML=state('err','건축물대장 인증키 <b>없음</b> — ②건축물대장만 조회되지 않습니다'); return }
-  if(S.dgk===DG_DEF){ el.innerHTML=state('ok','건축물대장 인증키 <b>연결됨</b> · 4종 모두 조회됩니다'); return }
+  if(!S.dgk){ el.innerHTML=state('err','건축물대장·상권정보 인증키 <b>없음</b> — ②건축물대장만 조회되지 않습니다'); return }
+  if(S.dgk===DG_DEF){ el.innerHTML=state('ok','건축물대장·상권정보 인증키 <b>연결됨</b> · 4종 모두 조회됩니다'); return }
   el.innerHTML=state('ok','내 인증키 <b>사용 중</b> · '+esc(S.dgk.slice(0,6))+'…'+esc(S.dgk.slice(-4)));
 }
 $('#vkNote').innerHTML='지도·토지 자료는 브이월드 키로 연결됩니다 · 서비스 주소 '+DOMAIN+' 전용 키를 씁니다.';

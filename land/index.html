@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#0B1526">
 <meta name="format-detection" content="telephone=no">
 <link rel="canonical" href="https://autooneclick.com/land/">
-<link rel="icon" href="../icon.png">
+<link rel="icon" href="/land/icon-192.png">
+<link rel="apple-touch-icon" href="/land/icon-192.png">
 <style>
 :root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F7FAFF;--ink2:#D7E2F2;--amber:#FF6B00;--amber2:#FFA24D;
  --on:#0A1224;--red:#E23A2E;--green:#2ED47A;--blue:#7FB2FF}
@@ -21,6 +22,7 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.95);-webkit-ba
  border-bottom:1px solid var(--line);padding:9px 12px;display:flex;align-items:center;gap:7px}
 header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 9px;white-space:nowrap}
 .brand{font-weight:900;font-size:14.5px;color:#fff;letter-spacing:-.4px;white-space:nowrap}.brand i{font-style:normal;color:var(--amber2)}
+.hicon{width:20px;height:20px;border-radius:6px;display:block;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 header .sp{flex:1}
 header .st{font-size:10.5px;font-weight:900;color:var(--on);background:var(--amber2);border-radius:999px;padding:3px 8px;white-space:nowrap}
 /* 1호 세트 이동 띠 */
@@ -122,7 +124,7 @@ main{padding:10px 12px 0}
 .foot b{color:#fff}
 .hide{display:none!important}
 /* 인쇄(A4 1장) */
-/* ─ 270: 3단 스위치 · 옵션 · 경사 범례 · 하단 합계 ─ */
+/* 3단 스위치 · 옵션 · 경사 범례 · 하단 합계 */
 .seg{display:flex;gap:5px;margin:0 0 8px}
 .seg button{flex:1;min-height:44px;border:1px solid var(--line2);border-radius:11px;background:#0B1729;color:var(--ink2);
  font-size:12px;font-weight:900;letter-spacing:-.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;padding:0 4px}
@@ -149,10 +151,10 @@ main{padding:10px 12px 0}
 .gbrow:last-child{border-bottom:0}
 .gbrow .k{flex:0 0 82px;color:#94A3B8;font-weight:800;font-size:11.5px}
 .gbrow .v{flex:1;min-width:0;font-weight:800;color:#fff;overflow-wrap:anywhere}
-/* 278 — 필요할 때만 나타나는 보조 버튼 */
+/* 필요할 때만 나타나는 보조 버튼 */
 body:not(.has-sel) .need-sel{display:none!important}
 body:not(.has-items) .need-items{display:none!important}
-/* 264 — 저장 전 확대 미리보기 모달 */
+/* 저장 전 확대 미리보기 모달 */
 .pv{position:fixed;inset:0;z-index:120;display:none;flex-direction:column;background:rgba(5,9,20,.96)}
 .pv.on{display:flex}
 .pvt{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #26375F;background:#0A1128}
@@ -180,6 +182,7 @@ body:not(.has-items) .need-items{display:none!important}
 <div id="app">
 <header>
   <a class="back" href="https://autooneclick.com/">← 원클릭</a>
+  <img class="hicon" src="/land/icon-192.png" alt="" width="20" height="20">
   <span class="brand">KTS <i>1호 통합</i></span>
   <span class="sp"></span>
   <span class="st" id="hdSt">필지 0</span>
@@ -446,7 +449,7 @@ function landInfo(pnu){
       S.official[pnu]=o; return o;
     }).catch(function(){ return null });
 }
-/* 용도지역·개별공시지가 — 조서 표의 '용도지역 / 공시지가' 열 (276번) */
+/* 용도지역·개별공시지가 — 조서 표의 '용도지역 / 공시지가' 열 */
 function infoPnu(pnu){
   if(!pnu) return Promise.resolve(null);
   if(S.info[pnu]) return Promise.resolve(S.info[pnu]);
@@ -704,7 +707,6 @@ function printMapCanvas(W,H){
   var b=selBox(); if(!b) return Promise.resolve(null);
   W=W||1400; H=H||Math.round(W*0.52);
   var pad=0.07, oldSl=SL.on;
-  if(SL.img) SL.on=true;
   var old={cx:S.V.cx,cy:S.V.cy,z:S.V.z};
   var cx=(b.minx+b.maxx)/2, cy=(b.miny+b.maxy)/2;
   var w=(b.maxx-b.minx)*(1+pad*2), h=(b.maxy-b.miny)*(1+pad*2);
@@ -1036,7 +1038,7 @@ function expandBox(b,f){
   return {minx:cx-ww/2,maxx:cx+ww/2,miny:cy-hh/2,maxy:cy+hh/2};
 }
 
-/* ---------- A4 1장 조서 (276·264·279) ---------- */
+/* ---------- A4 1장 조서 ---------- */
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
 function shortAddr(it){
   var s=String(it.addr||'').replace(/\s+/g,' ').trim();
@@ -1053,10 +1055,10 @@ function sheetRows(){
     var a=it.official||it.area||0, unit=it.unit||0;
     var o={addr:shortAddr(it), jibun:(it.jm==='산'?'산 ':'')+(it.jibun||''), jmok:it.jmok||it.jm||'',
            yongdo:it.yongdo||'', area:a, pyeong:pyeong(a), unit:unit, val:unit*a, tag:it.official?'공부':'도면',
-           slope:(it.slope!=null?it.slope:null)};
+           slope:(SL.on&&it.slope!=null?it.slope:null)};
     if(it.state==='in') ins.push(o); else outs.push(o);
   }
-  return {ins:ins,outs:outs};
+  return {ins:ins,outs:outs,legend:!!(SL.on&&SL.img)};
 }
 var SHEETF='"Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",-apple-system,system-ui,"Apple SD Gothic Neo",sans-serif';
 function sf(g,size,bold,color){ g.font=(bold?'900 ':'700 ')+size+'px '+SHEETF; g.fillStyle=color||'#111' }
@@ -1081,20 +1083,40 @@ function sheetLayout(d){
   var rows=d.ins;
   var mapX=M+20, mapW=innerW-40;
   var topY=M+126, rh=50, hh=50, totalH=50, gap=22, footH=64;
-  var minH=Math.round(mapW*0.46), maxH=Math.round(mapW*0.80);
-  var maxRows=Math.floor(((H-M-20)-(topY+minH+gap)-hh-totalH-footH)/rh);
+  var lgH=d.legend?52:0;               /* 경사도를 켰을 때만 지도 바로 아래 색 범례 한 줄 */
+  var minH=Math.round(mapW*0.40), maxH=Math.round(mapW*0.80);
+  var maxRows=Math.floor(((H-M-20)-(topY+minH+gap+lgH)-hh-totalH-footH)/rh);
   var lim=Math.max(1,Math.min(rows.length,maxRows,20));
   var overflow=rows.length>lim;
   var rowsH=lim*rh+(overflow?rh:0);
-  var budget=(H-M-20)-(topY+gap)-hh-totalH-footH-rowsH;
+  var budget=(H-M-20)-(topY+gap+lgH)-hh-totalH-footH-rowsH;
   var mapH=Math.max(minH,Math.min(maxH,Math.round(budget)));
   return {W:W,H:H,M:M,innerW:innerW,rows:rows,outs:d.outs,mapX:mapX,mapW:mapW,mapH:mapH,topY:topY,
-          rh:rh,hh:hh,totalH:totalH,gap:gap,lim:lim,overflow:overflow,rowsH:rowsH,footH:footH};
+          rh:rh,hh:hh,totalH:totalH,gap:gap,lim:lim,overflow:overflow,rowsH:rowsH,footH:footH,lgH:lgH};
 }
 function buildAreaSheet(){
   if(!S.order.length) return Promise.resolve(null);
   var d=sheetRows(), L=sheetLayout(d);
   return printMapCanvas(1400,Math.round(1400*L.mapH/L.mapW)).then(function(mp){ return drawAreaSheet(d,mp,L) });
+}
+function drawSheetSlopeLegend(g,x,y,w,h){
+  if(!w||!h) return;
+  var n=SLOPE10.length, cw=w/n, bh=Math.max(12,Math.round(h*0.52));
+  g.save();
+  g.textAlign='left'; g.textBaseline='alphabetic';
+  for(var i=0;i<n;i++){
+    var c=SLOPE10[i].rgb;
+    g.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+    var cx=x+Math.round(cw*i), cw2=Math.round(cw*(i+1))-Math.round(cw*i);
+    g.fillRect(cx,y,cw2,bh);
+  }
+  g.strokeStyle='#111'; g.lineWidth=1; g.strokeRect(x+.5,y+.5,w-1,bh-1);
+  g.fillStyle='#111'; g.font='800 13px '+SHEETF; g.textAlign='center';
+  for(var j=0;j<n;j++){
+    var lab=(j===n-1)?'45°~':(SLOPE10[j].lo+'°');
+    g.fillText(lab,x+cw*j+cw/2,y+bh+16);
+  }
+  g.restore();
 }
 function drawAreaSheet(d,mp,L){
   var rows=L.rows, outs=L.outs;
@@ -1114,7 +1136,7 @@ function drawAreaSheet(d,mp,L){
   var tot={area:0,pyeong:0,val:0};
   rows.forEach(function(r){ tot.area+=r.area||0; tot.pyeong+=pyeong(r.area||0); tot.val+=r.val||0 });
   sf(g,20,1); g.fillText('담은 필지 '+rows.length+'필지  ·  합계 '+num(tot.area,0)+'㎡ ('+num(pyeong(tot.area))+'평)'
-    +((SL.avg!=null&&isFinite(SL.avg))?('  ·  평균 경사도 '+SL.avg.toFixed(1)+'°'):''),M+20,M+110);
+    +((SL.on&&SL.avg!=null&&isFinite(SL.avg))?('  ·  평균 경사도 '+SL.avg.toFixed(1)+'°'):''),M+20,M+110);
   if(tot.val){ g.textAlign='right'; sf(g,17,0,'#333'); g.fillText('공시지가 총액 '+num(Math.round(tot.val))+'원',W-M-20,M+110); g.textAlign='left' }
   /* 지도 — A4 가로 폭에 맞춘 대형 가로 직사각형 */
   if(mp&&mp.canvas){ try{ g.drawImage(mp.canvas,mapX,topY,mapW,mapH) }catch(e){ mp=null } }
@@ -1122,6 +1144,8 @@ function drawAreaSheet(d,mp,L){
     g.fillStyle='#888'; g.font='800 18px '+SHEETF; g.textAlign='center';
     g.fillText('지도를 그리지 못했습니다',mapX+mapW/2,topY+mapH/2); g.textAlign='left' }
   g.strokeStyle='#111'; g.lineWidth=1.5; g.strokeRect(mapX,topY,mapW,mapH);
+  /* 경사도를 켠 상태에서만 지도 바로 아래에 0°~45°~ 색 범례 */
+  if(L.lgH) drawSheetSlopeLegend(g,mapX,topY+mapH+8,mapW,L.lgH-14);
   /* 표 — 지도와 폭 100% 일치 */
   var hasSl=rows.some(function(r){return r.slope!=null});
   var COLS=hasSl?[
@@ -1146,7 +1170,7 @@ function drawAreaSheet(d,mp,L){
   ];
   var tw=[],acc=0;
   for(var i=0;i<COLS.length;i++){ var cw=Math.round(mapW*COLS[i].w); if(i===COLS.length-1) cw=mapW-acc; tw.push(cw); acc+=cw }
-  var ty=topY+mapH+22;
+  var ty=topY+mapH+22+(L.lgH||0);
   g.fillStyle='#EDEDED'; g.fillRect(mapX,ty,mapW,hh);
   g.strokeStyle='#111'; g.lineWidth=1;
   g.strokeRect(mapX+.5,ty+.5,mapW-1,hh-1);
@@ -1262,7 +1286,7 @@ function drawAreaSheet(d,mp,L){
 }
 /* ---- 미리보기 모달 (264) ---- */
 function ensureSlope(){
-  if(SL.img||!S.order.length) return Promise.resolve();
+  if(!SL.on||SL.img||!S.order.length) return Promise.resolve();
   buildSlope();
   return new Promise(function(res){
     var n=0, t=setInterval(function(){
@@ -1348,6 +1372,7 @@ function selBox(){
    담은 필지(state==='in') 빨간 외곽선 안에만 픽셀을 겹쳐 그린다.
    ===================================================================== */
 var DEMURL='https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+var DEM_MAXZ=15;   /* 공개 수치표고 타일은 줌 15까지만 제공 — 16 이상은 404 */
 var SLOPE10=[
   {lo:0,hi:5,rgb:[255,255,255]},{lo:5,hi:10,rgb:[255,245,157]},{lo:10,hi:15,rgb:[255,235,59]},
   {lo:15,hi:20,rgb:[255,193,7]},{lo:20,hi:25,rgb:[255,152,0]},{lo:25,hi:30,rgb:[245,124,0]},
@@ -1360,19 +1385,28 @@ function demTile(z,x,y){
   var k='d'+z+'/'+x+'/'+y;
   if(demCache[k]) return demCache[k];
   var p=new Promise(function(res,rej){
-    var im=new Image(); im.crossOrigin='anonymous';
-    im.onload=function(){
-      try{
-        var c=document.createElement('canvas'); c.width=256; c.height=256;
-        var g=c.getContext('2d',{willReadFrequently:true});
-        g.drawImage(im,0,0,256,256);
-        var d=g.getImageData(0,0,256,256).data, f=new Float32Array(65536);
-        for(var i=0,j=0;i<65536;i++,j+=4) f[i]=d[j]*256+d[j+1]+d[j+2]/256-32768;
-        res(f);
-      }catch(e){ rej(e) }
-    };
-    im.onerror=function(){ rej(new Error('dem')) };
-    im.src=DEMURL.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+    var n=0;
+    function once(){
+      var im=new Image(); im.crossOrigin='anonymous';
+      im.onload=function(){
+        try{
+          var c=document.createElement('canvas'); c.width=256; c.height=256;
+          var g=c.getContext('2d',{willReadFrequently:true});
+          g.drawImage(im,0,0,256,256);
+          var d=g.getImageData(0,0,256,256).data, f=new Float32Array(65536);
+          for(var i=0,j=0;i<65536;i++,j+=4) f[i]=d[j]*256+d[j+1]+d[j+2]/256-32768;
+          res(f);
+        }catch(e){ rej(e) }
+      };
+      im.onerror=function(){
+        n++;
+        if(n<2){ setTimeout(once,450); return }
+        try{ delete demCache[k] }catch(e){}   /* 실패한 타일은 캐시에 남기지 않는다(다음에 다시 시도) */
+        rej(new Error('dem'));
+      };
+      im.src=DEMURL.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+    }
+    once();
   });
   demCache[k]=p; return p;
 }
@@ -1399,8 +1433,9 @@ function buildSlope(){
   var pad=0.12, w=(b.maxx-b.minx)*(1+pad*2), h=(b.maxy-b.miny)*(1+pad*2);
   var bx0=b.minx-(w-(b.maxx-b.minx))/2, bx1=b.maxx+(w-(b.maxx-b.minx))/2;
   var by0=b.miny-(h-(b.maxy-b.miny))/2, by1=b.maxy+(h-(b.maxy-b.miny))/2;
-  var z=16;
+  var z=Math.min(16,DEM_MAXZ);   /* 줌 18~19로 확대해도 지형 타일은 상한(15)까지만 요청한다 */
   function calc(){
+    if(z>DEM_MAXZ) z=DEM_MAXZ;
     var tx0=Math.floor(lon2x(bx0,z)/256), tx1=Math.floor(lon2x(bx1,z)/256);
     var ty0=Math.floor(lat2y(by1,z)/256), ty1=Math.floor(lat2y(by0,z)/256);
     var nx=tx1-tx0+1, ny=ty1-ty0+1;
@@ -1642,9 +1677,35 @@ $('#pvS').addEventListener('dblclick',function(e){ if(e.target&&e.target.id==='p
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('#pv').classList.contains('on')) closePv() });
 $('#printA4').addEventListener('click',openSheet);
 $('#copyAddr').addEventListener('click',function(){
-  var a=primaryAddr(); if(!a){ toast('먼저 필지를 담아 주세요'); return }
-  copyText(a).then(function(ok){ toast(ok?'주소를 복사했습니다':'주소: '+a) });
+  var list=addrList(); if(!list.length){ toast('먼저 필지를 담아 주세요'); return }
+  var r=addrText(list);
+  copyText(r.text).then(function(ok){
+    toast(ok?(list.length>1?(list.length+'필지 주소를 복사했습니다'):'주소를 복사했습니다'):('주소: '+r.text));
+  });
 });
+/* 담은 필지(담기 상태) 주소 — 같은 동·리는 앞 주소를 이어받아 한 줄로 묶는다
+   예) 경기도 가평군 조종면 신하리 162-9, 162-10, 162-11 */
+function addrList(){
+  var out=[];
+  for(var i=0;i<S.order.length;i++){
+    var it=S.sel[S.order[i]]; if(!it||it.state!=='in') continue;
+    if(!it.jibun) continue;
+    var jb=(it.jm==='산'?'산 ':'')+it.jibun;
+    /* 끝의 번지(산 포함)를 떼어 동·리까지만 남긴다 */
+    var pre=String(it.addr||'').replace(/\s+/g,' ').replace(/\s*(산\s*)?\d+(-\d+)?\s*$/,'').trim();
+    out.push({pre:pre,jb:jb});
+  }
+  return out;
+}
+function addrText(list){
+  var parts=[], prev=null;
+  for(var i=0;i<list.length;i++){
+    var x=list[i];
+    if(prev!==null&&x.pre&&x.pre===prev){ parts[parts.length-1]+=', '+x.jb }
+    else{ parts.push((x.pre?x.pre+' ':'')+x.jb); prev=x.pre||null }
+  }
+  return {text:parts.join(', '),n:list.length,groups:parts.length};
+}
 function copyText(t){
   return new Promise(function(res){
     try{
@@ -1675,6 +1736,12 @@ if(pq){
   $('#mapSt').textContent='주소를 넣거나 아래 예시를 누르세요';
 }
 window.__KTS_AREA=function(){ var s=sumOf(); return {n:s.nIn,out:s.nOut,area:+(s.inA||s.inD).toFixed(2),sel:S.order.length,parcels:(S.F.items||[]).length,mode:S.mode,view:S.view,z:S.V.z,edge:!!S.edge,hideNum:!!S.hideNum,cx:S.V.cx,cy:S.V.cy} };
+window.__KTS_SLOPE=function(){ var per=[];
+  for(var i=0;i<S.order.length;i++){ var it=S.sel[S.order[i]]; if(it&&it.state==='in') per.push({j:it.jibun,s:it.slope}) }
+  return {on:!!SL.on,img:!!SL.img,z:SL.z,busy:!!SL.busy,avg:SL.avg,st:(($('#mapSt')||{}).textContent||''),per:per} };
+window.__KTS_SHEETMETA=function(){ var d=sheetRows(), L=sheetLayout(d); return {rows:L.rows.length,outs:L.outs.length,lgH:L.lgH,
+  slopeOn:!!SL.on,img:!!SL.img,avg:SL.avg,hasSl:L.rows.some(function(r){return r.slope!=null}),cols:(L.rows.some(function(r){return r.slope!=null})?9:8)} };
+window.__KTS_ADDR=function(){ return addrText(addrList()).text };
 window.__KTS_SHEET=function(){ return buildAreaSheet() };
 window.__KTS_PV=function(){ return {open:!!($('#pv')&&$('#pv').classList.contains('on')),z:PV.z,cv:!!PV.cv} };
 window.__KTS_HIT=function(cx,cy){ var r=MAPW/$('#map').getBoundingClientRect().width, t=topLeft();

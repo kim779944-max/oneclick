@@ -5,7 +5,8 @@
 <meta name="description" content="지번·주소를 넣으면 필지 위치와 경계, 주변 경사도(°·%)·표고·향·단면을 5m 격자 그림으로 보여 줍니다. 하루 3건 무료(자정 초기화), 10건권 9,000원.">
 <meta name="theme-color" content="#0A1128">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="../icon.png">
+<link rel="icon" href="/slope/icon-192.png">
+<link rel="apple-touch-icon" href="/slope/icon-192.png">
 <style>
 :root{--bg:#0A1128;--card:#0F1B33;--card2:#12203C;--line:#26375F;--line2:#2E4370;--ink:#F3F6FA;--ink2:#AFBDD0;--gray:#94A3B8;
  --amber:#FF6B00;--amber2:#FFA24D;--on:#0A1224;--green:#2ED47A;--red:#E23A2E}
@@ -20,6 +21,7 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,17,40,.94);-webkit-ba
  border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px}
 header a.back{font-size:12px;font-weight:900;color:var(--amber2);text-decoration:none;border:1px solid rgba(255,107,0,.4);background:rgba(255,107,0,.1);border-radius:999px;padding:5px 10px;white-space:nowrap}
 .brand{font-weight:900;font-size:14.5px;color:#fff;letter-spacing:-.4px;white-space:nowrap}.brand i{font-style:normal;color:var(--amber2)}
+.hicon{width:20px;height:20px;border-radius:6px;display:block;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 header .sp{flex:1}
 /* ── 1호 세트 이동 띠 (247·259) ── */
 .setnav{display:flex;gap:6px;padding:8px 14px 0}
@@ -358,6 +360,7 @@ details.adv .keyrow{margin-top:7px}
 <div id="app">
 <header>
   <a class="back" href="https://autooneclick.com/" target="_blank" rel="noopener">← 원클릭</a>
+  <img class="hicon" src="/slope/icon-192.png" alt="" width="20" height="20">
   <span class="brand">KTS <i>경사도 지도</i></span>
   <span class="sp"></span>
   <span class="st" id="planTag">하루 3건 무료</span>
@@ -580,7 +583,7 @@ var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}c
         set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
 /* ---------------- 상태 ---------------- */
-/* 기본 Vworld 오픈키 — 대표님 발급(서비스 URL https://autooneclick.com 전용).
+/* 기본 Vworld 오픈키 — 서비스 URL https://autooneclick.com 전용.
    6번 카드에 아무 키도 넣지 않아도 이 키로 연결된다. 6번 카드에서 직접 비우면 그때부터는 쓰지 않는다. */
 var DEFAULT_VW_KEY='0C4AD93D-75D2-447B-B533-C5ADDD4A5B2F';
 /* 오늘 날짜(한국시간 YYYY-MM-DD) — 하루 3건 무료를 자정에 다시 채우는 기준 */
