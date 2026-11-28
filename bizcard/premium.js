@@ -144,7 +144,15 @@
     return out;
   }
 
-  /* 감동의 글 — 조회값만으로 쓴다(없는 사실을 만들지 않는다) */
+  /* 감동의 글 — 조회값만으로 쓴다(없는 사실을 만들지 않는다)
+     · 맹지인데 「차량 진입이 되며」 같은 모순 문구를 쓰지 않는다
+     · 명함 인삿말(me.intro)은 물건표에 섞지 않는다 (299번) */
+  function isBlind(it) {
+    var gb = (it && it.gb) || {}, ch = gb.char || {};
+    var road = String(ch.roadSideCodeNm || '');
+    var txt = String(road + ' ' + ((it && it.tags) || []).join(' '));
+    return /맹지/.test(txt) || (!road && /맹지/.test(String((it && it.tags) || '')));
+  }
   function storyOf(it, specs, me) {
     if (!it) return '';
     if (it.story) return it.story;
@@ -153,17 +161,18 @@
     var areaM2 = it.areaM2 || (ch.lndpclAr ? +ch.lndpclAr : null);
     var p = areaM2 ? Math.round(areaM2 / 3.305785) : null;
     var where = regionOf(it.addr) || '';
+    var blind = isBlind(it);
     var s = [];
     s.push((where + ' ' + (p ? num(p) + '평' : '') + (it.kind ? ' ' + it.kind : '') + '입니다.').replace(/\s+/g, ' ').trim());
     var core = [];
     if (zone) core.push(zone + '이라 건축과 토목 인허가의 폭이 넓고');
-    if (ch.roadSideCodeNm) core.push('도로접면이 ' + ch.roadSideCodeNm + '이라 차량 진입이 되며');
+    if (blind) core.push('도로가 닿지 않는 자리라 진입로 확보를 먼저 확인하셔야 하고');
+    else if (ch.roadSideCodeNm) core.push('도로접면이 ' + ch.roadSideCodeNm + '이라 차량 진입이 수월하고');
     if (jiga) core.push('공시지가는 ㎡당 ' + num(jiga) + '원으로 공적 기준이 분명합니다');
     if (core.length) s.push(core.join(' ') + '.');
-    var tags = (it.tags || []).slice(0, 2);
+    var tags = (it.tags || []).filter(function (t) { return !(blind && /도로접/.test(t)) }).slice(0, 2);
     if (tags.length) s.push(tags.join('·') + ' 조건을 갖추고 있어, 지금의 쓰임과 먼 훗날의 처분을 함께 그려 볼 수 있는 자리입니다.');
-    if (me && me.intro) s.push(me.intro);
-    else s.push('숫자만 보여 드리지 않겠습니다. 계약 전 등기부와 토지대장 원본으로 권리관계를 다시 확인하고, 현장까지 함께 걸어 보겠습니다.');
+    s.push('숫자만 보여 드리지 않겠습니다. 계약 전 등기부와 토지대장 원본으로 권리관계를 다시 확인하고, 현장까지 함께 걸어 보겠습니다.');
     return s.join(' ');
   }
 
@@ -188,15 +197,16 @@
 
     var points = (it.points || []).slice(0, 3);
     if (!points.length) {
+      var blind0 = isBlind(it);
       (it.tags || []).slice(0, 3).forEach(function (t) {
         var s2 = '';
-        if (t === '도로접') s2 = '도로에 바로 접해 차량 진입이 편합니다';
+        if (t === '도로접') s2 = blind0 ? '' : '도로에 바로 접해 차량 진입이 편합니다';
         else if (t === '평지') s2 = '평탄한 지형이라 성토·절토 부담이 적습니다';
         else if (t === '계곡') s2 = '계곡과 가까워 물과 바람이 좋습니다';
         else if (/관리$/.test(t)) s2 = t + ' — 개발행위 허가 검토가 가능합니다';
         else if (t === '급매') s2 = '급매 조건 — 협상 여지가 남아 있습니다';
         else s2 = t + ' 조건을 갖췄습니다';
-        points.push(s2);
+        if (s2) points.push(s2);
       });
     }
     if (!points.length) {
@@ -271,73 +281,126 @@
   function fit(m, avail, cw, land) {
     var mh = land ? 206 : 226;                     /* 03 투자조건 고정 높이 */
     var plays = [
-      { r: 37, p: 37, ss: 21, sl: 29, ml: 4 },
-      { r: 34, p: 35, ss: 20, sl: 28, ml: 4 },
-      { r: 32, p: 34, ss: 20, sl: 27, ml: 3 },
-      { r: 30, p: 33, ss: 19, sl: 26, ml: 3 },
-      { r: 28, p: 31, ss: 18, sl: 25, ml: 3 },
-      { r: 26, p: 30, ss: 18, sl: 24, ml: 2 }
+      { r: 37, p: 37, ss: 21, sl: 29 },
+      { r: 34, p: 35, ss: 20, sl: 28 },
+      { r: 32, p: 34, ss: 19, sl: 27 },
+      { r: 30, p: 33, ss: 18, sl: 26 },
+      { r: 28, p: 31, ss: 17, sl: 25 },
+      { r: 26, p: 30, ss: 16, sl: 23 },
+      { r: 24, p: 28, ss: 15, sl: 22 }
     ];
-    var pick = null;
-    for (var i = 0; i < plays.length; i++) {
-      var p = plays[i];
-      var lines = wrap(m.story, f(p.ss, 500), cw - 76, p.ml);
+    /* 감동의 글은 끝을 잘라 「…」를 붙이지 않는다 — 글이 다 들어가는 크기를 찾는다 */
+    function comp(p) {
+      var lines = wrap(m.story, f(p.ss, 500), cw - 76, 0);
       var ex = m.extras.length ? 32 : 0;
       var h1 = 58 + m.specs.length * p.r + 14;
       var h2 = 58 + m.points.length * p.p + ex + 6 + (lines.length * p.sl + 20) + 16;
       var h3 = 58 + mh + 14;
-      pick = { rowH: p.r, ptH: p.p, storySize: p.ss, storyLH: p.sl, storyLines: lines, moneyH: mh, c1: h1, c2: h2, c3: h3 };
-      if (h1 + h2 + h3 + 20 <= avail) { pick.gap = Math.min(56, (avail - h1 - h2 - h3) / 2); return pick; }
+      return { rowH: p.r, ptH: p.p, storySize: p.ss, storyLH: p.sl, storyLines: lines, moneyH: mh, c1: h1, c2: h2, c3: h3 };
     }
-    pick.gap = Math.max(7, (avail - pick.c1 - pick.c2 - pick.c3) / 2);
-    return pick;
+    var pick = null;
+    for (var i = 0; i < plays.length; i++) {
+      var t = comp(plays[i]);
+      pick = t;
+      if (t.c1 + t.c2 + t.c3 + 20 <= avail) { t.gap = Math.min(56, (avail - t.c1 - t.c2 - t.c3) / 2); return t; }
+    }
+    /* 가장 작은 크기로도 넘치면 글씨만 더 줄여 종이 안에 다 넣는다 */
+    var q = comp(plays[plays.length - 1]);
+    var ss = plays[plays.length - 1].ss - 1;
+    while (ss > 11) {
+      var t2 = comp({ r: 22, p: 26, ss: ss, sl: ss + 6 });
+      q = t2;
+      if (t2.c1 + t2.c2 + t2.c3 + 12 <= avail) break;
+      ss -= 1;
+    }
+    q.gap = Math.max(6, (avail - q.c1 - q.c2 - q.c3) / 2);
+    return q;
   }
 
   function headOf(m, land) {
     return land ? { title: 46, ty: 68, pointY: 56, addrY: 88 } : { title: 52, ty: 104, pointY: 0, addrY: 0 };
   }
 
+  /* 가로 16:9 — 사진 0장(위치도 한 장만) · 1장(꽉) · 2장 이상(썸네일 줄) */
   function planLand(m) {
     var W = LAND.W, H = LAND.H, PAD = 44;
     var headH = 104, footH = 100;
     var top = headH, bottom = H - footH;
     var LW = 884, LX = PAD, RX = PAD + LW + 20, RW = W - PAD - RX;
-    var subN = Math.max(0, (m.photos || []).length - 1) + (m.map ? 1 : 0);
-    var hasTh = subN > 0;
-    var thH = hasTh ? 106 : 0, gap = 12;
+    var nPh = (m.photos || []).length;
+    var hasMap = !!m.map;
+    var hasTh = nPh >= 2;
+    var gap = 12, thH = hasTh ? 106 : 0;
     var bigH = hasTh ? 420 : 486;
-    var mapY = top + bigH + (hasTh ? gap + thH + gap : gap);
-    var F = fit(m, bottom - top, RW, true);
+    var photo = null, mapBlock = null, thumbs = null;
+    var cardsX = RX, cardsW = RW;
+
+    if (!nPh && !hasMap) {
+      /* 사진도 위치도도 없을 때 — 빈 네이비 박스를 두지 않고 3단이 종이를 꽉 채운다 */
+      cardsX = PAD; cardsW = W - PAD * 2;
+    } else if (!nPh && hasMap) {
+      /* 사진 0장 — 위치도(위성·지적) 한 장만 크게. 위성사진 3중 중복 없음 */
+      mapBlock = { x: LX, y: top, w: LW, h: bottom - top, big: 1 };
+    } else {
+      photo = { x: LX, y: top, w: LW, h: bigH };
+      if (hasTh) thumbs = { x: LX, y: top + bigH + gap, w: LW, h: thH, n: Math.min(4, nPh - 1 + (hasMap ? 1 : 0)), gap: 10 };
+      if (hasMap) {
+        var mapY = top + bigH + (hasTh ? gap + thH + gap : gap);
+        mapBlock = { x: LX, y: mapY, w: LW, h: bottom - mapY };
+      }
+    }
+
+    var F = fit(m, bottom - top, cardsW, true);
+    var usedL = F.c1 + F.c2 + F.c3 + F.gap * 2, exL = Math.max(0, (bottom - top) - usedL);
+    F.c1 += exL * 0.18; F.c2 += exL * 0.64; F.c3 += exL * 0.18;
     var y = top, cards = [];
-    cards.push({ k: 'c1', num: '01', t: '물건 개요', x: RX, y: y, w: RW, h: F.c1 });
+    cards.push({ k: 'c1', num: '01', t: '물건 개요', x: cardsX, y: y, w: cardsW, h: F.c1 });
     y += F.c1 + F.gap;
-    cards.push({ k: 'c2', num: '02', t: '핵심 포인트', x: RX, y: y, w: RW, h: F.c2 });
+    cards.push({ k: 'c2', num: '02', t: '핵심 포인트', x: cardsX, y: y, w: cardsW, h: F.c2 });
     y += F.c2 + F.gap;
-    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: RX, y: y, w: RW, h: F.c3 });
+    cards.push({ k: 'c3', num: '03', t: '투자 조건', x: cardsX, y: y, w: cardsW, h: F.c3 });
     return {
       W: W, H: H, orient: 'land', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },
       foot: { x: 0, y: bottom, w: W, h: footH },
-      photo: { x: LX, y: top, w: LW, h: bigH },
-      thumbs: { x: LX, y: top + bigH + gap, w: LW, h: thH, n: hasTh ? Math.min(4, Math.max(2, subN)) : 0, gap: 10 },
-      map: { x: LX, y: mapY, w: LW, h: bottom - mapY },
+      photo: photo,
+      thumbs: thumbs || { x: LX, y: 0, w: LW, h: 0, n: 0, gap: 10 },
+      map: mapBlock,
       cards: cards,
       rowH: F.rowH, ptH: F.ptH, storySize: F.storySize, storyLH: F.storyLH,
       storyLines: F.storyLines, moneyH: F.moneyH
     };
   }
 
+  /* 세로 9:16 */
   function planPort(m) {
     var W = PORT.W, H = PORT.H, PAD = 40;
     var headH = 236, footH = 176;
     var top = headH, bottom = H - footH;
     var cw = W - PAD * 2;
-    var subN = Math.max(0, (m.photos || []).length - 1) + (m.map ? 1 : 0);
-    var hasTh = subN > 0;
-    var thH = hasTh ? 134 : 0, gap = 12;
+    var nPh = (m.photos || []).length;
+    var hasMap = !!m.map;
+    var hasTh = nPh >= 2;
+    var gap = 12, thH = hasTh ? 134 : 0;
     var bigH = hasTh ? 420 : 486;
-    var cardsTop = top + bigH + (hasTh ? gap + thH + 18 : 18);
+    var photo = null, mapBlock = null, thumbs = null, cardsTop;
+
+    if (nPh) {
+      photo = { x: PAD, y: top, w: cw, h: bigH };
+      if (hasTh) thumbs = { x: PAD, y: top + bigH + gap, w: cw, h: thH, n: Math.min(4, nPh - 1 + (hasMap ? 1 : 0)), gap: 10 };
+      cardsTop = top + bigH + (hasTh ? gap + thH + 18 : 18);
+    } else if (hasMap) {
+      /* 사진 0장 — 위치도 한 장만 크게 */
+      mapBlock = { x: PAD, y: top, w: cw, h: 560, big: 1 };
+      cardsTop = top + 560 + 18;
+    } else {
+      /* 사진도 위치도도 없음 — 빈 박스 없이 바로 3단 */
+      cardsTop = top + 6;
+    }
+
     var F = fit(m, bottom - cardsTop, cw, false);
+    var usedP = F.c1 + F.c2 + F.c3 + F.gap * 2, exP = Math.max(0, (bottom - cardsTop) - usedP);
+    F.c1 += exP * 0.18; F.c2 += exP * 0.64; F.c3 += exP * 0.18;
     var y = cardsTop, cards = [];
     cards.push({ k: 'c1', num: '01', t: '물건 개요', x: PAD, y: y, w: cw, h: F.c1 });
     y += F.c1 + F.gap;
@@ -348,9 +411,9 @@
       W: W, H: H, orient: 'port', pad: PAD,
       head: { x: 0, y: 0, w: W, h: headH },
       foot: { x: 0, y: bottom, w: W, h: footH },
-      photo: { x: PAD, y: top, w: cw, h: bigH },
-      thumbs: { x: PAD, y: top + bigH + gap, w: cw, h: thH, n: hasTh ? Math.min(4, Math.max(2, subN)) : 0, gap: 10 },
-      map: null,
+      photo: photo,
+      thumbs: thumbs || { x: PAD, y: 0, w: cw, h: 0, n: 0, gap: 10 },
+      map: mapBlock,
       cards: cards,
       rowH: F.rowH, ptH: F.ptH, storySize: F.storySize, storyLH: F.storyLH,
       storyLines: F.storyLines, moneyH: F.moneyH
@@ -443,17 +506,19 @@
       x.fillStyle = C.org; x.fillRect(0, P.head.h - 5, P.W, 5);
     }
 
-    /* ---------- 대표 사진 ---------- */
-    var ph = P.photo;
-    x.fillStyle = C.navy2; rr(x, ph.x, ph.y, ph.w, ph.h, 10); x.fill();
-    var drew = cover(x, imgs.main, ph.x, ph.y, ph.w, ph.h, 10);
-    if (!drew) {
-      x.fillStyle = 'rgba(255,255,255,.06)'; rr(x, ph.x, ph.y, ph.w, ph.h, 10); x.fill();
-      x.fillStyle = '#7d90aa'; x.font = f(land ? 26 : 30, 800); x.textAlign = 'center';
-      x.fillText('현장 사진 준비 중', ph.x + ph.w / 2, ph.y + ph.h / 2);
-      x.textAlign = 'left';
+    /* ---------- 대표 사진 (사진이 있을 때만) ---------- */
+    if (P.photo) {
+      var ph = P.photo;
+      x.fillStyle = C.navy2; rr(x, ph.x, ph.y, ph.w, ph.h, 10); x.fill();
+      var drew = cover(x, imgs.main, ph.x, ph.y, ph.w, ph.h, 10);
+      if (!drew) {
+        x.fillStyle = 'rgba(255,255,255,.06)'; rr(x, ph.x, ph.y, ph.w, ph.h, 10); x.fill();
+        x.fillStyle = '#7d90aa'; x.font = f(land ? 26 : 30, 800); x.textAlign = 'center';
+        x.fillText('현장 사진 준비 중', ph.x + ph.w / 2, ph.y + ph.h / 2);
+        x.textAlign = 'left';
+      }
+      if (m.polygon && m.polygon.photo === 0) polygon(x, m.polygon.points, ph.x, ph.y, ph.w, ph.h);
     }
-    if (m.polygon && m.polygon.photo === 0) polygon(x, m.polygon.points, ph.x, ph.y, ph.w, ph.h);
 
     /* ---------- 썸네일 줄(보조 사진 + 위치도) ---------- */
     var subs = imgs.subs || [];
@@ -477,8 +542,8 @@
       }
     }
 
-    /* ---------- 가로형 큰 위치도 ---------- */
-    if (land && P.map) {
+    /* ---------- 위치도 — 사진 0장이면 이 한 장이 대표 ---------- */
+    if (P.map) {
       var M = P.map;
       x.fillStyle = '#fff'; rr(x, M.x, M.y, M.w, M.h, 10); x.fill();
       x.save(); rr(x, M.x, M.y, M.w, M.h, 10); x.clip();
@@ -532,8 +597,9 @@
       var lx = cd.x + pad + 8, labW = 0;
       m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(land ? 20 : 21, 800))); });
       var vx = cd.x + pad + 8 + Math.min(land ? 116 : 122, labW + 16);
+      var top0 = cd.y + 58 + Math.max(0, (cd.h - 58 - m.specs.length * P.rowH - 8) / 2);
       m.specs.forEach(function (sp, i) {
-        var ry = cd.y + 58 + i * P.rowH;
+        var ry = top0 + i * P.rowH;
         if (ry + P.rowH > cd.y + cd.h - 4) return;
         if (i) { x.strokeStyle = '#eef2f7'; x.lineWidth = 1; x.beginPath(); x.moveTo(cd.x + pad, ry); x.lineTo(cd.x + cd.w - pad, ry); x.stroke(); }
         x.fillStyle = C.ink3; x.font = f(land ? 20 : 21, 800);
@@ -558,18 +624,14 @@
         x.fillText(clip(ex0, f(land ? 17 : 18, 800), cd.w - pad * 2 - 16), cd.x + pad + 8, iy + 20);
         iy += 32;
       }
-      var sy = iy + 6;
-      var room = cd.y + cd.h - sy - 12;
-      var Lmax = Math.max(1, Math.floor((room - 20) / P.storyLH));
-      var sLines = P.storyLines.slice(0, Math.min(Lmax, P.storyLines.length));
-      var trunc = sLines.length < P.storyLines.length;
+      var sy = iy + 6 + Math.max(0, (cd.y + cd.h - iy - P.storyLines.length * P.storyLH - 20 - 14) / 2);
+      var sLines = P.storyLines;
       var sh = sLines.length * P.storyLH + 20;
       x.fillStyle = '#f2f6fc'; rr(x, cd.x + pad, sy, cd.w - pad * 2, sh, 8); x.fill();
       x.fillStyle = C.org; x.fillRect(cd.x + pad, sy + 5, 3, sh - 10);
       x.fillStyle = C.ink2; x.font = f(P.storySize, 500);
       sLines.forEach(function (ln, i) {
-        var txt2 = (trunc && i === sLines.length - 1) ? clip(ln + ' …', f(P.storySize, 500), cd.w - pad * 2 - 26) : ln;
-        x.fillText(txt2, cd.x + pad + 16, sy + 24 + i * P.storyLH);
+        x.fillText(ln, cd.x + pad + 16, sy + 24 + i * P.storyLH);
       });
     } else if (cd.k === 'c3') {
       x.fillStyle = C.ink3; x.font = f(land ? 24 : 26, 800);
@@ -677,13 +739,14 @@
     h += '</div>';
     h += '<div style="' + abs(land ? P.pad : 0, P.head.h - 5, land ? P.W - P.pad * 2 : P.W, 5) + 'background:' + C.org + '"></div>';
 
-    /* 사진 */
-    h += '<div style="' + abs(P.photo.x, P.photo.y, P.photo.w, P.photo.h) + 'border-radius:10px;overflow:hidden;background:' + C.navy2 + '">';
-    if (m.photos[0]) h += '<img src="' + esc(m.photos[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
-    else if (m.map) h += '<img src="' + esc(m.map) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
-    else h += '<div style="display:grid;place-items:center;height:100%;color:#7d90aa;font-size:26px;font-weight:800">현장 사진 준비 중</div>';
-    if (m.polygon && m.polygon.photo === 0) h += polySvg(m.polygon.points);
-    h += '</div>';
+    /* 사진 (사진이 있을 때만 — 없으면 빈 네이비 박스를 두지 않는다) */
+    if (P.photo) {
+      h += '<div style="' + abs(P.photo.x, P.photo.y, P.photo.w, P.photo.h) + 'border-radius:10px;overflow:hidden;background:' + C.navy2 + '">';
+      if (m.photos[0]) h += '<img src="' + esc(m.photos[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
+      else h += '<div style="display:grid;place-items:center;height:100%;color:#7d90aa;font-size:26px;font-weight:800">현장 사진 준비 중</div>';
+      if (m.polygon && m.polygon.photo === 0) h += polySvg(m.polygon.points);
+      h += '</div>';
+    }
 
     /* 썸네일 + 위치도 */
     var subs = [];
@@ -754,8 +817,9 @@
       var lx = pad + 8, labW = 0;
       m.specs.forEach(function (s) { labW = Math.max(labW, measure(s[0], f(land ? 20 : 21, 800))); });
       var vx = pad + 8 + Math.min(land ? 116 : 122, labW + 16);
+      var top0 = 58 + Math.max(0, (cd.h - 58 - m.specs.length * P.rowH - 8) / 2);
       m.specs.forEach(function (sp, i) {
-        var ry = 58 + i * P.rowH;
+        var ry = top0 + i * P.rowH;
         if (ry + P.rowH > cd.h - 4) return;
         if (i) h += '<div style="' + abs(pad, ry, cd.w - pad * 2, 1) + 'background:#eef2f7"></div>';
         h += '<div style="' + abs(lx, ry + P.rowH - 11 - (land ? 20 : 21), 110, land ? 20 : 21) + 'font-size:' + (land ? 20 : 21) + 'px;line-height:' + (land ? 20 : 21) + 'px;font-weight:800;color:' + C.ink3 + ';white-space:nowrap">' + esc(sp[0]) + '</div>';
@@ -772,17 +836,13 @@
         h += '<div style="' + abs(pad, iy + 2, cd.w - pad * 2, 26) + 'background:#eef2f8;border-radius:6px;font-size:' + (land ? 17 : 18) + 'px;line-height:26px;font-weight:800;color:' + C.ink2 + ';padding:0 8px;white-space:nowrap;overflow:hidden">' + esc(m.extras.map(function (e) { return e.t + ' ' + (e.lines[0] || ''); }).join('  ·  ')) + '</div>';
         iy += 32;
       }
-      var sy = iy + 6;
-      var room = cd.h - sy - 12;
-      var Lmax = Math.max(1, Math.floor((room - 20) / P.storyLH));
-      var sLines = P.storyLines.slice(0, Math.min(Lmax, P.storyLines.length));
-      var trunc = sLines.length < P.storyLines.length;
+      var sy = iy + 6 + Math.max(0, (cd.h - iy - P.storyLines.length * P.storyLH - 20 - 14) / 2);
+      var sLines = P.storyLines;
       var sh = sLines.length * P.storyLH + 20;
       h += '<div style="' + abs(pad, sy, cd.w - pad * 2, sh) + 'background:#f2f6fc;border-radius:8px">';
       h += '<div style="' + abs(0, 5, 3, sh - 10) + 'background:' + C.org + '"></div>';
       sLines.forEach(function (ln, i) {
-        var txt2 = (trunc && i === sLines.length - 1) ? clip(ln + ' …', f(P.storySize, 500), cd.w - pad * 2 - 26) : ln;
-        h += '<div style="' + abs(16, 24 + i * P.storyLH - P.storySize, cd.w - pad * 2 - 26, P.storySize) + 'font-size:' + P.storySize + 'px;line-height:' + P.storySize + 'px;font-weight:500;color:' + C.ink2 + ';white-space:nowrap">' + esc(txt2) + '</div>';
+        h += '<div style="' + abs(16, 24 + i * P.storyLH - P.storySize, cd.w - pad * 2 - 26, P.storySize) + 'font-size:' + P.storySize + 'px;line-height:' + P.storySize + 'px;font-weight:500;color:' + C.ink2 + ';white-space:nowrap">' + esc(ln) + '</div>';
       });
       h += '</div>';
     } else if (cd.k === 'c3') {

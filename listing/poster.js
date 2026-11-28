@@ -41,7 +41,7 @@
   /* ---------------- 모델 만들기 ---------------- */
   function fromStore(id) {
     var items = LS('kts_bc_items', []) || [];
-    var me = LS('kts_bc_me', {}) || {};
+    var me = (window.KTSProfile && KTSProfile.me()) || LS('kts_bc_me', {}) || {};
     var it = null;
     for (var i = 0; i < items.length; i++) if (items[i].id === id) it = items[i];
     if (!it) return null;
@@ -522,14 +522,33 @@
   }
 
   /* ---------------- 시작 ---------------- */
+  var shortP = null;
   function boot() {
     var code = qs('m'), itemId = qs('item'), listId = qs('id');
+    var pno = qs('p'), pi = parseInt(qs('i') || '0', 10) || 0;
     if (qs('g') === '1') guest = true;
+    /* 짧은 주소가 실어 온 물건 — /1?i=2 같은 주소가 여기로 넘어온다 */
+    if (pno && window.KTS_SHORT && !shortP) {
+      var hint0 = $('#hint'); if (hint0) hint0.textContent = '물건표를 불러오는 중입니다';
+      KTS_SHORT.load(pno).then(function (res) {
+        var pl = res && res.ok ? res.p : null;
+        if (pl && pl.items && pl.items[pi]) {
+          var it0 = pl.items[pi];
+          var m0 = B.build(it0, pl.me || {});
+          m0.map = it0.map || mapUrl(it0.lat, it0.lon);
+          m0.itemId = it0.id; m0.polygon = it0.polygon || null;
+          shortP = { m: m0, n: pno };
+        }
+        boot();
+      }).catch(function () { boot(); });
+      return;
+    }
     if (code) {
       var d = null;
       try { d = B.dec(code) } catch (e) { d = null }
       if (d) { M = d; guest = true; }
     }
+    if (!M && shortP) { M = shortP.m; guest = true; }
     if (!M && itemId) M = fromStore(itemId);
     if (!M && listId) {
       fetch('data/listings.json', { cache: 'no-store' }).then(function (r) { return r.json() }).then(function (j) {
@@ -549,7 +568,7 @@
     }
     if (!M) M = demo();
     /* 휴대폰에서는 세로(9:16)가 먼저 보이게 — 한 번 고르면 그 선택을 기억한다 */
-    if (!itemId && !code && !listId && !LS(STATE, null) && (window.innerWidth || 390) < 620) orient = 'port';
+    if (!itemId && !code && !listId && !LS(STATE, null) && !st_qs_orient() && (window.innerWidth || 390) < 620) orient = 'port';
     if (!M.sections) M.sections = { right: 0, tx: 1, appraisal: 0 };
     rebuildExtras();
 

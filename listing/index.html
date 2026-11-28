@@ -210,6 +210,7 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
 </style>
 <link rel="stylesheet" href="../shared/kts-print.css">
 <link rel="stylesheet" href="print.css">
+<script src="../shared/profile-sync.js?v=20261128b"></script>
 <script src="../shared/kts-ui.js" defer></script>
 <link rel="manifest" href="/shared/pwa/listing.webmanifest"></head>
 <body>
@@ -329,7 +330,21 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
   }
   function digits(s) { return String(s || '').replace(/[^0-9+]/g, ''); }
   function shortUrl(l) { return (EMB || location.protocol === 'file:' ? 'https://autooneclick.com/listing/' : location.origin + location.pathname) + '?m=' + encodeURIComponent(l.id); }
-  function brokerOf(l) { return l.broker || DB.broker || {}; }
+  function brokerOf(l) {
+    /* 295·297번 — 전자명함에서 고친 명함 정보가 있으면 그것이 먼저 */
+    var p = (window.KTSProfile && KTSProfile.broker && KTSProfile.broker()) || null;
+    var base = l.broker || DB.broker || {};
+    if (!p) return base;
+    var out = {};
+    for (var k in base) out[k] = base[k];
+    if (p.name) out.name = p.name;
+    if (p.title) out.title = p.title;
+    if (p.office) out.office = p.office;
+    if (p.phone) out.phone = p.phone;
+    if (p.address) out.address = p.address;
+    if (p.email) out.email = p.email;
+    return out;
+  }
 
   function vcard(b) {
     function v(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\r?\n/g, '\\n'); }
@@ -521,7 +536,7 @@ dialog .lim{font-size:12.5px;color:var(--muted);background:var(--p2);padding:10p
           '<a class="btn" href="' + tel + '" role="button">' + I('phone') + '전화</a><a class="btn" href="' + esc(sms) + '" role="button">' + I('msg') + '문자</a></div></section>' +
         '<nav class="nextrow noprint" aria-label="이 매물로 이어서">' +
           '<a class="or" href="' + esc(gongbuHref) + '" target="_blank" rel="noopener">' + I('bld') + '4대 공부</a>' +
-          '<a href="poster.html?id=' + encodeURIComponent(l.id || '') + '" target="_blank" rel="noopener">' + I('print') + '물건 포스터</a>' +
+          '<a href="poster.html?id=' + encodeURIComponent(l.id || '') + '" target="_blank" rel="noopener">' + I('print') + '한장짜리 물건표</a>' +
           '<a href="' + ROOT + 'bizcard/" target="_blank" rel="noopener">' + I('contact') + '전자명함</a>' +
           '<a href="' + ROOT + 'contract/" target="_blank" rel="noopener">' + I('stamp') + '5초 계약서</a></nav>' +
         '<p class="moretools noprint"><a href="' + ROOT + 'viewer.html" target="_blank" rel="noopener">더뷰</a><a href="' + ROOT + 'sign/" target="_blank" rel="noopener">더싸인</a><a href="' + ROOT + 'theform/" target="_blank" rel="noopener">양식만들기</a><a id="slopeBtn" href="' + ROOT + 'slope/" target="_blank" rel="noopener">경사도</a></p>' +

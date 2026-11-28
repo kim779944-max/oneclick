@@ -49,6 +49,10 @@
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       LS.set(K.me, S.me); LS.set(K.items, S.items); LS.set(K.plan, S.plan);
+      /* 295·297번 — 명함 정보는 공용 프로필에도 적어 매물장·물건표·계약서가 따라 바뀌게 */
+      if (S.me && g.KTSProfile) { try { KTSProfile.set(S.me); } catch (e) { } }
+      /* 297번 — 짧은 주소가 있으면 QR은 그 주소를 담는다 */
+      if (S.me) { S.me.shortUrl = S.me.shortNo ? (location.origin + '/' + S.me.shortNo) : (S.me.shortUrl || ''); }
     }, 120);
   }
 
@@ -320,12 +324,37 @@
     list.forEach(ensureGeo);
   }
 
-  /* ---------------- 손님 화면 (265·281번) ---------------- */
+  /* ---------------- 손님 화면 (265·281·298번) — 그림은 guest.js 한 곳에서 ---------------- */
+  function guestPayload() {
+    var me = S.me || {};
+    var items = S.items.filter(function (x) { return x.starred })
+      .sort(function (a, b) { return b.createdAt - a.createdAt });
+    return {
+      v: 3, at: Date.now(), n: me.shortNo || 0,
+      me: {
+        org: me.org || '', title: me.title || '', name: me.name || '', phone: me.phone || '',
+        fax: me.fax || '', email: me.email || '', bizAddr: me.bizAddr || '', kakao: me.kakao || '',
+        field: me.field || '', strength: me.strength || '', intro: me.intro || '',
+        photo: me.photo || '', stamp: me.stamp || 'circle', style: me.style || 'seal',
+        qrKind: me.qrKind || 'url', shortNo: me.shortNo || 0
+      },
+      items: items.map(function (it) { return slimForGuest(it); })
+    };
+  }
+  function slimForGuest(it) {
+    return {
+      id: it.id, title: it.title, addr: it.addr, kind: it.kind,
+      areaM2: it.areaM2, areaP: it.areaP, price: it.price, dealType: it.dealType,
+      deposit: it.deposit, monthly: it.monthly, residual: it.residual, loan: it.loan,
+      exchange: it.exchange, appraisal: it.appraisal, tags: it.tags || [], demo: it.demo ? 1 : 0,
+      lat: it.lat, lon: it.lon, photos: (it.photos || []).slice(0, 1)
+    };
+  }
   function sharePayload() {
     var me = S.me || {};
-    var o = splitOrg(me);
     var top = S.items.filter(function (x) { return x.starred }).sort(function (a, b) { return b.createdAt - a.createdAt })[0];
-    var p = {
+    var o = splitOrg(me);
+    return {
       v: 1,
       o: o.org, t: o.title, n: me.name || '', p: me.phone || '', f: me.fax || '',
       e: me.email || '', a: me.bizAddr || '', k: me.kakao || '',
@@ -333,40 +362,46 @@
       q: top ? { i: top.id, t: top.title || '', a: top.addr || '', p: top.price || 0, r: top.residual || 0, k: top.kind || '', ap: top.areaP || 0 } : null,
       pm: top ? posterModelCode(top) : ''
     };
-    return p;
   }
   function guestLink() {
-    var code = g.KTS_BRIEF ? KTS_BRIEF.enc(sharePayload()) : '';
+    var code = g.KTS_BRIEF ? KTS_BRIEF.enc(guestPayload()) : '';
     return location.origin + location.pathname + '#/g/' + code;
   }
+
+  /* 예전 손님 링크(v1)도 그대로 열리게 — 새 그림으로 옮겨 담는다 */
+  function upgradePayload(p) {
+    if (!p) return null;
+    if (p.me) {
+      p.items = p.items || [];
+      return p;
+    }
+    var me = {
+      org: p.o || '', title: p.t || '', name: p.n || '', phone: p.p || '', fax: p.f || '',
+      email: p.e || '', bizAddr: p.a || '', kakao: p.k || '', field: p.fd || '',
+      strength: p.st || '', intro: p.it || '', stamp: p.sm || 'circle', style: 'seal'
+    };
+    var items = [];
+    if (p.q && p.q.i) {
+      items.push({ id: p.q.i, title: p.q.t || '', addr: p.q.a || '', kind: p.q.k || '', areaP: p.q.ap || 0, price: p.q.p || 0, residual: p.q.r || 0, photos: [] });
+    }
+    return { v: 3, me: me, items: items, n: 0 };
+  }
+
   function viewGuest() {
     var code = (location.hash.split('/')[2] || '');
     var p = g.KTS_BRIEF ? KTS_BRIEF.dec(code) : null;
+    p = p ? upgradePayload(p) : null;
     if (!p) {
       $('#v-card').innerHTML = '<div class="empty">명함 주소가 올바르지 않습니다.<br>보내 주신 링크를 다시 눌러 주세요.</div>';
       return;
     }
-    var me = { org: p.o, title: p.t, name: p.n, phone: p.p, fax: p.f, email: p.e, bizAddr: p.a, kakao: p.k, field: p.fd, strength: p.st, intro: p.it, stamp: p.sm || 'circle' };
-    var h = cardHtml(me, true);
-    if (p.q && p.q.i) {
-      var price = p.q.r ? '잔가 ' + money(p.q.r) : money(p.q.p);
-      h += '<a class="guest-item" href="' + esc('../listing/poster.html?m=' + encodeURIComponent(p.pm || '') + '&g=1') + '">'
-        + '<span class="gi-t">보내 드린 물건표</span>'
-        + '<b>' + esc(p.q.t || '매물') + '</b>'
-        + '<span class="gi-a">' + esc(p.q.a || '') + '</span>'
-        + '<span class="gi-p">' + esc(price) + '</span>'
-        + '<i>눌러서 크게 보기 · 이미지로 받기</i></a>';
+    if (!g.KTS_GUEST) {
+      $('#v-card').innerHTML = '<div class="empty">명함을 불러오지 못했습니다.<br>잠시 뒤 다시 열어 주세요.</div>';
+      return;
     }
-    h += '<p class="tiny">KTS 원클릭 전자명함 · 문의는 전화·카톡으로</p>';
+    var h = KTS_GUEST.card(p, { posterBase: p.n ? (location.origin + '/listing/poster.html?p=' + p.n) : '' });
     $('#v-card').innerHTML = h;
-    $('#btnSeal').addEventListener('click', openSeal);
-    paintSeal($('#sealCv'), 92);
-    var bs = $('#btnSaveCard');
-    if (bs) bs.addEventListener('click', function () { saveGuestContact(me); });
-    var bi = $('#btnInstall');
-    if (bi) bi.addEventListener('click', function (e) { e.preventDefault(); doInstall(); });
-    var bk = $('#btnKakao');
-    if (bk) bk.addEventListener('click', function (e) { e.preventDefault(); openKakaoOf(me); });
+    KTS_GUEST.bind($('#v-card'), p, {});
   }
   function saveGuestContact(me) {
     var o = splitOrg(me);
@@ -407,16 +442,19 @@
   function sealOpts(extra) {
     var me = S.me || {};
     var o = { shape: sealShape(), name: me.name || '', me: me,
+              style: me.style || 'seal', photo: me.photo || '',
+              code: me.shortNo ? String(me.shortNo) : '',
               value: (g.KTS && KTS.Seal) ? KTS.Seal.payload(me) : '' };
     if (extra) for (var k in extra) o[k] = extra[k];
     return o;
   }
   function paintSeal(cv, size) {
     if (!cv || !g.KTS || !KTS.Seal) return;
-    /* 명함 위 도장은 세로가 길어지지 않게 — 타원은 가로를 줄여 높이를 92px 안에 맞춘다 */
-    var s2 = sealShape() === 'oval' ? Math.round(size * 0.76) : size;
+    /* 명함 위 QR은 세로가 길어지지 않게 — 타원은 가로를 줄여 높이를 92px 안에 맞춘다 */
+    var style = (S.me && S.me.style) || 'seal';
+    var s2 = (style === 'seal' && sealShape() === 'oval') ? Math.round(size * 0.76) : size;
     try {
-      KTS.Seal.paint(cv, s2, sealOpts());
+      KTS.Seal.paint(cv, s2, sealOpts({ onload: function () { paintSeal(cv, size); } }));
       /* 화면에서는 CSS 크기로 — 캔버스 속성(기기 배율)이 그대로 쓰이면 도장이 커진다 */
       cv.style.width = size + 'px';
       cv.style.height = 'auto';
@@ -497,19 +535,77 @@
     try {
       var m = KTS_BRIEF.build(it, S.me);
       m.photos = [];                       /* 손님 링크에는 사진을 싣지 않는다(주소가 길어진다) */
+      m.edit = false;
       return KTS_BRIEF.enc(m);
     } catch (e) { return '' }
   }
 
-  function shareCard() {
+  /* ---------------- [내보내기] — ① 이미지 ② 짧은 주소 (2026-11-28) ---------------- */
+  function shareCard() { openExport(); }
+
+  function openExport() {
+    var me = S.me || {};
+    var starred = S.items.filter(function (x) { return x.starred });
+    var box = document.createElement('div');
+    box.className = 'exwrap';
+    box.innerHTML = '<div class="exbox" role="dialog" aria-label="내보내기">'
+      + '<div class="ex-h"><b>내보내기</b><button type="button" class="x" data-ex="close" aria-label="닫기">✕</button></div>'
+      + '<p class="ex-sub">손님에게 보낼 방법을 고르세요. 둘 다 됩니다.</p>'
+      + '<button type="button" class="exo img" data-ex="png"><i>' + IC.down + '</i><span><b>① 명함 이미지로 보내기</b><em>카톡·문자에 사진 한 장으로 바로</em></span></button>'
+      + '<button type="button" class="exo short" data-ex="short"><i>' + IC.copy + '</i><span><b>② 짧은 주소 만들기</b><em>' + (me.shortNo ? 'autooneclick.com/' + me.shortNo + ' — 다시 만들면 같은 번호로 갱신' : 'autooneclick.com/1 처럼 1번부터 차례로') + '</em></span></button>'
+      + '<div class="ex-out" id="exOut" hidden></div>'
+      + '<p class="ex-note">짧은 주소에는 지금 켜 둔 별표 매물 ' + starred.length + '건이 함께 담깁니다.</p>'
+      + '</div>';
+    document.body.appendChild(box);
+    function close() { box.remove(); }
+    box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('[data-ex="close"]')) close(); });
+    box.querySelector('[data-ex="png"]').addEventListener('click', function () { pngMode = 'share'; close(); saveCardImage(); });
+    box.querySelector('[data-ex="short"]').addEventListener('click', function () { makeShort(box); });
+  }
+
+  function makeShort(box) {
+    if (!g.KTS_SHORT) { toast('잠시 후 다시 시도해 주세요'); return; }
+    var out = box.querySelector('#exOut');
+    var btn = box.querySelector('[data-ex="short"]');
+    btn.disabled = true;
+    out.hidden = false;
+    out.innerHTML = '<p class="ex-wait"><i></i>짧은 주소를 만드는 중입니다</p>';
+    var starred = S.items.filter(function (x) { return x.starred });
+    KTS_SHORT.publish(S.me, starred).then(function (r) {
+      btn.disabled = false;
+      if (!r || !r.ok) {
+        out.innerHTML = '<p class="ex-err">짧은 주소를 만들지 못했습니다' + (r && r.msg ? ' — ' + esc(r.msg) : '') + '.</p>'
+          + '<button type="button" class="btn sm" data-ex="long">긴 주소로 보내기</button>';
+        var lb = out.querySelector('[data-ex="long"]');
+        if (lb) lb.addEventListener('click', function () { longShare(); });
+        return;
+      }
+      S.me.shortNo = r.n; S.me.shortUrl = r.url; save();
+      if ($('#sealCv')) paintSeal($('#sealCv'), 92);
+      var text = (S.me.name || '') + (S.me.org ? ' · ' + S.me.org : '') + ' 전자명함\n' + r.url;
+      out.innerHTML = '<div class="ex-done"><span>짧은 주소</span><b>' + esc(r.url.replace(/^https?:\/\//, '')) + '</b></div>'
+        + '<div class="ex-row"><button type="button" class="btn sm main" data-ex="copy">주소 복사</button>'
+        + '<button type="button" class="btn sm" data-ex="send">카톡·문자로 보내기</button>'
+        + '<button type="button" class="btn sm ghost" data-ex="long">긴 주소</button></div>';
+      out.querySelector('[data-ex="copy"]').addEventListener('click', function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(r.url).then(function () { toast('짧은 주소를 복사했습니다 — ' + r.url); });
+        else toast(r.url);
+      });
+      out.querySelector('[data-ex="send"]').addEventListener('click', function () {
+        if (navigator.share) navigator.share({ title: (S.me.name || 'KTS') + ' 전자명함', text: text, url: r.url }).catch(function () { });
+        else if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('복사했습니다 — 카톡에 붙여넣으세요'); });
+      });
+      out.querySelector('[data-ex="long"]').addEventListener('click', longShare);
+    });
+  }
+
+  function longShare() {
     var me = S.me || {};
     var url = guestLink();
     var text = (me.name || '') + (me.org ? ' · ' + me.org : '') + ' 전자명함\n' + url;
-    if (navigator.share) {
-      navigator.share({ title: (me.name || 'KTS') + ' 전자명함', text: text, url: url }).catch(function () { });
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(function () { toast('손님용 명함 주소를 복사했습니다'); });
-    } else toast(url);
+    if (navigator.share) navigator.share({ title: (me.name || 'KTS') + ' 전자명함', text: text, url: url }).catch(function () { });
+    else if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('손님용 명함 주소를 복사했습니다'); });
+    else toast(url);
   }
 
   function openKakao() {
@@ -546,8 +642,15 @@
     x.closePath();
   }
 
+  var pngMode = 'download';
   function saveCardImage() {
     var me = S.me || {};
+    /* 사진형 QR은 사진을 먼저 읽어야 그려진다 — 한 번만 기다렸다 다시 */
+    if ((me.style === 'photo') && window.KTS && KTS.Seal && !KTS.Seal.photoReady(me.photo) && !saveCardImage._p) {
+      saveCardImage._p = 1;
+      KTS.Seal.primePhoto(me.photo).then(function () { saveCardImage._p = 0; saveCardImage(); });
+      return;
+    }
     /* 카톡 인앱에서는 내려받기가 막힌다 — 크롬으로 탈출해서 저장 */
     if (isKakao && !isIOS) {
       toast('카톡 안에서는 저장이 막힙니다 — 크롬에서 저장합니다', 2400);
@@ -594,14 +697,31 @@
     function exportPng() {
       c.toBlob(function (b) {
         if (!b) { toast('이미지를 만들지 못했습니다'); return; }
-        var url = URL.createObjectURL(b);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = text(me.name || '전자명함').replace(/[\\/:*?"<>|]/g, '') + '_명함.png';
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function () { try { URL.revokeObjectURL(url) } catch (e) { } }, 6000);
-        toast('명함 1장을 PNG로 저장했습니다 — 카톡·문자에 붙여 보내세요', 3600);
+        var fname = text(me.name || '전자명함').replace(/[\\/:*?"<>|]/g, '') + '_명함.png';
+        var mode = pngMode; pngMode = 'download';
+        /* ① 바로 보내기 — 폰 공유창에 사진 한 장으로 */
+        if (mode === 'share' && navigator.canShare) {
+          try {
+            var file = new File([b], fname, { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share({ files: [file], title: (me.name || 'KTS') + ' 전자명함', text: (me.name || '') + (me.org ? ' · ' + me.org : '') + ' 명함' })
+                .catch(function () { downloadPng(b, fname); });
+              toast('공유창에서 카톡·문자를 고르세요', 3000);
+              return;
+            }
+          } catch (e) { }
+        }
+        downloadPng(b, fname);
       }, 'image/png');
+    }
+    function downloadPng(b, fname) {
+      var url = URL.createObjectURL(b);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = fname;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { try { URL.revokeObjectURL(url) } catch (e) { } }, 6000);
+      toast('명함 1장을 PNG로 저장했습니다 — 카톡·문자에 붙여 보내세요', 3600);
     }
 
     function paint(img) {
@@ -720,7 +840,7 @@
       var tx2 = sealX + sealSize + 40;
       x.textAlign = 'left'; x.fillStyle = '#111111';
       x.font = font(24, 900);
-      x.fillText('직인 QR', tx2, CARDH + 66);
+      x.fillText('명함 QR', tx2, CARDH + 66);
       x.font = font(40, 900);
       x.fillText(text(me.name || '이름'), tx2, CARDH + 124, right - tx2);
       x.font = font(24, 700); x.fillStyle = '#333333';
@@ -1481,7 +1601,17 @@
 
   function shareItem(it) {
     var pr = priceOf(it);
-    var url = posterUrl(it.id, true);
+    var url = '';
+    /* 짧은 주소가 있으면 그 번호의 물건표로 (손님 폰에서도 열린다) */
+    if (S.me && S.me.shortNo) {
+      var star = S.items.filter(function (x) { return x.starred }).sort(function (a, b) { return b.createdAt - a.createdAt });
+      var idx = star.map(function (x) { return x.id }).indexOf(it.id);
+      if (idx >= 0) url = location.origin + '/' + S.me.shortNo + '?i=' + idx;
+    }
+    if (!url) {
+      var code = posterModelCode(it);
+      url = code ? (location.origin + '/listing/poster.html?m=' + code + '&g=1') : posterUrl(it.id, true);
+    }
     var text = (it.title || '') + ' · ' + pr.label + ' ' + pr.text + '\n' + (it.addr || '') + '\n' + url;
     if (navigator.share) navigator.share({ title: it.title, text: text, url: url }).catch(function () { });
     else if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('매물 주소를 복사했습니다'); });
@@ -1576,8 +1706,14 @@
     h += field('kakao', '카톡 ID나 오픈채팅 주소 (선택)', me.kakao, '예) open.kakao.com/o/abcd');
     h += '</div>';
 
-    /* 직인 도장 QR — 모양 3종 + QR에 담을 것 */
-    h += '<div class="seal-set"><div class="ss-h"><b>직인 도장 QR</b><em>명함·포스터에 찍히는 도장</em></div>';
+    /* 명함 QR — 세 가지 격(直) 295·297번 */
+    h += '<div class="seal-set"><div class="ss-h"><b>명함 QR</b><em>명함·물건표에 찍히는 격</em></div>';
+    h += '<div class="seal-styles" id="sealStyles">';
+    [['seal', '직인 도장', '도장 안에 QR'], ['gov', '관공서형', '굵은 틀·짧은 번호'], ['photo', '내 사진', '가운데 초점']].forEach(function (p2) {
+      h += '<button type="button" class="sl-btn' + ((me.style || 'seal') === p2[0] ? ' on' : '') + '" data-style="' + p2[0] + '">'
+        + '<i class="sl-ico ' + p2[0] + '"></i><b>' + p2[1] + '</b><em>' + p2[2] + '</em></button>';
+    });
+    h += '</div>';
     h += '<div class="seal-shapes" id="sealShapes">';
     [['circle', '원형'], ['square', '사각'], ['oval', '타원']].forEach(function (p) {
       h += '<button type="button" class="ss-btn' + (sealShape() === p[0] ? ' on' : '') + '" data-shape="' + p[0] + '">'
@@ -1619,8 +1755,9 @@
       cur.photo = ''; paintPv(); toast('사진을 지웠습니다 — 이름 첫 글자로 표시됩니다');
     });
 
-    /* 직인 미리보기 — 이름·모양을 바꾸면 바로 다시 그린다 */
+    /* QR 미리보기 — 모양·격·이름을 바꾸면 바로 다시 그린다 */
     var previewShape = sealShape();
+    var previewStyle = (me.style || 'seal');
     function paintPreview() {
       var box = $('#sealPrev'); if (!box) return;
       box.innerHTML = '';
@@ -1628,11 +1765,25 @@
       box.appendChild(cv);
       var nameV = ($('#f-name') && $('#f-name').value) || me.name || '';
       var kind = ($('#f-qr') && $('#f-qr').value) || 'url';
+      var phoneV = ($('#f-phone') && $('#f-phone').value) || me.phone;
+      var orgV = ($('#f-org') && $('#f-org').value) || me.org;
       try {
-        KTS.Seal.paint(cv, 140, { shape: previewShape, name: nameV,
-          value: KTS.Seal.payload({ name: nameV, phone: ($('#f-phone') && $('#f-phone').value) || me.phone, org: ($('#f-org') && $('#f-org').value) || me.org, qrKind: kind }) });
+        KTS.Seal.paint(cv, 150, { style: previewStyle, shape: previewShape, name: nameV,
+          photo: cur.photo || '', code: S.me && S.me.shortNo ? String(S.me.shortNo) : '',
+          onload: paintPreview,
+          value: KTS.Seal.payload({ name: nameV, phone: phoneV, org: orgV, qrKind: kind,
+            shortNo: S.me && S.me.shortNo, shortUrl: S.me && S.me.shortUrl }) });
       } catch (e) { }
+      var shp = $('#sealShapes');
+      if (shp) shp.style.display = previewStyle === 'seal' ? '' : 'none';
     }
+    $$('#sealStyles .sl-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        previewStyle = b.getAttribute('data-style');
+        $$('#sealStyles .sl-btn').forEach(function (o) { o.classList.toggle('on', o === b) });
+        paintPreview();
+      });
+    });
     $$('#sealShapes .ss-btn').forEach(function (b) {
       b.addEventListener('click', function () {
         previewShape = b.getAttribute('data-shape');
@@ -1665,9 +1816,12 @@
         kakao: g.KTS_PARSE ? KTS_PARSE.normUrl($('#f-kakao').value || '') : ($('#f-kakao').value || '').trim(),
         photo: cur.photo || '',
         stamp: previewShape,
-        qrKind: ($('#f-qr') && $('#f-qr').value) || 'url'
+        style: previewStyle,
+        qrKind: ($('#f-qr') && $('#f-qr').value) || 'url',
+        shortNo: (S.me && S.me.shortNo) || 0,
+        shortUrl: (S.me && S.me.shortUrl) || ''
       };
-      save(); toast('저장했습니다');
+      save(); toast('저장했습니다 — 매물장·물건표·계약서에도 같이 반영됩니다');
       go(LS.get(K.shared, '') ? '#/new' : '#/card');
     });
     var bd = $('#btnDemoMe');

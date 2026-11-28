@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0B132B">
+<meta name="robots" content="noindex,follow">
+<title>KTS 전자명함</title>
+<!-- 짧은 주소 — autooneclick.com/1, /2, /3 …  (404.html 이 번호를 읽어 손님 명함을 그린다) -->
+<link rel="icon" href="/icon.png">
+<link rel="stylesheet" href="/bizcard/app.css?v=20261128b">
+<style>
+  html,body{margin:0;min-height:100%}
+  body{background:#0B132B;color:#e8eef8;font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+  .shortwrap{max-width:430px;margin:0 auto;padding:12px 12px 30px}
+  .shortwrap .brandline{display:flex;align-items:center;gap:8px;padding:4px 2px 10px;color:#ffb877;font-weight:900;font-size:13px;letter-spacing:.4px}
+  .shortwrap .brandline img{width:20px;height:20px;border-radius:5px}
+  .shortload{padding:60px 10px;text-align:center;color:#9fb0c8;font-size:14px;line-height:1.7}
+  .shortload i{display:inline-block;width:22px;height:22px;border:2px solid rgba(255,184,119,.35);border-top-color:#ffb877;border-radius:50%;animation:sp 1s linear infinite;margin-bottom:12px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .shortnone{background:#16213a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:22px 18px;margin-top:26px;text-align:center}
+  .shortnone b{display:block;font-size:17px;color:#fff;margin-bottom:8px}
+  .shortnone p{margin:0 0 14px;color:#a9bcd4;font-size:13.5px;line-height:1.65}
+  .shortnone a{display:inline-block;margin:4px 4px 0;padding:11px 16px;border-radius:11px;background:rgba(255,122,0,.16);
+    border:1px solid rgba(255,122,0,.55);color:#ffcf9e;font-weight:900;font-size:13.5px;text-decoration:none}
+  #sealBig{position:fixed;inset:0;background:rgba(6,11,22,.9);display:none;place-items:center;z-index:60;padding:20px}
+  #sealBig.on{display:grid}
+  #sealBig .in{background:#fff;border-radius:18px;padding:18px;text-align:center;max-width:340px}
+  #sealBig .in p{color:#333;font-size:12.5px;line-height:1.6;margin:10px 0 0}
+  #sealBig button{margin-top:12px;width:100%;height:42px;border:0;border-radius:11px;background:#10203a;color:#fff;font-weight:900;font-size:14px}
+</style>
+</head>
+<body>
+<div class="shortwrap" id="root">
+  <div class="brandline"><img src="/bizcard/icon-192.png" alt="">KTS 원클릭 · 전자명함</div>
+  <div class="shortload" id="load"><i></i><br>명함을 불러오는 중입니다</div>
+</div>
+<div id="sealBig"><div class="in"><div id="sealStage"></div><p>휴대폰 카메라로 찍으면 전자명함이 열립니다.</p><button type="button" id="sealX">닫기</button></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="/bizcard/vendor/qrcode.js?v=20261128b"></script>
+<script src="/bizcard/seal.js?v=20261128b"></script>
+<script src="/bizcard/guest.js?v=20261128b"></script>
+<script src="/bizcard/shorturl.js?v=20261128b"></script>
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('root');
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function qs(k){var m=location.search.match(new RegExp('[?&]'+k+'=([^&]*)'));return m?decodeURIComponent(m[1]):''}
+  function none(title, msg) {
+    root.innerHTML = '<div class="brandline"><img src="/bizcard/icon-192.png" alt="">KTS 원클릭 · 전자명함</div>'
+      + '<div class="shortnone"><b>' + esc(title) + '</b><p>' + msg + '</p>'
+      + '<a href="https://autooneclick.com/">원클릭 홈</a><a href="https://autooneclick.com/bizcard/">내 전자명함</a></div>';
+  }
+  function pathNo() {
+    var p = location.pathname.replace(/\/+$/, '');
+    var m = p.match(/\/(\d{1,6})$/);
+    return m ? m[1] : '';
+  }
+
+  var n = pathNo();
+  if (!n) {
+    none('주소를 찾지 못했습니다', '주소가 바뀌었거나 잘못 입력되었습니다.<br>보내 주신 링크를 다시 눌러 주세요.');
+    return;
+  }
+  if (!window.KTS_SHORT || !window.KTS_GUEST) {
+    none('명함을 열지 못했습니다', '잠시 뒤 다시 시도해 주세요.');
+    return;
+  }
+
+  KTS_SHORT.load(n).then(function (r) {
+    if (!r || !r.ok) {
+      if (r && (r.why === 'busy' || r.why === 'net')) {
+        none('명함을 불러오지 못했습니다', '지금 접속이 잠시 몰렸습니다.<br>잠깐 뒤 다시 열어 주세요. (번호 ' + esc(n) + ')'
+          + '<br><a href="javascript:location.reload()">다시 시도</a>');
+      } else {
+        none('아직 없는 명함입니다', '이 번호로 발급된 명함이 없습니다.<br>주소를 다시 확인해 주세요. (번호 ' + esc(n) + ')');
+      }
+      return;
+    }
+    var p = r.p;
+    /* 물건표를 누르면 그 물건표로 — 번호는 그대로 두고 물건만 고른다 */
+    var i = qs('i');
+    if (i !== '' && p.items && p.items[parseInt(i, 10)]) {
+      location.replace('/listing/poster.html?p=' + encodeURIComponent(n) + '&i=' + encodeURIComponent(i) + '&g=1');
+      return;
+    }
+    p.n = p.n || n;
+    document.title = ((p.me && p.me.name) ? p.me.name + ' ' : '') + (p.me && p.me.org ? p.me.org + ' · ' : '') + 'KTS 전자명함';
+    var base = location.origin + '/' + n;
+    root.innerHTML = '<div class="brandline"><img src="/bizcard/icon-192.png" alt="">KTS 원클릭 · 전자명함</div>'
+      + KTS_GUEST.card(p, { posterBase: base });
+    document.body.classList.add('guestmode');
+    KTS_GUEST.bind(root, p, {});
+    /* QR 크게 보기 */
+    var big = document.getElementById('sealBig'), stage = document.getElementById('sealStage');
+    var cv = root.querySelector('#sealCv');
+    if (cv) cv.addEventListener('click', function () { openBig(); });
+    var btn = root.querySelector('#btnSeal');
+    if (btn) btn.addEventListener('click', function (e) { e.preventDefault(); openBig(); });
+    function openBig() {
+      var w = Math.min(330, Math.max(220, Math.round((window.innerWidth || 390) * 0.72)));
+      stage.innerHTML = '';
+      var c2 = document.createElement('canvas');
+      stage.appendChild(c2);
+      try {
+        KTS.Seal.paint(c2, w, { style: (p.me.style || 'seal'), shape: p.me.stamp || 'circle', name: p.me.name || '',
+          photo: p.me.photo || '', code: String(p.n || n), value: KTS.Seal.payload(p.me),
+          onload: function () { openBig(); } });
+      } catch (e) { }
+      big.classList.add('on');
+    }
+    document.getElementById('sealX').addEventListener('click', function () { big.classList.remove('on'); });
+    big.addEventListener('click', function (e) { if (e.target === big) big.classList.remove('on'); });
+  });
+})();
+</script>
+<script src="/shared/visit.js?v=20261128b" defer></script>
+</body>
+</html>

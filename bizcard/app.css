@@ -634,3 +634,86 @@ body.guestmode #app{padding-top:10px}
 .two-col{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .two-col>*{min-width:0}
 .fl input{width:100%;min-width:0;box-sizing:border-box}
+
+/* ==========================================================================
+   2026-11-28 트랙3 — 293 아이콘 꽉 찬 컬러 · 298 손님 하단 버튼 순서 ·
+   내보내기 두 갈래(이미지/짧은 주소) · QR 세 가지 격 · 별표 매물 썸네일 줄
+   ========================================================================== */
+/* 293번 — 아이콘 꽉 찬 컬러 통일(딥네이비 바탕 위 선명한 색 + 둥근 사각) */
+.biz-acts .pact{height:33px;border-radius:10px;font-size:10.8px;gap:4px;border-width:1px}
+.biz-acts .pact svg{width:14px;height:14px;stroke-width:0}
+.pact.tel,body.guestmode .pact.tel{background:#17a35a;border-color:#17a35a;color:#fff}
+.pact.sms,body.guestmode .pact.sms{background:#2f7de1;border-color:#2f7de1;color:#fff}
+.pact.kakao{background:#fee500;border-color:#fee500;color:#2a2200}
+.pact.save{background:linear-gradient(180deg,#ffd48a,#f0b455);border-color:#ffd48a;color:#2a1a00}
+.pact.out{background:#e2762a;border-color:#e2762a;color:#fff}
+.pact.img{background:#8a6a2f;border-color:#a8813c;color:#ffe9c4}
+.pact.edit{background:#33455f;border-color:#41546f;color:#dbe6f4}
+.pact.inst{border:1px dashed rgba(226,186,122,.6);background:rgba(226,186,122,.12);color:#ffe3b0}
+
+/* QR 세 가지 격 고르기 */
+.seal-styles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 4px}
+.sl-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px 8px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.13);border-radius:12px;background:rgba(255,255,255,.04);color:#cfdaea;
+  font-family:inherit}
+.sl-btn b{font-size:11.5px;font-weight:900;letter-spacing:-.3px}
+.sl-btn em{font-style:normal;font-size:9.5px;color:#8ea3bd}
+.sl-btn.on{border-color:rgba(226,186,122,.85);background:rgba(226,186,122,.14);color:#ffe3b0}
+.sl-btn.on em{color:#d8b98a}
+.sl-ico{display:block;width:34px;height:34px;border-radius:9px;position:relative;background:#fff;border:1px solid rgba(255,255,255,.25)}
+.sl-ico::after{content:"";position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);
+  background:conic-gradient(#10203a 25%,#fff 0 50%,#10203a 0 75%,#fff 0);background-size:50% 50%}
+.sl-ico.seal{border-radius:50%;border:3px solid #b01b22}
+.sl-ico.seal::after{background:conic-gradient(#b01b22 25%,#fff 0 50%,#b01b22 0 75%,#fff 0);background-size:50% 50%}
+.sl-ico.gov{border:5px solid #10203a;border-radius:4px}
+.sl-ico.gov::after{width:12px;height:12px;background:conic-gradient(#10203a 25%,#fff 0 50%,#10203a 0 75%,#fff 0);background-size:50% 50%}
+.sl-ico.photo{border-radius:50%;border:2px solid #e2ba7a;background:radial-gradient(circle at 50% 42%,#f0c9a0 0 34%,#7d5a3a 60%,#10203a 100%)}
+.sl-ico.photo::after{width:13px;height:13px;right:2px;left:auto;top:auto;bottom:2px;transform:none;border-radius:2px;background:#10203a}
+
+/* 손님 — 별표 매물 사진 썸네일 줄 */
+#gstrip{margin-top:6px}
+#gstrip.scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+#gstrip.scroll .gcard{flex:0 0 118px;scroll-snap-align:start}
+#gstrip .gth{height:78px}
+#gstrip.scroll .gth{height:84px}
+#gstrip .gcard:active{transform:scale(.985)}
+
+/* 손님 — 화면 아래 버튼 순서 고정 [전화] → [문자] → [카톡] → [저장] (298번) */
+.gbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  max-width:430px;margin:0 auto;padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(11,19,43,0),rgba(11,19,43,.94) 42%)}
+.gbar .pact{height:46px;border-radius:12px;font-size:12px;font-weight:900;gap:5px;text-decoration:none}
+.gbar .pact svg{width:17px;height:17px}
+body.guestmode{padding-bottom:84px}
+.shortwrap{padding-bottom:92px}
+
+/* 내보내기 시트 — ① 이미지 ② 짧은 주소 */
+.exwrap{position:fixed;inset:0;z-index:120;background:rgba(5,9,18,.72);display:flex;align-items:flex-end;justify-content:center;
+  padding:12px;backdrop-filter:blur(3px)}
+.exbox{width:100%;max-width:430px;background:#141f36;border:1px solid rgba(255,255,255,.14);border-radius:18px;
+  padding:14px 14px calc(14px + env(safe-area-inset-bottom));color:#e8eef8;box-shadow:0 -20px 50px rgba(0,0,0,.5)}
+.ex-h{display:flex;align-items:center;justify-content:space-between}
+.ex-h b{font-size:16px;font-weight:900;letter-spacing:-.4px}
+.ex-h .x{width:30px;height:30px;border:0;border-radius:9px;background:rgba(255,255,255,.08);color:#cfdaea;
+  font-size:14px;font-weight:900;cursor:pointer}
+.ex-sub{margin:6px 0 10px;font-size:12px;color:#9fb0c8}
+.exo{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:12px;margin-bottom:8px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);border-radius:14px;background:#18253f;color:#e8eef8;font-family:inherit}
+.exo:active{transform:translateY(1px)}
+.exo>i{display:grid;place-items:center;flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:#2f7de1;color:#fff}
+.exo.short>i{background:#17a35a}
+.exo i svg{width:20px;height:20px}
+.exo b{display:block;font-size:14px;font-weight:900;letter-spacing:-.3px;color:#fff}
+.exo em{display:block;margin-top:2px;font-style:normal;font-size:11.5px;color:#9fb0c8;line-height:1.35}
+.ex-out{margin-top:2px}
+.ex-wait{margin:8px 0 2px;font-size:12.5px;color:#cfdaea;display:flex;align-items:center;gap:8px}
+.ex-wait i{width:16px;height:16px;border:2px solid rgba(255,184,119,.35);border-top-color:#ffb877;border-radius:50%;
+  animation:expin 1s linear infinite}
+@keyframes expin{to{transform:rotate(360deg)}}
+.ex-err{margin:8px 0;font-size:12.5px;color:#ffb4a4;line-height:1.5}
+.ex-done{margin-top:6px;padding:12px;border-radius:13px;background:rgba(23,163,90,.14);border:1px solid rgba(23,163,90,.45)}
+.ex-done span{display:block;font-size:10.5px;font-weight:900;color:#8ff0b4;letter-spacing:.3px}
+.ex-done b{display:block;margin-top:3px;font-size:19px;font-weight:900;color:#fff;letter-spacing:-.4px;word-break:break-all}
+.ex-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ex-row .btn{flex:1 1 30%}
+.ex-note{margin:10px 0 0;font-size:11px;color:#8ea3bd;line-height:1.5}
