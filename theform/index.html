@@ -448,7 +448,7 @@ body.cv main,body.cv .bar,body.cv #fillDock,body.cv #steps,body.cv .ktsRsv,body.
  <div id="tfMicEq"></div><div id="tfMicLive"><small id="tfMicWhere"></small><b id="tfMicTxt">말씀하세요…</b></div></div>
 <div id="zModal"><div class="zhd"><b id="zTitle">A4 미리보기</b><button type="button" id="zX">닫기</button></div>
  <div class="ztools"><button type="button" data-z="-" aria-label="작게">−</button><b id="zLv">100%</b><button type="button" data-z="+" aria-label="크게">＋</button><button type="button" data-z="fit" class="on" style="font-size:12px">화면 폭</button></div>
- <div id="zEdit" hidden><span class="zl" id="zEditLab">칸</span><input id="zEditIn" autocomplete="off"><textarea id="zEditTa" rows="2" hidden></textarea><button type="button" id="zEditDone">완료</button></div>
+ <div id="zEdit" hidden><span class="zl" id="zEditLab">칸</span><input id="zEditIn" autocomplete="off" oninput="zEditInput(this)" onchange="zEditInput(this)"><textarea id="zEditTa" rows="2" hidden oninput="zEditInput(this)" onchange="zEditInput(this)"></textarea><button type="button" id="zEditDone">완료</button></div>
  <div id="zBody"></div>
  <div class="zft"><button class="btn pri" id="zPdf">PDF 저장 · 인쇄</button><button class="btn sec" id="zPng">이미지(PNG) 저장</button><button class="btn sec" id="zX2">닫기</button></div></div>
 <div id="toast"></div>
