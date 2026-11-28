@@ -7,7 +7,7 @@
      실패하면 화면에 아무것도 쓰지 않고 조용히 끝납니다(사이트 동작에 영향 0).
    · 267번(429 보완): 카운터는 IP당 10초에 30번까지만 받습니다.
      → 모든 요청을 한 줄로 세워 0.34초 간격으로 보내고(초당 ~3회),
-       429가 오면 1.5초·3초 쉬었다 다시 보냅니다(최대 2번).
+       429가 오면 1.5초·3초·4.5초 쉬었다 다시 보냅니다(최대 3번).
      → 받아 온 값은 90초 동안 이 기기에 담아 두고 그대로 씁니다(같은 화면 왕복 줄임).
      → 한 번 본 페이지는 그 세션에서 다시 세지 않습니다(sessionStorage).
    · 보이는 곳: <p data-kts-visit></p> 가 있는 페이지(쇼룸 푸터 등).
@@ -45,7 +45,7 @@
     var url = API + '/' + job.kind + '/' + NS + '/' + encodeURIComponent(job.key);
     var done = function (val, retryAfter) {
       busy = false;
-      if (val === 'RETRY' && (job.tries = (job.tries || 0) + 1) <= 2) {
+      if (val === 'RETRY' && (job.tries = (job.tries || 0) + 1) <= 3) {
         lastAt = Date.now() + (retryAfter || 1500 * job.tries) - GAP;   /* 쉬었다 다시 */
         Q.unshift(job);
       } else {

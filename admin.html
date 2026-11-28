@@ -52,9 +52,11 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
 .note{font-size:10.5px;color:#7C8DA6;line-height:1.65;margin:8px 0 0;word-break:keep-all}
 .pin{display:flex;gap:60px;justify-content:center;margin-top:14px}
 /* ---------- 방문자 현황판 (267번 · 2026-11-28) ---------- */
-.vhd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:2px 0 8px}
-.vhd b{font-size:20px;font-weight:900;color:#fff}
-.vhd span{font-size:11px;color:var(--gray);font-weight:800}
+.vhd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:2px 0 8px}
+.vhd .vs{border:1px solid #1E2C4A;border-radius:11px;background:#0B1729;padding:8px 9px}
+.vhd .vs span{display:block;font-size:10px;font-weight:800;color:var(--gray)}
+.vhd .vs b{display:block;font-size:19px;font-weight:900;color:#fff;margin-top:2px;font-variant-numeric:tabular-nums}
+.vhd .vs:nth-child(1) b{color:var(--amber2)}
 .vrow{display:grid;grid-template-columns:1fr 66px 54px;align-items:center;gap:6px;padding:8px 6px;border-top:1px solid #1E2C4A;font-size:12px}
 .vrow:first-child{border-top:0}
 .vrow .vn{min-width:0;color:#DCE6F2;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -171,8 +173,10 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
       '</div>' +
 
       '<div class="card" id="visitCard"><b class="t"><em>④</em>방문자 현황 — 앱별 누적·오늘</b>' +
-        '<div class="vhd"><b id="vToday">—</b><span>오늘 전체 방문</span> <b id="vAll">—</b><span>쇼룸 홈 누적</span></div>' +
-        '<p class="note" style="margin-top:0">무료 카운터(abacus)의 숫자만 읽습니다 — 손님 이름·IP 같은 개인정보는 하나도 없습니다. 한 번에 다 물으면 429(제한)가 오므로 0.34초 간격으로 차례로 받고, 받은 값은 10분 동안 이 기기에 담아 둡니다.</p>' +
+        '<div class="vhd"><div class="vs"><span>오늘 전체</span><b id="vToday">—</b></div>' +
+          '<div class="vs"><span>쇼룸 홈 누적</span><b id="vAll">—</b></div>' +
+          '<div class="vs"><span>응답한 앱</span><b id="vCnt">—</b></div></div>' +
+        '<p class="note" style="margin-top:0">무료 카운터(abacus)의 숫자만 읽습니다 — 손님 이름·IP 같은 개인정보는 하나도 없습니다. 한 번에 다 물으면 429(제한)가 오므로 0.42초 간격으로 차례로 받고, 받은 값은 10분 동안 이 기기에 담아 둡니다.</p>' +
         '<div class="row"><button class="b-p" id="vLoad">불러오기</button><button class="b-g" id="vClear">이 기기 값 지우기</button></div>' +
         '<div class="vcap"><i>앱</i><i>누적</i><i>오늘</i></div>' +
         '<div class="vlist" id="vList"><p class="note" style="margin:8px">[불러오기]를 누르면 앱별 숫자가 차례로 나옵니다(약 10초).</p></div>' +
@@ -291,9 +295,9 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
     vPaint(rows);
     var msg = document.getElementById('vMsg');
     if (msg) { msg.hidden = false; msg.textContent = '불러오는 중… 0 / ' + labels.length; }
-    var i = 0;
-    KTSVisit.get(KTSVisit.todayKey()).then(function(v){ var e = document.getElementById('vToday'); if (e) e.textContent = vfmt(v); });
-    KTSVisit.get('p-home').then(function(v){ var e = document.getElementById('vAll'); if (e) e.textContent = vfmt(v); });
+    var i = 0, numToday = null, numHome = null;
+    KTSVisit.get(KTSVisit.todayKey()).then(function(v){ numToday = v; var e = document.getElementById('vToday'); if (e) e.textContent = vfmt(v); });
+    KTSVisit.get('p-home').then(function(v){ numHome = v; var e = document.getElementById('vAll'); if (e) e.textContent = vfmt(v); });
     function next(){
       if (i >= labels.length) { done(); return; }
       var r = rows[i]; i++;
@@ -313,10 +317,15 @@ pre{white-space:pre-wrap;word-break:break-all;background:#0B1729;border:1px soli
       vPaint(rows);
       var okn = rows.filter(function(r){ return r.t != null; }).length;
       if (msg) msg.textContent = '다 받았습니다 — ' + okn + ' / ' + rows.length + '개 앱 응답';
+      var cEl = document.getElementById('vCnt'); if (cEl) cEl.textContent = okn + '/' + rows.length;
+      /* '오늘 전체' 를 못 받았으면 앱별 오늘을 더해 근사값으로 보여 준다 */
+      if (numToday == null) {
+        numToday = rows.reduce(function(a, r){ return a + (r.d || 0); }, 0);
+        var tEl = document.getElementById('vToday');
+        if (tEl) tEl.textContent = '≈' + vfmt(numToday);
+      }
       try {
-        localStorage.setItem(VCACHE, JSON.stringify({ t: Date.now(), rows: rows,
-          all: Number((document.getElementById('vToday') || {}).textContent.replace(/,/g, '')) || null,
-          home: Number((document.getElementById('vAll') || {}).textContent.replace(/,/g, '')) || null }));
+        localStorage.setItem(VCACHE, JSON.stringify({ t: Date.now(), rows: rows, all: numToday, home: numHome }));
       } catch (e) {}
     }
     next();
