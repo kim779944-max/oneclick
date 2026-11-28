@@ -74,8 +74,10 @@ img{display:block;max-width:100%}
 .file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .inp{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
 .inp span{font-size:11px;color:var(--ink3);font-weight:800}
-.inp input,.inp select,.inp textarea{min-height:44px;border-radius:11px;border:1px solid var(--line2);background:#0b1428;
-  color:var(--ink);font:inherit;font-size:14px;padding:0 11px}
+.inp input,.inp select,.inp textarea{width:100%;min-width:0;min-height:44px;border-radius:11px;border:1px solid var(--line2);
+  background:#0b1428;color:var(--ink);font:inherit;font-size:14px;padding:0 11px}
+.sh-b{overflow-x:hidden}
+.two>.inp{min-width:0}
 .inp textarea{min-height:96px;padding:10px 11px;line-height:1.5}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .note{font-size:11px;color:var(--ink3);line-height:1.5;margin:2px 0 0}
